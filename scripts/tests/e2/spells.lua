@@ -273,15 +273,64 @@ end
 function test_astral_disruption()
     local r = region.create(0, 0, "plain")
     local r2 = r:get_astral('fog')
+    local r3 = region.create(r2.x+1, r2.y, 'fog')
     local f = faction.create("human")
     local u = unit.create(f, r)
     local uh = unit.create(get_monsters(), r2, 1, "braineater")
-    u.magic = "draig"
+    u.magic = "tybied"
     u:set_skill("magic", 100) -- level 100 should beat magic resistance
     u.aura = 200
-    u:add_spell("astral_disruption")
+    u:add_spell("astral_disruption", 14)
     u:add_order('ZAUBERE STUFE 1 "Stoere Astrale Integritaet"')
     process_orders()
-    assert_not_nil(r2:get_curse("astralblock"))
+    assert_equal(60, u.aura)
+    assert_equal(100, r2:get_curse("astralblock"))
+    assert_nil(r3:get_curse("astralblock"))
+    assert_equal(r, uh.region)
+end
+
+function test_astral_disruption_levels()
+    local r = region.create(0, 0, "plain")
+    local r2 = r:get_astral('fog')
+    local r3 = region.create(r2.x+1, r2.y, 'fog')
+    local r4 = region.create(r2.x+2, r2.y, 'fog')
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    local uh = unit.create(get_monsters(), r2, 1, "braineater")
+    u.magic = "tybied"
+    u:set_skill("magic", 100) -- level 100 should beat magic resistance
+    u.aura = 200
+    u:add_spell("astral_disruption", 14)
+    -- at level 5, range +1:
+    u:add_order('ZAUBERE STUFE 5 "Stoere Astrale Integritaet"')
+    process_orders()
+    assert_equal(60, u.aura)
+    assert_equal(100, r2:get_curse("astralblock"))
+    assert_equal(100, r3:get_curse("astralblock"))
+    assert_nil(r4:get_curse("astralblock"))
+    assert_equal(r, uh.region)
+end
+
+function test_astral_disruption_default_level()
+    local r = region.create(0, 0, "plain")
+    local r2 = r:get_astral('fog')
+    local r3 = region.create(r2.x+1, r2.y, 'fog')
+    local r4 = region.create(r3.x+1, r2.y, 'fog')
+    local r5 = region.create(r4.x+1, r2.y, 'fog')
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    local uh = unit.create(get_monsters(), r2, 1, "braineater")
+    u.magic = "tybied"
+    u:set_skill("magic", 100) -- level 100 should beat magic resistance
+    u.aura = 200
+    u:add_spell("astral_disruption", 14)
+    -- no level means cast at the spell's level (14)
+    u:add_order('ZAUBERE "Stoere Astrale Integritaet"')
+    process_orders()
+    assert_equal(60, u.aura)
+    assert_equal(100, r2:get_curse("astralblock"))
+    assert_equal(100, r3:get_curse("astralblock"))
+    assert_equal(100, r4:get_curse("astralblock"))
+    assert_nil(r5:get_curse("astralblock"))
     assert_equal(r, uh.region)
 end

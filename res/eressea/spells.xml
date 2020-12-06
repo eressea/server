@@ -214,7 +214,7 @@
   <spell name="view_reality" rank="5">
     <resource name="aura" amount="40" cost="fixed"/>
   </spell>
-  <spell name="astral_disruption" rank="4">
+  <spell name="astral_disruption" rank="4" variable="true">
     <resource name="aura" amount="140" cost="fixed"/>
   </spell>
   <spell name="seduction" rank="5" parameters="u" los="true">
@@ -422,7 +422,7 @@
     <resource name="aura" amount="1" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
-  <spell name="eternal_walls" rank="5" parameters="b" ship="true">
+  <spell name="eternal_walls" rank="5" parameters="b" ship="true" variable="true">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>
