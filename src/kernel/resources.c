@@ -182,7 +182,7 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
     if (!rtype->raw) {
-        int rule = config_get_int("resource.visibility.rule", 0);
+        int rule = config_get_int("resource.visibility.rule", 1);
         rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
         if (!rmtype) abort();
         rmtype->rtype = rtype;
