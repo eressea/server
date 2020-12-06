@@ -743,7 +743,8 @@ void immigration(void)
         /* if less than 50 are in the region and there is space and no monster or demon units in the region */
         if (repopulate) {
             int peasants = rpeasants(r);
-            int income = wage(r, NULL, NULL, turn) - maintenance_cost(NULL) + 1;
+            bool mourn = is_mourning(r, turn);
+            int income = peasant_wage(r, mourn) - maintenance_cost(NULL) + 1;
             if (income >= 0 && r->land && (peasants < repopulate) && region_maxworkers(r) >(peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
@@ -754,7 +755,7 @@ void immigration(void)
                     }
                 }
                 if (badunit == 0) {
-                    peasants += (int)(rng_double()*income);
+                    peasants += (int)(rng_double() * income);
                     rsetpeasants(r, peasants);
                 }
             }
@@ -836,8 +837,10 @@ void demographics(void)
 
                 if (r->age > 20) {
                     double mwp = fmax(region_maxworkers(r), 1);
+                    bool mourn = is_mourning(r, turn);
+                    int p_wage = peasant_wage(r, mourn);
                     double prob =
-                        pow(rpeasants(r) / (mwp * wage(r, NULL, NULL, turn) * 0.13), 4.0)
+                        pow(rpeasants(r) / (mwp * p_wage * 0.13), 4.0)
                         * PLAGUE_CHANCE;
 
                     if (rng_double() < prob) {

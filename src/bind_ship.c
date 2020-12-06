@@ -111,7 +111,7 @@ static int tolua_ship_set_name(lua_State * L)
 static int tolua_ship_set_size(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
-    sh->size = lua_tointeger(L, 2);
+    sh->size = (int)lua_tointeger(L, 2);
     return 0;
 }
 

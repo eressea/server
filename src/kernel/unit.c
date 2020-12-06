@@ -705,27 +705,33 @@ bool can_survive(const unit * u, const region * r)
     return false;
 }
 
+void leave_region(unit* u)
+{
+    assert(u->region);
+    setguard(u, false);
+    fset(u, UFL_MOVED);
+    if (u->ship || u->building) {
+        /* can_leave must be checked in travel_i */
+#ifndef NDEBUG
+        bool result = leave(u, false);
+        assert(result);
+#else
+        leave(u, false);
+#endif
+    }
+}
+
+
 void move_unit(unit * u, region * r, unit ** ulist)
 {
     assert(u && r);
 
     assert(u->faction || !"this unit is dead");
-    if (u->region == r)
-        return;
-    if (!ulist)
+    if (!ulist) {
         ulist = (&r->units);
+    }
     if (u->region) {
-        setguard(u, false);
-        fset(u, UFL_MOVED);
-        if (u->ship || u->building) {
-            /* can_leave must be checked in travel_i */
-#ifndef NDEBUG
-            bool result = leave(u, false);
-            assert(result);
-#else
-            leave(u, false);
-#endif
-        }
+        leave_region(u);
         translist(&u->region->units, ulist, u);
     }
     else {

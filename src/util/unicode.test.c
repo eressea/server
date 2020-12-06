@@ -16,23 +16,23 @@ static void test_unicode_trim(CuTest * tc)
     char buffer[32];
 
     strcpy(buffer, "Hello World");
-    CuAssertIntEquals(tc, 0, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 0, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello World", buffer);
 
     strcpy(buffer, "  Hello World");
-    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 2, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello World", buffer);
 
     strcpy(buffer, "Hello World  ");
-    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 2, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello World", buffer);
 
     strcpy(buffer, " Hello World ");
-    CuAssertIntEquals(tc, 2, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 2, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello World", buffer);
 
     strcpy(buffer, "Hello\t\r\nWorld");
-    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 3, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "HelloWorld", buffer);
 
     strcpy(buffer, "LTR");
@@ -40,27 +40,27 @@ static void test_unicode_trim(CuTest * tc)
     buffer[4] = -128;
     buffer[5] = -114;
     buffer[6] = 0;
-    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 3, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "LTR", buffer);
 
     strcpy(buffer, "  Hello Word  ");
-    CuAssertIntEquals(tc, 4, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 4, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
 
     strcpy(buffer, "Hello Word\n");
-    CuAssertIntEquals(tc, 1, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 1, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
 
     strcpy(buffer, "  Hello Word\t\n");
-    CuAssertIntEquals(tc, 4, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 4, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
 
     strcpy(buffer, " \t Hello Word");
-    CuAssertIntEquals(tc, 3, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 3, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Word", buffer);
 
     buffer[9] = -61;
-    CuAssertIntEquals(tc, 1, unicode_utf8_trim(buffer));
+    CuAssertIntEquals(tc, 1, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "Hello Wor?", buffer);
 }
 
@@ -127,7 +127,7 @@ static void test_unicode_utf8_to_ucs(CuTest *tc) {
 
     CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, "a", &sz));
     CuAssertIntEquals(tc, 'a', wc);
-    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 1, (int)sz);
 }
 
 static void test_unicode_bug2262(CuTest *tc) {
@@ -137,13 +137,13 @@ static void test_unicode_bug2262(CuTest *tc) {
 
     strcpy(name, "utende");
     CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, name, &sz));
-    CuAssertIntEquals(tc, 1, sz);
+    CuAssertIntEquals(tc, 1, (int)sz);
     CuAssertIntEquals(tc, 'u', wc);
-    CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 0, (int)unicode_utf8_trim(name));
 
     name[0] = -4; /* latin1: &uuml; should fail to decode */
     CuAssertIntEquals(tc, EILSEQ, unicode_utf8_decode(&wc, name, &sz));
-    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, EILSEQ, (int)unicode_utf8_trim(name));
 }
 
 static void test_unicode_compare(CuTest *tc)
@@ -159,7 +159,7 @@ static void test_unicode_trim_zwnj(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%sA%sB%s  ", zwnj, zwnj, zwnj);
     snprintf(expect, sizeof(expect), "A%sB", zwnj);
-    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 8, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 
@@ -169,7 +169,7 @@ static void test_unicode_trim_nbsp(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
     snprintf(expect, sizeof(expect), "A%sB", code);
-    CuAssertIntEquals(tc, 6, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 6, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 
@@ -179,7 +179,7 @@ static void test_unicode_trim_nnbsp(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
     snprintf(expect, sizeof(expect), "A%sB", code);
-    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 8, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 
@@ -189,7 +189,7 @@ static void test_unicode_trim_figure_space(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%sA%sB%s  ", code, code, code);
     snprintf(expect, sizeof(expect), "A%sB", code);
-    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 8, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 
@@ -199,7 +199,7 @@ static void test_unicode_trim_ltrm(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%sBrot%szeit%s  ", ltrm, ltrm, ltrm);
     snprintf(expect, sizeof(expect), "Brot%szeit", ltrm);
-    CuAssertIntEquals(tc, 8, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 8, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 
@@ -209,7 +209,7 @@ static void test_unicode_trim_emoji(CuTest *tc) {
     char expect[64];
     snprintf(name, sizeof(name), "%s Alarm%sClock %s", clock, clock, clock);
     strcpy(expect, name);
-    CuAssertIntEquals(tc, 0, unicode_utf8_trim(name));
+    CuAssertIntEquals(tc, 0, (int)unicode_utf8_trim(name));
     CuAssertStrEquals(tc, expect, name);
 }
 

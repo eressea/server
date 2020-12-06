@@ -17,6 +17,7 @@
 #include "gmtool.h"
 #endif
 
+#include "signals.h"
 #include "bindings.h"
 
 #include <iniparser.h>
@@ -246,39 +247,6 @@ static int parse_args(int argc, char **argv)
     }
     return 0;
 }
-
-#ifdef HAVE_BACKTRACE
-#include <execinfo.h>
-#include <signal.h>
-static void *btrace[50];
-
-static void report_segfault(int signo, siginfo_t * sinf, void *arg)
-{
-    size_t size;
-    int fd = fileno(stderr);
-
-    fflush(stdout);
-    fputs("\n\nProgram received SIGSEGV, backtrace follows.\n", stderr);
-    size = backtrace(btrace, 50);
-    backtrace_symbols_fd(btrace, size, fd);
-    abort();
-}
-
-static int setup_signal_handler(void)
-{
-    struct sigaction act;
-
-    act.sa_flags = SA_RESETHAND | SA_SIGINFO;
-    act.sa_sigaction = report_segfault;
-    sigfillset(&act.sa_mask);
-    return sigaction(SIGSEGV, &act, NULL);
-}
-#else
-static int setup_signal_handler(void)
-{
-    return 0;
-}
-#endif
 
 void locale_init(void)
 {

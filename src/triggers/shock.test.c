@@ -22,7 +22,7 @@ static void test_shock(CuTest *tc) {
 
     test_setup();
     shock_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 5);
     set_spellpoints(u, 10);
@@ -43,7 +43,7 @@ static void test_shock_low(CuTest *tc) {
 
     test_setup();
     shock_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     create_mage(u, M_GWYRRD);
     set_level(u, SK_MAGIC, 5);
     set_spellpoints(u, 1);

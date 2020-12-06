@@ -31,11 +31,11 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     int fno;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     fno = f->no;
     CuAssertPtrEquals(tc, f, factions);
     CuAssertPtrEquals(tc, NULL, f->next);
-    f2 = test_create_faction(NULL);
+    f2 = test_create_faction();
     CuAssertPtrEquals(tc, f2, factions->next);
     u = test_create_unit(f2, test_create_region(0, 0, NULL));
     CuAssertPtrNotNull(tc, u);
@@ -79,7 +79,7 @@ static void test_group_readwrite(CuTest * tc)
     test_setup();
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     create_group(f, "NW", 42);
     g = create_group(f, "Egoisten", 43);
     CuAssertPtrEquals(tc, f, g->f);
@@ -122,7 +122,7 @@ static void test_group(CuTest * tc)
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     assert(r && f);
     u = test_create_unit(f, r);
     assert(u);

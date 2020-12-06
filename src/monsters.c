@@ -974,7 +974,11 @@ void spawn_undead(void)
 {
     region *r;
     faction *monsters = get_monsters();
+    int spawn_chance = config_get_int("monsters.spawn.chance", 100) * 100;
 
+    if (spawn_chance <= 0) {
+        return;
+    }
     for (r = regions; r; r = r->next) {
         int unburied = deathcount(r);
 
@@ -985,7 +989,7 @@ void spawn_undead(void)
         }
 
         if (r->land && unburied > rpeasants(r) / 20
-            && rng_int() % 10000 < 100) {
+            && rng_int() % spawn_chance < 100) {
             message *msg;
             unit *u;
             /* es ist sinnfrei, wenn irgendwo im Wald 3er-Einheiten Untote entstehen.

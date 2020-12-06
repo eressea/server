@@ -12,16 +12,14 @@
 #include <assert.h>
 
 typedef struct alliance_fixture {
-    struct race * rc;
     struct faction *f1, *f2;
 } alliance_fixture;
 
 static void setup_alliance(alliance_fixture *fix) {
     test_setup();
-    fix->rc = test_create_race("human");
-    fix->f1 = test_create_faction(fix->rc);
-    fix->f2 = test_create_faction(fix->rc);
-    assert(fix->rc && fix->f1 && fix->f2);
+    fix->f1 = test_create_faction();
+    fix->f2 = test_create_faction();
+    assert(fix->f1 && fix->f2);
 }
 
 static void test_alliance_make(CuTest *tc) {
@@ -69,8 +67,8 @@ static void test_alliance_dead_faction(CuTest *tc) {
     alliance *al;
 
     test_setup();
-    f = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f = test_create_faction();
+    f2 = test_create_faction();
     al = makealliance(42, "Hodor");
     setalliance(f, al);
     setalliance(f2, al);
@@ -92,8 +90,8 @@ static void test_alliance_cmd(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_INVITE], itoa36(u2->faction->no)));
     unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
@@ -118,8 +116,8 @@ static void test_alliance_limits(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
 
     config_set("rules.limit.alliance", "1");
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
@@ -143,8 +141,8 @@ static void test_alliance_cmd_kick(CuTest *tc) {
     test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);
     setalliance(u2->faction, al);
 
@@ -162,8 +160,8 @@ static void test_alliance_cmd_no_invite(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
     unit_addorder(u2, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_JOIN], itoa36(42)));
     CuAssertTrue(tc, is_allied(u1->faction, u1->faction));
@@ -184,8 +182,8 @@ static void test_alliance_cmd_leave(CuTest *tc) {
     test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);
     setalliance(u2->faction, al);
 
@@ -205,8 +203,8 @@ static void test_alliance_cmd_transfer(CuTest *tc) {
     test_setup();
     al = makealliance(42, "Hodor");
     r = test_create_region(0, 0, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);
     setalliance(u2->faction, al);
     CuAssertPtrEquals(tc, u1->faction, alliance_get_leader(al));

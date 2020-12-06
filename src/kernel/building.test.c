@@ -44,7 +44,7 @@ static void test_building_set_owner(CuTest * tc)
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_region(0, 0, NULL);
 
     bld = test_create_building(r, NULL);
@@ -69,7 +69,7 @@ static void test_buildingowner_goes_to_next_when_empty(CuTest * tc)
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -95,7 +95,7 @@ static void test_buildingowner_goes_to_other_when_empty(CuTest * tc)
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -122,8 +122,8 @@ static void test_buildingowner_goes_to_same_faction_when_empty(CuTest * tc)
 
     test_setup();
 
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -152,7 +152,7 @@ static void test_buildingowner_goes_to_next_after_leave(CuTest * tc)
     struct faction *f;
 
     test_setup();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -178,7 +178,7 @@ static void test_buildingowner_goes_to_other_after_leave(CuTest * tc)
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -204,8 +204,8 @@ static void test_buildingowner_goes_to_same_faction_after_leave(CuTest * tc)
 
     test_setup();
 
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -237,7 +237,7 @@ static void test_buildingowner_resets_when_empty(CuTest * tc)
 
     test_setup();
 
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -263,7 +263,7 @@ void test_buildingowner_goes_to_empty_unit_after_leave(CuTest * tc)
 
     test_setup();
 
-    f1 = test_create_faction(NULL);
+    f1 = test_create_faction();
     r = test_create_plain(0, 0);
 
     bld = test_create_building(r, NULL);
@@ -358,7 +358,7 @@ static void test_active_building(CuTest *tc) {
     btype = test_create_buildingtype("castle");
     assert(btype && btype->maxsize == -1);
     b = test_create_building(r = test_create_region(0, 0, NULL), btype);
-    u = test_create_unit(test_create_faction(NULL), r);
+    u = test_create_unit(test_create_faction(), r);
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
 
@@ -388,8 +388,8 @@ static void test_safe_building(CuTest *tc) {
 
     test_setup();
     btype = test_create_buildingtype("castle");
-    u1 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
-    u2 = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u1 = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u2 = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
     u1->building = test_create_building(u1->region, btype);
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
@@ -422,15 +422,89 @@ static void test_cmp_castle_size(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
     b1 = test_create_building(r, NULL);
     b2 = test_create_building(r, NULL);
-    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
     u_set_building(u1, b1);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     u_set_building(u2, b2);
     b1->size = 5;
     b2->size = 10;
     CuAssertTrue(tc, cmp_castle_size(b1, b2) < 0);
     CuAssertTrue(tc, cmp_castle_size(b2, b1) > 0);
     CuAssertTrue(tc, cmp_castle_size(b1, b1) == 0);
+    test_teardown();
+}
+
+static void test_wage(CuTest *tc) {
+    region *r;
+    building *b;
+    building_type *btype;
+    struct building_stage *stage;
+    race *rc_orc, *rc_elf;
+    test_setup();
+    rc_orc = test_create_race("orc");
+    rc_elf = test_create_race("elf");
+    rc_elf->maintenance = 13;
+    btype = test_create_buildingtype("castle");
+    stage = btype->stages;
+    stage->construction->maxsize = 2; /* site */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 8; /* tradepost */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 40; /* fortification */
+    stage = stage->next = calloc(1, sizeof(struct building_stage));
+    stage->construction = calloc(1, sizeof(struct construction));
+    stage->construction->maxsize = 200; /* fortification */
+    r = test_create_plain(0, 0);
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+
+    b = test_create_building(r, btype);
+    b->size = 1;
+    CuAssertIntEquals(tc, 0, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 2;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b, false));
+    b->size = 9;
+    CuAssertIntEquals(tc, 1, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 10, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 10, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 10;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    b->size = 49;
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 11, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 11, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 12, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 50;
+    CuAssertIntEquals(tc, 3, buildingeffsize(b, false));
+    b->size = 249;
+    CuAssertIntEquals(tc, 3, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 12, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 11, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 13, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    b->size = 250;
+    CuAssertIntEquals(tc, 4, buildingeffsize(b, false));
+    CuAssertIntEquals(tc, 13, wage(r, rc_elf));
+    CuAssertIntEquals(tc, 12, wage(r, rc_orc));
+    CuAssertIntEquals(tc, 14, peasant_wage(r, false));
+    CuAssertIntEquals(tc, 10, peasant_wage(r, true));
+    config_set_int("rules.wage.function", 1);
+    CuAssertIntEquals(tc, 13, wage(r, rc_elf));
+    config_set_int("rules.wage.function", 0);
+    CuAssertIntEquals(tc, 0, wage(r, rc_elf));
+    config_set_int("rules.wage.function", 2);
+    CuAssertIntEquals(tc, rc_elf->maintenance, wage(r, rc_elf));
     test_teardown();
 }
 
@@ -468,9 +542,9 @@ static void test_cmp_taxes(CuTest *tc) {
     b2 = test_create_building(r, btype);
     b1->size = 5;
     b2->size = 10;
-    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
     u_set_building(u1, b1);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     u_set_building(u2, b2);
     CuAssertPtrEquals(tc, b2, largestbuilding(r, cmp_taxes, false));
     CuAssertTrue(tc, cmp_taxes(b1, b2) < 0);
@@ -500,9 +574,9 @@ static void test_cmp_current_owner(CuTest *tc) {
     CuAssertIntEquals(tc, 1, buildingeffsize(b1, false));
     b2->size = 1;
     CuAssertIntEquals(tc, 1, buildingeffsize(b2, false));
-    u1 = test_create_unit(test_create_faction(NULL), r);
+    u1 = test_create_unit(test_create_faction(), r);
     u_set_building(u1, b1);
-    u2 = test_create_unit(test_create_faction(NULL), r);
+    u2 = test_create_unit(test_create_faction(), r);
     u_set_building(u2, b2);
     region_set_owner(r, u1->faction, turn);
     CuAssertPtrEquals(tc, b1, largestbuilding(r, cmp_current_owner, false));
@@ -619,6 +693,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_cmp_castle_size);
     SUITE_ADD_TEST(suite, test_cmp_taxes);
     SUITE_ADD_TEST(suite, test_cmp_wage);
+    SUITE_ADD_TEST(suite, test_wage);
     SUITE_ADD_TEST(suite, test_cmp_current_owner);
     SUITE_ADD_TEST(suite, test_register_building);
     SUITE_ADD_TEST(suite, test_btype_defaults);

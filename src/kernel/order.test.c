@@ -390,7 +390,7 @@ static void test_study_order(CuTest *tc) {
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keywords(lang);
     init_skills(lang);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_STUDY, lang, "ALCH");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, skillname(SK_ALCHEMY, lang), gettoken(token, sizeof(token)));
@@ -419,7 +419,7 @@ static void test_study_order_unknown(CuTest *tc) {
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keywords(lang);
     init_skills(lang);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_STUDY, lang, "Schiffsbau");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, "Schiffsbau", gettoken(token, sizeof(token)));
@@ -449,7 +449,7 @@ static void test_study_order_quoted(CuTest *tc) {
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keywords(lang);
     init_skills(lang);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_STUDY, lang, "Waffenloser~Kampf");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, skillname(SK_WEAPONLESS, lang), gettoken(token, sizeof(token)));
@@ -478,7 +478,7 @@ static void test_study_order_unknown_tilde(CuTest *tc) {
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keywords(lang);
     init_skills(lang);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_STUDY, lang, "Waffenloser~Mampf");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, "Waffenloser Mampf", gettoken(token, sizeof(token)));
@@ -507,7 +507,7 @@ static void test_study_order_unknown_quoted(CuTest *tc) {
     locale_setstring(lang, "keyword::study", "LERNE");
     init_keywords(lang);
     init_skills(lang);
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_STUDY, lang, "'Waffenloser Dampf'");
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, "Waffenloser Dampf", gettoken(token, sizeof(token)));
@@ -552,7 +552,7 @@ static void test_create_order_long(CuTest *tc) {
     stream_order(&out, ord, lang, true);
     out.api->rewind(out.handle);
     out.api->readln(out.handle, buffer, sizeof(buffer));
-    CuAssertIntEquals(tc, 1026, strlen(buffer));
+    CuAssertIntEquals(tc, 1026, (int)strlen(buffer));
     mstream_done(&out);
     free_order(ord);
     test_teardown();

@@ -38,8 +38,8 @@ static void test_good_dreams(CuTest *tc) {
     test_setup();
     test_create_world();
     r = findregion(0, 0);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
@@ -66,8 +66,8 @@ static void test_dreams(CuTest *tc) {
 
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
@@ -94,8 +94,8 @@ static void test_bad_dreams(CuTest *tc) {
     test_setup();
     test_create_world();
     r = findregion(0, 0);
-    f1 = test_create_faction(NULL);
-    f2 = test_create_faction(NULL);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
 
@@ -130,7 +130,7 @@ static void test_view_reality(CuTest *tc) {
     mt_create_va(mt_new("viewreality_effect", NULL),
         "unit:unit", MT_NEW_END);
     rx = test_create_region(0, TP_RADIUS + 1, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, rx);
 
     /* can only cast in astral space */
@@ -203,7 +203,7 @@ static void test_show_astral(CuTest *tc) {
         "unit:unit", MT_NEW_END);
     ra = test_create_region(real2tp(0), real2tp(0) + 1 + SHOWASTRAL_MAX_RADIUS, NULL);
     ra->_plane = get_astralplane();
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = test_create_unit(f, ra);
 
     /* error: unit is in astral space */
@@ -269,7 +269,7 @@ static void test_watch_region(CuTest *tc) {
     faction *f;
     test_setup();
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     set_observer(r, f, 0, 2);
     CuAssertIntEquals(tc, 0, get_observer(r, f));

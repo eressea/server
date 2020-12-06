@@ -34,7 +34,7 @@ static bool char_trimmed(wint_t wc) {
 
 size_t unicode_utf8_trim(char *buf)
 {
-    int result = 0, ts = 0;
+    size_t result = 0, ts = 0;
     char *op = buf, *ip = buf, *lc = buf;
     assert(buf);
     while (*ip) {

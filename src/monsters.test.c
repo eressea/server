@@ -55,7 +55,7 @@ static void create_monsters(unit **up, unit **um) {
         "dragon:unit", "number:int", "target:region", "growl:string", MT_NEW_END);
     test_create_horse();
     default_locale = test_create_locale();
-    fp = test_create_faction(NULL);
+    fp = test_create_faction();
 
     fm = get_or_create_monsters();
     fset(fm, FFL_NOIDLEOUT);
@@ -273,7 +273,7 @@ static void test_spawn_seaserpent(CuTest *tc) {
     rc = test_create_race("seaserpent");
     rc->flags &= ~RCF_PLAYABLE;
     r = test_create_region(0, 0, NULL);
-    f = test_create_faction(NULL);
+    f = test_create_faction();
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, NULL, u->_name);
@@ -287,7 +287,7 @@ static void test_monsters_hate(CuTest *tc) {
     const struct locale *lang;
 
     test_setup();
-    tu = test_create_unit(test_create_faction(NULL), test_create_plain(1, 0));
+    tu = test_create_unit(test_create_faction(), test_create_plain(1, 0));
     mu = test_create_unit(get_monsters(), test_create_plain(0, 0));
     lang = mu->faction->locale;
     a_add(&mu->attribs, make_hate(tu));

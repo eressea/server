@@ -211,9 +211,9 @@ void locale_setstring(locale * lang, const char *key, const char *value)
     else {
         if (strcmp(find->str, value) != 0) {
             log_warning("multiple translations for key %s\n", key);
+            free(find->str);
+            find->str = str_strdup(value);
         }
-        free(find->str);
-        find->str = str_strdup(value);
     }
 }
 

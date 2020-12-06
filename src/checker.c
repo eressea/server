@@ -36,7 +36,7 @@ int parsefile(FILE *F) {
     OP_SetUserData(parser, &state);
 
     while (!done) {
-        size_t len = (int)fread(buf, 1, sizeof(buf), F);
+        int len = (int)fread(buf, 1, sizeof(buf), F);
         if (ferror(F)) {
             /* TODO: error message */
             err = errno;

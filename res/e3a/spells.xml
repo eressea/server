@@ -595,7 +595,7 @@
   <spell name="shockwave" rank="5" variable="true" combat="2">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="eternal_walls" rank="5" parameters="b" ship="true" variable="true">
+  <spell name="eternal_walls" rank="5" parameters="b" ship="true">
     <resource name="aura" amount="50" cost="fixed"/>
     <resource name="permaura" amount="1" cost="fixed"/>
   </spell>

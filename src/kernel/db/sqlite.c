@@ -101,7 +101,7 @@ int db_driver_faction_save(dbrow_id * p_id, int no, const char *email, const cha
     dbrow_id id = *p_id;
     int err;
     char dbno[4];
-    size_t len;
+    int len;
     const char *str;
     sqlite3_stmt *stmt = (id > 0) ? g_stmt_update_faction : g_stmt_insert_faction;
 
@@ -110,8 +110,8 @@ int db_driver_faction_save(dbrow_id * p_id, int no, const char *email, const cha
     err = sqlite3_reset(stmt);
     if (err != SQLITE_OK) return err;
     str = itoa36(no);
-    len = strlen(str);
-    assert(len <= 4);
+    len = (int)strlen(str);
+    assert(len > 0 && len <= 4);
     memcpy(dbno, str, len);
     err = sqlite3_bind_text(stmt, 1, dbno, len, SQLITE_STATIC);
     if (err != SQLITE_OK) return err;

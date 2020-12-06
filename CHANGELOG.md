@@ -1,12 +1,30 @@
-# Geplante Aenderungen in zukuenftigen Eressea-Versionen
 
-Als Anhaltspunkt fuer die Empfaenger der woechentlichen Testauswertungnen
-will ich versuchen, die Liste meiner Aenderungen seit dem letzten Release
-zu dokumentieren.
+# 3.26
 
-## Version 3.12.0
+  - Akademien, Traenke und Verzauberungen wirken auch bei LERNE AUTO
+  - Das lernen in einer Akademie erhoeht die Lernkosten. Koennen diese
+  nicht bezahlt werden, wird ohne deren Bonus gelernt.
+  - Lehrer muessen nicht mehr in der Akademie stehen, damit ihre Schueler
+  den Bonus bekommen
+  - Rohstoffe koennen jetzt bereits gesehen werden, wenn eine Einheit nur
+  die Haelfte des zum Abbau noetigen Talentes hat (statt bisher
+  Talent-1)
+  - Mauern der Ewigkeit und Störe Astrale Integrität brauchen keine
+  Stufenangabe, ihre Kosten sind nicht variabel [2651]
 
-- [other] optimierte Berechnung der Sichtbarkeit von Leuchttuermen
+# 3.25
+
+  - Ab sofort ist es nicht mehr erlaubt, Befehle mit weniger als 3 
+  Zeichen abzukürzen.
+  - Leuchttürme entdecken Seeschlangen und Drachen auf dem Ozean [2688]
+  - Magieresistenz von Insekten und Goblins repariert [2685]
+  - Getarnte Einheiten können wieder Eisen abbauen [2679]
+  - Gestaltwandlung kann nur einmal auf die selbe Einheit wirken [2680] 
+  - Handel benötigt eine Burg mit Mindestgröße 2 [2678]
+  - Geschützte Leerzeichen in Befehlen werden ignoriert [2670]
+
+# 3.12
+
 - [bug] Einheitenlimit bei GIB PERSON beachten
 - [bug] Einheitenlimit bei ALLIANCE JOIN beachten
 - [rule] Einheiten- und Personenzahl im Report beinhaltet *alle* Einheiten der Partei.

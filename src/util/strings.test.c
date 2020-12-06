@@ -176,7 +176,7 @@ static void test_sbstring(CuTest * tc)
 
     sbs_adopt(&sbs, buffer + 2, sizeof(buffer) - 2);
     CuAssertStrEquals(tc, "3456789012345", sbs.begin);
-    CuAssertIntEquals(tc, 13, sbs_length(&sbs));
+    CuAssertIntEquals(tc, 13, (int)sbs_length(&sbs));
 }
 
 static void test_sbs_strcat(CuTest * tc)

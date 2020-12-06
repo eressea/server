@@ -25,8 +25,8 @@ void test_upkeep_default(CuTest * tc)
     i_silver = it_find("money");
     assert(i_silver);
     r = test_create_region(0, 0, NULL);
-    f1 = test_create_faction(test_create_race("human"));
-    f2 = test_create_faction(test_create_race("human"));
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     assert(f1 && f2);
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
@@ -56,7 +56,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     i_silver = it_find("money");
     assert(i_silver);
     r = test_create_region(0, 0, NULL);
-    f1 = test_create_faction(test_create_race("human"));
+    f1 = test_create_faction();
     u1 = test_create_unit(f1, r);
     assert(r && u1);
 
@@ -82,7 +82,7 @@ void test_upkeep_from_pool(CuTest * tc)
     assert(i_silver);
     r = test_create_region(0, 0, NULL);
     assert(r);
-    u1 = test_create_unit(test_create_faction(test_create_race("human")), r);
+    u1 = test_create_unit(test_create_faction(), r);
 	assert(u1);
     u2 = test_create_unit(u1->faction, r);
     assert(u2);
@@ -115,8 +115,8 @@ void test_upkeep_from_friend(CuTest * tc)
     i_silver = it_find("money");
     assert(i_silver);
     r = test_create_region(0, 0, NULL);
-    f1 = test_create_faction(test_create_race("human"));
-    f2 = test_create_faction(test_create_race("human"));
+    f1 = test_create_faction();
+    f2 = test_create_faction();
     assert(f1 && f2);
     ally_set(&f1->allies, f2, HELP_MONEY);
     u1 = test_create_unit(f1, r);
@@ -149,7 +149,7 @@ void test_upkeep_free(CuTest * tc)
     i_silver = it_find("money");
     assert(i_silver);
     r = test_create_region(0, 0, NULL);
-    u = test_create_unit(test_create_faction(test_create_race("human")), r);
+    u = test_create_unit(test_create_faction(), r);
     assert(r && u);
 
     config_set("rules.food.flags", "4"); /* FOOD_IS_FREE */

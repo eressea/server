@@ -169,12 +169,19 @@ struct locale * test_create_locale(void) {
     return loc;
 }
 
-struct faction *test_create_faction(const struct race *rc)
+struct faction *test_create_faction_ex(const struct race *rc, const struct locale *loc)
 {
-    struct locale * loc = test_create_locale();
-    faction *f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc);
+    faction* f;
+    if (loc == NULL) {
+        loc = test_create_locale();
+    }
+    f = addfaction("nobody@eressea.de", NULL, rc ? rc : test_create_race("human"), loc);
     test_clear_messages(f);
     return f;
+}
+
+struct faction* test_create_faction(void) {
+    return test_create_faction_ex(NULL, NULL);
 }
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
@@ -371,11 +378,15 @@ ship_type * test_create_shiptype(const char * name)
     }
     stype->coasts =
         (terrain_type **)malloc(sizeof(terrain_type *) * 3);
-    stype->coasts[0] = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    stype->coasts[0] = test_create_terrain("plain",
+        LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
     stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
     stype->coasts[2] = NULL;
     if (default_locale) {
-        locale_setstring(default_locale, name, name);
+        const char* str = locale_getstring(default_locale, name);
+        if (!str || strcmp(name, str) != 0) {
+            locale_setstring(default_locale, name, name);
+        }
     }
     return stype;
 }
@@ -492,12 +503,8 @@ void test_create_world(void)
 
     loc = test_create_locale();
 
-    locale_setstring(loc, parameters[P_SHIP], "SCHIFF");
-    locale_setstring(loc, parameters[P_ANY], "ALLE");
     init_parameters(loc);
 
-    locale_setstring(loc, "status_aggressive", "aggressiv");
-    locale_setstring(loc, keyword(K_RESERVE), "RESERVIEREN");
     locale_setstring(loc, "money", "Silber");
     locale_setstring(loc, "money_p", "Silber");
     locale_setstring(loc, "cart", "Wagen");
@@ -541,8 +548,6 @@ void test_create_world(void)
             }
         }
     }
-
-    test_create_race("human");
 
     test_create_buildingtype("castle");
     test_create_shiptype("boat");

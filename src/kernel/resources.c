@@ -118,17 +118,29 @@ static void terraform_default(struct rawmaterial *res, const region * r)
 }
 
 static int visible_default(const rawmaterial * res, int skilllevel)
-/* resources are visible, if skill equals minimum skill to mine them
+/* resources are visible if skill equals minimum skill to mine them
  * plus current level of difficulty */
 {
     const struct item_type *itype = res->rtype->itype;
+    int level = res->level + itype->construction->minskill - 1;
     if (res->level <= 1
-        && res->level + itype->construction->minskill <= skilllevel + 1) {
+        && level <= skilllevel) {
         assert(res->amount > 0);
         return res->amount;
     }
-    else if (res->level + itype->construction->minskill <= skilllevel + 2) {
+    else if (level < skilllevel) {
         assert(res->amount > 0);
+        return res->amount;
+    }
+    return -1;
+}
+
+static int visible_half_skill(const rawmaterial * res, int skilllevel)
+/* resources are visible if skill equals half as much as normal */
+{
+    const struct item_type *itype = res->rtype->itype;
+    int level = res->level + itype->construction->minskill - 1;
+    if (2 * skilllevel >= level) {
         return res->amount;
     }
     return -1;
@@ -139,9 +151,8 @@ static void use_default(rawmaterial * res, const region * r, int amount)
     assert(res->amount > 0 && amount >= 0 && amount <= res->amount);
     res->amount -= amount;
     while (res->amount == 0) {
-        double modifier =
-            1.0 + ((rng_int() % (SHIFT * 2 + 1)) - SHIFT) * ((rng_int() % (SHIFT * 2 +
-            1)) - SHIFT) / 10000.0;
+        long rn = ((rng_int() % (SHIFT * 2 + 1)) - SHIFT) * ((rng_int() % (SHIFT * 2 + 1)) - SHIFT);
+        double modifier = 1.0 + rn / 10000.0;
         int i;
 
         for (i = 0; r->terrain->production[i].type; ++i) {
@@ -171,13 +182,19 @@ struct rawmaterial_type *rmt_get(const struct resource_type *rtype)
 struct rawmaterial_type *rmt_create(struct resource_type *rtype)
 {
     if (!rtype->raw) {
+        int rule = config_get_int("resource.visibility.rule", 1);
         rawmaterial_type *rmtype = rtype->raw = malloc(sizeof(rawmaterial_type));
         if (!rmtype) abort();
         rmtype->rtype = rtype;
         rmtype->terraform = terraform_default;
         rmtype->update = NULL;
         rmtype->use = use_default;
-        rmtype->visible = visible_default;
+        if (rule == 0) {
+            rmtype->visible = visible_default;
+        }
+        else {
+            rmtype->visible = visible_half_skill;
+        }
     }
     return rtype->raw;
 }

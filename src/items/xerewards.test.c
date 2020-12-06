@@ -19,7 +19,7 @@ static void test_manacrystal(CuTest *tc) {
 
     test_setup();
 
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     itype = test_create_itemtype("manacrystal");
     change_resource(u, itype->rtype, 1);
     CuAssertIntEquals(tc, -1, use_manacrystal(u, itype, 1, NULL));
@@ -48,21 +48,21 @@ static void test_skillpotion(CuTest *tc) {
     int initialWeeks_Magic = 0;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);
 
-    learn_skill(u, SK_ENTERTAINMENT, STUDYDAYS * u->number);
+    change_skill_days(u, SK_ENTERTAINMENT, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_ENTERTAINMENT);
     sk_set(pSkill, 5);
     initialWeeks_Entertainment = pSkill->weeks = 4;
 
-    learn_skill(u, SK_STAMINA, STUDYDAYS * u->number);
+    change_skill_days(u, SK_STAMINA, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_STAMINA);
     sk_set(pSkill, 5);
     initialWeeks_Stamina = pSkill->weeks = 4;
 
-    learn_skill(u, SK_MAGIC, STUDYDAYS * u->number);
+    change_skill_days(u, SK_MAGIC, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_MAGIC);
     sk_set(pSkill, 5);
     initialWeeks_Magic = pSkill->weeks = 4;

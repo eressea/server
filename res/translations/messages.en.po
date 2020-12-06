@@ -1161,7 +1161,7 @@ msgid "spyreport_faction"
 msgstr "\"$unit($target) belongs to $faction($faction).\""
 
 msgid "ship_drift"
-msgstr "\"The ship $ship($ship) drifts to the $direction($dir).\""
+msgstr "\"The ship $ship($ship) needs more sailors and drifts to the $direction($dir).\""
 
 msgid "error_max_magicians"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There may not be more than $int($amount) magicians in your faction.\""

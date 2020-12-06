@@ -29,7 +29,7 @@ void test_missing_feedback(CuTest *tc) {
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u->thisorder = create_order(K_ENTERTAIN, u->faction->locale, NULL);
     message_handle_missing(MESSAGE_MISSING_REPLACE);
     msg = msg_error(u, NULL, 77);
@@ -103,7 +103,7 @@ static void test_noerror(CuTest *tc) {
 
     test_setup();
     lang = test_create_locale();
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u->thisorder = parse_order("!@move", lang);
     CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
     CuAssertTrue(tc, !is_persistent(u->thisorder));

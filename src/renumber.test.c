@@ -28,7 +28,7 @@ static void test_renumber_faction(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     no = u->faction->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -47,8 +47,8 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
 
     setup_renumber(tc);
     mt_create_va(mt_new("renumber_inuse", NULL), "id:int", MT_NEW_END);
-    f2 = test_create_faction(NULL);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    f2 = test_create_faction();
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     no = f->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_FACTION]), itoa36(f2->no));
@@ -66,7 +66,7 @@ static void test_renumber_faction_invalid(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(0), test_create_region(0, 0, 0));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, 0));
     no = f->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s [halima]", LOC(lang, parameters[P_FACTION]));
@@ -96,7 +96,7 @@ static void test_renumber_building(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     uno = (no > 1) ? no - 1 : no + 1;
@@ -119,7 +119,7 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     u->building = test_create_building(u->region, NULL);
     uno = u->building->no;
     u->building = test_create_building(u->region, NULL);
@@ -138,7 +138,7 @@ static void test_renumber_ship(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
@@ -155,7 +155,7 @@ static void test_renumber_ship_twice(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
@@ -177,7 +177,7 @@ static void test_renumber_ship_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     u->ship = test_create_ship(u->region, NULL);
     uno = u->ship->no;
     u->ship = test_create_ship(u->region, NULL);
@@ -196,7 +196,7 @@ static void test_renumber_unit(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     no = u->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -214,7 +214,7 @@ static void test_renumber_unit_duplicate(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     no = u->no;
     u2 = test_create_unit(f, u->region);
     lang = f->locale;
@@ -233,7 +233,7 @@ static void test_renumber_unit_limit(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     no = u->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s 10000", LOC(lang, parameters[P_UNIT]));
@@ -251,7 +251,7 @@ static void test_renumber_unit_invalid(CuTest *tc) {
     const struct locale *lang;
 
     setup_renumber(tc);
-    u = test_create_unit(f = test_create_faction(NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
     no = u->no;
     lang = f->locale;
     u->thisorder = create_order(K_NUMBER, lang, "%s TEMP", LOC(lang, parameters[P_UNIT]));

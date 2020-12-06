@@ -1741,10 +1741,6 @@ msgstr "caravel"
 msgid "stone_p"
 msgstr "stones"
 
-msgctxt "keyword"
-msgid "locale"
-msgstr "LOCALE"
-
 msgctxt "spellinfo"
 msgid "song_suscept_magic"
 msgstr "This song, which is woven into the magical essence of the region, weakens the natural resistance against a singular enchantment by 15%. Only the allies of the bard (HELP GUARD) are immune to the effect of the chant."

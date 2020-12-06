@@ -30,8 +30,7 @@ static void test_move_to_vortex(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(5, 0, t_plain);
     CuAssertPtrNotNull(tc, create_special_direction(r1, r2, 10, "", "vortex", true));
-    u = test_create_unit(test_create_faction(rc_get_or_create("hodor")), r1);
-    u->faction->locale = lang;
+    u = test_create_unit(test_create_faction_ex(NULL, lang), r1);
     CuAssertIntEquals(tc, E_MOVE_NOREGION, movewhere(u, "barf", r1, &r));
     CuAssertIntEquals(tc, E_MOVE_OK, movewhere(u, "wirbel", r1, &r));
     CuAssertPtrEquals(tc, r2, r);

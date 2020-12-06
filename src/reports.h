@@ -46,7 +46,7 @@ extern "C" {
         const struct unit *u, unsigned int indent, seen_mode mode);
 
     int reports(void);
-    int write_reports(struct faction *f);
+    int write_reports(struct faction *f, const char *password);
     int init_reports(void);
     void reorder_units(struct region * r);
 

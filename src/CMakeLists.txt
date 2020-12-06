@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 2.8)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
@@ -92,7 +91,6 @@ set (PARSER_SRC
 
 set (ERESSEA_SRC
   vortex.c
-  academy.c
   alchemy.c
   automate.c
   battle.c
@@ -168,6 +166,7 @@ set(SERVER_SRC
   bindings.c
   console.c
   helpers.c
+  signals.c
   main.c
   )
 
@@ -180,9 +179,11 @@ set (SERVER_SRC ${SERVER_SRC}
 endif(CURSES_FOUND)
 
 #find_program(IWYU_PATH NAMES include-what-you-use iwyu)
-#if(NOT IWYU_PATH)
-#	message(STATUS "Could not find the program include-what-you-use")
-#endif()
+if(IWYU_PATH)
+  #  set(C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH} -Xiwyu --no_fwd_decls")
+else(IWYU_PATH)
+	message(STATUS "Could not find the program include-what-you-use")
+endif()
 
 add_library(version STATIC ${VERSION_SRC})
 add_library(parser ${PARSER_SRC})
@@ -212,7 +213,6 @@ target_link_libraries(eressea
 )
 
 set(TESTS_SRC
-  academy.test.c
   alchemy.test.c
   automate.test.c
   battle.test.c

@@ -80,10 +80,10 @@ static int timing_safe_strcmp(const char *str1, const char *str2)
 	const unsigned char *u1;
 	const unsigned char *u2;
 	int ret;
-	int i;
+	unsigned int i;
 
-	int len1 = strlen(str1);
-	int len2 = strlen(str2);
+	size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
 
 	/* In our context both strings should always have the same length
 	 * because they will be hashed passwords. */

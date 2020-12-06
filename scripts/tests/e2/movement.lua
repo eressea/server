@@ -165,3 +165,20 @@ function assert_capacity(text, u, silver, r1, r2, rx)
     process_orders()
     assert_equal(rx, u.region, text .. "unit should not move")
 end
+
+function test_move_to_same_region_leaves_building()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human", "test@example.com", "de")
+    local u = unit.create(f, r1, 1)
+    local b = building.create(u.region, "castle")
+    b.size = 2
+    u.building = b
+    assert_not_nil(u.building)
+    u:add_item("horse", 1)
+    u:set_skill("riding", 2)
+    u:add_order("NACH O W")
+    process_orders()
+    assert_equal(r1, u.region)
+    assert_nil(u.building)
+end

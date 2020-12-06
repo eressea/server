@@ -624,9 +624,6 @@ mark_travelthru(unit * u, region * r, const region_list * route,
 
 void move_ship(ship * sh, region * from, region * to, region_list * route)
 {
-    unit **iunit = &from->units;
-    unit **ulist = &to->units;
-
     assert(sh);
     if (from != to) {
         translist(&from->ships, &to->ships, sh);
@@ -636,25 +633,35 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(sh, from, route);
     }
 
-    while (*iunit != NULL) {
-        unit *u = *iunit;
-        assert(u->region == from);
+    if (route != NULL && from->units) {
+        unit** iunit = &from->units;
+        unit** ulist = &to->units;
+        unit* ufirst = NULL;
 
-        if (u->ship == sh) {
-            if (route != NULL)
+        do {
+            unit *u = *iunit;
+
+            if (u->ship == sh) {
+                *iunit = u->next;
+                if (!ufirst) {
+                    ufirst = u;
+                }
                 mark_travelthru(u, from, route, NULL);
-            if (from != to) {
-                u->ship = 0;  /* temporary trick -- do not use u_set_ship here */
+                u->ship = NULL;  /* temporary trick -- do not use u_set_ship here */
+                leave_region(u);
+                u->region = NULL;
+                u->next = NULL;
                 move_unit(u, to, ulist);
                 ulist = &u->next;
                 u->ship = sh; /* undo the trick -- do not use u_set_ship here */
+                if (effskill(u, SK_SAILING, from) >= 1) {
+                    produceexp(u, SK_SAILING, u->number);
+                }
             }
-            if (route && effskill(u, SK_SAILING, from) >= 1) {
-                produceexp(u, SK_SAILING, u->number);
+            else {
+                iunit = &u->next;
             }
-        }
-        if (*iunit == u)
-            iunit = &u->next;
+        } while (*iunit && (ufirst == NULL || ufirst != *iunit));
     }
 }
 
@@ -1612,9 +1619,9 @@ static const region_list *travel_route(unit * u,
         /* Berichte ueber Durchreiseregionen */
 
         if (mode != TRAVEL_TRANSPORTED) {
+            arg_regions ar;
             arg_regions *arp = NULL;
             if (steps > 1) {
-                arg_regions ar;
                 arp = &ar;
                 var_create_regions(arp, route_begin, steps - 1);
             }
@@ -2192,8 +2199,8 @@ void move_cmd_ex(unit * u, order * ord, const char *directions)
         init_order(ord, u->faction->locale);
     }
     if (u->ship && u == ship_owner(u->ship)) {
-        bool drifting = (getkeyword(ord) == K_MOVE);
-        sail(u, ord, drifting);
+        keyword_t kwd = getkeyword(ord);
+        sail(u, ord, (kwd == K_MOVE || kwd == K_ROUTE));
     }
     else {
         travel(u, ord);

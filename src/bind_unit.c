@@ -271,7 +271,7 @@ static int tolua_unit_get_guard(lua_State * L)
 static int tolua_unit_set_guard(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    unsigned int flags = (unsigned int)tolua_tonumber(L, 2, 0);
+    int flags = tolua_toboolean(L, 2, 0);
     setguard(u, flags!=0);
     return 0;
 }

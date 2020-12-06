@@ -1182,11 +1182,13 @@ static void report_statistics(struct stream *out, const region * r, const factio
     if (max_production(r) && (!fval(r->terrain, SEA_REGION)
         || f->race == get_race(RC_AQUARIAN))) {
         if (markets_module()) {     /* hack */
+            bool mourn = is_mourning(r, turn);
+            int p_wage = peasant_wage(r, mourn);
             m =
-                msg_message("nr_stat_salary_new", "max", wage(r, NULL, NULL, turn + 1));
+                msg_message("nr_stat_salary_new", "max", p_wage);
         }
         else {
-            m = msg_message("nr_stat_salary", "max", wage(r, f, f->race, turn + 1));
+            m = msg_message("nr_stat_salary", "max", wage(r, f->race));
         }
         nr_render(m, f->locale, buf, sizeof(buf), f);
         paragraph(out, buf, 2, 2, 0);
@@ -1337,7 +1339,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     }
                     rps_nowrap(out, buf);
                     newline(out);
-                    sprintf(buf, "; ECheck Lohn %d", wage(r, f, f->race, turn + 1));
+                    sprintf(buf, "; ECheck Lohn %d", wage(r, f->race));
                     rps_nowrap(out, buf);
                     newline(out);
                     newline(out);
