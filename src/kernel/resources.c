@@ -151,9 +151,8 @@ static void use_default(rawmaterial * res, const region * r, int amount)
     assert(res->amount > 0 && amount >= 0 && amount <= res->amount);
     res->amount -= amount;
     while (res->amount == 0) {
-        double modifier =
-            1.0 + ((rng_int() % (SHIFT * 2 + 1)) - SHIFT) * ((rng_int() % (SHIFT * 2 +
-            1)) - SHIFT) / 10000.0;
+        long rn = ((rng_int() % (SHIFT * 2 + 1)) - SHIFT) * ((rng_int() % (SHIFT * 2 + 1)) - SHIFT);
+        double modifier = 1.0 + rn / 10000.0;
         int i;
 
         for (i = 0; r->terrain->production[i].type; ++i) {
