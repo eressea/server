@@ -2,7 +2,7 @@
 IF "%WIN32_DEV%" == "" SET WIN32_DEV="C:\Libraries"
 SET CMAKE_ROOT=%ProgramFiles%\CMake
 IF "%LUA_DEV%" == "" SET LUA_DEV="%ProgramFiles(x86)%/Lua/5.1"
-SET VSVERSION=16
+SET VSVERSION=15
 SET SRCDIR=%CD%
 REM CD ..
 REM SET ERESSEA=%CD%
