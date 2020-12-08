@@ -1769,6 +1769,7 @@ static variant var_copy_regions(variant x)
         arg_regions *dst;
 
         x.v = dst = malloc(sizeof(arg_regions));
+        assert(dst);
         dst->nregions = src->nregions;
         src->nregions = 0;
         dst->regions = src->regions;
