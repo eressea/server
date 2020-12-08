@@ -2373,7 +2373,7 @@ bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mod
     }
     else {
         if (stealthmod > INT_MIN) {
-            if (mode > seen_travel || u->building || u->ship || is_guard(u)) {
+            if (mode >= seen_travel || u->building || u->ship || is_guard(u)) {
                 return cansee(f, u->region, u, stealthmod);
             }
             else {
