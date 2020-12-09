@@ -790,7 +790,7 @@ static void test_stealth_modifier(CuTest *tc) {
     r = test_create_region(0, 0, NULL);
     CuAssertIntEquals(tc, 0, stealth_modifier(r, f, seen_unit));
     CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_travel));
-    CuAssertIntEquals(tc, -2, stealth_modifier(r, f, seen_lighthouse));
+    CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_lighthouse));
     CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_spell));
 
     set_observer(r, f, 10, 1);
@@ -848,12 +848,12 @@ static void test_newbie_warning(CuTest *tc) {
     test_teardown();
 }
 
-static void test_visible_unit(CuTest *tc) {
-    unit *u;
-    faction *f;
-    ship *sh;
-    building *b;
-    race *rc;
+static void test_visible_unit(CuTest* tc) {
+    unit* u;
+    faction* f;
+    ship* sh;
+    building* b;
+    race* rc;
 
     test_setup();
     f = test_create_faction();
@@ -865,7 +865,7 @@ static void test_visible_unit(CuTest *tc) {
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_spell));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_battle));
-    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_travel));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse_land));
