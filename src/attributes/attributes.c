@@ -61,7 +61,7 @@ static int obs_age(struct attrib *a, void *owner)
 
     UNUSED_ARG(owner);
     update_interval(od->f, (region *)owner);
-    return --od->timer;
+    return --od->timer > 0;
 }
 
 static void obs_write(const variant *var, const void *owner,
@@ -90,13 +90,13 @@ attrib_type at_observer = {
     "observer", obs_init, a_free_voidptr, obs_age, obs_write, obs_read
 };
 
-static attrib *make_observer(faction *f, int perception)
+static attrib *make_observer(faction *f, int perception, int timer)
 {
     attrib * a = a_new(&at_observer);
     obs_data *od = (obs_data *)a->data.v;
     od->f = f;
     od->skill = perception;
-    od->timer = 2;
+    od->timer = timer;
     return a;
 }
 
@@ -132,7 +132,7 @@ void set_observer(region *r, faction *f, int skill, int turns)
     else {
         fset(r, RF_OBSERVER);
     }
-    a_add(&r->attribs, make_observer(f, skill));
+    a_add(&r->attribs, make_observer(f, skill, turns));
 }
 
 attrib_type at_unitdissolve = {

@@ -1000,7 +1000,6 @@ int stealth_modifier(const region *r, const faction *f, seen_mode mode)
     case seen_unit:
         return 0;
     case seen_lighthouse:
-        return -2;
     case seen_travel:
         return -1;
     default:

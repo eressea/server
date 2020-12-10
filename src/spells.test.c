@@ -164,7 +164,7 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
     free_castorder(&co);
 
-    set_observer(r, f, -1, -1);
+    set_observer(r, f, -1, 0);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
 
     /* target region r exists, but astral space is blocked */
