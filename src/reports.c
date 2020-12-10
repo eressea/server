@@ -1095,7 +1095,8 @@ void get_addresses(report_context * ctx)
                     faction *sf = visible_faction(ctx->f, u);
                     if (lastf != sf) {
                         if (u->building || u->ship || (stealthmod > INT_MIN
-                            && cansee(ctx->f, r, u, stealthmod))) {
+                            && visible_unit(u, ctx->f, stealthmod, seen_lighthouse)))
+                        {
                             add_seen_faction_i(&flist, sf);
                             lastf = sf;
                         }
