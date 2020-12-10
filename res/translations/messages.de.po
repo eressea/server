@@ -1422,7 +1422,7 @@ msgid "error259"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Befehl ist nur auf Einheiten innerhalb des selben Gebäudes oder Schiffes anwendbar.\""
 
 msgid "building_needed"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht nicht im benötigten Gebäude, $localize($building).\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit steht in keinem funktionierenden $localize($building).\""
 
 msgid "error149"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wohin soll die Botschaft gehen?\""

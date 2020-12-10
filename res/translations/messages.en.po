@@ -1422,7 +1422,7 @@ msgid "error259"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - That order only applies to units in the same building or ship.\""
 
 msgid "building_needed"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must be in a $localize($building) to produce this.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must be in a working $localize($building) to produce this.\""
 
 msgid "error149"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Who is supposed to get this message?\""
