@@ -508,7 +508,7 @@ static double overload(const region * r, ship * sh)
         double ovl;
 
         getshipweight(sh, &n, &p);
-        ovl = n / (double)(sh->type->cargo * sh->number);
+        ovl = n / (double)sh->type->cargo * sh->number;
         if (mcabins) {
             ovl = fmax(ovl, p / (double)mcabins);
         }
@@ -939,7 +939,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
             else if (sk >= stealth) {
-                double prob_u = (sk - stealth) * skill_prob;
+                double prob_u = skill_prob * ((double)sk - stealth);
                 guard_count += u->number;
                 /* amulet counts at most once */
                 prob_u += fmin(1, fmin(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
@@ -1452,7 +1452,7 @@ static void var_create_regions(arg_regions *dst, const region_list * begin, int 
 {
     const region_list *rsrc;
     int i;
-
+    assert(size > 0);
     dst->nregions = size;
     dst->regions = (region **) malloc(sizeof(region *) * (size_t)size);
     assert_alloc(dst->regions);
@@ -1642,7 +1642,9 @@ static const region_list *travel_route(unit * u,
 
 static bool ship_ready(const region * r, unit * u, order * ord)
 {
-    unit *cap = u->ship ? ship_owner(u->ship) : NULL;
+    unit* cap;
+    assert(u && u->ship);
+    cap = u->ship ? ship_owner(u->ship) : NULL;
     if (u != cap) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
