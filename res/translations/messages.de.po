@@ -1161,6 +1161,12 @@ msgid "spyreport_faction"
 msgstr "\"$unit($target) gehört der Partei $faction($faction) an.\""
 
 msgid "ship_drift"
+msgstr "\"Die $ship($ship) treibt nach $direction($dir).\""
+
+msgid "ship_drift_overload"
+msgstr "\"Die $ship($ship) ist überladen und treibt nach $direction($dir).\""
+
+msgid "ship_drift_nocrew"
 msgstr "\"Die $ship($ship) hat zu wenig Segler und treibt nach $direction($dir).\""
 
 msgid "error_max_magicians"
