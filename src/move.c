@@ -813,12 +813,13 @@ static void drifting_ships(region * r)
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
         while (*shp) {
-            ship *sh = *shp;
-            region *rnext = NULL;
-            region_list *route = NULL;
-            unit *firstu = r->units, *lastu = NULL;
+            ship* sh = *shp;
+            region* rnext = NULL;
+            region_list* route = NULL;
+            unit* firstu = r->units, * lastu = NULL;
             direction_t dir = NODIRECTION;
             double ovl;
+            const char* reason = "ship_drift";
 
             if (sh->type->fishing > 0) {
                 sh->flags |= SF_FISHING;
@@ -833,11 +834,21 @@ static void drifting_ships(region * r)
             /* Kapitaen da? Beschaedigt? Genuegend Matrosen?
              * Genuegend leicht? Dann ist alles OK. */
 
-            if (ship_finished(sh) && ship_crewed(sh, ship_owner(sh)) && cansail(r, sh)) {
-                shp = &sh->next;
-                continue;
+            if (ship_finished(sh)) {
+                if (!ship_crewed(sh, ship_owner(sh))) {
+                    reason = "ship_drift_nocrew";
+                }
+                else if (!cansail(r, sh)) {
+                    reason = "ship_drift_overload";
+                }
+                else {
+                    /* no problems, don't drift */
+                    shp = &sh->next;
+                    continue;
+                }
             }
 
+            fset(sh, SF_DRIFTED);
             ovl = overload(r, sh);
             if (ovl < overload_start()) {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
@@ -849,11 +860,10 @@ static void drifting_ships(region * r)
             }
 
             if (rnext && firstu) {
-                message *msg = msg_message("ship_drift", "ship dir", sh, dir);
+                message *msg = msg_message(reason, "ship dir", sh, dir);
                 msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
-            fset(sh, SF_DRIFTED);
             if (ovl >= overload_start()) {
                 damage_ship(sh, damage_overload(ovl));
                 msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));

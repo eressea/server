@@ -293,6 +293,10 @@ void setup_drift (struct drift_fixture *fix) {
 
     mt_create_va(mt_new("ship_drift", NULL),
         "ship:ship", "dir:int", MT_NEW_END);
+    mt_create_va(mt_new("ship_drift_nocrew", NULL),
+        "ship:ship", "dir:int", MT_NEW_END);
+    mt_create_va(mt_new("ship_drift_overload", NULL),
+        "ship:ship", "dir:int", MT_NEW_END);
     mt_create_va(mt_new("shipsink", NULL),
         "ship:ship", MT_NEW_END);
     mt_create_va(mt_new("massive_overload", NULL),
@@ -323,8 +327,24 @@ static void test_ship_empty(CuTest *tc) {
 
     movement();
     CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
+
+    test_teardown();
+}
+
+static void test_ship_no_crew(CuTest *tc) {
+    struct drift_fixture fix;
+
+    test_setup();
+    setup_drift(&fix);
+    set_level(fix.u, SK_SAILING, 0);
+
+    movement();
+    CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
+    CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift_nocrew"));
 
     test_teardown();
 }
@@ -340,6 +360,7 @@ static void test_no_drift_damage(CuTest *tc) {
     config_set("rules.ship.damage_drift", "0.0");
     movement();
     CuAssertPtrEquals(tc, fix.sh->region, findregion(0, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 0, ship_damage_percent(fix.sh));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
 
@@ -355,8 +376,9 @@ static void test_ship_normal_overload(CuTest *tc) {
     fix.u->number = 21;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 2, ship_damage_percent(fix.sh));
-    CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift_overload"));
 
     test_teardown();
 }
@@ -370,13 +392,16 @@ static void test_ship_big_overload(CuTest *tc) {
     fix.u->number = 22;
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(-1, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 5, ship_damage_percent(fix.sh));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift_overload"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
     test_teardown();
 }
 
-static void test_ship_no_real_overload(CuTest *tc) {
+static void test_ship_small_overload(CuTest *tc) {
     struct drift_fixture fix;
 
     test_setup();
@@ -386,7 +411,9 @@ static void test_ship_no_real_overload(CuTest *tc) {
     damage_ship(fix.sh, .80);
     movement();
     CuAssertPtrEquals(tc, fix.u->region, findregion(0, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 82, ship_damage_percent(fix.sh));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "ship_drift_overload"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
     test_teardown();
@@ -400,7 +427,11 @@ static void test_ship_ridiculous_overload(CuTest *tc) {
 
     fix.u->number = 500;
     movement();
+    CuAssertPtrEquals(tc, fix.u->region, findregion(-1, 0));
+    CuAssertIntEquals(tc, SF_DRIFTED, fix.sh->flags & SF_DRIFTED);
     CuAssertIntEquals(tc, 37, ship_damage_percent(fix.sh));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift_overload"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.f->msgs, "ship_drift"));
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.f->msgs, "massive_overload"));
 
     test_teardown();
@@ -755,9 +786,10 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);
     SUITE_ADD_TEST(suite, test_ship_empty);
+    SUITE_ADD_TEST(suite, test_ship_no_crew);
     SUITE_ADD_TEST(suite, test_no_drift_damage);
     SUITE_ADD_TEST(suite, test_ship_normal_overload);
-    SUITE_ADD_TEST(suite, test_ship_no_real_overload);
+    SUITE_ADD_TEST(suite, test_ship_small_overload);
     SUITE_ADD_TEST(suite, test_ship_big_overload);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload);
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_bad);
