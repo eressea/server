@@ -216,7 +216,7 @@ void do_autostudy(region *r)
                     if (money > 0) {
                         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);
                         ADDMSG(&u->faction->msgs, msg_message("studycost",
-                            "unit region cost skill", u, u->region, money, skill));
+                            "unit region cost skill", scholars[i].u, r, money, skill));
                     }
                 }
             }
