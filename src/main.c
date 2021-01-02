@@ -6,6 +6,7 @@
 #include <kernel/config.h>
 #include <kernel/messages.h>
 #include <kernel/version.h>
+#include <kernel/save.h>
 
 #include <util/language.h>
 #include <util/log.h>
@@ -196,6 +197,9 @@ static int parse_args(int argc, char **argv)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'D':
+                g_writegame = 0;
+                break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.path", arg);
