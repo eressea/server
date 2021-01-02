@@ -21,4 +21,6 @@ cd orders.dir || exit
 php ../../orders-php/cli.php -d "orders.db" export | tr -d '\r' > "../orders.$TURN"
 
 cd .. || exit
+mv orders.dir "orders.dir.$TURN"
+mkdir -p orders.dir
 
