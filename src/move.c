@@ -2258,8 +2258,8 @@ int follow_ship(unit * u, order * ord)
     if (fval(u, UFL_NOTMOVING)) {
         return 0;
     }
-    if (!fval(u_race(u), RCF_FLY|RCF_SWIM)) {
-        if (!u->ship) {
+    if (!u->ship) {
+        if (!fval(u_race(u), RCF_FLY|RCF_SWIM)) {
             cmistake(u, ord, 144, MSG_MOVE);
             return 0;
         }
