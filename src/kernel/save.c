@@ -35,6 +35,7 @@
 #include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <attributes/racename.h>
+#include <triggers/changerace.h>
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
 
@@ -444,10 +445,12 @@ unit *read_unit(gamedata *data)
     u_setrace(u, rc);
 
     READ_TOK(data->store, rname, sizeof(rname));
-    if (rname[0])
+    if (rname[0]) {
         u->irace = rc_find(rname);
-    else
+    }
+    else {
         u->irace = NULL;
+    }
 
     READ_INT(data->store, &bn);
     READ_INT(data->store, &sn);
@@ -524,14 +527,39 @@ unit *read_unit(gamedata *data)
         u->hp = u->number;
     }
     read_attribs(data, &u->attribs, u);
-    if (rc_demon && data->version < FIX_SHAPESHIFT_VERSION) {
+    if (rc_demon) {
         if (u_race(u) == rc_demon) {
-            const char *zRace = get_racename(u->attribs);
-            if (zRace) {
-                const struct race *rc = rc_find(zRace);
-                if (rc) {
-                    set_racename(&u->attribs, NULL);
-                    u->irace = rc;
+            if (data->version < FIX_SHAPESHIFT_VERSION) {
+                const char* zRace = get_racename(u->attribs);
+                if (zRace) {
+                    const struct race* rc = rc_find(zRace);
+                    if (rc) {
+                        set_racename(&u->attribs, NULL);
+                            u->irace = rc;
+                    }
+                }
+            }
+        }
+        else {
+            if (data->version < FIX_SHAPESHIFT_SPELL_VERSION) {
+                if (u->irace) {
+                    /* Einheit ist rassengetarnt, aber hat sie einen changerace timer? */
+                    trigger** trigs = get_triggers(u->attribs, "timer");
+                    if (trigs) {
+                        trigger* t = *trigs;
+                        while (t != NULL) {
+                            if (t->type == &tt_changerace) {
+                                break;
+                            }
+                            t = t->next;
+                        }
+                        if (t == NULL) {
+                            u->irace = NULL;
+                        }
+                    }
+                    else {
+                        u->irace = NULL;
+                    }
                 }
             }
         }
