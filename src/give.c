@@ -531,9 +531,6 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
 
         if (u2->number == 0) {
             const race* rc = u_race(u);
-            if (rc->flags & RCF_SHAPESHIFT) {
-                set_racename(&u2->attribs, get_racename(u->attribs));
-            }
             u_setrace(u2, rc);
             if (rc == get_race(RC_DAEMON)) {
                 u2->irace = u->irace;
