@@ -2572,6 +2572,12 @@ void follow_cmds(unit * u)
 
                 if (id > 0) {
                     u2 = findunit(id);
+                    if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
+                        ADDMSG(&u->faction->msgs, msg_message("unitnotfound_id",
+                            "unit region command id", u, r, ord, itoa36(id)));
+                        return;
+                    }
+
                 }
             }
             else if (p == P_SHIP) {
@@ -2600,13 +2606,6 @@ void follow_cmds(unit * u)
             }
             if (u2) {
                 bool moving = false;
-                if (u2->region != r || !cansee(u->faction, r, u2, 0)) {
-                    /* FIXME: u2 sollte hier keine TEMP Einheit sein. */
-                    ADDMSG(&u->faction->msgs, msg_message("unitnotfound_id",
-                        "unit region command id", u, r, ord, itoa36(u2->no)));
-                    return;
-                }
-
                 switch (getkeyword(u2->thisorder)) {
                 case K_MOVE:
                 case K_ROUTE:
