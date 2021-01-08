@@ -1818,7 +1818,7 @@ msgid "error243"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You did not specify a valid race.\""
 
 msgid "error133"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a caravansary before building roads through deserts.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a caravanserai before building roads through deserts.\""
 
 msgid "changepasswd"
 msgstr "\"The password of this faction is '$value'.\""
