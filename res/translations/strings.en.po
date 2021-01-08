@@ -1318,7 +1318,7 @@ msgid "peasantblood"
 msgstr "peasant blood"
 
 msgid "caravan"
-msgstr "caravanserei"
+msgstr "caravanserai"
 
 msgctxt "race"
 msgid "human"
