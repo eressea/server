@@ -2597,6 +2597,12 @@ msgstr "\"$unit($mage) makes $unit($target) appear as $race($race,$unit.size($ta
 msgid "error248"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The faction has to be 10 turns old.\""
 
+msgid "followfail_ship"
+msgstr "\"$ship($follower) could not catch up to $ship($ship).\""
+
+msgid "followdetect_ship"
+msgstr "\"$ship($follower) followed $ship($ship).\""
+
 msgid "followfail"
 msgstr "\"$unit($follower) could not follow $unit($unit).\""
 

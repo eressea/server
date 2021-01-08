@@ -897,6 +897,29 @@ static bool present(region * r, unit * u)
     return (u && u->region == r);
 }
 
+static void caught_target_ship(region* r, unit* u)
+{
+    attrib* a = a_find(u->attribs, &at_follow);
+
+    /* Verfolgungen melden */
+    /* Misserfolgsmeldung, oder bei erfolgreichem Verfolgen unter
+     * Umstaenden eine Warnung. */
+
+    if (a) {
+        unit* target = (unit*)a->data.v;
+
+        if (target == u || !present(r, target)) {
+            ADDMSG(&u->faction->msgs, msg_message("followfail_ship",
+                "ship follower", target->ship, u->ship));
+        }
+        else if (!alliedunit(target, u->faction, HELP_ALL)
+            && cansee(target->faction, r, u, 0)) {
+            ADDMSG(&target->faction->msgs, msg_message("followdetect_ship",
+                "ship follower", target->ship, u->ship));
+        }
+    }
+}
+
 static void caught_target(region * r, unit * u)
 {
     attrib *a = a_find(u->attribs, &at_follow);
@@ -1971,7 +1994,7 @@ static void sail(unit * u, order * ord, bool drifting)
 
         /* Verfolgungen melden */
         if (fval(u, UFL_FOLLOWING)) {
-            caught_target(current_point, u);
+            caught_target_ship(current_point, u);
         }
 
         move_ship(sh, starting_point, current_point, route);
