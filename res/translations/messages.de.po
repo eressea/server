@@ -2603,6 +2603,12 @@ msgstr "\"$unit($follower) konnte $unit($unit) nicht folgen.\""
 msgid "followdetect"
 msgstr "\"$unit($follower) ist $unit($unit) gefolgt.\""
 
+msgid "followfail_ship"
+msgstr "\"Die $ship($follower) konnte die $ship($ship) nicht einholen.\""
+
+msgid "followdetect_ship"
+msgstr "\"Die $ship($ship) wurde von $ship($follower) verfolgt.\""
+
 msgid "unitnotfound_id"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit $id wurde nicht gefunden.\""
 
