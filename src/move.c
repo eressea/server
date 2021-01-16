@@ -892,11 +892,6 @@ static void drifting_ships(region * r)
     }
 }
 
-static bool present(region * r, unit * u)
-{
-    return (u && u->region == r);
-}
-
 static void caught_target_ship(region* r, unit* u)
 {
     attrib* a = a_find(u->attribs, &at_follow);
@@ -908,7 +903,7 @@ static void caught_target_ship(region* r, unit* u)
     if (a) {
         unit* target = (unit*)a->data.v;
 
-        if (target == u || !present(r, target)) {
+        if (target == u || r != target->region) {
             ADDMSG(&u->faction->msgs, msg_message("followfail_ship",
                 "ship follower", target->ship, u->ship));
         }
@@ -931,7 +926,7 @@ static void caught_target(region * r, unit * u)
     if (a) {
         unit *target = (unit *)a->data.v;
 
-        if (target == u || !present(r, target)) {
+        if (target == u || r != target->region) {
             ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                 target, u));
         }
