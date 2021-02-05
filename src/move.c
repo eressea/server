@@ -2442,32 +2442,17 @@ static void move_pirates(void)
     }
 }
 
-void movement(void)
+void move_units(void)
 {
-    int ships;
+    region* r = regions;
+    while (r != NULL) {
+        unit** up = &r->units;
 
-    /* Initialize the additional encumbrance by transported units */
-    init_transportation();
-
-    /* Move ships in last phase, others first
-     * This is to make sure you can't land someplace and then get off the ship
-     * in the same turn.
-     */
-    for (ships = 0; ships <= 1; ++ships) {
-        region *r = regions;
-        while (r != NULL) {
-            unit **up = &r->units;
-            bool repeat = false;
-
-            while (*up) {
-                unit *u = *up;
-                keyword_t kword;
-
-                if (u->ship && fval(u->ship, SF_DRIFTED)) {
-                    up = &u->next;
-                    continue;
-                }
-                kword = getkeyword(u->thisorder);
+        while (*up) {
+            unit* u = *up;
+            up = &u->next;
+            if (!u->ship) {
+                keyword_t kword = getkeyword(u->thisorder);
 
                 if (kword == K_ROUTE || kword == K_MOVE) {
                     /* after moving, the unit has no thisorder. this prevents
@@ -2493,46 +2478,84 @@ void movement(void)
                         cmistake(u, u->thisorder, 55, MSG_MOVE);
                         set_order(&u->thisorder, NULL);
                     }
-                    else {
-                        if (ships) {
-                            if (u->ship && ship_owner(u->ship) == u) {
-                                move_cmd(u, u->thisorder);
-                            }
+                    else if (!u->ship || ship_owner(u->ship) != u) {
+                        move_cmd(u, u->thisorder);
+                        if (u->flags & UFL_LONGACTION) {
+                            up = &r->units;
+                        }
+                    }
+                }
+            }
+            /* else *up is already the next unit */
+        }
+        r = r->next;
+    }
+}
+
+void move_ships(void) {
+    region* r = regions;
+    while (r != NULL) {
+        unit** up = &r->units;
+
+        /* Abtreiben von beschaedigten, unterbemannten, ueberladenen Schiffen */
+        drifting_ships(r);
+
+        while (*up) {
+            unit* u = *up;
+            up = &u->next;
+
+            if (u->ship && !fval(u->ship, SF_DRIFTED)) {
+                keyword_t kword = getkeyword(u->thisorder);
+
+                if (kword == K_ROUTE || kword == K_MOVE) {
+                    /* after moving, the unit has no thisorder. this prevents
+                        * it from moving twice (or getting error messages twice).
+                        * UFL_NOTMOVING is set in combat if the unit is not allowed
+                        * to move because it was involved in a battle.
+                        */
+                    if (fval(u, UFL_NOTMOVING)) {
+                        if (fval(u, UFL_LONGACTION)) {
+                            cmistake(u, u->thisorder, 52, MSG_MOVE);
+                            set_order(&u->thisorder, NULL);
                         }
                         else {
-                            if (!u->ship || ship_owner(u->ship) != u) {
-                                move_cmd(u, u->thisorder);
-                            }
+                            cmistake(u, u->thisorder, 319, MSG_MOVE);
+                            set_order(&u->thisorder, NULL);
+                        }
+                    }
+                    else if (fval(u, UFL_MOVED)) {
+                        cmistake(u, u->thisorder, 187, MSG_MOVE);
+                        set_order(&u->thisorder, NULL);
+                    }
+                    else if (!can_move(u)) {
+                        cmistake(u, u->thisorder, 55, MSG_MOVE);
+                        set_order(&u->thisorder, NULL);
+                    }
+                    else if (u->ship && ship_owner(u->ship) == u) {
+                        move_cmd(u, u->thisorder);
+                        if (u->flags & UFL_LONGACTION) {
+                            up = &r->units;
                         }
                     }
                 }
-                if (u->region == r) {
-                    /* not moved, use next unit */
-                    up = &u->next;
-                }
-                else {
-                    if (*up && (*up)->region != r) {
-                        /* moved the upcoming unit along with u (units on ships or followers,
-                         * for example). must start from the beginning again immediately */
-                        up = &r->units;
-                        repeat = false;
-                    }
-                    else {
-                        repeat = true;
-                    }
-                }
-                /* else *up is already the next unit */
             }
-            if (repeat)
-                continue;
-            if (ships == 0) {
-                /* Abtreiben von beschaedigten, unterbemannten, ueberladenen Schiffen */
-                drifting_ships(r);
-            }
-            r = r->next;
+            /* else *up is already the next unit */
         }
+        r = r->next;
     }
+}
 
+void movement(void)
+{
+    /* Initialize the additional encumbrance by transported units */
+    init_transportation();
+
+    /* Move ships in last phase, others first
+     * This is to make sure you can't land someplace and then get off the ship
+     * in the same turn.
+     */
+    move_units();
+    move_ships();
     move_followers();
     move_pirates();
 }
