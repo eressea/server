@@ -2462,7 +2462,7 @@ void move_units(void)
     }
 }
 
-void move_ships() {
+void move_ships(void) {
     region* r = regions;
     while (r != NULL) {
         unit** up = &r->units;
