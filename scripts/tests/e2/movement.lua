@@ -195,10 +195,27 @@ function test_aquarians_can_swim()
     u1:set_skill('sailing', 2)
     u1:add_order("NACH O")
     u2.ship = sh
-    u2.name = 'Zolgrim'
     u2:add_order("NACH W")
     process_orders()
     assert_equal(r1, u2.region)
+    assert_equal(r3, u1.region)
+end
+
+function test_only_aquarians_can_swim()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "ocean")
+    local r3 = region.create(2, 0, "ocean")
+    local f = faction.create('human')
+    local u1 = unit.create(f, r2, 1)
+    local u2 = unit.create(f, r2, 1)
+    local sh = ship.create(r2, 'boat')
+    u1.ship = sh
+    u1:set_skill('sailing', 2)
+    u1:add_order("NACH O")
+    u2.ship = sh
+    u2:add_order("NACH W")
+    process_orders()
+    assert_equal(r3, u2.region)
     assert_equal(r3, u1.region)
 end
 
