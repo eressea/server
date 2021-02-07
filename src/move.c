@@ -2421,7 +2421,7 @@ void move_units(void)
         while (*up) {
             unit* u = *up;
             up = &u->next;
-            if (!u->ship) {
+            if (!u->ship || ship_owner(u->ship) != u) {
                 keyword_t kword = getkeyword(u->thisorder);
 
                 if (kword == K_ROUTE || kword == K_MOVE) {
