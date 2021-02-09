@@ -375,7 +375,8 @@ static int ncomponents;
 static void start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = {
         "far", "variable", "ocean", "ship", "los", 
-        "unittarget", "shiptarget", "buildingtarget", "regiontarget", "globaltarget", NULL };
+        "unittarget", "shiptarget", "buildingtarget", "regiontarget", "globaltarget", 
+        "noresist", NULL };
 
     if (xml_strequal(el, "resource")) {
         spell_component *spc;

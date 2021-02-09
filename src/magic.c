@@ -1664,7 +1664,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             case SPP_UNIT:
                 u = spobj->data.u;
 
-                if ((sp->sptyp & TESTRESISTANCE)
+                if (((sp->sptyp & NORESISTANCE) == 0)
                     && target_resists_magic(caster, u, TYP_UNIT, 0)) {
                     /* Fehlermeldung */
                     spobj->data.i = u->no;
@@ -1681,7 +1681,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             case SPP_BUILDING:
                 b = spobj->data.b;
 
-                if ((sp->sptyp & TESTRESISTANCE)
+                if (((sp->sptyp & NORESISTANCE) == 0)
                     && target_resists_magic(caster, b, TYP_BUILDING, 0)) {  /* Fehlermeldung */
                     spobj->data.i = b->no;
                     spobj->flag = TARGET_RESISTS;
@@ -1696,7 +1696,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             case SPP_SHIP:
                 sh = spobj->data.sh;
 
-                if ((sp->sptyp & TESTRESISTANCE)
+                if (((sp->sptyp & NORESISTANCE) == 0)
                     && target_resists_magic(caster, sh, TYP_SHIP, 0)) {     /* Fehlermeldung */
                     spobj->data.i = sh->no;
                     spobj->flag = TARGET_RESISTS;
@@ -1713,7 +1713,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
                    nicht target_r ueberprueft. */
                 tr = spobj->data.r;
 
-                if ((sp->sptyp & TESTRESISTANCE)
+                if (((sp->sptyp & NORESISTANCE) == 0)
                     && target_resists_magic(caster, tr, TYP_REGION, 0)) {   /* Fehlermeldung */
                     spobj->flag = TARGET_RESISTS;
                     ++*resist;
@@ -1752,7 +1752,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             sa->param[0] = spobj;
             co->par = sa;
 
-            if ((sp->sptyp & TESTRESISTANCE)) {
+            if (((sp->sptyp & NORESISTANCE) == 0)) {
                 if (target_resists_magic(caster, target_r, TYP_REGION, 0)) {
                     /* Fehlermeldung */
                     ADDMSG(&caster->faction->msgs, msg_message("spellregionresists",

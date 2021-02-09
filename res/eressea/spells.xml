@@ -93,7 +93,7 @@
   <spell name="transferauratraum" rank="1" syntax="aura" parameters="ui" ship="true">
     <resource name="aura" amount="2" cost="fixed"/>
   </spell>
-  <spell name="auratransfer" rank="1" syntax="aura" parameters="ui" ship="true">
+  <spell name="auratransfer" rank="1" syntax="aura" parameters="ui" noresist="true" ship="true">
     <resource name="aura" amount="1" cost="fixed"/>
   </spell>
   <spell name="stonegolem" rank="4" variable="true">
@@ -173,7 +173,7 @@
   <spell name="goodwinds" rank="5" parameters="s" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="airship" rank="5" parameters="s" ship="true">
+  <spell name="airship" rank="5" parameters="s" noresist="true" ship="true">
     <resource name="aura" amount="10" cost="fixed"/>
     <resource name="h12" amount="1" cost="fixed"/>
     <resource name="h20" amount="1" cost="fixed"/>
@@ -192,7 +192,7 @@
     <resource name="h7" amount="3" cost="fixed"/>
     <resource name="money" amount="50" cost="fixed"/>
   </spell>
-  <spell name="enterastral" rank="7" parameters="u+" variable="true">
+  <spell name="enterastral" rank="7" parameters="u+" noresist="true" variable="true">
     <resource name="aura" amount="2" cost="level"/>
   </spell>
   <spell name="leaveastral" rank="7" parameters="ru+" variable="true">
@@ -214,13 +214,13 @@
   <spell name="view_reality" rank="5">
     <resource name="aura" amount="40" cost="fixed"/>
   </spell>
-  <spell name="astral_disruption" rank="4" variable="true">
+  <spell name="astral_disruption" rank="4" noresist="true" variable="true">
     <resource name="aura" amount="140" cost="fixed"/>
   </spell>
   <spell name="seduction" rank="5" parameters="u" los="true">
     <resource name="aura" amount="12" cost="fixed"/>
   </spell>
-  <spell name="sound_out" rank="5" parameters="ur" los="true">
+  <spell name="sound_out" rank="5" parameters="ur" noresist="true" los="true">
     <resource name="aura" amount="4" cost="fixed"/>
     <resource name="money" amount="100" cost="fixed"/>
   </spell>
