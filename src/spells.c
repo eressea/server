@@ -723,14 +723,14 @@ static int sp_transferaura(castorder * co)
     struct sc_mage *scm_dst, *scm_src = get_mage(mage);
 
     assert(scm_src);
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     /* Wieviel Transferieren? */
     aura = pa->param[1]->data.i;
@@ -805,8 +805,13 @@ static int sp_goodwinds(castorder * co)
     ship *sh;
     unit *u;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+    
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     sh = pa->param[0]->data.sh;
@@ -958,8 +963,13 @@ static int sp_blessstonecircle(castorder * co)
     spellparameter *p = co->par;
     message *msg;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (p->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+    
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (p->param[0]->flag == TARGET_NOTFOUND)
+    if (p->param[0]->flag)
         return 0;
 
     b = p->param[0]->data.b;
@@ -1297,7 +1307,7 @@ static int sp_rosthauch(castorder * co)
 
         if (force <= 0)
             break;
-        if (pa->param[n]->flag & (TARGET_RESISTS | TARGET_NOTFOUND))
+        if (pa->param[n]->flag)
             continue;
 
         for (; iweapon != NULL; iweapon = iweapon->next) {
@@ -1387,8 +1397,7 @@ static int sp_kaelteschutz(castorder * co)
         if (force < 1)
             break;
 
-        if (pa->param[n]->flag == TARGET_RESISTS
-            || pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         u = pa->param[n]->data.u;
@@ -1440,14 +1449,14 @@ static int sp_sparkle(castorder * co)
     int duration = cast_level + 1;
     double effect;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     u = pa->param[0]->data.u;
     effect = (float)(rng_int() % 0xffffff);
@@ -1785,7 +1794,7 @@ static int sp_treewalkenter(castorder * co)
         unit *u = pa->param[n]->data.u;
         spllprm *param = pa->param[n];
 
-        if (param->flag & (TARGET_RESISTS | TARGET_NOTFOUND)) {
+        if (param->flag) {
             continue;
         }
 
@@ -1913,8 +1922,7 @@ static int sp_treewalkexit(castorder * co)
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
-        if (pa->param[n]->flag == TARGET_RESISTS
-            || pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         u = pa->param[n]->data.u;
@@ -2222,8 +2230,7 @@ static int sp_stormwinds(castorder * co)
         if (force <= 0)
             break;
 
-        if (pa->param[n]->flag == TARGET_RESISTS
-            || pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         sh = pa->param[n]->data.sh;
@@ -2491,8 +2498,13 @@ static int sp_fumblecurse(castorder * co)
     curse *c;
     spellparameter *pa = co->par;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;
@@ -2733,8 +2745,7 @@ static int sp_unholypower(castorder * co)
         const race *target_race;
         unit *u;
 
-        if (pa->param[i]->flag == TARGET_RESISTS
-            || pa->param[i]->flag == TARGET_NOTFOUND)
+        if (pa->param[i]->flag)
             continue;
 
         u = pa->param[i]->data.u;
@@ -3405,14 +3416,14 @@ static int sp_analysesong_unit(castorder * co)
     double force = co->force;
     spellparameter *pa = co->par;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     u = pa->param[0]->data.u;
 
@@ -3492,8 +3503,13 @@ static int sp_charmingsong(castorder * co)
     int resist_bonus = 0;
     int tb = 0;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;
@@ -3745,8 +3761,13 @@ static int sp_migranten(castorder * co)
     int max_force = (int) co->force;
     spellparameter *pa = co->par;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return co->level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
@@ -4030,8 +4051,13 @@ static int sp_pump(castorder * co)
     spellparameter *pa = co->par;
     int cast_level = co->level;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
@@ -4092,8 +4118,13 @@ static int sp_seduce(castorder * co)
     int cast_level = co->level;
     double force = co->force;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND) {
+    if (pa->param[0]->flag) {
         return 0;
     }
 
@@ -4183,8 +4214,13 @@ static int sp_calm_monster(castorder * co)
     double effect;
     message *msg;
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
@@ -4238,8 +4274,13 @@ static int sp_headache(castorder * co)
 
     target = pa->param[0]->data.u;        /* Zieleinheit */
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (target->number == 0 || pa->param[0]->flag == TARGET_NOTFOUND)
+    if (target->number == 0 || pa->param[0]->flag)
         return 0;
 
     /* finde das groesste Talent: */
@@ -4480,14 +4521,14 @@ int sp_illusionary_shapeshift(castorder * co)
     spellparameter *pa = co->par;
     const race *irace;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     u = pa->param[0]->data.u;
 
@@ -4538,14 +4579,14 @@ int sp_analysedream(castorder * co)
     int cast_level = co->level;
     spellparameter *pa = co->par;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     u = pa->param[0]->data.u;
     magicanalyse_unit(u, mage, cast_level);
@@ -4666,14 +4707,14 @@ int sp_dreamreading(castorder * co)
     double power = co->force;
     message *msg;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     u = pa->param[0]->data.u;
 
@@ -4724,8 +4765,7 @@ int sp_sweetdreams(castorder * co)
         if (opfer < 1)
             break;
 
-        if (pa->param[n]->flag == TARGET_RESISTS ||
-            pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         /* Zieleinheit */
@@ -4851,8 +4891,13 @@ int sp_itemcloak(castorder * co)
     double power = co->force;
     int duration = (int)fmax(2.0, power + 1);      /* works in the report, and ageing this round would kill it if it's <=1 */
 
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return cast_level;
+
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     /* Zieleinheit */
@@ -4901,8 +4946,7 @@ int sp_resist_magic_bonus(castorder * co)
         if (victims < 1)
             break;
 
-        if (pa->param[n]->flag == TARGET_RESISTS
-            || pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         u = pa->param[n]->data.u;
@@ -4975,7 +5019,7 @@ int sp_enterastral(castorder * co)
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 0; n < pa->length; n++) {
-        if (pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
         u = pa->param[n]->data.u;
 
@@ -5318,7 +5362,7 @@ int sp_fetchastral(castorder * co)
         int w;
         message *m;
 
-        if (pa->param[n]->flag & TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         if (u->region != ro) {
@@ -5360,7 +5404,7 @@ int sp_fetchastral(castorder * co)
         }
 
         if (!ucontact(u, mage)) {
-            if (power > 12 && !(pa->param[n]->flag & TARGET_RESISTS)) {
+            if (power > 12 && !(pa->param[n]->flag == TARGET_RESISTS)) {
                 ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
                     "feedback_no_contact_no_resist", "target", u));
                 ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target",
@@ -5680,14 +5724,14 @@ int sp_permtransfer(castorder * co)
     const spell *sp = co->sp;
     message *msg;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
-        return 0;
-
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
         return cast_level;
+
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (pa->param[0]->flag)
+        return 0;
 
     tu = pa->param[0]->data.u;
     aura = pa->param[1]->data.i;
@@ -6020,8 +6064,7 @@ int sp_speed2(castorder * co)
         if (maxmen < 1)
             break;
 
-        if (pa->param[n]->flag == TARGET_RESISTS
-            || pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         u = pa->param[n]->data.u;
