@@ -871,7 +871,7 @@ void demographics(void)
                 if (plant_rules==1) { /* E3 */
                     growing_trees_e3(r, current_season, last_weeks_season);
                 }
-                else { /* E2 */
+                else if (plant_rules) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season, plant_rules);
                     growing_herbs(r, current_season, last_weeks_season);
                 }

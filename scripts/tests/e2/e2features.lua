@@ -9,6 +9,7 @@ end
 function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
@@ -88,7 +89,6 @@ function test_herbalism()
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
 
-    eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
     u:add_item("money", u.number * 100)
     u:set_skill("herbalism", 5)
     r:set_resource("seed", 100)
