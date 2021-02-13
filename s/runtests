@@ -21,8 +21,8 @@ if [ ! -e $ROOT/$BUILD ]; then
   exit
 fi
 
-$UNIT_TESTS
 cd $ROOT/tests
+$UNIT_TESTS
 $RUN_TESTS -v1 ../scripts/run-tests.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e2.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e3.lua
