@@ -2,7 +2,7 @@
 ** Lua binding: eressea
 */
 
-#include "tolua.h"
+#include <tolua.h>
 
 #ifndef __cplusplus
 #include <stdlib.h>
