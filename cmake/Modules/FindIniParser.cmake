@@ -33,7 +33,7 @@ This module will set the following variables if found:
 #]=======================================================================]
 
 # Look for the necessary header
-find_path(IniParser_INCLUDE_DIR iniparser.h)
+find_path(IniParser_INCLUDE_DIR iniparser.h PATH_SUFFIXES iniparser)
 mark_as_advanced(IniParser_INCLUDE_DIR)
 
 # Look for the necessary library
