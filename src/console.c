@@ -199,7 +199,7 @@ static int loadline(lua_State * L)
     if (!pushline(L, 1))
         return -1;                  /* no input */
     for (;;) {                    /* repeat until gets a complete line */
-        status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+        status = luaL_loadbuffer(L, lua_tostring(L, 1), (size_t)lua_strlen(L, 1), "=stdin");
         if (!incomplete(L, status))
             break;                    /* cannot try to add lines? */
         if (!pushline(L, 0))        /* no more input? */
