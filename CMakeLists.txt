@@ -41,6 +41,7 @@ endif (NOT CURSES_FOUND)
 
 find_package (SQLite3 REQUIRED)
 find_package (IniParser REQUIRED)
+find_package (CJSON REQUIRED)
 find_package (EXPAT REQUIRED)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
@@ -53,7 +54,6 @@ endif(TOLUA_FOUND)
 
 enable_testing()
 
-add_subdirectory (cJSON)
 add_subdirectory (storage)
 add_subdirectory (clibs)
 add_subdirectory (process)
