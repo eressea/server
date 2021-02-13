@@ -5135,7 +5135,7 @@ int sp_pullastral(castorder * co)
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
         spllprm *spobj = pa->param[n];
-        if (spobj->flag == TARGET_NOTFOUND)
+        if (spobj->flag)
             continue;
 
         u = spobj->data.u;
@@ -5262,7 +5262,7 @@ int sp_leaveastral(castorder * co)
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
-        if (pa->param[n]->flag == TARGET_NOTFOUND)
+        if (pa->param[n]->flag)
             continue;
 
         u = pa->param[n]->data.u;
@@ -5659,7 +5659,7 @@ static int sp_eternizewall(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     b = pa->param[0]->data.b;
@@ -5782,7 +5782,7 @@ int sp_movecastle(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     b = pa->param[0]->data.b;
@@ -5867,7 +5867,7 @@ int sp_stealaura(castorder * co)
     struct sc_mage *scm;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     /* Zieleinheit */
@@ -6271,7 +6271,7 @@ static int sp_babbler(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;
@@ -6317,7 +6317,7 @@ static int sp_readmind(castorder * co)
     spellparameter *pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
 
     target = pa->param[0]->data.u;
