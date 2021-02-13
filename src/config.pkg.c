@@ -2,7 +2,7 @@
 ** Lua binding: config
 */
 
-#include "tolua.h"
+#include <tolua.h>
 
 #ifndef __cplusplus
 #include <stdlib.h>
