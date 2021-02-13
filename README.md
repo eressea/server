@@ -10,7 +10,8 @@ Debian-based Linux system, this is the apt-get command to
 install all of them:
 
     sudo apt-get install git cmake gcc make luarocks libxml2-dev \
-        liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev
+        liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
+        libcjson-dev libiniparser-dev
 
 # How to check out and build the Eressea server
 
