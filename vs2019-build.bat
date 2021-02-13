@@ -8,7 +8,7 @@ REM CD ..
 REM SET ERESSEA=%CD%
 REM CD %SRCDIR%
 
-SET CMAKE_MODULES="%CMAKE_ROOT%\share\cmake-3.19\Modules;%SRCDIR%\cmake\Modules"
+SET CMAKE_MODULES="%CMAKE_ROOT%\share\cmake-3.19\Modules"
 
 IF exist build-vs%VSVERSION% goto HAVEDIR
 mkdir build-vs%VSVERSION%
