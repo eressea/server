@@ -40,8 +40,8 @@ find_package (Curses)
 endif (NOT CURSES_FOUND)
 
 find_package (SQLite3 REQUIRED)
-
-find_package(EXPAT REQUIRED)
+find_package (IniParser REQUIRED)
+find_package (EXPAT REQUIRED)
 find_package (ToLua REQUIRED)
 if (TOLUA_FOUND)
 if (${TOLUA_VERSION_STRING} VERSION_EQUAL "5.2")
@@ -55,7 +55,6 @@ enable_testing()
 
 add_subdirectory (cJSON)
 add_subdirectory (storage)
-add_subdirectory (iniparser)
 add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)

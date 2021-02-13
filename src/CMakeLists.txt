@@ -301,6 +301,12 @@ if (HAVE_LIBBSD)
 target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
+if (IniParser_FOUND)
+target_include_directories(game PUBLIC ${IniParser_INCLUDE_DIRS})
+target_link_libraries(eressea ${IniParser_LIBRARIES})
+target_link_libraries(test_eressea ${IniParser_LIBRARIES})
+endif (IniParser_FOUND)
+
 if (SQLite3_FOUND)
 target_include_directories (game PRIVATE ${SQLite3_INCLUDE_DIRS})
 target_link_libraries(eressea ${SQLite3_LIBRARIES})
