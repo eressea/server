@@ -1,7 +1,6 @@
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CJSON_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
@@ -209,7 +208,7 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
 )
 
 set(TESTS_SRC
@@ -268,7 +267,7 @@ target_link_libraries(test_eressea
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
   )
 
 add_test(server test_eressea)
@@ -301,11 +300,8 @@ if (HAVE_LIBBSD)
 target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
-if (IniParser_FOUND)
-target_include_directories(game PUBLIC ${IniParser_INCLUDE_DIRS})
-target_link_libraries(eressea ${IniParser_LIBRARIES})
-target_link_libraries(test_eressea ${IniParser_LIBRARIES})
-endif (IniParser_FOUND)
+target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIRS})
+target_include_directories (game PUBLIC ${IniParser_INCLUDE_DIRS})
 
 if (SQLite3_FOUND)
 target_include_directories (game PRIVATE ${SQLite3_INCLUDE_DIRS})
