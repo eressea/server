@@ -320,7 +320,7 @@ add_definitions(-DUSE_READLINE)
 endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
-target_include_directories (eressea ${CURSES_INCLUDE_DIRS})
+target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
 target_link_libraries(eressea ${CURSES_LIBRARIES})
 add_definitions(-DUSE_CURSES)
 endif(CURSES_FOUND)
