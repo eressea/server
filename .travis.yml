@@ -1,6 +1,6 @@
 sudo: false
 language: c
-dist: bionic
+dist: focal
 compiler:
   - gcc
   - clang
@@ -22,6 +22,3 @@ addons:
       - luarocks
 os:
   - linux
-notifications:
-  slack:
-    secure: F89aXLWaE125PaJIlETv12jT4EfH6wLXJmGCPZzrN3OcLn2ahDWqjwuzR7lOEDf2nAISmeMPyDZMhEHXLNHAE5qP6lg9yliYQw5hzGmDK9m1xUq/pPEne/b2Y7K3my1mkRZ6n3asbHgSmBWAfCIk1JN8R5Rv+rmbLuWLc+zofts=
