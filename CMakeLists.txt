@@ -56,6 +56,7 @@ endif(TOLUA_FOUND)
 enable_testing()
 
 add_subdirectory (tolua)
+add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)
 add_subdirectory (process)
