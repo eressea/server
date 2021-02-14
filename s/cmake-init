@@ -82,6 +82,10 @@ LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
 if [ -d /usr/local/include/lua ]; then
    LUA_INCLUDE=/usr/local/include/lua
+elif [ -d /usr/include/lua5.4 ]; then
+   LUA_INCLUDE=/usr/include/lua5.4
+elif [ -d /usr/include/lua5.3 ]; then
+   LUA_INCLUDE=/usr/include/lua5.3
 elif [ -d /usr/include/lua5.2 ]; then
    LUA_INCLUDE=/usr/include/lua5.2
 elif [ -d /usr/include/lua5.1 ]; then
