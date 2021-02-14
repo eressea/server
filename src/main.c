@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/messages.h>
@@ -10,6 +6,7 @@
 
 #include <util/language.h>
 #include <util/log.h>
+#include <util/stats.h>
 #include <util/path.h>
 #include <util/password.h>
 
@@ -142,9 +139,9 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
     return index;
 }
 
-static int verbosity_to_flags(int verbosity) {
+static int verbosity_to_flags(int value) {
     int flags = 0;
-    switch (verbosity) {
+    switch (value) {
     case 0:
         flags = 0;
         break;
@@ -167,7 +164,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr, log_flags = 3;
+    int log_flags = 3;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -245,9 +242,9 @@ static int parse_args(int argc, char **argv)
     log_open(logfile, log_flags);
 
     /* also log to stderr: */
-    log_stderr = verbosity_to_flags(verbosity);
-    if (log_stderr) {
-        log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
+    log_flags = verbosity_to_flags(verbosity);
+    if (log_flags) {
+        log_to_file(log_flags | LOG_FLUSH | LOG_BRIEF, stderr);
     }
     return 0;
 }

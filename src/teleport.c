@@ -1,19 +1,19 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "teleport.h"
 
 /* kernel includes */
-#include <kernel/equipment.h>
-#include <kernel/unit.h>
-#include <kernel/region.h>
-#include <kernel/race.h>
-#include <kernel/terrain.h>
-#include <kernel/faction.h>
-#include <kernel/plane.h>
+#include "kernel/config.h"
+#include "kernel/equipment.h"
+#include "kernel/unit.h"
+#include "kernel/region.h"
+#include "kernel/race.h"
+#include "kernel/terrain.h"
+#include "kernel/faction.h"
+#include "kernel/plane.h"
 
 /* util includes */
-#include <util/log.h>
-#include <util/rng.h>
+#include "util/log.h"
+#include "util/stats.h"
+#include "util/rng.h"
 
 #include "skill.h"
 #include "monsters.h"
