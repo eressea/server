@@ -191,12 +191,18 @@ target_link_libraries(parser
   ${CRYPTO_LIBRARIES}
   )
 
-
 add_executable(checker ${CHECK_SRC})
 target_link_libraries(checker parser)
 
+if (HAVE_LIBBSD)
+  set (EXTRA_LIBS ${EXTRA_LIBS} bsd)
+endif (HAVE_LIBBSD)
+if (HAVE_LIBM)
+  set (EXTRA_LIBS ${EXTRA_LIBS} m)
+endif (HAVE_LIBM)
+
 add_library(game ${ERESSEA_SRC})
-target_link_libraries(game parser version)
+target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
