@@ -176,7 +176,7 @@ void addtoken(tnode ** root, const char *str, variant id)
                 index = lcs % NODEHASHSIZE;
 #endif
                 ref = (tref *)malloc(sizeof(tref));
-                assert_alloc(ref);
+                assert(ref);
                 ref->wc = lcs;
                 ref->node = node;
                 ++node->refcount;

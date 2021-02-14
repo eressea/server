@@ -26,7 +26,6 @@
 #include <spells/regioncurse.h>
 
 /* util includes */
-#include <util/assert.h>
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
 #include <util/strings.h>
@@ -698,7 +697,7 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
     d = *dp;
     if (!d) {
         d = *dp = malloc(sizeof(struct demand));
-        assert_alloc(d);
+        assert(d);
         d->next = NULL;
         d->type = ltype;
     }
@@ -763,7 +762,7 @@ int rsettrees(const region * r, int ageclass, int value)
 region *region_create(int uid)
 {
     region *r = (region *)calloc(1, sizeof(region));
-    assert_alloc(r);
+    assert(r);
     r->uid = uid;
     rhash_uid(r);
     return r;

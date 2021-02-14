@@ -44,7 +44,6 @@
 #include "attributes/otherfaction.h"
 
 /* util includes */
-#include "util/assert.h"
 #include "kernel/attrib.h"
 #include "util/base36.h"
 #include "util/language.h"
@@ -60,6 +59,7 @@
 #include <selist.h>
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
@@ -194,7 +194,7 @@ void battle_message_faction(battle * b, faction * f, struct message *m)
     assert(f);
     if (f->battles == NULL || f->battles->r != r) {
         struct bmsg *bm = (struct bmsg *)calloc(1, sizeof(struct bmsg));
-        assert_alloc(bm);
+        assert(bm);
         bm->next = f->battles;
         f->battles = bm;
         bm->r = r;

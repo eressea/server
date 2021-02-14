@@ -55,7 +55,6 @@
 #include "skill.h"
 
 /* util includes */
-#include <util/assert.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -70,6 +69,7 @@
 #include <storage.h>
 
 /* libc includes */
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,7 +112,7 @@ get_followers(unit * u, region * r, const region_list * route_end,
             while (a) {
                 if (a->data.v == u) {
                     follower *fnew = (follower *)malloc(sizeof(follower));
-                    assert_alloc(fnew);
+                    assert(fnew);
                     fnew->uf = uf;
                     fnew->ut = u;
                     fnew->route_end = route_end;
@@ -1483,7 +1483,7 @@ static void var_create_regions(arg_regions *dst, const region_list * begin, int 
     assert(size > 0);
     dst->nregions = size;
     dst->regions = (region **) malloc(sizeof(region *) * (size_t)size);
-    assert_alloc(dst->regions);
+    assert(dst->regions);
     for (i = 0, rsrc = begin; i != size; rsrc = rsrc->next, ++i) {
         dst->regions[i] = rsrc->data;
     }
