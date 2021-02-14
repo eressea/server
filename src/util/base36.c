@@ -1,10 +1,9 @@
-#include <platform.h>
 #include "base36.h"
-#include "log.h"
 
+#include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 
 #define USE_STRTOL
@@ -79,7 +78,7 @@ const char *itoab_r(int i, int base, char *s, size_t len)
             }
         }
         else {
-            log_error("static buffer exhausted, itoab(%d, %d)", i, base);
+            fprintf(stderr, "static buffer exhausted, itoab(%d, %d)", i, base);
             assert(i == 0 || !"itoab: static buffer exhausted");
         }
     }

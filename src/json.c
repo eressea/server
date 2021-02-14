@@ -9,7 +9,8 @@
 #include <kernel/faction.h>
 #include <kernel/terrain.h>
 #include <stream.h>
-#include "cJSON.h"
+
+#include <cJSON.h>
 
 #include <string.h>
 #include <stdlib.h>

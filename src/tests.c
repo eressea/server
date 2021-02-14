@@ -10,36 +10,37 @@
 #include "kernel/callbacks.h"
 #include "kernel/config.h"
 #include "kernel/alliance.h"
-#include <kernel/equipment.h>
-#include <kernel/messages.h>
-#include <kernel/plane.h>
-#include <kernel/region.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/item.h>
-#include <kernel/unit.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/faction.h>
-#include <kernel/building.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
-#include <kernel/terrain.h>
+#include "kernel/equipment.h"
+#include "kernel/messages.h"
+#include "kernel/plane.h"
+#include "kernel/region.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/item.h"
+#include "kernel/unit.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/faction.h"
+#include "kernel/building.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/spellbook.h"
+#include "kernel/terrain.h"
 
-#include <util/aliases.h>
-#include <util/functions.h>
-#include <util/keyword.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
-#include <util/log.h>
-#include <util/param.h>
-#include <util/rand.h>
-#include <util/assert.h>
+#include "util/aliases.h"
+#include "util/functions.h"
+#include "util/keyword.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/message.h"
+#include "util/log.h"
+#include "util/stats.h"
+#include "util/param.h"
+#include "util/rand.h"
 
 #include <CuTest.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -366,7 +367,7 @@ ship_type * test_create_shiptype(const char * name)
     stype->damage = 1;
     if (!stype->construction) {
         stype->construction = calloc(1, sizeof(construction));
-        assert_alloc(stype->construction);
+        assert(stype->construction);
         stype->construction->maxsize = 5;
         stype->construction->minskill = 1;
         stype->construction->reqsize = 1;
@@ -447,7 +448,7 @@ spell * test_create_spell(void)
     sp = create_spell("testspell");
 
     sp->components = (spell_component *)calloc(4, sizeof(spell_component));
-    assert_alloc(sp->components);
+    assert(sp->components);
     sp->components[0].amount = 1;
     sp->components[0].type = get_resourcetype(R_SILVER);
     sp->components[0].cost = SPC_FIX;

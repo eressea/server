@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "randenc.h"
 
 #include "chaos.h"
@@ -41,7 +37,7 @@
 #include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
-#include "util/log.h"
+#include "util/stats.h"
 #include "util/rand.h"
 #include "util/message.h"
 #include "util/rng.h"

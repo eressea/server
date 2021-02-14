@@ -77,21 +77,20 @@ fi
 
 DEST=$(dirname $ROOT)/server
 
-TOLUA_VERSION="5.2"
 LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
 if [ -d /usr/local/include/lua ]; then
-   TOLUA_VERSION="5.2"
    LUA_INCLUDE=/usr/local/include/lua
+elif [ -d /usr/include/lua5.4 ]; then
+   LUA_INCLUDE=/usr/include/lua5.4
+elif [ -d /usr/include/lua5.3 ]; then
+   LUA_INCLUDE=/usr/include/lua5.3
 elif [ -d /usr/include/lua5.2 ]; then
-   TOLUA_VERSION="5.2"
    LUA_INCLUDE=/usr/include/lua5.2
 elif [ -d /usr/include/lua5.1 ]; then
-   TOLUA_VERSION="5.1"
    LUA_INCLUDE=/usr/include/lua5.1
 elif [ -d /usr/local/include/lua5.1 ]; then
    LUA_DIR=/usr/local
-   TOLUA_VERSION="5.1"
    LUA_INCLUDE=/usr/local/include/lua5.1
 fi
 
@@ -111,20 +110,22 @@ HEREDOC
 
 path="$(which tolua)"
 if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
- echo "tolua is not installed, building from source"
- cd $ROOT
- if [ ! -d tolua/include ]; then
-  echo "fetching tolua ${TOLUA_VERSION} from github..."
-  git clone https://github.com/ennorehling/tolua-${TOLUA_VERSION}.git tolua
- fi
- echo "building tolua..."
+echo "tolua is not installed, building from source"
+cd $ROOT
+if [ ! -d tolua/include ]; then
+ echo "fetching tolua from github..."
+ git clone https://github.com/ennorehling/tolua.git tolua
  cd tolua
- make
- cd -
+else
+ cd tolua
+ git pull --rebase
+fi
+echo "building tolua..."
+make
+cd -
 cat >> $BUILD/config.cmake <<TOLUA
 SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")
 TOLUA
-
 else
  echo "tolua is $path"
 fi

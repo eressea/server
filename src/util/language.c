@@ -66,7 +66,7 @@ locale *get_or_create_locale(const char *name)
         }
     }
     *lp = l = (locale *)calloc(1, sizeof(locale));
-    assert_alloc(l);
+    assert(l);
     l->hashkey = hkey;
     l->name = str_strdup(name);
     l->index = nextlocaleindex++;

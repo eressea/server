@@ -3,6 +3,7 @@
 #endif
 
 #include "log.h"
+#include "stats.h"
 #include "macros.h"
 
 #include <CuTest.h>

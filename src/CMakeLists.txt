@@ -1,7 +1,6 @@
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CJSON_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
@@ -74,7 +73,6 @@ MACRO(TOLUA_BINDING PKGFILE FILES)
   )
 ENDMACRO(TOLUA_BINDING)
 
-IF(NOT MSVC)
 TOLUA_BINDING(log.pkg util/log.h)
 TOLUA_BINDING(locale.pkg bind_locale.h)
 TOLUA_BINDING(config.pkg bind_config.h)
@@ -82,7 +80,6 @@ TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kenel/config.h)
-ENDIF()
 
 set (PARSER_SRC
   ${DB_SRC}
@@ -192,12 +189,18 @@ target_link_libraries(parser
   ${CRYPTO_LIBRARIES}
   )
 
-
 add_executable(checker ${CHECK_SRC})
 target_link_libraries(checker parser)
 
+if (HAVE_LIBBSD)
+  set (EXTRA_LIBS ${EXTRA_LIBS} bsd)
+endif (HAVE_LIBBSD)
+if (HAVE_LIBM)
+  set (EXTRA_LIBS ${EXTRA_LIBS} m)
+endif (HAVE_LIBM)
+
 add_library(game ${ERESSEA_SRC})
-target_link_libraries(game parser version)
+target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
@@ -209,7 +212,7 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
 )
 
 set(TESTS_SRC
@@ -268,7 +271,7 @@ target_link_libraries(test_eressea
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
   )
 
 add_test(server test_eressea)
@@ -301,32 +304,35 @@ if (HAVE_LIBBSD)
 target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
-if (SQLITE3_FOUND)
-include_directories (${SQLITE3_INCLUDE_DIR})
-target_link_libraries(eressea ${SQLITE3_LIBRARIES})
-target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
-add_definitions(-DUSE_SQLITE)
+target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIRS})
+target_include_directories (game PUBLIC ${IniParser_INCLUDE_DIRS})
+
+if (SQLite3_FOUND)
+target_include_directories (game PRIVATE ${SQLite3_INCLUDE_DIRS})
+target_link_libraries(eressea ${SQLite3_LIBRARIES})
+target_link_libraries(test_eressea ${SQLite3_LIBRARIES})
+add_compile_definitions(game PRIVATE USE_SQLITE)
 elseif (DB_FOUND)
-include_directories (${DB_INCLUDE_DIR})
+#include_directories (${DB_INCLUDE_DIR})
 target_link_libraries(eressea ${DB_LIBRARIES})
 target_link_libraries(test_eressea ${DB_LIBRARIES})
-add_definitions(-DUSE_DB)
-endif(SQLITE3_FOUND)
+add_compile_definitions(game PRIVATE USE_DB)
+endif(SQLite3_FOUND)
 
 if (READLINE_FOUND)
-include_directories (${READLINE_INCLUDE_DIR})
+#include_directories (${READLINE_INCLUDE_DIR})
 target_link_libraries(eressea ${READLINE_LIBRARY})
-add_definitions(-DUSE_READLINE)
+add_compile_definitions(eressea PRIVATE DUSE_READLINE)
 endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
-include_directories (${CURSES_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
 target_link_libraries(eressea ${CURSES_LIBRARIES})
-add_definitions(-DUSE_CURSES)
+add_compile_definitions(eressea PRIVATE USE_CURSES)
 endif(CURSES_FOUND)
 
 if (EXPAT_FOUND)
-include_directories (${EXPAT_INCLUDE_DIRS})
+target_include_directories (game PRIVATE ${EXPAT_INCLUDE_DIRS})
 target_link_libraries(eressea ${EXPAT_LIBRARIES})
 target_link_libraries(test_eressea ${EXPAT_LIBRARIES})
 endif (EXPAT_FOUND)

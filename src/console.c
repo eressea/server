@@ -199,7 +199,7 @@ static int loadline(lua_State * L)
     if (!pushline(L, 1))
         return -1;                  /* no input */
     for (;;) {                    /* repeat until gets a complete line */
-        status = luaL_loadbuffer(L, lua_tostring(L, 1), lua_strlen(L, 1), "=stdin");
+        status = luaL_loadbuffer(L, lua_tostring(L, 1), (size_t)lua_strlen(L, 1), "=stdin");
         if (!incomplete(L, status))
             break;                    /* cannot try to add lines? */
         if (!pushline(L, 0))        /* no more input? */
@@ -227,7 +227,7 @@ static void dotty(lua_State * L)
             lua_insert(L, 1);
             if (lua_pcall(L, lua_gettop(L) - 1, 0, 0) != 0)
                 l_message(progname, lua_pushfstring(L,
-                "error calling " LUA_QL("print") " (%s)", lua_tostring(L, -1)));
+                "error calling 'print' (%s)", lua_tostring(L, -1)));
         }
     }
     lua_settop(L, 0);             /* clear stack */
