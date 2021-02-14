@@ -13,48 +13,49 @@
 #include "study.h"
 #include "spy.h"
 
-#include <spells/buildingcurse.h>
-#include <spells/regioncurse.h>
-#include <spells/unitcurse.h>
+#include "spells/buildingcurse.h"
+#include "spells/regioncurse.h"
+#include "spells/unitcurse.h"
 
-#include <kernel/ally.h>
-#include <kernel/alliance.h>
-#include <kernel/build.h>
-#include <kernel/building.h>
-#include <kernel/curse.h>
-#include <kernel/equipment.h>
-#include <kernel/faction.h>
-#include <kernel/group.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
-#include <kernel/spell.h>
+#include "kernel/ally.h"
+#include "kernel/alliance.h"
+#include "kernel/build.h"
+#include "kernel/building.h"
+#include "kernel/curse.h"
+#include "kernel/equipment.h"
+#include "kernel/faction.h"
+#include "kernel/group.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/plane.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
+#include "kernel/spell.h"
 
-#include <reports.h>
+#include "reports.h"
 
 /* attributes includes */
-#include <attributes/key.h>
-#include <attributes/racename.h>
-#include <attributes/otherfaction.h>
+#include "attributes/key.h"
+#include "attributes/racename.h"
+#include "attributes/otherfaction.h"
 
 /* util includes */
-#include <util/assert.h>
-#include <kernel/attrib.h>
-#include <util/base36.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
-#include <util/macros.h>
-#include <util/parser.h>
-#include <util/strings.h>
-#include <util/rand.h>
-#include <util/rng.h>
+#include "util/assert.h"
+#include "kernel/attrib.h"
+#include "util/base36.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/log.h"
+#include "util/macros.h"
+#include "util/parser.h"
+#include "util/strings.h"
+#include "util/stats.h"
+#include "util/rand.h"
+#include "util/rng.h"
 
 #include <selist.h>
 
