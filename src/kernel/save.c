@@ -40,7 +40,6 @@
 #include <triggers/shock.h>
 
 /* util includes */
-#include <util/assert.h>
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <kernel/event.h>

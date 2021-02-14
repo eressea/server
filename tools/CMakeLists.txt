@@ -7,5 +7,8 @@ target_include_directories (inifile PRIVATE ${IniParser_INCLUDE_DIRS})
 
 add_executable(gethash gethash.c)
 
-add_executable(atoi36 atoi36.c ${CMAKE_SOURCE_DIR}/src/util/base36.c)
+add_executable(atoi36
+  atoi36.c
+  ${CMAKE_SOURCE_DIR}/src/util/base36.c
+  )
 target_include_directories(atoi36 PRIVATE ${CMAKE_SOURCE_DIR}/src/util)

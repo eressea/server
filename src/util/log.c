@@ -4,8 +4,6 @@
 #include "strings.h"
 #include "unicode.h"
 
-#include <critbit.h>
-
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>

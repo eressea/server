@@ -57,7 +57,6 @@
 #include <kernel/unit.h>
 
 /* util includes */
-#include <util/assert.h>
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <kernel/event.h>
@@ -81,6 +80,7 @@
 #include <storage.h>
 
 /* libc includes */
+#include <assert.h>
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
@@ -1269,7 +1269,7 @@ add_ironweapon(const struct item_type *type, const struct item_type *rusty,
     float chance)
 {
     iron_weapon *iweapon = malloc(sizeof(iron_weapon));
-    assert_alloc(iweapon);
+    assert(iweapon);
     iweapon->type = type;
     iweapon->rusty = rusty;
     iweapon->chance = chance;
