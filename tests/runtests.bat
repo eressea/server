@@ -8,6 +8,8 @@ IF EXIST ..\build-vs16 SET BUILD=..\build-vs16\eressea\Debug
 
 SET SERVER=%BUILD%\eressea.exe
 %BUILD%\test_eressea.exe
+SET LUA_PATH=..\share\lua\5.4\?.lua;;
+
 %SERVER% -v1 ..\scripts\run-tests.lua
 %SERVER% -v1 -re2 ..\scripts\run-tests-e2.lua
 %SERVER% -v1 -re3 ..\scripts\run-tests-e3.lua
