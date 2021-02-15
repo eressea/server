@@ -48,6 +48,7 @@ fi
 shift 1
 done
 
+git submodule update --init
 ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
@@ -107,29 +108,6 @@ SET (CMAKE_INSTALL_PREFIX "$DEST" CACHE PATH "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
 HEREDOC
-
-path="$(which tolua)"
-if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
-echo "tolua is not installed, building from source"
-cd $ROOT
-if [ ! -d tolua/include ]; then
- echo "fetching tolua from github..."
- git clone https://github.com/ennorehling/tolua.git tolua
- cd tolua
-else
- cd tolua
- git pull --rebase
-fi
-echo "building tolua..."
-make
-cd -
-cat >> $BUILD/config.cmake <<TOLUA
-SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")
-TOLUA
-else
- echo "tolua is $path"
-fi
-unset path
 
 set -e
 
