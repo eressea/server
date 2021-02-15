@@ -1,3 +1,10 @@
+# 3.27
+
+  - Schiffe sind kommentarlos nicht nicht gesegelt [2722]
+  - Meermenschen konnten nicht mehr anschwimmen [2723]
+  - Magieresistenz repariert [2724]
+  - Kleine Änderung an Samenwachstum.
+  - Umstellung auf neue Versionen von externen Libraries.
 
 # 3.26
 
