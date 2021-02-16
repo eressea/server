@@ -86,6 +86,7 @@ extern "C" {
 
 #define MAX_START_RACE RC_ORC
 
+    extern struct race *races;
     extern int num_races;
     extern const char *racenames[MAXRACES];
 
@@ -151,7 +152,6 @@ extern "C" {
     const struct race *findrace(const char *, const struct locale *);
 
     struct race_list *get_familiarraces(void);
-    struct race *races;
     const struct race *get_race(race_t rt);
     /** TODO: compatibility hacks: **/
     race_t old_race(const struct race *);

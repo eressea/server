@@ -48,6 +48,7 @@ fi
 shift 1
 done
 
+git submodule update --init
 ROOT=$(git rev-parse --show-toplevel)
 [ -z $BUILD ] && BUILD=Debug
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"

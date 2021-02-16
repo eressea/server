@@ -126,7 +126,7 @@ extern "C" {
     extern struct attrib_type at_countdown;
 
     /* game-specific callbacks */
-    void(*border_convert_cb) (struct connection * con, struct attrib * attr);
+    extern void(*border_convert_cb) (struct connection * con, struct attrib * attr);
 
     const char * border_name(const struct connection *co,
         const struct region * r, const struct faction * f, int flags);

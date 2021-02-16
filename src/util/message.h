@@ -11,8 +11,6 @@ extern "C" {
 #define MT_NEW_END ((const char *)0)
 #define MAXSECTIONS 16
 
-    extern char *sections[MAXSECTIONS];
-
     typedef struct arg_type {
         struct arg_type *next;
         variant_type vtype;
@@ -44,6 +42,9 @@ extern "C" {
         variant args[]);
     /* msg_create(&mt_simplesentence, "enno", "eats", "chocolate", &locale_de);
      * parameters must be in the same order as they were for mt_new! */
+    
+    extern char *sections[MAXSECTIONS];
+    extern void(*msg_log_create) (const struct message * msg);
 
     void msg_release(struct message *msg);
     struct message *msg_addref(struct message *msg);
@@ -62,7 +63,6 @@ extern "C" {
         variant(*copy_arg) (variant), variant_type);
     arg_type *find_argtype(const char *name);
 
-    void(*msg_log_create) (const struct message * msg);
 
 #ifdef __cplusplus
 }
