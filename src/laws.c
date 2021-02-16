@@ -1276,7 +1276,7 @@ bool nmr_death(const faction * f, int turn, int timeout)
     if (f->age >= timeout && turn - f->lastorders >= timeout) {
         static bool rule_destroy;
         static int config;
-        
+
         if (config_changed(&config)) {
             rule_destroy = config_get_int("rules.nmr.destroy", 0) != 0;
         }
@@ -1310,7 +1310,7 @@ static void remove_idle_players(void)
                 f->lastorders = turn;
             }
             else if (turn != f->lastorders) {
-                char info[256];
+                  char info[256];
                 sprintf(info, "%d Einheiten, %d Personen",
                     f->num_units, f->num_people);
             }
@@ -1321,6 +1321,9 @@ static void remove_idle_players(void)
 
     i = turn + 1;
     if (i < 4) i = 4;
+    if (age) {
+      free(age);
+    }
     age = calloc(i, sizeof(int));
     if (!age) abort();
     for (fp = &factions; *fp;) {
@@ -1371,7 +1374,7 @@ int ally_cmd(unit * u, struct order *ord)
     int keyword, not_kw;
     const char *s;
     int sf_status;
-   
+
     init_order(ord, NULL);
     f = getfaction();
 
@@ -1551,7 +1554,7 @@ int prefix_cmd(unit * u, struct order *ord)
         group *g = get_group(u);
         if (g) {
             ap = &g->attribs;
-        } 
+        }
         else {
             ap = &u->faction->attribs;
         }
@@ -2859,7 +2862,7 @@ static void ageing(void)
         for (up = &r->units; *up;) {
             unit *u = *up;
             a_age(&u->attribs, u);
-            if (u == *up) 
+            if (u == *up)
                 handle_event(u->attribs, "timer", u);
             if (u == *up) /*-V581 */
                 up = &(*up)->next;
@@ -2923,7 +2926,7 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
-void maketemp_cmd(unit *u, order **olist) 
+void maketemp_cmd(unit *u, order **olist)
 {
     order *makeord;
     int err = checkunitnumber(u->faction, 1);
@@ -3948,7 +3951,7 @@ void init_processor(void)
     add_proc_unit(p, follow_cmds, "Folge auf Einheiten setzen");
     add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
-    /* all recruitment must be finished before we can calculate 
+    /* all recruitment must be finished before we can calculate
      * promotion cost of ability */
     p += 10;
     add_proc_global(p, quit, "Sterben");
