@@ -1303,6 +1303,7 @@ static void remove_idle_players(void)
 
     i = turn + 1;
     if (i < 4) i = 4;
+    free(age);
     age = calloc(i, sizeof(int));
     if (!age) abort();
     for (fp = &factions; *fp;) {
