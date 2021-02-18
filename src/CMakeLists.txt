@@ -285,19 +285,19 @@ add_test(server test_eressea)
 install(TARGETS eressea DESTINATION "bin")
 
 if (HAVE_EXECINFO_H AND HAVE_SIGNAL_H)
-  add_definitions(-DHAVE_BACKTRACE)
+  add_compile_definitions(HAVE_BACKTRACE)
 endif ()
 
 if (HAVE_LIBBSD)
-  add_definitions(-DHAVE_LIBBSD)
+  add_compile_definitions(HAVE_LIBBSD)
 endif (HAVE_LIBBSD)
 
 if (HAVE_STRLCAT)
-  add_definitions(-DHAVE_BSDSTRING)
+  add_compile_definitions(HAVE_BSDSTRING)
 endif (HAVE_STRLCAT)
 
 if (HAVE_STRDUP)
-  add_definitions(-DHAVE_STRDUP)
+  add_compile_definitions(HAVE_STRDUP)
 endif(HAVE_STRDUP)
 
 if (HAVE_LIBBSD)
