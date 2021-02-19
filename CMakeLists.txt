@@ -25,7 +25,7 @@ check_include_file(signal.h HAVE_SIGNAL_H)
 check_include_file(execinfo.h HAVE_EXECINFO_H)
 
 include (CheckLibraryExists)
-check_library_exists(m sin "" HAVE_LIBM)
+check_library_exists(m fmin "" HAVE_LIBM)
 check_library_exists(bsd strlcat "" HAVE_LIBBSD)
 
 include (CheckFunctionExists)
