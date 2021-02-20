@@ -12,6 +12,7 @@
 #include <cJSON.h>
 #include <CuTest.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -38,15 +39,14 @@ static void test_export_no_regions(CuTest * tc) {
     char buf[1024];
     stream out = { 0 };
     int err;
-    size_t len;
 
     test_setup();
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     err = json_export(&out, EXPORT_REGIONS);
     CuAssertIntEquals(tc, 0, err);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
     test_teardown();
@@ -58,16 +58,15 @@ static cJSON *export_a_region(CuTest * tc, const struct terrain_type *terrain, r
     int err;
     region *r;
     cJSON *json, *attr, *result, *regs;
-    size_t sz;
 
     r = test_create_region(0, 0, terrain);
 
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     err = json_export(&out, EXPORT_REGIONS);
     CuAssertIntEquals(tc, 0, err);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    sz = out.api->read(out.handle, buf, sizeof(buf));
-    buf[sz] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     mstream_done(&out);
 
     json = cJSON_Parse(buf);
@@ -122,15 +121,14 @@ static void test_export_no_factions(CuTest * tc) {
     char buf[1024];
     stream out = { 0 };
     int err;
-    size_t len;
 
     test_setup();
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     err = json_export(&out, EXPORT_FACTIONS);
     CuAssertIntEquals(tc, 0, err);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = 0;
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "{}", strip(buf));
     mstream_done(&out);
     test_teardown();
