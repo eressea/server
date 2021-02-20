@@ -62,8 +62,8 @@ struct flags {
     int result;
 };
 
-static void cb_flags(void* json, struct flags* flags)
-{
+static void cb_flags(void* json, void *udata) {
+    struct flags *flags = (struct flags *)udata;
     cJSON* entry = (cJSON*)json;
     int i;
     for (i = 0; flags->names[i]; ++i) {
