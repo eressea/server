@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.9)
+cmake_minimum_required(VERSION 3.13)
+
 if (WIN32)
 file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
@@ -17,7 +18,6 @@ set (HAVE_STRLCAT 0)
 set (HAVE_LIBBSD 0)
 set (HAVE_SIGNAL_H 0)
 set (HAVE_EXECINFO_H 0)
-include (MSVC)
 else (MSVC)
 
 include (CheckIncludeFile)
@@ -41,6 +41,7 @@ if (NOT CURSES_FOUND)
 find_package (Curses)
 endif (NOT CURSES_FOUND)
 
+#find_package (BerkeleyDB REQUIRED)
 find_package (SQLite3 REQUIRED)
 find_package (IniParser REQUIRED)
 find_package (CJSON REQUIRED)

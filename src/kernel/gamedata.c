@@ -1,5 +1,6 @@
-#include <platform.h>
-
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "gamedata.h"
 
 #include <util/log.h>

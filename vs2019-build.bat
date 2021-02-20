@@ -1,7 +1,5 @@
 @ECHO OFF
-IF "%WIN32_DEV%" == "" SET WIN32_DEV="C:\Libraries"
 SET CMAKE_ROOT=%ProgramFiles%\CMake
-IF "%LUA_DEV%" == "" SET LUA_DEV="%ProgramFiles(x86)%/Lua/5.1"
 SET VSVERSION=16
 SET SRCDIR=%CD%
 REM CD ..
@@ -17,5 +15,5 @@ cd build-vs%VSVERSION%
 IF NOT EXIST CMakeCache.txt GOTO NOCACHE
 DEL CMakeCache.txt
 :NOCACHE
-"%CMAKE_ROOT%\bin\cmake.exe" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -A Win32 -G "Visual Studio %VSVERSION%" -DCMAKE_PREFIX_PATH="%LUA_DEV%;%WIN32_DEV%" -DCMAKE_MODULE_PATH="%CMAKE_MODULES%" -DCMAKE_SUPPRESS_REGENERATION=TRUE ..
+"%CMAKE_ROOT%\bin\cmake.exe" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -A x64 -G "Visual Studio %VSVERSION%" -DCMAKE_MODULE_PATH="%CMAKE_MODULES%" -DCMAKE_SUPPRESS_REGENERATION=TRUE ..
 PAUSE

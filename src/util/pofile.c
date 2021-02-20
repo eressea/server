@@ -1,7 +1,6 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#define _CRT_SECURE_NO_WARNINGS
 #endif
-
 #include "pofile.h"
 #include "log.h"
 #include "strings.h"

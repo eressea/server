@@ -1,7 +1,6 @@
-#ifdef _MSV_VER
-#include <platform.h>
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
 #endif
-
 #include "util/order_parser.h"
 #include "util/keyword.h"
 #include "util/language.h"
