@@ -1268,8 +1268,8 @@ void do_enter(struct region *r, bool is_final_attempt)
     }
 }
 
+int newbies[MAXNEWPLAYERS];
 int dropouts[2];
-int *age = NULL;
 
 bool nmr_death(const faction * f, int turn, int timeout)
 {
@@ -1321,15 +1321,13 @@ static void remove_idle_players(void)
 
     i = turn + 1;
     if (i < 4) i = 4;
-    free(age);
-    age = calloc(i, sizeof(int));
-    if (!age) abort();
     for (fp = &factions; *fp;) {
         faction *f = *fp;
         if (!is_monsters(f)) {
             if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
-                if (f->age >= 0 && f->age <= turn)
-                    ++age[f->age];
+                if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
+                    ++newbies[f->age];
+                }
                 if (f->age == 2 || f->age == 3) {
                     if (f->lastorders == turn - 2) {
                         ++dropouts[f->age - 2];

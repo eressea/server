@@ -324,13 +324,11 @@ void report_summary(const summary * s, bool full)
             }
         }
     }
-    if (age) {
-        if (age[2] != 0) {
-            fprintf(F, "Erstabgaben:  %3d%%\n", 100 - (dropouts[0] * 100 / age[2]));
-        }
-        if (age[3] != 0) {
-            fprintf(F, "Zweitabgaben: %3d%%\n", 100 - (dropouts[1] * 100 / age[3]));
-        }
+    if (newbies[2] != 0) {
+        fprintf(F, "Erstabgaben:  %3d%%\n", 100 - (dropouts[0] * 100 / newbies[2]));
+    }
+    if (newbies[3] != 0) {
+        fprintf(F, "Zweitabgaben: %3d%%\n", 100 - (dropouts[1] * 100 / newbies[3]));
     }
     fprintf(F, "Neue Spieler: %d\n", newplayers);
 
