@@ -15,6 +15,7 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("magic.fumble.enable", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
+    eressea.settings.set("magic.resist.enable", "0")
 end
 
 function test_create_bogus()

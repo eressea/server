@@ -607,7 +607,7 @@ function test_seacast()
     u2.ship = s1
     u2:add_spell("stormwinds")
     u2:clear_orders()
-    u2:add_order("Zaubere stufe 2 'Sturmelementar' " .. itoa36(s1.id))
+    u2:add_order("ZAUBERE STUFE 2 'Sturmelementar' " .. itoa36(s1.id))
     u1:clear_orders()
     u1:add_order("NACH O O O O")
     process_orders()
