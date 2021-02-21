@@ -30,7 +30,6 @@
 #include "util/path.h"
 #include "util/rand.h"
 #include "util/rng.h"
-#include "util/unicode.h"
 
 #include "gmtool_structs.h"
 #include "console.h"
