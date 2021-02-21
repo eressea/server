@@ -42,7 +42,9 @@ endif (HAVE_LIBBSD)
 endif (MSVC)
 
 if (NOT CURSES_FOUND)
-find_package (Curses)
+  set(CURSES_NEED_WIDE TRUE)
+  set(CURSES_NEED_NCURSES TRUE)
+  find_package (Curses)
 endif (NOT CURSES_FOUND)
 
 #find_package (BerkeleyDB REQUIRED)

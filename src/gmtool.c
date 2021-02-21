@@ -4,6 +4,7 @@
 #endif
 #endif
 #include <curses.h>
+#define CURSES_UTF8
 
 #include "gmtool.h"
 #include "direction.h"
@@ -58,7 +59,7 @@ state *current_state = NULL;
 #define IFL_BUILDINGS (1<<3)
 
 static WINDOW *hstatus;
-static int gm_utf8 = 0; /* does our curses support utf-8? */
+static int gm_utf8 = 1; /* does our curses support utf-8? */
 
 static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
@@ -107,7 +108,7 @@ int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
 
 static void init_curses(void)
 {
-#ifdef PDCURSES
+#ifdef CURSES_UTF8
     /* PDCurses from vcpkg is compiled with UTF8 (and WIDE) support */
     gm_utf8 = 1;
 #endif
@@ -118,7 +119,7 @@ static void init_curses(void)
         short bcol = COLOR_BLACK;
         short hcol = COLOR_MAGENTA;
         start_color();
-#ifdef __PDCURSES__
+#ifdef CURSES_UTF8
         /* looks crap on putty with TERM=linux */
         if (can_change_color()) {
             init_color(COLOR_YELLOW, 1000, 1000, 0);
@@ -398,8 +399,8 @@ static bool handle_info_region(window * wnd, state * st, int c)
 
 int wxborder(WINDOW *win)
 {
-#ifdef __PDCURSES__
-    return wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
+#ifdef CURSES_UTF8
+    return box(win, 0, 0);
 #else
     return wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
 #endif
@@ -792,8 +793,7 @@ static coordinate *region2coord(const region * r, coordinate * c)
     c->pl = rplane(r);
     return c;
 }
-
-#ifdef __PDCURSES__
+#ifdef PDCURSES
 #define FAST_UP CTL_UP
 #define FAST_DOWN CTL_DOWN
 #define FAST_LEFT CTL_LEFT
