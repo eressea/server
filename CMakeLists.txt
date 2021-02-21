@@ -7,6 +7,10 @@ endif(WIN32)
 
 project (eressea-server C)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+if (WIN32)
+# make subdirectories build to the same output folders (DLLs):
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+endif (WIN32)
 
 if (MSVC)
 find_package (PDCurses)
@@ -56,7 +60,6 @@ endif(TOLUA_FOUND)
 
 enable_testing()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 add_subdirectory (tolua)
 add_subdirectory (tools)
 add_subdirectory (storage)

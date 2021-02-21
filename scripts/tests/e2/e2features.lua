@@ -15,6 +15,7 @@ function setup()
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("magic.resist.enable", "0")
 end
 
 function disabled_double_default()
