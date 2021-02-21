@@ -578,6 +578,9 @@ int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
         if (*length > 1) {
             *cp_character = '?';
         }
+        else {
+            *cp_character = (unsigned char)ucs4_character;
+        }
     }
     return result;
 }
