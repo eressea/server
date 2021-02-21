@@ -10,7 +10,7 @@ path = 'scripts'
 if config.install then
     path = config.install .. '/' .. path
 end
-package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
+package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path
 
 config.rules = 'e3'
 

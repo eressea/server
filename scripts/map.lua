@@ -2,7 +2,8 @@ local path = 'scripts'
 if config.install then
 	path = config.install .. '/' .. path
 end
-package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
+package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path
+
 require 'eressea.path'
 require 'eressea'
 require 'eressea.xmlconf'

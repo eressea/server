@@ -64,7 +64,6 @@ static void load_inifile(void)
 #ifdef USE_CURSES
     /* only one value in the [editor] section */
     force_color = config_get_int("editor.color", force_color);
-    gm_codepage = config_get_int("editor.codepage", gm_codepage);
 #endif
 }
 

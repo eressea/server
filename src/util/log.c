@@ -16,6 +16,14 @@
 #include <stdarg.h>
 #include <time.h>
 
+#ifdef WIN32
+#include <io.h>
+#define FISATTY(F) (_isatty(_fileno(F)))
+#else
+#include <unistd.h>
+#define FISATTY(F) (isatty(fileno(F)))
+#endif
+
 void errno_check(const char * file, int line) {
     if (errno) {
         log_info("errno is %d (%s) at %s:%d", 
@@ -24,8 +32,8 @@ void errno_check(const char * file, int line) {
     }
 }
 
-#ifdef STDIO_CP
-static int stdio_codepage = STDIO_CP;
+#if WIN32
+static int stdio_codepage = 1252;
 #else
 static int stdio_codepage = 0;
 #endif
@@ -63,7 +71,7 @@ void log_destroy(log_t *handle) {
     }
 }
 
-#define MAXLENGTH 4096          /* because I am lazy, CP437 output is limited to this many chars */
+#define MAXLENGTH 4096          /* because I am lazy, tty output is limited to this many chars */
 #define LOG_MAXBACKUPS 5
 
 static int
@@ -87,7 +95,7 @@ cp_convert(const char *format, unsigned char *buffer, size_t length, int codepag
             return result;
         }
         ++pos;
-        input += length;
+        input += size;
     }
     *pos = 0;
     return 0;
@@ -175,13 +183,16 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
     }
 }
 
-static void log_stdio(void *data, int level, const char *module, const char *format, va_list args) {
-    FILE *out = (FILE *)data;
-    int codepage = (out == stderr || out == stdout) ? stdio_codepage : 0;
-    const char *prefix = log_prefix(level);
+static void log_stdio(void* data, int level, const char* module, const char* format, va_list args) {
+    FILE* out = (FILE*)data;
+    int codepage = 0;
+    const char* prefix = log_prefix(level);
     size_t len = strlen(format);
 
     (void)module;
+    if (stdio_codepage && (out == stderr || out == stdout)) {
+        codepage = FISATTY(out) ? stdio_codepage : 0;
+    }
     fprintf(out, "%s: ", prefix);
 
     _log_write(out, codepage, format, args);

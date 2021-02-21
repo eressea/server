@@ -58,29 +58,14 @@ state *current_state = NULL;
 #define IFL_BUILDINGS (1<<3)
 
 static WINDOW *hstatus;
-
-#ifdef STDIO_CP
-int gm_codepage = STDIO_CP;
-#else 
-int gm_codepage = -1;
-#endif
+static int gm_utf8 = 0; /* does our curses support utf-8? */
 
 static void unicode_remove_diacritics(const char *rp, char *wp) {
     while (*rp) {
-        if (gm_codepage >= 0 && *rp & 0x80) {
+        if (*rp & 0x80) {
             size_t sz = 0;
             unsigned char ch;
-            switch (gm_codepage) {
-            case 1252:
-                unicode_utf8_to_cp1252(&ch, rp, &sz);
-                break;
-            case 437:
-                unicode_utf8_to_cp437(&ch, rp, &sz);
-                break;
-            default:
-                unicode_utf8_to_ascii(&ch, rp, &sz);
-                break;
-            }
+            unicode_utf8_to_ascii(&ch, rp, &sz);
             rp += sz;
             *wp++ = (char)ch;
         }
@@ -91,8 +76,13 @@ static void unicode_remove_diacritics(const char *rp, char *wp) {
     *wp = 0;
 }
 
-static void simplify(const char *rp, char *wp) {
-    unicode_remove_diacritics(rp, wp);
+static void simplify(const char* rp, char* wp) {
+    if (!gm_utf8) {
+        unicode_remove_diacritics(rp, wp);
+    }
+    else if (rp != wp) {
+        strcpy(wp, rp);
+    }
 }
 
 int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
@@ -117,6 +107,10 @@ int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
 
 static void init_curses(void)
 {
+#ifdef PDCURSES
+    /* PDCurses from vcpkg is compiled with UTF8 (and WIDE) support */
+    gm_utf8 = 1;
+#endif
     initscr();
 
     if (has_colors() || force_color) {
