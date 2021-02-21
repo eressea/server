@@ -4,7 +4,6 @@
 #endif
 #endif
 #include <curses.h>
-#define CURSES_UTF8
 
 #include "gmtool.h"
 #include "direction.h"
@@ -59,32 +58,6 @@ state *current_state = NULL;
 #define IFL_BUILDINGS (1<<3)
 
 static WINDOW *hstatus;
-static int gm_utf8 = 1; /* does our curses support utf-8? */
-
-static void unicode_remove_diacritics(const char *rp, char *wp) {
-    while (*rp) {
-        if (*rp & 0x80) {
-            size_t sz = 0;
-            unsigned char ch;
-            unicode_utf8_to_ascii(&ch, rp, &sz);
-            rp += sz;
-            *wp++ = (char)ch;
-        }
-        else {
-            *wp++ = *rp++;
-        }
-    }
-    *wp = 0;
-}
-
-static void simplify(const char* rp, char* wp) {
-    if (!gm_utf8) {
-        unicode_remove_diacritics(rp, wp);
-    }
-    else if (rp != wp) {
-        strcpy(wp, rp);
-    }
-}
 
 int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
     char buffer[128];
@@ -95,23 +68,15 @@ int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
     vsnprintf(buffer, sizeof(buffer) - 1, format, args);
     va_end(args);
 
-    simplify(buffer, buffer);
-
     return mvwaddstr(win, y, x, buffer);
 }
 
 int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
-    char buffer[128];
-    simplify(str, buffer);
-    return mvwaddnstr(w, y, x, buffer, len);
+    return mvwaddnstr(w, y, x, str, len);
 }
 
 static void init_curses(void)
 {
-#ifdef CURSES_UTF8
-    /* PDCurses from vcpkg is compiled with UTF8 (and WIDE) support */
-    gm_utf8 = 1;
-#endif
     initscr();
 
     if (has_colors() || force_color) {
@@ -119,13 +84,11 @@ static void init_curses(void)
         short bcol = COLOR_BLACK;
         short hcol = COLOR_MAGENTA;
         start_color();
-#ifdef CURSES_UTF8
         /* looks crap on putty with TERM=linux */
         if (can_change_color()) {
             init_color(COLOR_YELLOW, 1000, 1000, 0);
             init_color(COLOR_CYAN, 0, 1000, 1000);
         }
-#endif
         for (fg = 0; fg != 8; ++fg) {
             for (bg = 0; bg != 2; ++bg) {
                 init_pair((short)(fg + 8 * bg), (short)fg, (short)(bg ? hcol : bcol));
@@ -397,15 +360,6 @@ static bool handle_info_region(window * wnd, state * st, int c)
     return false;
 }
 
-int wxborder(WINDOW *win)
-{
-#ifdef CURSES_UTF8
-    return box(win, 0, 0);
-#else
-    return wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
-#endif
-}
-
 static void paint_info_region(window * wnd, const state * st)
 {
     WINDOW *win = wnd->handle;
@@ -415,7 +369,7 @@ static void paint_info_region(window * wnd, const state * st)
 
     UNUSED_ARG(st);
     werase(win);
-    wxborder(win);
+    box(win, 0, 0);
     if (mr && mr->r) {
         int line = 0;
         const region *r = mr->r;
@@ -753,7 +707,7 @@ static faction *select_faction(state * st)
     }
     selected = do_selection(ilist, "Select Faction", NULL, NULL);
     st->wnd_info->update |= 1;
-    st->wnd_map->update |= 1;
+    st->wnd_map->update |= 3;
     st->wnd_status->update |= 1;
 
     if (selected == NULL)
@@ -778,7 +732,7 @@ static const terrain_type *select_terrain(state * st,
     }
     selected = do_selection(ilist, "Terrain", NULL, NULL);
     st->wnd_info->update |= 1;
-    st->wnd_map->update |= 1;
+    st->wnd_map->update |= 3;
     st->wnd_status->update |= 1;
 
     if (selected == NULL)
@@ -1293,7 +1247,7 @@ static void handlekey(state * st, int c)
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
-        st->wnd_map->update |= 1;
+        st->wnd_map->update |= 3;
         break;
     case 'I':
         statusline(st->wnd_status->handle, "info-");
@@ -1346,7 +1300,7 @@ static void handlekey(state * st, int c)
             clear();
             st->wnd_info->update |= 1;
             st->wnd_status->update |= 1;
-            st->wnd_map->update |= 1;
+            st->wnd_map->update |= 3;
         }
         break;
     case 12:                   /* Ctrl-L */

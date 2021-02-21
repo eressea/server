@@ -188,7 +188,7 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
         int size = getmaxx(win) - 2;
         int line = 0, maxline = getmaxy(win) - 2;
         const char *str = result;
-        wxborder(win);
+        box(win, 0, 0);
 
         while (*str && line < maxline) {
             const char *end = strchr(str, '\n');
