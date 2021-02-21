@@ -50,13 +50,11 @@ find_package (SQLite3 REQUIRED)
 find_package (IniParser REQUIRED)
 find_package (CJSON REQUIRED)
 find_package (EXPAT REQUIRED)
-if (TOLUA_FOUND)
-if (${TOLUA_VERSION_STRING} VERSION_EQUAL "5.2")
-find_package (Lua 5.2 REQUIRED)
-else()
+
+find_package (Lua)
+if (NOT LLUA_FOUND)
 find_package (Lua51 REQUIRED)
 endif()
-endif(TOLUA_FOUND)
 
 enable_testing()
 
