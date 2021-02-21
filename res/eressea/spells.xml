@@ -173,7 +173,7 @@
   <spell name="goodwinds" rank="5" parameters="s" ship="true" variable="true">
     <resource name="aura" amount="1" cost="level"/>
   </spell>
-  <spell name="airship" rank="5" parameters="s" noresist="true" ship="true">
+  <spell name="airship" rank="5" parameters="s" ship="true">
     <resource name="aura" amount="10" cost="fixed"/>
     <resource name="h12" amount="1" cost="fixed"/>
     <resource name="h20" amount="1" cost="fixed"/>
