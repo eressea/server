@@ -56,6 +56,7 @@ endif(TOLUA_FOUND)
 
 enable_testing()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 add_subdirectory (tolua)
 add_subdirectory (tools)
 add_subdirectory (storage)
