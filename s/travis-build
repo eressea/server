@@ -39,5 +39,8 @@ cd ../process
 make
 cd $ROOT
 inifile
+luarocks install lunitx --local
+eval $(luarocks path)
 s/runtests -V
 integration_tests
+
