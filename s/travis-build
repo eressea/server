@@ -41,6 +41,8 @@ cd $ROOT
 inifile
 luarocks install lunitx --local
 eval $(luarocks path)
+export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
+echo $LUA_PATH
 s/runtests -V
 integration_tests
 
