@@ -71,7 +71,8 @@ int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
 }
 
 int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
-    return mvwaddnstr(w, y, x, str, len);
+    (void)len;
+    return mvwaddstr(w, y, x, str);
 }
 
 static void init_curses(void)
@@ -368,7 +369,6 @@ static void paint_info_region(window * wnd, const state * st)
 
     UNUSED_ARG(st);
     werase(win);
-    box(win, 0, 0);
     if (mr && mr->r) {
         int line = 0;
         const region *r = mr->r;
@@ -383,9 +383,9 @@ static void paint_info_region(window * wnd, const state * st)
         if (r->land) {
             int iron = region_getresource_level(r, get_resourcetype(R_IRON));
             int stone = region_getresource_level(r, get_resourcetype(R_STONE));
-            mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
-            mvwprintw(win, line++, 1, "S:%6d  I:%5d", stone, iron);
-            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
+            mvwprintw(win, line++, 1, "$:%8d  P:%8d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "S:%8d  I:%8d", stone, iron);
+            mvwprintw(win, line++, 1, "H:%8d  %s:%8d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
         }
@@ -427,6 +427,7 @@ static void paint_info_region(window * wnd, const state * st)
             }
         }
     }
+    box(win, 0, 0);
 }
 
 static void(*paint_info) (struct window * wnd, const struct state * st);
@@ -1494,15 +1495,17 @@ static void update_view(view * vi)
 state *state_open(void)
 {
     state *st = (state *)calloc(1, sizeof(state));
-    st->display.pl = get_homeplane();
-    st->cursor.pl = get_homeplane();
-    st->cursor.x = 0;
-    st->cursor.y = 0;
-    st->selected = calloc(1, sizeof(struct selection));
-    st->modified = 0;
-    st->info_flags = 0xFFFFFFFF;
-    st->prev = current_state;
-    current_state = st;
+    if (st) {
+        st->display.pl = get_homeplane();
+        st->cursor.pl = get_homeplane();
+        st->cursor.x = 0;
+        st->cursor.y = 0;
+        st->selected = calloc(1, sizeof(struct selection));
+        st->modified = 0;
+        st->info_flags = 0xFFFFFFFF;
+        st->prev = current_state;
+        current_state = st;
+    }
     return st;
 }
 
@@ -1519,7 +1522,7 @@ void run_mapper(void)
     WINDOW *hwininfo;
     WINDOW *hwinmap;
     int width, height, x, y;
-    int split = 20;
+    int split = 30;
     state *st;
     point tl;
 
