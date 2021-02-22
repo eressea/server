@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-eval $(luarocks path)
 ROOT=$(git rev-parse --show-toplevel)
 export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
