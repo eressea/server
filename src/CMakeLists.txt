@@ -9,42 +9,42 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-IF(DEFINED ERESSEA_VERSION)
+if(DEFINED ERESSEA_VERSION)
 set_source_files_properties(kernel/version.c PROPERTIES
-COMPILE_DEFINITIONS ERESSEA_VERSION="${ERESSEA_VERSION}")
-ENDIF()
+compile_definitions ERESSEA_VERSION="${ERESSEA_VERSION}")
+endif()
 
-IF(DEFINED ERESSEA_BUILDNO)
+if(DEFINED ERESSEA_BUILDNO)
 set_source_files_properties(kernel/version.c PROPERTIES
 COMPILE_DEFINITIONS ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
-ENDIF()
+endif()
 
-IF (CMAKE_COMPILER_IS_GNUCC)
+if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
-ENDIF()
-IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+endif()
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
-ELSEIF(MSVC)
+elseif(MSVC)
   add_compile_options(/WX /MP)
 #  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
         "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib")
-ELSE()
-    MESSAGE(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
-ENDIF()
+else()
+    message(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
+endif()
 
-IF(CMAKE_COMPILER_IS_CLANG)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wtautological-compare -Weverything")
-    MESSAGE(STATUS "compiler is clang: ${CMAKE_C_COMPILER_ID}")
-ELSEIF(CMAKE_COMPILER_IS_GCC)
-    EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+if(CMAKE_COMPILER_IS_CLANG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wtautological-compare -Weverything")
+    message(STATUS "compiler is clang: ${CMAKE_C_COMPILER_ID}")
+elseif(CMAKE_COMPILER_IS_GCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
         OUTPUT_VARIABLE GCC_VERSION)
-    IF (GCC_VERSION VERSION_GREATER 4.9)
+    if (GCC_VERSION VERSION_GREATER 4.9)
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
-    ENDIF()
-ENDIF(CMAKE_COMPILER_IS_CLANG)
+    endif()
+endif(CMAKE_COMPILER_IS_CLANG)
 
 string(REGEX REPLACE "/W[3|4]" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
@@ -57,23 +57,23 @@ add_subdirectory(triggers)
 add_subdirectory(modules)
 add_subdirectory(races)
 
-MACRO(ADD_LUA_MODULE MODULE_NAME FILES)
-  ADD_LIBRARY (${MODULE_NAME} SHARED ${FILES})
-  SET_TARGET_PROPERTIES(${MODULE_NAME}
+macro(ADD_LUA_MODULE MODULE_NAME FILES)
+  add_library (${MODULE_NAME} SHARED ${FILES})
+  set_target_properties(${MODULE_NAME}
     PROPERTIES
     PREFIX ""
   )
-ENDMACRO(ADD_LUA_MODULE)
+endmacro(ADD_LUA_MODULE)
 
-MACRO(TOLUA_BINDING PKGFILE FILES)
-  ADD_CUSTOM_COMMAND(
+macro(TOLUA_BINDING PKGFILE FILES)
+  add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c
     DEPENDS ${FILES} ${PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
     ARGS -o ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c ${PKGFILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
-ENDMACRO(TOLUA_BINDING)
+endmacro(TOLUA_BINDING)
 
 TOLUA_BINDING(log.pkg util/log.h)
 TOLUA_BINDING(locale.pkg bind_locale.h)
