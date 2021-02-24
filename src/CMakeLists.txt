@@ -9,15 +9,6 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-if(DEFINED ERESSEA_VERSION)
-set_source_files_properties(kernel/version.c PROPERTIES
-compile_definitions ERESSEA_VERSION="${ERESSEA_VERSION}")
-endif()
-
-if(DEFINED ERESSEA_BUILDNO)
-set_source_files_properties(kernel/version.c PROPERTIES
-COMPILE_DEFINITIONS ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
-endif()
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
@@ -185,7 +176,15 @@ else(IWYU_PATH)
 endif()
 
 add_library(version STATIC ${VERSION_SRC})
+if(DEFINED ERESSEA_VERSION)
+  target_compile_definitions(version PRIVATE ERESSEA_VERSION="${ERESSEA_VERSION}")
+endif()
+
+if(DEFINED ERESSEA_BUILDNO)
+  target_compile_definitions(version PRIVATE ERESSEA_VERSION="${ERESSEA_VERSION}")
+endif()
 add_library(parser ${PARSER_SRC})
+
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
