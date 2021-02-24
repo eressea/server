@@ -530,9 +530,11 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         }
 
         if (u2->number == 0) {
-            set_racename(&u2->attribs, get_racename(u->attribs));
-            u_setrace(u2, u_race(u));
-            u2->irace = u->irace;
+            const race* rc = u_race(u);
+            u_setrace(u2, rc);
+            if (rc == get_race(RC_DAEMON)) {
+                u2->irace = u->irace;
+            }
             if (fval(u, UFL_HERO)) {
                 fset(u2, UFL_HERO);
             }

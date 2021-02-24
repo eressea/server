@@ -2216,6 +2216,18 @@
       <arg name="unit" type="unit"/>
     </type>
   </message>
+  <message name="followdetect_ship" section="movement">
+    <type>
+      <arg name="follower" type="ship"/>
+      <arg name="ship" type="ship"/>
+    </type>
+  </message>
+  <message name="followfail_ship" section="movement">
+    <type>
+      <arg name="follower" type="ship"/>
+      <arg name="ship" type="ship"/>
+    </type>
+  </message>
   <message name="moveblocked" section="errors">
     <type>
       <arg name="unit" type="unit"/>

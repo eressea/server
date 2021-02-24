@@ -1,7 +1,7 @@
+cmake_minimum_required(VERSION 3.13)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CJSON_INCLUDE_DIR})
 include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
@@ -9,43 +9,44 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-IF(DEFINED ERESSEA_VERSION)
+if(DEFINED ERESSEA_VERSION)
 set_source_files_properties(kernel/version.c PROPERTIES
-COMPILE_DEFINITIONS ERESSEA_VERSION="${ERESSEA_VERSION}")
-ENDIF()
+compile_definitions ERESSEA_VERSION="${ERESSEA_VERSION}")
+endif()
 
-IF(DEFINED ERESSEA_BUILDNO)
+if(DEFINED ERESSEA_BUILDNO)
 set_source_files_properties(kernel/version.c PROPERTIES
 COMPILE_DEFINITIONS ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
-ENDIF()
+endif()
 
-IF (CMAKE_COMPILER_IS_GNUCC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wvla")
-ENDIF()
-IF (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wconversion -Wno-sign-conversion")
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long")
-#    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c89")
-ELSEIF(MSVC)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W4 /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES")
+if (CMAKE_COMPILER_IS_GNUCC)
+  add_compile_options(-Wvla)
+endif()
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
+elseif(MSVC)
+  add_compile_options(/WX /MP)
+#  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE
         "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrtd.lib")
-ELSE()
-    MESSAGE(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
-ENDIF()
+else()
+    message(STATUS "unknown compiler ${CMAKE_C_COMPILER_ID}")
+endif()
 
-IF(CMAKE_COMPILER_IS_CLANG)
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wtautological-compare -Weverything")
-    MESSAGE(STATUS "compiler is clang: ${CMAKE_C_COMPILER_ID}")
-ELSEIF(CMAKE_COMPILER_IS_GCC)
-    EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+if(CMAKE_COMPILER_IS_CLANG)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wtautological-compare -Weverything")
+    message(STATUS "compiler is clang: ${CMAKE_C_COMPILER_ID}")
+elseif(CMAKE_COMPILER_IS_GCC)
+    execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
         OUTPUT_VARIABLE GCC_VERSION)
-    IF (GCC_VERSION VERSION_GREATER 4.9)
+    if (GCC_VERSION VERSION_GREATER 4.9)
         SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
-    ENDIF()
-ENDIF(CMAKE_COMPILER_IS_CLANG)
+    endif()
+endif(CMAKE_COMPILER_IS_CLANG)
+
+string(REGEX REPLACE "/W[3|4]" "/w" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_subdirectory(util)
 add_subdirectory(kernel)
@@ -56,25 +57,24 @@ add_subdirectory(triggers)
 add_subdirectory(modules)
 add_subdirectory(races)
 
-MACRO(ADD_LUA_MODULE MODULE_NAME FILES)
-  ADD_LIBRARY (${MODULE_NAME} SHARED ${FILES})
-  SET_TARGET_PROPERTIES(${MODULE_NAME}
+macro(ADD_LUA_MODULE MODULE_NAME FILES)
+  add_library (${MODULE_NAME} SHARED ${FILES})
+  set_target_properties(${MODULE_NAME}
     PROPERTIES
     PREFIX ""
   )
-ENDMACRO(ADD_LUA_MODULE)
+endmacro(ADD_LUA_MODULE)
 
-MACRO(TOLUA_BINDING PKGFILE FILES)
-  ADD_CUSTOM_COMMAND(
+macro(TOLUA_BINDING PKGFILE FILES)
+  add_custom_command(
     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c
     DEPENDS ${FILES} ${PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
     ARGS -o ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c ${PKGFILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
-ENDMACRO(TOLUA_BINDING)
+endmacro(TOLUA_BINDING)
 
-IF(NOT MSVC)
 TOLUA_BINDING(log.pkg util/log.h)
 TOLUA_BINDING(locale.pkg bind_locale.h)
 TOLUA_BINDING(config.pkg bind_config.h)
@@ -82,7 +82,6 @@ TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kenel/config.h)
-ENDIF()
 
 set (PARSER_SRC
   ${DB_SRC}
@@ -192,12 +191,18 @@ target_link_libraries(parser
   ${CRYPTO_LIBRARIES}
   )
 
-
 add_executable(checker ${CHECK_SRC})
 target_link_libraries(checker parser)
 
+if (HAVE_LIBBSD)
+  set (EXTRA_LIBS ${EXTRA_LIBS} bsd)
+endif (HAVE_LIBBSD)
+if (HAVE_LIBM)
+  set (EXTRA_LIBS ${EXTRA_LIBS} m)
+endif (HAVE_LIBM)
+
 add_library(game ${ERESSEA_SRC})
-target_link_libraries(game parser version)
+target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 if (IWYU_PATH)
@@ -209,7 +214,7 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
 )
 
 set(TESTS_SRC
@@ -268,7 +273,7 @@ target_link_libraries(test_eressea
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARIES}
-  ${INIPARSER_LIBRARIES}
+  ${IniParser_LIBRARIES}
   )
 
 add_test(server test_eressea)
@@ -282,51 +287,54 @@ add_test(server test_eressea)
 install(TARGETS eressea DESTINATION "bin")
 
 if (HAVE_EXECINFO_H AND HAVE_SIGNAL_H)
-  add_definitions(-DHAVE_BACKTRACE)
+  add_compile_definitions(HAVE_BACKTRACE)
 endif ()
 
 if (HAVE_LIBBSD)
-  add_definitions(-DHAVE_LIBBSD)
+  add_compile_definitions(HAVE_LIBBSD)
 endif (HAVE_LIBBSD)
 
 if (HAVE_STRLCAT)
-  add_definitions(-DHAVE_BSDSTRING)
+  add_compile_definitions(HAVE_BSDSTRING)
 endif (HAVE_STRLCAT)
 
 if (HAVE_STRDUP)
-  add_definitions(-DHAVE_STRDUP)
+  add_compile_definitions(HAVE_STRDUP)
 endif(HAVE_STRDUP)
 
 if (HAVE_LIBBSD)
 target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
-if (SQLITE3_FOUND)
-include_directories (${SQLITE3_INCLUDE_DIR})
-target_link_libraries(eressea ${SQLITE3_LIBRARIES})
-target_link_libraries(test_eressea ${SQLITE3_LIBRARIES})
-add_definitions(-DUSE_SQLITE)
+target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIRS})
+target_include_directories (game PUBLIC ${IniParser_INCLUDE_DIRS})
+
+if (SQLite3_FOUND)
+target_include_directories (game PRIVATE ${SQLite3_INCLUDE_DIRS})
+target_link_libraries(eressea ${SQLite3_LIBRARIES})
+target_link_libraries(test_eressea ${SQLite3_LIBRARIES})
+target_compile_definitions(game PRIVATE USE_SQLITE)
 elseif (DB_FOUND)
-include_directories (${DB_INCLUDE_DIR})
+#include_directories (${DB_INCLUDE_DIR})
 target_link_libraries(eressea ${DB_LIBRARIES})
 target_link_libraries(test_eressea ${DB_LIBRARIES})
-add_definitions(-DUSE_DB)
-endif(SQLITE3_FOUND)
+target_compile_definitions(game PRIVATE USE_DB)
+endif(SQLite3_FOUND)
 
 if (READLINE_FOUND)
-include_directories (${READLINE_INCLUDE_DIR})
+#include_directories (${READLINE_INCLUDE_DIR})
 target_link_libraries(eressea ${READLINE_LIBRARY})
-add_definitions(-DUSE_READLINE)
+target_compile_definitions(eressea PRIVATE DUSE_READLINE)
 endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
-include_directories (${CURSES_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
 target_link_libraries(eressea ${CURSES_LIBRARIES})
-add_definitions(-DUSE_CURSES)
+target_compile_definitions(eressea PRIVATE USE_CURSES)
 endif(CURSES_FOUND)
 
 if (EXPAT_FOUND)
-include_directories (${EXPAT_INCLUDE_DIRS})
+target_include_directories (game PRIVATE ${EXPAT_INCLUDE_DIRS})
 target_link_libraries(eressea ${EXPAT_LIBRARIES})
 target_link_libraries(test_eressea ${EXPAT_LIBRARIES})
 endif (EXPAT_FOUND)

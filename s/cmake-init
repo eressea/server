@@ -6,9 +6,6 @@ pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 GETOPT=getopt
 GETOPT_LONG=1
 
-if [ -z "$(luarocks show lunitx)" ] ; then
-  luarocks install lunitx --local
-fi
 if [ "Darwin" = "$(uname)" ] ; then
   if [ -x "/usr/local/opt/gnu-getopt/bin/getopt" ] ; then
     GETOPT="/usr/local/opt/gnu-getopt/bin/getopt"
@@ -78,22 +75,20 @@ fi
 
 DEST=$(dirname $ROOT)/server
 
-LUA_VERSION="5.2"
 LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
-if [ -d /usr/local/include/lua5.3 ]; then
-   LUA_VERSION="5.3"
-   LUA_INCLUDE=/usr/local/include/lua5.3
+if [ -d /usr/local/include/lua ]; then
+   LUA_INCLUDE=/usr/local/include/lua
+elif [ -d /usr/include/lua5.4 ]; then
+   LUA_INCLUDE=/usr/include/lua5.4
+elif [ -d /usr/include/lua5.3 ]; then
+   LUA_INCLUDE=/usr/include/lua5.3
 elif [ -d /usr/include/lua5.2 ]; then
-   export LUA_DIR=/usr
-   LUA_VERSION="5.2"
    LUA_INCLUDE=/usr/include/lua5.2
 elif [ -d /usr/include/lua5.1 ]; then
-   LUA_VERSION="5.1"
    LUA_INCLUDE=/usr/include/lua5.1
 elif [ -d /usr/local/include/lua5.1 ]; then
-   export LUA_DIR=/usr/local
-   LUA_VERSION="5.1"
+   LUA_DIR=/usr/local
    LUA_INCLUDE=/usr/local/include/lua5.1
 fi
 
@@ -110,27 +105,6 @@ SET (CMAKE_INSTALL_PREFIX "$DEST" CACHE PATH "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
 HEREDOC
-
-path="$(which tolua)"
-if [ "$HAVE_TOLUA" = "0" ] || [ -z $path ] ; then
- echo "tolua is not installed, building from source"
- cd $ROOT
- if [ ! -d tolua/include ]; then
-  echo "fetching tolua ${LUA_VERSION} from github..."
-  git clone https://github.com/ennorehling/tolua-${LUA_VERSION}.git tolua
- fi
- echo "building tolua..."
- cd tolua
- make
- cd -
-cat >> $BUILD/config.cmake <<TOLUA
-SET(PC_TOLUA_DIR "$ROOT/tolua" CACHE PATH "tolua root")
-TOLUA
-
-else
- echo "tolua is $path"
-fi
-unset path
 
 set -e
 

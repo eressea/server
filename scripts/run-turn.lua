@@ -1,3 +1,5 @@
+require 'eressea.path'
+
 function nmr_check(maxnmrs)
   local nmrs = get_nmrs(1)
   if nmrs > maxnmrs then
@@ -188,11 +190,6 @@ end
 
 math.randomseed(rng.random())
 
-local path = 'scripts'
-if config.install then
-    path = config.install .. '/' .. path
-end
-package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
 require 'eressea'
 require 'eressea.xmlconf' -- read xml data
 

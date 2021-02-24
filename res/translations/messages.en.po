@@ -1161,6 +1161,12 @@ msgid "spyreport_faction"
 msgstr "\"$unit($target) belongs to $faction($faction).\""
 
 msgid "ship_drift"
+msgstr "\"The ship $ship($ship) drifts to the $direction($dir).\""
+
+msgid "ship_drift_overload"
+msgstr "\"The ship $ship($ship) is too heavily loaded and drifts to the $direction($dir).\""
+
+msgid "ship_drift_nocrew"
 msgstr "\"The ship $ship($ship) needs more sailors and drifts to the $direction($dir).\""
 
 msgid "error_max_magicians"
@@ -1812,7 +1818,7 @@ msgid "error243"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You did not specify a valid race.\""
 
 msgid "error133"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a caravansary before building roads through deserts.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build a caravanserai before building roads through deserts.\""
 
 msgid "changepasswd"
 msgstr "\"The password of this faction is '$value'.\""
@@ -2590,6 +2596,12 @@ msgstr "\"$unit($mage) makes $unit($target) appear as $race($race,$unit.size($ta
 
 msgid "error248"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The faction has to be 10 turns old.\""
+
+msgid "followfail_ship"
+msgstr "\"$ship($follower) could not catch up to $ship($ship).\""
+
+msgid "followdetect_ship"
+msgstr "\"$ship($follower) followed $ship($ship).\""
 
 msgid "followfail"
 msgstr "\"$unit($follower) could not follow $unit($unit).\""

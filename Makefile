@@ -5,5 +5,5 @@ test:
 	s/runtests
 
 clean:
-	@rm -f *.log.*
+	@rm -rf *.log.* Debug/CMake* 
 	@find . -name "*~" | xargs rm -f

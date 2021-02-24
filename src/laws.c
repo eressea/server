@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <kernel/config.h>
 #include "laws.h"
@@ -598,15 +598,27 @@ static int cap_int(int i, int imin, int imax) {
     return imin;
 }
 
+static bool
+increased_growth(const region* r, const struct race *rc_elf) {
+    const unit* u;
+    for (u = r->units; u; u = u->next) {
+        if (u_race(u) != rc_elf) {
+            return false;
+        }
+    }
+    return true;
+}
+
 static void
-growing_trees(region * r, const season_t current_season, const season_t last_weeks_season)
+growing_trees(region * r, const season_t current_season, const season_t last_weeks_season, int rules)
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
     double seedchance = config_get_flt("rules.treeseeds.chance", 0.01F) * RESOURCE_QUANTITY;
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
-        int mp, elves = count_race(r, get_race(RC_ELF));
+        const struct race* rc_elf = get_race(RC_ELF);
+        int mp, elves = count_race(r, rc_elf);
         direction_t d;
 
         a = a_find(r->attribs, &at_germs);
@@ -644,6 +656,12 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
                 ++seeds;
             }
             if (seeds > 0) {
+                if (rules > 2) {
+                    if (increased_growth(r, rc_elf)) {
+                        /* in empty regions, plant twice the seeds */
+                        seeds += seeds;
+                    }
+                }
                 seeds += rtrees(r, 0);
                 rsettrees(r, 0, seeds);
             }
@@ -803,7 +821,7 @@ void nmr_warnings(void)
 void demographics(void)
 {
     region *r;
-    int plant_rules = config_get_int("rules.grow.formula", 2);
+    int plant_rules = config_get_int("rules.grow.formula", 3);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
@@ -850,12 +868,12 @@ void demographics(void)
                 if (horse_rules > 0) {
                     horses(r);
                 }
-                if (plant_rules == 2) { /* E2 */
-                    growing_trees(r, current_season, last_weeks_season);
-                    growing_herbs(r, current_season, last_weeks_season);
-                }
-                else if (plant_rules==1) { /* E3 */
+                if (plant_rules==1) { /* E3 */
                     growing_trees_e3(r, current_season, last_weeks_season);
+                }
+                else if (plant_rules) { /* E2 */
+                    growing_trees(r, current_season, last_weeks_season, plant_rules);
+                    growing_herbs(r, current_season, last_weeks_season);
                 }
             }
 
@@ -1250,8 +1268,8 @@ void do_enter(struct region *r, bool is_final_attempt)
     }
 }
 
+int newbies[MAXNEWPLAYERS];
 int dropouts[2];
-int *age = NULL;
 
 bool nmr_death(const faction * f, int turn, int timeout)
 {
@@ -1303,15 +1321,13 @@ static void remove_idle_players(void)
 
     i = turn + 1;
     if (i < 4) i = 4;
-    free(age);
-    age = calloc(i, sizeof(int));
-    if (!age) abort();
     for (fp = &factions; *fp;) {
         faction *f = *fp;
         if (!is_monsters(f)) {
             if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
-                if (f->age >= 0 && f->age <= turn)
-                    ++age[f->age];
+                if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
+                    ++newbies[f->age];
+                }
                 if (f->age == 2 || f->age == 3) {
                     if (f->lastorders == turn - 2) {
                         ++dropouts[f->age - 2];

@@ -1,8 +1,10 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #endif
-
+#endif
 #include "log.h"
+#include "stats.h"
 #include "macros.h"
 
 #include <CuTest.h>

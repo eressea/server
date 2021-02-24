@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <kernel/config.h>
 #include "study.h"
@@ -658,7 +658,7 @@ int study_cmd(unit * u, order * ord)
         ADDMSG(&u->faction->msgs, msg_message("studycost",
             "unit region cost skill", u, u->region, money, sk));
     }
-    if (a != NULL) {
+    if (teach != NULL) {
         if (teach->teachers) {
             msg_teachers(teach->teachers, u, sk);
         }

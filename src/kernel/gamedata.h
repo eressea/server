@@ -48,8 +48,9 @@
 #define SHIP_NUMBER_VERSION 370 /* ships have a number */
 #define FIX_SHAPESHIFT_VERSION 371 /* shapeshifting demons */
 #define FIX_SEAROADS_VERSION 372 /* removing roads in ocean regions */
+#define FIX_SHAPESHIFT_SPELL_VERSION 373 /* shapeshift spell, bug 2719 */
 
-#define RELEASE_VERSION FIX_SEAROADS_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_SHAPESHIFT_SPELL_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

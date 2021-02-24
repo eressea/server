@@ -9,11 +9,13 @@ end
 function setup()
     eressea.free_game()
     eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("study.produceexp", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
+    eressea.settings.set("magic.resist.enable", "0")
 end
 
 function disabled_double_default()
@@ -88,7 +90,6 @@ function test_herbalism()
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
 
-    eressea.settings.set("rules.grow.formula", 0) -- plants do not grow
     u:add_item("money", u.number * 100)
     u:set_skill("herbalism", 5)
     r:set_resource("seed", 100)
@@ -606,7 +607,7 @@ function test_seacast()
     u2.ship = s1
     u2:add_spell("stormwinds")
     u2:clear_orders()
-    u2:add_order("Zaubere stufe 2 'Sturmelementar' " .. itoa36(s1.id))
+    u2:add_order("ZAUBERE STUFE 2 'Sturmelementar' " .. itoa36(s1.id))
     u1:clear_orders()
     u1:add_order("NACH O O O O")
     process_orders()

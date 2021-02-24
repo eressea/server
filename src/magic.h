@@ -134,14 +134,14 @@ extern "C" {
 #define BUILDINGSPELL   (1<<7)  /* ZAUBER .. <Gebaeude-Nr> [<Gebaeude-Nr> ..] */
 #define REGIONSPELL     (1<<8)  /* wirkt auf struct region */
 #define GLOBALTARGET    (1<<9) /* Ziel kann ausserhalb der region sein */
+#define NORESISTANCE    (1<<10) /* Zielobjekte nicht auf Magieresistenz pruefen. */
 
-#define PRECOMBATSPELL	(1<<10)  /* PRAEKAMPFZAUBER .. */
-#define COMBATSPELL     (1<<11)  /* KAMPFZAUBER .. */
-#define POSTCOMBATSPELL	(1<<12)  /* POSTKAMPFZAUBER .. */
+#define PRECOMBATSPELL	(1<<11)  /* PRAEKAMPFZAUBER .. */
+#define COMBATSPELL     (1<<12)  /* KAMPFZAUBER .. */
+#define POSTCOMBATSPELL	(1<<13)  /* POSTKAMPFZAUBER .. */
 #define ISCOMBATSPELL   (PRECOMBATSPELL|COMBATSPELL|POSTCOMBATSPELL)
 
 
-#define TESTRESISTANCE  (1<<13) /* Zielobjekte auf Magieresistenz pruefen. not used in XML? */
 #define NOTFAMILIARCAST (1<<14) /* not used by XML? */
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
 

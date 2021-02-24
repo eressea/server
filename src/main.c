@@ -1,14 +1,18 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #endif
 
 #include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/messages.h>
 #include <kernel/version.h>
+#include <kernel/save.h>
 
 #include <util/language.h>
 #include <util/log.h>
+#include <util/stats.h>
 #include <util/path.h>
 #include <util/password.h>
 
@@ -60,7 +64,6 @@ static void load_inifile(void)
 #ifdef USE_CURSES
     /* only one value in the [editor] section */
     force_color = config_get_int("editor.color", force_color);
-    gm_codepage = config_get_int("editor.codepage", gm_codepage);
 #endif
 }
 
@@ -141,9 +144,9 @@ static int get_arg(int argc, char **argv, size_t len, int index, const char **re
     return index;
 }
 
-static int verbosity_to_flags(int verbosity) {
+static int verbosity_to_flags(int value) {
     int flags = 0;
-    switch (verbosity) {
+    switch (value) {
     case 0:
         flags = 0;
         break;
@@ -166,7 +169,7 @@ static int verbosity_to_flags(int verbosity) {
 static int parse_args(int argc, char **argv)
 {
     int i;
-    int log_stderr, log_flags = 3;
+    int log_flags = 3;
 
     for (i = 1; i != argc; ++i) {
         char *argi = argv[i];
@@ -196,6 +199,9 @@ static int parse_args(int argc, char **argv)
         else {
             const char *arg;
             switch (argi[1]) {
+            case 'D':
+                g_writegame = 0;
+                break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.path", arg);
@@ -241,9 +247,9 @@ static int parse_args(int argc, char **argv)
     log_open(logfile, log_flags);
 
     /* also log to stderr: */
-    log_stderr = verbosity_to_flags(verbosity);
-    if (log_stderr) {
-        log_to_file(log_stderr | LOG_FLUSH | LOG_BRIEF, stderr);
+    log_flags = verbosity_to_flags(verbosity);
+    if (log_flags) {
+        log_to_file(log_flags | LOG_FLUSH | LOG_BRIEF, stderr);
     }
     return 0;
 }

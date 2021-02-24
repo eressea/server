@@ -1,7 +1,8 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #endif
-
+#endif
 #include "bindings.h"
 #include "bind_tolua.h"
 

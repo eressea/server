@@ -6,7 +6,7 @@ inifile() {
 cd $ROOT
 if [ ! -e eressea.ini ]; then
 cp conf/eressea.ini .
-$BUILD/iniparser/inifile eressea.ini add lua:paths lunit:scripts
+$BUILD/tools/inifile eressea.ini add lua:paths lunit:scripts
 fi
 }
 
@@ -39,5 +39,10 @@ cd ../process
 make
 cd $ROOT
 inifile
+luarocks install lunitx --local
+eval $(luarocks path)
+export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
+echo $LUA_PATH
 s/runtests -V
 integration_tests
+

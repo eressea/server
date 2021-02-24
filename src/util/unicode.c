@@ -572,10 +572,14 @@ unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
 int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
     size_t *length)
 {
-    int result = unicode_utf8_to_cp437(cp_character, utf8_string, length);
+    wint_t ucs4_character;
+    int result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
     if (result == 0) {
         if (*length > 1) {
             *cp_character = '?';
+        }
+        else {
+            *cp_character = (unsigned char)ucs4_character;
         }
     }
     return result;

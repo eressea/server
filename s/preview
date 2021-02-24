@@ -58,7 +58,6 @@ cat >| eressea.ini <<HEREDOC
 dbname = eressea.db
 dbswap = :memory:
 install = $SOURCE
-paths = $SOURCE/lunit:$SOURCE/git/scripts
 rules = e$game
 HEREDOC
 }

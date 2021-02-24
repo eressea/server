@@ -94,33 +94,18 @@ void a_writechars(const variant * var, const void *owner, struct storage *store)
 int a_readstring(variant * var, void *owner, struct gamedata *data)
 {
     char buf[DISPLAYSIZE];
-    char * result = 0;
-    int e;
-    size_t len = 0;
-    do {
-        e = READ_STR(data->store, buf, sizeof(buf));
-        if (result) {
-            char *tmp = realloc(result, len + DISPLAYSIZE - 1);
-            if (!tmp) {
-                free(result);
-                abort();
-            }
-            result = tmp;
-            strcpy(result + len, buf);
-            len += DISPLAYSIZE - 1;
-        }
-        else {
-            result = str_strdup(buf);
-        }
-    } while (e == ENOMEM);
-    var->v = result;
+
+    READ_STR(data->store, buf, sizeof(buf));
+    var->v = str_strdup(buf);
     return AT_READ_OK;
 }
 
 void a_writestring(const variant * var, const void *owner, struct storage *store)
 {
+    const char* str = (const char*)var->v;
     assert(var && var->v);
-    WRITE_STR(store, (const char *)var->v);
+    assert(strlen(str) < DISPLAYSIZE);
+    WRITE_STR(store, str);
 }
 
 void a_finalizestring(variant * var)

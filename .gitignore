@@ -1,4 +1,3 @@
-tolua/
 .vscode/
 *.orig
 eressea.ini
@@ -47,4 +46,3 @@ tests/data/185.dat
 /critbit/
 *.mo
 /.vs
-/CMakeSettings.json

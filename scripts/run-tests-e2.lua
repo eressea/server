@@ -1,22 +1,15 @@
 -- Tests that work in all games. With game config of E2. 
 -- Tests are under scripts/test/e2 and all files must be in scripts/test/e2/init.lua
 
-lunit = require('lunit')
-if _VERSION >= 'Lua 5.2' then
-module = lunit.module
-end
-
-path = 'scripts'
-if config.install then
-    path = config.install .. '/' .. path
-end
-package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
-
 config.rules = 'e2'
+lunit = require 'lunit'
+if _VERSION >= 'Lua 5.2' then
+    module = lunit.module
+end
 
+require 'eressea.path'
 require 'eressea'
 require 'eressea.xmlconf'
-require 'eressea.path'
 require 'tests.e2'
 
 rng.inject(0)

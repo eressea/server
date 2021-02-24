@@ -1,4 +1,6 @@
-#include <platform.h>
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <kernel/config.h>
 #include "autoseed.h"
 
@@ -131,6 +133,11 @@ newfaction *read_newfactions(const char *filename)
         }
         nf->password = str_strdup(password);
         nf->race = rc_find(race);
+        if (nf->race == NULL) {
+            log_error("new faction has unknown race '%s'.\n", race);
+            free(nf);
+            continue;
+        }
         if (alliances != NULL) {
             struct alliance *al = findalliance(alliance);
             if (al == NULL) {
@@ -142,24 +149,6 @@ newfaction *read_newfactions(const char *filename)
         }
         else {
             nf->allies = NULL;
-        }
-        if (nf->race == NULL) {
-            /* if the script didn't supply the race as a token, then it gives us a
-             * race in the default locale (which means that itis a UTF8 string) */
-            nf->race = findrace(race, default_locale);
-            if (nf->race == NULL) {
-                char buffer[32];
-                size_t outbytes = sizeof(buffer) - 1;
-                size_t inbytes = strlen(race);
-                unicode_latin1_to_utf8(buffer, &outbytes, race, &inbytes);
-                buffer[outbytes] = 0;
-                nf->race = findrace(buffer, default_locale);
-                if (nf->race == NULL) {
-                    log_error("new faction has unknown race '%s'.\n", race);
-                    free(nf);
-                    continue;
-                }
-            }
         }
         nf->lang = get_locale(lang);
         assert(nf->race && nf->email && nf->lang);

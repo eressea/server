@@ -1,5 +1,6 @@
-#include "platform.h"
-
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "json.h"
 
 #include <util/base36.h>
@@ -9,7 +10,8 @@
 #include <kernel/faction.h>
 #include <kernel/terrain.h>
 #include <stream.h>
-#include "cJSON.h"
+
+#include <cJSON.h>
 
 #include <string.h>
 #include <stdlib.h>

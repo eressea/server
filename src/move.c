@@ -55,7 +55,6 @@
 #include "skill.h"
 
 /* util includes */
-#include <util/assert.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/lists.h>
@@ -70,6 +69,7 @@
 #include <storage.h>
 
 /* libc includes */
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -112,7 +112,7 @@ get_followers(unit * u, region * r, const region_list * route_end,
             while (a) {
                 if (a->data.v == u) {
                     follower *fnew = (follower *)malloc(sizeof(follower));
-                    assert_alloc(fnew);
+                    assert(fnew);
                     fnew->uf = uf;
                     fnew->ut = u;
                     fnew->route_end = route_end;
@@ -508,7 +508,7 @@ static double overload(const region * r, ship * sh)
         double ovl;
 
         getshipweight(sh, &n, &p);
-        ovl = n / (double)(sh->type->cargo * sh->number);
+        ovl = n / (double)sh->type->cargo * sh->number;
         if (mcabins) {
             ovl = fmax(ovl, p / (double)mcabins);
         }
@@ -813,12 +813,13 @@ static void drifting_ships(region * r)
     if (fval(r->terrain, SEA_REGION)) {
         ship **shp = &r->ships;
         while (*shp) {
-            ship *sh = *shp;
-            region *rnext = NULL;
-            region_list *route = NULL;
-            unit *firstu = r->units, *lastu = NULL;
+            ship* sh = *shp;
+            region* rnext = NULL;
+            region_list* route = NULL;
+            unit* firstu = r->units, * lastu = NULL;
             direction_t dir = NODIRECTION;
             double ovl;
+            const char* reason = "ship_drift";
 
             if (sh->type->fishing > 0) {
                 sh->flags |= SF_FISHING;
@@ -833,11 +834,21 @@ static void drifting_ships(region * r)
             /* Kapitaen da? Beschaedigt? Genuegend Matrosen?
              * Genuegend leicht? Dann ist alles OK. */
 
-            if (ship_finished(sh) && ship_crewed(sh, ship_owner(sh)) && cansail(r, sh)) {
-                shp = &sh->next;
-                continue;
+            if (ship_finished(sh)) {
+                if (!ship_crewed(sh, ship_owner(sh))) {
+                    reason = "ship_drift_nocrew";
+                }
+                else if (!cansail(r, sh)) {
+                    reason = "ship_drift_overload";
+                }
+                else {
+                    /* no problems, don't drift */
+                    shp = &sh->next;
+                    continue;
+                }
             }
 
+            fset(sh, SF_DRIFTED);
             ovl = overload(r, sh);
             if (ovl < overload_start()) {
                 /* Auswahl einer Richtung: Zuerst auf Land, dann
@@ -849,11 +860,10 @@ static void drifting_ships(region * r)
             }
 
             if (rnext && firstu) {
-                message *msg = msg_message("ship_drift", "ship dir", sh, dir);
+                message *msg = msg_message(reason, "ship dir", sh, dir);
                 msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
-            fset(sh, SF_DRIFTED);
             if (ovl >= overload_start()) {
                 damage_ship(sh, damage_overload(ovl));
                 msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
@@ -882,9 +892,27 @@ static void drifting_ships(region * r)
     }
 }
 
-static bool present(region * r, unit * u)
+static void caught_target_ship(region* r, unit* u)
 {
-    return (u && u->region == r);
+    attrib* a = a_find(u->attribs, &at_follow);
+
+    /* Verfolgungen melden */
+    /* Misserfolgsmeldung, oder bei erfolgreichem Verfolgen unter
+     * Umstaenden eine Warnung. */
+
+    if (a) {
+        unit* target = (unit*)a->data.v;
+
+        if (target == u || r != target->region) {
+            ADDMSG(&u->faction->msgs, msg_message("followfail_ship",
+                "ship follower", target->ship, u->ship));
+        }
+        else if (!alliedunit(target, u->faction, HELP_ALL)
+            && cansee(target->faction, r, u, 0)) {
+            ADDMSG(&target->faction->msgs, msg_message("followdetect_ship",
+                "ship follower", target->ship, u->ship));
+        }
+    }
 }
 
 static void caught_target(region * r, unit * u)
@@ -898,7 +926,7 @@ static void caught_target(region * r, unit * u)
     if (a) {
         unit *target = (unit *)a->data.v;
 
-        if (target == u || !present(r, target)) {
+        if (target == u || r != target->region) {
             ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                 target, u));
         }
@@ -939,7 +967,7 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
             if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
                 guard_count = guard_count - u->number;
             else if (sk >= stealth) {
-                double prob_u = (sk - stealth) * skill_prob;
+                double prob_u = skill_prob * ((double)sk - stealth);
                 guard_count += u->number;
                 /* amulet counts at most once */
                 prob_u += fmin(1, fmin(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
@@ -1452,10 +1480,10 @@ static void var_create_regions(arg_regions *dst, const region_list * begin, int 
 {
     const region_list *rsrc;
     int i;
-
+    assert(size > 0);
     dst->nregions = size;
     dst->regions = (region **) malloc(sizeof(region *) * (size_t)size);
-    assert_alloc(dst->regions);
+    assert(dst->regions);
     for (i = 0, rsrc = begin; i != size; rsrc = rsrc->next, ++i) {
         dst->regions[i] = rsrc->data;
     }
@@ -1642,7 +1670,9 @@ static const region_list *travel_route(unit * u,
 
 static bool ship_ready(const region * r, unit * u, order * ord)
 {
-    unit *cap = u->ship ? ship_owner(u->ship) : NULL;
+    unit* cap;
+    assert(u && u->ship);
+    cap = u->ship ? ship_owner(u->ship) : NULL;
     if (u != cap) {
         cmistake(u, ord, 146, MSG_MOVE);
         return false;
@@ -1959,7 +1989,7 @@ static void sail(unit * u, order * ord, bool drifting)
 
         /* Verfolgungen melden */
         if (fval(u, UFL_FOLLOWING)) {
-            caught_target(current_point, u);
+            caught_target_ship(current_point, u);
         }
 
         move_ship(sh, starting_point, current_point, route);
@@ -2560,6 +2590,12 @@ void follow_cmds(unit * u)
 
                 if (id > 0) {
                     u2 = findunit(id);
+                    if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
+                        ADDMSG(&u->faction->msgs, msg_message("unitnotfound_id",
+                            "unit region command id", u, r, ord, itoa36(id)));
+                        return;
+                    }
+
                 }
             }
             else if (p == P_SHIP) {
@@ -2588,13 +2624,6 @@ void follow_cmds(unit * u)
             }
             if (u2) {
                 bool moving = false;
-                if (u2->region != r || !cansee(u->faction, r, u2, 0)) {
-                    /* FIXME: u2 sollte hier keine TEMP Einheit sein. */
-                    ADDMSG(&u->faction->msgs, msg_message("unitnotfound_id",
-                        "unit region command id", u, r, ord, itoa36(u2->no)));
-                    return;
-                }
-
                 switch (getkeyword(u2->thisorder)) {
                 case K_MOVE:
                 case K_ROUTE:

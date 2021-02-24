@@ -1,4 +1,6 @@
-#include <platform.h>
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "jsonconf.h"
 
 /* kernel includes */
@@ -47,22 +49,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int json_flags(cJSON *json, const char *flags[]) {
-    cJSON *entry;
-    int result = 0;
-    assert(json->type == cJSON_Array);
-    for (entry = json->child; entry; entry = entry->next) {
-        if (entry->type == cJSON_String) {
-            int i;
-            for (i = 0; flags[i]; ++i) {
-                if (strcmp(flags[i], entry->valuestring) == 0) {
-                    result |= (1 << i);
-                    break;
-                }
-            }
+static void json_map(void* object, void (*mapfun)(void* child, void* udata), void* udata)
+{
+    cJSON *child, *json = (cJSON*)object;
+    for (child = json->child; child; child = child->next) {
+        mapfun(child, udata);
+    }
+}
+
+struct flags {
+    const char** names;
+    int result;
+};
+
+static void cb_flags(void* json, void *udata) {
+    struct flags *flags = (struct flags *)udata;
+    cJSON* entry = (cJSON*)json;
+    int i;
+    for (i = 0; flags->names[i]; ++i) {
+        if (strcmp(flags->names[i], entry->valuestring) == 0) {
+            flags->result |= (1 << i);
+            break;
         }
     }
-    return result;
+}
+
+static int json_flags(cJSON *json, const char *flags[]) {
+    struct flags ctx = { flags, 0 };
+
+    assert(json->type == cJSON_Array);
+    json_map(json, cb_flags, &ctx);
+    return ctx.result;
 }
 
 static void json_requirements(cJSON *json, requirement **matp) {

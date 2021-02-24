@@ -101,7 +101,7 @@ list_selection *do_selection(list_selection * sel, const char *title,
                 wclrtoeol(wn);
             }
             wclrtobot(wn);
-            wxborder(wn);
+            box(wn, 0, 0);
             mvwprintw(wn, 0, 2, "[ %s ]", title);
             update = false;
         }

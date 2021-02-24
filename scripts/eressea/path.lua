@@ -1,5 +1,9 @@
-if config.paths ~= nil then
-    for path in string.gmatch(config.paths, "([^:]+)") do
-        package.path = package.path .. ';' .. path .. '/?.lua;' .. path .. '/?/init.lua'
-    end
+local path = '.'
+if config.install then
+	path = config.install
+else
+    path = os.getenv("ERESSEA_ROOT") or path
+    config.install = path
 end
+path = path .. "/scripts"
+package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path

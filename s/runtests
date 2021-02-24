@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-eval $(luarocks path)
 ROOT=$(git rev-parse --show-toplevel)
+export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
 [ -z $BUILD ] && BUILD=Debug ; export BUILD
 
 UNIT_TESTS=$ROOT/$BUILD/eressea/test_eressea
@@ -21,8 +21,8 @@ if [ ! -e $ROOT/$BUILD ]; then
   exit
 fi
 
-$UNIT_TESTS
 cd $ROOT/tests
+$UNIT_TESTS
 $RUN_TESTS -v1 ../scripts/run-tests.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e2.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e3.lua

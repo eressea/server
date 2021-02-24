@@ -218,7 +218,7 @@ static void stealth_race(unit *u, const char *s) {
         }
 
         /* Schablonen können sich als alles mögliche tarnen */
-        if (u_race(u)->flags & RCF_SHAPESHIFT) {
+        else if (u_race(u)->flags & RCF_SHAPESHIFT) {
             u->irace = trace;
             set_racename(&u->attribs, NULL);
         }

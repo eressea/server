@@ -32,30 +32,25 @@
 
 static void test_write_spaces(CuTest *tc) {
     stream out = { 0 };
-    char buf[1024];
-    size_t len;
+    char buf[5];
 
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     write_spaces(&out, 4);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
+    buf[4] = '\0';
     CuAssertStrEquals(tc, "    ", buf);
-    CuAssertIntEquals(tc, ' ', buf[3]);
     mstream_done(&out);
 }
 
 static void test_write_many_spaces(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
-    size_t len;
 
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     write_spaces(&out, 100);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
-    CuAssertIntEquals(tc, 100, (int)len);
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertIntEquals(tc, ' ', buf[99]);
     mstream_done(&out);
 }
@@ -66,7 +61,6 @@ static void test_report_region(CuTest *tc) {
     faction *f;
     unit *u;
     stream out = { 0 };
-    size_t len;
     struct locale *lang;
     struct resource_type *rt_stone;
     construction *cons;
@@ -96,7 +90,7 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "plain", "Ebene");
     locale_setstring(lang, "see_travel", "durchgereist");
 
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     r = test_create_region(0, 0, NULL);
     add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
@@ -113,35 +107,35 @@ static void test_report_region(CuTest *tc) {
     region_setname(r, "1234567890123456789012345678901234567890");
     r->seen.mode = seen_travel;
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "1234567890123456789012345678901234567890 (0,0) (durchgereist), Ebene, 3/2\nBlumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
     out.api->rewind(out.handle);
     region_setname(r, "12345678901234567890123456789012345678901234567890123456789012345678901234567890");
     r->seen.mode = seen_travel;
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "12345678901234567890123456789012345678901234567890123456789012345678901234567890\n(0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
     out.api->rewind(out.handle);
     region_setname(r, "Hodor");
     r->seen.mode = seen_travel;
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "Hodor (0,0) (durchgereist), Ebene, 3/2 Blumen, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
     out.api->rewind(out.handle);
     r->seen.mode = seen_unit;
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 135 Steine/1, 5 Bauern, 2 Silber, 7 Pferde.\n", buf);
 
     out.api->rewind(out.handle);
@@ -151,9 +145,9 @@ static void test_report_region(CuTest *tc) {
     r->land->money = 1;
     r->seen.mode = seen_unit;
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 3/2 Blumen, 1 Stein/1, 1 Bauer, 1 Silber, 1 Pferd.\n", buf);
 
     r->land->peasants = 0;
@@ -165,9 +159,9 @@ static void test_report_region(CuTest *tc) {
 
     out.api->rewind(out.handle);
     report_region(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, "Hodor (0,0), Ebene, 1 Stein/1.\n", buf);
 
     mstream_done(&out);
@@ -178,14 +172,14 @@ static void test_report_allies(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
     char exp[1024];
-    size_t len, linebreak = 72;
+    size_t linebreak = 72;
     struct locale *lang;
     faction *f, *f1, *f2, *f3;
 
     test_setup();
     lang = test_create_locale();
     locale_setstring(lang, "list_and", " und ");
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     f = test_create_faction_ex(NULL, lang);
     f1 = test_create_faction_ex(NULL, lang);
     f2 = test_create_faction_ex(NULL, lang);
@@ -195,9 +189,9 @@ static void test_report_allies(CuTest *tc) {
         LOC(lang, parameters[P_GUARD]));
     ally_set(&f->allies, f1, HELP_GUARD);
     report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = 0;
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, exp, buf);
 
     out.api->rewind(out.handle);
@@ -217,9 +211,9 @@ static void test_report_allies(CuTest *tc) {
         factionname(f3),
         LOC(lang, parameters[P_ANY]));
     report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = 0;
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, exp, buf);
 
     test_teardown();
@@ -228,7 +222,6 @@ static void test_report_allies(CuTest *tc) {
 static void test_report_travelthru(CuTest *tc) {
     stream out = { 0 };
     char buf[1024];
-    size_t len;
     region *r;
     faction *f;
     unit *u;
@@ -237,7 +230,7 @@ static void test_report_travelthru(CuTest *tc) {
     test_setup();
     lang = get_or_create_locale("de");
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     r = test_create_region(0, 0, NULL);
     r->flags |= RF_TRAVELUNIT;
     f = test_create_faction();
@@ -246,27 +239,31 @@ static void test_report_travelthru(CuTest *tc) {
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
 
+    buf[0] = '\0';
     report_travelthru(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "no travelers, no report", 0, (int)len);
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
+    CuAssertStrEquals_Msg(tc, "no travelers, no report", "", buf);
     mstream_done(&out);
 
-    mstream_init(&out);
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     travelthru_add(r, u);
     report_travelthru(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals_Msg(tc, "list one unit", "\nDurchreise: Hodor (1).\n", buf);
     mstream_done(&out);
 
-    mstream_init(&out);
+    buf[0] = '\0';
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     move_unit(u, r, 0);
     report_travelthru(&out, r, f);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    CuAssertIntEquals_Msg(tc, "do not list units that stopped in the region", 0, (int)len);
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
+    CuAssertStrEquals_Msg(tc, "do not list units that stopped in the region", "", buf);
 
     mstream_done(&out);
     test_teardown();
@@ -382,14 +379,12 @@ static void test_paragraph(CuTest *tc) {
     const char *expect = "im Westen das Hochland von Geraldin (93,-303).\n";
     char buf[256];
     stream out = { 0 };
-    size_t len;
 
-    mstream_init(&out);
-
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     paragraph(&out, toolong, 0, 0, 0);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, expect, buf);
 }
 
@@ -398,14 +393,12 @@ static void test_paragraph_break(CuTest *tc) {
     const char *expect = "die Ebene von Godsettova (94,-304) und im Westen das Hochland von Geraldin\n(93,-303).\n";
     char buf[256];
     stream out = { 0 };
-    size_t len;
 
-    mstream_init(&out);
-
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     paragraph(&out, toolong, 0, 0, 0);
+    out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, expect, buf);
 }
 
@@ -415,17 +408,15 @@ static void test_pump_paragraph_toolong(CuTest *tc) {
     sbstring sbs;
     char buf[256];
     stream out = { 0 };
-    size_t len;
 
-    mstream_init(&out);
-
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
     sbs_init(&sbs, buf, sizeof(buf));
     sbs_strcat(&sbs, toolong);
 
     pump_paragraph(&sbs, &out, 78, true);
+    out.api->write(out.handle, "\0", 1);
     out.api->rewind(out.handle);
-    len = out.api->read(out.handle, buf, sizeof(buf));
-    buf[len] = '\0';
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals(tc, expect, buf);
 }
 

@@ -23,7 +23,6 @@ extern "C" {
   void run_mapper(void);
 
   extern int force_color;
-  extern int gm_codepage;
 
   struct state *state_open(void);
   void state_close(struct state *);

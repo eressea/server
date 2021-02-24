@@ -23,7 +23,7 @@ extern "C" {
      * dass hier ein Fehler (fehlende ") vorliegt */
 
     /* TODO: is this *really* still in use? */
-    extern int enc_gamedata;
+    extern int g_writegame;
 
     int readgame(const char *filename);
     int writegame(const char *filename);

@@ -1,5 +1,5 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 #include "version.h"
 
@@ -8,7 +8,7 @@
 
 #ifndef ERESSEA_VERSION
 /* the version number, if it was not passed to make with -D */
-#define ERESSEA_VERSION "3.26.0"
+#define ERESSEA_VERSION "3.27.0"
 #endif
 
 const char *eressea_version(void) {

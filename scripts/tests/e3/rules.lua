@@ -6,7 +6,6 @@ else
   module(tcname, lunit.testcase, package.seeall)
 end
 
-local settings
 
 -- use the C implementation in market.c, because the Lua
 -- module is wrong (https://bugs.eressea.de/view.php?id=2225)
@@ -16,28 +15,14 @@ local function process_markets()
     eressea.process.markets()
 end
 
-local function set_rule(key, value)
-    if value==nil then
-        eressea.settings.set(key, settings[key])
-    else
-        settings[key] = settings[key] or eressea.settings.get(key)
-        eressea.settings.set(key, value)
-    end
-end
-
 function setup()
     eressea.game.reset()
     settings = {}
-    set_rule("rules.move.owner_leave", "1")
-    set_rule("rules.food.flags", "4")
-    set_rule("rules.ship.drifting", "0")
-    set_rule("rules.ship.storms", "0")
-end
-
-function teardown()
-    for k,_ in pairs(settings) do
-        set_rule(k)
-    end
+    eressea.settings.set("rules.move.owner_leave", "1")
+    eressea.settings.set("rules.food.flags", "4")
+    eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
+    eressea.settings.set("magic.resist.enable", "0")
 end
 
 function test_new_faction_cannot_give_unit()
@@ -988,7 +973,7 @@ function test_no_uruk()
 end
 
 function test_bug2187()
-  set_rule("rules.food.flags", "0")
+  eressea.settings.set("rules.food.flags", "0")
 
   local r = region.create(0,0,"plain")
   local f = faction.create("goblin", "2187@eressea.de", "de")
@@ -1005,7 +990,7 @@ function test_bug2187()
 --  init_reports()
 --  write_report(f)
       
-  set_rule("rules.food.flags", "4")
+  eressea.settings.set("rules.food.flags", "4")
 end
 
 
@@ -1027,8 +1012,8 @@ end
 
 function test_demons_using_mallornlance()
     -- bug 2392
-    set_rule("skillchange.demon.up", "0")
-    set_rule("NewbieImmunity", "0")
+    eressea.settings.set("skillchange.demon.up", "0")
+    eressea.settings.set("NewbieImmunity", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create('goblin')
     local u = unit.create(f, r, 1, 'demon')

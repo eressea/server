@@ -53,7 +53,7 @@ int sp_flying_ship(castorder * co)
     pa = co->par;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag == TARGET_NOTFOUND)
+    if (pa->param[0]->flag)
         return 0;
     sh = pa->param[0]->data.sh;
     if (sh->number > 1 || sh->type->construction->maxsize > 50) {

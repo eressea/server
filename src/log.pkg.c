@@ -15,8 +15,8 @@
 #include <string.h>
 
 /* Exported function */
-TOLUA_API int tolua_log_open (lua_State* tolua_S);
-LUALIB_API int luaopen_log (lua_State* tolua_S);
+int tolua_log_open (lua_State* tolua_S);
+int luaopen_log (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_log
@@ -132,7 +132,7 @@ static int tolua_log_eressea_log_info00(lua_State* tolua_S)
 }
 
 /* Open lib function */
-LUALIB_API int luaopen_log (lua_State* tolua_S)
+int luaopen_log (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
@@ -152,7 +152,7 @@ LUALIB_API int luaopen_log (lua_State* tolua_S)
  return 1;
 }
 /* Open tolua function */
-TOLUA_API int tolua_log_open (lua_State* tolua_S)
+int tolua_log_open (lua_State* tolua_S)
 {
  lua_pushcfunction(tolua_S, luaopen_log);
  lua_pushstring(tolua_S, "log");

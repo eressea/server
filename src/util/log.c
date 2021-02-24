@@ -1,11 +1,11 @@
-#include <platform.h>
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "log.h"
 
 #include "path.h"
 #include "strings.h"
 #include "unicode.h"
-
-#include <critbit.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -16,6 +16,14 @@
 #include <stdarg.h>
 #include <time.h>
 
+#ifdef WIN32
+#include <io.h>
+#define FISATTY(F) (_isatty(_fileno(F)))
+#else
+#include <unistd.h>
+#define FISATTY(F) (isatty(fileno(F)))
+#endif
+
 void errno_check(const char * file, int line) {
     if (errno) {
         log_info("errno is %d (%s) at %s:%d", 
@@ -24,8 +32,8 @@ void errno_check(const char * file, int line) {
     }
 }
 
-#ifdef STDIO_CP
-static int stdio_codepage = STDIO_CP;
+#if WIN32
+static int stdio_codepage = 1252;
 #else
 static int stdio_codepage = 0;
 #endif
@@ -63,7 +71,7 @@ void log_destroy(log_t *handle) {
     }
 }
 
-#define MAXLENGTH 4096          /* because I am lazy, CP437 output is limited to this many chars */
+#define MAXLENGTH 4096          /* because I am lazy, tty output is limited to this many chars */
 #define LOG_MAXBACKUPS 5
 
 static int
@@ -87,7 +95,7 @@ cp_convert(const char *format, unsigned char *buffer, size_t length, int codepag
             return result;
         }
         ++pos;
-        input += length;
+        input += size;
     }
     *pos = 0;
     return 0;
@@ -175,12 +183,16 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
     }
 }
 
-static void log_stdio(void *data, int level, const char *module, const char *format, va_list args) {
-    FILE *out = (FILE *)data;
-    int codepage = (out == stderr || out == stdout) ? stdio_codepage : 0;
-    const char *prefix = log_prefix(level);
+static void log_stdio(void* data, int level, const char* module, const char* format, va_list args) {
+    FILE* out = (FILE*)data;
+    int codepage = 0;
+    const char* prefix = log_prefix(level);
     size_t len = strlen(format);
 
+    (void)module;
+    if (stdio_codepage && (out == stderr || out == stdout)) {
+        codepage = FISATTY(out) ? stdio_codepage : 0;
+    }
     fprintf(out, "%s: ", prefix);
 
     _log_write(out, codepage, format, args);
@@ -208,6 +220,9 @@ static void vlog(log_t *lg, int level, const char *format, va_list args) {
 
 static void log_write(int flags, const char *module, const char *format, va_list args) {
     log_t *lg;
+
+    (void)module;
+
     for (lg = loggers; lg; lg = lg->next) {
         int level = flags & LOG_LEVELS;
         if (lg->flags & level) {
@@ -263,14 +278,6 @@ void log_info(const char *format, ...)
     va_end(args);
 }
 
-void log_printf(FILE * io, const char *format, ...)
-{
-    va_list args;
-    va_start(args, format);
-    log_write(LOG_CPINFO, NULL, format, args);
-    va_end(args);
-}
-
 static FILE *logfile;
 
 void log_close(void)
@@ -308,78 +315,4 @@ int log_level(log_t * log, int flags)
     int old = log->flags;
     log->flags = flags;
     return old;
-}
-
-static critbit_tree stats = CRITBIT_TREE();
-
-int stats_count(const char *stat, int delta) {
-    void * match;
-    if (cb_find_prefix_str(&stats, stat, &match, 1, 0) == 0) {
-        size_t len;
-        char data[128];
-        len = cb_new_kv(stat, strlen(stat), &delta, sizeof(delta), data);
-        cb_insert(&stats, data, len);
-        return delta;
-    }
-    else {
-        int *num;
-        cb_get_kv_ex(match, (void **)&num);
-        return *num += delta;
-    }
-}
-
-#if 0
-#define STATS_BATCH 8
-void stats_walk(const char *prefix, void(*callback)(const char *, int, void *), void *udata) {
-    void *match[STATS_BATCH];
-    int n, off = 0;
-    do {
-        int i;
-        n = cb_find_prefix_str(&stats, prefix, match, STATS_BATCH, off);
-        if (n == 0) {
-            break;
-        }
-        off += n;
-        for (i = 0; i != n; ++i) {
-            const void *kv = match[i];
-            int *num;
-            cb_get_kv_ex(kv, &(void *)num);
-            callback(kv, *num, udata);
-        }
-    } while (n == STATS_BATCH);
-}
-#else
-
-struct walk_data {
-    int (*callback)(const char *, int, void *);
-    void *udata;
-};
-
-static int walk_cb(void * match, const void * key, size_t keylen, void *udata) {
-    struct walk_data *data = (struct walk_data *)udata;
-    int *num;
-    cb_get_kv_ex(match, (void **)&num);
-    return data->callback((const char*)match, *num, data->udata);
-}
-
-int stats_walk(const char *prefix, int (*callback)(const char *, int, void *), void *udata) {
-    struct walk_data data;
-    data.callback = callback;
-    data.udata = udata;
-    return cb_foreach(&stats, prefix, strlen(prefix), walk_cb, &data);
-}
-#endif
-
-static int write_cb(const char *key, int val, void *udata) {
-    FILE * F = (FILE *)udata;
-    fprintf(F, "%s: %d\n", (const char *)key, val);
-    return 0;
-}
-
-void stats_write(FILE *F, const char *prefix) {
-    stats_walk(prefix, write_cb, F);
-}
-
-void stats_close(void) {
-    cb_clear(&stats);
 }

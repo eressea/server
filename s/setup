@@ -102,7 +102,6 @@ ini_add game id $game
 ini_add game start 1
 ini_sec lua
 ini_add lua install $SOURCE
-ini_add lua paths $SOURCE/scripts:$SOURCE/lunit
 ini_add lua rules $rules
 
 echo 0 > turn

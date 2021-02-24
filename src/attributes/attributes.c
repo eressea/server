@@ -145,7 +145,7 @@ static int read_ext(variant *var, void *owner, gamedata *data)
 
     UNUSED_ARG(var);
     READ_INT(data->store, &len);
-    data->store->api->r_bin(data->store->handle, NULL, (size_t)len);
+    data->store->api->r_str(data->store->handle, NULL, (size_t)len);
     return AT_READ_OK;
 }
 

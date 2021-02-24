@@ -13,6 +13,7 @@ keyword.test.c
 language.test.c
 # lists.test.c
 # log.test.c
+# stats.test.c
 message.test.c
 # nrmessage.test.c
 order_parser.test.c
@@ -42,6 +43,7 @@ keyword.c
 language.c
 lists.c
 log.c
+stats.c
 message.c
 mt19937ar.c
 nrmessage.c

@@ -18,8 +18,9 @@ extern "C" {
 
     extern struct attrib_type at_germs;
 
+#define MAXNEWPLAYERS 4
+    extern int newbies[MAXNEWPLAYERS];
     extern int dropouts[2];
-    extern int *age;
 
     void demographics(void);
     void immigration(void);

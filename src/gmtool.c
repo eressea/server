@@ -1,7 +1,8 @@
 #ifdef _MSC_VER
-#include <platform.h>
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
 #endif
-
+#endif
 #include <curses.h>
 
 #include "gmtool.h"
@@ -29,7 +30,6 @@
 #include "util/path.h"
 #include "util/rand.h"
 #include "util/rng.h"
-#include "util/unicode.h"
 
 #include "gmtool_structs.h"
 #include "console.h"
@@ -58,42 +58,6 @@ state *current_state = NULL;
 
 static WINDOW *hstatus;
 
-#ifdef STDIO_CP
-int gm_codepage = STDIO_CP;
-#else 
-int gm_codepage = -1;
-#endif
-
-static void unicode_remove_diacritics(const char *rp, char *wp) {
-    while (*rp) {
-        if (gm_codepage >= 0 && *rp & 0x80) {
-            size_t sz = 0;
-            unsigned char ch;
-            switch (gm_codepage) {
-            case 1252:
-                unicode_utf8_to_cp1252(&ch, rp, &sz);
-                break;
-            case 437:
-                unicode_utf8_to_cp437(&ch, rp, &sz);
-                break;
-            default:
-                unicode_utf8_to_ascii(&ch, rp, &sz);
-                break;
-            }
-            rp += sz;
-            *wp++ = (char)ch;
-        }
-        else {
-            *wp++ = *rp++;
-        }
-    }
-    *wp = 0;
-}
-
-static void simplify(const char *rp, char *wp) {
-    unicode_remove_diacritics(rp, wp);
-}
-
 int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
     char buffer[128];
     va_list args;
@@ -103,15 +67,12 @@ int umvwprintw(WINDOW *win, int y, int x, const char *format, ...) {
     vsnprintf(buffer, sizeof(buffer) - 1, format, args);
     va_end(args);
 
-    simplify(buffer, buffer);
-
     return mvwaddstr(win, y, x, buffer);
 }
 
 int umvwaddnstr(WINDOW *w, int y, int x, const char * str, int len) {
-    char buffer[128];
-    simplify(str, buffer);
-    return mvwaddnstr(w, y, x, buffer, len);
+    (void)len;
+    return mvwaddstr(w, y, x, str);
 }
 
 static void init_curses(void)
@@ -123,13 +84,11 @@ static void init_curses(void)
         short bcol = COLOR_BLACK;
         short hcol = COLOR_MAGENTA;
         start_color();
-#ifdef __PDCURSES__
         /* looks crap on putty with TERM=linux */
         if (can_change_color()) {
             init_color(COLOR_YELLOW, 1000, 1000, 0);
             init_color(COLOR_CYAN, 0, 1000, 1000);
         }
-#endif
         for (fg = 0; fg != 8; ++fg) {
             for (bg = 0; bg != 2; ++bg) {
                 init_pair((short)(fg + 8 * bg), (short)fg, (short)(bg ? hcol : bcol));
@@ -401,15 +360,6 @@ static bool handle_info_region(window * wnd, state * st, int c)
     return false;
 }
 
-int wxborder(WINDOW *win)
-{
-#ifdef __PDCURSES__
-    return wborder(win, 0, 0, 0, 0, 0, 0, 0, 0);
-#else
-    return wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
-#endif
-}
-
 static void paint_info_region(window * wnd, const state * st)
 {
     WINDOW *win = wnd->handle;
@@ -419,7 +369,6 @@ static void paint_info_region(window * wnd, const state * st)
 
     UNUSED_ARG(st);
     werase(win);
-    wxborder(win);
     if (mr && mr->r) {
         int line = 0;
         const region *r = mr->r;
@@ -434,9 +383,9 @@ static void paint_info_region(window * wnd, const state * st)
         if (r->land) {
             int iron = region_getresource_level(r, get_resourcetype(R_IRON));
             int stone = region_getresource_level(r, get_resourcetype(R_STONE));
-            mvwprintw(win, line++, 1, "$:%6d  P:%5d", rmoney(r), rpeasants(r));
-            mvwprintw(win, line++, 1, "S:%6d  I:%5d", stone, iron);
-            mvwprintw(win, line++, 1, "H:%6d  %s:%5d", rhorses(r),
+            mvwprintw(win, line++, 1, "$:%8d  P:%8d", rmoney(r), rpeasants(r));
+            mvwprintw(win, line++, 1, "S:%8d  I:%8d", stone, iron);
+            mvwprintw(win, line++, 1, "H:%8d  %s:%8d", rhorses(r),
                 (r->flags & RF_MALLORN) ? "M" : "T",
                 r->land->trees[1] + r->land->trees[2]);
         }
@@ -478,6 +427,7 @@ static void paint_info_region(window * wnd, const state * st)
             }
         }
     }
+    box(win, 0, 0);
 }
 
 static void(*paint_info) (struct window * wnd, const struct state * st);
@@ -757,7 +707,7 @@ static faction *select_faction(state * st)
     }
     selected = do_selection(ilist, "Select Faction", NULL, NULL);
     st->wnd_info->update |= 1;
-    st->wnd_map->update |= 1;
+    st->wnd_map->update |= 3;
     st->wnd_status->update |= 1;
 
     if (selected == NULL)
@@ -782,7 +732,7 @@ static const terrain_type *select_terrain(state * st,
     }
     selected = do_selection(ilist, "Terrain", NULL, NULL);
     st->wnd_info->update |= 1;
-    st->wnd_map->update |= 1;
+    st->wnd_map->update |= 3;
     st->wnd_status->update |= 1;
 
     if (selected == NULL)
@@ -797,8 +747,7 @@ static coordinate *region2coord(const region * r, coordinate * c)
     c->pl = rplane(r);
     return c;
 }
-
-#ifdef __PDCURSES__
+#ifdef PDCURSES
 #define FAST_UP CTL_UP
 #define FAST_DOWN CTL_DOWN
 #define FAST_LEFT CTL_LEFT
@@ -1298,7 +1247,7 @@ static void handlekey(state * st, int c)
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
-        st->wnd_map->update |= 1;
+        st->wnd_map->update |= 3;
         break;
     case 'I':
         statusline(st->wnd_status->handle, "info-");
@@ -1351,7 +1300,7 @@ static void handlekey(state * st, int c)
             clear();
             st->wnd_info->update |= 1;
             st->wnd_status->update |= 1;
-            st->wnd_map->update |= 1;
+            st->wnd_map->update |= 3;
         }
         break;
     case 12:                   /* Ctrl-L */
@@ -1546,15 +1495,17 @@ static void update_view(view * vi)
 state *state_open(void)
 {
     state *st = (state *)calloc(1, sizeof(state));
-    st->display.pl = get_homeplane();
-    st->cursor.pl = get_homeplane();
-    st->cursor.x = 0;
-    st->cursor.y = 0;
-    st->selected = calloc(1, sizeof(struct selection));
-    st->modified = 0;
-    st->info_flags = 0xFFFFFFFF;
-    st->prev = current_state;
-    current_state = st;
+    if (st) {
+        st->display.pl = get_homeplane();
+        st->cursor.pl = get_homeplane();
+        st->cursor.x = 0;
+        st->cursor.y = 0;
+        st->selected = calloc(1, sizeof(struct selection));
+        st->modified = 0;
+        st->info_flags = 0xFFFFFFFF;
+        st->prev = current_state;
+        current_state = st;
+    }
     return st;
 }
 
@@ -1571,7 +1522,7 @@ void run_mapper(void)
     WINDOW *hwininfo;
     WINDOW *hwinmap;
     int width, height, x, y;
-    int split = 20;
+    int split = 30;
     state *st;
     point tl;
 

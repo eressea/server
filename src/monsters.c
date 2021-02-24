@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "monsters.h"
 
 #include "economy.h"
@@ -34,21 +30,22 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/base36.h>
+#include "util/base36.h"
 #include "util/keyword.h"
 #include "util/language.h"
-#include <util/log.h>
-#include <util/rand.h>
-#include <util/rng.h>
-#include <util/strings.h>
+#include "util/log.h"
+#include "util/stats.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/strings.h"
 
 /* attributes includes */
-#include <attributes/hate.h>
-#include <attributes/otherfaction.h>
-#include <attributes/stealth.h>
-#include <attributes/targetregion.h>
+#include "attributes/hate.h"
+#include "attributes/otherfaction.h"
+#include "attributes/stealth.h"
+#include "attributes/targetregion.h"
 
-#include <spells/regioncurse.h>
+#include "spells/regioncurse.h"
 
 #include <selist.h>
 
