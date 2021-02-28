@@ -1,6 +1,7 @@
 #!/bin/bash
 
 eval "$(luarocks path)"
+export LUA_PATH="${ERESSEA}/server/scripts/?.lua;$LUA_PATH"
 GAME=$1
 (
 [ "$ENABLED" == "no" ] && exit
