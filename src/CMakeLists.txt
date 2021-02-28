@@ -181,7 +181,7 @@ if(DEFINED ERESSEA_VERSION)
 endif()
 
 if(DEFINED ERESSEA_BUILDNO)
-  target_compile_definitions(version PRIVATE ERESSEA_VERSION="${ERESSEA_VERSION}")
+  target_compile_definitions(version PRIVATE ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
 endif()
 add_library(parser ${PARSER_SRC})
 
