@@ -1004,24 +1004,22 @@ param_t give_cmd(unit * u, order * ord)
                 }
             }
         }
-        else if (u2 != NULL) {
-            if (!(u_race(u2)->ec_flags & ECF_GETITEM)) {
-                ADDMSG(&u->faction->msgs,
-                    msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
-            }
-            else {
-                itype = finditemtype(s, u->faction->locale);
-                if (itype != NULL) {
-                    if (can_give(u, u2, itype, 0)) {
-                        give_item(n, itype, u, u2, ord);
-                    }
-                    else {
-                        feedback_give_not_allowed(u, ord);
-                    }
+        else if (u2 != NULL && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
+            ADDMSG(&u->faction->msgs,
+                msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
+        }
+        else {
+            itype = finditemtype(s, u->faction->locale);
+            if (itype != NULL) {
+                if (can_give(u, u2, itype, 0)) {
+                    give_item(n, itype, u, u2, ord);
                 }
                 else {
-                    cmistake(u, ord, 123, MSG_COMMERCE);
+                    feedback_give_not_allowed(u, ord);
                 }
+            }
+            else {
+                cmistake(u, ord, 123, MSG_COMMERCE);
             }
         }
     }
