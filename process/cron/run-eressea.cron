@@ -1,12 +1,13 @@
 #!/bin/bash
 
-eval "$(luarocks path)"
 GAME=$1
 (
 [ "$ENABLED" == "no" ] && exit
 [ -z "$ERESSEA" ] && ERESSEA="$HOME/eressea"
 
 export ERESSEA
+eval "$(luarocks path)"
+export LUA_PATH="${ERESSEA}/server/scripts/?.lua;$LUA_PATH"
 BIN="$ERESSEA/server/bin"
 TURN=$(cat "$ERESSEA/game-$GAME/turn")
 if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
