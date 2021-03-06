@@ -393,16 +393,30 @@ void economics(region * r)
     for (u = r->units; u; u = u->next) {
         order *ord;
         if (u->number > 0) {
+            order* transfer = NULL;
             for (ord = u->orders; ord; ord = ord->next) {
                 keyword_t kwd = getkeyword(ord);
                 if (kwd == K_GIVE) {
-                    give_cmd(u, ord);
+                    param_t p = give_cmd(u, ord);
+                    /* deal with GIVE UNIT later */
+                    if (p == P_UNIT && !transfer) {
+                        transfer = ord;
+                    }
                 }
                 else if (kwd == K_FORGET) {
                     forget_cmd(u, ord);
                 }
                 if (u->orders == NULL) {
                     break;
+                }
+            }
+            if (transfer) {
+                for (ord = transfer; ord; ord = ord->next) {
+                    keyword_t kwd = getkeyword(ord);
+                    if (kwd == K_GIVE) {
+                        give_unit_cmd(u, ord);
+                        break;
+                    }
                 }
             }
         }

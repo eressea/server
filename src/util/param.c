@@ -65,7 +65,7 @@ param_t findparam(const char *s, const struct locale * lang)
 {
     param_t result = NOPARAM;
     char buffer[64];
-    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : 0;
+    char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : NULL;
 
     if (str && str[0] && str[1]) {
         int i;
