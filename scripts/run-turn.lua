@@ -1,4 +1,3 @@
-print("package.path", package.path)
 require 'eressea.path'
 
 function nmr_check(maxnmrs)
