@@ -1181,6 +1181,18 @@
       <arg name="dir" type="direction"/>
     </type>
   </message>
+  <message name="ship_drift_overload" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="dir" type="direction"/>
+    </type>
+  </message>
+  <message name="ship_drift_nocrew" section="events">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="dir" type="direction"/>
+    </type>
+  </message>
   <message name="iceberg_drift" section="events">
     <type>
       <arg name="region" type="region"/>
