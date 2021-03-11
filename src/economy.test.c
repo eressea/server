@@ -549,7 +549,7 @@ static void test_recruit(CuTest *tc) {
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 1, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
-    add_recruits(u, 1, 1);
+    add_recruits(u, 1, 1, 1);
     CuAssertIntEquals(tc, 2, u->number);
     CuAssertIntEquals(tc, 2, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
@@ -557,8 +557,12 @@ static void test_recruit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u->nextF);
     CuAssertPtrEquals(tc, NULL, u->prevF);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "recruit"));
-    add_recruits(u, 1, 2);
+    add_recruits(u, 1, 2, 2);
     CuAssertIntEquals(tc, 3, u->number);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
+    test_clear_messages(f);
+    add_recruits(u, 1, 1, 2);
+    CuAssertIntEquals(tc, 4, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
     test_teardown();
 }

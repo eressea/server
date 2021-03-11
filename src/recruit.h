@@ -13,7 +13,7 @@ extern "C" {
     struct unit;
 
     struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
-    void add_recruits(struct unit * u, int number, int wanted);
+    void add_recruits(struct unit* u, int number, int wanted, int ordered);
     void recruit(struct region * r);
 
 #ifdef __cplusplus
