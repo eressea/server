@@ -35,6 +35,26 @@ static void test_volcano_update(CuTest *tc) {
     test_teardown();
 }
 
+static void test_volcano_damage(CuTest* tc) {
+    unit* u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    scale_number(u, 100);
+    u->hp = u->number * 20;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, u->number * 10, u->hp);
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "d9"));
+
+    /* 10 people have 11 HP, the rest has 10 and dies */
+    u->hp = 1010;
+    CuAssertIntEquals(tc, 90, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 10, u->number);
+    CuAssertIntEquals(tc, 10, u->hp);
+
+    test_teardown();
+}
+
 static void test_volcano_outbreak(CuTest *tc) {
     region *r, *rn;
     unit *u1, *u2;
@@ -89,6 +109,7 @@ CuSuite *get_volcano_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_volcano_update);
+    SUITE_ADD_TEST(suite, test_volcano_damage);
     SUITE_ADD_TEST(suite, test_volcano_outbreak);
     return suite;
 }

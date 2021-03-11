@@ -75,85 +75,32 @@ static bool resurrect_unit(unit *u) {
     return false;
 }
 
-static int damage_unit(unit * u, const char *dam, bool physical, bool magic)
+int volcano_damage(unit* u, const char* dice)
 {
-    int *hp, hpstack[20];
-    int h;
-    int healings;
-    int i, dead = 0, hp_rem = 0;
+    int hp = u->hp / u->number;
+    int remain = u->hp % u->number;
+    int ac, i, dead = 0, total = 0;
 
-    assert(u->number);
-    if (fval(u_race(u), RCF_ILLUSIONARY)) {
-        return 0;
-    }
-
-    assert(u->number <= u->hp);
-    h = u->hp / u->number;
-    /* HP verteilen */
-    if (u->number < 20) {
-        hp = hpstack;
-    }
-    else {
-        hp = malloc(u->number * sizeof(int));
-    }
-    for (i = 0; i < u->number; i++)
-        hp[i] = h;
-    h = u->hp - (u->number * h);
-    for (i = 0; i < h; i++)
-        hp[i]++;
-
-    /* Schaden */
-    for (i = 0; i < u->number; i++) {
-        int damage = dice_rand(dam);
-        if (magic) {
-            variant magres = magic_resistance(u);
-            int save = magres.sa[0] / magres.sa[1];
-            damage -= damage * save;
-        }
-        if (physical) {
-            damage -= nb_armor(u, i);
-        }
-        hp[i] -= damage;
-    }
-
-    /* does this unit have any healing potions or effects? */
-    healings = i_get(u->items, oldpotiontype[P_HEAL]) * 4;
-    healings += get_effect(u, oldpotiontype[P_HEAL]);
-    /* Auswirkungen */
-    for (i = 0; i < u->number; i++) {
-        if (hp[i] <= 0) {
-            /* Sieben Leben */
-            if (u_race(u) == get_race(RC_CAT) && (chance(1.0 / 7))) {
-                hp[i] = u->hp / u->number;
-                hp_rem += hp[i];
+    for (i = 0; i != u->number; ++i) {
+        int damage = dice_rand(dice);
+        if (damage > 0) {
+            if (i == 0 || ac > 0) {
+                ac = nb_armor(u, i);
+                damage -= ac;
             }
-            else if (healings > 0) {
-                --healings;
-                if (resurrect_unit(u)) {
-                    /* Heiltrank benutzen */
-                    hp[i] = u->hp / u->number;
-                    hp_rem += hp[i];
-                }
-                else {
+            if (damage > 0) {
+                int h = hp + ((i < remain) ? 1 : 0);
+                if (damage >= h) {
                     ++dead;
                 }
+                else {
+                    total += (h - damage);
+                }
             }
-            else {
-                ++dead;
-            }
-        }
-        else {
-            hp_rem += hp[i];
         }
     }
-
     scale_number(u, u->number - dead);
-    u->hp = hp_rem;
-
-    if (hp != hpstack) {
-        free(hp);
-    }
-
+    u->hp = total;
     return dead;
 }
 
@@ -212,7 +159,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     for (up = &r->units; *up;) {
         unit *u = *up;
         if (u->number) {
-            int dead = damage_unit(u, damage, true, false);
+            int dead = volcano_damage(u, damage);
             /* TODO create undead */
             if (dead) {
                 ADDMSG(&u->faction->msgs, msg_message("volcano_dead",
