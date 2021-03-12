@@ -76,6 +76,29 @@ static void test_volcano_damage_armor(CuTest* tc) {
     test_teardown();
 }
 
+static void test_volcano_damage_cats(CuTest* tc) {
+    unit* u;
+    struct race* rc_cat;
+
+    test_setup();
+    rc_cat = test_create_race("cat");
+    u = test_create_unit(test_create_faction_ex(rc_cat, NULL), test_create_plain(0, 0));
+    scale_number(u, 100);
+
+    random_source_inject_constants(0.0, 0); /* cats are always lucky */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 100, u->number);
+    CuAssertIntEquals(tc, 10 * u->number, u->hp);
+
+    random_source_inject_constants(0.0, 1); /* cats are never lucky */
+    CuAssertIntEquals(tc, 100, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertIntEquals(tc, 0, u->hp);
+
+    test_teardown();
+}
+
 static void test_volcano_damage_healing_potions(CuTest* tc) {
     unit* u;
     item_type* itype;
@@ -162,6 +185,7 @@ CuSuite *get_volcano_suite(void)
     SUITE_ADD_TEST(suite, test_volcano_damage);
     SUITE_ADD_TEST(suite, test_volcano_damage_healing_potions);
     SUITE_ADD_TEST(suite, test_volcano_damage_armor);
+    SUITE_ADD_TEST(suite, test_volcano_damage_cats);
     SUITE_ADD_TEST(suite, test_volcano_outbreak);
     return suite;
 }

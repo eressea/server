@@ -81,6 +81,7 @@ int volcano_damage(unit* u, const char* dice)
     int remain = u->hp % u->number;
     int ac, i, dead = 0, total = 0;
     int healings = 0;
+    const struct race* rc_cat = get_race(RC_CAT);
 
     /* does this unit have any healing potions or effects? */
     if (oldpotiontype[P_HEAL]) {
@@ -99,7 +100,12 @@ int volcano_damage(unit* u, const char* dice)
                 int h = hp + ((i < remain) ? 1 : 0);
 
                 if (damage >= h) {
-                    if (healings > 0) {
+                    if (rc_cat && u_race(u) == rc_cat && ((rng_int() % 7) == 0)) {
+                        /* cats have nine lives */
+                        total += h;
+                        continue;
+                    }
+                    else if (healings > 0) {
                         --healings;
                         if (resurrect_unit(u)) {
                             /* take no damage at all */
