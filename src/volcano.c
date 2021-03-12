@@ -80,6 +80,13 @@ int volcano_damage(unit* u, const char* dice)
     int hp = u->hp / u->number;
     int remain = u->hp % u->number;
     int ac, i, dead = 0, total = 0;
+    int healings = 0;
+
+    /* does this unit have any healing potions or effects? */
+    if (oldpotiontype[P_HEAL]) {
+        healings = get_effect(u, oldpotiontype[P_HEAL]);
+        healings += i_get(u->items, oldpotiontype[P_HEAL]) * 4;
+    }
 
     for (i = 0; i != u->number; ++i) {
         int damage = dice_rand(dice);
@@ -90,7 +97,17 @@ int volcano_damage(unit* u, const char* dice)
             }
             if (damage > 0) {
                 int h = hp + ((i < remain) ? 1 : 0);
+                bool heal = false;
+
                 if (damage >= h) {
+                    if (healings > 0) {
+                        --healings;
+                        if (resurrect_unit(u)) {
+                            /* take no damage at all */
+                            total += h;
+                            continue;
+                        }
+                    }
                     ++dead;
                 }
                 else {

@@ -1,16 +1,20 @@
 #include <platform.h>
 #include <tests.h>
 #include "volcano.h"
+#include "alchemy.h"
 
+#include <attributes/reduceproduction.h>
+
+#include <kernel/attrib.h>
 #include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/messages.h>
 
-#include <kernel/attrib.h>
-
-#include <attributes/reduceproduction.h>
+#include <util/rand.h>
+#include <util/rng.h>
 
 #include <CuTest.h>
 
@@ -51,6 +55,52 @@ static void test_volcano_damage(CuTest* tc) {
     CuAssertIntEquals(tc, 90, volcano_damage(u, "10"));
     CuAssertIntEquals(tc, 10, u->number);
     CuAssertIntEquals(tc, 10, u->hp);
+
+    test_teardown();
+}
+
+static void test_volcano_damage_armor(CuTest* tc) {
+    unit* u;
+    item_type* itype;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    scale_number(u, 100);
+    itype = test_create_itemtype("plate");
+    new_armortype(itype, 0.0, frac_zero, 1, 0);
+    i_change(&u->items, itype, 50);
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 50, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, u->number, u->hp);
+
+    test_teardown();
+}
+
+static void test_volcano_damage_healing_potions(CuTest* tc) {
+    unit* u;
+    item_type* itype;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    scale_number(u, 100);
+    itype = test_create_itemtype("healing");
+    new_potiontype(itype, 1);
+    oldpotiontype[P_HEAL] = itype;
+    i_change(&u->items, itype, 50); /* saves up to 4 dead people each */
+
+    random_source_inject_constants(0.0, 1); /* potions always work */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 100, u->number);
+    CuAssertIntEquals(tc, 10 * u->number, u->hp);
+    CuAssertIntEquals(tc, 25, i_get(u->items, itype));
+
+    random_source_inject_constants(0.0, 0); /* potions never work, everyone dies */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 100, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertIntEquals(tc, 0, u->hp);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
 
     test_teardown();
 }
@@ -110,6 +160,8 @@ CuSuite *get_volcano_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_volcano_update);
     SUITE_ADD_TEST(suite, test_volcano_damage);
+    SUITE_ADD_TEST(suite, test_volcano_damage_healing_potions);
+    SUITE_ADD_TEST(suite, test_volcano_damage_armor);
     SUITE_ADD_TEST(suite, test_volcano_outbreak);
     return suite;
 }
