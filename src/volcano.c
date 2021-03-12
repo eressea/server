@@ -97,7 +97,6 @@ int volcano_damage(unit* u, const char* dice)
             }
             if (damage > 0) {
                 int h = hp + ((i < remain) ? 1 : 0);
-                bool heal = false;
 
                 if (damage >= h) {
                     if (healings > 0) {
