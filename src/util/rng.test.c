@@ -1,16 +1,17 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
+#include "rng.h"
+#include "rand.h"
+#include "tests.h"
+
 #include <CuTest.h>
 #include <ctype.h>
 
-#include "rng.h"
-#include "rand.h"
-
 static void test_rng_round(CuTest * tc)
 {
-    double f = rng_double();
-    double r = RAND_ROUND(f);
+    double f, r;
+
+    test_setup();
+    f = rng_double();
+    r = RAND_ROUND(f);
     CuAssertTrue(tc, f >= 0);
     CuAssertTrue(tc, r <= f + 1);
     CuAssertTrue(tc, r >= f);
