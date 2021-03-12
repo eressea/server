@@ -1714,8 +1714,6 @@ static void test_immigration(CuTest * tc)
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
 
-    random_source_inject_array(inject, 2);
-
     config_set("rules.wage.function", "0");
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
