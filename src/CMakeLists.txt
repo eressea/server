@@ -9,14 +9,13 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-
 if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
 endif()
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
 elseif(MSVC)
-  add_compile_options(/WX /MP)
+  add_compile_options(/WX /MP /FC)
 #  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
