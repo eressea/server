@@ -119,11 +119,11 @@ static void scramble(void *data, unsigned int n, size_t width)
     assert(width <= sizeof(temp));
     for (j = 0; j != n; ++j) {
         unsigned int k = rng_uint() % n;
-        if (k == j)
-            continue;
-        memcpy(temp, (char *)data + j * width, width);
-        memcpy((char *)data + j * width, (char *)data + k * width, width);
-        memcpy((char *)data + k * width, temp, width);
+        if (k != j) {
+            memcpy(temp, (char*)data + j * width, width);
+            memcpy((char*)data + j * width, (char*)data + k * width, width);
+            memcpy((char*)data + k * width, temp, width);
+        }
     }
 }
 

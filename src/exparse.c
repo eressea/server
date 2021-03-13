@@ -105,7 +105,6 @@ const XML_Char *attr_get(const XML_Char **attr, const char *key) {
 }
 
 static building_stage *stage;
-
 #define UPKEEP_MAX 4
 static maintenance upkeep[UPKEEP_MAX];
 static int nupkeep;
@@ -1502,15 +1501,17 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "building")) {
         stage_ptr = NULL;
         if (nupkeep > 0) {
-            btype->maintenance = (maintenance *)calloc(nupkeep + 1, sizeof(maintenance));
+            btype->maintenance = malloc((nupkeep + 1) * sizeof(maintenance));
             if (!btype->maintenance) abort();
             memcpy(btype->maintenance, upkeep, sizeof(maintenance) * nupkeep);
+            memset(btype->maintenance + nupkeep, 0, sizeof(maintenance));
             nupkeep = 0;
         }
         if (nrmods > 0) {
-            btype->modifiers = calloc(nrmods + 1, sizeof(resource_mod));
+            btype->modifiers = malloc((nrmods + 1) * sizeof(resource_mod));
             if (!btype->modifiers) abort();
             memcpy(btype->modifiers, rmods, sizeof(resource_mod) * nrmods);
+            memset(btype->modifiers + nrmods, 0, sizeof(resource_mod));
             nrmods = 0;
         }
         pi->object = NULL;

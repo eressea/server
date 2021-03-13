@@ -220,7 +220,7 @@ void free_order(order * ord)
 order *copy_order(const order * src)
 {
     if (src != NULL) {
-        order *ord = (order *)malloc(sizeof(order));
+        order *ord = malloc(sizeof(order));
         if (!ord) abort();
         ord->next = NULL;
         ord->command = src->command;
@@ -335,7 +335,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     else {
         zBuffer[0] = 0;
     }
-    ord = (order *)malloc(sizeof(order));
+    ord = malloc(sizeof(order));
     create_order_i(ord, kwd, zBuffer, false, false, lang);
     return ord;
 }
@@ -382,7 +382,7 @@ order *parse_order(const char *s, const struct locale * lang)
             }
         }
         if (kwd != NOKEYWORD) {
-            order *ord = (order *)malloc(sizeof(order));
+            order *ord = malloc(sizeof(order));
             if (ord == NULL) abort();
             create_order_i(ord, kwd, sptr, persistent, noerror, lang);
             return ord;
