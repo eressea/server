@@ -5,22 +5,15 @@
 #include <CuTest.h>
 #include <ctype.h>
 
-static void test_rng_round(CuTest * tc)
-{
-    double f, r;
-
-    test_setup();
-    f = rng_double();
-    r = RAND_ROUND(f);
-    CuAssertTrue(tc, f >= 0);
-    CuAssertTrue(tc, r <= f + 1);
-    CuAssertTrue(tc, r >= f);
-    CuAssertTrue(tc, r == r);
-    CuAssertTrue(tc, r == RAND_ROUND(r));
-}
-
 static void test_dice_rand(CuTest* tc)
 {
+    test_setup();
+
+    random_source_inject_constants(0.0, 0);
+    CuAssertIntEquals(tc, 1, dice_rand("1d10"));
+    CuAssertIntEquals(tc, 1, dice_rand("d20"));
+    CuAssertIntEquals(tc, 2, dice_rand("2d4"));
+
     CuAssertIntEquals(tc, 9, dice_rand("3*(2+1)"));
     CuAssertIntEquals(tc, 0, dice_rand("0"));
     CuAssertIntEquals(tc, -5, dice_rand("-5"));
@@ -34,7 +27,6 @@ static void test_dice_rand(CuTest* tc)
 CuSuite *get_rng_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_rng_round);
     SUITE_ADD_TEST(suite, test_dice_rand);
     return suite;
 }
