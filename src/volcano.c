@@ -5,6 +5,7 @@
 #include "alchemy.h"
 
 /* kernel includes */
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -82,6 +83,7 @@ int volcano_damage(unit* u, const char* dice)
     int ac, i, dead = 0, total = 0;
     int healings = 0;
     const struct race* rc_cat = get_race(RC_CAT);
+    int protect = inside_building(u) ? (building_protection(u->building) + 1) : 0;
 
     /* does this unit have any healing potions or effects? */
     if (oldpotiontype[P_HEAL]) {
@@ -90,7 +92,7 @@ int volcano_damage(unit* u, const char* dice)
     }
 
     for (i = 0; i != u->number; ++i) {
-        int damage = dice_rand(dice);
+        int damage = dice_rand(dice) - protect;
         if (damage > 0) {
             if (i == 0 || ac > 0) {
                 ac = nb_armor(u, i);

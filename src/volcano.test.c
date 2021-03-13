@@ -6,6 +6,7 @@
 #include <attributes/reduceproduction.h>
 
 #include <kernel/attrib.h>
+#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -72,6 +73,41 @@ static void test_volcano_damage_armor(CuTest* tc) {
     u->hp = u->number * 10;
     CuAssertIntEquals(tc, 50, volcano_damage(u, "10"));
     CuAssertIntEquals(tc, u->number, u->hp);
+
+    test_teardown();
+}
+
+static void test_volcano_damage_buildings(CuTest* tc) {
+    unit* u;
+    building_type* btype;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    scale_number(u, 100);
+    btype = test_create_castle();
+    u->building = test_create_building(u->region, btype);
+    u->building->size = 100; /* Turm, 2 Punkte Bonus */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 3 * u->number, u->hp);
+
+    scale_number(u, 40);
+    u->hp = u->number * 10;
+    u->building->size = 40; /* Befestigung, 1 Punkt Bonus */
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 40, u->number);
+    CuAssertIntEquals(tc, 2 * u->number, u->hp);
+
+    btype->flags -= BTF_FORTIFICATION; /* regular buildings provide just 1 point total */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, u->number, u->hp);
+
+    scale_number(u, 100); /* unit is to big for the building, everyone gets hurt */
+    u->hp = u->number * 10;
+    CuAssertIntEquals(tc, 100, volcano_damage(u, "10"));
+    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertIntEquals(tc, 0, u->hp);
 
     test_teardown();
 }
@@ -185,6 +221,7 @@ CuSuite *get_volcano_suite(void)
     SUITE_ADD_TEST(suite, test_volcano_damage);
     SUITE_ADD_TEST(suite, test_volcano_damage_healing_potions);
     SUITE_ADD_TEST(suite, test_volcano_damage_armor);
+    SUITE_ADD_TEST(suite, test_volcano_damage_buildings);
     SUITE_ADD_TEST(suite, test_volcano_damage_cats);
     SUITE_ADD_TEST(suite, test_volcano_outbreak);
     return suite;
