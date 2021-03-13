@@ -106,7 +106,7 @@ extern "C" {
 
     const char *buildingtype(const building_type * btype,
         const struct building *b, int bsize);
-    const char *write_buildingname(const building * b, char *ibuf,
+    const char *write_buildingname(const building *b, char *ibuf,
         size_t size);
     int buildingcapacity(const struct building *b);
     struct building *building_create(int id);
@@ -115,12 +115,13 @@ extern "C" {
     int build_building(struct unit *u, const struct building_type *typ,
         int id, int size, struct order *ord);
     bool building_finished(const struct building *b);
+    int building_protection(const struct building *b);
 
     int wage(const struct region *r, const struct race *rc);
     int peasant_wage(const struct region *r, bool mourn);
 
-    typedef int(*cmp_building_cb) (const struct building * b,
-        const struct building * a);
+    typedef int(*cmp_building_cb) (const struct building *b,
+        const struct building *a);
     struct building *largestbuilding(const struct region *r, cmp_building_cb,
         bool imaginary);
     int cmp_wage(const struct building *b, const struct building *bother);

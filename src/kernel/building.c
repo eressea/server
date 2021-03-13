@@ -335,6 +335,10 @@ int bt_protection(const building_type * btype, int stage)
     return watch_bonus[stage];
 }
 
+int building_protection(const building* b) {
+    return bt_protection(b->type, buildingeffsize(b, false));
+}
+
 void write_building_reference(const struct building *b, struct storage *store)
 {
     WRITE_INT(store, (b && b->region) ? b->no : 0);
