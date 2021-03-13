@@ -752,10 +752,8 @@ static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **
     }
 }
 
-static construction *parse_construction(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
+void parse_construction(construction *con, parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     int i;
-    construction *con = (construction *)calloc(1, sizeof(construction));
-    if (!con) abort();
     con->maxsize = -1;
     con->minskill = -1;
     con->reqsize = 1;
@@ -781,7 +779,6 @@ static construction *parse_construction(parseinfo *pi, const XML_Char *el, const
         }
     }
     nreqs = 0;
-    return con;
 }
 
 static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
@@ -831,7 +828,9 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
         else if (rtype->itype) {
             item_type *itype = rtype->itype;
             if (xml_strequal(el, "construction")) {
-                itype->construction = parse_construction(pi, el, attr);
+                itype->construction = calloc(1, sizeof(construction));
+                if (!itype->construction) abort();
+                parse_construction(itype->construction, pi, el, attr);
             }
             else if (xml_strequal(el, "requirement")) {
                 assert(itype->construction);
@@ -975,8 +974,9 @@ static void start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             handle_requirement(pi, el, attr);
         }
         else if (xml_strequal(el, "construction")) {
-            assert(!stype->construction);
-            stype->construction = parse_construction(pi, el, attr);
+            stype->construction = calloc(1, sizeof(construction));
+            if (!stype->construction) abort();
+            parse_construction(stype->construction, pi, el, attr);
         }
         else if (xml_strequal(el, "coast")) {
             handle_coast(pi, el, attr);
@@ -1283,7 +1283,9 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
             assert(stage == NULL);
             stage = (building_stage *)calloc(1, sizeof(building_stage));
             if (!stage) abort();
-            stage->construction = parse_construction(pi, el, attr);
+            stage->construction = calloc(1, sizeof(construction));
+            if (!stage->construction) abort();
+            parse_construction(stage->construction, pi, el, attr);
         }
         else if (xml_strequal(el, "maintenance")) {
             assert(!btype->maintenance);
