@@ -325,6 +325,10 @@ static double peasant_luck_factor(void)
     return config_get_flt("rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
 
+inline int round_births(double growth) {
+    return (int)growth;
+}
+
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 {
     int births = 0;
@@ -334,7 +338,7 @@ int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
     mean *= peasant_luck_factor() * peasant_growth_factor();
     mean *= ((peasants / (double)maxp < .9) ? 1 : PEASANTFORCE);
 
-    births = (int)ceil(normalvariate(mean, variance * mean));
+    births = round_births(normalvariate(mean, variance * mean));
     if (births <= 0)
         births = 1;
     if (births > peasants / 2)
@@ -353,7 +357,7 @@ static void peasants(region * r, int rule)
     if (peasants > 0 && rule > 0) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
-        int births = (int)ceil(fraction);
+        int births = round_births(fraction);
         attrib *a = a_find(r->attribs, &at_peasantluck);
 
         if (a != NULL) {

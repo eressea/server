@@ -172,7 +172,7 @@ endif(CURSES_FOUND)
 if(IWYU_PATH)
   #  set(C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH} -Xiwyu --no_fwd_decls")
 else(IWYU_PATH)
-	message(STATUS "Could not find the program include-what-you-use")
+	# message(STATUS "Could not find the program include-what-you-use")
 endif()
 
 add_library(version STATIC ${VERSION_SRC})
@@ -204,9 +204,6 @@ add_library(game ${ERESSEA_SRC})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
-if (IWYU_PATH)
-set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
-endif(IWYU_PATH)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
@@ -274,6 +271,11 @@ target_link_libraries(test_eressea
   ${CJSON_LIBRARIES}
   ${IniParser_LIBRARIES}
   )
+
+set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
+if (IWYU_PATH)
+set_target_properties(test_eressea eressea PROPERTIES C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+endif(IWYU_PATH)
 
 add_test(server test_eressea)
 #add_test(NAME E3
