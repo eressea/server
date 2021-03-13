@@ -316,22 +316,24 @@ int cmp_castle_size(const building * b, const building * a)
     return b->size - a->size;
 }
 
-static const int castle_bonus[6] = { 0, 1, 3, 5, 8, 12 };
+static const int castle_bonus[7] = { 0, 0, 1, 2, 3, 4, 5 };
 static const int watch_bonus[3] = { 0, 1, 2 };
 
 int bt_protection(const building_type * btype, int stage)
 {
-    assert(btype->flags & BTF_FORTIFICATION);
-    if (btype->maxsize < 0) {
-        if (stage > 5) {
-            stage = 5;
+    if (btype->flags & BTF_FORTIFICATION) {
+        if (btype->maxsize < 0) {
+            if (stage >= 7) {
+                stage = 6;
+            }
+            return castle_bonus[stage];
         }
-        return castle_bonus[stage];
+        if (stage > 2) {
+            stage = 2;
+        }
+        return watch_bonus[stage];
     }
-    if (stage > 2) {
-        stage = 2;
-    }
-    return watch_bonus[stage];
+    return 0;
 }
 
 int building_protection(const building* b) {

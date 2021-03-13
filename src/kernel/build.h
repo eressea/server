@@ -28,6 +28,7 @@ extern "C" {
         requirement *materials;     /* material req'd to build one object */
     } construction;
 
+    void construction_init(struct construction *con, int minskill, skill_t sk, int reqsize, int maxsize);
     void free_construction(struct construction *cons);
     int destroy_cmd(struct unit *u, struct order *ord);
     int leave_cmd(struct unit *u, struct order *ord);

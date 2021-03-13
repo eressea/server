@@ -10,6 +10,7 @@
 #include "reports.h"
 #include "vortex.h"
 
+#include "kernel/build.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
 #include "kernel/config.h"
@@ -39,6 +40,7 @@
 #include "util/message.h"
 #include "util/log.h"
 #include "util/stats.h"
+#include "util/strings.h"
 #include "util/param.h"
 #include "util/rand.h"
 
@@ -398,23 +400,27 @@ ship_type * test_create_shiptype(const char * name)
 
 building_type * test_create_buildingtype(const char * name)
 {
-    construction *con;
+    construction *con = NULL;
     building_type *btype = bt_get_or_create(name);
     if (btype->stages) {
         con = &btype->stages->construction;
     } else {
-        btype->stages = calloc(1, sizeof(building_stage));
-        con = &btype->stages->construction;
-        con->skill = SK_BUILDING;
-        con->maxsize = -1;
-        con->minskill = 1;
-        con->reqsize = 1;
+        btype->stages = malloc(sizeof(building_stage));
+        if (btype->stages) {
+            con = &btype->stages->construction;
+            con->materials = NULL;
+            construction_init(con, 1, SK_BUILDING, 1, -1);
+            btype->stages->name = NULL;
+            btype->stages->next = NULL;
+        }
     }
     if (con && !con->materials) {
-        con->materials = (requirement *)calloc(2, sizeof(requirement));
-        con->materials[1].number = 0;
-        con->materials[0].number = 1;
-        con->materials[0].rtype = get_resourcetype(R_STONE);
+        con->materials = malloc(2 * sizeof(requirement));
+        if (con->materials) {
+            con->materials[0].number = 1;
+            con->materials[0].rtype = get_resourcetype(R_STONE);
+            con->materials[1].number = 0;
+        }
     }
     if (default_locale) {
         if (locale_getstring(default_locale, name) == NULL) {
@@ -423,6 +429,46 @@ building_type * test_create_buildingtype(const char * name)
     }
     return btype;
 }
+
+static building_stage **init_stage(building_stage **stage_p, int minskill, int maxsize,
+    const char *name, const resource_type *rtype)
+{
+    building_stage *stage = malloc(sizeof(building_stage));
+    assert(stage);
+    stage->name = str_strdup(name);
+    construction_init(&stage->construction, minskill, SK_BUILDING, 1, maxsize);
+    stage->construction.materials = malloc(2 * sizeof(requirement));
+    if (stage->construction.materials) {
+        stage->construction.materials[0].number = 1;
+        stage->construction.materials[0].rtype = rtype;
+        stage->construction.materials[1].number = 0;
+    }
+    *stage_p = stage;
+    return &stage->next;
+}
+
+building_type *test_create_castle(void) {
+    building_type *btype = bt_get_or_create("castle");
+    const resource_type *rtype = get_resourcetype(R_STONE);
+    if (!rtype) {
+        rtype = test_create_itemtype("stone")->rtype;
+    }
+
+    if (!btype->stages) {
+        building_stage **stage_p = &btype->stages;
+        btype->flags |= BTF_FORTIFICATION;
+        stage_p = init_stage(stage_p, 1, 2, "site", rtype);
+        stage_p = init_stage(stage_p, 1, 8, "tradepost", rtype);
+        stage_p = init_stage(stage_p, 2, 40, "fortification", rtype);
+        stage_p = init_stage(stage_p, 3, 200, "tower", rtype);
+        stage_p = init_stage(stage_p, 4, 1000, "castle", rtype);
+        stage_p = init_stage(stage_p, 5, 5000, "fortress", rtype);
+        stage_p = init_stage(stage_p, 6, -1, "citadel", rtype);
+        *stage_p = NULL;
+    }
+    return btype;
+}
+
 
 item_type * test_create_itemtype(const char * name) {
     resource_type * rtype;
@@ -551,7 +597,7 @@ void test_create_world(void)
         }
     }
 
-    test_create_buildingtype("castle");
+    test_create_castle();
     test_create_shiptype("boat");
 }
 

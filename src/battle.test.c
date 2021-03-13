@@ -186,20 +186,7 @@ static void test_select_armor(CuTest *tc) {
 }
 
 static building_type * setup_castle(void) {
-    building_type * btype;
-    construction *cons;
-
-    btype = test_create_buildingtype("castle");
-    assert(btype->stages);
-
-    btype->flags |= BTF_FORTIFICATION;
-    cons = &btype->stages->construction;
-    cons->maxsize = 5;
-    btype->stages->next = calloc(1, sizeof(building_stage));
-    assert(btype->stages->next);
-    cons = &btype->stages->next->construction;
-    cons->maxsize = -1;
-    return btype;
+    return test_create_castle();
 }
 
 static void test_defenders_get_building_bonus(CuTest * tc)
@@ -236,9 +223,14 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     at.fighter = af;
     at.index = 0;
 
-    bld->size = 10; /* stage 1 building */
-    CuAssertIntEquals(tc, 1, buildingeffsize(bld, false));
+    bld->size = 10; /* stage 2 building */
+    CuAssertIntEquals(tc, 2, buildingeffsize(bld, false));
     CuAssertIntEquals(tc, -1, skilldiff(at, dt, 0));
+    CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
+
+    bld->size = 9; /* stage 1 building */
+    CuAssertIntEquals(tc, 1, buildingeffsize(bld, false));
+    CuAssertIntEquals(tc, 0, skilldiff(at, dt, 0));
     CuAssertIntEquals(tc, 0, skilldiff(dt, at, 0));
 
     bld->size = 1; /* stage 0 building */
@@ -323,14 +315,15 @@ static void test_building_defense_bonus(CuTest * tc)
     test_setup();
     btype = setup_castle();
 
-    btype->maxsize = -1; /* unlimited buildigs get the castle bonus */
+    btype->maxsize = -1; /* unlimited buildings get the castle bonus */
     CuAssertIntEquals(tc, 0, bt_protection(btype, 0));
-    CuAssertIntEquals(tc, 1, bt_protection(btype, 1));
-    CuAssertIntEquals(tc, 3, bt_protection(btype, 2));
-    CuAssertIntEquals(tc, 5, bt_protection(btype, 3));
-    CuAssertIntEquals(tc, 8, bt_protection(btype, 4));
-    CuAssertIntEquals(tc, 12, bt_protection(btype, 5));
-    CuAssertIntEquals(tc, 12, bt_protection(btype, 6));
+    CuAssertIntEquals(tc, 0, bt_protection(btype, 1));
+    CuAssertIntEquals(tc, 1, bt_protection(btype, 2));
+    CuAssertIntEquals(tc, 2, bt_protection(btype, 3));
+    CuAssertIntEquals(tc, 3, bt_protection(btype, 4));
+    CuAssertIntEquals(tc, 4, bt_protection(btype, 5));
+    CuAssertIntEquals(tc, 5, bt_protection(btype, 6));
+    CuAssertIntEquals(tc, 5, bt_protection(btype, 7)); /* illegal castle size */
 
     btype->maxsize = 10; /* limited-size buildings are treated like an E3 watchtower */
     CuAssertIntEquals(tc, 0, bt_protection(btype, 0));
@@ -748,7 +741,8 @@ static void test_battle_skilldiff_building(CuTest *tc)
     CuAssertIntEquals(tc, 0, skilldiff(ta, td, 0));
 
     ud->building->size = 10;
-    CuAssertIntEquals(tc, 1, buildingeffsize(ud->building, false));
+    CuAssertIntEquals(tc, 2, buildingeffsize(ud->building, false));
+    CuAssertIntEquals(tc, 1, building_protection(ud->building));
     CuAssertIntEquals(tc, -1, skilldiff(ta, td, 0));
 
     create_curse(NULL, &ud->building->attribs, &ct_magicwalls, 1, 1, 1, 1);

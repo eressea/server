@@ -1010,6 +1010,13 @@ void continue_ship(unit * u, int want)
     build_ship(u, sh, want);
 }
 
+void construction_init(struct construction *con, int minskill, skill_t sk, int reqsize, int maxsize) {
+    con->minskill = minskill;
+    con->skill = sk;
+    con->reqsize = reqsize;
+    con->maxsize = maxsize;
+}
+
 void free_construction(struct construction *cons)
 {
     free(cons->materials);

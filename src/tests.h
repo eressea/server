@@ -59,6 +59,7 @@ extern "C" {
     struct item_type * test_create_itemtype(const char * name);
     struct ship_type *test_create_shiptype(const char * name);
     struct building_type *test_create_buildingtype(const char *name);
+    struct building_type* test_create_castle(void);
     void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
     struct spell * test_create_spell(void);
     int test_set_item(struct unit * u, const struct item_type *itype, int value);
