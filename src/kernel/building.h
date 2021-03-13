@@ -1,7 +1,9 @@
 #ifndef H_KRNL_BUILDING
 #define H_KRNL_BUILDING
 
-#include <kernel/types.h>
+#include "types.h"
+#include "build.h"
+
 #include <util/resolve.h>
 #include <util/variant.h>
 
@@ -40,7 +42,7 @@ extern "C" {
 
     typedef struct building_stage {
         /* construction of this building stage: */
-        struct construction *construction;  
+        struct construction construction;  
         /* building stage name: */
         char * name;
         /* next stage, if upgradable: */

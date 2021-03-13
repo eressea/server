@@ -191,15 +191,14 @@ static building_type * setup_castle(void) {
 
     btype = test_create_buildingtype("castle");
     assert(btype->stages);
-    assert(btype->stages->construction);
 
     btype->flags |= BTF_FORTIFICATION;
-    cons = btype->stages->construction;
+    cons = &btype->stages->construction;
     cons->maxsize = 5;
     btype->stages->next = calloc(1, sizeof(building_stage));
-    cons = calloc(1, sizeof(construction));
+    assert(btype->stages->next);
+    cons = &btype->stages->next->construction;
     cons->maxsize = -1;
-    btype->stages->next->construction = cons;
     return btype;
 }
 

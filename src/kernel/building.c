@@ -102,7 +102,6 @@ static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
     while (btype->stages) {
         building_stage *next = btype->stages->next;
-        free_construction(btype->stages->construction);
         free(btype->stages->name);
         free(btype->stages);
         btype->stages = next;
@@ -190,7 +189,7 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             bsize = adjust_size(b, bsize);
         }
         for (stage = btype->stages; stage; stage = stage->next) {
-            bsize -= stage->construction->maxsize;
+            bsize -= stage->construction.maxsize;
             if (!stage->next || bsize <0) {
                 return stage->name;
             }
@@ -529,7 +528,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
         int n = 0;
         const building_stage *stage = btype->stages;
         do {
-            const construction *con = stage->construction;
+            const construction *con = &stage->construction;
             if (con->maxsize < 0) {
                 break;
             }

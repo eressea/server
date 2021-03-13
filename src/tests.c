@@ -401,17 +401,14 @@ building_type * test_create_buildingtype(const char * name)
     construction *con;
     building_type *btype = bt_get_or_create(name);
     if (btype->stages) {
-        con = btype->stages->construction;
+        con = &btype->stages->construction;
     } else {
         btype->stages = calloc(1, sizeof(building_stage));
-        con = (construction *)calloc(1, sizeof(construction));
-        if (con) {
-            con->skill = SK_BUILDING;
-            con->maxsize = -1;
-            con->minskill = 1;
-            con->reqsize = 1;
-            btype->stages->construction = con;
-        }
+        con = &btype->stages->construction;
+        con->skill = SK_BUILDING;
+        con->maxsize = -1;
+        con->minskill = 1;
+        con->reqsize = 1;
     }
     if (con && !con->materials) {
         con->materials = (requirement *)calloc(2, sizeof(requirement));

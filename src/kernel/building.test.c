@@ -446,16 +446,13 @@ static void test_wage(CuTest *tc) {
     rc_elf->maintenance = 13;
     btype = test_create_buildingtype("castle");
     stage = btype->stages;
-    stage->construction->maxsize = 2; /* site */
+    stage->construction.maxsize = 2; /* site */
     stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction = calloc(1, sizeof(struct construction));
-    stage->construction->maxsize = 8; /* tradepost */
+    stage->construction.maxsize = 8; /* tradepost */
     stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction = calloc(1, sizeof(struct construction));
-    stage->construction->maxsize = 40; /* fortification */
+    stage->construction.maxsize = 40; /* fortification */
     stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction = calloc(1, sizeof(struct construction));
-    stage->construction->maxsize = 200; /* fortification */
+    stage->construction.maxsize = 200; /* tower */
     r = test_create_plain(0, 0);
     CuAssertIntEquals(tc, 10, wage(r, rc_elf));
     CuAssertIntEquals(tc, 10, wage(r, rc_orc));
@@ -563,11 +560,11 @@ static void test_cmp_current_owner(CuTest *tc) {
     config_set("rules.region_owners", "1");
     r = test_create_region(0, 0, NULL);
     btype = test_create_buildingtype("watch");
-    btype->stages->construction->maxsize = 1;
+    btype->stages->construction.maxsize = 1;
     btype->taxes = 200;
     b1 = test_create_building(r, btype);
     btype = test_create_buildingtype("castle");
-    btype->stages->construction->maxsize = 1;
+    btype->stages->construction.maxsize = 1;
     btype->taxes = 100;
     b2 = test_create_building(r, btype);
     b1->size = 1;
@@ -595,18 +592,18 @@ static void test_building_effsize(CuTest *tc) {
     test_setup();
     btype = test_create_buildingtype("castle");
     stage = btype->stages;
-    assert(stage && stage->construction);
-    cons = stage->construction;
+    assert(stage);
+    cons = &stage->construction;
     cons->maxsize = 5;
 
     stage->next = calloc(1, sizeof(building_stage));
     stage = stage->next;
-    cons = stage->construction = calloc(1, sizeof(construction));
+    cons = &stage->construction;
     cons->maxsize = 5;
 
     stage->next = calloc(1, sizeof(building_stage));
     stage = stage->next;
-    cons = stage->construction = calloc(1, sizeof(construction));
+    cons = &stage->construction;
     cons->maxsize = -1;
 
     b = test_create_building(test_create_region(0,0,0), btype);
@@ -651,7 +648,6 @@ static void test_buildingtype(CuTest *tc) {
     btype = test_create_buildingtype("hodor");
     CuAssertPtrNotNull(tc, btype->stages);
     CuAssertPtrEquals(tc, NULL, btype->stages->name);
-    CuAssertPtrNotNull(tc, btype->stages->construction);
     CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
 
     btype->stages->name = str_strdup("castle");

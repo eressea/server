@@ -66,8 +66,7 @@ static building_type *setup_castle(item_type *it_stone) {
     btype = test_create_buildingtype("castle");
     stage = btype->stages = calloc(1, sizeof(building_stage));
     if (!stage) abort();
-    cons = stage->construction = calloc(1, sizeof(construction));
-    if (!cons) abort();
+    cons = &stage->construction;
     cons->materials = calloc(2, sizeof(requirement));
     if (!cons->materials) abort();
     cons->materials[0].number = 1;
@@ -78,8 +77,7 @@ static building_type *setup_castle(item_type *it_stone) {
     cons->skill = SK_BUILDING;
     stage = stage->next = calloc(1, sizeof(building_stage));
     if (!stage) abort();
-    cons = stage->construction = calloc(1, sizeof(construction));
-    if (!cons) abort();
+    cons = &stage->construction;
     cons->materials = calloc(2, sizeof(requirement));
     if (!cons->materials) abort();
     cons->materials[0].number = 1;
