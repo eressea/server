@@ -1927,7 +1927,7 @@ int skilldiff(troop at, troop dt, int dist)
         }
         if (b->type->flags & BTF_FORTIFICATION) {
             int stage = buildingeffsize(b, false);
-            int beff = building_protection(b->type, stage);
+            int beff = bt_protection(b->type, stage);
             if (beff > 0) {
                 skdiff -= beff;
                 is_protected = 2;

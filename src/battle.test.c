@@ -325,19 +325,19 @@ static void test_building_defense_bonus(CuTest * tc)
     btype = setup_castle();
 
     btype->maxsize = -1; /* unlimited buildigs get the castle bonus */
-    CuAssertIntEquals(tc, 0, building_protection(btype, 0));
-    CuAssertIntEquals(tc, 1, building_protection(btype, 1));
-    CuAssertIntEquals(tc, 3, building_protection(btype, 2));
-    CuAssertIntEquals(tc, 5, building_protection(btype, 3));
-    CuAssertIntEquals(tc, 8, building_protection(btype, 4));
-    CuAssertIntEquals(tc, 12, building_protection(btype, 5));
-    CuAssertIntEquals(tc, 12, building_protection(btype, 6));
+    CuAssertIntEquals(tc, 0, bt_protection(btype, 0));
+    CuAssertIntEquals(tc, 1, bt_protection(btype, 1));
+    CuAssertIntEquals(tc, 3, bt_protection(btype, 2));
+    CuAssertIntEquals(tc, 5, bt_protection(btype, 3));
+    CuAssertIntEquals(tc, 8, bt_protection(btype, 4));
+    CuAssertIntEquals(tc, 12, bt_protection(btype, 5));
+    CuAssertIntEquals(tc, 12, bt_protection(btype, 6));
 
     btype->maxsize = 10; /* limited-size buildings are treated like an E3 watchtower */
-    CuAssertIntEquals(tc, 0, building_protection(btype, 0));
-    CuAssertIntEquals(tc, 1, building_protection(btype, 1));
-    CuAssertIntEquals(tc, 2, building_protection(btype, 2));
-    CuAssertIntEquals(tc, 2, building_protection(btype, 3));
+    CuAssertIntEquals(tc, 0, bt_protection(btype, 0));
+    CuAssertIntEquals(tc, 1, bt_protection(btype, 1));
+    CuAssertIntEquals(tc, 2, bt_protection(btype, 2));
+    CuAssertIntEquals(tc, 2, bt_protection(btype, 3));
     test_teardown();
 }
 

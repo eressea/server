@@ -68,7 +68,7 @@ extern "C" {
     extern struct attrib_type at_building_generic_type;
 
     int cmp_castle_size(const struct building *b, const struct building *a);
-    int building_protection(const struct building_type *btype, int stage);
+    int bt_protection(const struct building_type *btype, int stage);
     building_type *bt_get_or_create(const char *name);
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
