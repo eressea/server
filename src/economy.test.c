@@ -685,9 +685,10 @@ static void test_modify_skill(CuTest *tc) {
     itype->construction->minskill = 1;
     itype->construction->maxsize = -1;
     itype->construction->reqsize = 1;
-    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials = malloc(2 * sizeof(requirement));
     itype->construction->materials[0].rtype = rtype;
     itype->construction->materials[0].number = 1;
+    itype->construction->materials[1].number = 0;
 
     /* our race gets a +1 bonus to the item's production skill */
     mod = itype->rtype->modifiers = calloc(2, sizeof(resource_mod));
@@ -742,9 +743,10 @@ static void test_modify_production(CuTest *tc) {
     itype->construction->minskill = 1;
     itype->construction->maxsize = 1;
     itype->construction->reqsize = 1;
-    itype->construction->materials = calloc(2, sizeof(requirement));
-    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials = malloc(2 * sizeof(requirement));
     itype->construction->materials[0].number = 1;
+    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials[1].number = 0;
     set_level(u, SK_ALCHEMY, 1);
     test_set_item(u, rt_silver->itype, 1);
     make_item(u, itype, 1);
@@ -753,7 +755,7 @@ static void test_modify_production(CuTest *tc) {
 
     /* make level-based raw materials, no materials used in construction */
     free(itype->construction->materials);
-    itype->construction->materials = 0;
+    itype->construction->materials = NULL;
     rtype->flags |= RTF_LIMITED;
     rmt_create(rtype);
     add_resource(u->region, 1, 300, 150, rtype); /* there are 300 stones at level 1 */

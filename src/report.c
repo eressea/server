@@ -2131,7 +2131,6 @@ report_plaintext(const char *filename, report_context * ctx,
                         sbs_strcat(&sbs, ", ");
                     }
                 }
-                assert(!rm->rtype);
             }
             centre(out, buf, true);
             newline(out);
