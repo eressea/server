@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include <platform.h>
 #include "rand.h"
 #include "mtrand.h"
@@ -9,11 +12,6 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-
-/* do not use M_PI, use one of these instead: */
-#define PI_F 3.1415926535897932384626433832795F
-#define PI_D 3.1415926535897932384626433832795
-#define PI_L 3.1415926535897932384626433832795L
 
 int lovar(double xpct_x2)
 {
@@ -36,10 +34,10 @@ double normalvariate(double mu, double sigma)
     if (phase == 0) {
         U = (rng_int() + 1.) / (RNG_RAND_MAX + 2.);
         V = rng_int() / (RNG_RAND_MAX + 1.);
-        Z = sqrt(-2 * log(U)) * sin(2 * PI_D * V);
+        Z = sqrt(-2 * log(U)) * sin(2 * M_PI * V);
     }
     else {
-        Z = sqrt(-2 * log(U)) * cos(2 * PI_D * V);
+        Z = sqrt(-2 * log(U)) * cos(2 * M_PI * V);
     }
     phase = 1 - phase;
 
