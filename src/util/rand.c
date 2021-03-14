@@ -1,17 +1,12 @@
 #ifdef _MSC_VER
 #define _USE_MATH_DEFINES
 #endif
-#include <platform.h>
 #include "rand.h"
 #include "mtrand.h"
 #include "rng.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>
 #include <math.h>
-#include <float.h>
-#include <ctype.h>
 
 int lovar(double xpct_x2)
 {
