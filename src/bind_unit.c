@@ -848,15 +848,18 @@ static int tolua_unit_clear_attribs(lua_State *L) {
 static int tolua_unit_has_attrib(lua_State *L) {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *name = tolua_tostring(L, 2, NULL);
-    attrib * a = u->attribs;
-    while (a) {
-        if (strcmp(a->type->name, name) == 0) {
-            break;
+    if (u && name) {
+        attrib * a = u->attribs;
+        while (a) {
+            if (strcmp(a->type->name, name) == 0) {
+                break;
+            }
+            a = a->nexttype;
         }
-        a = a->nexttype;
+        lua_pushboolean(L, a != NULL);
+        return 1;
     }
-    lua_pushboolean(L, a != NULL);
-    return 1;
+    return 0;
 }
 
 static int tolua_unit_get_key(lua_State * L)

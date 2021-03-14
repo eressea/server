@@ -296,17 +296,19 @@ static int tolua_create_curse(lua_State * L)
             ap = &target->attribs;
     }
     if (ap) {
-        const char *cname = tolua_tostring(L, 3, 0);
-        const curse_type *ctype = ct_find(cname);
-        if (ctype) {
-            float vigour = (float)tolua_tonumber(L, 4, 0);
-            int duration = (int)tolua_tonumber(L, 5, 0);
-            float effect = (float)tolua_tonumber(L, 6, 0);
-            int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
-            curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
-            if (c) {
-                tolua_pushboolean(L, true);
-                return 1;
+        const char *cname = tolua_tostring(L, 3, NULL);
+        if (cname) {
+            const curse_type *ctype = ct_find(cname);
+            if (ctype) {
+                float vigour = (float)tolua_tonumber(L, 4, 0);
+                int duration = (int)tolua_tonumber(L, 5, 0);
+                float effect = (float)tolua_tonumber(L, 6, 0);
+                int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
+                curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
+                if (c) {
+                    tolua_pushboolean(L, true);
+                    return 1;
+                }
             }
         }
     }
