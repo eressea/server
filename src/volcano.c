@@ -80,7 +80,7 @@ int volcano_damage(unit* u, const char* dice)
 {
     int hp = u->hp / u->number;
     int remain = u->hp % u->number;
-    int ac, i, dead = 0, total = 0;
+    int ac = 0, i, dead = 0, total = 0;
     int healings = 0;
     const struct race* rc_cat = get_race(RC_CAT);
     int protect = inside_building(u) ? (building_protection(u->building) + 1) : 0;
