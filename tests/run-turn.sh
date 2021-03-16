@@ -27,7 +27,7 @@ ROOT=`pwd`
 while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
-
+export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
 cd $ROOT/tests
 setup
 cleanup
