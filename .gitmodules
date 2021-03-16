@@ -5,6 +5,3 @@
 [submodule "clibs"]
 	path = clibs
 	url = https://github.com/ennorehling/clibs
-[submodule "tolua"]
-	path = tolua
-	url = https://github.com/ennorehling/tolua.git
