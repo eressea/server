@@ -47,6 +47,7 @@ if (NOT CURSES_FOUND)
   find_package (Curses)
 endif (NOT CURSES_FOUND)
 
+find_package (ToLua 5.2 REQUIRED)
 #find_package (BerkeleyDB REQUIRED)
 find_package (SQLite3 REQUIRED)
 find_package (IniParser REQUIRED)
@@ -60,7 +61,6 @@ endif()
 
 enable_testing()
 
-add_subdirectory (tolua)
 add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)

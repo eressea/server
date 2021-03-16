@@ -10,7 +10,7 @@ addons:
     packages:
       - libbsd-dev
       - libdb-dev
-      - liblua5.3-dev
+      - libtolua-dev
       - libncurses5-dev
       - libsqlite3-dev
       - libexpat1-dev
