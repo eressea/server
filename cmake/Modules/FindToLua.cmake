@@ -59,7 +59,7 @@ elseif(TOLUA_INCLUDE_DIR AND EXISTS "${TOLUA_INCLUDE_DIR}/tolua.h")
            TOLUA_VERSION_STRING "${tolua_version_str}")
     unset(tolua_version_str)
 else(PC_TOLUA_VERSION)
-message(ERROR "TOLUA_VERSION_STRING cannot be determined")
+message ("TOLUA_VERSION_STRING cannot be determined")
 endif(PC_TOLUA_VERSION)
 
 # handle the QUIETLY and REQUIRED arguments and set TOLUA_FOUND to TRUE if
