@@ -982,7 +982,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <attack type="2" damage="5d600"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="ghast" magres="60" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
+  <race name="ghast" magres="60" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes" scarepeasants="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -999,7 +999,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <attack type="2" damage="1d30"/>
     <attack type="2" damage="1d30"/>
   </race>
-  <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes">
+  <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
     <ai splitsize="10000" absorbpeasants="yes" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -1030,7 +1030,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <attack type="3" damage="1d1"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+  <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" desert="yes">
     <ai splitsize="10000" killpeasants="yes" moverandom="yes" scarepeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
