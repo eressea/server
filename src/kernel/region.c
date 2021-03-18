@@ -1242,7 +1242,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     assert(terrain);
 
     r->terrain = terrain;
-    reset_herbs(r);
     reset_rawmaterials(r);
     terraform_resources(r);
 
