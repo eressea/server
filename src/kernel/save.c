@@ -383,11 +383,12 @@ unit *read_unit(gamedata *data)
     char obuf[DISPLAYSIZE];
     faction *f;
     char rname[32];
-    static const struct race * rc_demon;
+    static const struct race *rc_demon, *rc_smurf;
     static int config;
 
     if (rc_changed(&config)) {
         rc_demon = get_race(RC_DAEMON);
+        rc_smurf = rc_find("smurf");
     }
 
     READ_INT(data->store, &n);
@@ -529,11 +530,18 @@ unit *read_unit(gamedata *data)
     }
     read_attribs(data, &u->attribs, u);
     if (rc_demon) {
-        if (u_race(u) == rc_demon) {
+        const struct race *rc = u_race(u);
+        if (rc == rc_smurf) {
+            if (!u->attribs) {
+                log_error("%s was a %s in a %s faction", unitname(u), rc->_name, u->faction->race->_name);
+                u->_race = u->faction->race;
+            }
+        }
+        if (rc == rc_demon) {
             if (data->version < FIX_SHAPESHIFT_VERSION) {
                 const char* zRace = get_racename(u->attribs);
                 if (zRace) {
-                    const struct race* rc = rc_find(zRace);
+                    rc = rc_find(zRace);
                     if (rc) {
                         set_racename(&u->attribs, NULL);
                             u->irace = rc;
