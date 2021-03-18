@@ -1242,7 +1242,6 @@ void terraform_region(region * r, const terrain_type * terrain)
     assert(terrain);
 
     r->terrain = terrain;
-    reset_herbs(r);
     reset_rawmaterials(r);
     terraform_resources(r);
 
@@ -1264,6 +1263,9 @@ void terraform_region(region * r, const terrain_type * terrain)
         if (!r->land) {
             r->land = calloc(1, sizeof(land_region));
             create_land(r);
+        }
+        else {
+            reset_herbs(r);
         }
         init_region(r);
     }
