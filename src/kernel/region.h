@@ -188,7 +188,7 @@ extern "C" {
 
 #define rbuildings(r) ((r)->buildings)
 
-#define rherbtype(r) ((r)->land?(r)->land->herbtype:0)
+#define rherbtype(r) ((r)->land?(r)->land->herbtype:NULL)
 
 
     bool r_isforest(const struct region *r);
