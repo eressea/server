@@ -1102,6 +1102,31 @@ void init_region(region *r)
     }
 }
 
+static void reset_herbs(region *r) {
+    const item_type *itype = NULL;
+    if (r->terrain->herbs) {
+        int len = 0;
+        while (r->terrain->herbs[len])
+            ++len;
+        if (len)
+            itype = r->terrain->herbs[rng_int() % len];
+    }
+    if (itype != NULL) {
+        rsetherbtype(r, itype);
+        rsetherbs(r, 50 + rng_int() % 31);
+    }
+    else {
+        rsetherbtype(r, NULL);
+    }
+
+    if (rng_int() % 100 < 3) {
+        fset(r, RF_MALLORN);
+    }
+    else {
+        freset(r, RF_MALLORN);
+    }
+}
+
 /* Resourcen loeschen, die im aktuellen terrain nicht (mehr) vorkommen koennen */
 static void reset_rawmaterials(region *r) {
     const terrain_type * terrain = r->terrain;
@@ -1208,28 +1233,7 @@ static void create_land(region *r) {
         nb = NULL;
     }
 
-    const item_type *itype = NULL;
-    if (r->terrain->herbs) {
-        int len = 0;
-        while (r->terrain->herbs[len])
-            ++len;
-        if (len)
-            itype = r->terrain->herbs[rng_int() % len];
-    }
-    if (itype != NULL) {
-        rsetherbtype(r, itype);
-        rsetherbs(r, 50 + rng_int() % 31);
-    }
-    else {
-        rsetherbtype(r, NULL);
-    }
-
-    if (rng_int() % 100 < 3) {
-        fset(r, RF_MALLORN);
-    } 
-    else {
-        freset(r, RF_MALLORN);
-    }
+    reset_herbs(r);
 }
 
 void terraform_region(region * r, const terrain_type * terrain)
@@ -1238,6 +1242,7 @@ void terraform_region(region * r, const terrain_type * terrain)
     assert(terrain);
 
     r->terrain = terrain;
+    reset_herbs(r);
     reset_rawmaterials(r);
     terraform_resources(r);
 
