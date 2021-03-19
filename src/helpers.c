@@ -2,6 +2,8 @@
 #include <platform.h>
 #endif
 
+#include "attributes/dict.h"
+
 #include "helpers.h"
 #include "vortex.h"
 #include "alchemy.h"
@@ -358,6 +360,7 @@ void register_tolua_helpers(void)
 {
     tt_register(&tt_caldera);
     at_register(&at_direction);
+    at_register(&at_dict); /* deprecated, but has an upgrade path */
     at_deprecate("lcbuilding", building_action_read);
 
     callbacks.equip_unit = lua_equipunit;
