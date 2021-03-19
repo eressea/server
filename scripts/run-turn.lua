@@ -16,15 +16,15 @@ function open_game(turn)
   return eressea.read_game(file .. ".dat")
 end
 
-function callbacks(rules, name, ...)
-	for k, v in pairs(rules) do
-		if 'table' == type(v) then
-			cb = v[name]
-			if 'function' == type(cb) then
-				cb(...)
-			end
-		end
-	end
+local function callbacks(rules, name, ...)
+  for k, v in pairs(rules) do
+    if 'table' == type(v) then
+      cb = v[name]
+      if 'function' == type(cb) then
+        cb(...)
+      end
+    end
+  end
 end
 
 local function write_emails(locales)
@@ -49,8 +49,8 @@ local function write_emails(locales)
 end
 
 local function join_path(a, b)
-    if a then return a .. '/' .. b end
-    return b
+  if a then return a .. '/' .. b end
+  return b
 end
 
 local function write_addresses()
@@ -85,23 +85,23 @@ local function write_aliases()
 end
 
 local function write_htpasswd()
-    local out = io.open(join_path(config.basepath, "htpasswd"), "w")
-    if out then
-        for f in factions() do
-            if f.password then
-                out:write(itoa36(f.id) .. ":" .. f.password .. "\n")
-            end
-        end
-        out:close()
+  local out = io.open(join_path(config.basepath, "htpasswd"), "w")
+  if out then
+    for f in factions() do
+      if f.password then
+        out:write(itoa36(f.id) .. ":" .. f.password .. "\n")
+      end
     end
+    out:close()
+  end
 end
 
 local function write_files(locales)
-    write_reports()
-    write_summary()
-    write_database()
-    write_passwords()
-    write_htpasswd()
+  write_reports()
+  write_summary()
+  write_database()
+  write_passwords()
+  write_htpasswd()
 end
 
 local function write_scores()
@@ -123,69 +123,69 @@ local function write_scores()
 end
 
 function process(rules, orders)
-    local confirmed_multis = { }
-    local suspected_multis = { }
+  local confirmed_multis = { }
+  local suspected_multis = { }
 
-    if open_game(get_turn())~=0 then
-        eressea.log.error("could not read game")
-        return -1
-    end
+  if open_game(get_turn())~=0 then
+    eressea.log.error("could not read game")
+    return -1
+  end
 
-    turn_begin()
-    -- create orders for monsters:
-    plan_monsters()
-    -- read orders for players:
-    if eressea.read_orders(orders) ~= 0 then
-        print("could not read " .. orders)
-        return -1
-    end
+  turn_begin()
+  -- create orders for monsters:
+  plan_monsters()
+  -- read orders for players:
+  if eressea.read_orders(orders) ~= 0 then
+    print("could not read " .. orders)
+    return -1
+  end
 
-    if nmr_check(config.maxnmrs or 80)~=0 then
-        return -1
-    end
-    callbacks(rules, 'init')
-    
-    -- run the turn:
-    turn_process()
-    callbacks(rules, 'update')
-    turn_end() -- ageing, etc.
+  if nmr_check(config.maxnmrs or 80)~=0 then
+    return -1
+  end
+  callbacks(rules, 'init')
+  
+  -- run the turn:
+  turn_process()
+  callbacks(rules, 'update')
+  turn_end() -- ageing, etc.
 
-    write_files(config.locales)
-    update_scores()
+  write_files(config.locales)
+  update_scores()
 
-    file = '' .. get_turn() .. '.dat'
-    if eressea.write_game(file)~=0 then
-        eressea.log.error("could not write game")
-        return -1
-    end
-    return 0
+  file = '' .. get_turn() .. '.dat'
+  if eressea.write_game(file)~=0 then
+    eressea.log.error("could not write game")
+    return -1
+  end
+  return 0
 end
 
 function run_turn(rules)
-    local turn = get_turn()
-    if turn<0 then
-        turn = read_turn()
-        set_turn(turn)
-    end
+  local turn = get_turn()
+  if turn<0 then
+    turn = read_turn()
+    set_turn(turn)
+  end
 
-    orderfile = orderfile or config.basepath .. '/orders.' .. turn
-    eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
-    local result = process(rules, orderfile)
-    return result
+  orderfile = orderfile or config.basepath .. '/orders.' .. turn
+  eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
+  local result = process(rules, orderfile)
+  return result
 end
 
 function file_exists(name)
-    local f=io.open(name,"r")
-    if not f then
-        return false
-    end
-    io.close(f)
-    return true
+  local f=io.open(name,"r")
+  if not f then
+    return false
+  end
+  io.close(f)
+  return true
 end
 
 if file_exists('execute.lock') then
-    eressea.log.error("Lockfile exists, aborting.")
-    assert(false)
+  eressea.log.error("Lockfile exists, aborting.")
+  assert(false)
 end
 
 math.randomseed(rng.random())
@@ -195,9 +195,9 @@ require 'eressea.xmlconf' -- read xml data
 
 local rules = {}
 if config.rules then
-    rules = require('eressea.' .. config.rules)
-    eressea.log.info('loaded ' .. #rules .. ' modules for ' .. config.rules)
+  rules = require('eressea.' .. config.rules)
+  eressea.log.info('loaded ' .. #rules .. ' modules for ' .. config.rules)
 else
-    eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
+  eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end
 run_turn(rules)
