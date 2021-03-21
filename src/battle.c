@@ -778,7 +778,28 @@ int select_magicarmor(troop t)
     return ma;
 }
 
-/* Sind side ds und Magier des meffect verbuendet, dann return 1*/
+int meffect_apply(struct meffect *me, int damage) {
+    assert(0 <= damage); /* damage sollte hier immer mindestens 0 sein */
+    /* jeder Schaden wird um effect% reduziert bis der Schild duration
+     * Trefferpunkte aufgefangen hat */
+    if (me->typ == SHIELD_REDUCE && me->effect <= 100) {
+        int hp = damage * me->effect / 100;
+        if (hp > me->duration) {
+            hp = me->duration;
+        }
+        damage -= hp;
+        me->duration -= hp;
+    }
+    /* gibt Ruestung +effect fuer duration Treffer */
+    else if (me->typ == SHIELD_ARMOR) {
+        damage -= me->effect;
+        if (damage < 0) damage = 0;
+        me->duration--;
+    }
+    return damage;
+}
+
+/* Sind side ds und Magier des meffect verbuendet? */
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
     UNUSED_ARG(b);
@@ -793,7 +814,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
     return false;
 }
 
-/* Sind side as und Magier des meffect verfeindet, dann return 1*/
+/* Sind side as und Magier des meffect verfeindet? */
 bool meffect_blocked(battle * b, meffect * s, side * as)
 {
     UNUSED_ARG(b);
@@ -1219,37 +1240,25 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
     return reduced_damage;
 }
 
-static int apply_magicshield(int reduced_damage, fighter *df,
+static int apply_magicshield(int damage, fighter *df,
     const weapon_type *awtype, battle *b, bool magic) {
     side *ds = df->side;
     selist *ql;
     int qi;
 
-    if (reduced_damage <= 0)
+    if (damage <= 0) {
         return 0;
+    }
 
     /* Schilde */
     for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
         meffect *me = (meffect *)selist_get(ql, qi);
         if (meffect_protection(b, me, ds) != 0) {
-            assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
-            /* jeder Schaden wird um effect% reduziert bis der Schild duration
-             * Trefferpunkte aufgefangen hat */
-            if (me->typ == SHIELD_REDUCE) {
-                int hp = reduced_damage * me->effect / 100;
-                reduced_damage -= hp;
-                me->duration -= hp;
-            }
-            /* gibt Ruestung +effect fuer duration Treffer */
-            if (me->typ == SHIELD_ARMOR) {
-                reduced_damage -= me->effect;
-                if (reduced_damage < 0) reduced_damage = 0;
-                me->duration--;
-            }
+            damage = meffect_apply(me, damage);
         }
     }
     
-    return reduced_damage;
+    return damage;
 }
 
 bool
