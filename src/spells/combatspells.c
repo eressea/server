@@ -1311,7 +1311,7 @@ int sp_reanimate(struct castorder * co)
     double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    int healable, j = 0;
+    int healable, raised = 0, demons = 0;
     double c = 0.50 + 0.02 * power;
     int k = (int)(EFFECT_HEALING_SPELL * power);
     bool use_item = has_ao_healing(mage);
@@ -1328,40 +1328,49 @@ int sp_reanimate(struct castorder * co)
     }
     while (healable--) {
         fighter *tf = select_corpse(b, fi);
-        if (tf != NULL && tf->side->casualties > 0
-            && u_race(tf->unit) != get_race(RC_DAEMON)
-            && (chance(c))) {
-            assert(tf->alive < tf->unit->number);
-            /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,
-             * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
-             * also sind die hp von t.fighter->alive
-             * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote
-             * oder weggelaufene ist t.fighter->hitpoints[tf->alive] */
-            tf->person[tf->alive].hp = 2;
-            ++tf->alive;
-            ++tf->side->size[SUM_ROW];
-            ++tf->side->size[tf->unit->status + 1];
-            ++tf->side->healed;
-            --tf->side->casualties;
-            assert(tf->side->casualties >= 0);
-            --tf->side->dead;
-            assert(tf->side->dead >= 0);
-            ++j;
+        if (tf != NULL && tf->side->casualties > 0) {
+          if (u_race(tf->unit) == get_race(RC_DAEMON)) {
+                ++demons;
+            } else {
+                if (chance(c)) {
+                    assert(tf->alive < tf->unit->number);
+                    /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,
+                     * t.fighter->alive ist jedoch die Anzahl lebender in der Einheit,
+                     * also sind die hp von t.fighter->alive
+                     * t.fighter->hitpoints[t.fighter->alive-1] und der erste Tote
+                     * oder weggelaufene ist t.fighter->hitpoints[tf->alive] */
+                    tf->person[tf->alive].hp = 2;
+                    ++tf->alive;
+                    ++tf->side->size[SUM_ROW];
+                    ++tf->side->size[tf->unit->status + 1];
+                    ++tf->side->healed;
+                    --tf->side->casualties;
+                    assert(tf->side->casualties >= 0);
+                    --tf->side->dead;
+                    assert(tf->side->dead >= 0);
+                    ++raised;
+                }
+            }
         }
     }
-    if (j <= 0) {
-        level = j;
+    if (raised <= 0) {
+        level = 0;
     }
     if (use_item) {
         msg =
-            msg_message("reanimate_effect_1", "mage amount item", mage, j,
+            msg_message("reanimate_effect_1", "mage amount item", mage, raised,
             get_resourcetype(R_AMULET_OF_HEALING));
     }
     else {
-        msg = msg_message("reanimate_effect_0", "mage amount", mage, j);
+        msg = msg_message("reanimate_effect_0", "mage amount", mage, raised);
     }
     message_all(b, msg);
     msg_release(msg);
+    if (demons > 0) {
+        msg = msg_message("reanimate_no_soul", "mage amount", mage, demons);
+        battle_message_faction(b, mage->faction, msg);
+        msg_release(msg);
+    }
 
     return level;
 }
@@ -1441,9 +1450,6 @@ int sp_healing(struct castorder * co)
     selist *fgs;
     message *msg;
     bool use_item = has_ao_healing(mage);
-
-    /* bis zu 11 Personen pro Stufe (einen HP muessen sie ja noch
-     * haben, sonst waeren sie tot) koennen geheilt werden */
 
     if (use_item) {
         healhp *= 2;

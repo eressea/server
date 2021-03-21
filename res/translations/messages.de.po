@@ -2801,3 +2801,5 @@ msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $
 msgid "sp_eternizewall_effect"
 msgstr "\"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde von $region($region) in die Mauern von $building($building).\""
 
+msgid "reanimate_no_soul"
+msgstr "$int($amount) Dämonen konnten nicht wiederbelebt werden, da sie keine Seele haben.\"

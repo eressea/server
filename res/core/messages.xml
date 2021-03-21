@@ -1087,6 +1087,13 @@
     </type>
   </message>
 
+  <message name="reanimate_no_soul" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="amount" type="int"/>
+    </type>
+  </message>
+
   <message name="chaosgate_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
