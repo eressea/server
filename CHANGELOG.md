@@ -1,3 +1,7 @@
+# 3.28
+
+ - Bugfix für Schild des Fisches (Solthar)
+
 # 3.27
 
   - Schiffe sind kommentarlos nicht nicht gesegelt [2722]
