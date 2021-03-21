@@ -111,6 +111,7 @@ const troop no_troop = { 0, 0 };
 static int max_turns;
 static int rule_damage;
 static int rule_loot;
+static double loot_divisor;
 static int flee_chance_max_percent;
 static int flee_chance_base;
 static int flee_chance_skill_bonus;
@@ -148,6 +149,7 @@ static void init_rules(void)
     rule_vampire = config_get_int("rules.combat.demon_vampire", 0);
     rule_loot = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
+    loot_divisor = config_get_flt("rules.items.loot_divisor", 1);
     /* new formula to calculate to-hit-chance */
     skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
@@ -776,7 +778,28 @@ int select_magicarmor(troop t)
     return ma;
 }
 
-/* Sind side ds und Magier des meffect verbuendet, dann return 1*/
+int meffect_apply(struct meffect *me, int damage) {
+    assert(0 <= damage); /* damage sollte hier immer mindestens 0 sein */
+    /* jeder Schaden wird um effect% reduziert bis der Schild duration
+     * Trefferpunkte aufgefangen hat */
+    if (me->typ == SHIELD_REDUCE && me->effect <= 100) {
+        int hp = damage * me->effect / 100;
+        if (hp > me->duration) {
+            hp = me->duration;
+        }
+        damage -= hp;
+        me->duration -= hp;
+    }
+    /* gibt Ruestung +effect fuer duration Treffer */
+    else if (me->typ == SHIELD_ARMOR) {
+        damage -= me->effect;
+        if (damage < 0) damage = 0;
+        me->duration--;
+    }
+    return damage;
+}
+
+/* Sind side ds und Magier des meffect verbuendet? */
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
     UNUSED_ARG(b);
@@ -791,7 +814,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
     return false;
 }
 
-/* Sind side as und Magier des meffect verfeindet, dann return 1*/
+/* Sind side as und Magier des meffect verfeindet? */
 bool meffect_blocked(battle * b, meffect * s, side * as)
 {
     UNUSED_ARG(b);
@@ -1217,37 +1240,25 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
     return reduced_damage;
 }
 
-static int apply_magicshield(int reduced_damage, fighter *df,
+static int apply_magicshield(int damage, fighter *df,
     const weapon_type *awtype, battle *b, bool magic) {
     side *ds = df->side;
     selist *ql;
     int qi;
 
-    if (reduced_damage <= 0)
+    if (damage <= 0) {
         return 0;
+    }
 
     /* Schilde */
     for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
         meffect *me = (meffect *)selist_get(ql, qi);
         if (meffect_protection(b, me, ds) != 0) {
-            assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
-            /* jeder Schaden wird um effect% reduziert bis der Schild duration
-             * Trefferpunkte aufgefangen hat */
-            if (me->typ == SHIELD_REDUCE) {
-                int hp = reduced_damage * (me->effect / 100);
-                reduced_damage -= hp;
-                me->duration -= hp;
-            }
-            /* gibt Ruestung +effect fuer duration Treffer */
-            if (me->typ == SHIELD_ARMOR) {
-                reduced_damage -= me->effect;
-                if (reduced_damage < 0) reduced_damage = 0;
-                me->duration--;
-            }
+            damage = meffect_apply(me, damage);
         }
     }
     
-    return reduced_damage;
+    return damage;
 }
 
 bool
@@ -2440,10 +2451,9 @@ static int loot_quota(const unit * src, const unit * dst,
 {
     UNUSED_ARG(type);
     if (dst && src && src->faction != dst->faction) {
-        double divisor = config_get_flt("rules.items.loot_divisor", 1);
-        assert(divisor <= 0 || divisor >= 1);
-        if (divisor >= 1) {
-            double r = n / divisor;
+        assert(loot_divisor <= 0 || loot_divisor >= 1);
+        if (loot_divisor > 1) {
+            double r = n / loot_divisor;
             int x = (int)r;
 
             r = r - x;
@@ -3166,7 +3176,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         int dwp[WMAX];
         int wcount[WMAX];
         int wused[WMAX];
-        int oi = 0, di = 0, w = 0;
+        int oi = 0, di = 0;
+        unsigned int w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3181,9 +3192,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        assert(w >= 0);
-        fig->weapons = (weapon *)calloc((size_t)(w + 1), sizeof(weapon));
-        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
+        fig->weapons = malloc((1 + w) * sizeof(weapon));
+        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        fig->weapons[w].type = NULL;
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
