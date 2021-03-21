@@ -138,3 +138,61 @@ function test_appeasement_break_guard()
     assert_equal(5, u2.status)
     assert_equal(false, u2.guard)
 end
+
+local function create_cp_mage(f, r)
+  local u2 = unit.create(f, r, 1)
+  u2.race = 'human'
+  u2.magic = 'cerddor'
+  u2:set_skill('magic', 20)
+  u2.aura = 100
+  u2:add_spell('song_of_confusion')
+  u2:add_spell('frighten')
+  u2.status = 3
+  return u2
+end
+
+local function create_cp_front(f, r)
+  local u2 = unit.create(f, r, 1000)
+  u2:set_skill('melee', 20)
+  u2:set_skill('stamina', 3)
+  u2:add_item('axe', u2.number)
+  u2:add_item('plate', u2.number)
+  u2:add_item('shield', u2.number)
+  u2.hp = u2.hp_max * u2.number
+  return u2
+end
+
+function test_confusion_and_panic()
+  f = faction.create('demon', "confusion@eressea.de", "de")
+  f2 = faction.create('demon')
+  for y = 1, 10 do
+    local u1, u2, u3, u4, r
+    r = region.create(0, 2*y, 'plain')
+    u1 = create_cp_front(f, r)
+    u2 = create_cp_mage(f, r)
+    u3 = create_cp_mage(f, r)
+    u2:add_order('KAMPFZAUBER STUFE 10 "Gesang der Angst"')
+    u3:add_order('KAMPFZAUBER STUFE 10 "Gesang der Verwirrung"')
+    create_cp_mage(f, r)
+
+    local u4 = create_cp_front(f2, r)
+    create_cp_mage(f2, r)
+    create_cp_mage(f2, r)
+    create_cp_mage(f2, r)
+
+    for ux in r.units do
+      for uy in r.units do
+        if ux.faction ~= uy.faction then
+          ux:add_order("ATTACKIERE " .. itoa36(uy.id))
+        end
+      end
+    end
+  end
+  for i = 1,10 do
+    process_orders()
+  end
+
+  -- should not produce "select_enemies has a bug"
+--  init_reports()
+--  write_reports()
+end
