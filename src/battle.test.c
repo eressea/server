@@ -448,6 +448,30 @@ static void test_calculate_armor(CuTest * tc)
     test_teardown();
 }
 
+static void test_spells_reduce_damage(CuTest *tc)
+{
+    struct meffect me;
+
+    me.typ = SHIELD_ARMOR;
+    me.duration = 10;
+    me.effect = 5;
+    CuAssertIntEquals(tc, 5, meffect_apply(&me, 10));
+    CuAssertIntEquals(tc, 9, me.duration);
+    CuAssertIntEquals(tc, 5, me.effect);
+    CuAssertIntEquals(tc, 0, meffect_apply(&me, 1));
+    CuAssertIntEquals(tc, 8, me.duration);
+    CuAssertIntEquals(tc, 5, me.effect);
+
+    me.typ = SHIELD_REDUCE;
+    me.duration = 10;
+    me.effect = 50;
+    CuAssertIntEquals(tc, 5, meffect_apply(&me, 10));
+    CuAssertIntEquals(tc, 5, me.duration);
+    CuAssertIntEquals(tc, 50, me.effect);
+    CuAssertIntEquals(tc, 7, meffect_apply(&me, 12));
+    CuAssertIntEquals(tc, 0, me.duration);
+}
+
 static void test_magic_resistance(CuTest *tc)
 {
     troop dt;
@@ -898,6 +922,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_calculate_armor);
     SUITE_ADD_TEST(suite, test_natural_armor);
     SUITE_ADD_TEST(suite, test_magic_resistance);
+    SUITE_ADD_TEST(suite, test_spells_reduce_damage);
     SUITE_ADD_TEST(suite, test_projectile_armor);
     SUITE_ADD_TEST(suite, test_tactics_chance);
     SUITE_ADD_TEST(suite, test_terminate);
