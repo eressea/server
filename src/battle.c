@@ -3177,7 +3177,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         int wcount[WMAX];
         int wused[WMAX];
         int oi = 0, di = 0;
-        unsigned int w = 0;
+        int w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3192,7 +3192,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        fig->weapons = malloc((1 + w) * sizeof(weapon));
+        fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
         memcpy(fig->weapons, weapons, w * sizeof(weapon));
         fig->weapons[w].type = NULL;
 
