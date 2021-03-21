@@ -111,6 +111,7 @@ const troop no_troop = { 0, 0 };
 static int max_turns;
 static int rule_damage;
 static int rule_loot;
+static float loot_divisor;
 static int flee_chance_max_percent;
 static int flee_chance_base;
 static int flee_chance_skill_bonus;
@@ -148,6 +149,7 @@ static void init_rules(void)
     rule_vampire = config_get_int("rules.combat.demon_vampire", 0);
     rule_loot = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
+    loot_divisor = config_get_flt("rules.items.loot_divisor", 1);
     /* new formula to calculate to-hit-chance */
     skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
@@ -1234,7 +1236,7 @@ static int apply_magicshield(int reduced_damage, fighter *df,
             /* jeder Schaden wird um effect% reduziert bis der Schild duration
              * Trefferpunkte aufgefangen hat */
             if (me->typ == SHIELD_REDUCE) {
-                int hp = reduced_damage * (me->effect / 100);
+                int hp = reduced_damage * me->effect / 100;
                 reduced_damage -= hp;
                 me->duration -= hp;
             }
@@ -2440,10 +2442,9 @@ static int loot_quota(const unit * src, const unit * dst,
 {
     UNUSED_ARG(type);
     if (dst && src && src->faction != dst->faction) {
-        double divisor = config_get_flt("rules.items.loot_divisor", 1);
-        assert(divisor <= 0 || divisor >= 1);
-        if (divisor >= 1) {
-            double r = n / divisor;
+        assert(loot_divisor <= 0 || loot_divisor >= 1);
+        if (loot_divisor > 1) {
+            double r = n / loot_divisor;
             int x = (int)r;
 
             r = r - x;
