@@ -138,3 +138,40 @@ function test_appeasement_break_guard()
     assert_equal(5, u2.status)
     assert_equal(false, u2.guard)
 end
+
+function test_dream_magician_dies()
+    local u1, u2, r, f, f2
+    r = region.create(0, 0, 'plain')
+    f = faction.create('human', "dreamer@eressea.de", "de")
+    u1 = unit.create(f, r, 1)
+    u1:set_skill("melee", 1)
+    u2 = unit.create(f, r, 1)
+    u2.magic = 'illaun'
+    u2:set_skill('magic', 10)
+    u2.aura = 100
+    u2:add_spell('gooddreams')
+    u2:add_order('ZAUBERE "Schöne Träume"')
+
+    f2 = faction.create('human')
+    u3 = unit.create(f2, r, 1000)
+
+    assert_equal(1, u1:eff_skill("melee"))
+
+    rng.inject(1)
+    process_orders()
+
+    u2:clear_orders()
+    -- how to kill a mage ...
+    u3:add_order("ATTACKIERE " .. itoa36(u2.id))
+    u1:add_order("KÄMPFE NICHT")
+    u2:add_order("KÄMPFE AGGRESSIV")
+
+
+    assert_equal(2, u1:eff_skill("melee"))
+    process_orders()
+    -- u2 is dead
+
+    -- in a perfect world, this would be a test that the curse has no effect. However, with rng == 0, the duration of the dream curse is only 1 week, so it would have faded anyway. But we should at least not crash.
+    assert_equal(0, u2.number)
+    assert_equal(1, u1:eff_skill("melee"))
+end
