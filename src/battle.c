@@ -111,7 +111,7 @@ const troop no_troop = { 0, 0 };
 static int max_turns;
 static int rule_damage;
 static int rule_loot;
-static float loot_divisor;
+static double loot_divisor;
 static int flee_chance_max_percent;
 static int flee_chance_base;
 static int flee_chance_skill_bonus;
@@ -3167,7 +3167,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         int dwp[WMAX];
         int wcount[WMAX];
         int wused[WMAX];
-        int oi = 0, di = 0, w = 0;
+        int oi = 0, di = 0;
+        unsigned int w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3182,9 +3183,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        assert(w >= 0);
-        fig->weapons = (weapon *)calloc((size_t)(w + 1), sizeof(weapon));
-        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
+        fig->weapons = malloc((1 + w) * sizeof(weapon));
+        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        fig->weapons[w].type = NULL;
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
