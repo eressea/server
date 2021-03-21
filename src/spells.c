@@ -6195,21 +6195,21 @@ static int sp_flee(castorder *co) {
     if (co->force <= 0) {
         return 0;
     }
-    return flee_spell(co, 4);
+    return flee_spell(co, 4, false);
 }
 
 static int sp_song_of_fear(castorder *co) {
     if (co->force <= 0) {
         return 0;
     }
-    return flee_spell(co, 3);
+    return flee_spell(co, 3, true);
 }
 
 static int sp_aura_of_fear(castorder *co) {
     if (co->force <= 0) {
         return 0;
     }
-    return flee_spell(co, 5);
+    return flee_spell(co, 5, false);
 }
 
 static int sp_armor_shield(struct castorder * co) {

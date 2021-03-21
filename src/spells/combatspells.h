@@ -1,6 +1,8 @@
 #ifndef H_GC_COMBATSPELLS
 #define H_GC_COMBATSPELLS
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,7 +38,7 @@ extern "C" {
     int sp_undeadhero(struct castorder * co);
     int sp_immolation(struct castorder * co);
 
-    int flee_spell(struct castorder * co, int strength);
+    int flee_spell(struct castorder * co, int strength, bool wounded);
     int damage_spell(struct castorder * co, int dmg, int strength);
     int armor_spell(struct castorder * co, int per_level, int time_multi);
 
