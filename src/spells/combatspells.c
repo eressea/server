@@ -861,7 +861,7 @@ static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
 
 /* Gesang der Furcht (Kampfzauber) */
 /* Panik (Praekampfzauber) */
-int flee_spell(struct castorder * co, int strength, bool wounded)
+int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
