@@ -861,7 +861,7 @@ static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
 
 /* Gesang der Furcht (Kampfzauber) */
 /* Panik (Praekampfzauber) */
-int flee_spell(struct castorder * co, int strength, bool wounded)
+int flee_spell(struct castorder * co, int strength)
 {
     fighter * fi = co->magician.fig;
     int level = co->level;
@@ -882,7 +882,7 @@ int flee_spell(struct castorder * co, int strength, bool wounded)
         return 0;
     }
 
-    fgs = select_fighters(b, fi->side, FS_ENEMY, wounded?select_afraid:select_alive, NULL);
+    fgs = select_fighters(b, fi->side, FS_ENEMY, (co->sp->sptyp & PRECOMBATSPELL) ? select_afraid : select_alive, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; force > 0 && ql; selist_advance(&ql, &qi, 1)) {
