@@ -355,20 +355,11 @@ function test_dream_magician_dies()
 
     process_orders()
 
-    u2:clear_orders()
-    -- how to kill a mage ...
-    u3:add_order("ATTACKIERE " .. itoa36(u2.id))
-    u1:add_order("KÄMPFE NICHT")
-    u2:add_order("KÄMPFE AGGRESSIV")
-
-    init_reports()
-    write_reports()
-
     assert_equal(2, u1:eff_skill("melee"))
+    u2.number = 0
+    assert_equal(1, u1:eff_skill("melee"))
     process_orders()
     -- u2 is dead
-
-    -- in a perfect world, this would be a test that the curse has no effect. However, with rng == 0, the duration of the dream curse is only 1 week, so it would have faded anyway. But we should at least not crash.
-    assert_equal(0, u2.number)
+    assert_nil(get_unit(u2.id))
     assert_equal(1, u1:eff_skill("melee"))
 end

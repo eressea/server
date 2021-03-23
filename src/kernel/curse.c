@@ -529,7 +529,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     /* die Kraft eines Spruchs darf nicht 0 sein */
     assert(vigour > 0);
 
-    c = get_curse(*ap, ct);
+    c = ap ? get_curse(*ap, ct) : NULL;
 
     if (c && (c_flags(c) & CURSE_ONLYONE)) {
         return NULL;
@@ -652,7 +652,7 @@ bool curse_active(const curse * c)
     if (c->vigour <= 0)
         return false;
 
-    return true;
+    return c->magician && c->magician->region && (c->magician->number > 0);
 }
 
 bool is_cursed_with(const attrib * ap, const curse * c)

@@ -1077,8 +1077,7 @@ static int att_modification(const unit * u, skill_t sk)
         attrib *a = a_find(u->region->attribs, &at_curse);
         while (a && a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
-            if (c->magician && curse_active(c) && c->type == &ct_gbdream &&
-                c->magician->number > 0 && c->magician->region) {
+            if (c->type == &ct_gbdream && curse_active(c)) {
                 int effect = curse_geteffect_int(c);
                 bool allied = alliedunit(c->magician, u->faction, HELP_GUARD);
                 if (allied) {
