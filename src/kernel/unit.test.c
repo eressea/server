@@ -647,6 +647,29 @@ static void test_get_modifier(CuTest *tc) {
     test_teardown();
 }
 
+static void test_get_modifier_cursed(CuTest *tc) {
+    region *r;
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    set_level(u, SK_TAXING, 1);
+
+    /* default: no effects: */
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 1, r, true));
+
+    /* cursed with good dreams */
+    create_curse(u, &r->attribs, &ct_gbdream, 1, 1, 1, 0);
+    CuAssertIntEquals(tc, 1, get_modifier(u, SK_TAXING, 1, r, true));
+    a_removeall(&r->attribs, NULL);
+
+    /* cursed with good dreams, but magician is dead */
+    create_curse(NULL, &r->attribs, &ct_gbdream, 1, 1, 1, 0);
+    CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 1, r, true));
+
+    test_teardown();
+}
+
 static void test_gift_items(CuTest *tc) {
     unit *u, *u1, *u2;
     region *r;
@@ -734,6 +757,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
     SUITE_ADD_TEST(suite, test_get_modifier);
+    SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
     return suite;
 }
