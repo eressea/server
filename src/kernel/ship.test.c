@@ -469,7 +469,7 @@ static void test_shipspeed_stormwind(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
+    create_curse(cap, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
     CuAssertPtrNotNull(tc, sh->attribs);
     CuAssertIntEquals_Msg(tc, "stormwind doubles ship range", sh->type->range * 2, shipspeed(sh, cap));
     a_age(&sh->attribs, sh);
@@ -487,7 +487,7 @@ static void test_shipspeed_nodrift(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
+    create_curse(cap, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
     CuAssertIntEquals_Msg(tc, "nodrift adds +1 to range", sh->type->range + 1, shipspeed(sh, cap));
     test_teardown();
 }
@@ -502,7 +502,7 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
     register_shipcurse();
     assert(sh && cap && crew);
 
-    create_curse(0, &sh->attribs, &ct_shipspeedup, 1, 1, 3, 0);
+    create_curse(cap, &sh->attribs, &ct_shipspeedup, 1, 1, 3, 0);
     CuAssertIntEquals_Msg(tc, "shipspeedup adds effect to range", sh->type->range + 3, shipspeed(sh, cap));
     test_teardown();
 }
@@ -572,15 +572,15 @@ static void test_maximum_shipspeed(CuTest *tc) {
     f = test_create_faction_ex(rc, NULL);
     setup_crew(sh, f, &cap, &crew);
     CuAssertIntEquals(tc, sh->type->range + 1, shipspeed(sh, cap));
-    create_curse(0, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
+    create_curse(cap, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
     CuAssertIntEquals(tc, 2 * sh->type->range + 1, shipspeed(sh, cap));
-    create_curse(0, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
+    create_curse(cap, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
     CuAssertIntEquals(tc, 2 * sh->type->range + 2, shipspeed(sh, cap));
     a = a_new(&at_speedup);
     a->data.i = 3;
     a_add(&sh->attribs, a);
     CuAssertIntEquals(tc, 2 * sh->type->range + 5, shipspeed(sh, cap));
-    create_curse(0, &sh->attribs, &ct_shipspeedup, 1, 1, 4, 0);
+    create_curse(cap, &sh->attribs, &ct_shipspeedup, 1, 1, 4, 0);
     CuAssertIntEquals(tc, 2 * sh->type->range + 9, shipspeed(sh, cap));
 }
 

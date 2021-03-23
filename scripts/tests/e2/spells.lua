@@ -334,3 +334,32 @@ function test_astral_disruption_default_level()
     assert_nil(r5:get_curse("astralblock"))
     assert_equal(r, uh.region)
 end
+
+function test_dream_magician_dies()
+    local u1, u2, r, f, f2
+    r = region.create(0, 0, 'plain')
+    f = faction.create('human', "dreamer@eressea.de", "de")
+    u1 = unit.create(f, r, 1)
+    u1:set_skill("melee", 1)
+    u2 = unit.create(f, r, 1)
+    u2.magic = 'illaun'
+    u2:set_skill('magic', 20)
+    u2.aura = 100
+    u2:add_spell('gooddreams')
+    u2:add_order('ZAUBERE STUFE 10 "Schöne Träume"')
+
+    f2 = faction.create('human')
+    u3 = unit.create(f2, r, 1000)
+
+    assert_equal(1, u1:eff_skill("melee"))
+
+    process_orders()
+
+    assert_equal(2, u1:eff_skill("melee"))
+    u2.number = 0
+    assert_equal(1, u1:eff_skill("melee"))
+    process_orders()
+    -- u2 is dead
+    assert_nil(get_unit(u2.id))
+    assert_equal(1, u1:eff_skill("melee"))
+end

@@ -769,10 +769,10 @@ static void test_battle_skilldiff_building(CuTest *tc)
     CuAssertIntEquals(tc, 1, building_protection(ud->building));
     CuAssertIntEquals(tc, -1, skilldiff(ta, td, 0));
 
-    create_curse(NULL, &ud->building->attribs, &ct_magicwalls, 1, 1, 1, 1);
+    create_curse(ud, &ud->building->attribs, &ct_magicwalls, 1, 1, 1, 1);
     CuAssertIntEquals(tc, -2, skilldiff(ta, td, 0));
 
-    create_curse(NULL, &ud->building->attribs, &ct_strongwall, 1, 1, 2, 1);
+    create_curse(ud, &ud->building->attribs, &ct_strongwall, 1, 1, 2, 1);
     CuAssertIntEquals(tc, -4, skilldiff(ta, td, 0));
 
     free_battle(b);
