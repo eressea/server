@@ -649,10 +649,7 @@ bool curse_active(const curse * c)
         return false;
     if (c_flags(c) & CURSE_ISNEW)
         return false;
-    if (c->vigour <= 0)
-        return false;
-
-    return c->magician && c->magician->region && (c->magician->number > 0);
+    return c->vigour > 0;
 }
 
 bool is_cursed_with(const attrib * ap, const curse * c)

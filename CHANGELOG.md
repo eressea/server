@@ -1,7 +1,8 @@
 # 3.28
 
- - Bugfix für Schild des Fisches (Solthar)
- - Dämonen können magisch reanimiert werden.
+  - Bugfix für Schild des Fisches (Solthar)
+  - Dämonen können magisch reanimiert werden.
+  - "Schöne Träume" verliert seine Wirkung, wenn der Zauberer stirbt.
 
 # 3.27
 

@@ -210,17 +210,8 @@ static void test_curse_active(CuTest *tc) {
     c->mask = CURSE_ISNEW;
     CuAssertTrue(tc, !curse_active(c));
     c->mask = 0;
-
-    u->number = 0;
-    CuAssertTrue(tc, !curse_active(c));
-    u->number = 1;
-
     c->magician = NULL;
-    CuAssertTrue(tc, !curse_active(c));
-    c->magician = u;
-
-    u->region = NULL;
-    CuAssertTrue(tc, !curse_active(c));
+    CuAssertTrue(tc, curse_active(c));
 
     test_teardown();
 }
