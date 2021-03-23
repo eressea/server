@@ -1329,7 +1329,6 @@ int sp_reanimate(struct castorder * co)
     while (healable--) {
         fighter *tf = select_corpse(b, fi);
         if (tf != NULL && tf->side->casualties > 0
-            && u_race(tf->unit) != get_race(RC_DAEMON)
             && (chance(c))) {
             assert(tf->alive < tf->unit->number);
             /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,

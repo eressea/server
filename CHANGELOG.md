@@ -1,6 +1,7 @@
 # 3.28
 
  - Bugfix für Schild des Fisches (Solthar)
+ - Dämonen können magisch reanimiert werden.
 
 # 3.27
 
