@@ -4,26 +4,26 @@
 
 #include "alchemy.h"
 
-/* kernel includes */
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/terrain.h>
-
 /* attributes includes */
-#include <attributes/reduceproduction.h>
+#include "attributes/reduceproduction.h"
+
+/* kernel includes */
+#include "kernel/attrib.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <util/log.h>
-#include <util/rand.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include "util/log.h"
+#include "util/rand.h"
+#include "util/message.h"
+#include "util/rng.h"
 
 /* libc includes */
 #include <assert.h>
