@@ -93,13 +93,6 @@ extern "C" {
             int row;
             int result;
         } rowcache;
-        struct {
-            struct side *side;
-            int status;
-            int alive;
-            int minrow, maxrow;
-            int enemies[8];
-        } fast;
     } battle;
 
     typedef struct weapon {

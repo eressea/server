@@ -878,7 +878,6 @@ void remove_troop(troop dt)
     fighter *df = dt.fighter;
     struct person p = df->person[dt.index];
     battle *b = df->side->battle;
-    b->fast.alive = -1;           /* invalidate cached value */
     b->rowcache.alive = -1;       /* invalidate cached value */
     ++df->removed;
     ++df->side->removed;
@@ -1419,35 +1418,11 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
 }
 
 int
-count_enemies(battle * b, const fighter * af, int minrow, int maxrow,
+count_enemies(battle *b, const fighter *af, int minrow, int maxrow,
     int select)
 {
-    int sr = statusrow(af->status);
-    side *as = af->side;
-
-    if (b->alive == b->fast.alive && as == b->fast.side && sr == b->fast.status
-        && minrow == b->fast.minrow && maxrow == b->fast.maxrow) {
-        if (b->fast.enemies[select] >= 0) {
-            return b->fast.enemies[select];
-        }
-        else if (select & SELECT_FIND) {
-            if (b->fast.enemies[select - SELECT_FIND] >= 0) {
-                return b->fast.enemies[select - SELECT_FIND];
-            }
-        }
-    }
-    else if (select != SELECT_FIND || b->alive != b->fast.alive) {
-        b->fast.side = as;
-        b->fast.status = sr;
-        b->fast.minrow = minrow;
-        b->fast.alive = b->alive;
-        b->fast.maxrow = maxrow;
-        memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
-    }
     if (maxrow >= FIRST_ROW) {
-        int i = count_enemies_i(b, af, minrow, maxrow, select);
-        b->fast.enemies[select] = i;
-        return i;
+        return count_enemies_i(b, af, minrow, maxrow, select);
     }
     return 0;
 }
@@ -2437,7 +2412,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
                         dt.fighter = df;
                         return dt;
                     }
-                    allies -= df->alive;
+                    allies -= (df->alive - df->removed);
                 }
             }
         }
