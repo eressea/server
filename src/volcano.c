@@ -119,8 +119,9 @@ int volcano_damage(unit* u, const char* dice)
             }
         }
     }
+    total = u->hp - total;
     scale_number(u, u->number - dead);
-    u->hp -= total;
+    u->hp = total;
     return dead;
 }
 

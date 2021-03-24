@@ -47,6 +47,8 @@ static void test_volcano_damage(CuTest* tc) {
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     scale_number(u, 100);
     u->hp = u->number * 20;
+    CuAssertIntEquals(tc, 0, volcano_damage(u, "0"));
+    CuAssertIntEquals(tc, u->number * 20, u->hp);
     CuAssertIntEquals(tc, 0, volcano_damage(u, "10"));
     CuAssertIntEquals(tc, u->number * 10, u->hp);
     CuAssertIntEquals(tc, 0, volcano_damage(u, "d9"));
