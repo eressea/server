@@ -66,7 +66,7 @@ function test_flags()
     local f = create_faction('halfling')
     local u = unit.create(f, r, 1)
     local no = itoa36(f.id)
-    local flags = 50332672
+    local flags = 50331648
     f.flags = flags
 
     eressea.write_game("test.dat")
