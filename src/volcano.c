@@ -92,6 +92,7 @@ int volcano_damage(unit* u, const char* dice)
     }
 
     for (i = 0; i != u->number; ++i) {
+        int h = hp + ((i < remain) ? 1 : 0);
         int damage = dice_rand(dice) - protect;
         if (damage > 0) {
             if (i == 0 || ac > 0) {
@@ -99,32 +100,27 @@ int volcano_damage(unit* u, const char* dice)
                 damage -= ac;
             }
             if (damage > 0) {
-                int h = hp + ((i < remain) ? 1 : 0);
-
                 if (damage >= h) {
                     if (rc_cat && u_race(u) == rc_cat && ((rng_int() % 7) == 0)) {
                         /* cats have nine lives */
-                        total += h;
                         continue;
                     }
                     else if (healings > 0) {
                         --healings;
                         if (resurrect_unit(u)) {
                             /* take no damage at all */
-                            total += h;
                             continue;
                         }
                     }
                     ++dead;
+                    damage = h;
                 }
-                else {
-                    total += (h - damage);
-                }
+                total += damage;
             }
         }
     }
     scale_number(u, u->number - dead);
-    u->hp = total;
+    u->hp -= total;
     return dead;
 }
 
