@@ -93,6 +93,7 @@ extern "C" {
             int row;
             int result;
         } rowcache;
+#ifdef BATTLE_FAST
         struct {
             struct side *side;
             int status;
@@ -100,6 +101,7 @@ extern "C" {
             int minrow, maxrow;
             int enemies[8];
         } fast;
+#endif
     } battle;
 
     typedef struct weapon {
