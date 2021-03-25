@@ -379,7 +379,7 @@ static int get_row(const side * s, int row, const side * vs)
     memset(size, 0, sizeof(size));
     for (line = FIRST_ROW; line != NUMROWS; ++line) {
         int si, sa_i;
-        /* how many enemies are there in the first row? */
+        /* how many enemies are there in this row? */
         for (si = 0; s->enemies[si]; ++si) {
             side *se = s->enemies[si];
             if (se->size[line] > 0) {
@@ -429,24 +429,14 @@ int get_unitrow(const fighter * af, const side * vs)
     int row = statusrow(af->status);
     if (vs == NULL) {
         int i;
-        for (i = FIGHT_ROW; i != row; ++i)
-            if (af->side->size[i])
+        for (i = FIGHT_ROW; i != row; ++i) {
+            if (af->side->size[i]) {
                 break;
+            }
+        }
         return FIGHT_ROW + (row - i);
     }
-    else {
-        battle *b = vs->battle;
-        if (row != b->rowcache.row || b->alive != b->rowcache.alive
-            || af->side != b->rowcache.as || vs != b->rowcache.vs) {
-            b->rowcache.alive = b->alive;
-            b->rowcache.as = af->side;
-            b->rowcache.vs = vs;
-            b->rowcache.row = row;
-            b->rowcache.result = get_row(af->side, row, vs);
-            return b->rowcache.result;
-        }
-        return b->rowcache.result;
-    }
+    return get_row(af->side, row, vs);
 }
 
 static void reportcasualties(battle * b, fighter * fig, int dead)
@@ -878,7 +868,7 @@ void remove_troop(troop dt)
     fighter *df = dt.fighter;
     struct person p = df->person[dt.index];
     battle *b = df->side->battle;
-    b->rowcache.alive = -1;       /* invalidate cached value */
+
     ++df->removed;
     ++df->side->removed;
     df->person[dt.index] = df->person[df->alive - df->removed];

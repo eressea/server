@@ -86,13 +86,6 @@ extern "C" {
         bool has_tactics_turn;
         bool reelarrow;
         int alive;
-        struct {
-            const struct side *as;
-            const struct side *vs;
-            int alive;
-            int row;
-            int result;
-        } rowcache;
     } battle;
 
     typedef struct weapon {
