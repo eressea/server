@@ -830,7 +830,6 @@ void rmfighter(fighter * df, int i)
     /* erst ziehen wir die Anzahl der Personen von den Kaempfern in der
      * Schlacht, dann von denen auf dieser Seite ab*/
     df->side->alive -= i;
-    df->side->battle->alive -= i;
 
     /* Dann die Kampfreihen aktualisieren */
     ds->size[SUM_ROW] -= i;
@@ -3084,7 +3083,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->side = s1;
     fig->alive = u->number;
     fig->side->alive += u->number;
-    fig->side->battle->alive += u->number;
     fig->catmsg = -1;
 
     /* Freigeben nicht vergessen! */

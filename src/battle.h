@@ -85,7 +85,6 @@ extern "C" {
         signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
         bool has_tactics_turn;
         bool reelarrow;
-        int alive;
     } battle;
 
     typedef struct weapon {
