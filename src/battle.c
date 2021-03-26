@@ -866,7 +866,6 @@ void remove_troop(troop dt)
 {
     fighter *df = dt.fighter;
     struct person p = df->person[dt.index];
-    battle *b = df->side->battle;
 
     ++df->removed;
     ++df->side->removed;
