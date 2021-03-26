@@ -1,8 +1,10 @@
 #include <platform.h>
 
 #include "magic.h"
-#include "teleport.h"
+
+#include "contact.h"
 #include "give.h"
+#include "teleport.h"
 
 #include <kernel/callbacks.h>
 #include <kernel/building.h>
@@ -15,6 +17,7 @@
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
+#include <kernel/objtypes.h>
 #include <kernel/pool.h>
 
 #include <kernel/attrib.h>
@@ -420,6 +423,66 @@ void test_multi_cast(CuTest *tc) {
     test_teardown();
 }
 
+static void test_resist_chance(CuTest *tc) {
+    unit *u1, *u2, *u3, *u4;
+    variant prob;
+
+    test_setup();
+    u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), u1->region);
+    u3 = test_create_unit(test_create_faction(), u1->region);
+    u4 = test_create_unit(u1->faction, u1->region);
+
+    /* my own units never resist: */
+    prob = resist_chance(u1, u4, TYP_UNIT, 0);
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+    prob = resist_chance(u1, u4, TYP_UNIT, 10);
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* allied units do not resist */
+    contact_unit(u3, u1);
+    prob = resist_chance(u1, u3, TYP_UNIT, 0);
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+    prob = resist_chance(u1, u3, TYP_UNIT, 10);
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* 50% base chance for equal skills */
+    prob = resist_chance(u1, u2, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 2));
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* 8 levels better = 40% reduced */
+    set_level(u1, SK_MAGIC, 8);
+    prob = resist_chance(u1, u2, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 10));
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* apply a 10% bonus */
+    prob = resist_chance(u1, u2, TYP_UNIT, 10);
+    prob = frac_sub(prob, frac_make(1, 5));
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* never less than 2 percent */
+    set_level(u1, SK_MAGIC, 10); /* negates the 50% base chance */
+    prob = resist_chance(u1, u2, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 50));
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* never more than 98 percent */
+    prob = resist_chance(u1, u2, TYP_UNIT, 100);
+    prob = frac_sub(prob, frac_make(98, 100));
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    /* 5% bonus per best skill of defender */
+    set_level(u1, SK_MAGIC, 10);
+    set_level(u2, SK_ENTERTAINMENT, 10); /* negate magic skill */
+    prob = resist_chance(u1, u2, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 2)); /* only 50% base chance remains */
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    test_teardown();
+}
+
 static void test_magic_resistance(CuTest *tc) {
     unit *u;
     race *rc;
@@ -758,6 +821,7 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_set_post_combatspell);
     SUITE_ADD_TEST(suite, test_hasspell);
     SUITE_ADD_TEST(suite, test_magic_resistance);
+    SUITE_ADD_TEST(suite, test_resist_chance);
     SUITE_ADD_TEST(suite, test_max_spellpoints);
     SUITE_ADD_TEST(suite, test_illusioncastle);
     SUITE_ADD_TEST(suite, test_regenerate_aura);

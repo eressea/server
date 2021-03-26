@@ -330,9 +330,9 @@ static bool cmp_curse(const attrib * a, const void *data)
     return false;
 }
 
-curse *get_curse(attrib * ap, const curse_type * ctype)
+curse *get_curse(const attrib * ap, const curse_type * ctype)
 {
-    attrib *a = ap;
+    const attrib *a = ap;
     if (!ctype) return NULL;
     while (a) {
         if (a->type == &at_curse) {

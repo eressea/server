@@ -287,14 +287,16 @@ extern "C" {
     /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
      *      die gewuenschte maximale Stufe (im Normalfall Stufe des Magiers,
      *      bei Farcasting Stufe*2^Entfernung) */
-    bool is_magic_resistant(struct unit *magician, struct unit *target, int
-        resist_bonus);
+    bool is_magic_resistant(const struct unit *magician, const struct unit *target,
+        int resist_bonus);
     /*      Mapperfunktion fuer target_resists_magic() vom Typ struct unit. */
-    variant magic_resistance(struct unit *target);
+    variant magic_resistance(const struct unit *target);
     /*      gibt die Chance an, mit der einem Zauber widerstanden wird. Je
      *      groesser, desto resistenter ist da Opfer */
-    bool target_resists_magic(struct unit *magician, void *obj, int objtyp,
-        int resist_bonus);
+    bool target_resists_magic(const struct unit *magician, const void *obj, int objtyp,
+        int bonus_percent);
+    variant resist_chance(const struct unit *magician, const void *obj, int objtyp,
+        int bonus_percent);
     /*      gibt false zurueck, wenn der Zauber gelingt, true, wenn das Ziel
      *      widersteht */
     struct spell * unit_getspell(struct unit *u, const char *s,

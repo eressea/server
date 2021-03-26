@@ -1048,7 +1048,7 @@ static int farcasting(unit * magician, region * r)
 
 /* allgemeine Magieresistenz einer Einheit,
  * reduziert magischen Schaden */
-variant magic_resistance(unit * target)
+variant magic_resistance(const unit * target)
 {
     attrib *a;
     curse *c;
@@ -1132,6 +1132,74 @@ variant magic_resistance(unit * target)
     return prob;
 }
 
+variant resist_chance(const unit *magician, const void *obj, int objtyp, int bonus_percent) {
+    variant v02p, v98p, prob = frac_make(bonus_percent, 100);
+    const attrib *a = NULL;
+
+    switch (objtyp) {
+    case TYP_UNIT:
+    {
+        int at, pa = 0;
+        const skill *sv;
+        const unit *u = (const unit *)obj;
+
+        if (ucontact(u, magician)) {
+            return frac_zero;
+        }
+        at = effskill(magician, SK_MAGIC, NULL);
+
+        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+            int sk = eff_skill(u, sv, NULL);
+            if (pa < sk)
+                pa = sk;
+        }
+
+        /* Contest, probability = 0.05 * (10 + pa - at); */
+        prob = frac_add(prob, frac_make(10 + pa - at, 20));
+        prob = frac_add(prob, magic_resistance(u));
+        break;
+    }
+
+    case TYP_REGION:
+        /* Bonus durch Zauber
+        probability +=
+            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((const region *)obj)->attribs;
+        break;
+
+    case TYP_BUILDING:
+        /* Bonus durch Zauber
+        probability +=
+            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
+        a = ((const building *)obj)->attribs;
+        /* Bonus durch Typ
+        probability += 0.01 * ((building *)obj)->type->magres; */
+        prob = frac_add(prob, ((const building *)obj)->type->magres);
+        break;
+
+    case TYP_SHIP:
+        /* Bonus durch Zauber */
+        a = ((const ship *)obj)->attribs;
+        break;
+    }
+
+    if (a) {
+        const curse *c = get_curse(a, &ct_magicrunes);
+        int effect = curse_geteffect_int(c);
+        prob = frac_add(prob, frac_make(effect, 100));
+    }
+    /* ignore results < 2% and > 98% */
+    v02p = frac_make(1, 50);
+    v98p = frac_make(49, 50);
+    if (frac_sign(frac_sub(prob, v02p)) < 0) {
+        return v02p;
+    }
+    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
+        return v98p;
+    }
+    return prob;
+}
+
 /* ------------------------------------------------------------- */
 /* Prueft, ob das Objekt dem Zauber widerstehen kann.
  * Objekte koennen Regionen, Units, Gebaeude oder Schiffe sein.
@@ -1144,10 +1212,9 @@ variant magic_resistance(unit * target)
  */
 
 bool
-target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
+target_resists_magic(const unit * magician, const void *obj, int objtyp, int t_bonus)
 {
-    variant v02p, v98p, prob = frac_make(t_bonus, 100);
-    attrib *a = NULL;
+    variant prob;
     static bool never_resist;
     static int config;
     if (config_changed(&config)) {
@@ -1161,78 +1228,20 @@ target_resists_magic(unit * magician, void *obj, int objtyp, int t_bonus)
         return true;
     }
 
-    switch (objtyp) {
-    case TYP_UNIT:
-    {
-        int at, pa = 0;
-        skill *sv;
-        unit *u = (unit *)obj;
-
-        if (ucontact(u, magician)) {
-            return false;
-        }
-        at = effskill(magician, SK_MAGIC, NULL);
-
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            int sk = eff_skill(u, sv, NULL);
-            if (pa < sk)
-                pa = sk;
-        }
-
-        /* Contest, probability = 0.05 * (10 + pa - at); */
-        prob = frac_add(prob, frac_make(10 + pa - at, 20));
-        prob = frac_add(prob, magic_resistance((unit *)obj));
-        break;
-    }
-
-    case TYP_REGION:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
-        a = ((region *)obj)->attribs;
-        break;
-
-    case TYP_BUILDING:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
-        a = ((building *)obj)->attribs;
-        /* Bonus durch Typ
-        probability += 0.01 * ((building *)obj)->type->magres; */
-        prob = frac_add(prob, ((building *)obj)->type->magres);
-        break;
-
-    case TYP_SHIP:
-        /* Bonus durch Zauber */
-        a = ((ship *)obj)->attribs;
-        break;
-    }
-
-    if (a) {
-        curse * c = get_curse(a, &ct_magicrunes);
-        int effect = curse_geteffect_int(c);
-        prob = frac_add(prob, frac_make(effect, 100));
-    }
-
-    /* ignore results < 2% and > 98% */
-    v02p = frac_make(1, 50);
-    v98p = frac_make(49, 50);
-    if (frac_sign(frac_sub(prob, v02p)) < 0) {
-        prob = v02p;
-    }
-    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
-        prob = v98p;
-    }
+    prob = resist_chance(magician, obj, objtyp, t_bonus);
 
     /* gibt true, wenn die Zufallszahl kleiner als die chance ist und
      * false, wenn sie gleich oder groesser ist, dh je groesser die
      * Magieresistenz (chance) desto eher gibt die Funktion true zurueck */
+    if (prob.sa[0] <= 0) {
+        return false;
+    }
     return rng_int() % prob.sa[1] < prob.sa[0];
 }
 
 /* ------------------------------------------------------------- */
 
-bool is_magic_resistant(unit * magician, unit * target, int resist_bonus)
+bool is_magic_resistant(const unit * magician, const unit * target, int resist_bonus)
 {
     return target_resists_magic(magician, target, TYP_UNIT,
         resist_bonus);
