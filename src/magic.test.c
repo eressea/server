@@ -507,23 +507,24 @@ static void test_resist_chance(CuTest *tc) {
 static void test_magic_resistance(CuTest *tc) {
     unit *u;
     race *rc;
+    building_type *btype;
 
     test_setup();
+
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+
+    btype = test_create_buildingtype("stonecircle");
+    btype->magresbonus = 20; /* this building gives +20% magic resistance */
+    u->building = test_create_building(u->region, btype);
+    u->building->flags = BLD_MAINTAINED;
+    CuAssertTrue(tc, frac_equal(frac_make(1, 5), magic_resistance(u)));
+    u->building = NULL;
 
     /* 5% bonus in magic resistance for each magic level */
     set_level(u, SK_MAGIC, 4); /* makes for 20% */
     CuAssertTrue(tc, frac_equal(frac_make(1, 5), magic_resistance(u)));
     set_level(u, SK_MAGIC, 0);
-
-    /* TODO:
-    * - ct_magicresistance
-    * - ct_badmagicresistancezone
-    * - ct_goodmagicresistancezone
-    * - alliedunit
-    * - stone circles
-    */
 
     CuAssertTrue(tc, frac_equal(rc->magres, magic_resistance(u)));
     rc->magres = frac_one;

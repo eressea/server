@@ -1116,12 +1116,11 @@ variant magic_resistance(const unit * target)
     /* Bonus durch Gebaeude */
     {
         struct building *b = inside_building(target);
-        const struct building_type *btype = building_is_active(b) ? b->type : NULL;
 
         /* gesegneter Steinkreis gibt 30% dazu */
-        if (btype) {
+        if (b && b->type->magresbonus && building_is_active(b)) {
             /* TODO: legacy. building-bonus is an integer-percentage */
-            prob = frac_add(prob, frac_make(btype->magresbonus, 100));
+            prob = frac_add(prob, frac_make(b->type->magresbonus, 100));
         }
     }
 

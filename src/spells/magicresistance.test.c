@@ -24,6 +24,10 @@
 #include <string.h>
 #include <assert.h>
 
+/* TODO:
+ * - ct_magicresistance on buildings
+ * - stone circles
+ */
 
 static void test_magicresistance_curse_effects(CuTest *tc) {
     struct region *r;
@@ -114,6 +118,9 @@ static void test_magicresistance_unit(CuTest *tc) {
     test_teardown();
 }
 
+/** 
+ * Test for spell "Heimstein"
+ */
 static void test_magicresistance_building(CuTest *tc) {
     struct region *r;
     struct faction *f1;
@@ -130,7 +137,7 @@ static void test_magicresistance_building(CuTest *tc) {
     u1 = test_create_unit(f1, r);
 
     b1 = test_create_building(r, NULL);
-
+    u1->building = b1;
     c = create_curse(u1, &b1->attribs, &ct_magicresistance, 10, 20, 30, 0);
     CuAssertPtrNotNull(tc, b1->attribs);
     CuAssertPtrEquals(tc, (void *)&at_curse, (void *)b1->attribs->type);
