@@ -480,6 +480,17 @@ static void test_resist_chance(CuTest *tc) {
     prob = frac_sub(prob, frac_make(1, 2)); /* only 50% base chance remains */
     CuAssertIntEquals(tc, 0, prob.sa[0]);
 
+    /* 5% bonus in magic resistance for each magic level */
+    set_level(u2, SK_MAGIC, 4); /* makes for 20% */
+    prob = magic_resistance(u2);
+    prob = frac_sub(prob, frac_make(1, 5)); /* 20% from magic levels */
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
+    prob = resist_chance(u1, u2, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 2)); /* 50% basic resistance */
+    prob = frac_sub(prob, frac_make(1, 5)); /* 20% from magic levels */
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+
     test_teardown();
 }
 
@@ -490,6 +501,12 @@ static void test_magic_resistance(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+
+    /* 5% bonus in magic resistance for each magic level */
+    set_level(u, SK_MAGIC, 4); /* makes for 20% */
+    CuAssertTrue(tc, frac_equal(frac_make(1, 5), magic_resistance(u)));
+    set_level(u, SK_MAGIC, 0);
+
     CuAssertTrue(tc, frac_equal(rc->magres, magic_resistance(u)));
     rc->magres = frac_one;
     CuAssert(tc, "magic resistance is capped at 0.9", frac_equal(magic_resistance(u), frac_make(9, 10)));
