@@ -6,23 +6,24 @@
 #include "give.h"
 #include "teleport.h"
 
-#include <kernel/callbacks.h>
+#include <util/language.h>
+#include <util/strings.h>
+
+#include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/race.h>
+#include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
-#include <kernel/order.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
 #include <kernel/objtypes.h>
 #include <kernel/pool.h>
-
-#include <kernel/attrib.h>
-#include <util/language.h>
-#include <util/strings.h>
 
 #include <CuTest.h>
 #include <selist.h>
@@ -439,7 +440,16 @@ static void test_resist_chance(CuTest *tc) {
     prob = resist_chance(u1, u4, TYP_UNIT, 10);
     CuAssertIntEquals(tc, 0, prob.sa[0]);
 
-    /* allied units do not resist */
+    /* allied units can still resist */
+    ally_set(&u3->faction->allies, u1->faction, HELP_GUARD);
+    prob = resist_chance(u1, u3, TYP_UNIT, 0);
+    prob = frac_sub(prob, frac_make(1, 2)); /* resist at 50% base chance */
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+    prob = resist_chance(u1, u3, TYP_UNIT, 10);
+    prob = frac_sub(prob, frac_make(3, 5)); /* resist at 10% + 50% base chance */
+    CuAssertIntEquals(tc, 0, prob.sa[0]);
+    ally_set(&u3->faction->allies, u1->faction, 0);
+
     contact_unit(u3, u1);
     prob = resist_chance(u1, u3, TYP_UNIT, 0);
     CuAssertIntEquals(tc, 0, prob.sa[0]);
@@ -506,6 +516,14 @@ static void test_magic_resistance(CuTest *tc) {
     set_level(u, SK_MAGIC, 4); /* makes for 20% */
     CuAssertTrue(tc, frac_equal(frac_make(1, 5), magic_resistance(u)));
     set_level(u, SK_MAGIC, 0);
+
+    /* TODO:
+    * - ct_magicresistance
+    * - ct_badmagicresistancezone
+    * - ct_goodmagicresistancezone
+    * - alliedunit
+    * - stone circles
+    */
 
     CuAssertTrue(tc, frac_equal(rc->magres, magic_resistance(u)));
     rc->magres = frac_one;

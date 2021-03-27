@@ -1070,8 +1070,9 @@ variant magic_resistance(const unit * target)
     c = get_curse(target->attribs, &ct_magicresistance);
     if (c) {
         /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
-        int effect = curse_geteffect_int(c) * get_cursedmen(target, c);
-        prob = frac_add(prob, frac_make(effect, 100));
+        variant effect = frac_make(curse_geteffect_int(c), 100);
+        effect = frac_mul(effect, frac_make(get_cursedmen(target, c), target->number));
+        prob = frac_add(prob, effect);
     }
 
     /* Unicorn +10 */
