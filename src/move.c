@@ -1838,7 +1838,7 @@ static void sail(unit * u, order * ord, bool drifting)
                         }
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+                                sh, next_point, sh->damage >= sh->size * DAMAGE_SCALE));
 
                             damage_ship(sh, damage_storm);
                             if (sh->damage >= sh->size * DAMAGE_SCALE) {
