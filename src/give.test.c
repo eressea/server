@@ -111,6 +111,17 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
 
+    /* must be allied to transfer a unit */
+    u_setfaction(env.src, env.f1);
+    ally_set(&env.f2->allies, env.f1, 0);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+
+    /* contact also works */
+    contact_unit(env.dst, env.src);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
+
     test_teardown();
 }
 
