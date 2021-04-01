@@ -3,6 +3,7 @@
   - Bugfix für Schild des Fisches (Solthar)
   - Dämonen können magisch reanimiert werden.
   - "Schöne Träume" verliert seine Wirkung, wenn der Zauberer stirbt.
+  - Mit GIB 0 können hungernde Personen an die Bauern gegeben werden.
 
 # 3.27
 

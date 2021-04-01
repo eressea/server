@@ -24,6 +24,7 @@ extern "C" {
     enum param_t give_cmd(struct unit * u, struct order * ord);
     struct message * check_give(const struct unit * u, const struct unit * u2, struct order *ord);
     bool can_give_to(struct unit *u, struct unit *u2);
+    bool can_give_men(const struct unit *u, const struct unit *dst, struct order *ord, struct message **msg);
     bool rule_transfermen(void);
 
 #ifdef __cplusplus

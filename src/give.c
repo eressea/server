@@ -265,7 +265,8 @@ static bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg)
+{
     UNUSED_ARG(dst);
     if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
@@ -274,7 +275,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
-    else if (fval(u, UFL_HUNGER)) {
+    else if (dst && fval(u, UFL_HUNGER)) {
         /* hungry people cannot be given away */
         if (msg) *msg = msg_error(u, ord, 73);
     }
