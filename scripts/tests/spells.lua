@@ -163,11 +163,10 @@ local function create_cp_front(f, r)
 end
 
 function test_confusion_and_panic()
-  f = faction.create('demon', "confusion@eressea.de", "de")
-  f2 = faction.create('demon')
-  for y = 1, 10 do
+    f = faction.create('demon')
+    f2 = faction.create('demon')
     local u1, u2, u3, u4, r
-    r = region.create(0, 2*y, 'plain')
+    r = region.create(0, 0, 'plain')
     u1 = create_cp_front(f, r)
     u2 = create_cp_mage(f, r)
     u3 = create_cp_mage(f, r)
@@ -181,18 +180,11 @@ function test_confusion_and_panic()
     create_cp_mage(f2, r)
 
     for ux in r.units do
-      for uy in r.units do
-        if ux.faction ~= uy.faction then
-          ux:add_order("ATTACKIERE " .. itoa36(uy.id))
+        for uy in r.units do
+            if ux.faction ~= uy.faction then
+                ux:add_order("ATTACKIERE " .. itoa36(uy.id))
+            end
         end
-      end
     end
-  end
-  for i = 1,10 do
     process_orders()
-  end
-
-  -- should not produce "select_enemies has a bug"
---  init_reports()
---  write_reports()
 end

@@ -1374,9 +1374,10 @@ static void end_spells(parseinfo *pi, const XML_Char *el) {
     else if (xml_strequal(el, "spell")) {
         spell *sp = (spell *)pi->object;
         if (ncomponents > 0) {
-            sp->components = (spell_component *)calloc(ncomponents + 1, sizeof(spell_component));
+            sp->components = malloc((1 + (size_t)ncomponents) * sizeof(spell_component));
             if (!sp->components) abort();
             memcpy(sp->components, components, sizeof(spell_component) * ncomponents);
+            sp->components[ncomponents].type = NULL;
             ncomponents = 0;
         }
         pi->object = NULL;

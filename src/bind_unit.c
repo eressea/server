@@ -194,7 +194,7 @@ static int tolua_unit_get_id(lua_State * L)
 static int tolua_unit_set_id(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    unit_setid(u, (int)tolua_tonumber(L, 2, 0));
+    unit_setid(u, (int)lua_tointeger(L, 2));
     return 0;
 }
 
@@ -202,6 +202,17 @@ static int tolua_unit_get_auramax(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
     lua_pushinteger(L, max_spellpoints(u, u->region));
+    return 1;
+}
+
+static int tolua_unit_set_auramax(lua_State * L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+    int aura = (int)lua_tointeger(L, 2);
+    int now = max_spellpoints(u, u->region);
+
+    aura = change_maxspellpoints(u, aura - now);
+    lua_pushinteger(L, aura);
     return 1;
 }
 
@@ -1055,7 +1066,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, TOLUA_CAST "race", tolua_unit_get_race,
                 tolua_unit_set_race);
             tolua_variable(L, TOLUA_CAST "hp_max", tolua_unit_get_hpmax, 0);
-            tolua_variable(L, TOLUA_CAST "aura_max", tolua_unit_get_auramax, 0);
+            tolua_variable(L, TOLUA_CAST "aura_max", tolua_unit_get_auramax, tolua_unit_set_auramax);
 
             tolua_function(L, TOLUA_CAST "equip", tolua_equipunit);
             tolua_function(L, TOLUA_CAST "show", tolua_bufunit);

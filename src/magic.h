@@ -112,7 +112,7 @@ extern "C" {
     typedef struct spell_component {
         const struct resource_type *type;
         int amount;
-        int cost;
+        enum spellcost_t cost;
     } spell_component;
 
     /* ------------------------------------------------------------- */
@@ -146,7 +146,7 @@ extern "C" {
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
 
     /* Flag Spruchkostenberechnung: */
-    enum {
+    enum spellcost_t {
         SPC_FIX,                    /* Fixkosten */
         SPC_LEVEL,                  /* Komponenten pro Level */
         SPC_LINEAR                  /* Komponenten pro Level und muessen vorhanden sein */
@@ -191,6 +191,7 @@ extern "C" {
     enum magic_t mage_get_type(const struct sc_mage *mage);
     const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
     struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
+    int mage_get_spell_level(const struct sc_mage *mage, const struct spell *sp);
     int mage_get_spellpoints(const struct sc_mage *m);
     void mage_set_spellpoints(struct sc_mage *m, int aura);
     int mage_change_spellpoints(struct sc_mage *m, int delta);
@@ -217,7 +218,7 @@ extern "C" {
     void unset_combatspell(struct unit *u, struct spell * sp);
     /*      loescht Kampfzauber */
     /* fuegt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-    int u_hasspell(const struct unit *u, const struct spell *sp);
+    bool u_hasspell(const struct unit *u, const struct spell *sp);
     /* prueft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
     bool knowsspell(const struct region *r, const struct unit *u,
@@ -242,7 +243,7 @@ extern "C" {
 
     /* Zaubern */
     double spellpower(struct region *r, struct unit *u, const struct spell * sp,
-        int cast_level, struct order *ord);
+        int cast_level);
     /*      ermittelt die Staerke eines Spruchs */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
@@ -282,8 +283,9 @@ extern "C" {
     /*      zieht die Komponenten des Zaubers aus dem Inventory der Einheit
      *      ab. Die effektive Stufe des gezauberten Spruchs ist wichtig fuer
      *      die korrekte Bestimmung der Magiepunktkosten */
-    int eff_spelllevel(struct unit *mage, struct unit *caster,
-        const struct spell * sp, int cast_level, int distance);
+    int max_spell_level(struct unit *mage, struct unit *caster,
+        const struct spell * sp, int cast_level, int distance, 
+        struct resource **reslist_p);
     /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
      *      die gewuenschte maximale Stufe (im Normalfall Stufe des Magiers,
      *      bei Farcasting Stufe*2^Entfernung) */
