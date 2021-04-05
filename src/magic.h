@@ -18,6 +18,7 @@ extern "C" {
 
     struct sc_mage;
     struct unit;
+    struct resource;
 
     extern const char *magic_school[MAXMAGIETYP];
     extern struct attrib_type at_familiar;
@@ -109,6 +110,13 @@ extern "C" {
     struct unit * co_get_magician(const struct castorder * co);
     struct region * co_get_region(const struct castorder * co);
 
+    /* Flag Spruchkostenberechnung: */
+    enum spellcost_t {
+        SPC_FIX,                    /* Fixkosten */
+        SPC_LEVEL,                  /* Komponenten pro Level */
+        SPC_LINEAR                  /* Komponenten pro Level und muessen vorhanden sein */
+    };
+
     typedef struct spell_component {
         const struct resource_type *type;
         int amount;
@@ -144,13 +152,6 @@ extern "C" {
 
 #define NOTFAMILIARCAST (1<<14) /* not used by XML? */
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
-
-    /* Flag Spruchkostenberechnung: */
-    enum spellcost_t {
-        SPC_FIX,                    /* Fixkosten */
-        SPC_LEVEL,                  /* Komponenten pro Level */
-        SPC_LINEAR                  /* Komponenten pro Level und muessen vorhanden sein */
-    };
 
     /* ------------------------------------------------------------- */
     /* Prototypen */

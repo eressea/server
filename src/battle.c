@@ -1781,7 +1781,6 @@ static void do_combatspell(troop at)
     int level, qi;
     double power;
     int fumblechance = 0;
-    const struct locale *lang = mage->faction->locale;
 
     sp = get_combatspell(mage, 1);
     if (sp == NULL || !u_hasspell(mage, sp)) {

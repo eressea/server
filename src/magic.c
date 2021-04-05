@@ -740,7 +740,6 @@ static void add_missing_component(resource **reslist_p, const struct spell_compo
  */
 int max_spell_level(unit * u, unit *caster, const spell * sp, int cast_level, int range, resource **reslist_p)
 {
-    const resource_type *r_aura = get_resourcetype(R_AURA);
     const struct spell_component *spc;
     int maxlevel = cast_level;
 
