@@ -364,11 +364,18 @@ write_mage(const variant *var, const void *owner, struct storage *store)
     write_spellbook(mage->spellbook, store);
 }
 
+static int reset_mage(attrib *a, void *owner) {
+    sc_mage *mage = (sc_mage *)a->data.v;
+    UNUSED_ARG(owner);
+    mage->spellcount = 0;
+    return 1;
+}
+
 attrib_type at_mage = {
     "mage",
     init_mage,
     free_mage,
-    NULL,
+    reset_mage,
     write_mage,
     read_mage,
     NULL,
@@ -498,7 +505,7 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
 bool u_hasspell(const unit *u, const struct spell *sp)
 {
     spellbook * book = unit_get_spellbook(u);
-    spellbook_entry * sbe = book ? spellbook_get(book, sp) : 0;
+    spellbook_entry * sbe = book ? spellbook_get(book, sp) : NULL;
     if (sbe) {
         return sbe->level <= effskill(u, SK_MAGIC, NULL);
     }

@@ -181,7 +181,7 @@ function test_familiar()
     local f = faction.create("human")
     local u = unit.create(f, r)
     local uid = u.id
-    u.name = 'Hodor'
+    u.name = 'Bonzi'
     u.magic = "gwyrrd"
     u.race = "elf"
     u:set_skill("magic", 10)
@@ -192,7 +192,7 @@ function test_familiar()
     process_orders()
     for u in r.units do 
         if u.id ~= uid then
-            assert_equal('Vertrauter von Hodor (' .. itoa36(uid) ..')', u.name)
+            assert_equal('Vertrauter von Bonzi (' .. itoa36(uid) ..')', u.name)
         end
     end
 end
@@ -222,6 +222,8 @@ function test_bug_2480()
 end
 
 function test_bug_2517()
+  -- Magier macht lange Befehle, wenn sein Vertrauter
+  -- zaubert (auch wenn es nicht eigene Zauber sind).
   local r = region.create(0, 0, "plain")
   local f = faction.create("elf")
   local um = unit.create(f, r, 1)
@@ -242,12 +244,25 @@ function test_bug_2517()
   assert_equal('gray', uf.magic)
   uf:add_order('LERNE Magie')
   um:clear_orders()
+  assert_equal(1, uf:get_skill('magic'))
   um:add_order('ARBEITEN')
+  assert_equal(0, um:get_item('money'))
   process_orders()
   assert_equal('gray', uf.magic)
   uf:add_order('ZAUBERE STUFE 1 Viehheilung')
+  um.aura = 10
+  uf.aura = 10
+  assert_equal(10, um:get_item('money')) -- langer Befehl wurde ausgefuehrt
   process_orders()
   assert_equal(50, uf:get_item('money'))
+  assert_equal(20, um:get_item('money')) -- langer Befehl wurde ausgefuehrt
+  assert_equal(8, um.aura) -- kein eigener Zauber, Aura des Magiers
+  assert_equal(10, uf.aura)
+  uf:add_spell('earn_silver#gwyrrd') -- ins private spellbook aufnehmen
+  process_orders()
+  assert_equal(9, uf.aura) -- einfache Kosten, aus eigener Aura
+  assert_equal(8, um.aura) -- keine Kosten für den Magier
+  assert_equal(30, um:get_item('money')) -- langer Befehl wurde ausgefuehrt
 end
 
 function test_familiar_school()
