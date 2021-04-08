@@ -192,7 +192,6 @@ extern "C" {
     enum magic_t mage_get_type(const struct sc_mage *mage);
     const struct spell *mage_get_combatspell(const struct sc_mage *mage, int nr, int *level);
     struct spellbook * mage_get_spellbook(const struct sc_mage * mage);
-    int mage_get_spell_level(const struct sc_mage *mage, const struct spell *sp);
     int mage_get_spellpoints(const struct sc_mage *m);
     void mage_set_spellpoints(struct sc_mage *m, int aura);
     int mage_change_spellpoints(struct sc_mage *m, int delta);
@@ -201,6 +200,7 @@ extern "C" {
     void unit_set_magic(struct unit *u, enum magic_t mtype);
     struct spellbook * unit_get_spellbook(const struct unit * u);
     void unit_add_spell(struct unit * u, struct spell * sp, int level);
+    int unit_spell_level(const struct unit *u, const struct spell *sp);
 
     bool is_mage(const struct unit *u);
     /*      gibt true, wenn u->mage gesetzt.  */
@@ -222,7 +222,9 @@ extern "C" {
     bool u_hasspell(const struct unit *u, const struct spell *sp);
     /* prueft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
-    bool knowsspell(const struct region *r, const struct unit *u,
+    bool knowsspell(
+        const struct region *r,
+        const struct unit *u,
         const struct spell * sp);
     /* prueft, ob die Einheit diesen Spruch gerade beherrscht, dh
      * mindestens die erforderliche Stufe hat. Hier koennen auch Abfragen

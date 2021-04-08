@@ -22,7 +22,6 @@ function test_ship_requires_skill()
     assert_not_nil(r2)
     local f = faction.create("human", "fake@eressea.de", "de")
     local u1 = unit.create(f, r1, 1)
-    u1.name = "fake"
     u1.ship = ship.create(r1, "longboat")
     u1:clear_orders()
     u1:add_order("NACH O")

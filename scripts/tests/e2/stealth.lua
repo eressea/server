@@ -45,7 +45,6 @@ function test_stealth_faction_on()
 end
 
 function test_stealth_faction_other()
-    u.name = "Enno"
 	u:clear_orders()
 	u:add_order("TARNEN PARTEI NUMMER " .. itoa36(f.id))
 

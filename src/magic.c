@@ -267,16 +267,12 @@ bool FactionSpells(void)
     return rule != 0;
 }
 
-int mage_get_spell_level(const sc_mage *mage, const spell *sp) {
-    spellbook *book = mage_get_spellbook(mage);
-    spellbook_entry *sbe = spellbook_get(book, sp);
-    return sbe ? sbe->level : 0;
-}
-
 int get_spell_level_mage(const spell * sp, void * cbdata)
 {
     sc_mage *mage = (sc_mage *)cbdata;
-    return mage_get_spell_level(mage, sp);
+    spellbook *book = mage_get_spellbook(mage);
+    spellbook_entry *sbe = spellbook_get(book, sp);
+    return sbe ? sbe->level : 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -502,12 +498,21 @@ sc_mage *create_mage(unit * u, magic_t mtyp)
 /* ------------------------------------------------------------- */
 /* Funktionen fuer die Bearbeitung der List-of-known-spells */
 
+int unit_spell_level(const unit *u, const struct spell *sp)
+{
+    spellbook *book = unit_get_spellbook(u);
+    spellbook_entry *sbe = book ? spellbook_get(book, sp) : NULL;
+    if (sbe) {
+        return sbe->level;
+    }
+    return 0;
+}
+
 bool u_hasspell(const unit *u, const struct spell *sp)
 {
-    spellbook * book = unit_get_spellbook(u);
-    spellbook_entry * sbe = book ? spellbook_get(book, sp) : NULL;
-    if (sbe) {
-        return sbe->level <= effskill(u, SK_MAGIC, NULL);
+    int level = unit_spell_level(u, sp);
+    if (level > 0) {
+        return level <= effskill(u, SK_MAGIC, NULL);
     }
     return false;
 }
@@ -826,10 +831,9 @@ void pay_spell(unit * mage, const unit *caster, const spell * sp, int cast_level
  */
 bool knowsspell(const region * r, const unit * u, const spell * sp)
 {
-    UNUSED_ARG(r);
-    assert(sp);
+    int level = unit_spell_level(u, sp);
     /* steht der Spruch in der Spruchliste? */
-    return u_hasspell(u, sp);
+    return level > 0;
 }
 
 /* Um einen Spruch zu beherrschen, muss der Magier die Stufe des
@@ -2479,16 +2483,16 @@ static bool is_moving_ship(ship * sh)
     return false;
 }
 
-static int default_spell_level(const sc_mage *mage, const spell *sp) {
+static int default_spell_level(const unit *u, const spell *sp) {
     if (sp && sp->components) {
         const struct spell_component *spc;
         for (spc = sp->components; spc->type; ++spc) {
             if (spc->cost != SPC_FIX) {
-                return -1;
+                return 0;
             }
         }
     }
-    return mage_get_spell_level(mage, sp);
+    return unit_spell_level(u, sp);
 }
 
 #define MAX_PARAMETERS 48
@@ -2503,7 +2507,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     spell *sp = NULL;
     plane *pl;
     spellparameter *args = NULL;
-    unit * mage = u;
+    unit * mage = NULL;
     param_t param;
 
     if (LongHunger(u)) {
@@ -2553,40 +2557,50 @@ static castorder *cast_cmd(unit * u, order * ord)
         return 0;
     }
 
+    /**
+    * skill = der maximale durch das Magietalent erlaubte Level.
+    * Entspricht dem Talent des Zaubernden, oder im Falle, dass ein
+    * Vertrauter einen Spruch seines Magiers zaubert, dessen halbes Talent.
+    */
+    skill = effskill(u, SK_MAGIC, NULL);
     sp = unit_getspell(u, s, u->faction->locale);
-    /* Vertraute koennen auch Zauber sprechen, die sie selbst nicht
-     * koennen. unit_getspell findet aber nur jene Sprueche, die
-     * die Einheit beherrscht. */
-    if (!sp && is_familiar(u)) {
+
+    /* 
+     * u = Die Einheit, die den Befehl gegeben hat.
+     * mage = Die Einheit, deren Spruchliste und Aura benutzt wird.
+     *
+     * Vertraute koennen auch Zauber sprechen, die sie selbst nicht
+     * koennen. `unit_getspell` findet aber nur jene Sprueche, die
+     * die Einheit beherrscht. In diesem Fall ist `familiar` der Vertraute.
+     */
+    if (sp) {
+        /* wir zaubern selbst */
+        mage = u;
+    }
+    else if (skill > 0) {
+        /* als Vertrauter suchen wir einen Spender-Magier mit dem Spruch */
         mage = get_familiar_mage(u);
         if (mage) {
-            familiar = u;
+            int limit = effskill(mage, SK_MAGIC, NULL) / 2;
+            if (limit < skill) {
+                skill = limit;
+            }
             sp = unit_getspell(mage, s, mage->faction->locale);
-        }
-        else {
-            /* somehow, this familiar has no mage! */
-            log_error("cast_cmd: familiar %s is without a mage?\n", unitname(u));
-            mage = u;
+            if (sp->sptyp & NOTFAMILIARCAST) {
+                /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
+                cmistake(u, ord, 177, MSG_MAGIC);
+                return 0;
+            }
+            familiar = u;
         }
     }
-
+    /* OBS: hier kein else! */
     if (!sp) {
         /* Fehler 'Spell not found' */
         cmistake(u, ord, 173, MSG_MAGIC);
         return 0;
     }
 
-    /* um testen auf spruchnamen zu unterbinden sollte vor allen
-     * fehlermeldungen die anzeigen das der magier diesen Spruch
-     * nur in diese Situation nicht anwenden kann, noch eine
-     * einfache Sicherheitspruefung kommen */
-    if (!knowsspell(r, u, sp)) {
-        /* vorsicht! u kann der familiar sein */
-        if (!familiar) {
-            cmistake(u, ord, 173, MSG_MAGIC);
-            return 0;
-        }
-    }
     if (sp->sptyp & ISCOMBATSPELL) {
         /* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
         cmistake(u, ord, 174, MSG_MAGIC);
@@ -2627,18 +2641,44 @@ static castorder *cast_cmd(unit * u, order * ord)
             cmistake(u, ord, 176, MSG_MAGIC);
             return 0;
         }
-        if (range > 1024) {         /* (2^10) weiter als 10 Regionen entfernt */
+        if (familiar) {
+            /* Magier zaubert durch Vertrauten: keine Fernzauber erlaubt */
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
+                "mage", mage));
+            return 0;
+        }
+        if (range > 1024) {
+            /* (2^10) weiter als 10 Regionen entfernt */
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
                 "target", target_r));
             return 0;
         }
     }
+    if (familiar) {
+        /*
+        * Magier zaubert durch Vertrauten: Doppelte Kosten.
+        *
+        * Das hier über range zu machen ist ein Hack, deshalb passiert es erst
+        * nach allen anderen Range-Checks.
+        */
+        range *= 2;
+    }
 
-    skill = effskill(mage, SK_MAGIC, NULL);
+    /**
+     * level = Die Stufe, auf der gezaubert werden soll. 
+     * Kann nicht höher sein als das Talent des Zaubernden, oder im
+     * Falle, dass ein Vertrauter einen Spruch seines Magiers zaubert,
+     * nicht höher als dessen halbes Talent.
+     */
     if (level < 0) {
-        level = default_spell_level(get_mage(mage), sp);
-        if (level < 0) {
+        level = default_spell_level(mage, sp);
+        if (level <= 0) {
             level = skill;
+        }
+        if (level > skill) {
+            /* die Einheit ist nicht erfahren genug fuer diesen Zauber */
+            cmistake(u, ord, 169, MSG_MAGIC);
+            return 0;
         }
     }
     else if (!(sp->sptyp & SPELLLEVEL)) {
@@ -2649,45 +2689,12 @@ static castorder *cast_cmd(unit * u, order * ord)
                 "mage region command", u, u->region, ord));
         }
     }
+    
     if (level > skill) {
-        /* die Einheit ist nicht erfahren genug fuer diesen Zauber */
-        cmistake(u, ord, 169, MSG_MAGIC);
-        return 0;
+        /* STUFE kann nicht mehr als das erlaubte Maximum sein */
+        level = skill;
     }
 
-    /* Vertrautenmagie */
-    /* Kennt der Vertraute den Spruch, so zaubert er ganz normal.
-     * Ansonsten zaubert der Magier durch seinen Vertrauten, dh
-     * zahlt Komponenten und Aura. Dabei ist die maximale Stufe
-     * die des Vertrauten!
-     * Der Spruch wirkt dann auf die Region des Vertrauten und
-     * gilt nicht als Farcasting. */
-    if (familiar) {
-        if ((sp->sptyp & NOTFAMILIARCAST)) {
-            /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
-            cmistake(u, ord, 177, MSG_MAGIC);
-            return 0;
-        }
-        if (mage != familiar) {        /* Magier zaubert durch Vertrauten */
-            int sk;
-            if (range > 1) {          /* Fehler! Versucht zu Farcasten */
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
-                    "mage", mage));
-                return 0;
-            }
-            sk = effskill(mage, SK_MAGIC, NULL);
-            if (distance(mage->region, r) > sk) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_toofar",
-                    "mage", mage));
-                return 0;
-            }
-            /* mage auf magier setzen, level anpassen, range fuer Erhoehung
-             * der Spruchkosten nutzen */
-            range *= 2;
-            sk /= 2;
-            if (level > sk) level = sk;
-        }
-    }
     /* Weitere Argumente zusammenbasteln */
     if (sp->parameter) {
         char *params[MAX_PARAMETERS];
