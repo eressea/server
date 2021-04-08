@@ -1165,9 +1165,9 @@ faction *read_faction(gamedata * data)
     }
     read_allies(data, &f->allies);
     read_groups(data, f);
-    f->spellbook = 0;
+    f->spellbook = NULL;
     if (data->version >= REGIONOWNER_VERSION) {
-        read_spellbook(FactionSpells() ? &f->spellbook : 0, data, get_spell_level_faction, (void *)f);
+        read_spellbook(FactionSpells() ? &f->spellbook : NULL, data, get_spell_level_faction, (void *)f);
     }
     return f;
 }

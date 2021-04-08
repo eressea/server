@@ -94,7 +94,6 @@ function test_appeasement_can_move()
     r2 = region.create(1, 0, 'plain')
     u2 = unit.create(faction.create('human'), r1, 1)
     u2.race = 'elf'
-    u2.name = 'Angsthase'
     u2.magic = 'gwyrrd'
     u2:set_skill('magic', 5)
     u2.aura = 10
@@ -118,7 +117,6 @@ function test_appeasement_break_guard()
     r2 = region.create(1, 0, 'plain')
     u2 = unit.create(faction.create('human'), r1, 1)
     u2.race = 'elf'
-    u2.name = 'Angsthase'
     u2.magic = 'gwyrrd'
     u2.guard = true
     u2.status = 1
