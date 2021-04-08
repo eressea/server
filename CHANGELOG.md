@@ -7,6 +7,8 @@
   - Magieresistenz: Einheiten widerstehen nicht Zaubern der eigenen Partei [2733].
   - Zauberkosten steigen durch Ring der Macht nicht an.
   - Effektiv gezauberte Stufe von Zauber anhängig von Verfügbarkeit der Materialen.
+  - Ring der Macht und Steinkreis erhöhen nicht die Zauberkosten [2737].
+  - Limits für Vertrautenzauber korrekt implementiert.
 
 # 3.27
 
