@@ -561,7 +561,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
         }
         set_curseingmagician(magician, *ap, ct);
     }
-    else {
+    else if (ap) {
         c = make_curse(magician, ap, ct, vigour, duration, effect, men);
     }
     return c;
