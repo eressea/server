@@ -2563,39 +2563,41 @@ static castorder *cast_cmd(unit * u, order * ord)
     * Vertrauter einen Spruch seines Magiers zaubert, dessen halbes Talent.
     */
     skill = effskill(u, SK_MAGIC, NULL);
-    sp = unit_getspell(u, s, u->faction->locale);
+    if (skill > 0) {
+        sp = unit_getspell(u, s, u->faction->locale);
 
-    /* 
-     * u = Die Einheit, die den Befehl gegeben hat.
-     * mage = Die Einheit, deren Spruchliste und Aura benutzt wird.
-     *
-     * Vertraute koennen auch Zauber sprechen, die sie selbst nicht
-     * koennen. `unit_getspell` findet aber nur jene Sprueche, die
-     * die Einheit beherrscht. In diesem Fall ist `familiar` der Vertraute.
-     */
-    if (sp) {
-        /* wir zaubern selbst */
-        mage = u;
-    }
-    else if (skill > 0) {
-        /* als Vertrauter suchen wir einen Spender-Magier mit dem Spruch */
-        mage = get_familiar_mage(u);
-        if (mage) {
-            int limit = effskill(mage, SK_MAGIC, NULL) / 2;
-            if (limit < skill) {
-                skill = limit;
+        /*
+         * u = Die Einheit, die den Befehl gegeben hat.
+         * mage = Die Einheit, deren Spruchliste und Aura benutzt wird.
+         *
+         * Vertraute koennen auch Zauber sprechen, die sie selbst nicht
+         * koennen. `unit_getspell` findet aber nur jene Sprueche, die
+         * die Einheit beherrscht. In diesem Fall ist `familiar` der Vertraute.
+         */
+        if (sp) {
+            /* wir zaubern selbst */
+            mage = u;
+        }
+        else {
+            /* als Vertrauter suchen wir einen Spender-Magier mit dem Spruch */
+            mage = get_familiar_mage(u);
+            if (mage) {
+                int limit = effskill(mage, SK_MAGIC, NULL) / 2;
+                if (limit < skill) {
+                    skill = limit;
+                }
+                sp = unit_getspell(mage, s, mage->faction->locale);
+                if (sp->sptyp & NOTFAMILIARCAST) {
+                    /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
+                    cmistake(u, ord, 177, MSG_MAGIC);
+                    return 0;
+                }
+                familiar = u;
             }
-            sp = unit_getspell(mage, s, mage->faction->locale);
-            if (sp->sptyp & NOTFAMILIARCAST) {
-                /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
-                cmistake(u, ord, 177, MSG_MAGIC);
-                return 0;
-            }
-            familiar = u;
         }
     }
-    /* OBS: hier kein else! */
-    if (!sp) {
+
+    if (!sp || !mage) {
         /* Fehler 'Spell not found' */
         cmistake(u, ord, 173, MSG_MAGIC);
         return 0;
