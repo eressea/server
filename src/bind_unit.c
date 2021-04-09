@@ -8,18 +8,15 @@
 #include "reports.h"
 #include "guard.h"
 #include "magic.h"
-#include "skill.h"
 
-/*  util includes */
-#include <kernel/attrib.h>
-#include <util/base36.h>
-#include <kernel/event.h>
-#include <util/log.h>
-#include <util/macros.h>
-#include "util/strings.h"
-#include "util/variant.h"
+/*  attributes includes */
+#include <attributes/racename.h>
+#include <attributes/key.h>
 
 /*  kernel includes */
+#include <kernel/attrib.h>
+#include "kernel/skill.h"
+#include <kernel/event.h>
 #include "kernel/skills.h"
 #include "kernel/types.h"
 #include <kernel/building.h>
@@ -38,9 +35,12 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-/*  attributes includes */
-#include <attributes/racename.h>
-#include <attributes/key.h>
+/*  util includes */
+#include <util/base36.h>
+#include <util/log.h>
+#include <util/macros.h>
+#include "util/strings.h"
+#include "util/variant.h"
 
 #include <selist.h>
 

@@ -16,6 +16,7 @@ extern "C" {
     struct sc_mage;
     struct gamedata;
     struct item_type;
+    enum skill_t;
 
 #define MAXUNITS 1048573       /* should be prime for hashing. 524287 was >90% full */
 
@@ -125,21 +126,21 @@ extern "C" {
         int alias);
 
     const char *u_description(const unit * u, const struct locale *lang);
-    struct skill *add_skill(struct unit *u, skill_t id);
-    void remove_skill(struct unit *u, skill_t sk);
-    struct skill *unit_skill(const struct unit *u, skill_t id);
-    bool has_skill(const unit * u, skill_t sk);
-    int effskill(const struct unit *u, skill_t sk, const struct region *r);
+    struct skill *add_skill(struct unit *u, enum skill_t id);
+    void remove_skill(struct unit *u, enum skill_t sk);
+    struct skill *unit_skill(const struct unit *u, enum skill_t id);
+    bool has_skill(const unit * u, enum skill_t sk);
+    int effskill(const struct unit *u, enum skill_t sk, const struct region *r);
 
-    void set_level(struct unit *u, skill_t id, int level);
-    int get_level(const struct unit *u, skill_t id);
+    void set_level(struct unit *u, enum skill_t id, int level);
+    int get_level(const struct unit *u, enum skill_t id);
     void transfermen(struct unit *src, struct unit *dst, int n);
     void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
 
     int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
-    int effskill_study(const struct unit *u, skill_t sk);
+    int effskill_study(const struct unit *u, enum skill_t sk);
 
-    int get_modifier(const struct unit *u, skill_t sk, int level,
+    int get_modifier(const struct unit *u, enum skill_t sk, int level,
         const struct region *r, bool noitem);
     int remove_unit(struct unit **ulist, struct unit *u);
     void leave_region(struct unit* u);
@@ -237,7 +238,7 @@ extern "C" {
     bool has_horses(const struct unit *u);
     int maintenance_cost(const struct unit *u);
     bool has_limited_skills(const struct unit *u);
-    bool is_limited_skill(skill_t sk);
+    bool is_limited_skill(enum skill_t sk);
 
 #ifdef __cplusplus
 }

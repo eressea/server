@@ -4,6 +4,7 @@
 #include "jsonconf.h"
 
 /* kernel includes */
+#include "kernel/attrib.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
@@ -15,11 +16,11 @@
 #include "kernel/resources.h"
 #include "kernel/ship.h"
 #include "kernel/terrain.h"
+#include "kernel/skill.h"
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 
 /* util includes */
-#include "kernel/attrib.h"
 #include "util/aliases.h"
 #include "util/crmessage.h"
 #include "util/functions.h"
@@ -36,7 +37,6 @@
 #include "direction.h"
 #include "move.h"
 #include "prefix.h"
-#include "skill.h"
 #include "exparse.h"
 
 /* external libraries */

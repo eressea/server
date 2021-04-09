@@ -4,7 +4,6 @@
 #include "items.h"
 
 #include "alchemy.h"
-#include "skill.h"
 #include "direction.h"
 #include "study.h"
 #include "economy.h"
@@ -25,6 +24,7 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
+#include <kernel/skill.h>
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 

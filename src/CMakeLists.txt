@@ -113,7 +113,6 @@ set (ERESSEA_SRC
   renumber.c
   report.c
   reports.c
-  skill.c
   spells.c
   spy.c
   steal.c
@@ -238,7 +237,6 @@ set(TESTS_SRC
   renumber.test.c
   report.test.c
   reports.test.c
-  skill.test.c
   spells.test.c
   spy.test.c
   study.test.c

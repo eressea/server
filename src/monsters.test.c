@@ -1,6 +1,12 @@
 #include <platform.h>
 #include <stdlib.h>
 
+#include "monsters.h"
+#include "guard.h"
+#include "reports.h"
+#include "study.h"
+
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -9,16 +15,10 @@
 #include <kernel/region.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
+#include "kernel/skill.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
-#include "monsters.h"
-#include "guard.h"
-#include "reports.h"
-#include "skill.h"
-#include "study.h"
-
-#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/nrmessage.h>

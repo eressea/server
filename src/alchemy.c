@@ -2,21 +2,21 @@
 #include <kernel/config.h>
 #include "alchemy.h"
 #include "guard.h"
-#include "skill.h"
 #include "study.h"
 
-#include <kernel/item.h>
-#include <kernel/faction.h>
-#include <kernel/messages.h>
+#include <kernel/attrib.h>
 #include <kernel/build.h>
+#include <kernel/faction.h>
+#include <kernel/gamedata.h>
+#include <kernel/item.h>
+#include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
-#include <kernel/unit.h>
+#include "kernel/skill.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>

@@ -10,7 +10,6 @@
 #include "laws.h"
 #include "monsters.h"
 #include "move.h"
-#include "skill.h"
 #include "study.h"
 #include "spy.h"
 
@@ -33,6 +32,7 @@
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 #include "kernel/spell.h"

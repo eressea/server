@@ -6,7 +6,6 @@
 #include "contact.h"
 #include "helpers.h"
 #include "laws.h"
-#include "skill.h"
 #include "spells.h"
 #include "study.h"
 
@@ -41,6 +40,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include "kernel/skill.h"
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>

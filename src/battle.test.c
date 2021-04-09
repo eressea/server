@@ -8,7 +8,6 @@
 
 #include "guard.h"
 #include "reports.h"
-#include "skill.h"
 
 #include <kernel/config.h>
 #include <kernel/building.h>
@@ -19,7 +18,8 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include <kernel/unit.h>
+#include "kernel/skill.h"
+#include "kernel/unit.h"
 
 #include <spells/buildingcurse.h>
 
