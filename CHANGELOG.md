@@ -9,6 +9,7 @@
   - Effektiv gezauberte Stufe von Zauber anhängig von Verfügbarkeit der Materialen.
   - Ring der Macht und Steinkreis erhöhen nicht die Zauberkosten [2737].
   - Limits für Vertrautenzauber korrekt implementiert.
+  - Kröten und Schlümpfe können nichts lernen.
 
 # 3.27
 

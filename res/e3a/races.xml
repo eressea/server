@@ -603,7 +603,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
-  <race name="toad" magres="20" maxaura="1" regaura="1" maintenance="10" weight="100" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
+  <race name="toad" magres="20" maxaura="1" regaura="1" maintenance="10" weight="100" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" nolearn="yes">
     <ai splitsize="1" learn="yes"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
@@ -627,7 +627,7 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="smurf" weight="1000" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes">
+  <race name="smurf" weight="1000" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" nolearn="yes">
     <ai splitsize="1" learn="yes"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
