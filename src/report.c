@@ -87,6 +87,8 @@
 #include <limits.h>
 #include <stdlib.h>
 
+#define TEMPLATE_BOM 0
+
 /* pre-C99 compatibility */
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)(-1))
@@ -1289,7 +1291,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     }
     fstream_init(&strm, F);
 
-    if (bom) {
+    if (TEMPLATE_BOM && bom) {
         swrite(bom, 1, strlen(bom), out);
     }
 
