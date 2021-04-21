@@ -1685,54 +1685,52 @@ void do_combatmagic(battle * b, combatmagic_t was)
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
-            unit *mage = fig->unit;
-            unit *caster = mage;
+            unit *u = fig->unit;
+            unit *caster = u;
 
             if (fig->alive <= 0)
                 continue;               /* fighter kann im Kampf getoetet worden sein */
 
-            level = effskill(mage, SK_MAGIC, r);
+            level = effskill(u, SK_MAGIC, r);
             if (level > 0) {
                 double power;
                 const spell *sp;
-                const struct locale *lang = mage->faction->locale;
+                const struct locale *lang = u->faction->locale;
                 order *ord;
 
                 switch (was) {
                 case DO_PRECOMBATSPELL:
-                    sp = get_combatspell(mage, 0);
-                    sl = get_combatspelllevel(mage, 0);
+                    sp = mage_get_combatspell(get_mage(u), 0, &sl);
                     break;
                 case DO_POSTCOMBATSPELL:
-                    sp = get_combatspell(mage, 2);
-                    sl = get_combatspelllevel(mage, 2);
+                    sp = mage_get_combatspell(get_mage(u), 2, &sl);
                     break;
                 default:
                     /* Fehler! */
                     return;
                 }
-                if (sp == NULL || !u_hasspell(mage, sp))
+                if (sp == NULL || !u_hasspell(u, sp))
                     continue;
 
-                level = max_spell_level(mage, caster, sp, level, 1, NULL);
+                level = max_spell_level(u, caster, sp, level, 1, NULL);
                 if (sl > 0 && sl < level) {
                     level = sl;
                 }
                 if (level < 1) {
-                    report_failed_spell(b, mage, sp);
+                    report_failed_spell(b, u, sp);
                     continue;
                 }
 
                 ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
-                power = spellpower(r, mage, sp, level);
+                power = spellpower(r, u, sp, level);
                 free_order(ord);
                 if (power <= 0) {       /* Effekt von Antimagie */
-                    report_failed_spell(b, mage, sp);
-                    pay_spell(mage, NULL, sp, level, 1);
+                    report_failed_spell(b, u, sp);
+                    pay_spell(u, NULL, sp, level, 1);
                 }
-                else if (fumble(r, mage, sp, level)) {
-                    report_failed_spell(b, mage, sp);
-                    pay_spell(mage, NULL, sp, level, 1);
+                else if (fumble(r, u, sp, level)) {
+                    report_failed_spell(b, u, sp);
+                    pay_spell(u, NULL, sp, level, 1);
                 }
                 else {
                     co = create_castorder_combat(0, fig, sp, level, power);
@@ -1774,34 +1772,31 @@ static void do_combatspell(troop at)
 {
     const spell *sp;
     fighter *fi = at.fighter;
-    unit *mage = fi->unit;
+    unit *u = fi->unit;
     battle *b = fi->side->battle;
     region *r = b->region;
     selist *ql;
-    int level, qi;
+    int level, qi, sl;
     double power;
     int fumblechance = 0;
+    struct sc_mage *mage = get_mage(u);
 
-    sp = get_combatspell(mage, 1);
-    if (sp == NULL || !u_hasspell(mage, sp)) {
+    sp = mage_get_combatspell(mage, 1, &sl);
+    if (sl <= 0 || sp == NULL || !u_hasspell(u, sp)) {
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
-    level = max_spell_level(mage, mage, sp, fi->magic, 1, NULL);
+    level = max_spell_level(u, u, sp, fi->magic, 1, NULL);
     if (level < 1) {
         fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;
     }
-    else {
-        int sl = get_combatspelllevel(mage, 1);
-        if (sl < level) {
-            level = sl;
-        }
+    else if (sl < level) {
+        level = sl;
     }
-
-    if (fumble(r, mage, sp, level)) {
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
+    if (fumble(r, u, sp, level)) {
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
 
@@ -1817,14 +1812,14 @@ static void do_combatspell(troop at)
 
     /* Antimagie die Fehlschlag erhoeht */
     if (rng_int() % 100 < fumblechance) {
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
-    power = spellpower(r, mage, sp, level);
+    power = spellpower(r, u, sp, level);
     if (power <= 0) {             /* Effekt von Antimagie */
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
 

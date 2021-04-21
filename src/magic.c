@@ -524,9 +524,11 @@ int get_combatspelllevel(const unit * u, int nr)
 {
     int level;
     if (mage_get_combatspell(get_mage(u), nr, &level) != NULL) {
-        int maxlevel = effskill(u, SK_MAGIC, NULL);
-        if (level > maxlevel) {
-            return maxlevel;
+        if (level > 0) {
+            int maxlevel = effskill(u, SK_MAGIC, NULL);
+            if (level > maxlevel) {
+                return maxlevel;
+            }
         }
         return level;
     }
@@ -573,21 +575,13 @@ void unset_combatspell(unit * u, spell * sp)
             m->combatspells[i].sp = NULL;
         }
     }
-    else if (sp->sptyp & PRECOMBATSPELL) {
-        if (sp != get_combatspell(u, 0))
-            return;
-    }
-    else if (sp->sptyp & COMBATSPELL) {
-        if (sp != get_combatspell(u, 1)) {
-            return;
-        }
-        nr = 1;
-    }
-    else if (sp->sptyp & POSTCOMBATSPELL) {
-        if (sp != get_combatspell(u, 2)) {
+    else {
+        if (sp->sptyp & PRECOMBATSPELL) nr = 0;
+        else if (sp->sptyp & COMBATSPELL) nr = 1;
+        else if (sp->sptyp & POSTCOMBATSPELL) nr = 2;
+        if (sp != mage_get_combatspell(m, nr, NULL)) {
             return;
         }
-        nr = 2;
     }
     m->combatspells[nr].sp = NULL;
     m->combatspells[nr].level = 0;
