@@ -2649,7 +2649,13 @@ msgid "error201"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Race and target unit have not been supplied.\""
 
 msgid "newbieimmunity"
-msgstr "\"Your faction is immune against assaults for $int($turns) more weeks.\""
+msgstr "\"Your faction will be immune against assaults for the next $int($turns) weeks.\""
+
+msgid "newbieimmunityending"
+msgstr "\"Your faction will be immune against assaults only one more week.\""
+
+msgid "newbieimmunityended"
+msgstr "\"Your faction will no longer be immune against assaults.\""
 
 msgid "curseinfo::auraboost_0"
 msgstr "\"Powerful magical energies are pulsing through $unit($unit). ($int36($id))\""

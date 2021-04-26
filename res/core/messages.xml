@@ -5480,6 +5480,8 @@
       <arg name="turns" type="int"/>
     </type>
   </message>
+  <message name="newbieimmunityending" section="nr" />
+  <message name="newbieimmunityended" section="nr" />
   <message name="alliance::kickedout" section="events">
     <type>
       <arg name="votes" type="int"/>

@@ -1433,9 +1433,16 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
 void report_warnings(faction *f, int now)
 {
     if (f->age < NewbieImmunity()) {
-        ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
-            NewbieImmunity() - f->age));
-    }
+        assert(IsImmune(f));
+        if (f->age + 2 < NewbieImmunity()) {
+            ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
+                NewbieImmunity() - f->age - 1));
+        } else if (f->age +1 < NewbieImmunity()) {
+            ADDMSG(&f->msgs, msg_message("newbieimmunityending", ""));
+        } else {
+            ADDMSG(&f->msgs, msg_message("newbieimmunityended", ""));
+        }
+    } /* else assert(!IsImmune(f)); */
 
     if (f->race == get_race(RC_INSECT)) {
         season_t season = calendar_season(now + 1);
