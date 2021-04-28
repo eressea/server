@@ -1,6 +1,6 @@
 sudo: false
 language: c
-dist: bionic 
+dist: focal
 compiler:
   - gcc
   - clang
@@ -16,7 +16,6 @@ addons:
       - libexpat1-dev
       - libiniparser-dev
       - libcjson-dev
-      - valgrind
       - cppcheck
       - shellcheck
       - luarocks
