@@ -183,9 +183,9 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
-            swrite(" '", 1, 2, out);
+            swrite(" \"", 1, 2, out);
             swrite(text, 1, strlen(text), out);
-            swrite("'", 1, 1, out);
+            swrite("\"", 1, 1, out);
         }
         else {
             swrite(" ", 1, 1, out);
