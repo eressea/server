@@ -131,9 +131,9 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
                     sbs_strcat(&sbs, str);
                 } 
                 else {
-                    sbs_strcat(&sbs, " '");
+                    sbs_strcat(&sbs, " \"");
                     sbs_strcat(&sbs, str);
-                    sbs_strcat(&sbs, "'");
+                    sbs_strcat(&sbs, "\"");
                 }
             }
         } else {
