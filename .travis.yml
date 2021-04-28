@@ -8,6 +8,7 @@ script: s/travis-build
 addons:
   apt:
     packages:
+      - libc6-dbg
       - libbsd-dev
       - libdb-dev
       - libtolua-dev
