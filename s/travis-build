@@ -43,6 +43,10 @@ luarocks install lunitx --local
 eval $(luarocks path)
 export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
 echo $LUA_PATH
-s/runtests -V
+if [ -e /usr/bin/valgrind ]; then
+ s/runtests -V
+else
+ s/runtests
+fi
 integration_tests
 
