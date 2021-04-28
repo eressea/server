@@ -461,7 +461,7 @@ static void test_study_order_quoted(CuTest *tc) {
     swrite("\n", 1, 1, &out);
     out.api->rewind(out.handle);
     out.api->readln(out.handle, token, sizeof(token));
-    CuAssertStrEquals(tc, "LERNE 'Waffenloser Kampf'", token);
+    CuAssertStrEquals(tc, "LERNE \"Waffenloser Kampf\"", token);
     mstream_done(&out);
 
     test_teardown();

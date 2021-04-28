@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 ROOT=$(git rev-parse --show-toplevel)
 export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
