@@ -1091,7 +1091,7 @@ variant magic_resistance(unit * target)
         c = (curse *)a->data.v;
         mage = c->magician;
 
-        if (mage != NULL) {
+        if (mage != NULL && mage->number > 0) {
             if (good_resist && c->type == &ct_goodmagicresistancezone) {
                 if (alliedunit(mage, target->faction, HELP_GUARD)) {
                     /* TODO: legacy. magicresistance-effect is an integer-percentage stored in a double */
