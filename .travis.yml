@@ -1,6 +1,6 @@
 sudo: false
 language: c
-dist: bionic 
+dist: focal 
 compiler:
   - gcc
   - clang
