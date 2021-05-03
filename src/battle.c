@@ -1781,8 +1781,12 @@ static void do_combatspell(troop at)
     int fumblechance = 0;
     struct sc_mage *mage = get_mage(u);
 
+    if (!mage) {
+        fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
+        return;
+    }
     sp = mage_get_combatspell(mage, 1, &sl);
-    if (sl <= 0 || sp == NULL || !u_hasspell(u, sp)) {
+    if (sp == NULL || sl <= 0 || !u_hasspell(u, sp)) {
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
