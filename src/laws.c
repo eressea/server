@@ -2965,10 +2965,8 @@ void maketemp_cmd(unit *u, order **olist)
         ship *sh;
         unit *u2;
         order **ordp, **oinsert;
-#ifndef NDEBUG
         keyword_t kwd = init_order(makeord, NULL);
         assert(kwd == K_MAKETEMP);
-#endif
         alias = getid();
         s = gettoken(token, sizeof(token));
         if (s && s[0] == '\0') {
