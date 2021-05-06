@@ -764,7 +764,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
             }
             else {
                 /* keine neue Burg anfangen wenn eine Nummer angegeben war */
-                cmistake(u, ord, 6, MSG_PRODUCE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "building_not_found", ""));
                 return 0;
             }
         }
@@ -804,7 +804,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         if (!rule_other) {
             unit *owner = building_owner(b);
             if (!owner || owner->faction != u->faction) {
-                cmistake(u, ord, 1222, MSG_PRODUCE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "not_building_owner", ""));
                 return 0;
             }
         }
@@ -984,7 +984,7 @@ void continue_ship(unit * u, int want)
         sh = u->ship;
 
     if (!sh) {
-        cmistake(u, u->thisorder, 20, MSG_PRODUCE);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder, "ship_not_found", ""));
         return;
     }
     msize = ship_maxsize(sh);

@@ -95,7 +95,7 @@ int contact_cmd(unit * u, order * ord)
         /* new-style syntax, KONTAKTIERE PARTEI foo */
         faction * f = getfaction();
         if (!f) {
-            cmistake(u, ord, 66, MSG_EVENT);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
         }
         else {
             contact_faction(u, f);
