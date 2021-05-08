@@ -9,10 +9,6 @@ extern "C" {
     TYP_REGION,
     TYP_BUILDING,
     TYP_SHIP,
-    TYP_FACTION,
-    TYP_ACTION,
-    TYP_TRIGGER,
-    TYP_TIMEOUT
   } objtype_t;
 
 #ifdef __cplusplus
