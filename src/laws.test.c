@@ -76,6 +76,10 @@ static void test_renamed_thing(CuTest * tc)
     CuAssertTrue(tc, !renamed_thing(b->name, b->type->_name));
     building_setname(b, "castle bLut");
     CuAssertTrue(tc, !renamed_thing(b->name, b->type->_name));
+    building_setname(b, "castlf");
+    CuAssertTrue(tc, renamed_thing(b->name, b->type->_name));
+    building_setname(b, "CASTLE");
+    CuAssertTrue(tc, !renamed_thing(b->name, b->type->_name));
     test_teardown();
 }
 
@@ -1506,6 +1510,7 @@ static void test_name_foreign_unseen(CuTest *tc) {
         LOC(f->locale, parameters[P_FACTION]),
         itoa36(ux->faction->no));
     name_cmd(u, u->thisorder);
+    CuAssert(tc, "cs", !cansee(ux->faction, u->region, u, 0));
     CuAssertStrEquals(tc, "Hodor", ux->faction->name);
     CuAssertPtrNotNull(tc, test_find_messagetype(ux->faction->msgs, "renamed_faction_notseen"));
     test_clear_messages(f);

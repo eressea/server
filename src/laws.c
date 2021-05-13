@@ -1569,6 +1569,77 @@ static void generic_setname(char **oldname, const char *newname) {
         *oldname = NULL;
 }
 
+static bool check_default_names(const char *name, int ngenerics, const char * generics[]) {
+    int i;
+    for (i = 0; i < ngenerics; ++i) {
+        if (!renamed_thing(name, generics[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static const char *building_describable(const building *b) {
+    assert(b);
+    if (fval(b->type, BTF_NAMECHANGE) || !b->display || !b->display[0])
+      return NULL;
+    return "error278";
+}
+
+
+static const char *building_nameable(const building *b, bool foreign) {
+    const char *error = NULL;
+    if (!b)
+      return NULL;
+    if (!fval(b->type, BTF_NAMECHANGE)) {
+      error = "error278";
+    } else if (foreign) {
+      error = "building_renamed";
+    }
+
+    if (error) {
+      const char *generics[2] = { "site", b->type->_name };
+      if (!check_default_names(building_getname(b), 2,  generics)) {
+        return error;
+      }
+    }
+    return NULL;
+}
+
+static const char *ship_nameable(const ship *sh, bool foreign) {
+    if (sh && foreign) {
+      const char *generics[2] = { parameters[P_SHIP], sh->type->_name };
+
+      if (!check_default_names(ship_getname(sh), 2,  generics))
+        return "ship_renamed";
+    }
+
+    return NULL;
+}
+
+static const char *faction_nameable(const faction *f, bool foreign) {
+    if (f && foreign) {
+      const char *generics[1] = { parameters[P_FACTION] };
+
+      if (!check_default_names(faction_getname(f), 1,  generics)) {
+        return "faction_renamed";
+      }
+    }
+    return NULL;
+}
+
+
+static const char *unit_nameable(const unit *u, bool foreign) {
+    if (u && foreign) {
+      const char *generics[1] = { parameters[P_UNIT] };
+
+      if (!check_default_names(unit_getname(u), 1,  generics))
+        return "unit_renamed";
+    }
+
+    return NULL;
+}
+
 int text_cmd(unit *u, order *ord, const keyword_t cmd) {
     char token[128];
     param_t p;
@@ -1584,184 +1655,149 @@ int text_cmd(unit *u, order *ord, const keyword_t cmd) {
     alliance *all = NULL;
     group *g = NULL;
     void *object = NULL;
-    int ngenerics = 0;
-    const char *generics[2];
-    const char *oldname = NULL;
     char *newname = NULL;
 
     const char *error_notfound = NULL;
     const char *error_notowner = NULL;
     const char *error_renamed = NULL;
-    const char *error_unnamable = "error278";
     const char *message_seen = NULL;
     const char *message_unseen = NULL;
 
     init_order(ord, NULL);
     str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
-    if (cmd == K_DISPLAY) {
-        switch (p) {
-        case P_BUILDING:
-        case P_GEBAEUDE:
-            object = b;
-            owner = b ? building_owner(b) : NULL;
-            error_notfound = "not_in_building";
-            error_notowner = "not_building_owner";
-            break;
-        case P_SHIP:
-            object = sh;
-            owner = sh ? ship_owner(sh) : NULL;
-            error_notfound = "not_in_ship";
-            error_notowner = "not_ship_owner";
-            break;
-        case P_UNIT:
-            object = u;
-            owner = u;
-            break;
-        case P_PRIVAT:
-            object = u;
-            owner = u;
-            break;
-        case P_FACTION:
-            object = f;
-            owner = u;
-            break;
-        case P_REGION:
-            object = r;
-            if (r->land && u->faction == region_get_owner(r))
-            owner = u;
-            error_notowner = "not_region_owner";
-            break;
-        default:
+    if (p == P_FOREIGN) {
+        if (cmd == K_DISPLAY) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
             return 0;
         }
-        ownerfaction = owner ? owner->faction : NULL;
-    } else if (p == P_FOREIGN) {
         foreign = true;
         str = gettoken(token, sizeof(token));
         p = findparam_ex(str, u->faction->locale);
-        switch (p) {
-        case P_BUILDING:
-        case P_GEBAEUDE:
-            object = b = getbuilding(u->region);
+    }
+    switch (p) {
+    case P_BUILDING:
+    case P_GEBAEUDE:
+        if (foreign) {
+            b = getbuilding(u->region);
             error_notfound = "building_not_found";
-            error_renamed = "building_renamed";
             message_seen = "renamed_building_seen";
             message_unseen = "renamed_building_notseen";
-            if (b) {
-                owner = building_owner(b);
-                oldname = building_getname(b);
-                ngenerics = 2;
-                generics[0] = b->type->_name;
-                generics[1] = "site";
-            }
-            break;
-        case P_SHIP:
-            object = sh = getship(u->region);
-            error_notfound = "ship_not_found";
-            error_renamed = "ship_renamed";
-            message_seen = "renamed_ship_seen";
-            message_unseen = "renamed_ship_notseen";
-            if (sh) {
-                owner = ship_owner(sh);
-                oldname = ship_getname(sh);
-                ngenerics = 2;
-                generics[0] = sh->type->_name;
-                generics[1] = parameters[P_SHIP];
-            }
-            break;
-        case P_FACTION:
-            object = f = getfaction();
-            error_notfound = "faction_not_found";
-            error_renamed = "faction_renamed";
-            message_seen = "renamed_faction_seen";
-            message_unseen = "renamed_faction_notseen";
-            if (f) {
-                ownerfaction = f;
-                oldname = faction_getname(f);
-                ngenerics = 1;
-                generics[0] = "factiondefault";
-            }
-            break;
-        case P_UNIT:
-            getunit(u->region, u->faction, &u2);
-            object = u2;
-            error_notfound = "feedback_unit_not_found";
-            error_renamed = "unit_renamed";
-            message_seen = "renamed_unit_seen";
-            message_unseen = "renamed_unit_notseen";
-            if (u2) {
-                owner = u2;
-                oldname = unit_getname(u2);
-                ngenerics = 1;
-                generics[0] = "unitdefault";
-            }
-            break;
-        case P_ALLIANCE:
-        case P_REGION:
-        case P_GROUP:
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
-            return 0;
-            break;
-        default:
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "name_what", ""));
-            return 0;
-            break;
-        }
-        if (!ownerfaction && owner) {
-            ownerfaction = owner->faction;
-        }
-    } else {
-        switch (p) {
-        case P_BUILDING:
-        case P_GEBAEUDE:
-            object = b;
-            owner = b ? building_owner(b) : NULL;
+        } else {
             error_notfound = "not_in_building";
             error_notowner = "not_building_owner";
-            break;
-        case P_SHIP:
-            object = sh;
-            owner = sh ? ship_owner(sh) : NULL;
-            error_notfound = "not_in_ship";
-            error_notowner = "not_ship_owner";
-            break;
-        case P_FACTION:
-            object = f;
-            owner = u;
-            break;
-        case P_UNIT:
+        }
+        object = b;
+        if (b) {
+            error_renamed = (cmd == K_DISPLAY)?
+                building_describable(b):building_nameable(b, foreign);
+            owner = building_owner(b);
+        }
+        break;
+    case P_SHIP:
+        if (foreign) {
+          sh = getship(u->region);
+          error_notfound = "ship_not_found";
+          message_seen = "renamed_ship_seen";
+          message_unseen = "renamed_ship_notseen";
+        } else {
+          error_notfound = "not_in_ship";
+          error_notowner = "not_ship_owner";
+        }
+        object = sh;
+        if (sh) {
+            if (cmd == K_NAME)
+                error_renamed = ship_nameable(sh, foreign);
+            owner = ship_owner(sh);
+        }
+        break;
+    case P_FACTION:
+        if (foreign) {
+            f = getfaction();
+            error_notfound = "faction_not_found";
+            message_seen = "renamed_faction_seen";
+            message_unseen = "renamed_faction_notseen";
+        }
+        object = f;
+        owner = u;
+        ownerfaction = f;
+        if (f && foreign && IsImmune(f)) {
+            if (cmd == K_NAME)
+                error_renamed = faction_nameable(f, foreign);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                "newbie_immunity_error", "turns", NewbieImmunity()));
+            return 0;
+        }
+        break;
+    case P_UNIT:
+        if (foreign) {
+            getunit(u->region, u->faction, &u2);
+            error_notfound = "feedback_unit_not_found";
+            message_seen = "renamed_unit_seen";
+            message_unseen = "renamed_unit_notseen";
+        } else {
             u2 = u;
+        }
+        object = u2;
+        owner = u2;
+        error_renamed = unit_nameable(u2, foreign);
+        break;
+    case P_ALLIANCE:
+        if (cmd == K_DISPLAY) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
+            return 0;
+        }
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
+        }
+        all = f_get_alliance(u->faction);
+        object = all;
+        if (all && alliance_get_leader(all) == u->faction)
+            owner = u;
+        error_notfound = "not_in_alliance";
+        error_notowner = "not_alliance_owner";
+        break;
+    case P_REGION:
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
+        }
+        object = r;
+        if (r->land && u->faction == region_get_owner(r))
+            owner = u;
+        error_notowner = "not_region_owner";
+        break;
+    case P_GROUP:
+        if (cmd == K_DISPLAY) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
+            return 0;
+        }
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
+        }
+        object = g = get_group(u);
+        owner = u;
+        error_notfound = "not_in_group";
+        break;
+    case P_PRIVAT:
+        if (cmd == K_DISPLAY) {
             object = u;
             owner = u;
             break;
-        case P_ALLIANCE:
-            all = f_get_alliance(u->faction);
-            object = all;
-            if (all && alliance_get_leader(all) == u->faction)
-            owner = u;
-            error_notfound = "not_in_alliance";
-            error_notowner = "not_alliance_owner";
-            break;
-        case P_REGION:
-            object = r;
-            if (r->land && u->faction == region_get_owner(r))
-            owner = u;
-            error_notowner = "not_region_owner";
-            break;
-        case P_GROUP:
-            object = g = get_group(u);
-            owner = u;
-            error_notfound = "not_in_group";
-            break;
-        default:
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "name_what", ""));
-            return 0;
-            break;
         }
-        ownerfaction = owner ? owner->faction : NULL;
+        /* else fallthrough! */
+    default:
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            (cmd == K_DISPLAY)?"display_what":"name_what", ""));
+        return 0;
+        break;
     }
+
+    if (!ownerfaction)
+        ownerfaction = owner ? owner->faction : NULL;
+
     if (!object) {
         assert(error_notfound);
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_notfound, ""));
@@ -1774,26 +1810,9 @@ int text_cmd(unit *u, order *ord, const keyword_t cmd) {
         return 0;
     }
 
-    if (object == b && !fval(b->type, BTF_NAMECHANGE)
-        && ((cmd == K_DISPLAY && u->building->display && u->building->display[0])
-            || (cmd == K_NAME && renamed_thing(b->name, b->type->_name)))) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_unnamable, ""));
+    if (error_renamed) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_renamed, ""));
         return 0;
-    }
-
-    if (ngenerics && foreign) {
-        int i;
-        bool renamed = true;
-        for (i = 0; renamed && i < ngenerics; ++i) {
-            if (!renamed_thing(oldname, generics[i])) {
-                renamed = false;
-            }
-        }
-        if (renamed) {
-            assert(error_renamed);
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_renamed, ""));
-            return 0;
-        }
     }
 
     str = getstrtoken();
@@ -1895,17 +1914,22 @@ bool renamed_thing(const char *name, const char *typename)
 
     for (; lang; lang = nextlocale(lang)) {
         const char *localname = LOC(lang, typename);
+        char nbuffer[DISPLAYSIZE], tbuffer[DISPLAYSIZE];
         if (localname) {
             size_t typelen = strlen(localname);
+            int cmp;
             if (namelen < typelen || namelen > typelen + 5)
+                continue;
+            unicode_utf8_tolower(nbuffer, namelen, name);
+            unicode_utf8_tolower(tbuffer, typelen, localname);
+            cmp = strncmp(nbuffer, tbuffer, typelen);
+            if (cmp != 0)
                 continue;
             if (namelen == typelen)
                 return false;
-            if (strncmp(name, localname, typelen) != 0)
+            if (nbuffer[typelen] != ' ')
                 continue;
-            if (name[typelen] != ' ')
-                continue;
-            if (atoi36(name+typelen+1) > 0)
+            if (atoi36(nbuffer+typelen+1) > 0)
                 return false;
         }
     }
