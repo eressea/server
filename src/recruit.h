@@ -13,6 +13,7 @@ extern "C" {
     struct unit;
 
     struct message *can_recruit(struct unit *u, const struct race *rc, struct order *ord, int now);
+    int max_recruits(const struct region *r);
     void add_recruits(struct unit* u, int number, int wanted, int ordered);
     void recruit(struct region * r);
 

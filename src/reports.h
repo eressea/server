@@ -16,11 +16,17 @@ extern "C" {
     struct selist;
     struct stream;
     struct seen_region;
+    struct region;
 
     /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
     /* Breite einer Reportzeile: */
 #define REPORTWIDTH 78
+
+#define GR_PLURAL     0x01      /* grammar: plural */
+#define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
+#define MAX_RAWMATERIALS 12     /* maximum kinds of resources in a regions */
+
 
     extern const char *directions[];
     extern const char *coasts[];
@@ -32,8 +38,6 @@ extern "C" {
     extern const char *options[MAXOPTIONS];    /* report options */
 
     void reports_done(void);
-
-    struct unit *can_find(struct faction *, struct faction *);
 
     bool omniscient(const struct faction *f);
     struct selist *get_regions_distance(struct region * root, int radius);
@@ -95,8 +99,8 @@ extern "C" {
         int number;
         int level;
     } resource_report;
-    int report_resources(const struct region *r, struct resource_report *res,
-        int size, const struct faction *viewer, bool see_unit);
+    int report_resources(const struct region *r, struct resource_report res[MAX_RAWMATERIALS],
+        const struct faction *viewer, seen_mode mode);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, int now);
@@ -120,11 +124,8 @@ extern "C" {
     const char *get_mailcmd(const struct locale *loc);
 
     bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
-    bool see_region_details(const struct region *r);
 
-#define GR_PLURAL     0x01      /* grammar: plural */
-#define MAX_INVENTORY 128       /* maimum number of different items in an inventory */
-#define MAX_RAWMATERIALS 8      /* maximum kinds of raw materials in a regions */
+    bool see_schemes(const struct region *r);
 
 #ifdef __cplusplus
 }

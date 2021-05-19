@@ -20,7 +20,7 @@ extern "C" {
     void cr_output_unit(struct stream *out, const struct faction * f,
         const struct unit * u, seen_mode mode);
     void cr_output_resources(struct stream *out, const struct faction * f,
-        const struct region *r, bool see_unit);
+        const struct region *r, seen_mode mode);
 #ifdef __cplusplus
 }
 #endif

@@ -74,8 +74,8 @@ static void setup_resources(void) {
     locale_setstring(lang, "peasant_p", "Bauern");
     locale_setstring(lang, "stone", "Stein");
     locale_setstring(lang, "stone_p", "Steine");
-    locale_setstring(lang, "tree", "Blume");
-    locale_setstring(lang, "tree_p", "Blumen");
+    locale_setstring(lang, "tree", "Baum");
+    locale_setstring(lang, "tree_p", "Baeume");
     locale_setstring(lang, "sapling", "Schoessling");
     locale_setstring(lang, "sapling_p", "Schoesslinge");
     locale_setstring(lang, "mallornsapling", "Mallornschoessling");
@@ -106,7 +106,7 @@ static void test_cr_resources(CuTest *tc) {
     region_setresource(r, get_resourcetype(R_STONE), 1);
 
     mstream_init(&strm);
-    cr_output_resources(&strm, f, r, true);
+    cr_output_resources(&strm, f, r, seen_unit);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "3;Baeume", line);
@@ -118,6 +118,20 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Bauern\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "200;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Baeume\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "3;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "\"Schoesslinge\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "2;number", line);
@@ -125,23 +139,9 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "\"Blumen\";type", line);
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "3;number", line);
-
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "\"Silber\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "300;number", line);
-
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "\"Bauern\";type", line);
-    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "200;number", line);
 
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
@@ -158,6 +158,61 @@ static void test_cr_resources(CuTest *tc) {
     CuAssertStrEquals(tc, "1;skill", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "1;number", line);
+
+    CuAssertIntEquals(tc, -1, strm.api->readln(strm.handle, line, sizeof(line)));
+
+    mstream_done(&strm);
+    test_teardown();
+}
+
+static void test_cr_lighthouse(CuTest *tc) {
+    stream strm;
+    char line[1024];
+    faction *f;
+    region *r;
+
+    setup_resources();
+
+    f = test_create_faction();
+    r = test_create_region(0, 0, NULL);
+    r->land->horses = 1;
+    r->land->peasants = 200;
+    r->land->money = 300;
+    rsettrees(r, 0, 1);
+    rsettrees(r, 1, 2);
+    rsettrees(r, 2, 3);
+    region_setresource(r, get_resourcetype(R_STONE), 1);
+
+    mstream_init(&strm);
+    cr_output_resources(&strm, f, r, seen_lighthouse_land);
+    strm.api->rewind(strm.handle);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "3;Baeume", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "2;Schoesslinge", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Bauern\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "200;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Baeume\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "3;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Schoesslinge\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "2;number", line);
+
+    CuAssertIntEquals(tc, -1, strm.api->readln(strm.handle, line, sizeof(line)));
 
     mstream_done(&strm);
     test_teardown();
@@ -182,7 +237,7 @@ static void test_cr_mallorn(CuTest *tc) {
     rsettrees(r, 2, 3);
 
     mstream_init(&strm);
-    cr_output_resources(&strm, f, r, false);
+    cr_output_resources(&strm, f, r, seen_travel);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "3;Baeume", line);
@@ -194,9 +249,9 @@ static void test_cr_mallorn(CuTest *tc) {
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "\"Mallornschoesslinge\";type", line);
+    CuAssertStrEquals(tc, "\"Bauern\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
-    CuAssertStrEquals(tc, "2;number", line);
+    CuAssertStrEquals(tc, "200;number", line);
 
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
@@ -204,6 +259,29 @@ static void test_cr_mallorn(CuTest *tc) {
     CuAssertStrEquals(tc, "\"Mallorn\";type", line);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
     CuAssertStrEquals(tc, "3;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Mallornschoesslinge\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "2;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Silber\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "300;number", line);
+
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertIntEquals(tc, 0, memcmp(line, "RESOURCE ", 9));
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"Pferde\";type", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "1;number", line);
+
+    CuAssertIntEquals(tc, -1, strm.api->readln(strm.handle, line, sizeof(line)));
 
     mstream_done(&strm);
     test_teardown();
@@ -429,6 +507,7 @@ CuSuite *get_creport_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_cr_unit);
     SUITE_ADD_TEST(suite, test_cr_resources);
+    SUITE_ADD_TEST(suite, test_cr_lighthouse);
     SUITE_ADD_TEST(suite, test_cr_mallorn);
     SUITE_ADD_TEST(suite, test_cr_hiderace);
     SUITE_ADD_TEST(suite, test_cr_factionstealth);

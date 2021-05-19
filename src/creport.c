@@ -4,9 +4,6 @@
 #include <kernel/config.h>
 #include <kernel/version.h>
 #include "creport.h"
-#include "market.h"
-#include "guard.h"
-#include "travelthru.h"
 
 /* tweakable features */
 #define RESOURCECOMPAT
@@ -14,8 +11,6 @@
 #define BUFFERSIZE 32768
 /* FIXME: riesig, wegen spionage-messages :-( */
 static char g_bigbuf[BUFFERSIZE];
-
-#include <spells/regioncurse.h>
 
 /* modules include */
 #include <modules/score.h>
@@ -29,12 +24,16 @@ static char g_bigbuf[BUFFERSIZE];
 #include <attributes/stealth.h>
 
 /* gamecode includes */
-#include "laws.h"
-#include "economy.h"
-#include "move.h"
-#include "reports.h"
 #include "alchemy.h"
+#include "economy.h"
+#include "guard.h"
+#include "laws.h"
+#include "market.h"
+#include "move.h"
+#include "recruit.h"
+#include "reports.h"
 #include "teleport.h"
+#include "travelthru.h"
 
 /* kernel includes */
 #include "kernel/alliance.h"
@@ -1170,11 +1169,11 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
     }
 }
 
-void cr_output_resources(stream *out, const faction * f, const region *r, bool see_unit)
+void cr_output_resources(stream *out, const faction * f, const region *r, seen_mode mode)
 {
     char *pos = g_bigbuf;
     resource_report result[MAX_RAWMATERIALS];
-    int n, size = report_resources(r, result, MAX_RAWMATERIALS, f, see_unit);
+    int n, size = report_resources(r, result, f, mode);
 
 #ifdef RESOURCECOMPAT
     int trees = rtrees(r, 2);
@@ -1211,12 +1210,12 @@ void cr_output_resources(stream *out, const faction * f, const region *r, bool s
 }
 
 static void cr_output_resources_compat(FILE *F, report_context * ctx,
-    region *r, bool see_unit)
+    region *r)
 {
     /* TODO: eliminate this function */
     stream strm;
     fstream_init(&strm, F);
-    cr_output_resources(&strm, ctx->f, r, see_unit);
+    cr_output_resources(&strm, ctx->f, r, r->seen.mode);
 }
 
 
@@ -1331,39 +1330,20 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
     fprintf(F, "\"%s\";Terrain\n", translate(tname, LOC(f->locale, tname)));
     if (r->seen.mode != seen_unit)
         fprintf(F, "\"%s\";visibility\n", visibility[r->seen.mode]);
-    if (r->seen.mode == seen_neighbour) {
-        cr_borders(r, f, r->seen.mode, F);
-    }
-    else {
-        building *b;
-        ship *sh;
-        unit *u;
-        int stealthmod = stealth_modifier(r, f, r->seen.mode);
-
+    if (r->seen.mode > seen_neighbour) {
         if (r->land && r->land->display && r->land->display[0])
             fprintf(F, "\"%s\";Beschr\n", r->land->display);
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
             fprintf(F, "%d;Bauern\n", rpeasants(r));
-            fprintf(F, "%d;Pferde\n", rhorses(r));
 
             if (r->seen.mode >= seen_travel) {
-                if (rule_region_owners()) {
-                    faction *owner = region_get_owner(r);
-                    if (owner) {
-                        fprintf(F, "%d;owner\n", owner->no);
-                    }
-                }
+                fprintf(F, "%d;Pferde\n", rhorses(r));
                 fprintf(F, "%d;Silber\n", rmoney(r));
                 if (skill_enabled(SK_ENTERTAINMENT)) {
                     fprintf(F, "%d;Unterh\n", entertainmoney(r));
                 }
-                if (is_cursed(r->attribs, &ct_riotzone)) {
-                    fputs("0;Rekruten\n", F);
-                }
-                else {
-                    fprintf(F, "%d;Rekruten\n", rpeasants(r) / RECRUITFRACTION);
-                }
+                fprintf(F, "%d;Rekruten\n", max_recruits(r));
                 if (max_production(r)) {
                     /* Im CR steht der Bauernlohn, der bei Trauer nur 10 ist */
                     bool mourn = is_mourning(r, turn);
@@ -1373,6 +1353,12 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                         fputs("1;mourning\n", F);
                     }
                 }
+                if (rule_region_owners()) {
+                    faction *owner = region_get_owner(r);
+                    if (owner) {
+                        fprintf(F, "%d;owner\n", owner->no);
+                    }
+                }
                 if (r->land && r->land->ownership) {
                     fprintf(F, "%d;morale\n", region_get_morale(r));
                 }
@@ -1380,7 +1366,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
             /* this writes both some tags (RESOURCECOMPAT) and a block.
              * must not write any blocks before it */
-            cr_output_resources_compat(F, ctx, r, r->seen.mode >= seen_unit);
+            cr_output_resources_compat(F, ctx, r);
 
             if (r->seen.mode >= seen_unit) {
                 /* trade */
@@ -1416,54 +1402,58 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
             }
         }
         cr_output_curses_compat(F, f, r, TYP_REGION);
-        cr_borders(r, f, r->seen.mode, F);
-        if (r->seen.mode >= seen_unit && is_astral(r)
-            && !is_cursed(r->attribs, &ct_astralblock))
-        {
-            /* Sonderbehandlung Teleport-Ebene */
-            region *rl[MAX_SCHEMES];
-            int num = get_astralregions(r, inhabitable, rl);
+    }
+    cr_borders(r, f, r->seen.mode, F);
+    if (see_schemes(r)) {
+        /* Sonderbehandlung Teleport-Ebene */
+        region *rl[MAX_SCHEMES];
+        int num = get_astralregions(r, inhabitable, rl);
 
-            if (num > 0) {
-                int i;
-                for (i = 0; i != num; ++i) {
-                    region *r2 = rl[i];
-                    plane *plx = rplane(r2);
+        if (num > 0) {
+            int i;
+            for (i = 0; i != num; ++i) {
+                region *r2 = rl[i];
+                plane *plx = rplane(r2);
 
-                    nx = r2->x;
-                    ny = r2->y;
-                    pnormalize(&nx, &ny, plx);
-                    adjust_coordinates(f, &nx, &ny, plx);
-                    fprintf(F, "SCHEMEN %d %d\n", nx, ny);
-                    fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
-                }
+                nx = r2->x;
+                ny = r2->y;
+                pnormalize(&nx, &ny, plx);
+                adjust_coordinates(f, &nx, &ny, plx);
+                fprintf(F, "SCHEMEN %d %d\n", nx, ny);
+                fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
             }
         }
-
+    }
+    if (r->seen.mode >= seen_travel) {
+        message_list *mlist = r_getmessages(r, f);
+        cr_output_messages(F, r->msgs, f);
+        if (mlist) {
+            cr_output_messages(F, mlist, f);
+        }
+    }
+    if (r->seen.mode >= seen_lighthouse) {
         cr_output_travelthru(F, r, f);
-        if (see_region_details(r)) {
-            message_list *mlist = r_getmessages(r, f);
-            cr_output_messages(F, r->msgs, f);
-            if (mlist) {
-                cr_output_messages(F, mlist, f);
-            }
-        }
-        if (r->seen.mode >= seen_lighthouse) {
-            /* buildings */
+
+        /* buildings */
+        if (r->buildings) {
+            building *b;
             for (b = rbuildings(r); b; b = b->next) {
                 int fno = -1;
-                u = building_owner(b);
+                unit *u = building_owner(b);
                 if (u && !fval(u, UFL_ANON_FACTION)) {
                     const faction *sf = visible_faction(f, u);
                     fno = sf->no;
                 }
                 cr_output_building_compat(F, b, u, fno, f);
             }
+        }
 
-            /* ships */
+        /* ships */
+        if (r->ships) {
+            ship *sh;
             for (sh = r->ships; sh; sh = sh->next) {
                 int fno = -1;
-                u = ship_owner(sh);
+                unit *u = ship_owner(sh);
                 if (u && !fval(u, UFL_ANON_FACTION)) {
                     const faction *sf = visible_faction(f, u);
                     fno = sf->no;
@@ -1471,7 +1461,12 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
 
                 cr_output_ship_compat(F, sh, u, fno, f, r);
             }
-            /* visible units */
+        }
+
+        /* visible units */
+        if (r->units) {
+            unit *u;
+            int stealthmod = stealth_modifier(r, f, r->seen.mode);
             for (u = r->units; u; u = u->next) {
                 if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                     cr_output_unit_compat(F, f, u, r->seen.mode);

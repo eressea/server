@@ -320,6 +320,14 @@ static int recruit_cost(const faction * f, const race * rc)
     return -1;
 }
 
+int max_recruits(const struct region *r)
+{
+    if (is_cursed(r->attribs, &ct_riotzone)) {
+        return 0;
+    }
+    return rpeasants(r) / RECRUITFRACTION;
+}
+
 message *can_recruit(unit *u, const race *rc, order *ord, int now)
 {
     region *r = u->region;
