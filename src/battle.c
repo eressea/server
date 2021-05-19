@@ -2086,12 +2086,13 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                  * sonst helden mit feuerschwertern zu maechtig */
                 if (numattack == 0 && wp && wp->type->attack) {
                     int dead = 0;
-                    standard_attack = wp->type->attack(&ta, wp->type, &dead);
-                    if (!standard_attack)
+                    standard_attack = false;
+                    if (wp->type->attack(&ta, wp->type, &dead)) {
                         reload = true;
-                    af->catmsg += dead;
-                    if (!standard_attack && af->person[ta.index].last_action < b->turn) {
-                        af->person[ta.index].last_action = b->turn;
+                        af->catmsg += dead;
+                        if (af->person[ta.index].last_action < b->turn) {
+                            af->person[ta.index].last_action = b->turn;
+                        }
                     }
                 }
                 if (standard_attack) {
