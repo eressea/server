@@ -27,14 +27,15 @@ extern "C" {
 #define FFL_PWMSG         (1<<2)  /* received a "new password" message */
 #define FFL_QUIT          (1<<3)
 #define FFL_CURSED        (1<<4)  /* you're going to have a bad time */
-#define FFL_SELECT        (1<<22) /* ehemals f->dh, u->dh, r->dh, etc... */
-#define FFL_MARK          (1<<23) /* fuer markierende algorithmen, die das
+#define FFL_PAUSED        (1<<5)  /* faction is parked until it receives orders again */
+#define FFL_SELECT        (1<<6)  /* ehemals f->dh, u->dh, r->dh, etc... */
+#define FFL_MARK          (1<<7)  /* fuer markierende algorithmen, die das
                                    * hinterher auch wieder loeschen muessen!
                                    * (FFL_SELECT muss man vorher initialisieren,
                                    * FL_MARK hinterher loeschen) */
 #define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
-#define FFL_SAVEMASK (FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED)
+#define FFL_SAVEMASK (FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED|FFL_PAUSED)
 
     typedef struct origin {
         struct origin *next;
