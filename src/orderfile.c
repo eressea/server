@@ -66,7 +66,7 @@ static void handle_faction(void *userData, int no, const char *password) {
         if (checkpasswd(f, password)) {
             state->f = f;
             f->lastorders = turn;
-            freset(f, FFL_PAUSED);
+            f->flags &= ~(FFL_PAUSED);
         }
         else {
             log_debug("invalid password for faction %s", itoa36(no));

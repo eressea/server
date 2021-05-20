@@ -681,6 +681,24 @@ static void test_get_modifier_cursed(CuTest *tc) {
     test_teardown();
 }
 
+static void test_maintenance_cost(CuTest *tc) {
+    unit *u;
+    race *rc;
+    test_setup();
+    CuAssertIntEquals(tc, 10, maintenance_cost(NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertIntEquals(tc, 10, maintenance_cost(u));
+    u->number = 4;
+    CuAssertIntEquals(tc, 40, maintenance_cost(u));
+    rc = test_create_race("smurf");
+    rc->maintenance = 15;
+    u_setrace(u, rc);
+    CuAssertIntEquals(tc, 60, maintenance_cost(u));
+    u->faction->flags |= FFL_PAUSED;
+    CuAssertIntEquals(tc, 0, maintenance_cost(u));
+    test_teardown();
+}
+
 static void test_gift_items(CuTest *tc) {
     unit *u, *u1, *u2;
     region *r;
@@ -770,5 +788,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_get_modifier);
     SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
+    SUITE_ADD_TEST(suite, test_maintenance_cost);
     return suite;
 }
