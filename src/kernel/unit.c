@@ -1789,8 +1789,12 @@ bool has_horses(const unit * u)
 #define MAINTENANCE 10
 int maintenance_cost(const struct unit *u)
 {
-    if (u == NULL)
+    if (u == NULL) {
         return MAINTENANCE;
+    }
+    if (is_paused(u->faction)) {
+        return 0;
+    }
     return u_race(u)->maintenance * u->number;
 }
 
