@@ -68,7 +68,6 @@ static void test_allies_set(CuTest *tc) {
 
 static void test_alliedfaction(CuTest *tc) {
     struct faction *f1, *f2;
-    struct allies * al = NULL;
 
     test_setup();
     f1 = test_create_faction();
@@ -88,7 +87,6 @@ static void test_alliedfaction(CuTest *tc) {
 static void test_alliedunit(CuTest *tc) {
     struct faction *f2, *f1;
     struct unit *u;
-    struct allies *al = NULL;
 
     test_setup();
     u = test_create_unit(f1 = test_create_faction(), test_create_plain(0, 0));
