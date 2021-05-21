@@ -21,7 +21,7 @@ void restack_units(void)
         bool sorted = false;
         while (*up) {
             unit *u = *up;
-            if (!fval(u, UFL_MARK)) {
+            if (!fval(u, UFL_MARK) && !is_paused(u->faction)) {
                 struct order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_SORT) {

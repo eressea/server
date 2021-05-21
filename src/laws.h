@@ -47,7 +47,7 @@ extern "C" {
     void update_long_order(struct unit *u);
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
-    bool long_order_allowed(const struct unit *u);
+    bool long_order_allowed(const struct unit *u, bool flags_only);
     bool password_wellformed(const char *password);
 
     int locale_cmd(struct unit *u, struct order *ord);

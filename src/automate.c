@@ -39,7 +39,7 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *
             if (kwd == K_AUTOSTUDY) {
                 if (f == u->faction) {
                     unext = u->next;
-                    if (long_order_allowed(u)) {
+                    if (long_order_allowed(u, false)) {
                         scholar * st = scholars + nscholars;
                         skill_t sk = getskill(u->faction->locale);
                         if (skill == NOSKILL && sk != NOSKILL) {
@@ -198,6 +198,7 @@ void do_autostudy(region *r)
         assert(batchsize <= MAXSCHOLARS);
     }
     for (u = r->units; u; u = u->next) {
+        if (is_paused(u->faction)) continue;
         if (!fval(u, UFL_MARK)) {
             unit *ulist = u;
             int sum_scholars = 0;

@@ -789,7 +789,7 @@ void nmr_warnings(void)
     faction *f, *fa;
 #define HELP_NMR (HELP_GUARD|HELP_MONEY)
     for (f = factions; f; f = f->next) {
-        if (!fval(f, FFL_NOIDLEOUT) && turn > f->lastorders) {
+        if (!fval(f, FFL_NOIDLEOUT|FFL_PAUSED) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
             if (turn - f->lastorders == NMRTimeout() - 1) {
                 ADDMSG(&f->msgs, msg_message("nmr_warning_final", ""));
@@ -1188,6 +1188,9 @@ static void do_contact(region * r)
     unit * u;
     for (u = r->units; u; u = u->next) {
         order *ord;
+
+        if (is_paused(u->faction)) continue;
+
         for (ord = u->orders; ord; ord = ord->next) {
             keyword_t kwd = getkeyword(ord);
             if (kwd == K_CONTACT) {
@@ -1204,6 +1207,8 @@ void do_enter(struct region *r, bool is_final_attempt)
     for (uptr = &r->units; *uptr;) {
         unit *u = *uptr;
         order **ordp = &u->orders;
+
+        if (is_paused(u->faction)) continue;
 
         while (*ordp) {
             order *ord = *ordp;
@@ -1349,7 +1354,7 @@ void quit(void)
     faction **fptr = &factions;
     while (*fptr) {
         faction *f = *fptr;
-        if (f->flags & FFL_QUIT) {
+        if ((f->flags & FFL_QUIT) && !is_paused(f)) {
             destroyfaction(fptr);
         }
         else {
@@ -2939,6 +2944,8 @@ void new_units(void)
         for (u = r->units; u; u = u->next) {
             order **ordp = &u->orders;
 
+            if (is_paused(u->faction)) continue;
+
             /* this needs to happen very early in the game somewhere. since this is
              ** pretty much the first function called per turn, and I am lazy, I
              ** decree that it goes here */
@@ -3588,20 +3595,23 @@ void add_proc_unit(int priority, void(*process) (unit *), const char *name)
     }
 }
 
-bool long_order_allowed(const unit *u)
+bool long_order_allowed(const unit *u, bool flags_only)
 {
     const region *r = u->region;
+
+    if (is_paused(u->faction)) return false;
     if (fval(u, UFL_LONGACTION)) {
         /* this message was already given in laws.update_long_order
         cmistake(u, ord, 52, MSG_PRODUCE);
         */
         return false;
     }
-    else if (fval(r->terrain, SEA_REGION)
-        && u_race(u) != get_race(RC_AQUARIAN)
-        && !(u_race(u)->flags & RCF_SWIM)) {
-        /* error message disabled by popular demand */
-        return false;
+    if (fval(r->terrain, SEA_REGION) && !(u_race(u)->flags & RCF_SWIM)) {
+        if (flags_only) return false;
+        else if (u_race(u) != get_race(RC_AQUARIAN)) {
+            /* error message disabled by popular demand */
+            return false;
+        }
     }
     return true;
 }
@@ -3650,6 +3660,8 @@ void process(void)
                 for (u = r->units; u; u = u->next) {
                     processor *porder, *punit = pregion;
 
+                    if (is_paused(u->faction)) continue;
+
                     while (punit && punit->priority == prio && punit->type == PR_UNIT) {
                         punit->data.per_unit.process(u);
                         punit = punit->next;
@@ -3680,7 +3692,7 @@ void process(void)
                                         cmistake(u, ord, 224, MSG_MAGIC);
                                         ord = NULL;
                                     }
-                                    else if (!long_order_allowed(u)) {
+                                    else if (!long_order_allowed(u, false)) {
                                         ord = NULL;
                                     }
                                 }

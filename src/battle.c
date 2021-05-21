@@ -3524,6 +3524,8 @@ static void join_allies(battle * b)
             faction *f = u->faction;
             fighter *c = NULL;
 
+            if (is_paused(u->faction)) continue;
+
             for (s = b->sides; s != s_end; ++s) {
                 side *se;
                 /* Wenn alle attackierten noch FFL_NOAID haben, dann kaempfe nicht mit. */
@@ -3648,8 +3650,7 @@ static bool start_battle(region * r, battle ** bp)
     bool fighting = false;
 
     for (u = r->units; u != NULL; u = u->next) {
-        if (fval(u, UFL_LONGACTION))
-            continue;
+        if (!long_order_allowed(u, true)) continue;
         if (u->number > 0) {
             order *ord;
 
@@ -3682,10 +3683,6 @@ static bool start_battle(region * r, battle ** bp)
                         cmistake(u, ord, 226, MSG_BATTLE);
                         continue;
                     }
-
-                    /* ist ein Fluechtling aus einem andern Kampf */
-                    if (fval(u, UFL_LONGACTION))
-                        continue;
 
                     if (curse_active(get_curse(r->attribs, &ct_peacezone))) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "peace_active", ""));
@@ -3922,6 +3919,9 @@ void force_leave(region *r, battle *b) {
 
     for (u = r->units; u; u = u->next) {
         unit *uo = NULL;
+
+        if (is_paused(u->faction)) continue;
+
         if (u->building) {
             uo = building_owner(u->building);
         }

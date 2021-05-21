@@ -2760,7 +2760,7 @@ void magic(void)
                 !is_cursed(u->attribs, &ct_insectfur))
                 continue;
 
-            if (fval(u, UFL_WERE | UFL_LONGACTION)) {
+            if (fval(u, UFL_WERE | UFL_LONGACTION) || is_paused(u->faction)) {
                 continue;
             }
 

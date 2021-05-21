@@ -431,6 +431,7 @@ static void demon_skillchanges(void)
     for (r = regions; r; r = r->next) {
         unit *u;
         for (u = r->units; u; u = u->next) {
+            if (is_paused(u->faction)) continue;
             if (u_race(u) == rc_demon) {
                 demon_skillchange(u);
             }

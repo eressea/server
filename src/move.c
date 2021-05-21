@@ -1184,6 +1184,7 @@ static bool transport(unit * ut, unit * u)
 
 static bool can_move(const unit * u)
 {
+    if (is_paused(u->faction)) return false;
     if (u_race(u)->flags & RCF_CANNOTMOVE)
         return false;
     if (get_movement(&u->attribs, MV_CANNOTMOVE))
@@ -2366,7 +2367,7 @@ static void move_followers(void)
         while (*up != NULL) {
             unit *u = *up;
 
-            if (!fval(u, UFL_MOVED | UFL_NOTMOVING)) {
+            if (!fval(u, UFL_MOVED | UFL_NOTMOVING) && !is_paused(u->faction)) {
                 order *ord;
 
                 for (ord = u->orders; ord; ord = ord->next) {
@@ -2419,7 +2420,7 @@ static void move_pirates(void)
         while (*up) {
             unit *u = *up;
 
-            if (!fval(u, UFL_NOTMOVING) && getkeyword(u->thisorder) == K_PIRACY) {
+            if (!fval(u, UFL_NOTMOVING) && !is_paused(u->faction) && getkeyword(u->thisorder) == K_PIRACY) {
                 piracy_cmd(u);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
@@ -2450,6 +2451,7 @@ void move_units(void)
         while (*up) {
             unit* u = *up;
             up = &u->next;
+            if (is_paused(u->faction)) continue;
             if (!u->ship || ship_owner(u->ship) != u) {
                 keyword_t kword = getkeyword(u->thisorder);
 
@@ -2503,6 +2505,7 @@ void move_ships(void) {
             unit* u = *up;
             up = &u->next;
 
+            if (is_paused(u->faction)) continue;
             if (u->ship && !fval(u->ship, SF_DRIFTED)) {
                 keyword_t kword = getkeyword(u->thisorder);
 
