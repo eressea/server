@@ -308,7 +308,7 @@ alliedgroup(const struct faction *f,
     allies *all = g ? g->allies : f->allies;
     int status;
 
-    if (!(faction_alive(f) && faction_alive(f2))) {
+    if (is_paused(f) || (!(faction_alive(f) && faction_alive(f2)))) {
         return 0;
     }
     status = ally_get(all, f2) & mask;
@@ -329,7 +329,7 @@ int alliedunit(const unit * u, const faction * f2, int mask)
     if (u->faction == f2) {
         return mask;
     }
-    if (!faction_alive(f2)) {
+    if (is_paused(u->faction) || !faction_alive(f2)) {
         return 0;
     }
     if (u->faction != NULL && f2 != NULL) {
