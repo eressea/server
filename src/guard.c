@@ -84,25 +84,25 @@ static bool is_guardian_u(const unit * guard, unit * u)
     return true;
 }
 
-static bool is_guardian_r(const unit * guard)
+static bool is_guardian_r(const unit * u)
 {
-    if (guard->number == 0)
+    if (u->number == 0 || is_paused(u->faction))
         return false;
 
     /* if region_owners exist then they may be guardians: */
-    if (guard->building && rule_region_owners() && guard == building_owner(guard->building)) {
-        faction *owner = region_get_owner(guard->region);
-        if (owner == guard->faction) {
-            building *bowner = largestbuilding(guard->region, cmp_taxes, false);
-            if (bowner == guard->building) {
+    if (u->building && rule_region_owners() && u == building_owner(u->building)) {
+        faction *owner = region_get_owner(u->region);
+        if (owner == u->faction) {
+            building *bowner = largestbuilding(u->region, cmp_taxes, false);
+            if (bowner == u->building) {
                 return true;
             }
         }
     }
 
-    if ((guard->flags & UFL_GUARD) == 0)
+    if ((u->flags & UFL_GUARD) == 0)
         return false;
-    return fval(u_race(guard), RCF_UNARMEDGUARD) || is_monsters(guard->faction) || (armedmen(guard, true) > 0);
+    return fval(u_race(u), RCF_UNARMEDGUARD) || is_monsters(u->faction) || (armedmen(u, true) > 0);
 }
 
 bool is_guard(const struct unit * u)
