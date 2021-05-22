@@ -1208,7 +1208,10 @@ void do_enter(struct region *r, bool is_final_attempt)
         unit *u = *uptr;
         order **ordp = &u->orders;
 
-        if (is_paused(u->faction)) continue;
+        if (is_paused(u->faction)) {
+            uptr = &u->next;
+            continue;
+        }
 
         while (*ordp) {
             order *ord = *ordp;
