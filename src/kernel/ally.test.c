@@ -79,7 +79,7 @@ static void test_alliedfaction(CuTest *tc) {
     ally_set(&f1->allies, f2, HELP_ALL);
     CuAssertIntEquals(tc, HELP_ALL, alliedfaction(f1, f2, HELP_ALL));
     f1->flags |= FFL_PAUSED;
-    CuAssertIntEquals(tc, 0, alliedfaction(f1, f2, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(f1, f2, HELP_ALL));
 
     test_teardown();
 }
@@ -98,7 +98,7 @@ static void test_alliedunit(CuTest *tc) {
     ally_set(&f1->allies, f2, HELP_ALL);
     CuAssertIntEquals(tc, HELP_ALL, alliedunit(u, f2, HELP_ALL));
     f1->flags |= FFL_PAUSED;
-    CuAssertIntEquals(tc, 0, alliedunit(u, f2, HELP_ALL));
+    CuAssertIntEquals(tc, HELP_GUARD, alliedunit(u, f2, HELP_ALL));
 
     test_teardown();
 }
