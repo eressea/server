@@ -4,7 +4,6 @@
 #include "items.h"
 
 #include "alchemy.h"
-#include "skill.h"
 #include "direction.h"
 #include "study.h"
 #include "economy.h"
@@ -25,6 +24,7 @@
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/spell.h>
+#include <kernel/skill.h>
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 
@@ -287,22 +287,19 @@ struct order *ord)
         change_effect(u, itype, 100 * amount);
     }
     else {
-        const race *irace = u_irace(u);
-        if (irace == u_race(u)) {
-            const race *rcfailure = rc_find("smurf");
-            if (!rcfailure) {
-                rcfailure = rc_find("toad");
-            }
-            if (rcfailure) {
-                trigger *trestore = trigger_changerace(u, u_race(u), irace);
-                if (trestore) {
-                    int duration = 2 + rng_int() % 8;
+        const race *rcfailure = rc_find("smurf");
+        if (!rcfailure) {
+            rcfailure = rc_find("toad");
+        }
+        if (rcfailure) {
+            trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
+            if (trestore) {
+                int duration = 2 + rng_int() % 8;
 
-                    add_trigger(&u->attribs, "timer", trigger_timeout(duration,
-                        trestore));
-                    u->irace = NULL;
-                    u_setrace(u, rcfailure);
-                }
+                add_trigger(&u->attribs, "timer", trigger_timeout(duration,
+                    trestore));
+                u->irace = NULL;
+                u_setrace(u, rcfailure);
             }
         }
     }

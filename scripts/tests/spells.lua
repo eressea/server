@@ -94,7 +94,6 @@ function test_appeasement_can_move()
     r2 = region.create(1, 0, 'plain')
     u2 = unit.create(faction.create('human'), r1, 1)
     u2.race = 'elf'
-    u2.name = 'Angsthase'
     u2.magic = 'gwyrrd'
     u2:set_skill('magic', 5)
     u2.aura = 10
@@ -118,7 +117,6 @@ function test_appeasement_break_guard()
     r2 = region.create(1, 0, 'plain')
     u2 = unit.create(faction.create('human'), r1, 1)
     u2.race = 'elf'
-    u2.name = 'Angsthase'
     u2.magic = 'gwyrrd'
     u2.guard = true
     u2.status = 1
@@ -137,4 +135,54 @@ function test_appeasement_break_guard()
     assert_equal(r1, u2.region)
     assert_equal(5, u2.status)
     assert_equal(false, u2.guard)
+end
+
+local function create_cp_mage(f, r)
+  local u2 = unit.create(f, r, 1)
+  u2.race = 'human'
+  u2.magic = 'cerddor'
+  u2:set_skill('magic', 20)
+  u2.aura = 100
+  u2:add_spell('song_of_confusion')
+  u2:add_spell('frighten')
+  u2.status = 3
+  return u2
+end
+
+local function create_cp_front(f, r)
+  local u2 = unit.create(f, r, 1000)
+  u2:set_skill('melee', 20)
+  u2:set_skill('stamina', 3)
+  u2:add_item('axe', u2.number)
+  u2:add_item('plate', u2.number)
+  u2:add_item('shield', u2.number)
+  u2.hp = u2.hp_max * u2.number
+  return u2
+end
+
+function test_confusion_and_panic()
+    f = faction.create('demon')
+    f2 = faction.create('demon')
+    local u1, u2, u3, u4, r
+    r = region.create(0, 0, 'plain')
+    u1 = create_cp_front(f, r)
+    u2 = create_cp_mage(f, r)
+    u3 = create_cp_mage(f, r)
+    u2:add_order('KAMPFZAUBER STUFE 10 "Gesang der Angst"')
+    u3:add_order('KAMPFZAUBER STUFE 10 "Gesang der Verwirrung"')
+    create_cp_mage(f, r)
+
+    local u4 = create_cp_front(f2, r)
+    create_cp_mage(f2, r)
+    create_cp_mage(f2, r)
+    create_cp_mage(f2, r)
+
+    for ux in r.units do
+        for uy in r.units do
+            if ux.faction ~= uy.faction then
+                ux:add_order("ATTACKIERE " .. itoa36(uy.id))
+            end
+        end
+    end
+    process_orders()
 end

@@ -131,9 +131,9 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
                     sbs_strcat(&sbs, str);
                 } 
                 else {
-                    sbs_strcat(&sbs, " '");
+                    sbs_strcat(&sbs, " \"");
                     sbs_strcat(&sbs, str);
-                    sbs_strcat(&sbs, "'");
+                    sbs_strcat(&sbs, "\"");
                 }
             }
         } else {
@@ -183,9 +183,9 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
         assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
-            swrite(" '", 1, 2, out);
+            swrite(" \"", 1, 2, out);
             swrite(text, 1, strlen(text), out);
-            swrite("'", 1, 1, out);
+            swrite("\"", 1, 1, out);
         }
         else {
             swrite(" ", 1, 1, out);
@@ -220,7 +220,7 @@ void free_order(order * ord)
 order *copy_order(const order * src)
 {
     if (src != NULL) {
-        order *ord = (order *)malloc(sizeof(order));
+        order *ord = malloc(sizeof(order));
         if (!ord) abort();
         ord->next = NULL;
         ord->command = src->command;
@@ -335,7 +335,7 @@ order *create_order(keyword_t kwd, const struct locale * lang,
     else {
         zBuffer[0] = 0;
     }
-    ord = (order *)malloc(sizeof(order));
+    ord = malloc(sizeof(order));
     create_order_i(ord, kwd, zBuffer, false, false, lang);
     return ord;
 }
@@ -382,7 +382,7 @@ order *parse_order(const char *s, const struct locale * lang)
             }
         }
         if (kwd != NOKEYWORD) {
-            order *ord = (order *)malloc(sizeof(order));
+            order *ord = malloc(sizeof(order));
             if (ord == NULL) abort();
             create_order_i(ord, kwd, sptr, persistent, noerror, lang);
             return ord;

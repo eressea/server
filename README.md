@@ -9,9 +9,9 @@ Eressea depends on a number of external libraries. On a recent
 Debian-based Linux system, this is the apt-get command to
 install all of them:
 
-    sudo apt-get install git cmake gcc make luarocks libxml2-dev \
+    sudo apt-get install git cmake gcc make luarocks \
         liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
-        libcjson-dev libiniparser-dev
+        libcjson-dev libiniparser-dev libexpat1-dev
 
 # How to check out and build the Eressea server
 

@@ -2,6 +2,22 @@
 #include <platform.h>
 #endif
 
+#include "alchemy.h"
+#include "contact.h"
+#include "direction.h"
+#include "guard.h"
+#include "laws.h"
+#include "lighthouse.h"
+#include "monsters.h"
+#include "move.h"
+#include "piracy.h"
+#include "reports.h"
+#include "study.h"
+#include "spy.h"
+#include "teleport.h"
+#include "travelthru.h"
+#include "vortex.h"
+
 /* kernel includes */
 #include "kernel/ally.h"
 #include "kernel/attrib.h"
@@ -21,23 +37,10 @@
 #include "kernel/region.h"
 #include "kernel/render.h"
 #include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/terrain.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
-
-#include "alchemy.h"
-#include "contact.h"
-#include "guard.h"
-#include "laws.h"
-#include "lighthouse.h"
-#include "monsters.h"
-#include "move.h"
-#include "piracy.h"
-#include "reports.h"
-#include "study.h"
-#include "spy.h"
-#include "travelthru.h"
-#include "vortex.h"
 
 #include <spells/flyingship.h>
 #include <spells/unitcurse.h>
@@ -49,10 +52,6 @@
 #include <attributes/movement.h>
 #include <attributes/stealth.h>
 #include <attributes/targetregion.h>
-
-#include "teleport.h"
-#include "direction.h"
-#include "skill.h"
 
 /* util includes */
 #include <util/base36.h>
@@ -1838,7 +1837,7 @@ static void sail(unit * u, order * ord, bool drifting)
                         }
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, current_point, sh->damage >= sh->size * DAMAGE_SCALE));
+                                sh, next_point, sh->damage >= sh->size * DAMAGE_SCALE));
 
                             damage_ship(sh, damage_storm);
                             if (sh->damage >= sh->size * DAMAGE_SCALE) {

@@ -28,52 +28,65 @@ void eressea_free_game(void) {
 }
 
 int eressea_read_game(const char * filename) {
-    return readgame(filename);
+    if (filename) {
+        return readgame(filename);
+    }
+    return -1;
 }
 
 int eressea_write_game(const char * filename) {
-    remove_empty_factions();
-    return writegame(filename);
+    if (filename) {
+        remove_empty_factions();
+        return writegame(filename);
+    }
+    return -1;
 }
 
 int eressea_read_orders(const char * filename) {
-    FILE * F = fopen(filename, "r");
-    int result;
+    if (filename) {
+        FILE *F = fopen(filename, "r");
+        int result;
 
-    if (!F) {
-        perror(filename);
-        return -1;
+        if (!F) {
+            perror(filename);
+            return -1;
+        }
+        log_info("reading orders from %s", filename);
+        result = parseorders(F);
+        fclose(F);
+        return result;
     }
-    log_info("reading orders from %s", filename);
-    result = parseorders(F);
-    fclose(F);
-    return result;
+    return -1;
 }
 
 int eressea_export_json(const char * filename, int flags) {
-    FILE *F = fopen(filename, "w");
-    if (F) {
-        stream out = { 0 };
-        int err;
-        fstream_init(&out, F);
-        err = json_export(&out, flags);
-        fstream_done(&out);
-        return err;
+    if (filename) {
+        FILE *F = fopen(filename, "w");
+        if (F) {
+            stream out = { 0 };
+            int err;
+            fstream_init(&out, F);
+            err = json_export(&out, flags);
+            fstream_done(&out);
+            return err;
+        }
+        perror(filename);
     }
-    perror(filename);
     return -1;
 }
 
 int eressea_import_json(const char * filename) {
-    FILE *F = fopen(filename, "r");
-    if (F) {
-        stream out = { 0 };
-        int err;
-        fstream_init(&out, F);
-        err = json_import(&out);
-        fstream_done(&out);
-        return err;
+    if (filename) {
+        FILE *F = fopen(filename, "r");
+        if (F) {
+            stream out = { 0 };
+            int err;
+            fstream_init(&out, F);
+            err = json_import(&out);
+            fstream_done(&out);
+            return err;
+        }
+        perror(filename);
     }
-    perror(filename);
     return -1;
 }

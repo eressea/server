@@ -1696,7 +1696,6 @@ static void test_show_both(CuTest *tc) {
 static void test_immigration(CuTest * tc)
 {
     region *r;
-    double inject[] = { 1 };
 
     test_setup();
     r = test_create_region(0, 0, NULL);
@@ -1713,8 +1712,6 @@ static void test_immigration(CuTest * tc)
 
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
-
-    random_source_inject_array(inject, 2);
 
     config_set("rules.wage.function", "0");
     immigration();

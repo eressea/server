@@ -330,9 +330,9 @@ static bool cmp_curse(const attrib * a, const void *data)
     return false;
 }
 
-curse *get_curse(attrib * ap, const curse_type * ctype)
+curse *get_curse(const attrib * ap, const curse_type * ctype)
 {
-    attrib *a = ap;
+    const attrib *a = ap;
     if (!ctype) return NULL;
     while (a) {
         if (a->type == &at_curse) {
@@ -529,7 +529,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     /* die Kraft eines Spruchs darf nicht 0 sein */
     assert(vigour > 0);
 
-    c = get_curse(*ap, ct);
+    c = ap ? get_curse(*ap, ct) : NULL;
 
     if (c && (c_flags(c) & CURSE_ONLYONE)) {
         return NULL;
@@ -561,7 +561,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
         }
         set_curseingmagician(magician, *ap, ct);
     }
-    else {
+    else if (ap) {
         c = make_curse(magician, ap, ct, vigour, duration, effect, men);
     }
     return c;
@@ -649,10 +649,7 @@ bool curse_active(const curse * c)
         return false;
     if (c_flags(c) & CURSE_ISNEW)
         return false;
-    if (c->vigour <= 0)
-        return false;
-
-    return true;
+    return c->vigour > 0;
 }
 
 bool is_cursed_with(const attrib * ap, const curse * c)

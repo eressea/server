@@ -326,7 +326,6 @@ int alliedunit(const unit * u, const faction * f2, int mask)
 {
     assert(u);
     assert(f2);
-    assert(u->region);            /* the unit should be in a region, but it's possible that u->number==0 (TEMP units) */
     if (u->faction == f2) {
         return mask;
     }
@@ -335,17 +334,6 @@ int alliedunit(const unit * u, const faction * f2, int mask)
     }
     if (u->faction != NULL && f2 != NULL) {
         group *g;
-
-        if (mask & HELP_FIGHT) {
-            if ((u->flags & UFL_DEFENDER) || (u->faction->flags & FFL_DEFENDER)) {
-                faction *owner = region_get_owner(u->region);
-                /* helps the owner of the region */
-                if (owner == f2) {
-                    return HELP_FIGHT;
-                }
-            }
-        }
-
         g = get_group(u);
         if (g) {
             return alliedgroup(u->faction, f2, g, mask);
@@ -354,4 +342,3 @@ int alliedunit(const unit * u, const faction * f2, int mask)
     }
     return 0;
 }
-

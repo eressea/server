@@ -264,7 +264,7 @@ extern "C" {
     /* gibt pointer auf die erste curse-struct zurueck, deren Typ ctype ist,
      * oder einen NULL-pointer
      * */
-    struct curse *get_curse(struct attrib *ap, const curse_type * ctype);
+    struct curse *get_curse(const struct attrib *ap, const curse_type * ctype);
 
     const curse_type *ct_find(const char *c);
     void ct_register(const curse_type *);

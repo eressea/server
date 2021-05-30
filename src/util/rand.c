@@ -1,19 +1,12 @@
-#include <platform.h>
+#ifdef _MSC_VER
+#define _USE_MATH_DEFINES
+#endif
 #include "rand.h"
 #include "mtrand.h"
 #include "rng.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>
 #include <math.h>
-#include <float.h>
-#include <ctype.h>
-
-/* do not use M_PI, use one of these instead: */
-#define PI_F 3.1415926535897932384626433832795F
-#define PI_D 3.1415926535897932384626433832795
-#define PI_L 3.1415926535897932384626433832795L
 
 int lovar(double xpct_x2)
 {
@@ -36,10 +29,10 @@ double normalvariate(double mu, double sigma)
     if (phase == 0) {
         U = (rng_int() + 1.) / (RNG_RAND_MAX + 2.);
         V = rng_int() / (RNG_RAND_MAX + 1.);
-        Z = sqrt(-2 * log(U)) * sin(2 * PI_D * V);
+        Z = sqrt(-2 * log(U)) * sin(2 * M_PI * V);
     }
     else {
-        Z = sqrt(-2 * log(U)) * cos(2 * PI_D * V);
+        Z = sqrt(-2 * log(U)) * cos(2 * M_PI * V);
     }
     phase = 1 - phase;
 
@@ -69,62 +62,53 @@ bool chance(double x)
 
 typedef struct random_source {
     double (*double_source) (void);
+    int (*int32_source) (void);
 } random_source;
 
 random_source *r_source = 0;
 
 double rng_injectable_double(void) {
-    if (r_source)
+    if (r_source && r_source->double_source)
         return r_source->double_source();
     return genrand_real2();
 }
 
-static double constant_value;
+int rng_injectable_int(void) {
+    if (r_source && r_source->int32_source)
+        return r_source->int32_source();
+    return (int)genrand_int31();
+}
 
-static double constant_source (void) {
-    return constant_value;
+static double constant_value_double;
+static int constant_value_int32;
+
+static double constant_double(void) {
+    return constant_value_double;
+}
+
+static int constant_int32(void) {
+    return constant_value_int32;
 }
 
 struct random_source constant_provider = {
-    constant_source
+    constant_double, NULL
 };
 
-void random_source_inject_constant(double value) {
-    constant_value = value;
+void random_source_inject_constant(double dval) {
+    constant_value_double = dval;
     r_source = &constant_provider;
 }
 
-static double *values;
-static int value_size;
-static int value_index;
-
-static double array_source (void) {
-    assert(value_index<value_size);
-    return values[value_index++];
-}
-
-struct random_source array_provider = {
-    array_source
+struct random_source constants_provider = {
+    constant_double, constant_int32
 };
 
-void random_source_inject_array(double inject[], int size) {
-    int i;
-    assert(size > 0);
-    value_size = size;
-    if (values)
-        free(values);
-    values = malloc(sizeof(double) * size);
-    if (!values) abort();
-    for (i=0; i < size; ++i) {
-        values[i] = inject[i];
-    }
-    value_index = 0;
-    r_source = &array_provider;
+void random_source_inject_constants(double dval, int ival) {
+    constant_value_double = dval;
+    constant_value_int32 = ival;
+    r_source = &constants_provider;
 }
 
 void random_source_reset(void) {
-    if (values)
-        free(values);
-    values = NULL;
     r_source = NULL;
 }

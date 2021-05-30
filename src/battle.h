@@ -85,21 +85,6 @@ extern "C" {
         signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
         bool has_tactics_turn;
         bool reelarrow;
-        int alive;
-        struct {
-            const struct side *as;
-            const struct side *vs;
-            int alive;
-            int row;
-            int result;
-        } rowcache;
-        struct {
-            struct side *side;
-            int status;
-            int alive;
-            int minrow, maxrow;
-            int enemies[8];
-        } fast;
     } battle;
 
     typedef struct weapon {
@@ -254,6 +239,7 @@ extern "C" {
     void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
 
     double tactics_chance(const struct unit *u, int skilldiff);
+    int meffect_apply(struct meffect *me, int damage);
 #ifdef __cplusplus
 }
 #endif

@@ -9,14 +9,13 @@ include_directories (${TOLUA_INCLUDE_DIR})
 include_directories (${LUA_INCLUDE_DIR})
 include_directories (${INIPARSER_INCLUDE_DIR})
 
-
 if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
 endif()
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
 elseif(MSVC)
-  add_compile_options(/WX /MP)
+  add_compile_options(/WX /MP /FC)
 #  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG
         "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcmt.lib /NODEFAULTLIB:libcd.lib /NODEFAULTLIB:libcmtd.lib /NODEFAULTLIB:msvcrt.lib")
@@ -114,7 +113,6 @@ set (ERESSEA_SRC
   renumber.c
   report.c
   reports.c
-  skill.c
   spells.c
   spy.c
   steal.c
@@ -172,7 +170,7 @@ endif(CURSES_FOUND)
 if(IWYU_PATH)
   #  set(C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH} -Xiwyu --no_fwd_decls")
 else(IWYU_PATH)
-	message(STATUS "Could not find the program include-what-you-use")
+	# message(STATUS "Could not find the program include-what-you-use")
 endif()
 
 add_library(version STATIC ${VERSION_SRC})
@@ -181,7 +179,7 @@ if(DEFINED ERESSEA_VERSION)
 endif()
 
 if(DEFINED ERESSEA_BUILDNO)
-  target_compile_definitions(version PRIVATE ERESSEA_VERSION="${ERESSEA_VERSION}")
+  target_compile_definitions(version PRIVATE ERESSEA_BUILDNO="${ERESSEA_BUILDNO}")
 endif()
 add_library(parser ${PARSER_SRC})
 
@@ -204,9 +202,6 @@ add_library(game ${ERESSEA_SRC})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
-if (IWYU_PATH)
-set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
-endif(IWYU_PATH)
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARIES}
@@ -242,7 +237,6 @@ set(TESTS_SRC
   renumber.test.c
   report.test.c
   reports.test.c
-  skill.test.c
   spells.test.c
   spy.test.c
   study.test.c
@@ -274,6 +268,11 @@ target_link_libraries(test_eressea
   ${CJSON_LIBRARIES}
   ${IniParser_LIBRARIES}
   )
+
+set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
+if (IWYU_PATH)
+set_target_properties(test_eressea eressea PROPERTIES C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+endif(IWYU_PATH)
 
 add_test(server test_eressea)
 #add_test(NAME E3

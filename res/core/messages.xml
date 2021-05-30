@@ -3807,13 +3807,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error185" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error187" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -5487,6 +5480,8 @@
       <arg name="turns" type="int"/>
     </type>
   </message>
+  <message name="newbieimmunityending" section="nr" />
+  <message name="newbieimmunityended" section="nr" />
   <message name="alliance::kickedout" section="events">
     <type>
       <arg name="votes" type="int"/>

@@ -469,7 +469,7 @@ bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
     int err = 0;
     const race *rc = u_race(u);
 
-    if (sk < 0) {
+    if (sk < 0 || sk >= MAXSKILLS) {
         err = 77;
     }
     /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */

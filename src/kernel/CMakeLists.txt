@@ -37,6 +37,7 @@ region.test.c
 # resources.test.c
 save.test.c
 ship.test.c
+skill.test.c
 skills.test.c
 spellbook.test.c
 spell.test.c
@@ -74,6 +75,7 @@ region.c
 resources.c
 save.c
 ship.c
+skill.c
 skills.c
 spellbook.c
 spell.c

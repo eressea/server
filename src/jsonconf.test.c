@@ -320,7 +320,6 @@ static void test_castles(CuTest *tc) {
     cJSON *json = cJSON_Parse(data);
     const building_type *bt;
     const building_stage *stage;
-    const construction *con;
 
     test_setup();
 
@@ -333,17 +332,14 @@ static void test_castles(CuTest *tc) {
     CuAssertPtrNotNull(tc, bt);
     CuAssertPtrNotNull(tc, stage = bt->stages);
     CuAssertStrEquals(tc, "site", stage->name);
-    CuAssertPtrNotNull(tc, con = stage->construction);
-    CuAssertIntEquals(tc, 2, con->maxsize);
+    CuAssertIntEquals(tc, 2, stage->construction.maxsize);
 
     CuAssertPtrNotNull(tc, stage = stage->next);
     CuAssertPtrEquals(tc, NULL, stage->name);
-    CuAssertPtrNotNull(tc, con = stage->construction);
-    CuAssertIntEquals(tc, 6, con->maxsize);
+    CuAssertIntEquals(tc, 6, stage->construction.maxsize);
 
     CuAssertPtrNotNull(tc, stage = stage->next);
-    CuAssertPtrNotNull(tc, con = stage->construction);
-    CuAssertIntEquals(tc, -1, con->maxsize);
+    CuAssertIntEquals(tc, -1, stage->construction.maxsize);
 
     CuAssertPtrEquals(tc, NULL, stage->next);
 
@@ -425,8 +421,7 @@ static void test_buildings(CuTest * tc)
 
     CuAssertPtrNotNull(tc, bt->stages);
     CuAssertPtrEquals(tc, NULL, bt->stages->next);
-    CuAssertPtrNotNull(tc, bt->stages->construction);
-    CuAssertPtrNotNull(tc, con = bt->stages->construction);
+    con = &bt->stages->construction;
     CuAssertPtrNotNull(tc, con->materials);
     CuAssertIntEquals(tc, 2, con->materials[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)con->materials[0].rtype);

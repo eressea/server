@@ -14,7 +14,6 @@
 #include "stealth.h"
 #include "magic.h"
 #include "movement.h"
-#include "dict.h"
 #include "otherfaction.h"
 #include "overrideroads.h"
 #include "racename.h"
@@ -198,7 +197,6 @@ void register_attributes(void)
     at_deprecate("gm", a_readint);
     at_deprecate("guard", a_readint); /* used to contain guard-flags (v3.10.0-259-g8597e8b) */
     at_register(&at_stealth);
-    at_register(&at_dict);
     at_register(&at_unitdissolve);
     at_register(&at_observer);
     at_register(&at_overrideroads);

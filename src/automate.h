@@ -3,10 +3,9 @@
 #ifndef H_GC_AUTOMATE
 #define H_GC_AUTOMATE
 
-#include "skill.h"
-
 struct region;
 struct unit;
+enum skill_t;
 
 typedef struct scholar {
     struct unit *u;
@@ -19,7 +18,8 @@ typedef struct scholar {
 
 void do_autostudy(struct region *r);
 
-int autostudy_init(scholar scholars[], int max_scholars, struct unit **units, skill_t *o_skill);
+int autostudy_init(scholar scholars[], int max_scholars,
+        struct unit **units, enum skill_t *o_skill);
 void autostudy_run(scholar scholars[], int nscholars);
 
 #endif

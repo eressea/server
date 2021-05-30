@@ -51,7 +51,7 @@ syntaxtree *stree_create(void)
     syntaxtree *sroot = NULL;
     const struct locale *lang = locales;
     while (lang) {
-        syntaxtree *stree = (syntaxtree *)malloc(sizeof(syntaxtree));
+        syntaxtree *stree = malloc(sizeof(syntaxtree));
         if (!stree) abort();
         stree->lang = lang;
         stree->next = sroot;
@@ -64,7 +64,7 @@ syntaxtree *stree_create(void)
 }
 
 void stree_add(struct syntaxtree *stree, const char *str, parser fun) {
-    command *cmd = (command *)malloc(sizeof(command));
+    command *cmd = malloc(sizeof(command));
     variant var;
 
     assert(str);

@@ -4,6 +4,7 @@
 #include "jsonconf.h"
 
 /* kernel includes */
+#include "kernel/attrib.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
@@ -15,11 +16,11 @@
 #include "kernel/resources.h"
 #include "kernel/ship.h"
 #include "kernel/terrain.h"
+#include "kernel/skill.h"
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 
 /* util includes */
-#include "kernel/attrib.h"
 #include "util/aliases.h"
 #include "util/crmessage.h"
 #include "util/functions.h"
@@ -36,7 +37,6 @@
 #include "direction.h"
 #include "move.h"
 #include "prefix.h"
-#include "skill.h"
 #include "exparse.h"
 
 /* external libraries */
@@ -155,16 +155,13 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
     }
 }
 
-static void json_construction(cJSON *json, construction **consp) {
+static void json_construction(cJSON *json, construction *cons) {
     cJSON *child;
-    construction * cons;
     
     if (json->type != cJSON_Object) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
     }
-    cons = (construction *)calloc(1, sizeof(construction));
-    if (!cons) abort();
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
         case cJSON_Object:
@@ -187,7 +184,6 @@ static void json_construction(cJSON *json, construction **consp) {
             log_error("construction %s contains unknown attribute %s", json->string, child->string);
         }
     }
-    *consp = cons;
 }
 
 static void json_terrain_production(cJSON *json, terrain_production *prod) {
@@ -345,9 +341,9 @@ static void json_stages(cJSON *json, building_type *bt) {
             stage = calloc(1, sizeof(building_stage));
             if (!stage) abort();
             json_stage(child, stage);
-            if (stage->construction->maxsize > 0) {
-                stage->construction->maxsize -= size;
-                size += stage->construction->maxsize;
+            if (stage->construction.maxsize > 0) {
+                stage->construction.maxsize -= size;
+                size += stage->construction.maxsize;
             }
             *sp = stage;
             sp = &stage->next;
@@ -447,19 +443,20 @@ static void json_ship(cJSON *json, ship_type *st) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        int i;
+        int i, n;
         switch (child->type) {
         case cJSON_Object:
             if (strcmp(child->string, "construction") == 0) {
-                json_construction(child, &st->construction);
+                st->construction = calloc(1, sizeof(construction));
+                json_construction(child, st->construction);
             }
             else {
                 log_error("ship %s contains unknown attribute %s", json->string, child->string);
             }
             break;
         case cJSON_Array:
-            st->coasts = (terrain_type **)
-                malloc(sizeof(terrain_type *) * (1 + cJSON_GetArraySize(child)));
+            n = cJSON_GetArraySize(child);
+            st->coasts = malloc(sizeof(terrain_type *) * (1 + (size_t)n));
             if (!st->coasts) abort();
             for (i = 0, iter = child->child; iter; iter = iter->next) {
                 if (iter->type == cJSON_String) {
@@ -469,7 +466,7 @@ static void json_ship(cJSON *json, ship_type *st) {
                     }
                 }
             }
-            st->coasts[i] = 0;
+            st->coasts[n] = 0;
             break;
         case cJSON_Number:
             if (strcmp(child->string, "range") == 0) {

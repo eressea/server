@@ -119,11 +119,11 @@ static void scramble(void *data, unsigned int n, size_t width)
     assert(width <= sizeof(temp));
     for (j = 0; j != n; ++j) {
         unsigned int k = rng_uint() % n;
-        if (k == j)
-            continue;
-        memcpy(temp, (char *)data + j * width, width);
-        memcpy((char *)data + j * width, (char *)data + k * width, width);
-        memcpy((char *)data + k * width, temp, width);
+        if (k != j) {
+            memcpy(temp, (char*)data + j * width, width);
+            memcpy((char*)data + j * width, (char*)data + k * width, width);
+            memcpy((char*)data + k * width, temp, width);
+        }
     }
 }
 
@@ -393,16 +393,30 @@ void economics(region * r)
     for (u = r->units; u; u = u->next) {
         order *ord;
         if (u->number > 0) {
+            order* transfer = NULL;
             for (ord = u->orders; ord; ord = ord->next) {
                 keyword_t kwd = getkeyword(ord);
                 if (kwd == K_GIVE) {
-                    give_cmd(u, ord);
+                    param_t p = give_cmd(u, ord);
+                    /* deal with GIVE UNIT later */
+                    if (p == P_UNIT && !transfer) {
+                        transfer = ord;
+                    }
                 }
                 else if (kwd == K_FORGET) {
                     forget_cmd(u, ord);
                 }
                 if (u->orders == NULL) {
                     break;
+                }
+            }
+            if (transfer) {
+                for (ord = transfer; ord; ord = ord->next) {
+                    keyword_t kwd = getkeyword(ord);
+                    if (kwd == K_GIVE) {
+                        give_unit_cmd(u, ord);
+                        break;
+                    }
                 }
             }
         }
@@ -1030,7 +1044,7 @@ int make_cmd(unit * u, struct order *ord)
         if (pl && fval(pl, PFL_NOBUILD)) {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else if (btype->stages && btype->stages->construction) {
+        else if (btype->stages) {
             int id = getid();
             build_building(u, btype, id, m, ord);
         }

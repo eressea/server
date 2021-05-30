@@ -72,6 +72,7 @@ static void setup_give(struct give *env) {
     mt_create_error(128);
     mt_create_error(129);
     mt_create_error(96);
+    mt_create_error(73);
     mt_create_error(10);
     mt_create_feedback("feedback_give_forbidden");
     mt_create_feedback("peasants_give_invalid");
@@ -110,6 +111,17 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrEquals(tc, NULL, env.f1->units);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
+
+    /* must be allied to transfer a unit */
+    u_setfaction(env.src, env.f1);
+    ally_set(&env.f2->allies, env.f1, 0);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+
+    /* contact also works */
+    contact_unit(env.dst, env.src);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
 
     test_teardown();
 }
@@ -367,12 +379,35 @@ static void test_give_men_not_to_self(CuTest * tc) {
     struct give env = { 0 };
     message * msg;
     test_setup_ex(tc);
-    env.f2 = env.f1 = test_create_faction();
+    env.f1 = test_create_faction();
+    env.f2 = NULL;
     setup_give(&env);
     msg = give_men(1, env.src, env.src, NULL);
     CuAssertStrEquals(tc, "error10", test_get_messagetype(msg));
     CuAssertIntEquals(tc, 1, env.src->number);
     msg_release(msg);
+    test_teardown();
+}
+
+static void test_give_men_hungry(CuTest * tc) {
+    struct give env = { 0 };
+    message * msg = NULL;
+    test_setup_ex(tc);
+    env.f1 = test_create_faction();
+    env.f2 = test_create_faction();
+    setup_give(&env);
+    CuAssertTrue(tc, can_give_men(env.src, env.dst, NULL, &msg));
+    CuAssertPtrEquals(tc, NULL, msg);
+    env.src->flags |= UFL_HUNGER;
+    CuAssertTrue(tc, !can_give_men(env.src, env.dst, NULL, &msg));
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertStrEquals(tc, "error73", test_get_messagetype(msg));
+    msg_release(msg);
+
+    msg = NULL;
+    CuAssertTrue(tc, can_give_men(env.src, NULL, NULL, &msg));
+    CuAssertPtrEquals(tc, NULL, msg);
+
     test_teardown();
 }
 
@@ -382,7 +417,7 @@ static void test_give_peasants(CuTest * tc) {
 
     test_setup_ex(tc);
     env.f1 = test_create_faction();
-    env.f2 = 0;
+    env.f2 = NULL;
     setup_give(&env);
     rsetpeasants(env.r, 0);
     msg = disband_men(1, env.src, NULL);
@@ -542,6 +577,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_other_faction);
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
+    SUITE_ADD_TEST(suite, test_give_men_hungry);
     SUITE_ADD_TEST(suite, test_give_unit);
     SUITE_ADD_TEST(suite, test_give_unit_humans);
     SUITE_ADD_TEST(suite, test_give_unit_other_race);

@@ -7,6 +7,7 @@
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
+#include "teleport.h"
 #include "travelthru.h"
 #include "lighthouse.h"
 #include "donations.h"
@@ -18,11 +19,13 @@
 #include "attributes/racename.h"
 #include "attributes/stealth.h"
 
+#include "spells/regioncurse.h"
 #include "spells/unitcurse.h"
 
 /* kernel includes */
 #include "kernel/config.h"
 #include "kernel/calendar.h"
+#include "kernel/curse.h"
 #include "kernel/ally.h"
 #include "kernel/alliance.h"
 #include "kernel/connection.h"
@@ -186,6 +189,10 @@ const char *hp_status(const unit * u)
         return mkname("damage", "strong");
 
     return NULL;
+}
+
+bool see_schemes(const region *r) {
+    return r->seen.mode >= seen_unit && is_astral(r) && !is_cursed(r->attribs, &ct_astralblock);
 }
 
 void
@@ -468,56 +475,47 @@ report_building(const struct building *b, const char **name,
 }
 
 int
-report_resources(const region * r, resource_report * result, int size,
-    const faction * viewer, bool see_unit)
+report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
+    const faction * viewer, seen_mode mode)
 {
     int n = 0;
 
     if (r->land) {
         int peasants = rpeasants(r);
-        int money = rmoney(r);
-        int horses = rhorses(r);
-        int trees = rtrees(r, 2);
-        int saplings = rtrees(r, 1);
-        bool mallorn = fval(r, RF_MALLORN) != 0;
-        const resource_type *rtype;
-
-        if (saplings) {
-            if (n >= size)
-                return -1;
-            rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
-            report_resource(result + n, rtype, saplings, -1);
-            ++n;
-        }
-        if (trees) {
-            if (n >= size)
-                return -1;
-            rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
-            report_resource(result + n, rtype, trees, -1);
-            ++n;
-        }
-        if (money) {
-            if (n >= size)
-                return -1;
-            report_resource(result + n, get_resourcetype(R_SILVER), money, -1);
-            ++n;
-        }
         if (peasants) {
-            if (n >= size)
-                return -1;
             report_resource(result + n, get_resourcetype(R_PEASANT), peasants, -1);
             ++n;
         }
+
+        if (mode >= seen_lighthouse_land) {
+            const resource_type *rtype;
+            int trees = rtrees(r, 2);
+            int saplings = rtrees(r, 1);
+            bool mallorn = fval(r, RF_MALLORN) != 0;
+            if (trees) {
+                rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
+                report_resource(result + n, rtype, trees, -1);
+                ++n;
+            }
+            if (saplings) {
+                rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
+                report_resource(result + n, rtype, saplings, -1);
+                ++n;
+            }
+        }
+    }
+    if (mode >= seen_travel) {
+        rawmaterial *res = r->resources;
+        int money = rmoney(r);
+        int horses = rhorses(r);
+        if (money) {
+            report_resource(result + n, get_resourcetype(R_SILVER), money, -1);
+            ++n;
+        }
         if (horses) {
-            if (n >= size)
-                return -1;
             report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
             ++n;
         }
-    }
-
-    if (see_unit) {
-        rawmaterial *res = r->resources;
         while (res) {
             const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
@@ -543,10 +541,13 @@ report_resources(const region * r, resource_report * result, int size,
                 }
             }
             if (level >= 0 && visible >= 0) {
-                if (n >= size)
-                    return -1;
-                report_resource(result + n, res->rtype, visible, level);
-                n++;
+                if (n >= MAX_RAWMATERIALS) {
+                    log_error("More than MAX_RAWMATERIALS resources in %s", regionname(r, NULL));
+                }
+                else {
+                    report_resource(result + n, res->rtype, visible, level);
+                    ++n;
+                }
             }
             res = res->next;
         }
@@ -1433,9 +1434,16 @@ static void cb_add_seen(region *r, unit *u, void *cbdata) {
 void report_warnings(faction *f, int now)
 {
     if (f->age < NewbieImmunity()) {
-        ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
-            NewbieImmunity() - f->age));
-    }
+        assert(IsImmune(f));
+        if (f->age + 2 < NewbieImmunity()) {
+            ADDMSG(&f->msgs, msg_message("newbieimmunity", "turns",
+                NewbieImmunity() - f->age - 1));
+        } else if (f->age +1 < NewbieImmunity()) {
+            ADDMSG(&f->msgs, msg_message("newbieimmunityending", ""));
+        } else {
+            ADDMSG(&f->msgs, msg_message("newbieimmunityended", ""));
+        }
+    } /* else assert(!IsImmune(f)); */
 
     if (f->race == get_race(RC_INSECT)) {
         season_t season = calendar_season(now + 1);
@@ -2382,11 +2390,6 @@ bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mod
         }
     }
     return false;
-}
-
-bool see_region_details(const region *r)
-{
-    return r->seen.mode >= seen_travel;
 }
 
 void register_reports(void)

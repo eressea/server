@@ -5,7 +5,6 @@
 #include "economy.h"
 
 #include "laws.h"
-#include "skill.h"
 #include "study.h"
 
 #include <util/message.h>
@@ -19,6 +18,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include "kernel/skill.h"
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 

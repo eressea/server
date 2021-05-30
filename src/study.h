@@ -1,8 +1,8 @@
 #ifndef H_KRNL_STUDY
 #define H_KRNL_STUDY
 
-#include "skill.h"
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,6 +10,7 @@ extern "C" {
 
     struct unit;
     struct selist;
+    enum skill_t;
 
 #define STUDYDAYS 30
 #define TEACHNUMBER 10
@@ -27,18 +28,21 @@ extern "C" {
     int study_cmd(struct unit *u, struct order *ord);
 
     magic_t getmagicskill(const struct locale *lang);
-    skill_t getskill(const struct locale *lang);
+    enum skill_t getskill(const struct locale *lang);
     bool is_migrant(struct unit *u);
-    int study_cost(struct unit *u, skill_t sk);
-    bool check_student(const struct unit *u, struct order *ord, skill_t sk);
+    int study_cost(struct unit *u, enum skill_t sk);
+    bool check_student(const struct unit *u, struct order *ord,
+            enum skill_t sk);
 
-    typedef void(*learn_fun)(struct unit *u, skill_t sk, int days);
+    typedef void(*learn_fun)(struct unit *u, enum skill_t sk, int days);
 
-    int learn_skill(struct unit *u, skill_t sk, int days, int studycost);
-    void change_skill_days(struct unit *u, skill_t sk, int days);
+    int learn_skill(struct unit *u, enum skill_t sk, int days,
+            int studycost);
+    void change_skill_days(struct unit *u, enum skill_t sk, int days);
 
-    void produceexp(struct unit *u, skill_t sk, int n);
-    void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn);
+    void produceexp(struct unit *u, enum skill_t sk, int n);
+    void produceexp_ex(struct unit *u, enum skill_t sk, int n,
+            learn_fun learn);
 
     void demon_skillchange(struct unit *u);
 

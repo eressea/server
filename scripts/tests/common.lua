@@ -66,7 +66,7 @@ function test_flags()
     local f = create_faction('halfling')
     local u = unit.create(f, r, 1)
     local no = itoa36(f.id)
-    local flags = 50332672
+    local flags = 50331648
     f.flags = flags
 
     eressea.write_game("test.dat")
@@ -136,11 +136,9 @@ function test_fleeing_units_can_be_transported()
   u1.number = 100
   u1:add_order("ATTACKIEREN " .. itoa36(u2.id))
   u2.number = 100
-  u2.name = 'Passagier'
   u2:add_order("FAHREN " .. itoa36(u3.id))
   u2:add_order("KAEMPFE FLIEHE")
   u3.number = 100
-  u3.name = 'Transporter'
   u3:add_order("KAEMPFE FLIEHE")
   u3:add_order("TRANSPORT " .. itoa36(u2.id))
   u3:add_order("NACH O ")
@@ -642,7 +640,6 @@ function test_laen2()
   u1:set_skill("mining", 15)
   u1:clear_orders()
   u1:add_order("MACHEN Laen")
-  u1.name = "Laenmeister"
 
   local b = building.create(r, "mine")
   b.size = 10

@@ -549,7 +549,7 @@ static void test_recruit(CuTest *tc) {
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 1, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
-    add_recruits(u, 1, 1);
+    add_recruits(u, 1, 1, 1);
     CuAssertIntEquals(tc, 2, u->number);
     CuAssertIntEquals(tc, 2, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
@@ -557,8 +557,12 @@ static void test_recruit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, u->nextF);
     CuAssertPtrEquals(tc, NULL, u->prevF);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "recruit"));
-    add_recruits(u, 1, 2);
+    add_recruits(u, 1, 2, 2);
     CuAssertIntEquals(tc, 3, u->number);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
+    test_clear_messages(f);
+    add_recruits(u, 1, 1, 2);
+    CuAssertIntEquals(tc, 4, u->number);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "recruit"));
     test_teardown();
 }
@@ -681,9 +685,10 @@ static void test_modify_skill(CuTest *tc) {
     itype->construction->minskill = 1;
     itype->construction->maxsize = -1;
     itype->construction->reqsize = 1;
-    itype->construction->materials = calloc(2, sizeof(requirement));
+    itype->construction->materials = malloc(2 * sizeof(requirement));
     itype->construction->materials[0].rtype = rtype;
     itype->construction->materials[0].number = 1;
+    itype->construction->materials[1].number = 0;
 
     /* our race gets a +1 bonus to the item's production skill */
     mod = itype->rtype->modifiers = calloc(2, sizeof(resource_mod));
@@ -738,9 +743,10 @@ static void test_modify_production(CuTest *tc) {
     itype->construction->minskill = 1;
     itype->construction->maxsize = 1;
     itype->construction->reqsize = 1;
-    itype->construction->materials = calloc(2, sizeof(requirement));
-    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials = malloc(2 * sizeof(requirement));
     itype->construction->materials[0].number = 1;
+    itype->construction->materials[0].rtype = rt_silver;
+    itype->construction->materials[1].number = 0;
     set_level(u, SK_ALCHEMY, 1);
     test_set_item(u, rt_silver->itype, 1);
     make_item(u, itype, 1);
@@ -749,7 +755,7 @@ static void test_modify_production(CuTest *tc) {
 
     /* make level-based raw materials, no materials used in construction */
     free(itype->construction->materials);
-    itype->construction->materials = 0;
+    itype->construction->materials = NULL;
     rtype->flags |= RTF_LIMITED;
     rmt_create(rtype);
     add_resource(u->region, 1, 300, 150, rtype); /* there are 300 stones at level 1 */

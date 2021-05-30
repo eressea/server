@@ -22,9 +22,10 @@ extern "C" {
        By calling the random_source_inject... functions you can set a special random source,
        which is handy for testing */
     double rng_injectable_double(void);
+    int rng_injectable_int(void);
 
+    void random_source_inject_constants(double dval, int ival);
     void random_source_inject_constant(double value);
-    void random_source_inject_array(double inject[], int size);
     void random_source_reset(void);
 
 #ifdef __cplusplus

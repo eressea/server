@@ -115,7 +115,6 @@ function test_dwarf_bonus()
     local u = unit.create(faction.create("dwarf"), r)
     assert_equal("dwarf", u.faction.race)
     assert_equal("dwarf", u.race)
-    u.faction.name = "Zwerge"
     u.number = 10
     u:set_skill("mining", 1)
     u:add_order("MACHE EISEN")

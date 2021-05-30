@@ -1,8 +1,21 @@
+# 3.28
+
+  - Bugfix für Schild des Fisches (Solthar)
+  - Dämonen können magisch reanimiert werden.
+  - "Schöne Träume" verliert seine Wirkung, wenn der Zauberer stirbt.
+  - Mit GIB 0 können hungernde Personen an die Bauern gegeben werden.
+  - Magieresistenz: Einheiten widerstehen nicht Zaubern der eigenen Partei [2733].
+  - Zauberkosten steigen durch Ring der Macht nicht an.
+  - Effektiv gezauberte Stufe von Zauber anhängig von Verfügbarkeit der Materialen.
+  - Ring der Macht und Steinkreis erhöhen nicht die Zauberkosten [2737].
+  - Limits für Vertrautenzauber korrekt implementiert.
+  - Kröten und Schlümpfe können nichts lernen.
+
 # 3.27
 
-  - Schiffe sind kommentarlos nicht nicht gesegelt [2722]
-  - Meermenschen konnten nicht mehr anschwimmen [2723]
-  - Magieresistenz repariert [2724]
+  - Schiffe sind kommentarlos nicht gesegelt [2722].
+  - Meermenschen konnten nicht mehr anschwimmen [2723].
+  - Magieresistenz repariert [2724].
   - Kleine Änderung an Samenwachstum.
   - Umstellung auf neue Versionen von externen Libraries.
 

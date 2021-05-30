@@ -5,6 +5,7 @@
 
 eval "$(luarocks path)"
 export LUA_PATH="${ERESSEA}/git/scripts/?.lua;$LUA_PATH"
+
 branch="develop"
 if [ -e "${ERESSEA}/build/.preview" ]; then
     branch=$(cat "${ERESSEA}/build/.preview")

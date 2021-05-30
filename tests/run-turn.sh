@@ -27,7 +27,7 @@ ROOT=`pwd`
 while [ ! -d $ROOT/.git ]; do
   ROOT=`dirname $ROOT`
 done
-
+export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
 cd $ROOT/tests
 setup
 cleanup
@@ -56,7 +56,7 @@ assert_grep_count reports/$CRFILE '^GEGENSTAENDE' 2
 assert_grep_count reports/185-heg.cr '185;Runde' 1
 assert_grep_count reports/185-heg.cr ';Baeume' 4
 assert_grep_count reports/185-heg.cr '"B.ume";type' 4
-assert_grep_count reports/185-heg.cr '"Pferde";type' 6
+assert_grep_count reports/185-heg.cr '"Pferde";type' 2 
 assert_grep_count reports/185-heg.nr 'erblickt' 6
 assert_grep_count reports/185-heg.cr '"lighthouse";visibility' 6
 assert_grep_count reports/185-heg.cr '"neighbour";visibility' 11

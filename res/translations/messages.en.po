@@ -1937,9 +1937,6 @@ msgstr "\"Nightmares plague the population. ($int36($id))\""
 msgid "error295"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Only mages may use an astralcrystal.\""
 
-msgid "error185"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The spell seems exceptionally weak. Something has interfred with the magical energies.\""
-
 msgid "error181"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - To do this, the magician has to be in a castle or on board a ship.\""
 
@@ -2652,7 +2649,13 @@ msgid "error201"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Race and target unit have not been supplied.\""
 
 msgid "newbieimmunity"
-msgstr "\"Your faction is immune against assaults for $int($turns) more weeks.\""
+msgstr "\"Your faction will be protected against attacks for the next $int($turns) weeks.\""
+
+msgid "newbieimmunityending"
+msgstr "\"Your faction will be protected against attacks only one more week.\""
+
+msgid "newbieimmunityended"
+msgstr "\"Your faction will no longer be protected against attacks.\""
 
 msgid "curseinfo::auraboost_0"
 msgstr "\"Powerful magical energies are pulsing through $unit($unit). ($int36($id))\""

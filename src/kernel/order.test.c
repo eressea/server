@@ -454,14 +454,14 @@ static void test_study_order_quoted(CuTest *tc) {
     CuAssertIntEquals(tc, K_STUDY, init_order(u->thisorder, lang));
     CuAssertStrEquals(tc, skillname(SK_WEAPONLESS, lang), gettoken(token, sizeof(token)));
 
-    CuAssertStrEquals(tc, "LERNE 'Waffenloser Kampf'", get_command(u->thisorder, lang, token, sizeof(token)));
+    CuAssertStrEquals(tc, "LERNE \"Waffenloser Kampf\"", get_command(u->thisorder, lang, token, sizeof(token)));
 
     mstream_init(&out);
     stream_order(&out, u->thisorder, lang, true);
     swrite("\n", 1, 1, &out);
     out.api->rewind(out.handle);
     out.api->readln(out.handle, token, sizeof(token));
-    CuAssertStrEquals(tc, "LERNE 'Waffenloser Kampf'", token);
+    CuAssertStrEquals(tc, "LERNE \"Waffenloser Kampf\"", token);
     mstream_done(&out);
 
     test_teardown();

@@ -9,11 +9,12 @@ extern "C" {
 
     /* generates a random number on [0,1)-real-interval */
     double rng_injectable_double(void);
+    int rng_injectable_int(void);
 
 #ifdef RNG_MT
 # include "mtrand.h"
 # define rng_init(seed) init_genrand(seed)
-# define rng_int (int)genrand_int31
+# define rng_int rng_injectable_int
 # define rng_uint (unsigned int)genrand_int32
 # define rng_double rng_injectable_double
 # define RNG_RAND_MAX 0x7fffffff
@@ -24,7 +25,6 @@ extern "C" {
 # define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
-#define RAND_ROUND(fractional) ((rng_double() < fractional-(int)fractional)?((int)fractional+1):((int)fractional))
 #ifdef __cplusplus
 }
 #endif

@@ -24,13 +24,13 @@
 #include <CuTest.h>
 
 
+static const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
+
 static void test_curse(CuTest * tc)
 {
     attrib *attrs = NULL;
     curse *c, *result;
     int cid;
-
-    curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
 
     test_setup();
     c = create_curse(NULL, &attrs, &ct_dummy, 1.0, 1, 1, 1);
@@ -162,7 +162,6 @@ static void test_write_flag(CuTest *tc) {
 }
 
 static void test_curse_ids(CuTest *tc) {
-    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
     curse *c1, *c2;
     attrib *a1 = 0, *a2 = 0;
 
@@ -178,12 +177,11 @@ static void test_curse_ids(CuTest *tc) {
 }
 
 static void test_curse_flags(CuTest *tc) {
-    const curse_type ct_dummy = { "dummy", CURSETYP_NORM, 0, M_SUMEFFECT, NULL };
     curse *c1, *c2;
     unit *u;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     c1 = create_curse(u, &u->attribs, &ct_dummy, 1, 1, 1, 0);
     CuAssertPtrEquals(tc, u, c1->magician);
     CuAssertIntEquals(tc, 1, (int)c1->effect);
@@ -195,6 +193,26 @@ static void test_curse_flags(CuTest *tc) {
     CuAssertIntEquals(tc, 2, (int)c1->effect);
     CuAssertIntEquals(tc, 1, (int)c1->vigour);
     CuAssertIntEquals(tc, 1, c1->duration);
+    test_teardown();
+}
+
+static void test_curse_active(CuTest *tc) {
+    curse *c;
+    unit *u;
+
+    test_setup();
+
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertTrue(tc, !curse_active(NULL));
+    c = create_curse(u, &u->attribs, &ct_dummy, 1.0, 1, 1, 0);
+    CuAssertIntEquals(tc, 0, c->mask);
+    CuAssertTrue(tc, curse_active(c));
+    c->mask = CURSE_ISNEW;
+    CuAssertTrue(tc, !curse_active(c));
+    c->mask = 0;
+    c->magician = NULL;
+    CuAssertTrue(tc, curse_active(c));
+
     test_teardown();
 }
 
@@ -210,5 +228,6 @@ CuSuite *get_curse_suite(void)
     SUITE_ADD_TEST(suite, test_write_flag);
     SUITE_ADD_TEST(suite, test_curse_flags);
     SUITE_ADD_TEST(suite, test_curse_ids);
+    SUITE_ADD_TEST(suite, test_curse_active);
     return suite;
 }

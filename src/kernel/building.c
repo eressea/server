@@ -102,7 +102,6 @@ static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
     while (btype->stages) {
         building_stage *next = btype->stages->next;
-        free_construction(btype->stages->construction);
         free(btype->stages->name);
         free(btype->stages);
         btype->stages = next;
@@ -190,7 +189,7 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             bsize = adjust_size(b, bsize);
         }
         for (stage = btype->stages; stage; stage = stage->next) {
-            bsize -= stage->construction->maxsize;
+            bsize -= stage->construction.maxsize;
             if (!stage->next || bsize <0) {
                 return stage->name;
             }
@@ -317,22 +316,28 @@ int cmp_castle_size(const building * b, const building * a)
     return b->size - a->size;
 }
 
-static const int castle_bonus[6] = { 0, 1, 3, 5, 8, 12 };
+static const int castle_bonus[7] = { 0, 0, 1, 2, 3, 4, 5 };
 static const int watch_bonus[3] = { 0, 1, 2 };
 
-int building_protection(const building_type * btype, int stage)
+int bt_protection(const building_type * btype, int stage)
 {
-    assert(btype->flags & BTF_FORTIFICATION);
-    if (btype->maxsize < 0) {
-        if (stage > 5) {
-            stage = 5;
+    if (btype->flags & BTF_FORTIFICATION) {
+        if (btype->maxsize < 0) {
+            if (stage >= 7) {
+                stage = 6;
+            }
+            return castle_bonus[stage];
         }
-        return castle_bonus[stage];
+        if (stage > 2) {
+            stage = 2;
+        }
+        return watch_bonus[stage];
     }
-    if (stage > 2) {
-        stage = 2;
-    }
-    return watch_bonus[stage];
+    return 0;
+}
+
+int building_protection(const building* b) {
+    return bt_protection(b->type, buildingeffsize(b, false));
 }
 
 void write_building_reference(const struct building *b, struct storage *store)
@@ -525,7 +530,7 @@ int bt_effsize(const building_type * btype, const building * b, int bsize)
         int n = 0;
         const building_stage *stage = btype->stages;
         do {
-            const construction *con = stage->construction;
+            const construction *con = &stage->construction;
             if (con->maxsize < 0) {
                 break;
             }

@@ -265,7 +265,8 @@ static bool unit_has_cursed_item(const unit * u)
     return false;
 }
 
-static bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg) {
+bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg)
+{
     UNUSED_ARG(dst);
     if (unit_has_cursed_item(u)) {
         if (msg) *msg = msg_error(u, ord, 78);
@@ -274,7 +275,7 @@ static bool can_give_men(const unit *u, const unit *dst, order *ord, message **m
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
-    else if (fval(u, UFL_HUNGER)) {
+    else if (dst && fval(u, UFL_HUNGER)) {
         /* hungry people cannot be given away */
         if (msg) *msg = msg_error(u, ord, 73);
     }
@@ -813,9 +814,42 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
     }
 }
 
-void give_cmd(unit * u, order * ord)
+void give_unit_cmd(unit* u, order* ord)
 {
-    char token[128];
+    char token[64];
+    unit* u2;
+    message* msg = NULL;
+    keyword_t kwd;
+    int err;
+
+    kwd = init_order(ord, NULL);
+    assert(kwd == K_GIVE);
+    err = getunit(u->region, u->faction, &u2);
+
+    if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
+        msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
+    }
+    else {
+        msg = check_give(u, u2, ord);
+    }
+
+    if (msg) {
+        ADDMSG(&u->faction->msgs, msg);
+    }
+    else if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
+        cmistake(u, ord, 167, MSG_COMMERCE);
+    }
+    else {
+        param_t p = findparam(gettoken(token, sizeof(token)), u->faction->locale);
+        if (p == P_UNIT) {
+            give_unit(u, u2, ord);
+        }
+    }
+}
+
+param_t give_cmd(unit * u, order * ord)
+{
+    char token[64];
     region *r = u->region;
     unit *u2;
     const char *s;
@@ -828,41 +862,44 @@ void give_cmd(unit * u, order * ord)
 
     kwd = init_order(ord, NULL);
     assert(kwd == K_GIVE);
+
     err = getunit(r, u->faction, &u2);
     s = gettoken(token, sizeof(token));
     n = s ? atoip(s) : 0;
     p = (n > 0) ? NOPARAM : findparam(s, u->faction->locale);
 
-    /* first, do all the ones that do not require HELP_GIVE or CONTACT */
-    if (p == P_CONTROL) {
-        /* handled in give_control_cmd */
-        return;
-    }
-    else if (p == P_SHIP) {
-        ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "give_number_missing", "resource", "ship_p"));
-        return;
-    }
-    else if (p == P_PERSON) {
-        ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "give_number_missing", "resource", "person_p"));
-        return;
+    /* quick exit before any errors are generated: */
+    if (p == P_UNIT || p == P_CONTROL) {
+        /* handled in give_unit_cmd */
+        return p;
     }
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "feedback_unit_not_found", ""));
-        return;
+        return NOPARAM;
     }
     if (u == u2) {
         cmistake(u, ord, 8, MSG_COMMERCE);
-        return;
+        return NOPARAM;
+    }
+
+    /* first, do all the ones that do not require HELP_GIVE or CONTACT */
+    if (p == P_SHIP) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "give_number_missing", "resource", "ship_p"));
+        return p;
+    }
+    else if (p == P_PERSON) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "give_number_missing", "resource", "person_p"));
+        return p;
     }
 
     msg = check_give(u, u2, ord);
     if (msg) {
         ADDMSG(&u->faction->msgs, msg);
-        return;
+        return p;
     }
 
     /* UFL_TAKEALL ist ein grober Hack. Generalisierung tut not, ist aber nicht
@@ -870,12 +907,12 @@ void give_cmd(unit * u, order * ord)
     pl = rplane(r);
     if (pl && fval(pl, PFL_NOGIVE) && (!u2 || !fval(u2, UFL_TAKEALL))) {
         cmistake(u, ord, 268, MSG_COMMERCE);
-        return;
+        return p;
     }
 
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE) && !ucontact(u2, u)) {
         cmistake(u, ord, 40, MSG_COMMERCE);
-        return;
+        return p;
     }
     else if (p == NOPARAM) {
         /* the most likely case: giving items to someone.
@@ -886,17 +923,15 @@ void give_cmd(unit * u, order * ord)
         bool given = false;
         if (!can_give(u, u2, NULL, GIVE_HERBS)) {
             feedback_give_not_allowed(u, ord);
-            return;
         }
-        if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
+        else if (u2 && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
-            return;
         }
-        if (u->items) {
-            item **itmp = &u->items;
+        else if (u->items) {
+            item** itmp = &u->items;
             while (*itmp) {
-                item *itm = *itmp;
+                item* itm = *itmp;
                 if (fval(itm->type, ITF_HERB) && itm->number > 0) {
                     /* give_item aendert im fall,das man alles uebergibt, die
                     * item-liste der unit, darum continue vor pointerumsetzten */
@@ -907,38 +942,27 @@ void give_cmd(unit * u, order * ord)
                 }
                 itmp = &itm->next;
             }
+            if (!given) {
+                cmistake(u, ord, 38, MSG_COMMERCE);
+            }
         }
-        if (!given) {
-            cmistake(u, ord, 38, MSG_COMMERCE);
-        }
-        return;
+        return p;
     }
 
     else if (p == P_ZAUBER) {
         cmistake(u, ord, 7, MSG_COMMERCE);
         /* geht nimmer */
-        return;
+        return p;
     }
-
-    else if (p == P_UNIT) {       /* Einheiten uebergeben */
-        if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
-            cmistake(u, ord, 167, MSG_COMMERCE);
-            return;
-        }
-
-        give_unit(u, u2, ord);
-        return;
-    }
-
     else if (p == P_ANY) {
         give_all_items(u, u2, ord);
-        return;
+        return p;
     }
     else if (p == P_EACH) {
         if (u2 == NULL) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "peasants_give_invalid", ""));
-            return;
+            return p;
         }
         s = gettoken(token, sizeof(token));          /* skip one ahead to get the amount. */
         n = s ? atoip(s) : 0;   /* n: Anzahl */
@@ -948,59 +972,59 @@ void give_cmd(unit * u, order * ord)
 
     if (s == NULL) {
         cmistake(u, ord, 113, MSG_COMMERCE);
-        return;
     }
-
-    p = findparam(s, u->faction->locale);
-    if (p == P_SHIP) {
-        if (u->ship) {
-            message * msg;
-            if (n > u->ship->number) {
-                n = u->ship->number;
+    else {
+        p = findparam(s, u->faction->locale);
+        if (p == P_SHIP) {
+            if (u->ship) {
+                message* msg;
+                if (n > u->ship->number) {
+                    n = u->ship->number;
+                }
+                msg = give_ship(u, u2, n, ord);
+                if (msg) {
+                    ADDMSG(&u->faction->msgs, msg);
+                }
             }
-            msg = give_ship(u, u2, n, ord);
-            if (msg) {
-                ADDMSG(&u->faction->msgs, msg);
+            else {
+                cmistake(u, ord, 144, MSG_COMMERCE);
             }
         }
-        else {
-            cmistake(u, ord, 144, MSG_COMMERCE);
+        else if (p == P_PERSON) {
+            if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
+                ADDMSG(&u->faction->msgs,
+                    msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
+            }
+            else {
+                if (n > u->number) {
+                    n = u->number;
+                }
+                msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
+                if (msg) {
+                    ADDMSG(&u->faction->msgs, msg);
+                }
+            }
         }
-        return;
-    }
-    else if (p == P_PERSON) {
-        if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
-            ADDMSG(&u->faction->msgs,
-                msg_feedback(u, ord, "race_noregroup", "race", u_race(u)));
-            return;
-        }
-        if (n > u->number) n = u->number;
-        msg = u2 ? give_men(n, u, u2, ord) : disband_men(n, u, ord);
-        if (msg) {
-            ADDMSG(&u->faction->msgs, msg);
-        }
-        return;
-    }
-
-    if (u2 != NULL) {
-        if (!(u_race(u2)->ec_flags & ECF_GETITEM)) {
+        else if (u2 != NULL && !(u_race(u2)->ec_flags & ECF_GETITEM)) {
             ADDMSG(&u->faction->msgs,
                 msg_feedback(u, ord, "race_notake", "race", u_race(u2)));
-            return;
-        }
-    }
-
-    itype = finditemtype(s, u->faction->locale);
-    if (itype != NULL) {
-        if (can_give(u, u2, itype, 0)) {
-            give_item(n, itype, u, u2, ord);
         }
         else {
-            feedback_give_not_allowed(u, ord);
+            itype = finditemtype(s, u->faction->locale);
+            if (itype != NULL) {
+                if (can_give(u, u2, itype, 0)) {
+                    give_item(n, itype, u, u2, ord);
+                }
+                else {
+                    feedback_give_not_allowed(u, ord);
+                }
+            }
+            else {
+                cmistake(u, ord, 123, MSG_COMMERCE);
+            }
         }
-        return;
     }
-    cmistake(u, ord, 123, MSG_COMMERCE);
+    return p;
 }
 
 message *check_give(const unit *u, const unit *u2, order * ord) {

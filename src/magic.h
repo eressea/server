@@ -18,6 +18,7 @@ extern "C" {
 
     struct sc_mage;
     struct unit;
+    struct resource;
 
     extern const char *magic_school[MAXMAGIETYP];
     extern struct attrib_type at_familiar;
@@ -109,10 +110,17 @@ extern "C" {
     struct unit * co_get_magician(const struct castorder * co);
     struct region * co_get_region(const struct castorder * co);
 
+    /* Flag Spruchkostenberechnung: */
+    enum spellcost_t {
+        SPC_FIX,                    /* Fixkosten */
+        SPC_LEVEL,                  /* Komponenten pro Level */
+        SPC_LINEAR                  /* Komponenten pro Level und muessen vorhanden sein */
+    };
+
     typedef struct spell_component {
         const struct resource_type *type;
         int amount;
-        int cost;
+        enum spellcost_t cost;
     } spell_component;
 
     /* ------------------------------------------------------------- */
@@ -144,13 +152,6 @@ extern "C" {
 
 #define NOTFAMILIARCAST (1<<14) /* not used by XML? */
 #define ANYTARGET       (UNITSPELL|REGIONSPELL|BUILDINGSPELL|SHIPSPELL) /* wirkt auf alle objekttypen (unit, ship, building, region) */
-
-    /* Flag Spruchkostenberechnung: */
-    enum {
-        SPC_FIX,                    /* Fixkosten */
-        SPC_LEVEL,                  /* Komponenten pro Level */
-        SPC_LINEAR                  /* Komponenten pro Level und muessen vorhanden sein */
-    };
 
     /* ------------------------------------------------------------- */
     /* Prototypen */
@@ -199,6 +200,7 @@ extern "C" {
     void unit_set_magic(struct unit *u, enum magic_t mtype);
     struct spellbook * unit_get_spellbook(const struct unit * u);
     void unit_add_spell(struct unit * u, struct spell * sp, int level);
+    int unit_spell_level(const struct unit *u, const struct spell *sp);
 
     bool is_mage(const struct unit *u);
     /*      gibt true, wenn u->mage gesetzt.  */
@@ -217,10 +219,12 @@ extern "C" {
     void unset_combatspell(struct unit *u, struct spell * sp);
     /*      loescht Kampfzauber */
     /* fuegt den Spruch mit der Id spellid der Spruchliste der Einheit hinzu. */
-    int u_hasspell(const struct unit *u, const struct spell *sp);
+    bool u_hasspell(const struct unit *u, const struct spell *sp);
     /* prueft, ob der Spruch in der Spruchliste der Einheit steht. */
     void pick_random_spells(struct faction *f, int level, struct spellbook * book, int num_spells);
-    bool knowsspell(const struct region *r, const struct unit *u,
+    bool knowsspell(
+        const struct region *r,
+        const struct unit *u,
         const struct spell * sp);
     /* prueft, ob die Einheit diesen Spruch gerade beherrscht, dh
      * mindestens die erforderliche Stufe hat. Hier koennen auch Abfragen
@@ -242,7 +246,7 @@ extern "C" {
 
     /* Zaubern */
     double spellpower(struct region *r, struct unit *u, const struct spell * sp,
-        int cast_level, struct order *ord);
+        int cast_level);
     /*      ermittelt die Staerke eines Spruchs */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
@@ -282,19 +286,22 @@ extern "C" {
     /*      zieht die Komponenten des Zaubers aus dem Inventory der Einheit
      *      ab. Die effektive Stufe des gezauberten Spruchs ist wichtig fuer
      *      die korrekte Bestimmung der Magiepunktkosten */
-    int eff_spelllevel(struct unit *mage, struct unit *caster,
-        const struct spell * sp, int cast_level, int distance);
+    int max_spell_level(struct unit *mage, struct unit *caster,
+        const struct spell * sp, int cast_level, int distance, 
+        struct resource **reslist_p);
     /*      ermittelt die effektive Stufe des Zaubers. Dabei ist cast_level
      *      die gewuenschte maximale Stufe (im Normalfall Stufe des Magiers,
      *      bei Farcasting Stufe*2^Entfernung) */
-    bool is_magic_resistant(struct unit *magician, struct unit *target, int
-        resist_bonus);
+    bool is_magic_resistant(const struct unit *magician, const struct unit *target,
+        int resist_bonus);
     /*      Mapperfunktion fuer target_resists_magic() vom Typ struct unit. */
-    variant magic_resistance(struct unit *target);
+    variant magic_resistance(const struct unit *target);
     /*      gibt die Chance an, mit der einem Zauber widerstanden wird. Je
      *      groesser, desto resistenter ist da Opfer */
-    bool target_resists_magic(struct unit *magician, void *obj, int objtyp,
-        int resist_bonus);
+    bool target_resists_magic(const struct unit *magician, const void *obj, int objtyp,
+        int bonus_percent);
+    variant resist_chance(const struct unit *magician, const void *obj, int objtyp,
+        int bonus_percent);
     /*      gibt false zurueck, wenn der Zauber gelingt, true, wenn das Ziel
      *      widersteht */
     struct spell * unit_getspell(struct unit *u, const char *s,

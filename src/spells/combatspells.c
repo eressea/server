@@ -882,7 +882,7 @@ int flee_spell(struct castorder * co, int strength)
         return 0;
     }
 
-    fgs = select_fighters(b, fi->side, FS_ENEMY, select_afraid, NULL);
+    fgs = select_fighters(b, fi->side, FS_ENEMY, (co->sp->sptyp & PRECOMBATSPELL) ? select_afraid : select_alive, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; force > 0 && ql; selist_advance(&ql, &qi, 1)) {
@@ -895,7 +895,7 @@ int flee_spell(struct castorder * co, int strength)
                 ++panik;
             }
             else if (!(df->person[n].flags & FL_COURAGE)
-                || !(u_race(df->unit)->flags & RCF_UNDEAD)) {
+                && !(u_race(df->unit)->flags & RCF_UNDEAD)) {
                 if (!is_magic_resistant(mage, df->unit, 0)) {
                     df->person[n].flags |= FL_PANICED;
                     ++panik;
@@ -1329,7 +1329,6 @@ int sp_reanimate(struct castorder * co)
     while (healable--) {
         fighter *tf = select_corpse(b, fi);
         if (tf != NULL && tf->side->casualties > 0
-            && u_race(tf->unit) != get_race(RC_DAEMON)
             && (chance(c))) {
             assert(tf->alive < tf->unit->number);
             /* t.fighter->person[].hp beginnt mit t.index = 0 zu zaehlen,

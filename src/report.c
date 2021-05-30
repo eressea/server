@@ -3,12 +3,6 @@
 #endif
 
 #include "report.h"
-#include "reports.h"
-#include "guard.h"
-#include "laws.h"
-#include "market.h"
-#include "monsters.h"
-#include "travelthru.h"
 
 #include <spells/regioncurse.h>
 #include <spells/buildingcurse.h>
@@ -25,10 +19,17 @@
 /* gamecode includes */
 #include "alchemy.h"
 #include "economy.h"
+#include "guard.h"
+#include "laws.h"
+#include "market.h"
+#include "monsters.h"
 #include "move.h"
+#include "recruit.h"
+#include "reports.h"
+#include "teleport.h"
+#include "travelthru.h"
 #include "upkeep.h"
 #include "vortex.h"
-#include "teleport.h"
 
 /* kernel includes */
 #include "kernel/alliance.h"
@@ -86,6 +87,8 @@
 #include <math.h>
 #include <limits.h>
 #include <stdlib.h>
+
+#define TEMPLATE_BOM 0
 
 /* pre-C99 compatibility */
 #ifndef SIZE_MAX
@@ -893,7 +896,7 @@ static void report_region_description(struct stream *out, const region * r, fact
     /* iron & stone */
     if (r->seen.mode >= seen_unit) {
         resource_report result[MAX_RAWMATERIALS];
-        int numresults = report_resources(r, result, MAX_RAWMATERIALS, f, true);
+        int numresults = report_resources(r, result, f, r->seen.mode);
 
         for (n = 0; n < numresults; ++n) {
             if (result[n].number >= 0 && result[n].level >= 0) {
@@ -930,9 +933,9 @@ static void report_region_description(struct stream *out, const region * r, fact
     }
     if (r->seen.mode >= seen_travel) {
         report_region_resource(&sbs, f->locale, get_resourcetype(R_SILVER), rmoney(r));
+        /* Pferde */
+        report_region_resource(&sbs, f->locale, get_resourcetype(R_HORSE), rhorses(r));
     }
-    /* Pferde */
-    report_region_resource(&sbs, f->locale, get_resourcetype(R_HORSE), rhorses(r));
     sbs_strcat(&sbs, ".");
 
     if (r->land && r->land->display && r->land->display[0]) {
@@ -1061,38 +1064,35 @@ char *report_list(const struct locale *lang, char *buffer, size_t len, int argc,
 
 static void report_region_schemes(struct stream *out, const region * r, faction * f) {
 
-    if (r->seen.mode >= seen_unit && is_astral(r) &&
-        !is_cursed(r->attribs, &ct_astralblock)) {
-        /* Sonderbehandlung Teleport-Ebene */
-        region *rl[MAX_SCHEMES];
-        int num = get_astralregions(r, inhabitable, rl);
-        char buf[4096];
+    /* Sonderbehandlung Teleport-Ebene */
+    region *rl[MAX_SCHEMES];
+    int num = get_astralregions(r, inhabitable, rl);
+    char buf[4096];
 
-        if (num == 1) {
-            /* single region is easy */
-            region *rn = rl[0];
-            f_regionid(rn, f, buf, sizeof(buf));
-        }
-        else if (num > 1) {
-            int i;
-            const char *rnames[MAX_SCHEMES];
+    if (num == 1) {
+        /* single region is easy */
+        region *rn = rl[0];
+        f_regionid(rn, f, buf, sizeof(buf));
+    }
+    else if (num > 1) {
+        int i;
+        const char *rnames[MAX_SCHEMES];
 
-            for (i = 0; i != num; ++i) {
-                char rbuf[REPORTWIDTH];
-                region *rn = rl[i];
-                f_regionid(rn, f, rbuf, sizeof(rbuf));
-                rnames[i] = str_strdup(rbuf);
-            }
-            report_list(f->locale, buf, sizeof(buf), num, rnames);
-            for (i = 0; i != num; ++i) {
-                free((char *)rnames[i]);
-            }
+        for (i = 0; i != num; ++i) {
+            char rbuf[REPORTWIDTH];
+            region *rn = rl[i];
+            f_regionid(rn, f, rbuf, sizeof(rbuf));
+            rnames[i] = str_strdup(rbuf);
         }
-        if (num > 0) {
-            if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
-                newline(out);
-                paragraph(out, buf, 0, 0, 0);
-            }
+        report_list(f->locale, buf, sizeof(buf), num, rnames);
+        for (i = 0; i != num; ++i) {
+            free((char *)rnames[i]);
+        }
+    }
+    if (num > 0) {
+        if (format_replace(LOC(f->locale, "nr_schemes_template"), "{0}", buf, buf, sizeof(buf))) {
+            newline(out);
+            paragraph(out, buf, 0, 0, 0);
         }
     }
 }
@@ -1149,12 +1149,10 @@ void report_region(struct stream *out, const region * r, faction * f)
     }
 
     report_region_description(out, r, f, see);
-    if (r->seen.mode >= seen_unit) {
+    if (see_schemes(r)) {
         report_region_schemes(out, r, f);
     }
-    if (r->seen.mode >= seen_lighthouse_land) {
-        report_region_edges(out, r, f, edges, ne);
-    }
+    report_region_edges(out, r, f, edges, ne);
 }
 
 static void report_statistics(struct stream *out, const region * r, const faction * f)
@@ -1196,7 +1194,7 @@ static void report_statistics(struct stream *out, const region * r, const factio
     }
 
     if (p) {
-        m = msg_message("nr_stat_recruits", "max", p / RECRUITFRACTION);
+        m = msg_message("nr_stat_recruits", "max", max_recruits(r));
         nr_render(m, f->locale, buf, sizeof(buf), f);
         paragraph(out, buf, 2, 2, 0);
         msg_release(m);
@@ -1289,7 +1287,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     }
     fstream_init(&strm, F);
 
-    if (bom) {
+    if (TEMPLATE_BOM && bom) {
         swrite(bom, 1, strlen(bom), out);
     }
 
@@ -2131,7 +2129,6 @@ report_plaintext(const char *filename, report_context * ctx,
                         sbs_strcat(&sbs, ", ");
                     }
                 }
-                assert(!rm->rtype);
             }
             centre(out, buf, true);
             newline(out);

@@ -201,7 +201,7 @@ int destroy_cmd(unit * u, struct order *ord)
             }
             ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
             for (stage = b->type->stages; stage; stage = stage->next) {
-                size = recycle(u, stage->construction, size);
+                size = recycle(u, &stage->construction, size);
             }
             remove_building(&r->buildings, b);
         }
@@ -667,7 +667,7 @@ static int build_failure(unit *u, order *ord, const building_type *btype, int wa
         break;
     case ENOMATERIALS:
         ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
-            btype->stages->construction, want));
+            &btype->stages->construction, want));
         break;
     case ELOWSKILL:
     case ENEEDSKILL:
@@ -684,7 +684,7 @@ static int build_stages(unit *u, const building_type *btype, int built, int n, i
     int made = 0;
 
     for (stage = btype->stages; stage; stage = stage->next) {
-        const construction * con = stage->construction;
+        const construction * con = &stage->construction;
         if (con->maxsize < 0 || con->maxsize > built) {
             int err, want = INT_MAX;
             if (n < INT_MAX) {
@@ -740,7 +740,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     int skills, basesk;         /* number of skill points remainig */
 
     assert(u->number);
-    assert(btype->stages && btype->stages->construction);
+    assert(btype->stages);
 
     basesk = effskill(u, SK_BUILDING, NULL);
     skills = build_skill(u, basesk, 0);
@@ -1008,6 +1008,13 @@ void continue_ship(unit * u, int want)
     }
 
     build_ship(u, sh, want);
+}
+
+void construction_init(struct construction *con, int minskill, skill_t sk, int reqsize, int maxsize) {
+    con->minskill = minskill;
+    con->skill = sk;
+    con->reqsize = reqsize;
+    con->maxsize = maxsize;
 }
 
 void free_construction(struct construction *cons)

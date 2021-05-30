@@ -4,25 +4,26 @@
 
 #include "alchemy.h"
 
-/* kernel includes */
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/terrain.h>
-
 /* attributes includes */
-#include <attributes/reduceproduction.h>
+#include "attributes/reduceproduction.h"
+
+/* kernel includes */
+#include "kernel/attrib.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <util/log.h>
-#include <util/rand.h>
-#include <util/message.h>
-#include <util/rng.h>
+#include "util/log.h"
+#include "util/rand.h"
+#include "util/message.h"
+#include "util/rng.h"
 
 /* libc includes */
 #include <assert.h>
@@ -75,85 +76,52 @@ static bool resurrect_unit(unit *u) {
     return false;
 }
 
-static int damage_unit(unit * u, const char *dam, bool physical, bool magic)
+int volcano_damage(unit* u, const char* dice)
 {
-    int *hp, hpstack[20];
-    int h;
-    int healings;
-    int i, dead = 0, hp_rem = 0;
-
-    assert(u->number);
-    if (fval(u_race(u), RCF_ILLUSIONARY)) {
-        return 0;
-    }
-
-    assert(u->number <= u->hp);
-    h = u->hp / u->number;
-    /* HP verteilen */
-    if (u->number < 20) {
-        hp = hpstack;
-    }
-    else {
-        hp = malloc(u->number * sizeof(int));
-    }
-    for (i = 0; i < u->number; i++)
-        hp[i] = h;
-    h = u->hp - (u->number * h);
-    for (i = 0; i < h; i++)
-        hp[i]++;
-
-    /* Schaden */
-    for (i = 0; i < u->number; i++) {
-        int damage = dice_rand(dam);
-        if (magic) {
-            variant magres = magic_resistance(u);
-            int save = magres.sa[0] / magres.sa[1];
-            damage -= damage * save;
-        }
-        if (physical) {
-            damage -= nb_armor(u, i);
-        }
-        hp[i] -= damage;
-    }
+    int hp = u->hp / u->number;
+    int remain = u->hp % u->number;
+    int ac = 0, i, dead = 0, total = 0;
+    int healings = 0;
+    const struct race* rc_cat = get_race(RC_CAT);
+    int protect = inside_building(u) ? (building_protection(u->building) + 1) : 0;
 
     /* does this unit have any healing potions or effects? */
-    healings = i_get(u->items, oldpotiontype[P_HEAL]) * 4;
-    healings += get_effect(u, oldpotiontype[P_HEAL]);
-    /* Auswirkungen */
-    for (i = 0; i < u->number; i++) {
-        if (hp[i] <= 0) {
-            /* Sieben Leben */
-            if (u_race(u) == get_race(RC_CAT) && (chance(1.0 / 7))) {
-                hp[i] = u->hp / u->number;
-                hp_rem += hp[i];
+    if (oldpotiontype[P_HEAL]) {
+        healings = get_effect(u, oldpotiontype[P_HEAL]);
+        healings += i_get(u->items, oldpotiontype[P_HEAL]) * 4;
+    }
+
+    for (i = 0; i != u->number; ++i) {
+        int h = hp + ((i < remain) ? 1 : 0);
+        int damage = dice_rand(dice) - protect;
+        if (damage > 0) {
+            if (i == 0 || ac > 0) {
+                ac = nb_armor(u, i);
+                damage -= ac;
             }
-            else if (healings > 0) {
-                --healings;
-                if (resurrect_unit(u)) {
-                    /* Heiltrank benutzen */
-                    hp[i] = u->hp / u->number;
-                    hp_rem += hp[i];
-                }
-                else {
+            if (damage > 0) {
+                if (damage >= h) {
+                    if (rc_cat && u_race(u) == rc_cat && ((rng_int() % 7) == 0)) {
+                        /* cats have nine lives */
+                        continue;
+                    }
+                    else if (healings > 0) {
+                        --healings;
+                        if (resurrect_unit(u)) {
+                            /* take no damage at all */
+                            continue;
+                        }
+                    }
                     ++dead;
+                    damage = h;
                 }
+                total += damage;
             }
-            else {
-                ++dead;
-            }
-        }
-        else {
-            hp_rem += hp[i];
         }
     }
-
+    total = u->hp - total;
     scale_number(u, u->number - dead);
-    u->hp = hp_rem;
-
-    if (hp != hpstack) {
-        free(hp);
-    }
-
+    u->hp = total;
     return dead;
 }
 
@@ -212,7 +180,7 @@ volcano_destruction(region * volcano, region * r, const char *damage)
     for (up = &r->units; *up;) {
         unit *u = *up;
         if (u->number) {
-            int dead = damage_unit(u, damage, true, false);
+            int dead = volcano_damage(u, damage);
             /* TODO create undead */
             if (dead) {
                 ADDMSG(&u->faction->msgs, msg_message("volcano_dead",

@@ -77,23 +77,29 @@ int *casualties)
     battle *b = af->side->battle;
     troop dt;
     int d = 0, enemies;
-    weapon *wp = af->person[at->index].missile;
-    const resource_type *rtype = rt_find("catapultammo");
+    weapon *wp;
+    const resource_type *rtype;
 
+    if (au->status >= ST_AVOID) {
+        /* do not want to waste ammo. no shots fired */
+        return false;
+    }
+
+    wp = af->person[at->index].missile;
     assert(wp->type == wtype);
     assert(af->person[at->index].reload == 0);
+    rtype = rt_find("catapultammo");
 
     if (rtype) {
         if (get_pooled(au, rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1) <= 0) {
-            /* No ammo. Use other weapon if available. */
-            return true;
+            return false;
         }
     }
 
     enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
     if (enemies > CATAPULT_ATTACKS) enemies = CATAPULT_ATTACKS;
     if (enemies == 0) {
-        return true;                /* allow further attacks */
+        return false;
     }
 
     if (af->catmsg == -1) {
@@ -139,7 +145,7 @@ int *casualties)
     if (casualties) {
         *casualties = d;
     }
-    return false;                 /* keine weitren attacken */
+    return true; /* catapult must reload */
 }
 
 void register_weapons(void)

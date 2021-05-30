@@ -151,7 +151,7 @@ static recruitment *select_recruitment(recruit_request ** rop,
     return recruits;
 }
 
-void add_recruits(unit * u, int number, int wanted)
+void add_recruits(unit * u, int number, int wanted, int ordered)
 {
     region *r = u->region;
     assert(number <= wanted);
@@ -178,9 +178,9 @@ void add_recruits(unit * u, int number, int wanted)
             remove_unit(&r->units, unew);
         }
     }
-    if (number < wanted) {
+    if (number < ordered) {
         ADDMSG(&u->faction->msgs, msg_message("recruit",
-            "unit region amount want", u, r, number, wanted));
+            "unit region amount want", u, r, number, u->wants));
     }
 }
 
@@ -265,7 +265,7 @@ static int do_recruiting(recruitment * recruits, int available)
                 /* unit is empty, dead, and cannot recruit */
                 number = 0;
             }
-            add_recruits(u, number, req->qty);
+            add_recruits(u, number, req->qty, u->wants);
             if (number > 0) {
                 int dec = (int)(number * multi);
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
@@ -318,6 +318,14 @@ static int recruit_cost(const faction * f, const race * rc)
         return rc->recruitcost;
     }
     return -1;
+}
+
+int max_recruits(const struct region *r)
+{
+    if (is_cursed(r->attribs, &ct_riotzone)) {
+        return 0;
+    }
+    return rpeasants(r) / RECRUITFRACTION;
 }
 
 message *can_recruit(unit *u, const race *rc, order *ord, int now)
@@ -406,6 +414,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
         }
     }
 
+    u->wants = n;
     if (recruitcost < 0) {
         rc = u_race(u);
         recruitcost = recruit_cost(f, rc);
@@ -452,7 +461,6 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     }
 
     u_setrace(u, rc);
-    u->wants = n;
     o = (recruit_request *)calloc(1, sizeof(recruit_request));
     if (!o) abort();
     o->qty = n;

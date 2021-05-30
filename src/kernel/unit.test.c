@@ -647,6 +647,40 @@ static void test_get_modifier(CuTest *tc) {
     test_teardown();
 }
 
+static void test_get_modifier_cursed(CuTest *tc) {
+    region *r;
+    unit *u, *u2, *u3;
+    curse *c;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(u->faction, r); /* allied */
+    u3 = test_create_unit(test_create_faction(), r); /* not allied */
+    set_level(u2, SK_TAXING, 1);
+    set_level(u3, SK_TAXING, 1);
+
+    /* default: no effects: */
+    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
+
+    /* cursed with good dreams */
+    c = create_curse(u, &r->attribs, &ct_gbdream, 1, 1, 1, 0);
+    CuAssertIntEquals(tc, 1, get_modifier(u2, SK_TAXING, 1, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
+
+    /* cursed with good dreams, but magician just died */
+    u->number = 0;
+    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
+
+    /* cursed with good dreams, but magician is dead */
+    c->magician = NULL;
+    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
+    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
+
+    test_teardown();
+}
+
 static void test_gift_items(CuTest *tc) {
     unit *u, *u1, *u2;
     region *r;
@@ -734,6 +768,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
     SUITE_ADD_TEST(suite, test_get_modifier);
+    SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
     return suite;
 }

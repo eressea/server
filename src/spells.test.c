@@ -168,7 +168,7 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, -1, get_observer(r, f));
 
     /* target region r exists, but astral space is blocked */
-    c = create_curse(NULL, &ra->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    c = create_curse(u, &ra->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
@@ -177,7 +177,7 @@ static void test_view_reality(CuTest *tc) {
     remove_curse(&ra->attribs, c);
 
     /* target region r exists, but astral interference is blocked */
-    c = create_curse(NULL, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    c = create_curse(u, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
@@ -246,7 +246,7 @@ static void test_show_astral(CuTest *tc) {
     free_castorder(&co);
 
     /* astral block on r */
-    c = create_curse(NULL, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    c = create_curse(u, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
@@ -254,7 +254,7 @@ static void test_show_astral(CuTest *tc) {
     remove_curse(&r->attribs, c);
 
     /* astral block on rx */
-    c = create_curse(NULL, &rx->attribs, &ct_astralblock, 50.0, 1, 50, 0);
+    c = create_curse(u, &rx->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));

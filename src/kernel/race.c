@@ -226,7 +226,7 @@ race_list *get_familiarraces(void)
 
 void racelist_insert(struct race_list **rl, const struct race *r)
 {
-    race_list *rl2 = (race_list *)malloc(sizeof(race_list));
+    race_list *rl2 = malloc(sizeof(race_list));
 
     if (!rl2) abort();
     rl2->data = r;

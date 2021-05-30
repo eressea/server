@@ -1937,9 +1937,6 @@ msgstr "\"Albträume plagen die Leute. ($int36($id))\""
 msgid "error295"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nur ein Magier kann einen Astralkristall benutzen.\""
 
-msgid "error185"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber scheint ungewöhnlich schwach zu sein. Irgendetwas hat die magischen Energien abgeleitet.\""
-
 msgid "error181"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu muß sich der Magier in der Burg oder an Bord des Schiffes befinden.\""
 
@@ -2652,7 +2649,13 @@ msgid "error201"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Rasse und Zieleinheit wurden vergessen.\""
 
 msgid "newbieimmunity"
-msgstr "\"Deine Partei ist noch $int($turns) Wochen immun gegen Angriffe.\""
+msgstr "\"Deine Partei ist noch die nächsten $int($turns) Wochen immun gegen Angriffe.\""
+
+msgid "newbieimmunityending"
+msgstr "\"Deine Partei ist nur noch in der kommenden Woche immun gegen Angriffe.\""
+
+msgid "newbieimmunityended"
+msgstr "\"Deine Partei ist nun nicht mehr immun gegen Angriffe.\""
 
 msgid "curseinfo::auraboost_0"
 msgstr "\"$unit($unit) fühlt sich von starken magischen Energien durchströmt. ($int36($id))\""

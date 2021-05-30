@@ -10,7 +10,6 @@
 #include "laws.h"
 #include "monsters.h"
 #include "move.h"
-#include "skill.h"
 #include "study.h"
 #include "spy.h"
 
@@ -33,6 +32,7 @@
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 #include "kernel/spell.h"
@@ -111,6 +111,7 @@ const troop no_troop = { 0, 0 };
 static int max_turns;
 static int rule_damage;
 static int rule_loot;
+static double loot_divisor;
 static int flee_chance_max_percent;
 static int flee_chance_base;
 static int flee_chance_skill_bonus;
@@ -148,6 +149,7 @@ static void init_rules(void)
     rule_vampire = config_get_int("rules.combat.demon_vampire", 0);
     rule_loot = config_get_int("rules.combat.loot",
         LOOT_MONSTERS | LOOT_OTHERS | LOOT_KEEPLOOT);
+    loot_divisor = config_get_flt("rules.items.loot_divisor", 1);
     /* new formula to calculate to-hit-chance */
     skill_formula = config_get_int("rules.combat.skill_formula",
         FORMULA_ORIG);
@@ -377,7 +379,7 @@ static int get_row(const side * s, int row, const side * vs)
     memset(size, 0, sizeof(size));
     for (line = FIRST_ROW; line != NUMROWS; ++line) {
         int si, sa_i;
-        /* how many enemies are there in the first row? */
+        /* how many enemies are there in this row? */
         for (si = 0; s->enemies[si]; ++si) {
             side *se = s->enemies[si];
             if (se->size[line] > 0) {
@@ -427,24 +429,14 @@ int get_unitrow(const fighter * af, const side * vs)
     int row = statusrow(af->status);
     if (vs == NULL) {
         int i;
-        for (i = FIGHT_ROW; i != row; ++i)
-            if (af->side->size[i])
+        for (i = FIGHT_ROW; i != row; ++i) {
+            if (af->side->size[i]) {
                 break;
+            }
+        }
         return FIGHT_ROW + (row - i);
     }
-    else {
-        battle *b = vs->battle;
-        if (row != b->rowcache.row || b->alive != b->rowcache.alive
-            || af->side != b->rowcache.as || vs != b->rowcache.vs) {
-            b->rowcache.alive = b->alive;
-            b->rowcache.as = af->side;
-            b->rowcache.vs = vs;
-            b->rowcache.row = row;
-            b->rowcache.result = get_row(af->side, row, vs);
-            return b->rowcache.result;
-        }
-        return b->rowcache.result;
-    }
+    return get_row(af->side, row, vs);
 }
 
 static void reportcasualties(battle * b, fighter * fig, int dead)
@@ -776,7 +768,28 @@ int select_magicarmor(troop t)
     return ma;
 }
 
-/* Sind side ds und Magier des meffect verbuendet, dann return 1*/
+int meffect_apply(struct meffect *me, int damage) {
+    assert(0 <= damage); /* damage sollte hier immer mindestens 0 sein */
+    /* jeder Schaden wird um effect% reduziert bis der Schild duration
+     * Trefferpunkte aufgefangen hat */
+    if (me->typ == SHIELD_REDUCE && me->effect <= 100) {
+        int hp = damage * me->effect / 100;
+        if (hp > me->duration) {
+            hp = me->duration;
+        }
+        damage -= hp;
+        me->duration -= hp;
+    }
+    /* gibt Ruestung +effect fuer duration Treffer */
+    else if (me->typ == SHIELD_ARMOR) {
+        damage -= me->effect;
+        if (damage < 0) damage = 0;
+        me->duration--;
+    }
+    return damage;
+}
+
+/* Sind side ds und Magier des meffect verbuendet? */
 bool meffect_protection(battle * b, meffect * s, side * ds)
 {
     UNUSED_ARG(b);
@@ -791,7 +804,7 @@ bool meffect_protection(battle * b, meffect * s, side * ds)
     return false;
 }
 
-/* Sind side as und Magier des meffect verfeindet, dann return 1*/
+/* Sind side as und Magier des meffect verfeindet? */
 bool meffect_blocked(battle * b, meffect * s, side * as)
 {
     UNUSED_ARG(b);
@@ -817,7 +830,6 @@ void rmfighter(fighter * df, int i)
     /* erst ziehen wir die Anzahl der Personen von den Kaempfern in der
      * Schlacht, dann von denen auf dieser Seite ab*/
     df->side->alive -= i;
-    df->side->battle->alive -= i;
 
     /* Dann die Kampfreihen aktualisieren */
     ds->size[SUM_ROW] -= i;
@@ -854,9 +866,7 @@ void remove_troop(troop dt)
 {
     fighter *df = dt.fighter;
     struct person p = df->person[dt.index];
-    battle *b = df->side->battle;
-    b->fast.alive = -1;           /* invalidate cached value */
-    b->rowcache.alive = -1;       /* invalidate cached value */
+
     ++df->removed;
     ++df->side->removed;
     df->person[dt.index] = df->person[df->alive - df->removed];
@@ -1217,37 +1227,25 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
     return reduced_damage;
 }
 
-static int apply_magicshield(int reduced_damage, fighter *df,
+static int apply_magicshield(int damage, fighter *df,
     const weapon_type *awtype, battle *b, bool magic) {
     side *ds = df->side;
     selist *ql;
     int qi;
 
-    if (reduced_damage <= 0)
+    if (damage <= 0) {
         return 0;
+    }
 
     /* Schilde */
     for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
         meffect *me = (meffect *)selist_get(ql, qi);
         if (meffect_protection(b, me, ds) != 0) {
-            assert(0 <= reduced_damage); /* rda sollte hier immer mindestens 0 sein */
-            /* jeder Schaden wird um effect% reduziert bis der Schild duration
-             * Trefferpunkte aufgefangen hat */
-            if (me->typ == SHIELD_REDUCE) {
-                int hp = reduced_damage * (me->effect / 100);
-                reduced_damage -= hp;
-                me->duration -= hp;
-            }
-            /* gibt Ruestung +effect fuer duration Treffer */
-            if (me->typ == SHIELD_ARMOR) {
-                reduced_damage -= me->effect;
-                if (reduced_damage < 0) reduced_damage = 0;
-                me->duration--;
-            }
+            damage = meffect_apply(me, damage);
         }
     }
     
-    return reduced_damage;
+    return damage;
 }
 
 bool
@@ -1408,35 +1406,11 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
 }
 
 int
-count_enemies(battle * b, const fighter * af, int minrow, int maxrow,
+count_enemies(battle *b, const fighter *af, int minrow, int maxrow,
     int select)
 {
-    int sr = statusrow(af->status);
-    side *as = af->side;
-
-    if (b->alive == b->fast.alive && as == b->fast.side && sr == b->fast.status
-        && minrow == b->fast.minrow && maxrow == b->fast.maxrow) {
-        if (b->fast.enemies[select] >= 0) {
-            return b->fast.enemies[select];
-        }
-        else if (select & SELECT_FIND) {
-            if (b->fast.enemies[select - SELECT_FIND] >= 0) {
-                return b->fast.enemies[select - SELECT_FIND];
-            }
-        }
-    }
-    else if (select != SELECT_FIND || b->alive != b->fast.alive) {
-        b->fast.side = as;
-        b->fast.status = sr;
-        b->fast.minrow = minrow;
-        b->fast.alive = b->alive;
-        b->fast.maxrow = maxrow;
-        memset(b->fast.enemies, -1, sizeof(b->fast.enemies));
-    }
     if (maxrow >= FIRST_ROW) {
-        int i = count_enemies_i(b, af, minrow, maxrow, select);
-        b->fast.enemies[select] = i;
-        return i;
+        return count_enemies_i(b, af, minrow, maxrow, select);
     }
     return 0;
 }
@@ -1711,60 +1685,52 @@ void do_combatmagic(battle * b, combatmagic_t was)
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
-            unit *mage = fig->unit;
-            unit *caster = mage;
+            unit *u = fig->unit;
+            unit *caster = u;
 
             if (fig->alive <= 0)
                 continue;               /* fighter kann im Kampf getoetet worden sein */
 
-            level = effskill(mage, SK_MAGIC, r);
+            level = effskill(u, SK_MAGIC, r);
             if (level > 0) {
                 double power;
                 const spell *sp;
-                const struct locale *lang = mage->faction->locale;
+                const struct locale *lang = u->faction->locale;
                 order *ord;
 
                 switch (was) {
                 case DO_PRECOMBATSPELL:
-                    sp = get_combatspell(mage, 0);
-                    sl = get_combatspelllevel(mage, 0);
+                    sp = mage_get_combatspell(get_mage(u), 0, &sl);
                     break;
                 case DO_POSTCOMBATSPELL:
-                    sp = get_combatspell(mage, 2);
-                    sl = get_combatspelllevel(mage, 2);
+                    sp = mage_get_combatspell(get_mage(u), 2, &sl);
                     break;
                 default:
                     /* Fehler! */
                     return;
                 }
-                if (sp == NULL)
+                if (sp == NULL || !u_hasspell(u, sp))
                     continue;
 
-                ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
-                if (!cancast(mage, sp, 1, 1, ord)) {
-                    free_order(ord);
-                    continue;
-                }
-
-                level = eff_spelllevel(mage, caster, sp, level, 1);
+                level = max_spell_level(u, caster, sp, level, 1, NULL);
                 if (sl > 0 && sl < level) {
                     level = sl;
                 }
-                if (level < 0) {
-                    report_failed_spell(b, mage, sp);
-                    free_order(ord);
+                if (level < 1) {
+                    report_failed_spell(b, u, sp);
                     continue;
                 }
 
-                power = spellpower(r, mage, sp, level, ord);
+                ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
+                power = spellpower(r, u, sp, level);
                 free_order(ord);
                 if (power <= 0) {       /* Effekt von Antimagie */
-                    report_failed_spell(b, mage, sp);
-                    pay_spell(mage, NULL, sp, level, 1);
+                    report_failed_spell(b, u, sp);
+                    pay_spell(u, NULL, sp, level, 1);
                 }
-                else if (fumble(r, mage, sp, level)) {
-                    report_failed_spell(b, mage, sp);
-                    pay_spell(mage, NULL, sp, level, 1);
+                else if (fumble(r, u, sp, level)) {
+                    report_failed_spell(b, u, sp);
+                    pay_spell(u, NULL, sp, level, 1);
                 }
                 else {
                     co = create_castorder_combat(0, fig, sp, level, power);
@@ -1806,37 +1772,35 @@ static void do_combatspell(troop at)
 {
     const spell *sp;
     fighter *fi = at.fighter;
-    unit *mage = fi->unit;
+    unit *u = fi->unit;
     battle *b = fi->side->battle;
     region *r = b->region;
     selist *ql;
-    int level, qi;
+    int level, qi, sl;
     double power;
     int fumblechance = 0;
-    order *ord;
-    int sl;
-    const struct locale *lang = mage->faction->locale;
+    struct sc_mage *mage = get_mage(u);
 
-    sp = get_combatspell(mage, 1);
-    if (sp == NULL) {
+    if (!mage) {
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
-    ord = create_order(K_CAST, lang, "'%s'", spell_name(mkname_spell(sp), lang));
-    if (!cancast(mage, sp, 1, 1, ord)) {
+    sp = mage_get_combatspell(mage, 1, &sl);
+    if (sp == NULL || sl <= 0 || !u_hasspell(u, sp)) {
+        fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
+        return;
+    }
+    level = max_spell_level(u, u, sp, fi->magic, 1, NULL);
+    if (level < 1) {
         fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;
     }
-
-    level = eff_spelllevel(mage, mage, sp, fi->magic, 1);
-    sl = get_combatspelllevel(mage, 1);
-    if (sl > 0 && sl < level) {
+    else if (sl < level) {
         level = sl;
     }
-
-    if (fumble(r, mage, sp, level)) {
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
+    if (fumble(r, u, sp, level)) {
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
 
@@ -1852,16 +1816,14 @@ static void do_combatspell(troop at)
 
     /* Antimagie die Fehlschlag erhoeht */
     if (rng_int() % 100 < fumblechance) {
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
-        free_order(ord);
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
-    power = spellpower(r, mage, sp, level, ord);
-    free_order(ord);
+    power = spellpower(r, u, sp, level);
     if (power <= 0) {             /* Effekt von Antimagie */
-        report_failed_spell(b, mage, sp);
-        pay_spell(mage, NULL, sp, level, 1);
+        report_failed_spell(b, u, sp);
+        pay_spell(u, NULL, sp, level, 1);
         return;
     }
 
@@ -1926,8 +1888,7 @@ int skilldiff(troop at, troop dt, int dist)
             }
         }
         if (b->type->flags & BTF_FORTIFICATION) {
-            int stage = buildingeffsize(b, false);
-            int beff = building_protection(b->type, stage);
+            int beff = building_protection(b);
             if (beff > 0) {
                 skdiff -= beff;
                 is_protected = 2;
@@ -2125,12 +2086,13 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                  * sonst helden mit feuerschwertern zu maechtig */
                 if (numattack == 0 && wp && wp->type->attack) {
                     int dead = 0;
-                    standard_attack = wp->type->attack(&ta, wp->type, &dead);
-                    if (!standard_attack)
+                    standard_attack = false;
+                    if (wp->type->attack(&ta, wp->type, &dead)) {
                         reload = true;
-                    af->catmsg += dead;
-                    if (!standard_attack && af->person[ta.index].last_action < b->turn) {
-                        af->person[ta.index].last_action = b->turn;
+                        af->catmsg += dead;
+                        if (af->person[ta.index].last_action < b->turn) {
+                            af->person[ta.index].last_action = b->turn;
+                        }
                     }
                 }
                 if (standard_attack) {
@@ -2427,7 +2389,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
                         dt.fighter = df;
                         return dt;
                     }
-                    allies -= df->alive;
+                    allies -= (df->alive - df->removed);
                 }
             }
         }
@@ -2441,10 +2403,9 @@ static int loot_quota(const unit * src, const unit * dst,
 {
     UNUSED_ARG(type);
     if (dst && src && src->faction != dst->faction) {
-        double divisor = config_get_flt("rules.items.loot_divisor", 1);
-        assert(divisor <= 0 || divisor >= 1);
-        if (divisor >= 1) {
-            double r = n / divisor;
+        assert(loot_divisor <= 0 || loot_divisor >= 1);
+        if (loot_divisor > 1) {
+            double r = n / loot_divisor;
             int x = (int)r;
 
             r = r - x;
@@ -3110,7 +3071,6 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->side = s1;
     fig->alive = u->number;
     fig->side->alive += u->number;
-    fig->side->battle->alive += u->number;
     fig->catmsg = -1;
 
     /* Freigeben nicht vergessen! */
@@ -3167,7 +3127,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         int dwp[WMAX];
         int wcount[WMAX];
         int wused[WMAX];
-        int oi = 0, di = 0, w = 0;
+        int oi = 0, di = 0;
+        int w = 0;
         for (itm = u->items; itm && w != WMAX; itm = itm->next) {
             const weapon_type *wtype = resource2weapon(itm->type->rtype);
             if (wtype == NULL || itm->number == 0)
@@ -3182,9 +3143,9 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
             }
             assert(w != WMAX);
         }
-        assert(w >= 0);
-        fig->weapons = (weapon *)calloc((size_t)(w + 1), sizeof(weapon));
-        memcpy(fig->weapons, weapons, (size_t)w * sizeof(weapon));
+        fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
+        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        fig->weapons[w].type = NULL;
 
         for (i = 0; i != w; ++i) {
             int j, o = 0, d = 0;
@@ -3268,7 +3229,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         for (itm = u->items; itm; itm = itm->next) {
             if (itm->type->rtype->atype) {
                 if (i_canuse(u, itm->type)) {
-                    struct armor *adata = (struct armor *)malloc(sizeof(armor)), **aptr;
+                    struct armor *adata = malloc(sizeof(armor)), **aptr;
                     adata->atype = itm->type->rtype->atype;
                     adata->count = itm->number;
                     for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
