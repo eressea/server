@@ -167,6 +167,9 @@ static order *monster_attack(unit * u, const unit * target)
 {
     assert(u->region == target->region);
     assert(u->faction != target->faction);
+    if (is_paused(target->faction)) {
+        return NULL;
+    }
     if (!cansee(u->faction, u->region, target, 0)) {
         return NULL;
     }
