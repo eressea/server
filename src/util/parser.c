@@ -24,6 +24,8 @@ typedef struct parse_state {
 
 static parse_state *states;
 
+#define TRIMMED(wc) (iswspace(wc) || iswcntrl(wc) || (wc) == 160 || (wc) == 8199 || (wc) == 8239)
+
 static int ltrim(const char **str_p)
 {
     int ret = 0;
@@ -35,7 +37,7 @@ static int ltrim(const char **str_p)
     while (*str) {
         unsigned char uc = *(unsigned char *)str;
         if (~uc & 0x80) {
-            if (iswgraph(uc)) break;
+            if (!TRIMMED(uc)) break;
             ++str;
         }
         else {
@@ -44,7 +46,7 @@ static int ltrim(const char **str_p)
                 log_warning("illegal character sequence in UTF8 string: %s\n", str);
                 break;
             }
-            if (iswgraph(wc)) break;
+            if (!TRIMMED(wc)) break;
             str += len;
         }
     }
