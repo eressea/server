@@ -22,6 +22,7 @@ extern "C" {
     int getint(void);
     int getid(void);
     unsigned int atoip(const char *s);
+    int ltrim(const char **str_p);
 
 #ifdef __cplusplus
 }

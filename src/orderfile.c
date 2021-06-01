@@ -95,51 +95,55 @@ static void handle_unit(void *userData, int no) {
 
 static void handle_order(void *userData, const char *str) {
     parser_state *state = (parser_state *)userData;
-    const char * tok, *input = str;
+    const char * tok, *input;
     char buffer[64];
     const struct locale *lang;
-    param_t p;
     faction * f = state->f;
 
     lang = f ? f->locale : default_locale;
+    ltrim(&str);
+    if (*str == 0) return;
+    input = str;
     tok = parse_token(&input, buffer, sizeof(buffer));
-    p = findparam(tok, lang);
-    if (p == P_FACTION || p == P_GAMENAME) {
-        tok = parse_token(&input, buffer, sizeof(buffer));
-        if (tok) {
-            int no = atoi36(tok);
+    if (tok) {
+        param_t p = findparam(tok, lang);
+        if (p == P_FACTION || p == P_GAMENAME) {
             tok = parse_token(&input, buffer, sizeof(buffer));
-            handle_faction(userData, no, tok);
+            if (tok) {
+                int no = atoi36(tok);
+                tok = parse_token(&input, buffer, sizeof(buffer));
+                handle_faction(userData, no, tok);
+            }
+            else {
+                /* TODO: log_error() */
+            }
         }
-        else {
-            /* TODO: log_error() */
+        else if (p == P_UNIT) {
+            tok = parse_token(&input, buffer, sizeof(buffer));
+            if (tok) {
+                int no = atoi36(tok);
+                handle_unit(userData, no);
+            }
         }
-    }
-    else if (p == P_UNIT) {
-        tok = parse_token(&input, buffer, sizeof(buffer));
-        if (tok) {
-            int no = atoi36(tok);
-            handle_unit(userData, no);
+        else if (p == P_NEXT) {
+            state->f = NULL;
+            state->u = NULL;
+            state->next_order = NULL;
         }
-    }
-    else if (p == P_NEXT) {
-        state->f = NULL;
-        state->u = NULL;
-        state->next_order = NULL;
-    }
-    else if (p == P_REGION) {
-        state->u = NULL;
-        state->next_order = NULL;
-    }
-    else if (state->u) {
-        unit * u = state->u;
-        order * ord = parse_order(str, lang);
-        if (ord) {
-            *state->next_order = ord;
-            state->next_order = &ord->next;
+        else if (p == P_REGION) {
+            state->u = NULL;
+            state->next_order = NULL;
         }
-        else {
-            ADDMSG(&u->faction->msgs, msg_message("parse_error", "unit command", u, str));
+        else if (state->u) {
+            unit *u = state->u;
+            order *ord = parse_order(str, lang);
+            if (ord) {
+                *state->next_order = ord;
+                state->next_order = &ord->next;
+            }
+            else {
+                ADDMSG(&u->faction->msgs, msg_message("parse_error", "unit command", u, str));
+            }
         }
     }
 }
