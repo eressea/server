@@ -24,7 +24,7 @@ typedef struct parse_state {
 
 static parse_state *states;
 
-static int eatwhitespace_c(const char **str_p)
+static int ltrim(const char **str_p)
 {
     int ret = 0;
     wint_t wc;
@@ -32,11 +32,10 @@ static int eatwhitespace_c(const char **str_p)
     const char *str = *str_p;
 
     /* skip over potential whitespace */
-    for (;;) {
-        unsigned char utf8_character = (unsigned char)*str;
-        if (~utf8_character & 0x80) {
-            if (!iswspace(utf8_character))
-                break;
+    while (*str) {
+        unsigned char uc = *(unsigned char *)str;
+        if (~uc & 0x80) {
+            if (!iswspace(uc)) break;
             ++str;
         }
         else {
@@ -45,8 +44,8 @@ static int eatwhitespace_c(const char **str_p)
                 log_warning("illegal character sequence in UTF8 string: %s\n", str);
                 break;
             }
-            if (!iswspace(wc))
-                break;
+            if (iswgraph(wc)) break;
+            if (iswalnum(wc)) break;
             str += len;
         }
     }
@@ -94,7 +93,7 @@ void parser_popstate(void)
 bool parser_end(void)
 {
     if (states->current_token) {
-        eatwhitespace_c(&states->current_token);
+        ltrim(&states->current_token);
         return *states->current_token == 0;
     }
     return true;
@@ -103,7 +102,7 @@ bool parser_end(void)
 void skip_token(void)
 {
     char quotechar = 0;
-    eatwhitespace_c(&states->current_token);
+    ltrim(&states->current_token);
 
     while (*states->current_token) {
         wint_t wc;
@@ -152,7 +151,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     if (!ctoken) {
         return 0;
     }
-    eatwhitespace_c(&ctoken);
+    ltrim(&ctoken);
     if (!*ctoken) {
         if (buflen > 0) {
             *cursor = 0;
