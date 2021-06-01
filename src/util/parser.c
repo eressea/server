@@ -35,9 +35,9 @@ static int ltrim(const char **str_p)
 
     /* skip over potential whitespace */
     while (*str) {
-        unsigned char uc = *(unsigned char *)str;
-        if (~uc & 0x80) {
-            if (!TRIMMED(uc)) break;
+        wc = *(unsigned char *)str;
+        if (~wc & 0x80) {
+            if (!TRIMMED(wc)) break;
             ++str;
         }
         else {
