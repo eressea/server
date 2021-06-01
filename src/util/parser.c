@@ -35,7 +35,7 @@ static int ltrim(const char **str_p)
     while (*str) {
         unsigned char uc = *(unsigned char *)str;
         if (~uc & 0x80) {
-            if (!iswspace(uc)) break;
+            if (iswgraph(uc)) break;
             ++str;
         }
         else {
@@ -45,7 +45,6 @@ static int ltrim(const char **str_p)
                 break;
             }
             if (iswgraph(wc)) break;
-            if (iswalnum(wc)) break;
             str += len;
         }
     }

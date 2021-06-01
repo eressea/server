@@ -92,8 +92,14 @@ static void test_parse_token_limit_utf8(CuTest *tc) {
     char lbuf[8];
     const char *tok;
     const char *orig = "a\xc3\xa4\xc3\xb6\xc3\xbc\xc3\x9f"; /* auml ouml uuml szlig, 8 bytes long */
-    const char *str = orig+1;
+    const char *str;
+    const char *wspace = " \x07\xc2\xa0\t.okay";
 
+    str = wspace;
+    tok = parse_token(&str, lbuf, sizeof(lbuf));
+    CuAssertStrEquals(tc, tok, ".okay");
+
+    str = orig + 1;
     tok = parse_token(&str, lbuf, sizeof(lbuf));
     CuAssertPtrEquals(tc, (void *)(orig + strlen(orig)), (void *)str);
     CuAssertStrEquals(tc, tok, "\xc3\xa4\xc3\xb6\xc3\xbc"); /* just three letters fit, 6 bytes long */
