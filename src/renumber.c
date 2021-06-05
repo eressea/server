@@ -162,7 +162,7 @@ int renumber_cmd(unit * u, order * ord)
     case P_BUILDING:
     case P_GEBAEUDE:
         if (!u->building) {
-            cmistake(u, ord, 145, MSG_EVENT);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "not_in_building", ""));
             break;
         }
         if (building_owner(u->building) != u) {

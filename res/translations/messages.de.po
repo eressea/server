@@ -207,7 +207,7 @@ msgid "curseinfo::Feuerwand"
 msgstr "Eine Feuerwand blockiert die Ein- und Ausreise. ($int36($id))"
 
 msgid "renamed_building_notseen"
-msgstr "\"$building($building) in $region($region) bekommt einen Spitznamen.\""
+msgstr "\"$building($renamed) in $region($region) bekommt einen Spitznamen.\""
 
 msgid "heroes_race"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) können keine Helden erwählen.\""
@@ -303,6 +303,9 @@ msgid "itemcloak"
 msgstr "\"$unit($mage) legt einen Schleier um die Ausrüstung von $unit.dative($target).\""
 
 msgid "error5"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
+
+msgid "not_building_owner"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
 
 msgid "para_tactics_lost"
@@ -417,7 +420,7 @@ msgid "dumbeffect"
 msgstr "\"$unit($unit) vergisst durch Dumpfbackenbrot $int($weeks) Wochen des Talentes $skill($skill).\""
 
 msgid "renamed_ship_seen"
-msgstr "\"Die $ship($ship) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
+msgstr "\"Die $ship($renamed) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
 
 msgid "error126"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht verkaufen.\""
@@ -521,13 +524,13 @@ msgstr "\"Eine gewaltige Flutwelle verschlingt $unit($unit) in $region($region).
 msgid "error14"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist auf hoher See.\""
 
-msgid "renamed_notseen"
+msgid "renamed_unit_notseen"
 msgstr "\"$unit($renamed) in $region($region) bekommt einen Spitznamen.\""
 
 msgid "curseinfo::goodmagicresistancezone"
 msgstr "\"Die natürliche Widerstandskraft gegen Verzauberung bestimmter Einheiten in dieser Region wurde gestärkt. ($int36($id))\""
 
-msgid "error66"
+msgid "faction_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei wurde nicht gefunden.\""
 
 msgid "error88"
@@ -575,7 +578,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Region ist 
 msgid "para_lineup_battle"
 msgstr "\"Einheiten vor der $int($turn). Runde:\""
 
-msgid "error245"
+msgid "ship_renamed"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat schon einen Namen.\""
 
 msgid "sp_chaosrow_effect_0"
@@ -710,6 +713,9 @@ msgstr "\"$unit($unit) nimmt Schaden durch den Giftelementar in $region($region)
 msgid "error144"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf keinem Schiff.\""
 
+msgid "not_in_ship"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist auf keinem Schiff.\""
+
 msgid "magicboost_effect"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Sphären des Chaos geben dem Magier einen Teil ihrer Kraft.\""
 
@@ -782,7 +788,7 @@ msgstr "\"$unit($unit) bekommt von einer Schlange einen Apfel angeboten. ($int36
 msgid "skill_needed"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dazu braucht man das Talent $skill($skill).\""
 
-msgid "renamed_seen"
+msgid "renamed_unit_seen"
 msgstr "\"$unit($renamed) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
 
 msgid "analyse_unit_nospell"
@@ -848,7 +854,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit mu�
 msgid "error_herorecruit"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Helden können nicht rekrutieren.\""
 
-msgid "error109"
+msgid "name_what"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Einheit, eine Region oder eine Partei benannt werden soll.\""
 
 msgid "msg_event"
@@ -872,7 +878,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Leere Einheiten
 msgid "curseinfo::sparkle_7"
 msgstr "\"Die Frauen des nahegelegenen Dorfes bewundern $unit($unit) verstohlen. ($int36($id))\""
 
-msgid "error110"
+msgid "display_what"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man muß angeben, ob eine Burg, ein Schiff, eine Region oder eine Einheit beschrieben werden soll.\""
 
 msgid "curseinfo::sparkle_18"
@@ -1149,7 +1155,7 @@ msgid "plant_skills"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Man benötigt mindestens $int($minskill) $skill($skill), um $resource($product,0) zu pflanzen.\""
 
 msgid "renamed_ship_notseen"
-msgstr "\"Die $ship($ship) in $region($region) bekommt einen Spitznamen.\""
+msgstr "\"Die $ship($renamed) in $region($region) bekommt einen Spitznamen.\""
 
 msgid "error123"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas hat die Einheit nicht.\""
@@ -1268,7 +1274,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Einheit ka
 msgid "cast_rally_effect"
 msgstr "\"$unit($mage) besänftigt den Bauernaufstand in $region($region).\""
 
-msgid "error246"
+msgid "building_renamed"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude hat schon einen Namen.\""
 
 msgid "stealaura_fail"
@@ -1436,7 +1442,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wohin soll die 
 msgid "curseinfo::building_unknown"
 msgstr "\"Ein unbekannter Zauber liegt auf dem Gebäude. ($int36($id))\""
 
-msgid "error145"
+msgid "not_in_building"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Burg.\""
 
 msgid "piratenovictim"
@@ -1509,7 +1515,7 @@ msgid "battle_row"
 msgstr "\"... in der $int($row). Kampflinie:\""
 
 msgid "renamed_faction_seen"
-msgstr "\"Die Partei bekommt von $unit.dative($unit) in $region($region) einen Spitznamen.\""
+msgstr "\"Die Partei bekommt von $unit.dative($renamer) in $region($region) einen Spitznamen.\""
 
 msgid "error_not_on_undead"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber kann nicht auf Untote gezaubert werden.\""
@@ -1526,9 +1532,6 @@ msgstr "\"$unit($unit) ist im Traum eine Fee erschienen. ($int36($id))\""
 msgid "rust_effect_0"
 msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte.\""
 
-msgid "error1222"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
-
 msgid "header_battle"
 msgstr "\"In $region($region) findet ein Kampf statt.\""
 
@@ -1536,6 +1539,9 @@ msgid "wormhole_dissolve"
 msgstr "\"Das Wurmloch in $region($region) schließt sich.\""
 
 msgid "error12"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht.\""
+
+msgid "not_ship_owner"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff gehört uns nicht.\""
 
 msgid "error34"
@@ -1653,6 +1659,9 @@ msgid "error53"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine Tränke herstellen.\""
 
 msgid "error20"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff wurde nicht gefunden.\""
+
+msgid "ship_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff wurde nicht gefunden.\""
 
 msgid "error42"
@@ -1802,7 +1811,7 @@ msgstr "\"$resource($item,1) (Gewicht: $weight($weight)): $description\""
 msgid "error128"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann die Partei nicht aufnehmen.\""
 
-msgid "error247"
+msgid "faction_renamed"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Partei hat schon einen Namen.\""
 
 msgid "spellfail_generous"
@@ -2183,6 +2192,9 @@ msgstr "\"$unit($unit) tötete $int($dead) Krieger.\""
 msgid "error6"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude wurde nicht gefunden.\""
 
+msgid "building_not_found"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude wurde nicht gefunden.\""
+
 msgid "sailnolandingstorm"
 msgstr "\"Die Mannschaft der $ship($ship) kann in letzter Sekunde verhindern, dass das Schiff in $region($region) auf Land aufläuft.\""
 
@@ -2334,7 +2346,7 @@ msgid "curseinfo::sparkle_6"
 msgstr "\"$unit($unit) findet eine kleine Flöte, die eine wundersame Melodie spielt. ($int36($id))\""
 
 msgid "renamed_building_seen"
-msgstr "\"$building($building) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
+msgstr "\"$building($renamed) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
 
 msgid "sp_shadowknights_effect"
 msgstr "\"$unit($mage) beschwört Trugbilder herauf.\""
@@ -2609,7 +2621,7 @@ msgstr "\"Die $ship($ship) wurde von $ship($follower) verfolgt.\""
 msgid "unitnotfound_id"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheit $id wurde nicht gefunden.\""
 
-msgid "error244"
+msgid "unit_renamed"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat schon einen Namen.\""
 
 msgid "use_tacticcrystal"
@@ -2732,7 +2744,7 @@ msgstr "\"$unit($mage) meint, dass auf $ship($ship) kein Zauber liegt.\""
 msgid "error257"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ungültiges Locale.\""
 
-msgid "error147"
+msgid "not_region_owner"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist nicht Burgherr der größten Burg in der Region.\""
 
 msgid "unknowndirection"
@@ -2803,4 +2815,16 @@ msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $
 
 msgid "sp_eternizewall_effect"
 msgstr "\"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde von $region($region) in die Mauern von $building($building).\""
+
+msgid "foreign_not_allowed"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - BENENNE FREMD hierfür nicht erlaubt.\""
+
+msgid "not_in_group"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist in keiner Gruppe.\""
+
+msgid "not_in_alliance"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Deine Partei ist in keiner Allianz.\""
+
+msgid "not_alliance_owner"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Du bist nicht der Anführer der Allianz.\""
 

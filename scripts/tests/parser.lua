@@ -165,7 +165,7 @@ function test_build_castle()
     process_orders()
     assert_not_nil(u.building)
     assert_equal(1, u.building.size)
-    assert_equal(u.building.name, "Burg")
+    assert_equal(u.building.name, "Burg " .. itoa36(u.building.id))
 end
 
 function test_route()

@@ -2272,47 +2272,50 @@
   </message>
   <message name="renamed_faction_notseen" section="events">
     <type>
+      <arg name="renamed" type="faction"/>
+      <arg name="region" type="region"/>
   </type>
   </message>
   <message name="renamed_faction_seen" section="events">
     <type>
-      <arg name="unit" type="unit"/>
+      <arg name="renamed" type="faction"/>
       <arg name="region" type="region"/>
+      <arg name="renamer" type="unit"/>
     </type>
   </message>
   <message name="renamed_building_notseen" section="events">
     <type>
-      <arg name="building" type="building"/>
+      <arg name="renamed" type="building"/>
       <arg name="region" type="region"/>
     </type>
   </message>
   <message name="renamed_building_seen" section="events">
     <type>
-      <arg name="building" type="building"/>
+      <arg name="renamed" type="building"/>
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
   </message>
   <message name="renamed_ship_notseen" section="events">
     <type>
-      <arg name="ship" type="ship"/>
+      <arg name="renamed" type="ship"/>
       <arg name="region" type="region"/>
     </type>
   </message>
   <message name="renamed_ship_seen" section="events">
     <type>
-      <arg name="ship" type="ship"/>
+      <arg name="renamed" type="ship"/>
       <arg name="region" type="region"/>
       <arg name="renamer" type="unit"/>
     </type>
   </message>
-  <message name="renamed_notseen" section="events">
+  <message name="renamed_unit_notseen" section="events">
     <type>
       <arg name="renamed" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
-  <message name="renamed_seen" section="events">
+  <message name="renamed_unit_seen" section="events">
     <type>
       <arg name="renamed" type="unit"/>
       <arg name="region" type="region"/>
@@ -3263,28 +3266,28 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error247" section="errors">
+  <message name="faction_renamed" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error246" section="errors">
+  <message name="building_renamed" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error245" section="errors">
+  <message name="ship_renamed" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error244" section="errors">
+  <message name="unit_renamed" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4115,7 +4118,7 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error147" section="errors">
+  <message name="not_region_owner" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4129,7 +4132,7 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error145" section="errors">
+  <message name="not_in_building" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4137,6 +4140,13 @@
     </type>
   </message>
   <message name="error144" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="not_in_ship" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4346,14 +4356,14 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error110" section="errors">
+  <message name="display_what" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error109" section="errors">
+  <message name="name_what" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4704,7 +4714,7 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error66" section="errors">
+  <message name="faction_not_found" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -5114,6 +5124,13 @@
       <arg name="command" type="order"/>
     </type>
   </message>
+  <message name="ship_not_found" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
   <message name="error19" section="errors">
     <type>
       <arg name="unit" type="unit"/>
@@ -5178,7 +5195,14 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error1222" section="errors">
+  <message name="not_ship_owner" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="not_building_owner" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -5221,6 +5245,13 @@
     </type>
   </message>
   <message name="error6" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+  <message name="building_not_found" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -6391,6 +6422,38 @@
       <arg name="number" type="int"/>
       <arg name="target" type="region"/>
       <arg name="growl" type="string"/>
+    </type>
+  </message>
+
+  <message name="foreign_not_allowed" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="not_in_group" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="not_in_alliance" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="not_alliance_owner" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
     </type>
   </message>
 

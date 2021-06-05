@@ -28,8 +28,7 @@ extern "C" {
     void deliverMail(struct faction *f, struct region *r, struct unit *u,
         const char *s, struct unit *receiver);
 
-    bool renamed_building(const struct building * b);
-    int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
+    bool renamed_thing(const char *name, const char *typename);
     void get_food(struct region * r);
 
     int enter_building(struct unit *u, struct order *ord, int id, bool report);
