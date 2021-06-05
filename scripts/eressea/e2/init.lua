@@ -66,7 +66,6 @@ local sets = {
     ['seed_seaserpent'] = {
         ['skills'] = {
             ['magic'] = 4,
-            ['stealth'] = 2,
             ['stamina'] = 1,
             ['perception'] = 3,
         }
