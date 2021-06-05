@@ -575,3 +575,8 @@ int rc_get_mask(char *list) {
     }
     return mask;
 }
+
+bool rc_can_learn(const race *rc, skill_t sk) {
+    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
+    return rc->bonus[sk] > -99;
+}

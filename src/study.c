@@ -472,8 +472,7 @@ bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
     if (sk < 0 || sk >= MAXSKILLS) {
         err = 77;
     }
-    /* Hack: Talente mit Malus -99 koennen nicht gelernt werden */
-    else if (rc->bonus[sk] == -99) {
+    else if (!rc_can_learn(rc, sk)) {
         err = 771;
     }
     else {

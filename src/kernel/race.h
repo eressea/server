@@ -172,6 +172,7 @@ extern "C" {
     void rc_set_param(struct race *rc, const char *key, const char *value);
 
     int rc_luxury_trade(const struct race *rc);
+    bool rc_can_learn(const race *rc, skill_t sk);
     int rc_herb_trade(const struct race *rc);
     variant rc_magres(const struct race *rc);
     double rc_maxaura(const struct race *rc);

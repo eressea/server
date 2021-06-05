@@ -599,7 +599,7 @@ static order *monster_learn(unit * u)
     c = 0;
 
     for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        if (sv->level > 0) {
+        if (sv->level > 0 && rc_can_learn(u->_race, sv->id)) {
             if (++c == n) {
                 return create_order(K_STUDY, lang, "'%s'", skillname(sv->id, lang));
             }

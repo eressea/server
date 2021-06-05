@@ -875,8 +875,9 @@ static void test_visible_unit(CuTest* tc) {
     f = test_create_faction();
     rc = test_create_race("smurf");
     rc->flags |= RCF_UNARMEDGUARD;
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
 
+    /* visibility on land */
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
     CuAssertTrue(tc, cansee(f, u->region, u, 0));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_spell));
@@ -885,25 +886,49 @@ static void test_visible_unit(CuTest* tc) {
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse_land));
-
-    CuAssertTrue(tc, !visible_unit(u, f, -2, seen_lighthouse));
+    /* weight makes no difference on land */
     rc->weight = 5000;
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse_land));
+    /* stealth makes you invisible */
+    set_level(u, SK_STEALTH, 2);
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_unit));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_travel));
 
+    /* visibility of stealthed units in oceans */
+    u = test_create_unit(u->faction, test_create_ocean(0, 1));
+    set_level(u, SK_STEALTH, 2);
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
+    rc->weight = 4999;
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_unit));
     u->ship = sh = test_create_ship(u->region, NULL);
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
+    CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
     u->ship = NULL;
 
+    /* guards can always be seen */
     setguard(u, true);
     CuAssertTrue(tc, is_guard(u));
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
     setguard(u, false);
 
     u->building = b = test_create_building(u->region, NULL);
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_travel));
-    CuAssertTrue(tc, visible_unit(u, f, -2, seen_lighthouse));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_travel));
+    CuAssertTrue(tc, visible_unit(u, f, 0, seen_lighthouse));
     u->building = NULL;
 
     set_level(u, SK_STEALTH, 1);
