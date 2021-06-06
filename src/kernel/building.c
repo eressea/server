@@ -617,7 +617,7 @@ unit *building_owner(const building * bld)
 
 void building_update_owner(building * bld) {
     unit * owner = bld->_owner;
-    bld->_owner = building_owner_ex(bld, owner ? owner->faction : 0);
+    bld->_owner = building_owner_ex(bld, owner ? owner->faction : NULL);
 }
 
 const char *building_getname(const building * self)

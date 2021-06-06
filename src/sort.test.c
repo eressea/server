@@ -1,9 +1,11 @@
 #include "sort.h"
 
+#include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/unit.h"
 #include "kernel/order.h"
 #include "kernel/region.h"
+#include "kernel/ship.h"
 
 #include "util/base36.h"
 #include "util/keyword.h"
@@ -57,10 +59,75 @@ static void test_sort_before(CuTest *tc) {
     test_teardown();
 }
 
+static void test_sort_before_owner(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    building *b;
+    ship *sh;
+
+    test_setup();
+    u1 = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    b = test_create_building(r, NULL);
+    sh = test_create_ship(r, NULL);
+
+    u2 = test_create_unit(f, r);
+    unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
+        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+    u1->building = b;
+    building_update_owner(b);
+    CuAssertPtrEquals(tc, u1, r->units);
+    CuAssertPtrEquals(tc, u2, u1->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+
+    /* nothing happens: */
+    restack_units();
+    CuAssertPtrEquals(tc, u1, r->units);
+    CuAssertPtrEquals(tc, u2, u1->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error259"));
+    test_clear_messagelist(&f->msgs);
+
+    /* u2 must be in the same building: */
+    u2->building = b;
+    restack_units();
+    CuAssertPtrEquals(tc, u1, r->units);
+    CuAssertPtrEquals(tc, u2, u1->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error261"));
+    test_clear_messagelist(&f->msgs);
+
+    u1->building = NULL;
+    u2->building = NULL;
+    building_update_owner(b);
+    u1->ship = sh;
+    ship_update_owner(sh);
+
+    /* nothing happens: */
+    restack_units();
+    CuAssertPtrEquals(tc, u1, r->units);
+    CuAssertPtrEquals(tc, u2, u1->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error259"));
+    test_clear_messagelist(&f->msgs);
+
+    /* u2 must be in the same ship: */
+    u2->ship = sh;
+    restack_units();
+    CuAssertPtrEquals(tc, u1, r->units);
+    CuAssertPtrEquals(tc, u2, u1->next);
+    CuAssertPtrEquals(tc, NULL, u2->next);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error261"));
+    test_clear_messagelist(&f->msgs);
+
+    test_teardown();
+}
+
 
 CuSuite *get_sort_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_sort_before_owner);
     SUITE_ADD_TEST(suite, test_sort_after);
     SUITE_ADD_TEST(suite, test_sort_before);
     return suite;
