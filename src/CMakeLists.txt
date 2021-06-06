@@ -113,6 +113,7 @@ set (ERESSEA_SRC
   renumber.c
   report.c
   reports.c
+  sort.c
   spells.c
   spy.c
   steal.c
@@ -237,6 +238,7 @@ set(TESTS_SRC
   renumber.test.c
   report.test.c
   reports.test.c
+  sort.test.c
   spells.test.c
   spy.test.c
   study.test.c

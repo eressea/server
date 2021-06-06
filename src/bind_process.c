@@ -10,6 +10,7 @@
 #include "magic.h"
 #include "market.h"
 #include "move.h"
+#include "sort.h"
 #include "study.h"
 
 #include <kernel/alliance.h>

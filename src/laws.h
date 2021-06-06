@@ -44,7 +44,6 @@ extern "C" {
     void defaultorders(void);
     void quit(void);
     void monthly_healing(void);
-    void restack_units(void);
     void update_long_order(struct unit *u);
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
