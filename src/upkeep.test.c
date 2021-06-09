@@ -4,6 +4,7 @@
 #include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
@@ -137,6 +138,25 @@ void test_upkeep_from_friend(CuTest * tc)
     test_teardown();
 }
 
+void test_lifestyle(CuTest *tc)
+{
+    unit *u;
+    race *rc;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertIntEquals(tc, 10, lifestyle(u));
+    u->number = 2;
+    CuAssertIntEquals(tc, 20, lifestyle(u));
+    rc = test_create_race("smurf");
+    rc->maintenance = 15;
+    u_setrace(u, rc);
+    CuAssertIntEquals(tc, 30, lifestyle(u));
+    u->faction->flags |= FFL_PAUSED;
+    CuAssertIntEquals(tc, 0, lifestyle(u));
+    test_teardown();
+}
+
 void test_upkeep_free(CuTest * tc)
 {
     region *r;
@@ -168,5 +188,6 @@ CuSuite *get_upkeep_suite(void)
     SUITE_ADD_TEST(suite, test_upkeep_from_friend);
     SUITE_ADD_TEST(suite, test_upkeep_hunger_damage);
     SUITE_ADD_TEST(suite, test_upkeep_free);
+    SUITE_ADD_TEST(suite, test_lifestyle);
     return suite;
 }

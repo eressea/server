@@ -392,6 +392,9 @@ void economics(region * r)
 
     for (u = r->units; u; u = u->next) {
         order *ord;
+
+        if (is_paused(u->faction)) continue;
+
         if (u->number > 0) {
             order* transfer = NULL;
             for (ord = u->orders; ord; ord = ord->next) {
@@ -428,6 +431,8 @@ void destroy(region *r) {
     for (u = r->units; u; u = u->next) {
         order *ord = u->thisorder;
         keyword_t kwd = getkeyword(ord);
+
+        if (is_paused(u->faction)) continue;
         if (kwd == K_DESTROY) {
             if (destroy_cmd(u, ord) == 0) {
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
@@ -2299,7 +2304,7 @@ void auto_work(region * r)
     long total = 0;
 
     for (u = r->units; u; u = u->next) {
-        if (!(u->flags & UFL_LONGACTION) && !is_monsters(u->faction)) {
+        if (long_order_allowed(u, false) && !is_monsters(u->faction)) {
             int work = work_cmd(u, NULL, &nextrequest);
             if (work) {
                 total += work;
@@ -2403,17 +2408,17 @@ void produce(struct region *r)
         bool trader = false;
         keyword_t todo;
 
-        if (fval(u, UFL_LONGACTION))
-            continue;
-
-        if (u_race(u) == rc_insect && r_insectstalled(r) &&
-            !is_cursed(u->attribs, &ct_insectfur))
-            continue;
+        if (!long_order_allowed(u, false)) continue;
 
         if (fval(u, UFL_LONGACTION) && u->thisorder == NULL) {
             /* this message was already given in laws.c:update_long_order
                cmistake(u, u->thisorder, 52, MSG_PRODUCE);
                */
+            continue;
+        }
+
+        if (u_race(u) == rc_insect && r_insectstalled(r) &&
+            !is_cursed(u->attribs, &ct_insectfur)) {
             continue;
         }
 

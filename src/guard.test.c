@@ -97,6 +97,12 @@ static void test_is_guard(CuTest * tc)
     set_level(ug, SK_MELEE, 1);
     CuAssertIntEquals(tc, 1, armedmen(ug, false));
     CuAssertTrue(tc, is_guard(ug));
+
+    ug->faction->flags |= FFL_PAUSED;
+    CuAssertTrue(tc, !is_guard(ug));
+    i_change(&ug->items, itype, -1);
+    CuAssertIntEquals(tc, 0, armedmen(ug, false));
+    CuAssertTrue(tc, !is_guard(ug));
     test_teardown();
 }
 

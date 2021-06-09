@@ -23,13 +23,14 @@
 
 #include <assert.h>
 
-int lifestyle(const unit * u)
+int lifestyle(const unit *u)
 {
     int need;
     plane *pl;
 
-    if (is_monsters(u->faction))
+    if (is_monsters(u->faction)) {
         return 0;
+    }
 
     need = maintenance_cost(u);
 

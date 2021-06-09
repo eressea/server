@@ -13,6 +13,17 @@
 #include "util/param.h"
 #include "util/parser.h"
 
+void sort_before(unit *v, unit **up) {
+    unit *u = *up;
+    region *r = u->region;
+    unit **vp = &r->units;
+    while (*vp != v)
+        vp = &(*vp)->next;
+    *vp = u;
+    *up = u->next;
+    u->next = v;
+}
+
 void restack_units(void)
 {
     region *r;
@@ -21,7 +32,7 @@ void restack_units(void)
         bool sorted = false;
         while (*up) {
             unit *u = *up;
-            if (!fval(u, UFL_MARK)) {
+            if (!fval(u, UFL_MARK) && !is_paused(u->faction)) {
                 struct order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_SORT) {
@@ -37,7 +48,13 @@ void restack_units(void)
                         id = getid();
                         v = findunit(id);
 
-                        if (!v || v->faction != u->faction || v->region != r) {
+                        if (v == u) {
+                            syntax_error(u, ord);
+                        }
+                        else if (!v || v->region != r) {
+                            cmistake(u, ord, 258, MSG_EVENT);
+                        }
+                        else if (v->faction != u->faction && !is_paused(v->faction)) {
                             cmistake(u, ord, 258, MSG_EVENT);
                         }
                         else if (v->building != u->building || v->ship != u->ship) {
@@ -48,9 +65,6 @@ void restack_units(void)
                         }
                         else if (u->ship && ship_owner(u->ship) == u) {
                             cmistake(u, ord, 260, MSG_EVENT);
-                        }
-                        else if (v == u) {
-                            syntax_error(u, ord);
                         }
                         else {
                             switch (p) {
@@ -63,18 +77,27 @@ void restack_units(void)
                                 break;
                             case P_BEFORE:
                                 if (v->ship && ship_owner(v->ship) == v) {
-                                    cmistake(v, ord, 261, MSG_EVENT);
+                                    if (is_paused(v->faction)) {
+                                        sort_before(v, up);
+                                        ship_set_owner(u);
+                                    }
+                                    else {
+                                        cmistake(v, ord, 261, MSG_EVENT);
+                                        break;
+                                    }
                                 }
                                 else if (v->building && building_owner(v->building) == v) {
-                                    cmistake(v, ord, 261, MSG_EVENT);
+                                    if (is_paused(v->faction)) {
+                                        sort_before(v, up);
+                                        building_set_owner(u);
+                                    }
+                                    else {
+                                        cmistake(v, ord, 261, MSG_EVENT);
+                                        break;
+                                    }
                                 }
                                 else {
-                                    unit **vp = &r->units;
-                                    while (*vp != v)
-                                        vp = &(*vp)->next;
-                                    *vp = u;
-                                    *up = u->next;
-                                    u->next = v;
+                                    sort_before(v, up);
                                 }
                                 fset(u, UFL_MARK);
                                 sorted = true;

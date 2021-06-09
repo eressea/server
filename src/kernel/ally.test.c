@@ -66,12 +66,52 @@ static void test_allies_set(CuTest *tc) {
     test_teardown();
 }
 
+static void test_alliedfaction(CuTest *tc) {
+    struct faction *f1, *f2;
+
+    test_setup();
+    f1 = test_create_faction();
+    f2 = test_create_faction();
+
+    CuAssertIntEquals(tc, 0, alliedfaction(f1, f2, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_GIVE);
+    CuAssertIntEquals(tc, HELP_GIVE, alliedfaction(f1, f2, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_ALL);
+    CuAssertIntEquals(tc, HELP_ALL, alliedfaction(f1, f2, HELP_ALL));
+    f1->flags |= FFL_PAUSED;
+    CuAssertIntEquals(tc, HELP_GUARD, alliedfaction(f1, f2, HELP_ALL));
+
+    test_teardown();
+}
+
+static void test_alliedunit(CuTest *tc) {
+    struct faction *f2, *f1;
+    struct unit *u;
+
+    test_setup();
+    u = test_create_unit(f1 = test_create_faction(), test_create_plain(0, 0));
+    f2 = test_create_faction();
+
+    CuAssertIntEquals(tc, 0, alliedunit(u, f2, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_GIVE);
+    CuAssertIntEquals(tc, HELP_GIVE, alliedunit(u, f2, HELP_ALL));
+    ally_set(&f1->allies, f2, HELP_ALL);
+    CuAssertIntEquals(tc, HELP_ALL, alliedunit(u, f2, HELP_ALL));
+    f1->flags |= FFL_PAUSED;
+    CuAssertIntEquals(tc, HELP_GUARD, alliedunit(u, f2, HELP_ALL));
+
+    test_teardown();
+}
+
+
 CuSuite *get_ally_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_allies);
     SUITE_ADD_TEST(suite, test_allies_clone);
     SUITE_ADD_TEST(suite, test_allies_set);
+    SUITE_ADD_TEST(suite, test_alliedfaction);
+    SUITE_ADD_TEST(suite, test_alliedunit);
     return suite;
 }
 

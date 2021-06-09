@@ -36,12 +36,15 @@ void renumber_factions(void)
     } *renum = NULL, *rp;
     faction *f;
     for (f = factions; f; f = f->next) {
-        attrib *a = a_find(f->attribs, &at_number);
+        attrib *a;
         int want;
         struct renum **rn;
 
-        if (!a)
-            continue;
+        if (is_paused(f)) continue;
+
+        a = a_find(f->attribs, &at_number);
+        if (!a) continue;
+
         want = a->data.i;
         if (!faction_id_is_unused(want)) {
             a_remove(&f->attribs, a);
