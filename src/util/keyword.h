@@ -71,6 +71,7 @@ extern "C"
         K_PROMOTION,
         K_PAY,
         K_LOOT,
+        K_EXPEL,
         K_AUTOSTUDY,
         K_LOCALE,
         MAXKEYWORDS,

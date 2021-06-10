@@ -1,11 +1,11 @@
 {
     "keywords": {
         "en" : {
-            "plant": "PLANT",
-	    "grow": [ "GROW", "BREED" ],
-            "promote": ["PROMOTE", "PROMOTION" ],
-            "locale": ["LANGUAGE", "LOCALE"],
-            "combat": [ "COMBAT", "FIGHT" ]
+          "plant": "PLANT",
+          "grow": [ "GROW", "BREED" ],
+          "promote": ["PROMOTE", "PROMOTION" ],
+          "locale": ["LANGUAGE", "LOCALE"],
+          "combat": [ "COMBAT", "FIGHT" ]
         },
         "de": {
             "//" : "//",
@@ -36,6 +36,7 @@
             "maketemp": ["MACHE TEMP", "MACHETEMP"],
             "move" : "NACH",
             "password" : "PASSWORT",
+            "expel" : "VERTREIBE",
             "loot" : ["PLÜNDERE", "PLÜNDERN"],
             "recruit": ["REKRUTIERE", "REKRUTIEREN"],
             "reserve": ["RESERVIERE", "RESERVIEREN"],

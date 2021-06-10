@@ -119,7 +119,7 @@ int spy_cmd(unit * u, struct order *ord)
 
     if (!target) {
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, u->thisorder, "feedback_unit_not_found", ""));
+            msg_feedback(u, u->thisorder, "feedback_unit_not_found", NULL));
         return 0;
     }
     if (effskill(u, SK_SPY, NULL) < 1) {
