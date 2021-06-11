@@ -2496,6 +2496,10 @@ msgctxt "keyword"
 msgid "loot"
 msgstr "PLÜNDERE"
 
+msgctxt "keyword"
+msgid "expel"
+msgstr "VERTREIBE"
+
 msgctxt "calendar"
 msgid "month_1"
 msgstr "Feldsegen"

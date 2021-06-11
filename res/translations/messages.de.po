@@ -590,6 +590,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um in Gletscher
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit wurde nicht gefunden.\""
 
+msgid "feedback_not_inside"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kontrolliert kein Schiff oder Gebäude.\""
+
 msgid "error206"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Gebäude liegt bereits so ein Zauber.\""
 

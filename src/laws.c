@@ -3939,11 +3939,12 @@ void init_processor(void)
         add_proc_global(p, defaultorders, "Defaults setzen");
     }
     add_proc_global(p, demographics, "Nahrung, Seuchen, Wachstum, Wanderung");
+    p += 10;
 
     if (!keyword_disabled(K_SORT)) {
-        p += 10;
-        add_proc_global(p, restack_units, "Einheiten sortieren");
+        add_proc_region(p, do_sort, "Einheiten sortieren");
     }
+    add_proc_order(p, K_EXPEL, expel_cmd, 0, "Einheiten verjagen");
     if (!keyword_disabled(K_NUMBER)) {
         add_proc_order(p, K_NUMBER, renumber_cmd, 0, "Neue Nummern (Einheiten)");
         p += 10;
@@ -4184,6 +4185,69 @@ int locale_cmd(unit * u, order * ord)
         if (lang && lang != f->locale) {
             change_locale(f, lang, del);
         }
+    }
+    return 0;
+}
+
+static void expel_building(unit *u, unit *u2, order *ord) {
+    building *b = u->building;
+
+    if (u != building_owner(b)) {
+        /* error: must be the owner */
+        cmistake(u, ord, 5, MSG_EVENT);
+    }
+    else {
+        if (leave(u2, true)) {
+            message *msg = msg_message("force_leave_building", "owner unit building", u, u2, u->building);
+            add_message(&u->faction->msgs, msg);
+            add_message(&u2->faction->msgs, msg);
+            msg_release(msg);
+        }
+    }
+}
+
+static void expel_ship(unit *u, unit *u2, order *ord) {
+    ship *sh = u->ship;
+    if (u != ship_owner(sh)) {
+        /* error: must be the owner */
+        cmistake(u, ord, 146, MSG_EVENT);
+    }
+    else if (!u->region->land) {
+        /* error: must not be at sea */
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "error_onlandonly", NULL));
+    }
+    else {
+        if (leave(u2, true)) {
+            message *msg = msg_message("force_leave_ship", "owner unit ship", u, u2, u->ship);
+            add_message(&u->faction->msgs, msg);
+            add_message(&u2->faction->msgs, msg);
+            msg_release(msg);
+        }
+    }
+}
+
+int expel_cmd(unit *u, order *ord) {
+    faction *f = u->faction;
+    unit *u2;
+    init_order(ord, f->locale);
+    getunit(u->region, u->faction, &u2);
+    if (u2 == NULL) {
+        /* error: target unit not found */
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "feedback_unit_not_found", NULL));
+        return 0;
+    }
+    if (u->building) {
+        expel_building(u, u2, ord);
+    }
+    else if (u->ship) {
+        expel_ship(u, u2, ord);
+    }
+    else {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "feedback_not_inside", NULL));
+        /* error: unit must be owner of a ship or building */
     }
     return 0;
 }

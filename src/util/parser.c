@@ -26,7 +26,7 @@ static parse_state *states;
 
 #define TRIMMED(wc) (iswspace(wc) || iswcntrl(wc) || (wc) == 160 || (wc) == 8199 || (wc) == 8239)
 
-static int ltrim(const char **str_p)
+int ltrim(const char **str_p)
 {
     int ret = 0;
     wint_t wc;

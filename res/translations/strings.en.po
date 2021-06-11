@@ -2168,6 +2168,10 @@ msgid "loot"
 msgstr "loot"
 
 msgctxt "keyword"
+msgid "expel"
+msgstr "EXPEL"
+
+msgctxt "keyword"
 msgid "guard"
 msgstr "GUARD"
 
