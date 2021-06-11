@@ -181,21 +181,30 @@ static void test_expel_building(CuTest *tc) {
     test_setup();
     u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), u1->region);
+    ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
+
+    expel_cmd(u2, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
+    test_clear_messages(u2->faction);
+
     b = u2->building = u1->building = test_create_building(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, building_owner(b));
 
-    ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
     expel_cmd(u2, ord);
     /* Nothing happened: */
     CuAssertPtrEquals(tc, u1, building_owner(b));
     CuAssertPtrEquals(tc, b, u1->building);
     CuAssertPtrEquals(tc, b, u2->building);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error5"));
+    test_clear_messages(u1->faction);
     free_order(ord);
 
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
     expel_cmd(u1, ord);
     /* owner has expelled u2: */
     CuAssertPtrEquals(tc, NULL, u2->building);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_building"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_building"));
     test_teardown();
 }
 
@@ -207,15 +216,21 @@ static void test_expel_ship(CuTest *tc) {
     test_setup();
     u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), u1->region);
+    ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
+    expel_cmd(u2, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
+    test_clear_messages(u2->faction);
+
     sh = u2->ship = u1->ship = test_create_ship(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
 
-    ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
     expel_cmd(u2, ord);
     /* Nothing happened: */
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
     CuAssertPtrEquals(tc, sh, u1->ship);
     CuAssertPtrEquals(tc, sh, u2->ship);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error146"));
+    test_clear_messages(u2->faction);
     free_order(ord);
 
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
@@ -223,6 +238,27 @@ static void test_expel_ship(CuTest *tc) {
     /* owner has expelled u2: */
     CuAssertPtrEquals(tc, NULL, u2->ship);
     CuAssertPtrEquals(tc, sh, leftship(u2));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_ship"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_ship"));
+    test_teardown();
+}
+
+static void test_expel_ship_at_sea(CuTest *tc) {
+    unit *u1, *u2;
+    order *ord;
+    ship *sh;
+
+    test_setup();
+    u1 = test_create_unit(test_create_faction(), test_create_ocean(0, 0));
+    u2 = test_create_unit(test_create_faction(), u1->region);
+    sh = u2->ship = u1->ship = test_create_ship(u1->region, NULL);
+    CuAssertPtrEquals(tc, u1, ship_owner(sh));
+
+    ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    expel_cmd(u1, ord);
+    /* owner has not expelled u2: */
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "error_onlandonly"));
+    CuAssertPtrEquals(tc, sh, u2->ship);
     test_teardown();
 }
 
@@ -2375,6 +2411,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_display_cmd);
     SUITE_ADD_TEST(suite, test_expel_building);
     SUITE_ADD_TEST(suite, test_expel_ship);
+    SUITE_ADD_TEST(suite, test_expel_ship_at_sea);
     SUITE_ADD_TEST(suite, test_rule_force_leave);
     SUITE_ADD_TEST(suite, test_force_leave_buildings);
     SUITE_ADD_TEST(suite, test_force_leave_ships);

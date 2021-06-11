@@ -3925,21 +3925,25 @@ void force_leave(region *r, battle *b) {
         if (u->building) {
             uo = building_owner(u->building);
         }
-        if (u->ship && r->land) {
+        else if (u->ship && r->land) {
             uo = ship_owner(u->ship);
         }
-        if (uo && is_enemy(b, uo, u)) {
-            message *msg = NULL;
-            if (u->building) {
-                msg = msg_message("force_leave_building", "unit owner building", u, uo, u->building);
+        else {
+            continue;
+        }
+        if (is_enemy(b, uo, u)) {
+            if (leave(u, true)) {
+                message *msg;
+                if (uo->building) {
+                    msg = msg_message("force_leave_building", "unit owner building", u, uo, uo->building);
+                }
+                else {
+                    msg = msg_message("force_leave_ship", "unit owner ship", u, uo, uo->ship);
+                }
+                add_message(&u->faction->msgs, msg);
+                add_message(&uo->faction->msgs, msg);
+                msg_release(msg);
             }
-            else {
-                msg = msg_message("force_leave_ship", "unit owner ship", u, uo, u->ship);
-            }
-            if (msg) {
-                ADDMSG(&u->faction->msgs, msg);
-            }
-            leave(u, false);
         }
     }
 }

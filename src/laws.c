@@ -4197,7 +4197,12 @@ static void expel_building(unit *u, unit *u2, order *ord) {
         cmistake(u, ord, 5, MSG_EVENT);
     }
     else {
-        leave_building(u2);
+        if (leave(u2, true)) {
+            message *msg = msg_message("force_leave_building", "owner unit building", u, u2, u->building);
+            add_message(&u->faction->msgs, msg);
+            add_message(&u2->faction->msgs, msg);
+            msg_release(msg);
+        }
     }
 }
 
@@ -4213,7 +4218,12 @@ static void expel_ship(unit *u, unit *u2, order *ord) {
             msg_feedback(u, ord, "error_onlandonly", NULL));
     }
     else {
-        leave_ship(u2);
+        if (leave(u2, true)) {
+            message *msg = msg_message("force_leave_ship", "owner unit ship", u, u2, u->ship);
+            add_message(&u->faction->msgs, msg);
+            add_message(&u2->faction->msgs, msg);
+            msg_release(msg);
+        }
     }
 }
 
@@ -4235,6 +4245,8 @@ int expel_cmd(unit *u, order *ord) {
         expel_ship(u, u2, ord);
     }
     else {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "feedback_not_inside", NULL));
         /* error: unit must be owner of a ship or building */
     }
     return 0;

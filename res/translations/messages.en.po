@@ -590,6 +590,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build 
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit could not be found.\""
 
+msgid "feedback_unit_not_found"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not the owner of a ship or building.\""
+
 msgid "error206"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is alrady a spell on that building.\""
 
