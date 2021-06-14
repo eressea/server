@@ -1997,6 +1997,7 @@ static void test_long_order_on_ocean(CuTest *tc) {
     test_setup();
     rc = test_create_race("pikachu");
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_ocean(0, 0));
+    CuAssertTrue(tc, long_order_allowed(u, true));
     CuAssertTrue(tc, !long_order_allowed(u, false));
     rc->flags |= RCF_SWIM;
     CuAssertTrue(tc, long_order_allowed(u, false));
@@ -2007,11 +2008,10 @@ static void test_long_order_on_ocean(CuTest *tc) {
     rc = test_create_race("aquarian");
     u = test_create_unit(test_create_faction_ex(rc, NULL), u->region);
     CuAssertTrue(tc, long_order_allowed(u, false));
-    CuAssertTrue(tc, !long_order_allowed(u, true));
+    CuAssertTrue(tc, long_order_allowed(u, true));
     u->faction->flags |= FFL_PAUSED;
     CuAssertTrue(tc, !long_order_allowed(u, true));
     CuAssertTrue(tc, !long_order_allowed(u, false));
-    u->faction->flags -= FFL_PAUSED;
     test_teardown();
 }
 
