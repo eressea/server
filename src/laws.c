@@ -3609,9 +3609,9 @@ bool long_order_allowed(const unit *u, bool flags_only)
         */
         return false;
     }
+    if (flags_only) return true;
     if (fval(r->terrain, SEA_REGION) && !(u_race(u)->flags & RCF_SWIM)) {
-        if (flags_only) return false;
-        else if (u_race(u) != get_race(RC_AQUARIAN)) {
+        if (u_race(u) != get_race(RC_AQUARIAN)) {
             /* error message disabled by popular demand */
             return false;
         }
