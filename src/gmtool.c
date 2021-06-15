@@ -854,6 +854,23 @@ static void select_regions(state * st, int selectmode)
             }
         }
     }
+    else if (findmode == 'v') {
+        region *r;
+        /* fresh virgin regions */
+        sprintf(sbuffer, "%svirgin", status);
+        statusline(st->wnd_status->handle, sbuffer);
+        for (r = regions; r; r = r->next) {
+            if (r->age == 0) {
+                if (selectmode & MODE_SELECT) {
+                    select_coordinate(st->selected, r->x, r->y,
+                        selectmode == MODE_SELECT);
+                }
+                else {
+                    highlight_region(r, selectmode == MODE_MARK);
+                }
+            }
+        }
+    }
     else if (findmode == 'c') {
         region *r;
         sprintf(sbuffer, "%schaos", status);
