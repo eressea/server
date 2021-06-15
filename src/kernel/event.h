@@ -37,6 +37,11 @@ extern "C" {
         variant data;
     } event_arg;
 
+    typedef struct handler_info {
+        char *event;
+        trigger *triggers;
+    } handler_info;
+
     trigger *t_new(trigger_type * ttype);
     void t_free(trigger * t);
     void t_add(trigger ** tlist, trigger * t);
