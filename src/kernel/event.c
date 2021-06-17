@@ -105,11 +105,6 @@ int handle_triggers(trigger ** triggers, void *param)
  ** at_eventhandler
  **/
 
-typedef struct handler_info {
-    char *event;
-    trigger *triggers;
-} handler_info;
-
 static void init_handler(variant *var)
 {
     var->v = calloc(1, sizeof(handler_info));
