@@ -1184,7 +1184,7 @@ int sp_appeasement(struct castorder * co)
 
     /* Fliehende Einheiten verlassen auf jeden Fall Gebaeude und Schiffe. */
     if (!(r->terrain->flags & SEA_REGION)) {
-        leave(mage, false);
+        (void)leave(mage, false);
     }
     /* und bewachen nicht */
     setguard(mage, false);

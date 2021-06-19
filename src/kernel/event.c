@@ -29,8 +29,10 @@ void write_triggers(struct storage *store, const trigger * t)
 
 int read_triggers(struct gamedata *data, trigger ** tp)
 {
+    assert(*tp == NULL);
     for (;;) {
         trigger_type *ttype;
+        trigger *tr;
         char zText[128];
 
         READ_TOK(data->store, zText, sizeof(zText));
@@ -38,19 +40,22 @@ int read_triggers(struct gamedata *data, trigger ** tp)
             break;
         ttype = tt_find(zText);
         assert(ttype || !"unknown trigger-type");
-        *tp = t_new(ttype);
+        tr = t_new(ttype);
+        assert(tr->next == NULL);
         if (ttype->read) {
             int i = ttype->read(*tp, data);
             switch (i) {
             case AT_READ_OK:
-                tp = &(*tp)->next;
+                *tp = tr;
+                tp = &tr->next;
                 break;
             case AT_READ_FAIL:
-                t_free(*tp);
-                free(*tp);
-                *tp = NULL;
+                t_free(tr);
+                free(tr);
                 break;
             default:
+                t_free(tr);
+                free(tr);
                 assert(!"invalid return value");
                 break;
             }
