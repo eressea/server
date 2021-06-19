@@ -60,6 +60,10 @@ int read_triggers(struct gamedata *data, trigger ** tp)
                 break;
             }
         }
+        else {
+            *tp = tr;
+            tp = &tr->next;
+        }
     }
     return 0;
 }
