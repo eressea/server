@@ -59,13 +59,15 @@ int read_triggers(struct gamedata *data, trigger ** tp)
     return 0;
 }
 
-trigger *t_new(trigger_type * ttype)
+trigger *t_new(trigger_type *ttype)
 {
     trigger *t = calloc(1, sizeof(trigger));
-    if (!t) abort();
-    t->type = ttype;
-    if (ttype->initialize)
-        ttype->initialize(t);
+    if (t) {
+        t->type = ttype;
+        if (ttype->initialize) {
+            ttype->initialize(t);
+        }
+    }
     return t;
 }
 

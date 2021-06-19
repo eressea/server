@@ -85,20 +85,35 @@ trigger_type tt_changerace = {
 trigger *trigger_changerace(unit * u, const race * prace, const race * irace)
 {
     trigger *t = t_new(&tt_changerace);
-    changerace_data *td = (changerace_data *)t->data.v;
+    if (t) {
+        changerace_data *td = (changerace_data *)t->data.v;
 
-    td->u = u;
-    td->race = prace;
-    td->irace = irace;
+        td->u = u;
+        td->race = prace;
+        td->irace = irace;
+    }
     return t;
 }
 
 extern struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace) {
-    trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
-    if (trestore) {
-        add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
-        u->irace = irace;
-        u_setrace(u, urace);
+    trigger **texists = get_triggers(u->attribs, "timer");
+    trigger *tr = NULL;
+
+    if (texists) {
+        tr = *texists;
     }
-    return trestore;
+    else {
+        trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
+        if (trestore) {
+            tr = trigger_timeout(duration, trestore);
+            add_trigger(&u->attribs, "timer", tr);
+        }
+    }
+    if (tr) {
+        u->irace = irace;
+        if (urace) {
+            u_setrace(u, urace);
+        }
+    }
+    return tr;
 }

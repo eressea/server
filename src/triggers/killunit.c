@@ -61,6 +61,8 @@ trigger_type tt_killunit = {
 trigger *trigger_killunit(unit * u)
 {
     trigger *t = t_new(&tt_killunit);
-    t->data.v = (void *)u;
+    if (t) {
+        t->data.v = (void *)u;
+    }
     return t;
 }

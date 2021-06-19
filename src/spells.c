@@ -4551,7 +4551,7 @@ int sp_illusionary_shapeshift(castorder * co)
         return 0;
     }
 
-    if (NULL == change_race(u, 3 + (int)power, NULL, irace)) {
+    if (NULL == change_race(u, 3 + (int)power, NULL, rc)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_shapeshift_fail", "target race", u, rc));
         return 0;

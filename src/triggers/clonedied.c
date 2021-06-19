@@ -71,6 +71,8 @@ trigger_type tt_clonedied = {
 trigger *trigger_clonedied(unit * u)
 {
     trigger *t = t_new(&tt_clonedied);
-    t->data.v = (void *)u;
+    if (t) {
+        t->data.v = (void *)u;
+    }
     return t;
 }

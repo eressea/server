@@ -96,9 +96,11 @@ trigger_type tt_giveitem = {
 trigger *trigger_giveitem(unit * u, const item_type * itype, int number)
 {
     trigger *t = t_new(&tt_giveitem);
-    giveitem_data *td = (giveitem_data *)t->data.v;
-    td->number = number;
-    td->u = u;
-    td->itype = itype;
+    if (t) {
+        giveitem_data *td = (giveitem_data *)t->data.v;
+        td->number = number;
+        td->u = u;
+        td->itype = itype;
+    }
     return t;
 }

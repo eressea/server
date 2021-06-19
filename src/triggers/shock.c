@@ -130,6 +130,8 @@ trigger_type tt_shock = {
 trigger *trigger_shock(unit * u)
 {
     trigger *t = t_new(&tt_shock);
-    t->data.v = (void *)u;
+    if (t) {
+        t->data.v = (void *)u;
+    }
     return t;
 }

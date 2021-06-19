@@ -115,13 +115,15 @@ trigger *trigger_createcurse(struct unit * mage, struct unit * target,
     const curse_type * ct, double vigour, int duration, double effect, int men)
 {
     trigger *t = t_new(&tt_createcurse);
-    createcurse_data *td = (createcurse_data *)t->data.v;
-    td->mage = mage;
-    td->target = target;
-    td->type = ct;
-    td->vigour = vigour;
-    td->duration = duration;
-    td->effect = effect;
-    td->men = men;
+    if (t) {
+        createcurse_data *td = (createcurse_data *)t->data.v;
+        td->mage = mage;
+        td->target = target;
+        td->type = ct;
+        td->vigour = vigour;
+        td->duration = duration;
+        td->effect = effect;
+        td->men = men;
+    }
     return t;
 }

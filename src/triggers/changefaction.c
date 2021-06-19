@@ -86,8 +86,10 @@ trigger_type tt_changefaction = {
 trigger *trigger_changefaction(unit * u, struct faction * f)
 {
     trigger *t = t_new(&tt_changefaction);
-    changefaction_data *td = (changefaction_data *)t->data.v;
-    td->unit = u;
-    td->faction = f;
+    if (t) {
+        changefaction_data *td = (changefaction_data *)t->data.v;
+        td->unit = u;
+        td->faction = f;
+    }
     return t;
 }

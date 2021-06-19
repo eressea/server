@@ -79,8 +79,10 @@ trigger_type tt_timeout = {
 trigger *trigger_timeout(int time, trigger * callbacks)
 {
     trigger *t = t_new(&tt_timeout);
-    timeout_data *td = (timeout_data *)t->data.v;
-    td->triggers = callbacks;
-    td->timer = time;
+    if (t) {
+        timeout_data *td = (timeout_data *)t->data.v;
+        td->triggers = callbacks;
+        td->timer = time;
+    }
     return t;
 }

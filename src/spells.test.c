@@ -286,23 +286,43 @@ static void test_watch_region(CuTest *tc) {
 
 static void test_change_race(CuTest *tc) {
     unit *u;
-    race *rctoad;
+    race *rctoad, *rcsmurf;
     trigger **tp, *tr;
     timeout_data *td;
     changerace_data *crd;
 
     test_setup();
     rctoad = test_create_race("toad");
+    rcsmurf = test_create_race("smurf");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)u->_race);
-    CuAssertPtrNotNull(tc, change_race(u, 2, rctoad, NULL));
+    CuAssertPtrNotNull(tc, tr = change_race(u, 2, rctoad, NULL));
     CuAssertPtrEquals(tc, (void *)rctoad, (void *)u->_race);
     CuAssertPtrEquals(tc, NULL, (void *)u->irace);
+    CuAssertPtrEquals(tc, &tt_timeout, tr->type);
     CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertPtrEquals(tc, NULL, u->attribs->next);
     tp = get_triggers(u->attribs, "timer");
     CuAssertPtrNotNull(tc, tp);
-    CuAssertPtrNotNull(tc, tr = *tp);
-    CuAssertPtrEquals(tc, &tt_timeout, tr->type);
+    CuAssertPtrEquals(tc, tr, *tp);
+    CuAssertPtrEquals(tc, NULL, tr->next);
+    td = (timeout_data *)tr->data.v;
+    CuAssertPtrNotNull(tc, td);
+    CuAssertIntEquals(tc, 2, td->timer);
+    CuAssertPtrNotNull(tc, td->triggers);
+    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
+    CuAssertPtrEquals(tc, NULL, td->triggers->next);
+    crd = (changerace_data *)td->triggers->data.v;
+    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)crd->race);
+    CuAssertPtrEquals(tc, NULL, (void *)crd->irace);
+
+    /* change race, but do not add a second change_race trigger */
+    CuAssertPtrEquals(tc, tr, change_race(u, 2, rctoad, NULL));
+    CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertPtrEquals(tc, NULL, u->attribs->next);
+    CuAssertPtrEquals(tc, NULL, tr->next);
+    CuAssertPtrEquals(tc, (void *)rctoad, (void *)u->_race);
+    CuAssertPtrEquals(tc, NULL, (void *)u->irace);
     td = (timeout_data *)tr->data.v;
     CuAssertPtrNotNull(tc, td);
     CuAssertIntEquals(tc, 2, td->timer);

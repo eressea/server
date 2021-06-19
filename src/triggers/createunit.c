@@ -103,10 +103,12 @@ trigger *trigger_createunit(region * r, struct faction * f,
     const struct race * rc, int number)
 {
     trigger *t = t_new(&tt_createunit);
-    createunit_data *td = (createunit_data *)t->data.v;
-    td->r = r;
-    td->f = f;
-    td->race = rc;
-    td->number = number;
+    if (t) {
+        createunit_data *td = (createunit_data *)t->data.v;
+        td->r = r;
+        td->f = f;
+        td->race = rc;
+        td->number = number;
+    }
     return t;
 }
