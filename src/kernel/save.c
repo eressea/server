@@ -82,9 +82,6 @@
 #define MAXORDERS 256
 #define MAXPERSISTENT 128
 
-/* exported symbols symbols */
-int g_writegame = 1;
-
 static void read_alliances(gamedata *data)
 {
     storage *store = data->store;
@@ -1773,9 +1770,6 @@ int writegame(const char *filename)
     stream strm;
     FILE *F;
 
-    if (g_writegame == 0) {
-        return -1;
-    }
     create_directories();
     path_join(datapath(), filename, path, sizeof(path));
     /* make sure we don't overwrite an existing file (hard links) */

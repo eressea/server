@@ -150,13 +150,15 @@ function process(rules, orders)
   callbacks(rules, 'update')
   turn_end() -- ageing, etc.
 
-  write_files(config.locales)
-  update_scores()
+  if not config.debug then
+      write_files(config.locales)
+      update_scores()
 
-  file = '' .. get_turn() .. '.dat'
-  if eressea.write_game(file)~=0 then
-    eressea.log.error("could not write game")
-    return -1
+      file = '' .. get_turn() .. '.dat'
+      if eressea.write_game(file)~=0 then
+        eressea.log.error("could not write game")
+        return -1
+      end
   end
   return 0
 end
