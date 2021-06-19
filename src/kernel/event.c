@@ -43,7 +43,7 @@ int read_triggers(struct gamedata *data, trigger ** tp)
         tr = t_new(ttype);
         assert(tr->next == NULL);
         if (ttype->read) {
-            int i = ttype->read(*tp, data);
+            int i = ttype->read(tr, data);
             switch (i) {
             case AT_READ_OK:
                 *tp = tr;
