@@ -5,6 +5,7 @@
 
 #include <kernel/config.h>
 #include <kernel/curse.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -18,6 +19,9 @@
 #include <spells/regioncurse.h>
 
 #include <attributes/attributes.h>
+
+#include <triggers/changerace.h>
+#include <triggers/timeout.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -280,6 +284,38 @@ static void test_watch_region(CuTest *tc) {
     test_teardown();
 }
 
+static void test_change_race(CuTest *tc) {
+    unit *u;
+    race *rctoad;
+    trigger **tp, *tr;
+    timeout_data *td;
+    changerace_data *crd;
+
+    test_setup();
+    rctoad = test_create_race("toad");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)u->_race);
+    CuAssertPtrNotNull(tc, change_race(u, 2, rctoad, NULL));
+    CuAssertPtrEquals(tc, (void *)rctoad, (void *)u->_race);
+    CuAssertPtrEquals(tc, NULL, (void *)u->irace);
+    CuAssertPtrNotNull(tc, u->attribs);
+    tp = get_triggers(u->attribs, "timer");
+    CuAssertPtrNotNull(tc, tp);
+    CuAssertPtrNotNull(tc, tr = *tp);
+    CuAssertPtrEquals(tc, &tt_timeout, tr->type);
+    td = (timeout_data *)tr->data.v;
+    CuAssertPtrNotNull(tc, td);
+    CuAssertIntEquals(tc, 2, td->timer);
+    CuAssertPtrNotNull(tc, td->triggers);
+    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
+    CuAssertPtrEquals(tc, NULL, td->triggers->next);
+    crd = (changerace_data *)td->triggers->data.v;
+    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)crd->race);
+    CuAssertPtrEquals(tc, NULL, (void *)crd->irace);
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -289,5 +325,6 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);
+    SUITE_ADD_TEST(suite, test_change_race);
     return suite;
 }

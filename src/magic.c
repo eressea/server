@@ -1273,10 +1273,12 @@ static void do_fumble(castorder * co)
     unit *caster = co_get_caster(co);
     const spell *sp = co->sp;
     int level = co->level;
-    int duration;
     double effect;
     static int rc_cache;
+    static const race *rc_toad = NULL;
     fumble_f fun;
+    trigger *trestore;
+    int duration;
 
     ADDMSG(&caster->faction->msgs,
         msg_message("patzer", "unit region spell", caster, r, sp));
@@ -1293,32 +1295,26 @@ static void do_fumble(castorder * co)
         break;
 
     case 1: /* toad */
-    {
-        /* one or two things will happen: the toad changes her race back,
+        /* one or two things will happen: the toad changes its race back,
          * and may or may not get toadslime.
          * The list of things to happen are attached to a timeout
-         * trigger and that's added to the triggerlit of the mage gone toad.
+         * trigger and that's added to the triggerlist of the mage gone toad.
          */
-        static const race *rc_toad;
-        trigger *trestore = trigger_changerace(mage, u_race(mage), mage->irace);
-        if (chance(0.7)) {
-            const resource_type *rtype = rt_find("toadslime");
-            if (rtype) {
-                t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
-            }
-        }
-        duration = rng_int() % level / 2;
-        if (duration < 2) duration = 2;
-        add_trigger(&mage->attribs, "timer", trigger_timeout(duration, trestore));
         if (rc_changed(&rc_cache)) {
             rc_toad = get_race(RC_TOAD);
         }
-        u_setrace(mage, rc_toad);
-        mage->irace = NULL;
-        ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
+        duration = rng_int() % level / 2;
+        trestore = change_race(mage, duration, rc_toad, NULL);
+        if (trestore) {
+            if (chance(0.7)) {
+                const resource_type *rtype = rt_find("toadslime");
+                if (rtype) {
+                    t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
+                }
+            }
+            ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
+        }
         break;
-    }
-    /* fall-through is intentional! */
 
     case 2:
         /* temporary skill loss */
@@ -1330,6 +1326,7 @@ static void do_fumble(castorder * co)
         c->data.i = SK_MAGIC;
         ADDMSG(&caster->faction->msgs, msg_message("patzer2", "unit region", caster, r));
         break;
+ 
     case 3:
     case 4:
         /* Spruch schlaegt fehl, alle Magiepunkte weg */

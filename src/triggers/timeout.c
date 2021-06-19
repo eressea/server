@@ -16,12 +16,6 @@
  ** timeout
  **/
 
-typedef struct timeout_data {
-    trigger *triggers;
-    int timer;
-    variant trigger_data;
-} timeout_data;
-
 static void timeout_init(trigger * t)
 {
     t->data.v = calloc(1, sizeof(timeout_data));

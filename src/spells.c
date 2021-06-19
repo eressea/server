@@ -4551,13 +4551,13 @@ int sp_illusionary_shapeshift(castorder * co)
         return 0;
     }
 
-    add_trigger(&u->attribs, "timer", trigger_timeout((int)power + 3,
-        trigger_changerace(u, NULL, irace)));
-    u->irace = rc;
-
+    if (NULL == change_race(u, 3 + (int)power, NULL, irace)) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+            "sp_shapeshift_fail", "target race", u, rc));
+        return 0;
+    }
     ADDMSG(&mage->faction->msgs, msg_message("shapeshift_effect",
         "mage target race", mage, u, rc));
-
     return cast_level;
 }
 

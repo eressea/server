@@ -1,5 +1,6 @@
 #include <platform.h>
 #include "changerace.h"
+#include "timeout.h"
 
 /* kernel includes */
 #include <kernel/unit.h>
@@ -25,12 +26,6 @@
 /***
  ** restore a mage that was turned into a toad
  **/
-
-typedef struct changerace_data {
-    struct unit *u;
-    const struct race *race;
-    const struct race *irace;
-} changerace_data;
 
 static void changerace_init(trigger * t)
 {
@@ -96,4 +91,14 @@ trigger *trigger_changerace(unit * u, const race * prace, const race * irace)
     td->race = prace;
     td->irace = irace;
     return t;
+}
+
+extern struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace) {
+    trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
+    if (trestore) {
+        add_trigger(&u->attribs, "timer", trigger_timeout(duration, trestore));
+        u->irace = irace;
+        u_setrace(u, urace);
+    }
+    return trestore;
 }

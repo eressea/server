@@ -10,11 +10,15 @@ extern "C" {
     struct unit;
     struct race;
 
+    typedef struct changerace_data {
+        struct unit *u;
+        const struct race *race;
+        const struct race *irace;
+    } changerace_data;
+
     extern struct trigger_type tt_changerace;
 
-    extern struct trigger *trigger_changerace(struct unit *u,
-        const struct race *urace, const struct race *irace);
-
+    extern struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace);
 #ifdef __cplusplus
 }
 #endif

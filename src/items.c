@@ -292,15 +292,8 @@ struct order *ord)
             rcfailure = rc_find("toad");
         }
         if (rcfailure) {
-            trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
-            if (trestore) {
-                int duration = 2 + rng_int() % 8;
-
-                add_trigger(&u->attribs, "timer", trigger_timeout(duration,
-                    trestore));
-                u->irace = NULL;
-                u_setrace(u, rcfailure);
-            }
+            int duration = 2 + rng_int() % 8;
+            change_race(u, duration, rcfailure, NULL);
         }
     }
     use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,

@@ -7,6 +7,11 @@ extern "C" {
     struct trigger_type;
     struct trigger;
 
+    typedef struct timeout_data {
+        struct trigger *triggers;
+        int timer;
+    } timeout_data;
+
     extern struct trigger_type tt_timeout;
 
     extern struct trigger *trigger_timeout(int time, struct trigger *callbacks);
