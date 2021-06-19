@@ -317,11 +317,11 @@ static void test_change_race(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, (void *)crd->irace);
 
     /* change race, but do not add a second change_race trigger */
-    CuAssertPtrEquals(tc, tr, change_race(u, 2, rctoad, NULL));
+    CuAssertPtrEquals(tc, tr, change_race(u, 2, rcsmurf, NULL));
     CuAssertPtrNotNull(tc, u->attribs);
     CuAssertPtrEquals(tc, NULL, u->attribs->next);
     CuAssertPtrEquals(tc, NULL, tr->next);
-    CuAssertPtrEquals(tc, (void *)rctoad, (void *)u->_race);
+    CuAssertPtrEquals(tc, (void *)rcsmurf, (void *)u->_race);
     CuAssertPtrEquals(tc, NULL, (void *)u->irace);
     td = (timeout_data *)tr->data.v;
     CuAssertPtrNotNull(tc, td);
