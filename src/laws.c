@@ -4078,7 +4078,15 @@ bool cansee(const faction * f, const region * r, const unit * u, int modifier)
         }
     }
 
-    return (rings <= 0 && stealth <= 0);
+    if (rings <= 0 && stealth <= 0) {
+        return true;
+    }
+
+    /* bug 2763 and 2754: sea serpents are visible on oceans */
+    if ((u->region->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000)) {
+        return true;
+    }
+    return false;
 }
 
 bool cansee_unit(const unit * u, const unit * target, int modifier)
