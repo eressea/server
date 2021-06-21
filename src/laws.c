@@ -4036,6 +4036,7 @@ void turn_end(void)
  */
 bool cansee(const faction * f, const region * r, const unit * u, int modifier)
 {
+    unit *u2;
     int stealth, rings;
 
     if (u->faction == f || omniscient(f)) {
@@ -4060,7 +4061,10 @@ bool cansee(const faction * f, const region * r, const unit * u, int modifier)
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    unit *u2;
+    if (rings < u->number && stealth <= 0) {
+        return true;
+    }
+
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == f) {
             if (rings < u->number || invisible(u, u2) < u->number) {
@@ -4076,10 +4080,6 @@ bool cansee(const faction * f, const region * r, const unit * u, int modifier)
                 }
             }
         }
-    }
-
-    if (rings <= 0 && stealth <= 0) {
-        return true;
     }
 
     /* bug 2763 and 2754: sea serpents are visible on oceans */
