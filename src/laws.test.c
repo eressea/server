@@ -1967,6 +1967,42 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * Hidden monsters are seen in oceans if they are big enough.
+ */
+static void test_cansee_monsters(CuTest *tc) {
+    unit *u, *u2;
+    race *rc;
+    const item_type *itype;
+
+    test_setup();
+    itype = test_create_itemtype("roi");
+    u = test_create_unit(test_create_faction(), test_create_ocean(0, 0));
+    u2 = test_create_unit(test_create_faction(), u->region);
+    rc = test_create_race("seaserpent");
+    rc->weight = 4999;
+    u_setrace(u2, rc);
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 2));
+
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 1));
+
+    rc->weight = 5000;
+    /* no stealth for fatties at sea */
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 1));
+
+    /* rings still work */
+    i_change(&u2->items, itype, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 2));
+
+    test_teardown();
+}
+
 static void test_nmr_timeout(CuTest *tc) {
     test_setup();
     CuAssertIntEquals(tc, 0, NMRTimeout());
@@ -2439,6 +2475,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee);
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
+    SUITE_ADD_TEST(suite, test_cansee_monsters);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);

@@ -4032,8 +4032,13 @@ static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *targe
     enum cansee_t result = CANSEE_HIDDEN;
     if (rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
-        int amulet = i_get(u->items, rtype->itype);
-        if (amulet <= 0) {
+        if (rtype) {
+            int amulet = i_get(u->items, rtype->itype);
+            if (amulet <= 0) {
+                return CANSEE_INVISIBLE;
+            }
+        }
+        else {
             return CANSEE_INVISIBLE;
         }
     }

@@ -1218,7 +1218,9 @@ int invisible(const unit * target, const unit * viewer)
             if (hidden > target->number) hidden = target->number;
             if (viewer) {
                 const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
-                hidden -= i_get(viewer->items, rtype->itype);
+                if (rtype) {
+                    hidden -= i_get(viewer->items, rtype->itype);
+                }
             }
         }
         return hidden;
