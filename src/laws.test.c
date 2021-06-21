@@ -1898,32 +1898,37 @@ static void test_cansee(CuTest *tc) {
 
 static void test_cansee_ring(CuTest *tc) {
     unit *u, *u2;
-    item_type *itype[2];
+    item_type *iring, *isee;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
     u2 = test_create_unit(test_create_faction(), u->region);
-    scale_number(u2, 2);
 
-    itype[0] = test_create_itemtype("roi");
-    itype[1] = test_create_itemtype("aots");
+    iring = test_create_itemtype("roi");
+    isee = test_create_itemtype("aots");
     CuAssertPtrNotNull(tc, get_resourcetype(R_RING_OF_INVISIBILITY));
-    CuAssertPtrEquals(tc, itype[0]->rtype, (void *)get_resourcetype(R_RING_OF_INVISIBILITY));
+    CuAssertPtrEquals(tc, iring->rtype, (void *)get_resourcetype(R_RING_OF_INVISIBILITY));
     CuAssertPtrNotNull(tc, get_resourcetype(R_AMULET_OF_TRUE_SEEING));
-    CuAssertPtrEquals(tc, itype[1]->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
+    CuAssertPtrEquals(tc, isee->rtype, (void *)get_resourcetype(R_AMULET_OF_TRUE_SEEING));
 
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
 
-    /* a single ring is not enough to hide two people */
-    i_change(&u2->items, itype[0], 1);
+    /* a single ring hides one person, but not two: */
+    i_change(&u2->items, iring, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    scale_number(u2, 2);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
 
     /* two rings can hide two people */
-    i_change(&u2->items, itype[0], 1);
+    i_change(&u2->items, iring, 1);
     CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
 
     /* one amulet negates one of the two rings */
-    i_change(&u->items, itype[1], 1);
+    i_change(&u->items, isee, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    /* having more rings than people doesn't help: */
+    i_change(&u2->items, iring, 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
 
     test_teardown();
