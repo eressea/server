@@ -4021,10 +4021,79 @@ void turn_end(void)
     update_spells();
 }
 
+typedef enum cansee_t {
+    CANSEE_DETECTED,
+    CANSEE_HIDDEN,
+    CANSEE_INVISIBLE
+} cansee_t;
+
+static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
+{
+    enum cansee_t result = CANSEE_HIDDEN;
+    if (rings >= target->number) {
+        const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
+        int amulet = i_get(u->items, rtype->itype);
+        if (amulet <= 0) {
+            return CANSEE_INVISIBLE;
+        }
+    }
+    if (skill_enabled(SK_PERCEPTION)) {
+        int watch = effskill(u, SK_PERCEPTION, r);
+        if (stealth > watch) {
+            return result;
+        }
+    }
+    return CANSEE_DETECTED;
+}
+
+static bool is_exposed(const unit *u) {
+    return u->building || u->ship || is_guard(u) || leftship(u);
+}
+
+static bool big_sea_monster(const unit *u, const region *r) {
+    return ((r->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000));
+}
+
+bool 
+cansee_unit(const unit * u, const region *r, const unit * target, int modifier)
+/* r kann != u->region sein, wenn es um durchreisen geht */
+{
+    int stealth, rings;
+    enum cansee_t see;
+    if (target->number == 0) {
+        return false;
+    }
+    else if (target->faction == u->faction || omniscient(u->faction)) {
+        return true;
+    }
+    else if (is_exposed(target)) {
+        return true;
+    }
+    else if (target->number == 0) {
+        attrib *a = a_find(target->attribs, &at_creator);
+        if (a) {
+            /* u is an empty temporary unit. In this special case we look at the creating unit. */
+            target = (unit *)a->data.v;
+        }
+        else {
+            return false;
+        }
+    }
+
+    stealth = eff_stealth(target, r) - modifier;
+    rings = invisible(target, NULL);
+    see = cansee_ex(u, r, target, stealth, rings);
+    if (CANSEE_HIDDEN == see) {
+        /* bug 2763 and 2754: can see sea serpents on oceans */
+        return big_sea_monster(u, r);
+    }
+    return CANSEE_DETECTED == see;
+}
+
 /**
  * Determine if unit can be seen by faction.
  *
- * @param f -- the observiong faction
+ * @param f -- the observing faction
  * @param u -- the unit that is observed
  * @param r -- the region that u is obesrved from (see below)
  * @param m -- terrain modifier to stealth
@@ -4034,15 +4103,18 @@ void turn_end(void)
  * Es muss auch niemand aus f in der region sein, wenn sie vom Turm
  * erblickt wird.
  */
-bool cansee(const faction * f, const region * r, const unit * u, int modifier)
+bool cansee(const faction *f, const region *r, const unit *u, int modifier)
 {
     unit *u2;
-    int stealth, rings;
+    int rings, stealth;
+    bool bsm, result;
 
+    /* quick exits: */
     if (u->faction == f || omniscient(f)) {
         return true;
     }
     else if (u->number == 0) {
+        /* no need to do this in each cansee_unit: */
         attrib *a = a_find(u->attribs, &at_creator);
         if (a) {
             /* u is an empty temporary unit. In this special case we look at the creating unit. */
@@ -4052,9 +4124,8 @@ bool cansee(const faction * f, const region * r, const unit * u, int modifier)
             return false;
         }
     }
-
-    /* simple visibility, just gotta have a viewer in the region to see 'em */
-    if (leftship(u) || is_guard(u) || u->building || u->ship) {
+    if (is_exposed(u)) {
+        /* obviosuly visibile, we only need a viewer in the region */
         return true;
     }
 
@@ -4065,117 +4136,30 @@ bool cansee(const faction * f, const region * r, const unit * u, int modifier)
         return true;
     }
 
+    result = bsm = big_sea_monster(u, r);
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == f) {
-            if (rings < u->number || invisible(u, u2) < u->number) {
-                if (skill_enabled(SK_PERCEPTION)) {
-                    int observation = effskill(u2, SK_PERCEPTION, NULL);
-
-                    if (observation >= stealth) {
-                        return true;
-                    }
-                }
-                else {
-                    return true;
-                }
-            }
-        }
-    }
-
-    /* bug 2763 and 2754: sea serpents are visible on oceans */
-    if ((u->region->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000)) {
-        return true;
-    }
-    return false;
-}
-
-bool cansee_unit(const unit * u, const unit * target, int modifier)
-/* target->region kann != u->region sein, wenn es um durchreisen geht */
-{
-    if (target->number == 0)
-        return false;
-    else if (target->faction == u->faction)
-        return true;
-    else {
-        int n, rings;
-
-        if (is_guard(target) || target->building
-            || target->ship) {
-            return true;
-        }
-
-        n = eff_stealth(target, target->region) - modifier;
-        rings = invisible(target, NULL);
-        if (rings == 0 && n <= 0) {
-            return true;
-        }
-
-        if (rings && invisible(target, u) >= target->number) {
-            return false;
-        }
-        if (skill_enabled(SK_PERCEPTION)) {
-            int o = effskill(u, SK_PERCEPTION, target->region);
-            if (o >= n) {
+            enum cansee_t see = cansee_ex(u2, r, u, stealth, rings);
+            if (see == CANSEE_DETECTED) {
                 return true;
             }
-        }
-        else {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool
-cansee_durchgezogen(const faction * f, const region * r, const unit * u,
-    int modifier)
-    /* r kann != u->region sein, wenn es um durchreisen geht */
-    /* und es muss niemand aus f in der region sein, wenn sie vom Turm
-    * erblickt wird */
-{
-    unit *u2;
-
-    if (u->number == 0)
-        return false;
-    else if (u->faction == f)
-        return true;
-    else {
-        int rings, n;
-
-        if (is_guard(u) || u->building || u->ship) {
-            return true;
-        }
-
-        n = eff_stealth(u, r) - modifier;
-        rings = invisible(u, NULL);
-        if (rings == 0 && n <= 0) {
-            return true;
-        }
-
-        for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction == f) {
-                int o;
-
-                if (rings && invisible(u, u2) >= u->number)
-                    continue;
-
-                o = effskill(u2, SK_PERCEPTION, NULL);
-
-                if (o >= n) {
-                    return true;
-                }
+            else if (see == CANSEE_HIDDEN && bsm) {
+                return true;
             }
+            /* still invisible to all: */
+            result = false;
         }
     }
-    return false;
+    return result;
 }
 
 bool
 seefaction(const faction * f, const region * r, const unit * u, int modifier)
 {
     if (((f == u->faction) || !fval(u, UFL_ANON_FACTION))
-        && cansee(f, r, u, modifier))
+        && cansee(f, r, u, modifier)) {
         return true;
+    }
     return false;
 }
 

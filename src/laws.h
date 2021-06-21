@@ -86,9 +86,7 @@ extern "C" {
 
     bool cansee(const struct faction * f, const struct region * r,
         const struct unit *u, int modifier);
-    bool cansee_durchgezogen(const struct faction *f, const struct region *r,
-        const struct unit *u, int modifier);
-    bool cansee_unit(const struct unit *u, const struct unit *target,
+    bool cansee_unit(const struct unit *u, const struct region *r, const struct unit *who,
         int modifier);
     bool seefaction(const struct faction *f, const struct region *r,
         const struct unit *u, int modifier);

@@ -1045,7 +1045,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
         for (u = r->units; u; u = u->next) {
             faction *sf = visible_faction(f, u);
             assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
-            if (data->lastf != sf && cansee_unit(ut, u, data->stealthmod)) {
+            if (data->lastf != sf && cansee_unit(ut, r, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
                 data->lastf = sf;
             }
@@ -2361,7 +2361,7 @@ static void count_cb(region *r, unit *u, void *cbdata) {
     count_data *data = (count_data *)cbdata;
     const struct faction *f = data->f;
     if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-        if (cansee_durchgezogen(f, r, u, 0)) {
+        if (cansee(f, r, u, 0)) {
             ++data->n;
         }
     }

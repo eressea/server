@@ -74,7 +74,7 @@ void travelthru_add(region * r, unit * u)
 
 bool travelthru_cansee(const struct region *r, const struct faction *f, const struct unit *u) {
     if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {
-        return cansee_durchgezogen(f, r, u, 0);
+        return cansee(f, r, u, 0);
     }
     return false;
 }
