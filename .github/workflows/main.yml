@@ -25,6 +25,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install dependencies
+        run: sudo apt install libexpat1-dev libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck luarocks 
       - name: Run .travis.yml build script
         uses: ktomk/run-travis-yml@v1
         with:
