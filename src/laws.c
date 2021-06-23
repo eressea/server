@@ -326,7 +326,7 @@ static double peasant_luck_factor(void)
     return config_get_flt("rules.peasants.peasantluck.factor", PEASANTLUCK);
 }
 
-#define ROUND_BIRTHS(growth) ((int)growth)
+#define ROUND_BIRTHS(growth) (int)ceil(growth)
 
 int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
 {
