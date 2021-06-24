@@ -65,6 +65,43 @@ static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
     test_log_stop(log, sl);
 }
 
+void test_merge_items(CuTest *tc)
+{
+    item *src = NULL, *dst = NULL;
+    const struct item_type *itype, *ihorse;
+
+    test_setup();
+    itype = test_create_itemtype("iron");
+    ihorse = test_create_itemtype("horse");
+
+    i_merge(&dst, &src);
+    CuAssertPtrEquals(tc, NULL, dst);
+    CuAssertPtrEquals(tc, NULL, src);
+
+    i_change(&src, itype, 1);
+    CuAssertIntEquals(tc, 1, i_get(src, itype));
+    i_merge(&dst, &src);
+    CuAssertPtrEquals(tc, NULL, src);
+    CuAssertIntEquals(tc, 1, i_get(dst, itype));
+
+    i_change(&src, itype, 1);
+    CuAssertIntEquals(tc, 1, i_get(src, itype));
+    i_merge(&dst, &src);
+    CuAssertPtrEquals(tc, NULL, src);
+    CuAssertIntEquals(tc, 2, i_get(dst, itype));
+
+    i_change(&src, itype, 1);
+    i_change(&src, ihorse, 1);
+    CuAssertIntEquals(tc, 1, i_get(src, itype));
+    CuAssertIntEquals(tc, 1, i_get(src, ihorse));
+    i_merge(&dst, &src);
+    CuAssertPtrEquals(tc, NULL, src);
+    CuAssertIntEquals(tc, 3, i_get(dst, itype));
+    CuAssertIntEquals(tc, 1, i_get(dst, ihorse));
+
+    test_teardown();
+}
+
 void test_change_item(CuTest * tc)
 {
     unit * u;
@@ -197,6 +234,7 @@ CuSuite *get_item_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_resourcename_no_appearance);
     SUITE_ADD_TEST(suite, test_resourcename_with_appearance);
+    SUITE_ADD_TEST(suite, test_merge_items);
     SUITE_ADD_TEST(suite, test_change_item);
     SUITE_ADD_TEST(suite, test_get_resource);
     SUITE_ADD_TEST(suite, test_resource_type);

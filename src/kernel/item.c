@@ -406,25 +406,30 @@ item *i_add(item ** pi, item * i)
 
 void i_merge(item ** pi, item ** si)
 {
-    item *i = *si;
-    while (i) {
-        item *itmp;
-        while (*pi) {
-            int d = strcmp((*pi)->type->rtype->_name, i->type->rtype->_name);
-            if (d >= 0)
-                break;
-            pi = &(*pi)->next;
-        }
-        if (*pi && (*pi)->type == i->type) {
-            (*pi)->number += i->number;
-            assert((*pi)->number >= 0);
-            i_free(i_remove(&i, i));
-        }
-        else {
-            itmp = i->next;
-            i->next = *pi;
-            *pi = i;
-            i = itmp;
+    if (*pi == NULL) {
+        *pi = *si;
+    }
+    else {
+        item *i = *si;
+        while (i) {
+            item *itmp;
+            while (*pi) {
+                int d = strcmp((*pi)->type->rtype->_name, i->type->rtype->_name);
+                if (d >= 0)
+                    break;
+                pi = &(*pi)->next;
+            }
+            if (*pi && (*pi)->type == i->type) {
+                (*pi)->number += i->number;
+                assert((*pi)->number >= 0);
+                i_free(i_remove(&i, i));
+            }
+            else {
+                itmp = i->next;
+                i->next = *pi;
+                *pi = i;
+                i = itmp;
+            }
         }
     }
     *si = NULL;

@@ -763,6 +763,7 @@ void monster_cannibalism(unit *u)
 
     for (u2 = u->next; u2; u2 = u2->next) {
         if (u2->_race == u->_race) {
+            i_merge(&u->items, &u2->items);
             stats_count("monsters.cannibalism", u2->number);
             u2->number = 0;
         }

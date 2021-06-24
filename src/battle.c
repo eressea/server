@@ -3852,10 +3852,6 @@ static void battle_flee(battle * b)
                 int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
                 if (runhp > 600) runhp = 600;
 
-                if (u->ship && fval(u->region->terrain, SEA_REGION)) {
-                    /* keine Flucht von Schiffen auf hoher See */
-                    continue;
-                }
                 if (fval(u_race(u), RCF_UNDEAD) || u_race(u) == get_race(RC_SHADOWKNIGHT)) {
                     /* Untote fliehen nicht. Warum eigentlich? */
                     continue;
