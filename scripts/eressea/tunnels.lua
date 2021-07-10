@@ -18,7 +18,7 @@ end
 local function get_target(param)
     local ntargets = #targets
     if ntargets == 0 then
-        eressea.log.error("Zero tunnel targets for  [" .. param .. "]")
+        eressea.log.error("No tunnel targets for  [" .. param .. "]")
         return nil
     end
     local rn = math.fmod(rng_int(), ntargets)
@@ -31,10 +31,13 @@ end
 
 local function tunnel_action(b, param)
   local units = tunnel_travelers(b)
-  local rto = get_target(param)
   eressea.log.info("Tunnel from " .. tostring(b) .. " [" .. param .. "]")
-  if rto and units then
+  if units then
     for _, u in pairs(units) do
+        local rto = get_target(param)
+        if not rto then
+            break
+        end
         u.region = rto
         eressea.log.info("teleported " .. tostring(u) .. " to " .. tostring(rto))
     end
