@@ -86,7 +86,7 @@ int update_nmrs(void)
         if (f->age<=1) {
             ++newplayers;
         }
-        else if (!fval(f, FFL_NOIDLEOUT|FFL_CURSED)) {
+        else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED)) {
             int nmr = turn - f->lastorders;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {

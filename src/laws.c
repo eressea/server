@@ -1335,7 +1335,7 @@ static void remove_idle_players(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
         if (!is_monsters(f)) {
-            if (RemoveNMRNewbie() && !fval(f, FFL_NOIDLEOUT)) {
+            if (RemoveNMRNewbie() && !fval(f, FFL_PAUSED|FFL_NOIDLEOUT)) {
                 if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
                     ++newbies[f->age];
                 }

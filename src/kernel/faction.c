@@ -659,7 +659,7 @@ void remove_empty_factions(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
 
-        if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_NOIDLEOUT)) {
+        if (!(f->_alive && f->units!=NULL) && !fval(f, FFL_PAUSED|FFL_NOIDLEOUT)) {
             destroyfaction(fp);
         }
         else {
