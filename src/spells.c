@@ -500,7 +500,10 @@ static const race *select_familiar(const race * magerace, int level, magic_t mag
         return rcfixed;
     }
 
-    assert(magerace->familiars[0]);
+    if (magerace->familiars[0] == NULL) {
+        log_error("a %s magician is trying to summon a familiar", magerace->_name);
+        return NULL;
+    }
     if (rnd >= 100 - (level * 5)) {
         retval = magerace->familiars[magiegebiet];
         assert(retval);
@@ -568,7 +571,7 @@ static int sp_summon_familiar(castorder * co)
     }
     rc = select_familiar(caster->_race, cast_level, caster->faction->magiegebiet);
     if (rc == NULL) {
-        log_error("could not find suitable familiar for %s.\n", caster->faction->race->_name);
+        log_error("could not find suitable familiar for %s.\n", unitname(caster));
         return 0;
     }
 
