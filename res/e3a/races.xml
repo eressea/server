@@ -5,7 +5,7 @@
   <!-- begin main races -->
 
   <race name="template" maintenance="0" magres="100" maxaura="0" regaura="0" weight="0" capacity="1000" speed="10.0" hp="10" damage="1d4" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" fly="yes" swim="yes" walk="yes" shapeshift="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" recruitunlimited="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <attack type="1" damage="1d4"/>
   </race>
   <race name="lynx" maxaura="0" regaura="0" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" getitem="yes">
@@ -32,7 +32,7 @@
   </race>
 
   <race name="human" maxaura="1" regaura="1" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <param name="other_race" value="elf"/>
     <skill name="riding" modifier="+1"/>
     <skill name="shipcraft" modifier="2"/>
@@ -45,7 +45,7 @@
   </race>
 
   <race name="orc" studyspeed="-5" magres="-5" maxaura="1" regaura="1" recruitcost="100" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <param name="other_race" value="troll"/>
 
     <skill name="bow" speed="+5"/>
@@ -76,7 +76,7 @@
   capacity="540" speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
   giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <param name="other_race" value="dwarf"/>
     <param name="luxury_trade" value="600"/>
     <skill name="bow" modifier="-1"/>
@@ -102,7 +102,7 @@
   <!-- begin secondary races -->
 
   <race name="demon" magres="15" maxaura="1" regaura="1.1" recruitcost="360" maintenance="10" weight="1000" capacity="540" speed="1.0" hp="30" ac="2" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <skill name="cartmaking" modifier="-2"/>
     <skill name="forestry" modifier="1"/>
     <skill name="melee" modifier="1"/>
@@ -125,7 +125,7 @@
   speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
   giveunit="yes" getitem="yes" equipment="yes" >
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <skill name="armorer" modifier="-1"/>
     <skill name="bow" modifier="2"/>
     <skill name="building" modifier="-1"/>
@@ -143,7 +143,7 @@
   </race>
 
   <race name="troll" magres="10" maxaura="1" regaura="1" recruitcost="260" maintenance="10" weight="2000" capacity="1080" speed="1.0" hp="20" ac="1" damage="1d5+3" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <param name="armor.stamina" value="4"/> <!-- +1 natural armor per X levels stamina -->
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-2"/>
@@ -169,7 +169,7 @@
   speed="1.0" hp="20" damage="1d5" unarmedattack="-2"
   unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes"
   giveunit="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <skill name="armorer" modifier="2"/>
     <skill name="bow" modifier="-1"/>
     <skill name="building" modifier="2"/>
@@ -598,13 +598,13 @@
     <attack type="1" damage="1d6"/>
   </race>
   <race name="braineater" magres="90" maxaura="1.0" regaura="1.0" weight="100" capacity="540" speed="1.0" hp="20" damage="0d0" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="10" fly="yes" walk="yes" teach="no" invinciblenonmagic="yes">
-    <ai splitsize="500" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
+    <ai splitsize="500" scarepeasants="yes" killpeasants="yes" moverandom="yes"/>
     <attack type="2" damage="3d15"/>
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
   <race name="toad" magres="20" maxaura="1" regaura="1" maintenance="10" weight="100" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" learn="no">
-    <ai splitsize="1" learn="yes"/>
+    <ai splitsize="1"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
     <skill name="bow" modifier="-10"/>
@@ -628,7 +628,7 @@
     <attack type="4" damage="1d2"/>
   </race>
   <race name="smurf" weight="1000" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" learn="no">
-    <ai splitsize="1" learn="yes"/>
+    <ai splitsize="1"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
     <skill name="bow" modifier="-10"/>
@@ -656,13 +656,13 @@
     <attack type="4" damage="2d40"/>
   </race>
   <race name="shadowmaster" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.0" regaura="2.0" weight="500" capacity="540" speed="1.0" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" walk="yes" teach="no" desert="yes">
-    <ai splitsize="50" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
+    <ai splitsize="50" scarepeasants="yes" killpeasants="yes" moverandom="yes"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
   <race name="shadowdemon" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" walk="yes" teach="no" desert="yes" recruitethereal="yes">
-    <ai splitsize="1000" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes"/>
+    <ai splitsize="1000" scarepeasants="yes" killpeasants="yes" moverandom="yes"/>
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
@@ -684,14 +684,14 @@
   </race>
 
   <race name="dracoid" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveperson="yes" getitem="yes" equipment="yes">
-    <ai splitsize="10000" moverandom="yes" learn="yes"/>
+    <ai splitsize="10000" moverandom="yes"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
     <attack type="1" damage="1d5"/>
   </race>
 
   <race name="ent" magres="25" maxaura="1.0" regaura="0.5" weight="5000" capacity="2500" speed="1.0" hp="50" ac="4" damage="2d4+12" unarmedattack="0" unarmeddefense="0" attackmodifier="9" defensemodifier="7" walk="yes" teach="no">
-    <ai splitsize="1000" moverandom="yes" learn="yes" scarepeasants="yes"/>
+    <ai splitsize="1000" moverandom="yes" scarepeasants="yes"/>
     <attack type="4" damage="2d12"/>
     <attack type="4" damage="2d12"/>
   </race>
@@ -832,7 +832,7 @@
   </race>
 
   <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" teach="no" getitem="yes" resistbash="yes">
-    <ai splitsize="6" scarepeasants="yes" killpeasants="yes" moverandom="yes" learn="yes" moveattack="yes"/>
+    <ai splitsize="6" scarepeasants="yes" killpeasants="yes" moverandom="yes" moveattack="yes"/>
     <skill name="tactics" modifier="4"/>
     <skill name="stealth" modifier="-99"/>
     <attack type="4" damage="1d30"/>

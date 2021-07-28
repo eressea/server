@@ -218,7 +218,7 @@ extern "C" {
 #define RCF_ATTACK_MOVED   (1<<27)      /* may attack if it has moved */
 #define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
 
-#define RCF_DEFAULT RCF_CANSAIL
+#define RCF_DEFAULT (RCF_CANSAIL|RCF_AI_LEARN)
 
     /* Economic flags */
 #define ECF_GIVEPERSON     (1<<0)   /* Uebergibt Personen */

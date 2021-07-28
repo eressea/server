@@ -770,6 +770,10 @@ void monster_cannibalism(unit *u)
     }
 }
 
+static bool monster_can_learn(const race *rc) {
+    return (rc->flags & (RCF_NOLEARN|RCF_AI_LEARN)) == RCF_AI_LEARN;
+}
+
 void plan_monsters(faction * f)
 {
     region *r;
@@ -870,7 +874,7 @@ void plan_monsters(faction * f)
                         long_order = create_order(K_PIRACY, f->locale, NULL);
                     }
                     else {
-                        if (rc->flags & RCF_AI_LEARN) {
+                        if (monster_can_learn(rc)) {
                             long_order = monster_learn(u);
                         }
                     }
