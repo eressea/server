@@ -2578,7 +2578,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                     skill = limit;
                 }
                 sp = unit_getspell(mage, s, mage->faction->locale);
-                if (sp->sptyp & NOTFAMILIARCAST) {
+                if (sp == NULL || sp->sptyp & NOTFAMILIARCAST) {
                     /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
                     cmistake(u, ord, 177, MSG_MAGIC);
                     return 0;
