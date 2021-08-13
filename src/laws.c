@@ -4030,7 +4030,7 @@ typedef enum cansee_t {
 static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
 {
     enum cansee_t result = CANSEE_HIDDEN;
-    if (rings >= target->number) {
+    if (rings > 0 && rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (rtype) {
             int amulet = i_get(u->items, rtype->itype);
@@ -4059,7 +4059,7 @@ static bool big_sea_monster(const unit *u, const region *r) {
     return ((r->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000));
 }
 
-bool 
+bool
 cansee_unit(const unit * u, const region *r, const unit * target, int modifier)
 /* r kann != u->region sein, wenn es um durchreisen geht */
 {
@@ -4126,18 +4126,18 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
             u = (unit *)a->data.v;
         }
         else {
-            return false;
+            return true;
         }
     }
     if (is_exposed(u)) {
-        /* obviosuly visibile, we only need a viewer in the region */
+        /* obviosuly visible, we only need a viewer in the region */
         return true;
     }
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    if (rings < u->number && stealth <= 0) {
+    if ((rings <= 0 || rings < u->number) && stealth <= 0) {
         return true;
     }
 
