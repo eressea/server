@@ -4068,7 +4068,7 @@ static bool big_sea_monster(const unit *u, const region *r) {
     return ((r->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000));
 }
 
-bool 
+bool
 cansee_unit(const unit * u, const region *r, const unit * target, int modifier)
 /* r kann != u->region sein, wenn es um durchreisen geht */
 {
@@ -4135,7 +4135,7 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
             u = (unit *)a->data.v;
         }
         else {
-            return false;
+            return true;
         }
     }
     if (is_exposed(u)) {
