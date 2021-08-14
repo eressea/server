@@ -84,7 +84,5 @@ function test_recruit_empty()
     end
     assert_equal(0, zero)
     assert_equal(1, count)
-
-    init_reports()
-    write_reports()
 end
+
