@@ -195,18 +195,18 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         }
         else if (utf8_character == '"' || utf8_character == '\'') {
             if (utf8_character == quotechar) {
-                ++ctoken;
+                quotechar = 0;
                 break;
             }
             else if (quotechar == 0 && cstart == ctoken) {
                 quotechar = utf8_character;
-                ++ctoken;
             }
             else {
                 if (cursor - buflen < lbuf - len) {
-                    *cursor++ = *ctoken++;
+                    *cursor++ = *ctoken;
                 }
             }
+            ++ctoken;
         }
         else if (utf8_character == SPACE_REPLACEMENT) {
             if (cursor - buflen < lbuf - len) {
