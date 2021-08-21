@@ -220,16 +220,16 @@ static void test_getstrtoken(CuTest *tc) {
     CuAssertStrEquals(tc, "durr", getstrtoken());
     CuAssertStrEquals(tc, "", getstrtoken());
     CuAssertStrEquals(tc, "", getstrtoken());
-    CuAssertStrEquals(tc, 0, getstrtoken());
+    CuAssertStrEquals(tc, NULL, getstrtoken());
     init_tokens_str(0);
-    CuAssertStrEquals(tc, 0, getstrtoken());
+    CuAssertStrEquals(tc, NULL, getstrtoken());
 }
 
 static void test_skip_token(CuTest *tc) {
     init_tokens_str("hurr \"durr\"");
     skip_token();
     CuAssertStrEquals(tc, "durr", getstrtoken());
-    CuAssertStrEquals(tc, 0, getstrtoken());
+    CuAssertStrEquals(tc, NULL, getstrtoken());
 }
 
 static void test_replace_order(CuTest *tc) {

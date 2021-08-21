@@ -126,7 +126,7 @@ static void test_get_set_param(CuTest * tc)
 {
     struct param *par = 0;
     test_setup();
-    CuAssertStrEquals(tc, 0, get_param(par, "foo"));
+    CuAssertStrEquals(tc, NULL, get_param(par, "foo"));
     set_param(&par, "foo", "bar");
     set_param(&par, "bar", "foo");
     CuAssertStrEquals(tc, "bar", get_param(par, "foo"));
