@@ -196,6 +196,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
         else if (utf8_character == '"' || utf8_character == '\'') {
             if (utf8_character == quotechar) {
                 quotechar = 0;
+                ++ctoken;
                 break;
             }
             else if (quotechar == 0 && cstart == ctoken) {

@@ -21,11 +21,11 @@ static void test_transliterate(CuTest * tc)
     CuAssertStrEquals(tc, "aeoeuess", transliterate(buffer, sizeof(buffer), "\xc3\x84\xc3\x96\xc3\x9c\xe1\xba\x9e"));
 
     /* handle buffer that is too small */
-    CuAssertStrEquals(tc, 0, transliterate(buffer, 1, "herpderp"));
+    CuAssertStrEquals(tc, NULL, transliterate(buffer, 1, "herpderp"));
     CuAssertStrEquals(tc, "", buffer);
-    CuAssertStrEquals(tc, 0, transliterate(buffer, 3, "herpderp"));
+    CuAssertStrEquals(tc, NULL, transliterate(buffer, 3, "herpderp"));
     CuAssertStrEquals(tc, "he", buffer);
-    CuAssertStrEquals(tc, 0, transliterate(buffer, 3, "h\xc3\xa4rpd\xc3\xa4rp"));
+    CuAssertStrEquals(tc, NULL, transliterate(buffer, 3, "h\xc3\xa4rpd\xc3\xa4rp"));
     CuAssertStrEquals(tc, "h?", buffer);
 }
 
