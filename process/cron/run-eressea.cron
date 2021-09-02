@@ -47,6 +47,11 @@ if [ ! -s "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
   echo "server did not create data for turn $TURN in game $GAME"
   exit 3
 fi
+if [ ! -f "express-$TURN.txt" ]; then
+  if [ -f express.txt ]; then
+    mv express.txt "express-$TURN.txt"
+  fi
+fi
 echo "sending reports for game $GAME, turn $TURN"
 "$BIN/compress.sh" "$GAME" "$TURN"
 "$BIN/sendreports.sh" "$GAME"
