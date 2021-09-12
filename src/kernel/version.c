@@ -8,7 +8,7 @@
 
 #ifndef ERESSEA_VERSION
 /* the version number, if it was not passed to make with -D */
-#define ERESSEA_VERSION "3.29.0"
+#define ERESSEA_VERSION "3.30.0"
 #endif
 
 const char *eressea_version(void) {
