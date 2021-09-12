@@ -538,7 +538,12 @@ const char *faction_getbanner(const faction * f)
 
 void faction_setbanner(faction * f, const char *banner)
 {
-    f->banner_id = dbstring_save(banner);
+    if (banner && banner[0]) {
+        f->banner_id = dbstring_save(banner);
+    }
+    else {
+        f->banner_id = 0;
+    }
 }
 
 const char *faction_getpassword(const faction *f) {

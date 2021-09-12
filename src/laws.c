@@ -2162,13 +2162,8 @@ int banner_cmd(unit * u, struct order *ord)
 
     init_order(ord, NULL);
     s = getstrtoken();
-    if (!s || !s[0]) {
-        cmistake(u, ord, 125, MSG_EVENT);
-    }
-    else {
-        faction_setbanner(u->faction, s);
-        ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
-    }
+    faction_setbanner(u->faction, s);
+    ADDMSG(&u->faction->msgs, msg_message("changebanner", "value", s));
 
     return 0;
 }
