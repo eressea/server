@@ -4535,13 +4535,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error125" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error84" section="errors">
     <type>
       <arg name="unit" type="unit"/>

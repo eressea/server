@@ -692,9 +692,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kan
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde keine Emailadresse angegeben.\""
 
-msgid "error125"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Banner angegeben.\""
-
 msgid "starvation"
 msgstr "\"$unit($unit) verliert in $region($region) $int($dead) von $int($add($live,$dead)) Personen durch Unterernährung.\""
 
