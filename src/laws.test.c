@@ -1312,7 +1312,6 @@ static void test_banner_cmd(CuTest *tc) {
     order *ord;
 
     test_setup();
-    mt_create_error(125);
     mt_create_va(mt_new("changebanner", NULL), "value:string", MT_NEW_END);
     u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
 
@@ -1325,8 +1324,8 @@ static void test_banner_cmd(CuTest *tc) {
 
     ord = create_order(K_BANNER, f->locale, NULL);
     banner_cmd(u, ord);
-    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error125"));
+    CuAssertStrEquals(tc, NULL, faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changebanner"));
     free_order(ord);
     test_clear_messages(f);
 
