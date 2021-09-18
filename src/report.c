@@ -2203,6 +2203,10 @@ report_plaintext(const char *filename, report_context * ctx,
                     }
                 }
             }
+            else while (u && u->building) {
+                /* do not report units in buildings */
+                u = u->next;
+            }
             while (u && !u->ship) {
                 if (visible_unit(u, f, stealthmod, r->seen.mode)) {
                     nr_unit(out, f, u, 4, r->seen.mode);
