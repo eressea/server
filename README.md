@@ -23,6 +23,7 @@ Here's how you clone and build the source on Linux or macOS:
     git clone --recursive git://github.com/eressea/server.git source
     cd source
     git submodule update --init
+    s/cmake-init
     s/build
 
 If you got this far and all went well, you have built the server, and
