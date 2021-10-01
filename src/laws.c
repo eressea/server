@@ -1009,7 +1009,7 @@ int quit_cmd(unit * u, struct order *ord)
 #ifdef QUIT_WITH_TRANSFER
                 faction *f2 = getfaction();
                 if (f2 == NULL || f2 == u->faction) {
-                    cmistake(u, ord, 66, MSG_EVENT);
+                    ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
                     flags = 0;
                 }
                 else if (f->race != f2->race) {
@@ -1094,7 +1094,7 @@ int enter_ship(unit * u, struct order *ord, int id, bool report)
     sh = findship(id);
     if (sh == NULL || sh->number < 1 || sh->region != r) {
         if (report) {
-            cmistake(u, ord, 20, MSG_MOVE);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "ship_not_found", ""));
         }
         return 0;
     }
@@ -1160,7 +1160,7 @@ int enter_building(unit * u, order * ord, int id, bool report)
     b = findbuilding(id);
     if (b == NULL || b->region != r) {
         if (report) {
-            cmistake(u, ord, 6, MSG_MOVE);
+          ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "building_not_found", ""));
         }
         return 0;
     }
@@ -1386,7 +1386,7 @@ int ally_cmd(unit * u, struct order *ord)
     f = getfaction();
 
     if (f == NULL || is_monsters(f)) {
-        cmistake(u, ord, 66, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
         return 0;
     }
     if (f == u->faction)
@@ -1561,7 +1561,7 @@ int prefix_cmd(unit * u, struct order *ord)
         group *g = get_group(u);
         if (g) {
             ap = &g->attribs;
-        } 
+        }
         else {
             ap = &u->faction->attribs;
         }
@@ -1570,394 +1570,383 @@ int prefix_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-int display_cmd(unit * u, struct order *ord)
-{
+static void generic_setname(char **oldname, const char *newname) {
+    free(*oldname);
+    if (newname)
+        *oldname = str_strdup(newname);
+    else
+        *oldname = NULL;
+}
+
+static bool check_default_names(const char *name, int ngenerics, const char * generics[]) {
+    int i;
+    for (i = 0; i < ngenerics; ++i) {
+        if (!renamed_thing(name, generics[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static const char *building_describable(const building *b) {
+    assert(b);
+    if (fval(b->type, BTF_NAMECHANGE) || !b->display || !b->display[0])
+      return NULL;
+    return "error278";
+}
+
+
+static const char *building_nameable(const building *b, bool foreign) {
+    const char *error = NULL;
+    if (!b)
+      return NULL;
+    if (!fval(b->type, BTF_NAMECHANGE)) {
+      error = "error278";
+    } else if (foreign) {
+      error = "building_renamed";
+    }
+
+    if (error) {
+      const char *generics[2] = { "site", b->type->_name };
+      if (!check_default_names(building_getname(b), 2,  generics)) {
+        return error;
+      }
+    }
+    return NULL;
+}
+
+static const char *ship_nameable(const ship *sh, bool foreign) {
+    if (sh && foreign) {
+      const char *generics[2] = { parameters[P_SHIP], sh->type->_name };
+
+      if (!check_default_names(ship_getname(sh), 2,  generics))
+        return "ship_renamed";
+    }
+
+    return NULL;
+}
+
+static const char *faction_nameable(const faction *f, bool foreign) {
+    if (f && foreign) {
+      const char *generics[1] = { parameters[P_FACTION] };
+
+      if (!check_default_names(faction_getname(f), 1,  generics)) {
+        return "faction_renamed";
+      }
+    }
+    return NULL;
+}
+
+
+static const char *unit_nameable(const unit *u, bool foreign) {
+    if (u && foreign) {
+      const char *generics[1] = { parameters[P_UNIT] };
+
+      if (!check_default_names(unit_getname(u), 1,  generics))
+        return "unit_renamed";
+    }
+
+    return NULL;
+}
+
+int text_cmd(unit *u, order *ord, const keyword_t cmd) {
     char token[128];
-    char **s = NULL;
-    char *str;
-    region *r = u->region;
-
-    init_order(ord, NULL);
-
-    str = gettoken(token, sizeof(token));
-    switch (findparam_ex(str, u->faction->locale)) {
-    case P_BUILDING:
-    case P_GEBAEUDE:
-        if (!u->building) {
-            cmistake(u, ord, 145, MSG_PRODUCE);
-            break;
-        }
-        if (building_owner(u->building) != u) {
-            cmistake(u, ord, 5, MSG_PRODUCE);
-            break;
-        }
-        if (!fval(u->building->type, BTF_NAMECHANGE) && u->building->display && u->building->display[0]) {
-            cmistake(u, ord, 278, MSG_EVENT);
-            break;
-        }
-        s = &u->building->display;
-        break;
-
-    case P_SHIP:
-        if (!u->ship) {
-            cmistake(u, ord, 144, MSG_PRODUCE);
-            break;
-        }
-        if (ship_owner(u->ship) != u) {
-            cmistake(u, ord, 12, MSG_PRODUCE);
-            break;
-        }
-        s = &u->ship->display;
-        break;
-
-    case P_UNIT:
-        str = getstrtoken();
-        if (str) {
-            unicode_utf8_trim(str);
-        }
-        unit_setinfo(u, str);
-        break;
-
-    case P_PRIVAT:
-        str = getstrtoken();
-        if (str) {
-            unicode_utf8_trim(str);
-        }
-        usetprivate(u, str);
-        break;
-
-    case P_REGION:
-        if (!r->land || u->faction != region_get_owner(r)) {
-            cmistake(u, ord, 147, MSG_EVENT);
-            break;
-        }
-        s = &r->land->display;
-        break;
-
-    default:
-        cmistake(u, ord, 110, MSG_EVENT);
-        break;
-    }
-
-    if (s != NULL) {
-        const char *s2 = getstrtoken();
-
-        free(*s);
-        if (s2) {
-            char * sdup = str_strdup(s2);
-            if (unicode_utf8_trim(sdup) != 0) {
-                log_info("trimming info: %s", s2);
-            }
-            if (strlen(sdup) >= DISPLAYSIZE) {
-                sdup[DISPLAYSIZE-1] = 0;
-            }
-            *s = sdup;
-        }
-        else {
-            *s = NULL;
-        }
-    }
-
-    return 0;
-}
-
-bool renamed_building(const building * b)
-{
-    const struct locale *lang = locales;
-    size_t len = strlen(b->name);
-    for (; lang; lang = nextlocale(lang)) {
-        const char *bdname = LOC(lang, b->type->_name);
-        if (bdname) {
-            size_t bdlen = strlen(bdname);
-            if (len >= bdlen && strncmp(b->name, bdname, bdlen) == 0) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
-{
-	char name[NAMESIZE];
-    assert(s2);
-    if (!s2[0]) {
-        cmistake(u, ord, 84, MSG_EVENT);
-        return 0;
-    }
-
-    /* TODO: Validate to make sure people don't have illegal characters in
-     * names, phishing-style? () come to mind. */
-    str_strlcpy(name, s2, sizeof(name));
-    if (unicode_utf8_trim(name) != 0) {
-        log_info("trimming name: %s", s2);
-    }
-
-    free(*s);
-    *s = str_strdup(name);
-    return 0;
-}
-
-static bool try_rename(unit *u, building *b, order *ord) {
-    unit *owner = b ? building_owner(b) : NULL;
-    bool foreign = !(owner && owner->faction == u->faction);
-
-    if (!b) {
-        cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
-        return false;
-    }
-
-    if (!fval(b->type, BTF_NAMECHANGE) && renamed_building(b)) {
-        cmistake(u, ord, 278, MSG_EVENT);
-        return false;
-    }
-
-    if (foreign) {
-        if (renamed_building(b)) {
-            cmistake(u, ord, 246, MSG_EVENT);
-            return false;
-        }
-
-        if (owner) {
-            if (cansee(owner->faction, u->region, u, 0)) {
-                ADDMSG(&owner->faction->msgs,
-                    msg_message("renamed_building_seen",
-                        "building renamer region", b, u, u->region));
-            }
-            else {
-                ADDMSG(&owner->faction->msgs,
-                    msg_message("renamed_building_notseen",
-                        "building region", b, u->region));
-            }
-        }
-    }
-    if (owner && owner->faction != u->faction) {
-        cmistake(u, ord, 148, MSG_PRODUCE);
-        return false;
-    }
-    return true;
-}
-
-int
-rename_building(unit * u, order * ord, building * b, const char *name)
-{
-    assert(name);
-    if (!try_rename(u, b, ord)) {
-        return -1;
-    }
-    return rename_cmd(u, ord, &b->name, name);
-}
-
-int name_cmd(struct unit *u, struct order *ord)
-{
-    char token[128];
-    building *b = u->building;
-    region *r = u->region;
-    char **s = NULL;
     param_t p;
     bool foreign = false;
     const char *str;
+    faction *f = u->faction;
+    region *r = u->region;
+    building *b = u->building;
+    ship *sh = u->ship;
+    unit *u2 = NULL;
+    unit *owner = NULL;
+    faction *ownerfaction = NULL;
+    alliance *all = NULL;
+    group *g = NULL;
+    void *object = NULL;
+    char *newname = NULL;
 
-    init_order(ord, u->faction->locale);
+    const char *error_notfound = NULL;
+    const char *error_notowner = NULL;
+    const char *error_renamed = NULL;
+    const char *message_seen = NULL;
+    const char *message_unseen = NULL;
+
+    init_order(ord, NULL);
     str = gettoken(token, sizeof(token));
     p = findparam_ex(str, u->faction->locale);
-
     if (p == P_FOREIGN) {
-        str = gettoken(token, sizeof(token));
+        if (cmd == K_DISPLAY) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
+            return 0;
+        }
         foreign = true;
+        str = gettoken(token, sizeof(token));
         p = findparam_ex(str, u->faction->locale);
     }
-
     switch (p) {
-    case P_ALLIANCE:
-        if (!foreign && f_get_alliance(u->faction)) {
-            alliance *al = u->faction->alliance;
-            faction *lead = alliance_get_leader(al);
-            if (lead == u->faction) {
-                s = &al->name;
-            }
-        }
-        break;
     case P_BUILDING:
     case P_GEBAEUDE:
         if (foreign) {
             b = getbuilding(u->region);
+            error_notfound = "building_not_found";
+            message_seen = "renamed_building_seen";
+            message_unseen = "renamed_building_notseen";
+        } else {
+            error_notfound = "not_in_building";
+            error_notowner = "not_building_owner";
         }
-        if (try_rename(u, b, ord)) {
-            s = &b->name;
+        object = b;
+        if (b) {
+            error_renamed = (cmd == K_DISPLAY)?
+                building_describable(b):building_nameable(b, foreign);
+            owner = building_owner(b);
+        }
+        break;
+    case P_SHIP:
+        if (foreign) {
+          sh = getship(u->region);
+          error_notfound = "ship_not_found";
+          message_seen = "renamed_ship_seen";
+          message_unseen = "renamed_ship_notseen";
+        } else {
+          error_notfound = "not_in_ship";
+          error_notowner = "not_ship_owner";
+        }
+        object = sh;
+        if (sh) {
+            if (cmd == K_NAME)
+                error_renamed = ship_nameable(sh, foreign);
+            owner = ship_owner(sh);
         }
         break;
     case P_FACTION:
         if (foreign) {
-            faction *f;
-
             f = getfaction();
-            if (!f) {
-                cmistake(u, ord, 66, MSG_EVENT);
-                break;
-            }
-            if (f->age < 10) {
-                cmistake(u, ord, 248, MSG_EVENT);
-                break;
-            }
-            else {
-                const struct locale *lang = locales;
-                size_t f_len = strlen(f->name);
-                for (; lang; lang = nextlocale(lang)) {
-                    const char *fdname = LOC(lang, "factiondefault");
-                    size_t fdlen = strlen(fdname);
-                    if (f_len >= fdlen && strncmp(f->name, fdname, fdlen) == 0) {
-                        break;
-                    }
-                }
-                if (lang == NULL) {
-                    cmistake(u, ord, 247, MSG_EVENT);
-                    break;
-                }
-            }
-            if (cansee(f, r, u, 0)) {
-                ADDMSG(&f->msgs,
-                    msg_message("renamed_faction_seen", "unit region", u, r));
-            }
-            else {
-                ADDMSG(&f->msgs, msg_message("renamed_faction_notseen", "", r));
-            }
-            s = &f->name;
+            error_notfound = "faction_not_found";
+            message_seen = "renamed_faction_seen";
+            message_unseen = "renamed_faction_notseen";
         }
-        else {
-            s = &u->faction->name;
+        object = f;
+        owner = u;
+        ownerfaction = f;
+        if (f && foreign && IsImmune(f)) {
+            if (cmd == K_NAME)
+                error_renamed = faction_nameable(f, foreign);
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                "newbie_immunity_error", "turns", NewbieImmunity()));
+            return 0;
         }
         break;
-
-    case P_SHIP:
-        if (foreign) {
-            ship *sh = getship(r);
-            unit *uo;
-
-            if (!sh) {
-                cmistake(u, ord, 20, MSG_EVENT);
-                break;
-            }
-            else {
-                const struct locale *lang = locales;
-                size_t sh_len = strlen(sh->name);
-                for (; lang; lang = nextlocale(lang)) {
-                    const char *sdname = LOC(lang, sh->type->_name);
-                    size_t sdlen = strlen(sdname);
-                    if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
-                        break;
-                    }
-
-                    sdname = LOC(lang, parameters[P_SHIP]);
-                    sdlen = strlen(sdname);
-                    if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
-                        break;
-                    }
-
-                }
-                if (lang == NULL) {
-                    cmistake(u, ord, 245, MSG_EVENT);
-                    break;
-                }
-            }
-            uo = ship_owner(sh);
-            if (uo) {
-                if (cansee(uo->faction, r, u, 0)) {
-                    ADDMSG(&uo->faction->msgs,
-                        msg_message("renamed_ship_seen", "ship renamer region", sh, u, r));
-                }
-                else {
-                    ADDMSG(&uo->faction->msgs,
-                        msg_message("renamed_ship_notseen", "ship region", sh, r));
-                }
-            }
-            s = &sh->name;
-        }
-        else {
-            unit *uo;
-            if (!u->ship) {
-                cmistake(u, ord, 144, MSG_PRODUCE);
-                break;
-            }
-            uo = ship_owner(u->ship);
-            if (uo->faction != u->faction) {
-                cmistake(u, ord, 12, MSG_PRODUCE);
-                break;
-            }
-            s = &u->ship->name;
-        }
-        break;
-
     case P_UNIT:
         if (foreign) {
-            unit *u2 = 0;
-
-            getunit(r, u->faction, &u2);
-            if (!u2 || !cansee(u->faction, r, u2, 0)) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                    "feedback_unit_not_found", ""));
-                break;
-            }
-            else {
-                char udefault[32];
-                default_name(u2, udefault, sizeof(udefault));
-                if (strcmp(unit_getname(u2), udefault) != 0) {
-                    cmistake(u, ord, 244, MSG_EVENT);
-                    break;
-                }
-            }
-            if (cansee(u2->faction, r, u, 0)) {
-                ADDMSG(&u2->faction->msgs, msg_message("renamed_seen",
-                    "renamer renamed region", u, u2, r));
-            }
-            else {
-                ADDMSG(&u2->faction->msgs, msg_message("renamed_notseen",
-                    "renamed region", u2, r));
-            }
-            s = &u2->_name;
+            getunit(u->region, u->faction, &u2);
+            error_notfound = "feedback_unit_not_found";
+            message_seen = "renamed_unit_seen";
+            message_unseen = "renamed_unit_notseen";
+        } else {
+            u2 = u;
         }
-        else {
-            s = &u->_name;
-        }
+        object = u2;
+        owner = u2;
+        error_renamed = unit_nameable(u2, foreign);
         break;
-
+    case P_ALLIANCE:
+        if (cmd == K_DISPLAY) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
+            return 0;
+        }
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
+        }
+        all = f_get_alliance(u->faction);
+        object = all;
+        if (all && alliance_get_leader(all) == u->faction)
+            owner = u;
+        error_notfound = "not_in_alliance";
+        error_notowner = "not_alliance_owner";
+        break;
     case P_REGION:
-        if (u->faction != region_get_owner(r)) {
-            cmistake(u, ord, 147, MSG_EVENT);
-            break;
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
         }
-        s = &r->land->name;
+        object = r;
+        if (r->land && u->faction == region_get_owner(r))
+            owner = u;
+        error_notowner = "not_region_owner";
         break;
-
     case P_GROUP:
-    {
-        group *g = get_group(u);
-        if (g) {
-            s = &g->name;
+        if (cmd == K_DISPLAY) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "display_what", ""));
+            return 0;
+        }
+        if (foreign) {
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "foreign_not_allowed", ""));
+            return 0;
+        }
+        object = g = get_group(u);
+        owner = u;
+        error_notfound = "not_in_group";
+        break;
+    case P_PRIVAT:
+        if (cmd == K_DISPLAY) {
+            object = u;
+            owner = u;
             break;
         }
-        else {
-            cmistake(u, ord, 109, MSG_EVENT);
-            break;
-        }
-    }
-    break;
+        /* else fallthrough! */
     default:
-        cmistake(u, ord, 109, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+            (cmd == K_DISPLAY)?"display_what":"name_what", ""));
+        return 0;
         break;
     }
 
-    if (s != NULL) {
-        const char *name = getstrtoken();
-        if (name) {
-            rename_cmd(u, ord, s, name);
+    if (!ownerfaction)
+        ownerfaction = owner ? owner->faction : NULL;
+
+    if (!object) {
+        assert(error_notfound);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_notfound, ""));
+        return 0;
+    }
+
+    if (!foreign && owner != u) {
+        assert(error_notowner);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_notowner, ""));
+        return 0;
+    }
+
+    if (error_renamed) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, error_renamed, ""));
+        return 0;
+    }
+
+    str = getstrtoken();
+    if (str) {
+        size_t maxlen = cmd == K_DISPLAY ? DISPLAYSIZE : NAMESIZE;
+        newname = str_strdup(str);
+        if (unicode_utf8_trim(newname) != 0) {
+            log_info("trimming info: %s", str);
         }
-        else {
-            cmistake(u, ord, 84, MSG_EVENT);
+        if (strlen(newname) >= maxlen) {
+            newname[maxlen - 1] = 0;
+        }
+        if (newname && strlen(newname) == 0) {
+            free(newname);
+            newname = NULL;
         }
     }
+
+    if (cmd == K_DISPLAY) {
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+            generic_setname(&b->display, newname);
+            break;
+        case P_SHIP:
+            generic_setname(&sh->display, newname);
+            break;
+        case P_UNIT:
+            unit_setinfo(u, newname);
+            break;
+        case P_PRIVAT:
+            usetprivate(u, newname);
+            break;
+        case P_FACTION:
+            faction_setbanner(f, newname);
+            break;
+        case P_REGION:
+            generic_setname(&r->land->display, newname);
+            break;
+        default:
+            break;
+        }
+    } else {
+        if (!newname) {
+            cmistake(u, ord, 84, MSG_EVENT);
+            return 0;
+        }
+        switch (p) {
+        case P_BUILDING:
+        case P_GEBAEUDE:
+            building_setname(b, newname);
+            break;
+        case P_SHIP:
+            ship_setname(sh, newname);
+            break;
+        case P_FACTION:
+            faction_setname(f, newname);
+            break;
+        case P_UNIT:
+            unit_setname(u2, newname);
+            break;
+        case P_ALLIANCE:
+            alliance_setname(all, newname);
+            break;
+        case P_REGION:
+            region_setname(r, newname);
+            break;
+        case P_GROUP:
+            generic_setname(&g->name, newname);
+            break;
+        default:
+            break;
+        }
+        if (foreign && ownerfaction) {
+            if (cansee(ownerfaction, r, u, 0)) {
+                assert(message_seen);
+                ADDMSG(&ownerfaction->msgs, msg_message(message_seen,
+                    "renamer renamed region", u, object, r));
+            } else {
+                assert(message_unseen);
+                ADDMSG(&ownerfaction->msgs, msg_message(message_unseen,
+                    "renamed region", object, r));
+            }
+        }
+    }
+    free(newname);
 
     return 0;
+}
+
+int display_cmd(unit * u, struct order *ord) {
+    return text_cmd(u, ord, K_DISPLAY);
+}
+
+bool renamed_thing(const char *name, const char *typename)
+{
+    const struct locale *lang = locales;
+    size_t namelen = strlen(name);
+
+    for (; lang; lang = nextlocale(lang)) {
+        const char *localname = LOC(lang, typename);
+        char nbuffer[DISPLAYSIZE], tbuffer[DISPLAYSIZE];
+        if (localname) {
+            size_t typelen = strlen(localname);
+            int cmp;
+            if (namelen < typelen || namelen > typelen + 5)
+                continue;
+            unicode_utf8_tolower(nbuffer, namelen, name);
+            unicode_utf8_tolower(tbuffer, typelen, localname);
+            cmp = strncmp(nbuffer, tbuffer, typelen);
+            if (cmp != 0)
+                continue;
+            if (namelen == typelen)
+                return false;
+            if (nbuffer[typelen] != ' ')
+                continue;
+            if (atoi36(nbuffer+typelen+1) > 0)
+                return false;
+        }
+    }
+    return true;
+}
+
+int name_cmd(struct unit *u, struct order *ord) {
+  return text_cmd(u, ord, K_NAME);
 }
 
 /* ------------------------------------------------------------- */
@@ -2004,7 +1993,7 @@ static void mailfaction(unit * u, int n, struct order *ord, const char *s)
     if (f && n > 0)
         deliverMail(f, u->region, u, s, NULL);
     else
-        cmistake(u, ord, 66, MSG_MESSAGE);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
 }
 
 int mail_cmd(unit * u, struct order *ord)
@@ -2046,7 +2035,7 @@ int mail_cmd(unit * u, struct order *ord)
             }
 
             if (!u2) {
-                cmistake(u, ord, 66, MSG_MESSAGE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
                 break;
             }
 
@@ -2089,7 +2078,7 @@ int mail_cmd(unit * u, struct order *ord)
             building *b = getbuilding(r);
 
             if (!b) {
-                cmistake(u, ord, 6, MSG_MESSAGE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "building_not_found", ""));
                 break;
             }
 
@@ -2118,7 +2107,7 @@ int mail_cmd(unit * u, struct order *ord)
             ship *sh = getship(r);
 
             if (!sh) {
-                cmistake(u, ord, 20, MSG_MESSAGE);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "ship_not_found", ""));
                 break;
             }
 
@@ -2777,7 +2766,7 @@ static void ageing(void)
         for (up = &r->units; *up;) {
             unit *u = *up;
             a_age(&u->attribs, u);
-            if (u == *up) 
+            if (u == *up)
                 handle_event(u->attribs, "timer", u);
             if (u == *up) /*-V581 */
                 up = &(*up)->next;
@@ -2841,7 +2830,7 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
-void maketemp_cmd(unit *u, order **olist) 
+void maketemp_cmd(unit *u, order **olist)
 {
     order *makeord;
     int err = checkunitnumber(u->faction, 1);
@@ -3359,7 +3348,7 @@ int use_cmd(unit * u, struct order *ord)
 int pay_cmd(unit * u, struct order *ord)
 {
     if (!u->building) {
-        cmistake(u, ord, 6, MSG_EVENT);
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "building_not_found", ""));
     }
     else {
         param_t p;
@@ -3373,7 +3362,7 @@ int pay_cmd(unit * u, struct order *ord)
             /* If the unit is not the owner of the building: error */
             if (owner->no != u->no) {
                 /* The building is not ours error */
-                cmistake(u, ord, 1222, MSG_EVENT);
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "not_building_owner", ""));
             }
             else {
                 /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
@@ -3394,14 +3383,14 @@ int pay_cmd(unit * u, struct order *ord)
                         else
                         {
                             /* The building is not ours error */
-                            cmistake(u, ord, 1222, MSG_EVENT);
+                            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "not_building_owner", ""));
                         }
 
                     }
                     else
                     {
                         /* Building not found error */
-                        cmistake(u, ord, 6, MSG_PRODUCE);
+                        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "building_not_found", ""));
                     }
                 }
             }
@@ -3871,7 +3860,7 @@ void init_processor(void)
     add_proc_unit(p, follow_cmds, "Folge auf Einheiten setzen");
     add_proc_order(p, K_QUIT, quit_cmd, 0, "Stirb");
 
-    /* all recruitment must be finished before we can calculate 
+    /* all recruitment must be finished before we can calculate
      * promotion cost of ability */
     p += 10;
     add_proc_global(p, quit, "Sterben");

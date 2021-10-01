@@ -7,6 +7,7 @@
 #include <kernel/building.h>
 #include <kernel/unit.h>
 
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/strings.h>
 
@@ -680,6 +681,20 @@ static void test_buildingcapacity(CuTest *tc) {
     test_teardown();
 }
 
+static void test_building_defaultname(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    char name[NAMESIZE];
+    test_setup();
+    btype = test_create_buildingtype("herp");
+    b = test_create_building(test_create_region(0, 0, NULL), btype);
+
+    snprintf(name, sizeof(name), "herp %s", itoa36(b->no));
+    CuAssertStrEquals(tc, name, building_getname(b));
+
+    test_teardown();
+}
+
 CuSuite *get_building_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -707,5 +722,6 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_active_building);
     SUITE_ADD_TEST(suite, test_buildingtype_exists);
     SUITE_ADD_TEST(suite, test_safe_building);
+    SUITE_ADD_TEST(suite, test_building_defaultname);
     return suite;
 }

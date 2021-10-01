@@ -283,7 +283,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                     else {
                         struct faction *f = findfaction(nr);
                         if (f == NULL || !can_set_factionstealth(u, f)) {
-                            cmistake(u, ord, 66, MSG_EVENT);
+                            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "faction_not_found", ""));
                             break;
                         }
                         else {
