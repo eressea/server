@@ -3,6 +3,7 @@
 #include "timeout.h"
 
 /* kernel includes */
+#include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
 
@@ -95,7 +96,7 @@ trigger *trigger_changerace(unit * u, const race * prace, const race * irace)
     return t;
 }
 
-extern struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace) {
+struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace) {
     trigger **texists = get_triggers(u->attribs, "timer");
     trigger *tr = NULL;
 
@@ -117,3 +118,31 @@ extern struct trigger *change_race(struct unit *u, int duration, const struct ra
     }
     return tr;
 }
+
+void fix_smurfication(unit *u)
+{
+    const race *rc = u->faction->race;
+    if (u->attribs) {
+        trigger **tp = get_triggers(u->attribs, "timer");
+        while (*tp) {
+            trigger *t = *tp;
+            if (t->type == &tt_timeout) {
+                timeout_data *td = (timeout_data *)t->data.v;
+                trigger *tr = td->triggers;
+                for (; tr; tr = tr->next) {
+                    if (tr->type != &tt_changerace) {
+                        break;
+                    }
+                }
+                if (tr == NULL) {
+                    tp = &t->next;
+                    t_free(t);
+                    continue;
+                }
+            }
+            tp = &t->next;
+        }
+    }
+    u->_race = rc;
+}
+

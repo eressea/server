@@ -371,26 +371,6 @@ static void write_skills(gamedata *data, const unit *u) {
     }
 }
 
-static void fix_smurfication(unit *u) {
-    if (u->attribs) {
-        attrib *a;
-        for (a = a_find(u->attribs, &at_eventhandler); a && a->type == &at_eventhandler; a = a->next) {
-            handler_info *info = (handler_info *)a->data.v;
-            if (0 == strcmp("timer", info->event)) {
-                trigger *t;
-                for (t = info->triggers; t; t = t->next) {
-                    if (t->type == &tt_changerace) {
-                        /* is a smurf, but will change back */
-                        return;
-                    }
-                }
-            }
-        }
-    }
-    log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
-    u->_race = u->faction->race;
-}
-
 unit *read_unit(gamedata *data)
 {
     unit *u;
@@ -549,6 +529,7 @@ unit *read_unit(gamedata *data)
     if (rc_demon) {
         const struct race *rc = u_race(u);
         if (rc == rc_smurf) {
+            log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
             fix_smurfication(u);
         }
         if (rc == rc_demon) {
