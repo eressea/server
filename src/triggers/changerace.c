@@ -135,7 +135,7 @@ void fix_smurfication(unit *u)
                     }
                 }
                 if (tr == NULL) {
-                    tp = &t->next;
+                    *tp = t->next;
                     t_free(t);
                     continue;
                 }
