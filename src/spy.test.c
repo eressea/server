@@ -1,6 +1,9 @@
-#include <platform.h>
+#include "spy.h"
 
 #include <magic.h>
+
+#include <attributes/otherfaction.h>
+
 #include <kernel/config.h>
 #include <kernel/types.h>
 #include <kernel/race.h>
@@ -13,20 +16,18 @@
 #include <kernel/messages.h>
 #include <kernel/attrib.h>
 
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
-#include "util/param.h"
+#include <util/param.h>
 #include <util/crmessage.h>
+#include <util/rand.h>
+
 #include <tests.h>
-
-#include <attributes/otherfaction.h>
-
-#include "spy.h"
+#include <CuTest.h>
 
 #include <assert.h>
 #include <stdio.h>
-
-#include <CuTest.h>
 
 typedef struct {
     region *r;
@@ -35,8 +36,15 @@ typedef struct {
 } spy_fixture;
 
 static void setup_spy(spy_fixture *fix) {
+    random_source_inject_constant(0);
+    mt_create_va(mt_new("feedback_unit_not_found", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("spyreport", NULL),
         "spy:unit", "target:unit", "status:int", MT_NEW_END);
+    mt_create_va(mt_new("spyfail", NULL),
+        "spy:unit", "target:unit", MT_NEW_END);
+    mt_create_va(mt_new("spydetect", NULL),
+        "spy:unit", "target:unit", MT_NEW_END);
     mt_create_va(mt_new("spyreport_mage", NULL),
         "spy:unit", "target:unit", "type:int", MT_NEW_END);
     mt_create_va(mt_new("spyreport_faction", NULL),
@@ -63,6 +71,59 @@ static void setup_spy(spy_fixture *fix) {
         fix->spy = test_create_unit(test_create_faction(), fix->r);
         fix->victim = test_create_unit(test_create_faction(), fix->r);
     }
+}
+
+static void test_spy_target_found(CuTest *tc) {
+    spy_fixture fix;
+    order *ord;
+
+    test_setup();
+    setup_spy(&fix);
+    set_level(fix.spy, SK_SPY, 1);
+    ord = create_order(K_SPY, fix.spy->faction->locale, "%s", itoa36(fix.victim->no));
+
+    spy_cmd(fix.spy, ord);
+    
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "spyfail"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.spy->faction->msgs, "feedback_unit_not_found"));
+
+    test_teardown();
+}
+
+static void test_spy_target_not_present(CuTest *tc) {
+    spy_fixture fix;
+    order *ord;
+    region *r;
+
+    test_setup();
+    setup_spy(&fix);
+    set_level(fix.spy, SK_SPY, 1);
+    ord = create_order(K_SPY, fix.spy->faction->locale, "%s", itoa36(fix.victim->no));
+
+    r = test_create_plain(0, 1);
+    move_unit(fix.victim, r, NULL);
+    spy_cmd(fix.spy, ord);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.spy->faction->msgs, "spyfail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "feedback_unit_not_found"));
+
+    test_teardown();
+}
+
+static void test_spy_target_not_seen(CuTest *tc) {
+    spy_fixture fix;
+    order *ord;
+
+    test_setup();
+    setup_spy(&fix);
+    set_level(fix.victim, SK_STEALTH, 20);
+    set_level(fix.spy, SK_SPY, 1);
+    ord = create_order(K_SPY, fix.spy->faction->locale, "%s", itoa36(fix.victim->no));
+
+    spy_cmd(fix.spy, ord);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(fix.spy->faction->msgs, "spyfail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.spy->faction->msgs, "feedback_unit_not_found"));
+
+    test_teardown();
 }
 
 static void test_simple_spy_message(CuTest *tc) {
@@ -281,6 +342,9 @@ CuSuite *get_spy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_simple_spy_message);
+    SUITE_ADD_TEST(suite, test_spy_target_found);
+    SUITE_ADD_TEST(suite, test_spy_target_not_present);
+    SUITE_ADD_TEST(suite, test_spy_target_not_seen);
     SUITE_ADD_TEST(suite, test_all_spy_message);
     SUITE_ADD_TEST(suite, test_sink_ship);
     SUITE_ADD_TEST(suite, test_sabotage_self);
