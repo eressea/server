@@ -19,7 +19,7 @@ extern "C" {
     extern struct trigger_type tt_changerace;
 
     struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace);
-    void fix_smurfication(struct unit *u);
+    void restore_race(struct unit *u, const struct race *rc);
 
 #ifdef __cplusplus
 }

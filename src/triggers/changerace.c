@@ -119,28 +119,29 @@ struct trigger *change_race(struct unit *u, int duration, const struct race *ura
     return tr;
 }
 
-void fix_smurfication(unit *u)
+void restore_race(unit *u, const race *rc)
 {
-    const race *rc = u->faction->race;
     if (u->attribs) {
         trigger **tp = get_triggers(u->attribs, "timer");
-        while (*tp) {
-            trigger *t = *tp;
-            if (t->type == &tt_timeout) {
-                timeout_data *td = (timeout_data *)t->data.v;
-                trigger *tr = td->triggers;
-                for (; tr; tr = tr->next) {
-                    if (tr->type != &tt_changerace) {
-                        break;
+        if (tp) {
+            while (*tp) {
+                trigger *t = *tp;
+                if (t->type == &tt_timeout) {
+                    timeout_data *td = (timeout_data *)t->data.v;
+                    trigger *tr = td->triggers;
+                    for (; tr; tr = tr->next) {
+                        if (tr->type != &tt_changerace) {
+                            break;
+                        }
+                    }
+                    if (tr == NULL) {
+                        *tp = t->next;
+                        t_free(t);
+                        continue;
                     }
                 }
-                if (tr == NULL) {
-                    *tp = t->next;
-                    t_free(t);
-                    continue;
-                }
+                tp = &t->next;
             }
-            tp = &t->next;
         }
     }
     u->_race = rc;
