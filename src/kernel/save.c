@@ -576,7 +576,7 @@ unit *read_unit(gamedata *data)
             if (tp) {
                 while (*tp) {
                     trigger *tr = *tp;
-                    if (tr->type = &tt_timeout) {
+                    if (tr->type == &tt_timeout) {
                         t = tr;
                         break;
                     }
