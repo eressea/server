@@ -3019,11 +3019,11 @@ static int tactics_bonus(int num) {
 
         do {
             rnd = (int)(rng_int() % 100);
-            if (rnd >= 40 && rnd <= 69)
+            if (rnd < 30)
                 p_bonus += 1;
-            else if (rnd <= 89)
+            else if (rnd < 50)
                 p_bonus += 2;
-            else
+            else if (rnd >= 90)
                 p_bonus += 3;
         } while (rnd >= 97);
         if (bonus < p_bonus) bonus = p_bonus;
