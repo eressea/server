@@ -3010,6 +3010,27 @@ side * find_side(battle * b, const faction * f, const group * g, unsigned int fl
     return 0;
 }
 
+static int tactics_bonus(int num) {
+    int i, bonus = 0;
+
+    for (i = 0; i < num; i++) {
+        int p_bonus = 0;
+        int rnd;
+
+        do {
+            rnd = (int)(rng_int() % 100);
+            if (rnd >= 40 && rnd <= 69)
+                p_bonus += 1;
+            else if (rnd <= 89)
+                p_bonus += 2;
+            else
+                p_bonus += 3;
+        } while (rnd >= 97);
+        if (bonus < p_bonus) bonus = p_bonus;
+    }
+    return bonus;
+}
+
 fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 {
 #define WMAX 20
@@ -3277,23 +3298,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 #endif
 
     if (tactics > 0) {
-        int bonus = 0;
-
-        for (i = 0; i < fig->alive; i++) {
-            int p_bonus = 0;
-            int rnd;
-
-            do {
-                rnd = (int)(rng_int() % 100);
-                if (rnd >= 40 && rnd <= 69)
-                    p_bonus += 1;
-                else if (rnd <= 89)
-                    p_bonus += 2;
-                else
-                    p_bonus += 3;
-            } while (rnd >= 97);
-            if (p_bonus > bonus) p_bonus = bonus;
-        }
+        int bonus = tactics_bonus(fig->alive);
         tactics += bonus;
     }
 
