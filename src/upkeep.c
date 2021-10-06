@@ -4,6 +4,7 @@
 #include "upkeep.h"
 
 #include <kernel/ally.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/config.h>
 #include <kernel/item.h>
@@ -15,6 +16,8 @@
 #include <kernel/unit.h>
 
 #include <util/rand.h>
+
+#include <spells/unitcurse.h>
 
 #include "alchemy.h"
 #include "economy.h"
@@ -296,8 +299,10 @@ void get_food(region * r)
         }
         else if (is_cold && rc == rc_insect) {
             /* insects in glaciers get hunger damage */
-            if (hunger(u->number, u)) {
-                fset(u, UFL_HUNGER);
+            if (!is_cursed(u->attribs, &ct_insectfur)) {
+                if (hunger(u->number, u)) {
+                    fset(u, UFL_HUNGER);
+                }
             }
         }
     }
