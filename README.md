@@ -29,7 +29,7 @@ Here's how you clone and build the source on Linux or macOS:
 
 If you got this far and all went well, you have built the server, and
 it will have passed some basic functionality tests.
-The next step is to workout the ['Getting Started' article on the Wiki](https://github.com/eressea/server/wiki/Getting-Started).
+The next step is to workout the ['Getting Started'](https://github.com/eressea/server/wiki/Getting-Started) guide on the Wiki.
 
 * [![Static Analysis](https://scan.coverity.com/projects/6742/badge.svg?flat=1)](https://scan.coverity.com/projects/6742/)
 * [![Build Status](https://api.travis-ci.org/eressea/server.svg?branch=develop)](https://travis-ci.org/eressea/server)
