@@ -15,6 +15,7 @@
 #include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
@@ -502,6 +503,39 @@ static void test_cr_factionstealth(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cr_default(CuTest *tc) {
+    stream strm;
+    char line[1024];
+    faction *f;
+    region *r;
+    unit *u;
+    order *order = 0;
+
+    test_setup();
+    f = test_create_faction();
+    r = test_create_region(0, 0, NULL);
+    u = test_create_unit(f, r);
+
+    order = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
+    addlist(&u->old_orders, order);
+    order = create_order(K_GIVE, f->locale, "0 1 silver");
+    addlist(&u->old_orders, order);
+
+    mstream_init(&strm);
+    cr_output_unit(&strm, f, u, seen_unit);
+    strm.api->rewind(strm.handle);
+    do {
+        CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    } while (strcmp("COMMANDS", line) != 0);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"move east\"", line);
+    CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
+    CuAssertStrEquals(tc, "\"give 0 1 silver\"", line);
+    CuAssertIntEquals(tc, -1, strm.api->readln(strm.handle, line, sizeof(line)));
+    mstream_done(&strm);
+    test_teardown();
+}
+
 CuSuite *get_creport_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -511,5 +545,6 @@ CuSuite *get_creport_suite(void)
     SUITE_ADD_TEST(suite, test_cr_mallorn);
     SUITE_ADD_TEST(suite, test_cr_hiderace);
     SUITE_ADD_TEST(suite, test_cr_factionstealth);
+    SUITE_ADD_TEST(suite, test_cr_default);
     return suite;
 }

@@ -477,7 +477,7 @@ static int cr_spell(variant var, const char *name, char *buffer, const void *use
     spell *sp = (spell *)var.v;
     if (sp != NULL) {
         sprintf(buffer, "\"%s\";%s\n", spell_name(mkname_spell(sp), report->locale), name);
-    } 
+    }
     else {
         sprintf(buffer, "\"\";%s\n", name);
     }
@@ -597,7 +597,7 @@ static void cr_output_battles(FILE * F, faction * f)
 }
 
 /* prints a building */
-static void cr_output_building(struct stream *out, building *b, 
+static void cr_output_building(struct stream *out, building *b,
     const unit *owner, int fno, faction *f)
 {
     const char *bname, *billusion;
@@ -881,11 +881,9 @@ void cr_output_unit(stream *out, const faction * f,
         stream_printf(out, "COMMANDS\n");
         for (ord = u->old_orders; ord; ord = ord->next) {
             /* this new order will replace the old defaults */
-            if (is_persistent(ord)) {
-                swrite("\"", 1, 1, out);
-                stream_order(out, ord, lang, true);
-                swrite("\"\n", 1, 2, out);
-            }
+            swrite("\"", 1, 1, out);
+            stream_order(out, ord, lang, true);
+            swrite("\"\n", 1, 2, out);
         }
         for (ord = u->orders; ord; ord = ord->next) {
             keyword_t kwd = getkeyword(ord);
