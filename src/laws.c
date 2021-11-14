@@ -1004,38 +1004,45 @@ int quit_cmd(unit * u, struct order *ord)
         int flags = FFL_QUIT;
         if (rule_transfermen()) {
             param_t p;
-            p = getparam(f->locale);
-            if (p == P_FACTION) {
+            const char * s = gettoken(token, sizeof(token));
+            if (s) {
+                p = findparam(s, f->locale);
+                if (p != P_FACTION) {
+                    log_error("faction %s: QUIT FACTION syntax error.", factionname(f));
+                    cmistake(u, ord, 209, MSG_EVENT);
+                    flags = 0;
+                } else {
 #ifdef QUIT_WITH_TRANSFER
-                faction *f2 = getfaction();
-                if (f2 == NULL || f2 == u->faction) {
-                    cmistake(u, ord, 66, MSG_EVENT);
-                    flags = 0;
-                }
-                else if (f->race != f2->race) {
-                    cmistake(u, ord, 281, MSG_EVENT);
-                    flags = 0;
-                }
-                else {
-                    unit *u2;
-                    for (u2 = u->region->units; u2; u2 = u2->next) {
-                        if (u2->faction == f2) {
-                            if (ucontact(u2, u)) {
-                                transfer_faction(u->faction, u2->faction);
-                                break;
-                            }
-                        }
-                    }
-                    if (u2 == NULL) {
-                        /* no target unit found */
-                        cmistake(u, ord, 40, MSG_EVENT);
+                    faction *f2 = getfaction();
+                    if (f2 == NULL || f2 == u->faction) {
+                        cmistake(u, ord, 66, MSG_EVENT);
                         flags = 0;
                     }
-                }
+                    else if (f->race != f2->race) {
+                        cmistake(u, ord, 281, MSG_EVENT);
+                        flags = 0;
+                    }
+                    else {
+                        unit *u2;
+                        for (u2 = u->region->units; u2; u2 = u2->next) {
+                            if (u2->faction == f2) {
+                                if (ucontact(u2, u)) {
+                                    transfer_faction(u->faction, u2->faction);
+                                    break;
+                                }
+                            }
+                        }
+                        if (u2 == NULL) {
+                            /* no target unit found */
+                            cmistake(u, ord, 40, MSG_EVENT);
+                            flags = 0;
+                        }
+                    }
 #else
-                log_error("faction %s: QUIT FACTION is disabled.", factionname(f));
-                flags = 0;
+                    log_error("faction %s: QUIT FACTION is disabled.", factionname(f));
+                    flags = 0;
 #endif
+                }
             }
         }
         f->flags |= flags;

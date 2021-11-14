@@ -2751,7 +2751,7 @@ msgid "battle_loot"
 msgstr "\"$unit($unit) erbeutet $int($amount) $resource($item,$amount).\""
 
 msgid "error209"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax Error.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntaktischer Fehler.\""
 
 msgid "summonundead_effect_0"
 msgstr "\"$unit($mage) kann in $region($region) keine Untoten rufen.\""
