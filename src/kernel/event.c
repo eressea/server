@@ -101,13 +101,14 @@ int handle_triggers(trigger ** triggers, void *param)
     trigger **tp = triggers;
     while (*tp) {
         trigger *t = *tp;
-        if (t->type->handle(t, param) != 0) {
+        if (t->type->handle(t, param) == 0) {
             *tp = t->next;
             t_free(t);
             free(t);
         }
-        else
+        else {
             tp = &t->next;
+        }
     }
     return (*triggers != NULL);
 }

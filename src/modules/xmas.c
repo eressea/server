@@ -27,7 +27,7 @@
 
 static int xmasgate_handle(trigger * t, void *data)
 {
-    return -1;
+    return 0;
 }
 
 static void xmasgate_write(const trigger * t, struct storage *store)

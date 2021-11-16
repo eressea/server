@@ -419,8 +419,8 @@ unit *read_unit(gamedata *data)
         u_setfaction(u, f);
     }
     if (!u->faction) {
-        log_error("unit %s has faction == NULL", itoa36(u->no));
-        return 0;
+        log_error("unit %s has missing faction %s", itoa36(u->no), itoa36(n));
+        return NULL;
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
