@@ -540,6 +540,20 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
     test_teardown();
 }
 
+static void test_ship_damage(CuTest *tc) {
+    ship *sh;
+    sh = setup_ship();
+    damage_ship(sh, 0.5);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    sh->number = 2;
+    CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
+    sh->damage = 0;
+    damage_ship(sh, 0.5);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE, sh->damage);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+}
+
 static void test_shipspeed_damage(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
@@ -691,6 +705,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_crew_skill);
+    SUITE_ADD_TEST(suite, test_ship_damage);
     SUITE_ADD_TEST(suite, test_shipspeed);
     SUITE_ADD_TEST(suite, test_shipspeed_speedy);
     SUITE_ADD_TEST(suite, test_shipspeed_stormwind);

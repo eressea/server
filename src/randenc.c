@@ -270,7 +270,7 @@ static void move_iceberg(region * r)
                 shn = sh->next;
                 if (fval(sh, SF_SELECT)) {
                     u = ship_owner(sh);
-                    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                    if (ship_damage_percent(sh) >= 100) {
                         if (u != NULL) {
                             ADDMSG(&u->faction->msgs, msg_message("overrun_by_iceberg_des",
                                 "ship", sh));

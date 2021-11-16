@@ -2779,7 +2779,7 @@ static void aftermath(battle * b)
         while (*sp) {
             ship *sh = *sp;
             freset(sh, SF_DAMAGED);
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_damage_percent(sh) >= 100) {
                 sink_ship(sh);
                 remove_ship(sp, sh);
             }

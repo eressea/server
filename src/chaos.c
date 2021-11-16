@@ -137,7 +137,7 @@ static void chaos(region * r, faction *monsters)
                             ship *sh = *slist;
 
                             damage_ship(sh, 0.5);
-                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                            if (ship_damage_percent(sh) >= 100) {
                                 sink_ship(sh);
                                 remove_ship(slist, sh);
                             }

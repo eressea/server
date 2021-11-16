@@ -530,7 +530,7 @@ static ship *do_maelstrom(region * r, unit * u)
 
     damage_ship(u->ship, 0.01 * damage);
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_damage_percent(sh) >= 100) {
         ADDMSG(&u->faction->msgs, msg_message("entermaelstrom",
             "region ship damage sink", r, sh, damage, 1));
         sink_ship(sh);
@@ -870,7 +870,7 @@ static void drifting_ships(region * r)
             else {
                 damage_ship(sh, damage_drift);
             }
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_damage_percent(sh) >= 100) {
                 msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
                 sink_ship(sh);
                 remove_ship(shp, sh);
@@ -1838,10 +1838,10 @@ static void sail(unit * u, order * ord, bool drifting)
                         }
                         if (storm && rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, next_point, sh->damage >= sh->size * DAMAGE_SCALE));
+                                sh, next_point, ship_damage_percent(sh) >= 100));
 
                             damage_ship(sh, damage_storm);
-                            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+                            if (ship_damage_percent(sh) >= 100) {
                                 /* ship sinks, end journey here */
                                 break;
                             }
@@ -1949,7 +1949,7 @@ static void sail(unit * u, order * ord, bool drifting)
         }
     }
 
-    if (sh->damage >= sh->size * DAMAGE_SCALE) {
+    if (ship_damage_percent(sh) >= 100) {
         if (sh->region) {
             ADDMSG(&f->msgs, msg_message("shipsink", "ship", sh));
             sink_ship(sh);

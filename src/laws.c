@@ -2629,7 +2629,7 @@ void sinkships(struct region * r)
                     damage_ship(sh, dmg);
                 }
             }
-            if (sh->damage >= sh->size * DAMAGE_SCALE) {
+            if (ship_damage_percent(sh) >= 100) {
                 sink_ship(sh);
                 remove_ship(shp, sh);
             }
