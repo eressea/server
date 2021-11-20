@@ -594,7 +594,7 @@ static void test_clone_men(CuTest *tc) {
     test_teardown();
 }
 
-static void test_transfermen(CuTest *tc) {
+static void test_transfer_hitpoints(CuTest *tc) {
     unit *u1, *u2;
     region *r;
     faction *f;
@@ -613,6 +613,38 @@ static void test_transfermen(CuTest *tc) {
     CuAssertIntEquals(tc, 140000, u2->hp);
     CuAssertIntEquals(tc, 0, u1->number);
     CuAssertIntEquals(tc, 0, u1->hp);
+    test_teardown();
+}
+
+static void test_transfer_skills(CuTest *tc) {
+    unit *u1, *u2;
+    region *r;
+    faction *f;
+    skill *sv;
+
+    test_setup();
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 200);
+    set_level(u1, SK_ALCHEMY, 2);
+    sv = unit_skill(u1, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 3, sv->weeks);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 100);
+    set_level(u2, SK_ALCHEMY, 2);
+    transfermen(u1, u2, 100);
+    CuAssertIntEquals(tc, 100, u1->number);
+    CuAssertIntEquals(tc, 2, effskill(u1, SK_ALCHEMY, NULL));
+    CuAssertIntEquals(tc, 200, u2->number);
+    CuAssertIntEquals(tc, 2, effskill(u2, SK_ALCHEMY, NULL));
+    remove_skill(u1, SK_ALCHEMY);
+    transfermen(u1, u2, 100);
+    CuAssertIntEquals(tc, 300, u2->number);
+    sv = unit_skill(u2, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
     test_teardown();
 }
 
@@ -764,10 +796,9 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_clone_men);
+    SUITE_ADD_TEST(suite, test_transfer_hitpoints);
+    SUITE_ADD_TEST(suite, test_transfer_skills);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
-    SUITE_ADD_TEST(suite, test_transfermen);
-    SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
-    SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);

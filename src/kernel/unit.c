@@ -777,23 +777,23 @@ void clone_men(const unit * u, unit * dst, int n)
                 double dlevel = 0.0;
 
                 if (sv && sv->level) {
-                    dlevel += (sv->level + 1 - sv->weeks / (sv->level + 1.0)) * n;
+                    dlevel += (sv->level + 1.0 - sv->weeks / (sv->level + 1.0)) * n;
                     level += sv->level * n;
                 }
                 if (sn && sn->level) {
                     dlevel +=
-                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * dst->number;
+                        (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * dst->number;
                     level += sn->level * dst->number;
                 }
 
-                dlevel = dlevel / (n + dst->number);
-                level = level / (n + dst->number);
+                dlevel /= ((double)n + dst->number);
+                level /= (n + dst->number);
                 if (level <= dlevel) {
                     /* apply the remaining fraction to the number of weeks to go.
                      * subtract the according number of weeks, getting closer to the
                      * next level */
                     level = (int)dlevel;
-                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1));
+                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
                 }
                 else {
                     /* make it harder to reach the next level.

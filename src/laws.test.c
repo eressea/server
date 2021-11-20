@@ -653,12 +653,12 @@ static void test_reserve_cmd(CuTest *tc) {
     const resource_type *rtype;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
@@ -670,6 +670,39 @@ static void test_reserve_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
     CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_reserve_all(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    order *ord;
+    const resource_type *rtype;
+    struct locale *loc;
+
+    test_setup();
+    init_resources();
+    loc = test_create_locale();
+    locale_setstring(loc, parameters[P_ANY], "ALLES");
+    init_parameters(loc);
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    ord = create_order(K_RESERVE, f->locale, "ALLES SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 100, reserve_cmd(u1, ord));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
     free_order(ord);
     test_teardown();
 }
@@ -2439,8 +2472,9 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_can_guard);
     SUITE_ADD_TEST(suite, test_fleeing_cannot_guard);
     SUITE_ADD_TEST(suite, test_unskilled_cannot_guard);
-    SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
+    SUITE_ADD_TEST(suite, test_reserve_self);
+    SUITE_ADD_TEST(suite, test_reserve_all);
     SUITE_ADD_TEST(suite, test_pay_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd_other_building);
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
