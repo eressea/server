@@ -623,6 +623,7 @@ static void test_transfer_skills(CuTest *tc) {
     skill *sv;
 
     test_setup();
+    config_set_int("study.random_progress", 0);
     r = test_create_region(0, 0, NULL);
     f = test_create_faction();
     u1 = test_create_unit(f, r);
