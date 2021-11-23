@@ -404,6 +404,23 @@ static void test_safe_building(CuTest *tc) {
     test_teardown();
 }
 
+static void test_visible_building(CuTest *tc) {
+    building_type *bt_castle, *bt_light, *bt_illusion;
+    building *b;
+
+    test_setup();
+    bt_light = test_create_buildingtype("lighthouse");
+    bt_illusion = test_create_buildingtype("illusioncastle");
+    bt_castle = test_create_buildingtype("castle");
+
+    b = test_create_building(test_create_plain(0, 0), bt_light);
+    CuAssertPtrEquals(tc, bt_light, (void *)visible_building(b));
+    make_icastle(b, bt_castle, 1);
+    CuAssertPtrEquals(tc, bt_castle, (void *)visible_building(b));
+
+    test_teardown();
+}
+
 static void test_building_type(CuTest *tc) {
     building_type *btype;
     test_setup();
@@ -706,6 +723,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_building_type);
     SUITE_ADD_TEST(suite, test_active_building);
     SUITE_ADD_TEST(suite, test_buildingtype_exists);
+    SUITE_ADD_TEST(suite, test_visible_building);
     SUITE_ADD_TEST(suite, test_safe_building);
     return suite;
 }

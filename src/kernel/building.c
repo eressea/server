@@ -520,6 +520,16 @@ int buildingeffsize(const building * b, bool imaginary)
     return bt_effsize(btype, b, b->size);
 }
 
+const building_type *visible_building(const building *b) {
+    if (b->attribs) {
+        const attrib *a = a_find(b->attribs, &at_icastle);
+        if (a != NULL) {
+            return icastle_type(a);
+        }
+    }
+    return b->type;
+}
+
 int bt_effsize(const building_type * btype, const building * b, int bsize)
 {
     if (b) {
@@ -689,12 +699,15 @@ void building_setregion(building * b, region * r)
 bool in_safe_building(unit *u1, unit *u2) {
     if (u1->building) {
         building * b = inside_building(u1);
-        if (b && b->type->flags & BTF_FORTIFICATION) {
-            if (!u2->building) {
-                return true;
-            }
-            if (u2->building != b || b != inside_building(u2)) {
-                return true;
+        if (b) {
+            const building_type *btype = visible_building(b);
+            if (btype->flags & BTF_FORTIFICATION) {
+                if (!u2->building) {
+                    return true;
+                }
+                if (u2->building != b || b != inside_building(u2)) {
+                    return true;
+                }
             }
         }
     }
