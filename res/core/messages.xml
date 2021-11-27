@@ -1394,6 +1394,7 @@
   <message name="use_antimagiccrystal" section="magic">
     <type>
       <arg name="unit" type="unit"/>
+      <arg name="used" type="int"/>
     </type>
   </message>
   <message name="magicboost_effect" section="magic">

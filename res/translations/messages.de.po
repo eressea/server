@@ -2229,7 +2229,7 @@ msgid "summondragon"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($target).\""
 
 msgid "use_antimagiccrystal"
-msgstr "\"$unit($unit) benutzt einen Antimagiekristall.\""
+msgstr "\"$unit($unit) benutzt $int($used) Antimagiekristall$if($eq($used,1),\"\",\"e\").\""
 
 msgid "cast_stun_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger sind für einen Moment benommen.\""
