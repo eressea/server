@@ -127,7 +127,7 @@ struct order *ord)
 {
     region *r = u->region;
     const resource_type *rt_crystal;
-    int i, used;
+    int i;
 
     rt_crystal = rt_find("antimagic");
     assert(rt_crystal != NULL);
