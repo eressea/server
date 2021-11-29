@@ -34,7 +34,6 @@
     "NewbieImmunity": 8,
     "modules.market": false,
     "modules.wormhole": false,
-    "monsters.spawn.chance": 50,
     "entertain.base": 0,
     "entertain.perlevel": 20,
     "taxing.perlevel": 20,
