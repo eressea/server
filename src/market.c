@@ -59,7 +59,7 @@ attrib_type at_market = {
 
 bool markets_module(void)
 {
-    return config_get_int("modules.market", 1) != 0;
+    return config_get_int("modules.market", 0) != 0;
 }
 
 void do_markets(void)

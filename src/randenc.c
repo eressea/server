@@ -488,7 +488,7 @@ void randomevents(void)
     region *r;
     faction *monsters = get_monsters();
 
-    if (config_get_int("modules.iceberg", 1)) {
+    if (config_get_int("modules.iceberg", 0)) {
         icebergs();
     }
     for (r = regions; r; r = r->next) {

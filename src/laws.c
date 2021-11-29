@@ -4014,7 +4014,7 @@ void turn_end(void)
     remove_empty_units();
 
     /* must happen AFTER age, because that would destroy them right away */
-    if (config_get_int("modules.wormhole", 1)) {
+    if (config_get_int("modules.wormhole", 0)) {
         wormholes_update();
     }
 
