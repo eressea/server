@@ -160,7 +160,7 @@ msgstr "rusty swords"
 
 msgctxt "iteminfo"
 msgid "magicbag"
-msgstr "This bag encloses a dimensional fold, which can store up to 200 stones of weight without any extra burden on the bearer. Large items such as horses or carts cannot be placed inside."
+msgstr "This bag encloses a dimensional fold, which can store up to 200 stones of weight without any extra burden on the bearer. Large items such as stones, horses or carts cannot be placed inside. It is also not possible to transport one magic bag in another. The bag itself weighs 1 stones of weight"
 
 msgid "lighthouse"
 msgstr "lighthouse"
