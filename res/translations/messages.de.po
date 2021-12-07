@@ -1347,7 +1347,7 @@ msgid "buildroad"
 msgstr "\"$unit($unit) erweitert in $region($region) das Straßennetz um $int($size).\""
 
 msgid "nr_border_opaque"
-msgstr "Im $direction($dir) verperrt ${object} die Sicht."
+msgstr "Im $direction($dir) versperrt ${object} die Sicht."
 
 msgid "nr_border_transparent"
 msgstr "Im $direction($dir) befindet sich ${object}."
