@@ -788,6 +788,23 @@ static void test_gift_items(CuTest *tc) {
     test_teardown();
 }
 
+static void test_max_heroes(CuTest* tc) {
+    CuAssertIntEquals(tc, 0, max_heroes(56));
+    CuAssertIntEquals(tc, 1, max_heroes(57));
+    CuAssertIntEquals(tc, 1, max_heroes(62));
+    CuAssertIntEquals(tc, 2, max_heroes(63));
+    CuAssertIntEquals(tc, 2, max_heroes(70));
+    CuAssertIntEquals(tc, 3, max_heroes(71));
+    config_set_int("rules.heroes.offset", 500);
+    CuAssertIntEquals(tc, 0, max_heroes(556));
+    CuAssertIntEquals(tc, 1, max_heroes(557));
+    CuAssertIntEquals(tc, 1, max_heroes(562));
+    CuAssertIntEquals(tc, 2, max_heroes(563));
+    CuAssertIntEquals(tc, 2, max_heroes(570));
+    CuAssertIntEquals(tc, 3, max_heroes(571));
+}
+
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -821,5 +838,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
     SUITE_ADD_TEST(suite, test_maintenance_cost);
+    SUITE_ADD_TEST(suite, test_max_heroes);
     return suite;
 }

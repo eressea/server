@@ -1426,11 +1426,17 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     return u;
 }
 
-int maxheroes(const struct faction *f)
+int max_heroes(int num_people)
 {
-    int nsize = f->num_people;
-    if (nsize == 0)
+    static int config;
+    static int rule_offset;
+    if (config_changed(&config)) {
+        rule_offset = config_get_int("rules.heroes.offset", 0);
+    }
+    int nsize = num_people - rule_offset;
+    if (nsize <= 0) {
         return 0;
+    }
     else {
         int nmax = (int)(log10(nsize / 50.0) * 20);
         return (nmax < 0) ? 0 : nmax;

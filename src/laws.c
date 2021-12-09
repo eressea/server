@@ -944,7 +944,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     }
 
     hnow = countheroes(fdst);
-    hmax = maxheroes(fdst);
+    hmax = max_heroes(fdst->num_people);
     u = fsrc->units;
     while (u) {
         unit *unext = u->nextF;
@@ -2382,10 +2382,10 @@ int promotion_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    if (maxheroes(u->faction) < countheroes(u->faction) + u->number) {
+    if (max_heroes(u->faction->num_people) < countheroes(u->faction) + u->number) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "heroes_maxed", "max count",
-                maxheroes(u->faction), countheroes(u->faction)));
+                max_heroes(u->faction->num_people), countheroes(u->faction)));
         return 0;
     }
     if (!valid_race(u->faction, u_race(u))) {

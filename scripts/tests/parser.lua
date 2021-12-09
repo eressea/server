@@ -256,14 +256,15 @@ function test_promote_after_recruit()
     local r1 = region.create(0, 0, 'plain')
     local r2 = region.create(1, 0, 'plain')
     local u1 = unit.create(f, r1, 1)
-    local u2 = unit.create(f, r2, 55)
+    local bonus = eressea.settings.get("rules.heroes.offset") or 0
+    local u2 = unit.create(f, r2, 55 + bonus)
     u2:add_order('REKRUTIERE 1')
     u1:add_order('BEFOERDERE')
-    u1:add_item('money', 57)
+    u1:add_item('money', 57 + bonus)
     u2:add_item('money', 150)
     local fl = u1.flags
     process_orders()
-    assert_equal(56, u2.number)
-    assert_equal(fl + 128, u1.flags) -- UFL_HERO
+    assert_equal(56 + bonus, u2.number)
     assert_equal(0, u1:get_item('money'))
+    assert_equal(fl + 128, u1.flags) -- UFL_HERO
 end
