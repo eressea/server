@@ -85,7 +85,7 @@ int tolua_faction_add_item(lua_State * L)
 static int tolua_faction_get_maxheroes(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    lua_pushinteger(L, maxheroes(f));
+    lua_pushinteger(L, max_heroes(f->num_people));
     return 1;
 }
 
