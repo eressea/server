@@ -2047,7 +2047,7 @@ report_plaintext(const char *filename, report_context * ctx,
         msg_release(m);
         centre(out, buf, true);
     }
-    maxh = maxheroes(f);
+    maxh = max_heroes(f->num_people);
     if (maxh) {
         message *msg =
             msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);

@@ -24,6 +24,8 @@
 		"rules.check_overload": false,
 		"rules.limit.faction": 2500,
 		"rules.maxskills.magic": 5,
+		"rules.heroes.offset": 500,
+		"rules.heroes.combat_speed": 5,
 		"rules.guard.base_stop_prob": 0.30,
 		"rules.guard.skill_stop_prob": 0.05,
 		"rules.guard.amulet_stop_prob": 0.10,

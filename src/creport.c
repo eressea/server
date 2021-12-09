@@ -1592,7 +1592,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     i = countheroes(f);
     if (i > 0)
         fprintf(F, "%d;heroes\n", i);
-    i = maxheroes(f);
+    i = max_heroes(f->num_people);
     if (i > 0)
         fprintf(F, "%d;max_heroes\n", i);
 

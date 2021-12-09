@@ -55,7 +55,7 @@ extern "C" {
 #define UFL_SAVEMASK (UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 128 * 1024
-    extern int maxheroes(const struct faction *f);
+    extern int max_heroes(int num_people);
     extern int countheroes(const struct faction *f);
 
     typedef struct reservation {
