@@ -58,7 +58,7 @@ void OP_ParserFree(OP_Parser parser) {
     free(parser);
 }
 
-static enum OP_Error buffer_append(OP_Parser parser, const char *s, int len)
+static enum OP_Error buffer_append(OP_Parser parser, const char *s, size_t len)
 {
     size_t total = len + 1;
     size_t remain = parser->m_bufferEnd - parser->m_bufferPtr;
@@ -125,9 +125,31 @@ static char *skip_spaces(char *pos) {
     return next;
 }
 
+static void strip_comment(char* str)
+{
+    char* pos = strpbrk(str, "\"';");
+    char quote = 0;
+    while (pos) {
+        if (*pos == ';') {
+            if (!quote) {
+                *pos = 0;
+                break;
+            }
+        }
+        else if (!quote) {
+            quote = *pos;
+        }
+        else if (*pos == quote) {
+            quote = 0;
+        }
+        pos = strpbrk(pos + 1, "\"';");
+    }
+}
+
 static enum OP_Error handle_line(OP_Parser parser) {
     if (parser->m_orderHandler) {
         char * str = skip_spaces(parser->m_bufferPtr);
+        strip_comment(str);
         if (*str) {
             parser->m_orderHandler(parser->m_userData, str);
         }
@@ -137,7 +159,7 @@ static enum OP_Error handle_line(OP_Parser parser) {
 
 static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
 {
-    char * pos = strpbrk(parser->m_bufferPtr, "\\;\n");
+    char * pos = strpbrk(parser->m_bufferPtr, "\\\n");
     while (pos) {
         enum OP_Error code;
         size_t len = pos - parser->m_bufferPtr;
@@ -154,7 +176,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 return OP_STATUS_ERROR;
             }
             parser->m_bufferPtr = pos + 1;
-            pos = strpbrk(parser->m_bufferPtr, "\\;\n");
+            pos = strpbrk(parser->m_bufferPtr, "\\\n");
             break;
         case '\\':
             /* if this is the last non-space before the line break, then lines need to be joined */
@@ -164,7 +186,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                 assert(shift > 0);
                 memmove(parser->m_bufferPtr + shift, parser->m_bufferPtr, len);
                 parser->m_bufferPtr += shift;
-                pos = strpbrk(next + 1, "\\;\n");
+                pos = strpbrk(next + 1, "\\\n");
                 ++parser->m_lineNumber;
             }
             else {
@@ -182,84 +204,9 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
                     }
                 }
                 else {
-                    pos = strpbrk(pos + 1, "\\;\n");
+                    pos = strpbrk(pos + 1, "\\\n");
                 }
             }
-            break;
-        case ';':
-            /* the current line ends in a comment */
-            *pos++ = '\0';
-            handle_line(parser);
-            /* find the end of the comment so we can skip it.
-             * obs: multi-line comments are possible with a backslash. */
-            do {
-                next = strpbrk(pos, "\\\n");
-                if (next) {
-                    if (*next == '\n') {
-                        /* no more lines in this comment, we're done: */
-                        ++parser->m_lineNumber;
-                        break; /* exit loop */
-                    }
-                    else {
-                        /* is this backslash the final character? */
-                        next = skip_spaces(next + 1);
-                        if (*next == '\n') {
-                            /* we have a multi-line comment! */
-                            pos = next + 1;
-                            ++parser->m_lineNumber;
-                        }
-                        else if (*next == '\0') {
-                            /* cannot find the EOL char yet, stream is dry. keep ; and \ */
-                            continue_comment = 2;
-                        }
-                        else {
-                            /* keep looking for a backslash */
-                            pos = next;
-                        }
-                    }
-                }
-            } while (next && *next);
-
-            if (!next) {
-                /* we exhausted the buffer before we finished the line */
-                if (isFinal) {
-                    /* this comment was at the end of the file, it just has no newline. done! */
-                    return OP_STATUS_OK;
-                }
-                else {
-                    /* there is more of this line in the next buffer, save the semicolon */
-                    continue_comment = 1;
-                }
-            }
-            else { 
-                if (*next) {
-                    /* end comment parsing, begin parsing a new line */
-                    pos = next + 1;
-                    continue_comment = 0;
-                }
-                else if (!continue_comment) {
-                    /* reached end of input naturally, need more data to finish */
-                    continue_comment = 1;
-                }
-            }
-
-            if (continue_comment) {
-                ptrdiff_t skip = parser->m_bufferEnd - parser->m_bufferPtr;
-                assert(skip >= continue_comment);
-                if (skip >= continue_comment) {
-                    /* should always be true */
-                    parser->m_bufferPtr += (skip - continue_comment);
-                    parser->m_bufferPtr[0] = ';';
-                }
-                if (continue_comment == 2) {
-                    parser->m_bufferPtr[1] = '\\';
-                }
-                continue_comment = 0;
-                return OP_STATUS_OK;
-            }
-            /* continue the outer loop */
-            parser->m_bufferPtr = pos;
-            pos = strpbrk(pos, "\\;\n");
             break;
         default:
             parser->m_errorCode = OP_ERROR_SYNTAX;
@@ -273,7 +220,7 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
     return OP_STATUS_OK;
 }
 
-enum OP_Status OP_Parse(OP_Parser parser, const char *s, int len, int isFinal)
+enum OP_Status OP_Parse(OP_Parser parser, const char *s, size_t len, int isFinal)
 {
     enum OP_Error code;
 
