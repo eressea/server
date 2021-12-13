@@ -164,7 +164,6 @@ static enum OP_Status parse_buffer(OP_Parser parser, int isFinal)
         enum OP_Error code;
         size_t len = pos - parser->m_bufferPtr;
         char *next;
-        int continue_comment = 0;
 
         switch (*pos) {
         case '\n':
