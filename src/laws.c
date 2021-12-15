@@ -350,13 +350,15 @@ static void peasants(region * r, int rule)
     int rp = rpeasants(r);
     int money = rmoney(r);
     int maxp = max_production(r);
-    int n, satiated;
-    int dead = 0, peasants = rp;
+    int n, dead = 0, peasants = rp;
+    int satiated = money / maintenance_cost(NULL);
+    int max_survive = (maxp < satiated) ? maxp : satiated;
 
-    if (peasants > 0 && rule > 0) {
+    if (peasants > 0 && rule > 0 && peasants < max_survive) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
         int births = ROUND_BIRTHS(fraction);
+
         attrib *a = a_find(r->attribs, &at_peasantluck);
 
         if (a != NULL) {
@@ -364,14 +366,19 @@ static void peasants(region * r, int rule)
         }
 
         luck = peasant_luck_effect(peasants, luck, maxp, .5);
-        if (luck > 0)
+        if (luck > 0) {
             ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
-        peasants += births + luck;
+            births += luck;
+        }
+        if (peasants + births > max_survive) {
+            /* if we cannot afford to breed, we don't */
+            births = max_survive - peasants;
+        }
+        peasants += births;
     }
 
     /* Alle werden satt, oder halt soviele fuer die es auch Geld gibt */
 
-    satiated = money / maintenance_cost(NULL);
     if (satiated > peasants) satiated = peasants;
     rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
