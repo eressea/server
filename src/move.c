@@ -431,42 +431,47 @@ bool canswim(unit * u)
     return false;
 }
 
-static int walk_mode(const unit * u)
+static int walk_speed(const unit * u)
 {
-    int horses = 0, maxhorses, unicorns = 0, maxunicorns;
+    int horses = 0, maxhorses, unicorns = 0;
     int skill;
     item *itm;
-    const item_type *it_horse, *it_elvenhorse, *it_charger;
+    const item_type *it_elvenhorse;
     const resource_type *rtype;
 
-    it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
-    it_charger = ((rtype = get_resourcetype(R_CHARGER)) != NULL) ? rtype->itype : 0;
 
     for (itm = u->items; itm; itm = itm->next) {
-        if (itm->type == it_horse || itm->type == it_charger) {
+        if (itm->type->flags & ITF_ANIMAL) {
+            if (itm->type == it_elvenhorse) {
+                unicorns += itm->number;
+            }
             horses += itm->number;
         }
-        else if (itm->type == it_elvenhorse) {
-            unicorns += itm->number;
-        }
+    }
+
+    if ((u_race(u)->flags & RCF_HORSE) && !horses) {
+        return BP_RIDING;
     }
 
     skill = effskill(u, SK_RIDING, NULL);
-    maxunicorns = (skill / 5) * u->number;
     maxhorses = riding_horse_limit(u, skill);
 
-    if (!(u_race(u)->flags & RCF_HORSE)
-        && ((horses == 0 && unicorns == 0)
-            || horses > maxhorses || unicorns > maxunicorns)) {
-        return BP_WALKING;
-    }
-
-    if (ridingcapacity(u) - eff_weight(u) >= 0) {
-        if (horses == 0 && unicorns >= u->number && !(u_race(u)->flags & RCF_HORSE)) {
-            return BP_UNICORN;
+    if (horses > maxhorses) {
+        if (horses <= walking_horse_limit(u, skill)) {
+            return BP_WALKING;
         }
-        return BP_RIDING;
+        return 0;
+    }
+    if (ridingcapacity(u) - eff_weight(u) >= 0) {
+        if (horses) {
+            if (horses == unicorns) {
+                if (skill >= 5) {
+                    return BP_UNICORN;
+                }
+            }
+            return BP_RIDING;
+        }
     }
 
     return BP_WALKING;
@@ -1436,7 +1441,7 @@ int movement_speed(const unit * u)
             mp = BP_DRAGON;
         }
         else {
-            mp = walk_mode(u);
+            mp = walk_speed(u);
             if (mp >= BP_RIDING) {
                 dk = 1.0;
             }
@@ -1636,7 +1641,7 @@ static const region_list *travel_route(unit * u,
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
         }
-        else if (walk_mode(u) >= BP_RIDING) {
+        else if (walk_speed(u) >= BP_RIDING) {
             walkmode = 1;
             produceexp(u, SK_RIDING, u->number);
         }
