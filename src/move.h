@@ -81,6 +81,7 @@ extern "C" {
     direction_t drift_target(struct ship *sh);
     struct order * cycle_route(struct order * ord, const struct locale *lang, int gereist);
     struct order * make_movement_order(const struct locale *lang, direction_t steps[], int length);
+
 #ifdef __cplusplus
 }
 #endif

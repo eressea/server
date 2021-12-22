@@ -635,6 +635,8 @@ void init_resources(void)
     rtype->flags |= RTF_ITEM | RTF_LIMITED;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
+    rtype->itype->weight = 5000;
+    rtype->itype->capacity = 7000;
 
     /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);
