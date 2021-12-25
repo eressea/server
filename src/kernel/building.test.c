@@ -410,7 +410,6 @@ static void test_visible_building(CuTest *tc) {
 
     test_setup();
     bt_light = test_create_buildingtype("lighthouse");
-    bt_illusion = test_create_buildingtype("illusioncastle");
     bt_castle = test_create_buildingtype("castle");
 
     b = test_create_building(test_create_plain(0, 0), bt_light);
