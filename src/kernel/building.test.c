@@ -405,7 +405,7 @@ static void test_safe_building(CuTest *tc) {
 }
 
 static void test_visible_building(CuTest *tc) {
-    building_type *bt_castle, *bt_light, *bt_illusion;
+    building_type *bt_castle, *bt_light;
     building *b;
 
     test_setup();
