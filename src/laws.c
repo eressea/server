@@ -2675,11 +2675,11 @@ static void age_stonecircle(building *b) {
                         i_change(&u->items, rtype->itype, 1);
                         ++unicorns;
                     }
-                    if (unicorns) {
-                        ADDMSG(&u->faction->msgs, msg_message("scunicorn",
-                                                              "unit amount rtype",
-                                                              u, unicorns, rtype));
-                    }
+                }
+                if (unicorns) {
+                    ADDMSG(&u->faction->msgs, msg_message("scunicorn",
+                        "unit amount rtype",
+                        u, unicorns, rtype));
                 }
             }
         }
