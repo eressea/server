@@ -165,7 +165,7 @@ struct ship *findship(int i)
 void damage_ship(ship * sh, double percent)
 {
     double damage =
-        DAMAGE_SCALE * sh->type->damage * percent * sh->number * sh->size + sh->damage + .000001;
+        DAMAGE_SCALE * sh->type->damage * percent * sh->size + sh->damage + .000001;
     sh->damage = (int)damage;
 }
 
@@ -566,5 +566,5 @@ int ship_damage_percent(const ship *sh) {
     /* Schaden muss granularer sein als Größe, deshalb ist er skaliert
      * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Größenpunkt.
      */
-    return ((DAMAGE_SCALE - 1) + sh->damage * 100) / (sh->size * sh->number * DAMAGE_SCALE);
+    return ((DAMAGE_SCALE - 1) + sh->damage * DAMAGE_SCALE) / (sh->size * DAMAGE_SCALE);
 }

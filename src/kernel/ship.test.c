@@ -547,10 +547,12 @@ static void test_ship_damage(CuTest *tc) {
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
     sh->number = 2;
+    sh->size *= 2;
     CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
+
     sh->damage = 0;
     damage_ship(sh, 0.5);
-    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE, sh->damage);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
 }
 
