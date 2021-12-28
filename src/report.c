@@ -1827,15 +1827,15 @@ static void nr_paragraph(struct stream *out, message * m, const faction * f)
     paragraph(out, buf, 0, 0, 0);
 }
 
-typedef struct cb_data {
+typedef struct travelthru_data {
     struct stream *out;
     char *handle_start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
-} cb_data;
+} travelthru_data;
 
-static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
+static void init_cb(travelthru_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
     data->handle_start = buffer;
@@ -1846,7 +1846,7 @@ static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size
 }
 
 static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
-    cb_data *data = (cb_data *)cbdata;
+    travelthru_data *data = (travelthru_data *)cbdata;
     const faction *f = data->f;
 
     if (data->counter >= data->maxtravel) {
@@ -1879,7 +1879,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
                 else {
                     str = ", ";
                 }
-                len = strlen(str);
+                len = str ? strlen(str) : 0;
                 if (len < size) {
                     memcpy(writep, str, len);
                     writep += len;
@@ -1908,7 +1908,7 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
         int maxtravel = count_travelthru(r, f);
 
         if (maxtravel > 0) {
-            cb_data cbdata;
+            travelthru_data cbdata;
             char buf[8192];
 
             newline(out);
