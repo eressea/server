@@ -1909,13 +1909,15 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
 
         if (maxtravel > 0) {
             travelthru_data cbdata;
-            char buf[8192];
+            char buf[256];
+            size_t bytes;
 
             newline(out);
             init_cb(&cbdata, out, buf, sizeof(buf), f);
             cbdata.maxtravel = maxtravel;
-            cbdata.writep +=
-                str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+            bytes = str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+            assert(bytes < sizeof(buf));
+            cbdata.writep += bytes;
             travelthru_map(r, cb_write_travelthru, &cbdata);
             return;
         }
