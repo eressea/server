@@ -745,6 +745,48 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
+static int merge_skill(const skill* sv, const skill* sn, skill *result, int n, int add)
+{
+    int weeks = sv ? sv->weeks : 0, level = sv ? sv->level : 0;
+    assert(result);
+    if (sn != NULL && n > 0) {
+        double dlevel = sv ? ((level + 1.0 - weeks / (level + 1.0)) * add) : 0.0;
+
+        level *= add;
+        if (sn && sn->level) {
+            dlevel +=
+                (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * n;
+            level += sn->level * n;
+        }
+
+        dlevel /= ((double)add + n);
+        level /= (add + n);
+        if (level <= dlevel) {
+            /* apply the remaining fraction to the number of weeks to go.
+             * subtract the according number of weeks, getting closer to the
+             * next level */
+            level = (int)dlevel;
+            weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
+        }
+        else {
+            /* make it harder to reach the next level.
+             * weeks+level is the max difficulty, 1 - the fraction between
+             * level and dlevel applied to the number of weeks between this
+             * and the previous level is the added difficutly */
+            level = (int)dlevel + 1;
+            weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
+        }
+    }
+    if (level) {
+        assert(weeks > 0 && weeks <= level * 2 + 1);
+        assert(n != 0 || (sv && level == sv->level
+            && weeks == sv->weeks));
+        result->level = level;
+        result->weeks = weeks;
+    }
+    return level;
+}
+
 void clone_men(const unit * u, unit * dst, int n)
 {
     const attrib *a;
@@ -762,60 +804,19 @@ void clone_men(const unit * u, unit * dst, int n)
         assert(dst->number + n > 0);
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
-            int weeks, level = 0;
+            int level;
             skill *sv = unit_skill(u, sk);
             skill *sn = unit_skill(dst, sk);
-
+            skill result;
             if (sv == NULL && sn == NULL)
                 continue;
-            if (sn == NULL && dst->number == 0) {
-                /* new unit, easy to solve */
-                level = sv->level;
-                weeks = sv->weeks;
-            }
-            else {
-                double dlevel = 0.0;
-
-                if (sv && sv->level) {
-                    dlevel += (sv->level + 1.0 - sv->weeks / (sv->level + 1.0)) * n;
-                    level += sv->level * n;
-                }
-                if (sn && sn->level) {
-                    dlevel +=
-                        (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * dst->number;
-                    level += sn->level * dst->number;
-                }
-
-                dlevel /= ((double)n + dst->number);
-                level /= (n + dst->number);
-                if (level <= dlevel) {
-                    /* apply the remaining fraction to the number of weeks to go.
-                     * subtract the according number of weeks, getting closer to the
-                     * next level */
-                    level = (int)dlevel;
-                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
-                }
-                else {
-                    /* make it harder to reach the next level.
-                     * weeks+level is the max difficulty, 1 - the fraction between
-                     * level and dlevel applied to the number of weeks between this
-                     * and the previous level is the added difficutly */
-                    level = (int)dlevel + 1;
-                    weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
-                }
-            }
-            if (level) {
-                if (sn == NULL)
+            level = merge_skill(sv, sn, &result, dst->number, n);
+            if (level > 0) {
+                if (sn == NULL) {
                     sn = add_skill(dst, sk);
-                sn->level = (unsigned char)level;
-                sn->weeks = (unsigned char)weeks;
-                assert(sn->weeks > 0 && sn->weeks <= sn->level * 2 + 1);
-                assert(dst->number != 0 || (sv && sn->level == sv->level
-                    && sn->weeks == sv->weeks));
-            }
-            else if (sn) {
-                remove_skill(dst, sk);
-                sn = NULL;
+                }
+                sn->level = result.level;
+                sn->weeks = result.weeks;
             }
         }
         a = a_find(u->attribs, &at_effect);
