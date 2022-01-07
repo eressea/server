@@ -43,7 +43,6 @@ extern "C" {
 #define skill_level(level) (level)
     void increase_skill(struct unit * u, enum skill_t sk, int weeks);
     void reduce_skill(struct unit *u, skill * sv, int weeks);
-    int skill_weeks(int level);
     int skill_compare(const skill * sk, const skill * sc);
 
     void sk_set(skill * sv, int level);

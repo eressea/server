@@ -92,14 +92,6 @@ int level(int days)
     return i;
 }
 
-void sk_set(skill * sv, int level)
-{
-    assert(sv && level != 0);
-    sv->weeks = skill_weeks(level);
-    sv->level = level;
-    assert(sv->weeks <= sv->level * 2 + 1);
-}
-
 static bool rule_random_progress(void)
 {
     static int rule, config;
@@ -109,7 +101,7 @@ static bool rule_random_progress(void)
     return rule != 0;
 }
 
-int skill_weeks(int level)
+static int skill_weeks(int level)
 /* how many weeks must i study to get from level to level+1 */
 {
     if (rule_random_progress()) {
@@ -121,6 +113,14 @@ int skill_weeks(int level)
         return heads;
     }
     return level + 1;
+}
+
+void sk_set(skill* sv, int level)
+{
+    assert(sv && level != 0);
+    sv->weeks = skill_weeks(level);
+    sv->level = level;
+    assert(sv->weeks <= sv->level * 2 + 1);
 }
 
 void increase_skill(unit * u, skill_t sk, int weeks)

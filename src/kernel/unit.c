@@ -742,10 +742,35 @@ void move_unit(unit * u, region * r, unit ** ulist)
     u->region = r;
 }
 
-/* ist mist, aber wegen nicht skalierender attribute notwendig: */
-#include "alchemy.h"
+static int skill_weeks(const skill* sv)
+{
+    int weeks = 0;
+    if (sv) {
+        int n = sv->level + 1;
+        weeks = n * (n + 1) / 2;
+        weeks -= sv->weeks;
+    }
+    return weeks;
+}
 
-static int merge_skill(const skill* sv, const skill* sn, skill *result, int n, int add)
+static int weeks_to_level(double weeks)
+{
+    return (int)(sqrt(1.0 + weeks * 8.0) - 1) / 2;
+}
+
+static int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
+{
+    double w = skill_weeks(sn) * (double)n;
+    w += skill_weeks(sv) * (double)add;
+    int level = weeks_to_level(w / ((double)n + add));
+    assert(result);
+    result->level = level;
+    result->weeks = 0;
+    result->weeks = skill_weeks(result) - (level * (level + 1) / 2);
+    return level;
+}
+#if 0
+static int merge_skill_orig(const skill* sv, const skill* sn, skill *result, int n, int add)
 {
     int weeks = sv ? sv->weeks : 0, level = sv ? sv->level : 0;
     assert(result);
@@ -786,6 +811,9 @@ static int merge_skill(const skill* sv, const skill* sn, skill *result, int n, i
     }
     return level;
 }
+#endif
+/* ist mist, aber wegen nicht skalierender attribute notwendig: */
+#include "alchemy.h"
 
 void clone_men(const unit * u, unit * dst, int n)
 {
