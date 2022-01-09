@@ -194,20 +194,38 @@ static int level_from_weeks(int weeks, int n)
     return (int)(sqrt(1.0 + (weeks * 8.0 / n)) - 1) / 2;
 }
 
+static int weeks_studied(const skill* sv)
+{
+    int expect = progress_weeks(sv->level + 1, false);
+    return expect - sv->weeks;
+}
+
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
 {
     /* number of person-weeks the units have studied: */
+    int total = add + n;
     int weeks = (sn ? weeks_from_level(sn->level) : 0) * n
         + (sv ? weeks_from_level(sv->level) : 0) * add;
     /* level that combined unit should be at: */
-    int level = level_from_weeks(weeks, n + add);
+    int level = level_from_weeks(weeks, total);
 
     result->level = level;
     /* how long it should take to the next level: */
     result->weeks = progress_weeks(level + 1, false);
+
+    /* see if we have any remaining weeks: */
+    weeks -= weeks_from_level(level) * total;
     /* adjusted by how much we already studied: */
-    // result->weeks -= weeks / (n + add);
-    return level;
+    if (sv) weeks += weeks_studied(sv) * add;
+    if (sn) weeks += weeks_studied(sn) * n;
+    if (weeks / total) {
+        result->weeks -= weeks / total;
+        while (result->weeks < 0) {
+            ++result->level;
+            result->weeks += progress_weeks(result->level, false);
+        }
+    }
+    return result->level;
 }
 #else
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)

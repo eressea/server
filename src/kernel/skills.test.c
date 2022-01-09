@@ -61,17 +61,36 @@ static void test_skills_merge(CuTest* tc)
     src.level = 4;
     dst.level = 6;
 
-    /* close as possible to next level: */
+    /* close as possible to next level: (T4, 1) + (T6, 1) = (T5, 1) */
     src.weeks = 1;
     dst.weeks = 1;
     CuAssertIntEquals(tc, 5, merge_skill(&src, &dst, &result, 1, 1));
     CuAssertIntEquals(tc, 5, result.level);
+    CuAssertIntEquals(tc, 1, result.weeks);
 
-    /* max. far from next level: */
-    src.weeks = 8;
-    dst.weeks = 12;
+    /* max. far from next level: (T4, 10) + (T6, 14) = (T5, 11) */
+    src.weeks = src.level * 2 + 2;
+    dst.weeks = dst.level * 2 + 2;
     CuAssertIntEquals(tc, 5, merge_skill(&src, &dst, &result, 1, 1));
     CuAssertIntEquals(tc, 5, result.level);
+    CuAssertIntEquals(tc, 11, result.weeks);
+
+    /* extreme values: (T99, 1) + (T1, 1) = (T70, 30) */
+    src.level = 99;
+    dst.level = 1;
+    src.weeks = 1;
+    dst.weeks = 1;
+    CuAssertIntEquals(tc, 70, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 70, result.level);
+    CuAssertIntEquals(tc, 30, result.weeks);
+
+    /* extreme values: (T99, 200) + (T1, 4) = (70, 3) */
+    src.weeks = src.level * 2 + 2;
+    dst.weeks = dst.level * 2 + 2;
+    CuAssertIntEquals(tc, 70, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 70, result.level);
+    CuAssertIntEquals(tc, 3, result.weeks);
+
     test_teardown();
 }
 
