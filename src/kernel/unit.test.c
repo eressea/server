@@ -650,6 +650,44 @@ static void test_transfer_skills(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * A transfer of men between two units with different progress
+ * merges their skill progress.
+ */
+static void test_transfer_skills_merge(CuTest *tc) {
+    unit *u1, *u2, *u3;
+    region *r;
+    faction *f;
+    skill *sv;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction();
+
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 5);
+
+    u2 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+    u3 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+
+    transfermen(u1, u2, 2);
+    CuAssertIntEquals(tc, 3, u1->number);
+    CuAssertIntEquals(tc, 3, u2->number);
+    sv = unit_skill(u2, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 1, sv->level);
+
+    transfermen(u1, u3, 3);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertIntEquals(tc, 4, u3->number);
+    sv = unit_skill(u3, SK_ALCHEMY);
+    CuAssertPtrEquals(tc, NULL, sv);
+
+    test_teardown();
+}
+
 static void test_get_modifier(CuTest *tc) {
     race * rc;
     region *r;
@@ -817,6 +855,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_clone_men);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
+    SUITE_ADD_TEST(suite, test_transfer_skills_merge);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);

@@ -179,6 +179,7 @@ static int weeks_from_level(int level)
     return level * (level + 1) / 2;
 }
 
+/*
 static int weeks_from_skill(const skill* sv)
 {
     if (sv) {
@@ -186,17 +187,11 @@ static int weeks_from_skill(const skill* sv)
     }
     return 0;
 }
+*/
 
 static int level_from_weeks(int weeks, int n)
 {
     return (int)(sqrt(1.0 + (weeks * 8.0 / n)) - 1) / 2;
-}
-
-static int min_level(const skill* sa, const skill* sb)
-{
-    int a = sa ? sa->level : 0;
-    int b = sb ? sb->level : 0;
-    return (a < b) ? a : b;
 }
 
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
