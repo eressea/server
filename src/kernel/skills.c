@@ -196,11 +196,12 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     if (sv) weeks += weeks_studied(sv) * add;
     if (sn) weeks += weeks_studied(sn) * n;
     if (weeks / total) {
-        result->weeks -= weeks / total;
-        while (result->weeks < 0) {
+        weeks = result->weeks - weeks / total;
+        while (weeks < 0) {
             ++result->level;
-            result->weeks += progress_weeks(result->level, false);
+            weeks += progress_weeks(result->level, false);
         }
+        result->weeks = weeks;
     }
     return result->level;
 }

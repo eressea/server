@@ -84,12 +84,12 @@ static void test_skills_merge(CuTest* tc)
     CuAssertIntEquals(tc, 70, result.level);
     CuAssertIntEquals(tc, 30, result.weeks);
 
-    /* extreme values: (T99, 200) + (T1, 4) = (70, 3) */
+    /* extreme values: (T99, 200) + (T1, 4) = (T69, 1) */
     src.weeks = src.level * 2 + 2;
     dst.weeks = dst.level * 2 + 2;
-    CuAssertIntEquals(tc, 70, merge_skill(&src, &dst, &result, 1, 1));
-    CuAssertIntEquals(tc, 70, result.level);
-    CuAssertIntEquals(tc, 3, result.weeks);
+    CuAssertIntEquals(tc, 69, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 69, result.level);
+    CuAssertIntEquals(tc, 61, result.weeks);
 
     test_teardown();
 }
