@@ -742,76 +742,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
     u->region = r;
 }
 
-static int skill_weeks(const skill* sv)
-{
-    int weeks = 0;
-    if (sv) {
-        int n = sv->level + 1;
-        weeks = n * (n + 1) / 2;
-        weeks -= sv->weeks;
-    }
-    return weeks;
-}
 
-static int weeks_to_level(double weeks)
-{
-    return (int)(sqrt(1.0 + weeks * 8.0) - 1) / 2;
-}
-
-static int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
-{
-    double w = skill_weeks(sn) * (double)n;
-    w += skill_weeks(sv) * (double)add;
-    int level = weeks_to_level(w / ((double)n + add));
-    assert(result);
-    result->level = level;
-    result->weeks = 0;
-    result->weeks = skill_weeks(result) - (level * (level + 1) / 2);
-    return level;
-}
-#if 0
-static int merge_skill_orig(const skill* sv, const skill* sn, skill *result, int n, int add)
-{
-    int weeks = sv ? sv->weeks : 0, level = sv ? sv->level : 0;
-    assert(result);
-    if (sn != NULL && n > 0) {
-        double dlevel = sv ? ((level + 1.0 - weeks / (level + 1.0)) * add) : 0.0;
-
-        level *= add;
-        if (sn && sn->level) {
-            dlevel +=
-                (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * n;
-            level += sn->level * n;
-        }
-
-        dlevel /= ((double)add + n);
-        level /= (add + n);
-        if (level <= dlevel) {
-            /* apply the remaining fraction to the number of weeks to go.
-             * subtract the according number of weeks, getting closer to the
-             * next level */
-            level = (int)dlevel;
-            weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
-        }
-        else {
-            /* make it harder to reach the next level.
-             * weeks+level is the max difficulty, 1 - the fraction between
-             * level and dlevel applied to the number of weeks between this
-             * and the previous level is the added difficutly */
-            level = (int)dlevel + 1;
-            weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
-        }
-    }
-    if (level) {
-        assert(weeks > 0 && weeks <= level * 2 + 1);
-        assert(n != 0 || (sv && level == sv->level
-            && weeks == sv->weeks));
-        result->level = level;
-        result->weeks = weeks;
-    }
-    return level;
-}
-#endif
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 

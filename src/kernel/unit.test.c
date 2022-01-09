@@ -616,6 +616,10 @@ static void test_transfer_hitpoints(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * A transfer of men between two units with the same skill 
+ * does not change their skills.
+ */
 static void test_transfer_skills(CuTest *tc) {
     unit *u1, *u2;
     region *r;
@@ -640,41 +644,9 @@ static void test_transfer_skills(CuTest *tc) {
     CuAssertIntEquals(tc, 2, effskill(u1, SK_ALCHEMY, NULL));
     CuAssertIntEquals(tc, 200, u2->number);
     CuAssertIntEquals(tc, 2, effskill(u2, SK_ALCHEMY, NULL));
-    remove_skill(u1, SK_ALCHEMY);
-    transfermen(u1, u2, 100);
-    CuAssertIntEquals(tc, 300, u2->number);
     sv = unit_skill(u2, SK_ALCHEMY);
-    CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
-    test_teardown();
-}
-
-static void test_transfer_skills_merge(CuTest *tc) {
-    unit *u1, *u2;
-    region *r;
-    faction *f;
-    skill *sv;
-
-    test_setup();
-    config_set_int("study.random_progress", 0);
-    r = test_create_region(0, 0, NULL);
-    f = test_create_faction();
-    u1 = test_create_unit(f, r);
-    set_level(u1, SK_ALCHEMY, 2);
-    sv = unit_skill(u1, SK_ALCHEMY);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 3, sv->weeks);
-    u2 = test_create_unit(f, r);
-    set_level(u2, SK_ALCHEMY, 4);
-    sv = unit_skill(u2, SK_ALCHEMY);
-    CuAssertIntEquals(tc, 4, sv->level);
-    CuAssertIntEquals(tc, 5, sv->weeks);
-    transfermen(u1, u2, 1);
-    CuAssertIntEquals(tc, 0, u1->number);
-    CuAssertIntEquals(tc, 2, u2->number);
-    sv = unit_skill(u2, SK_ALCHEMY);
-    CuAssertIntEquals(tc, 3, sv->level);
-    CuAssertIntEquals(tc, 4, sv->weeks);
     test_teardown();
 }
 
@@ -845,7 +817,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_clone_men);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
-    SUITE_ADD_TEST(suite, test_transfer_skills_merge);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
