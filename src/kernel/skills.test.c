@@ -32,10 +32,54 @@ static void test_skills(CuTest * tc)
     test_teardown();
 }
 
+static void test_skills_merge(CuTest* tc)
+{
+    skill src, dst, result;
+    test_setup();
+    config_set_int("study.random_progress", 0);
+
+    /* 1xT2 merges with 2xT0 to become 3xT1 */
+    dst.level = 2;
+    dst.weeks = 3;
+    CuAssertIntEquals(tc, 1, merge_skill(NULL, &dst, &result, 1, 2));
+    CuAssertIntEquals(tc, 1, result.level);
+    CuAssertIntEquals(tc, 2, result.weeks);
+
+    /* 1xT2 merges with 3xT0, skill goes poof */
+    CuAssertIntEquals(tc, 0, merge_skill(NULL, &dst, &result, 1, 3));
+    CuAssertIntEquals(tc, 0, result.level);
+    CuAssertIntEquals(tc, 1, result.weeks);
+
+    /* two units with the same skills are merged: no change */
+    src.level = 2;
+    src.weeks = 3;
+    CuAssertIntEquals(tc, 2, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 2, result.level);
+    CuAssertIntEquals(tc, 3, result.weeks);
+
+    /* T4 + T6 always makes T5 */
+    src.level = 4;
+    dst.level = 6;
+
+    /* close as possible to next level: */
+    src.weeks = 1;
+    dst.weeks = 1;
+    CuAssertIntEquals(tc, 5, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 5, result.level);
+
+    /* max. far from next level: */
+    src.weeks = 8;
+    dst.weeks = 12;
+    CuAssertIntEquals(tc, 5, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 5, result.level);
+    test_teardown();
+}
+
 CuSuite *get_skills_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_skills);
+    SUITE_ADD_TEST(suite, test_skills_merge);
     return suite;
 }
 
