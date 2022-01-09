@@ -722,6 +722,12 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
     }
 }
 
+int level_days(unsigned int level)
+{
+    /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
+    return 30 * ((level + 1) * level / 2);
+}
+
 /** prints all that belongs to a unit
 * @param f observers faction
 * @param u unit to report

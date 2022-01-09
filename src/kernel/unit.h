@@ -132,8 +132,8 @@ extern "C" {
     bool has_skill(const unit * u, enum skill_t sk);
     int effskill(const struct unit *u, enum skill_t sk, const struct region *r);
 
-    void set_level(struct unit *u, enum skill_t id, int level);
-    int get_level(const struct unit *u, enum skill_t id);
+    void set_level(struct unit *u, enum skill_t id, unsigned int level);
+    unsigned int get_level(const struct unit *u, enum skill_t id);
     void transfermen(struct unit *src, struct unit *dst, int n);
     void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
 
