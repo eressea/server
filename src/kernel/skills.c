@@ -69,7 +69,7 @@ skillmod(const unit * u, const region * r, enum skill_t sk, int value)
     return value;
 }
 
-void sk_set(skill * sv, int level)
+void sk_set(skill * sv, unsigned int level)
 {
     assert(sv && level != 0);
     sv->weeks = skill_weeks(level);

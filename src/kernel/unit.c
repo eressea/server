@@ -538,7 +538,7 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
     return id;
 }
 
-int get_level(const unit * u, skill_t id)
+unsigned int get_level(const unit * u, skill_t id)
 {
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
@@ -553,7 +553,7 @@ int get_level(const unit * u, skill_t id)
     return 0;
 }
 
-void set_level(unit * u, skill_t sk, int value)
+void set_level(unit * u, skill_t sk, unsigned int value)
 {
     skill *sv = u->skills;
 

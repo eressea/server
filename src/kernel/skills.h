@@ -42,7 +42,7 @@ extern "C" {
     unsigned int skill_weeks(unsigned int level);
     int skill_compare(const skill * sk, const skill * sc);
 
-    void sk_set(skill * sv, int level);
+    void sk_set(skill * sv, unsigned int level);
 
 #ifdef __cplusplus
 }
