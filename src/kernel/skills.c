@@ -150,21 +150,10 @@ int skill_compare(const skill * sk, const skill * sc)
     return 0;
 }
 
-#if 1
 static int weeks_from_level(int level)
 {
     return level * (level + 1) / 2;
 }
-
-/*
-static int weeks_from_skill(const skill* sv)
-{
-    if (sv) {
-        return weeks_from_level(sv->level + 1) - sv->weeks;
-    }
-    return 0;
-}
-*/
 
 static int level_from_weeks(int weeks, int n)
 {
@@ -205,46 +194,3 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     }
     return result->level;
 }
-#else
-int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
-{
-    int weeks = sv ? sv->weeks : 0, level = sv ? sv->level : 0;
-    assert(result);
-    if (sn != NULL && n > 0) {
-        double dlevel = sv ? ((level + 1.0 - weeks / (level + 1.0)) * add) : 0.0;
-
-        level *= add;
-        if (sn && sn->level) {
-            dlevel +=
-                (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * n;
-            level += sn->level * n;
-        }
-
-        dlevel /= ((double)add + n);
-        level /= (add + n);
-        if (level <= dlevel) {
-            /* apply the remaining fraction to the number of weeks to go.
-             * subtract the according number of weeks, getting closer to the
-             * next level */
-            level = (int)dlevel;
-            weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
-        }
-        else {
-            /* make it harder to reach the next level.
-             * weeks+level is the max difficulty, 1 - the fraction between
-             * level and dlevel applied to the number of weeks between this
-             * and the previous level is the added difficutly */
-            level = (int)dlevel + 1;
-            weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
-        }
-    }
-    if (level) {
-        assert(weeks > 0 && weeks <= level * 2 + 1);
-        assert(n != 0 || (sv && level == sv->level
-            && weeks == sv->weeks));
-        result->level = level;
-        result->weeks = weeks;
-    }
-    return level;
-}
-#endif
