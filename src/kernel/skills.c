@@ -82,8 +82,9 @@ static bool rule_random_progress(void)
 static int progress_weeks(unsigned int level, bool random_progress)
 /* how many weeks must i study to get from level-1 to level */
 {
+    assert(level > 0);
     if (random_progress) {
-        unsigned int coins = 2 * level;
+        unsigned int coins = 2 * (level - 1);
         int heads = 1;
         while (coins--) {
             heads += rng_int() % 2;
