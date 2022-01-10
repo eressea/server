@@ -477,6 +477,7 @@ static void test_ship_damage_overload(CuTest *tc) {
     CuAssertDblEquals(tc, 0.05, damage_overload(1.5, damage_max), ASSERT_DBL_DELTA);
     CuAssertDblEquals(tc, 0.21, damage_overload(3.25, damage_max), ASSERT_DBL_DELTA);
     CuAssertDblEquals(tc, 0.37, damage_overload(5, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.0, damage_overload(5, 0.0), ASSERT_DBL_DELTA);
 }
 
 static void test_follow_unit(CuTest *tc) {
