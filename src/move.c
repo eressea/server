@@ -747,7 +747,7 @@ static double overload_max_damage(void) {
     return config_get_flt("rules.ship.overload.damage.max", 0.37);
 }
 
-double damage_overload(double overload)
+double damage_overload(double overload, double damage_max)
 {
     double damage, badness;
     if (overload < overload_start())
@@ -757,7 +757,7 @@ double damage_overload(double overload)
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
         damage += fmin(badness, overload_worst() - overload_worse()) *
-            (overload_max_damage() - damage) /
+            (damage_max - damage) /
             (overload_worst() - overload_worse());
     }
     return damage;
@@ -823,6 +823,7 @@ static void drifting_ships(region * r)
             unit* firstu = r->units, * lastu = NULL;
             direction_t dir = NODIRECTION;
             double ovl;
+            double damage_max = overload_max_damage();
             const char* reason = "ship_drift";
 
             if (sh->type->fishing > 0) {
@@ -868,19 +869,22 @@ static void drifting_ships(region * r)
                 msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
-            if (ovl >= overload_start()) {
-                damage_ship(sh, damage_overload(ovl));
-                msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+            if (damage_max > 0) {
+                if (ovl >= overload_start()) {
+                    damage_ship(sh, damage_overload(ovl, damage_max));
+                    msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+                }
+                else {
+                    damage_ship(sh, damage_drift);
+                }
+                if (ship_damage_percent(sh) >= 100) {
+                    msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
+                    sink_ship(sh);
+                    remove_ship(shp, sh);
+                    continue;
+                }
             }
-            else {
-                damage_ship(sh, damage_drift);
-            }
-            if (ship_damage_percent(sh) >= 100) {
-                msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
-                sink_ship(sh);
-                remove_ship(shp, sh);
-            }
-            else if (rnext) {
+            if (rnext) {
                 /* Das Schiff und alle Einheiten darin werden nun von r
                     * nach rnext verschoben. Danach eine Meldung. */
                 add_regionlist(&route, rnext);
