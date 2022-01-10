@@ -1406,6 +1406,12 @@ ship *read_ship(gamedata *data)
     }
     READ_INT(store, &sh->size);
     READ_INT(store, &sh->damage);
+
+    if (sh->size > 0 && sh->number > 1) {
+        int damage = sh->damage / sh->size;
+        log_error("%d ships in %s at %d%% damage.", sh->number, shipname(sh), damage);
+    }
+
     if (data->version >= FOSS_VERSION) {
         READ_INT(store, &sh->flags);
     }

@@ -462,7 +462,7 @@ int ship_capacity(const ship * sh)
     if (ship_finished(sh)) {
         int i = sh->type->cargo * sh->number;
         if (sh->damage) {
-            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+            i = (int)ceil(i * (1.0 - (double)sh->damage / DAMAGE_SCALE / sh->size));
         }
         return i;
     }
@@ -474,7 +474,7 @@ int ship_cabins(const ship * sh)
     if (ship_finished(sh)) {
         int i = sh->type->cabins * sh->number;
         if (sh->damage) {
-            i = (int)ceil(i * (1.0 - sh->damage / sh->size / (double)DAMAGE_SCALE));
+            i = (int)ceil(i * (1.0 - (double)sh->damage / DAMAGE_SCALE / sh->size));
         }
         return i;
     }
