@@ -23,7 +23,7 @@ typedef void(*OP_OrderHandler) (void *userData, const char *str);
 OP_Parser OP_ParserCreate(void);
 void OP_ParserFree(OP_Parser parser);
 void OP_ParserReset(OP_Parser parser);
-enum OP_Status OP_Parse(OP_Parser parser, const char *s, int len, int isFinal);
+enum OP_Status OP_Parse(OP_Parser parser, const char *s, size_t len, int isFinal);
 void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler);
 void OP_SetUserData(OP_Parser parser, void *userData);
 enum OP_Error OP_GetErrorCode(OP_Parser parser);

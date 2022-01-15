@@ -779,7 +779,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     test_teardown();
 }
 
-static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
+static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, unsigned int level, unsigned int week, unsigned int weekmax)
 {
     skill *sv = unit_skill(u, sk);
     if (sv) {

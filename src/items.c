@@ -183,7 +183,7 @@ struct order *ord)
         }
     }
     use_pooled(u, rt_crystal, GET_DEFAULT, amount);
-    ADDMSG(&u->region->msgs, msg_message("use_antimagiccrystal", "unit", u));
+    ADDMSG(&u->region->msgs, msg_message("use_antimagiccrystal", "unit used", u, amount));
     return 0;
 }
 
@@ -304,9 +304,12 @@ struct order *ord)
     return 0;
 }
 
-/* ------------------------------------------------------------- */
-/* Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
-* Runde um -1 - 4 Punkte. */
+/**
+ * BENUTZE 1 Traumauge
+ *
+ * Kann auch von Nichtmagier benutzt werden, modifiziert Taktik fuer diese
+ * Runde um -1 - 4 Punkte.
+ */
 static int
 use_tacticcrystal(unit * u, const struct item_type *itype, int amount,
     struct order *ord)

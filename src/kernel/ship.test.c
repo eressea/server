@@ -1,6 +1,7 @@
 #include <platform.h>
 
 #include <kernel/config.h>
+#include <kernel/build.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -79,6 +80,26 @@ static void test_ship_crewed(CuTest * tc)
     set_level(u2, SK_SAILING, 4);
     CuAssertTrue(tc, ship_crewed(sh, u1));
 
+    test_teardown();
+}
+
+static void test_ship_capacity(CuTest* tc)
+{
+    ship_type* stype;
+    ship* sh;
+    test_setup();
+    stype = test_create_shiptype("caravel");
+    stype->construction->maxsize = 250;
+    stype->cargo = 25000;
+    stype->cabins = 2500;
+    sh = test_create_ship(test_create_ocean(0, 0), stype);
+    sh->number = 10;
+    sh->size = ship_maxsize(sh);
+    CuAssertIntEquals(tc, 250000, ship_capacity(sh));
+    CuAssertIntEquals(tc, 25000, ship_cabins(sh));
+    sh->damage = 2500; /* 1% damage */
+    CuAssertIntEquals(tc, 247500, ship_capacity(sh));
+    CuAssertIntEquals(tc, 24750, ship_cabins(sh));
     test_teardown();
 }
 
@@ -540,6 +561,22 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
     test_teardown();
 }
 
+static void test_ship_damage(CuTest *tc) {
+    ship *sh;
+    sh = setup_ship();
+    damage_ship(sh, 0.5);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    sh->number = 2;
+    sh->size *= 2;
+    CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
+
+    sh->damage = 0;
+    damage_ship(sh, 0.5);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+}
+
 static void test_shipspeed_damage(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
@@ -682,6 +719,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_stype_defaults);
     SUITE_ADD_TEST(suite, test_ship_set_owner);
     SUITE_ADD_TEST(suite, test_ship_crewed);
+    SUITE_ADD_TEST(suite, test_ship_capacity);
     SUITE_ADD_TEST(suite, test_shipowner_resets_when_empty);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_next_when_empty);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_other_when_empty);
@@ -691,6 +729,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_crew_skill);
+    SUITE_ADD_TEST(suite, test_ship_damage);
     SUITE_ADD_TEST(suite, test_shipspeed);
     SUITE_ADD_TEST(suite, test_shipspeed_speedy);
     SUITE_ADD_TEST(suite, test_shipspeed_stormwind);

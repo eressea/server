@@ -371,26 +371,6 @@ static void write_skills(gamedata *data, const unit *u) {
     }
 }
 
-static void fix_smurfication(unit *u) {
-    if (u->attribs) {
-        attrib *a;
-        for (a = a_find(u->attribs, &at_eventhandler); a && a->type == &at_eventhandler; a = a->next) {
-            handler_info *info = (handler_info *)a->data.v;
-            if (0 == strcmp("timer", info->event)) {
-                trigger *t;
-                for (t = info->triggers; t; t = t->next) {
-                    if (t->type == &tt_changerace) {
-                        /* is a smurf, but will change back */
-                        return;
-                    }
-                }
-            }
-        }
-    }
-    log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
-    u->_race = u->faction->race;
-}
-
 unit *read_unit(gamedata *data)
 {
     unit *u;
@@ -400,12 +380,13 @@ unit *read_unit(gamedata *data)
     char obuf[DISPLAYSIZE];
     faction *f;
     char rname[32];
-    static const struct race *rc_demon, *rc_smurf;
+    static const struct race *rc_demon, *rc_smurf, *rc_toad;
     static int config;
 
     if (rc_changed(&config)) {
         rc_demon = get_race(RC_DAEMON);
         rc_smurf = rc_find("smurf");
+        rc_toad = rc_find("toad");
     }
 
     READ_INT(data->store, &n);
@@ -438,8 +419,8 @@ unit *read_unit(gamedata *data)
         u_setfaction(u, f);
     }
     if (!u->faction) {
-        log_error("unit %s has faction == NULL", itoa36(u->no));
-        return 0;
+        log_error("unit %s has missing faction %s", itoa36(u->no), itoa36(n));
+        return NULL;
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
@@ -547,18 +528,20 @@ unit *read_unit(gamedata *data)
     }
     read_attribs(data, &u->attribs, u);
     if (rc_demon) {
-        const struct race *rc = u_race(u);
         if (rc == rc_smurf) {
-            fix_smurfication(u);
+            assert(u->faction->race);
+            rc = u->faction->race;
+            log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, rc->_name);
+            restore_race(u, rc);
         }
-        if (rc == rc_demon) {
+        else if (rc == rc_demon) {
             if (data->version < FIX_SHAPESHIFT_VERSION) {
                 const char* zRace = get_racename(u->attribs);
                 if (zRace) {
-                    rc = rc_find(zRace);
-                    if (rc) {
+                    const race *rx = rc_find(zRace);
+                    if (rx) {
                         set_racename(&u->attribs, NULL);
-                            u->irace = rc;
+                            u->irace = rx;
                     }
                 }
             }
@@ -584,6 +567,25 @@ unit *read_unit(gamedata *data)
                         u->irace = NULL;
                     }
                 }
+            }
+        }
+    }
+    if (rc_toad || rc_smurf) {
+        if (rc == rc_toad || rc == rc_smurf) {
+            trigger **tp = get_triggers(u->attribs, "timer"), *t = NULL;
+            if (tp) {
+                while (*tp) {
+                    trigger *tr = *tp;
+                    if (tr->type == &tt_timeout) {
+                        t = tr;
+                        break;
+                    }
+                    tp = &tr->next;
+                }
+            }
+            if (t == NULL) {
+                log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
+                restore_race(u, u->faction->race);
             }
         }
     }
@@ -1404,6 +1406,15 @@ ship *read_ship(gamedata *data)
     }
     READ_INT(store, &sh->size);
     READ_INT(store, &sh->damage);
+
+    if (data->version < FIX_SHIP_DAMAGE_VERSION) {
+        if (sh->size > 0 && sh->number > 1) {
+            int damage = sh->damage / sh->size;
+            log_error("%d ships in %s had %d%% damage.", sh->number, shipname(sh), damage);
+            sh->damage /= sh->number;
+        }
+    }
+
     if (data->version >= FOSS_VERSION) {
         READ_INT(store, &sh->flags);
     }

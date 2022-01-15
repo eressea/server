@@ -692,9 +692,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kan
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde keine Emailadresse angegeben.\""
 
-msgid "error125"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Banner angegeben.\""
-
 msgid "starvation"
 msgstr "\"$unit($unit) verliert in $region($region) $int($dead) von $int($add($live,$dead)) Personen durch Unterernährung.\""
 
@@ -1350,7 +1347,7 @@ msgid "buildroad"
 msgstr "\"$unit($unit) erweitert in $region($region) das Straßennetz um $int($size).\""
 
 msgid "nr_border_opaque"
-msgstr "Im $direction($dir) verperrt ${object} die Sicht."
+msgstr "Im $direction($dir) versperrt ${object} die Sicht."
 
 msgid "nr_border_transparent"
 msgstr "Im $direction($dir) befindet sich ${object}."
@@ -2232,7 +2229,7 @@ msgid "summondragon"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) ruft Drachen nach $region($target).\""
 
 msgid "use_antimagiccrystal"
-msgstr "\"$unit($unit) benutzt einen Antimagiekristall.\""
+msgstr "\"$unit($unit) benutzt $int($used) Antimagiekristall$if($eq($used,1),\"\",\"e\").\""
 
 msgid "cast_stun_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger sind für einen Moment benommen.\""
@@ -2754,7 +2751,7 @@ msgid "battle_loot"
 msgstr "\"$unit($unit) erbeutet $int($amount) $resource($item,$amount).\""
 
 msgid "error209"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntax Error.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Syntaktischer Fehler.\""
 
 msgid "summonundead_effect_0"
 msgstr "\"$unit($mage) kann in $region($region) keine Untoten rufen.\""

@@ -1,5 +1,5 @@
-#ifndef H_KRNL_MAGIC
-#define H_KRNL_MAGIC
+#ifndef H_MAGIC
+#define H_MAGIC
 
 #include <kernel/types.h>
 #include <util/variant.h>

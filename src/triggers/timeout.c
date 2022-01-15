@@ -36,10 +36,9 @@ static int timeout_handle(trigger * t, void *data)
     timeout_data *td = (timeout_data *)t->data.v;
     if (--td->timer == 0) {
         handle_triggers(&td->triggers, NULL);
-        return -1;
     }
     UNUSED_ARG(data);
-    return 0;
+    return td->timer;
 }
 
 static void timeout_write(const trigger * t, struct storage *store)

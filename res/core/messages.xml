@@ -1394,6 +1394,7 @@
   <message name="use_antimagiccrystal" section="magic">
     <type>
       <arg name="unit" type="unit"/>
+      <arg name="used" type="int"/>
     </type>
   </message>
   <message name="magicboost_effect" section="magic">
@@ -4529,13 +4530,6 @@
     </type>
   </message>
   <message name="error85" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error125" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>

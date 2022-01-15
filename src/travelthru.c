@@ -79,14 +79,14 @@ bool travelthru_cansee(const struct region *r, const struct faction *f, const st
     return false;
 }
 
-struct cb_data {
+struct cb_map_data {
     void(*call)(region *, struct unit *, void *);
     void *data;
     struct region *r;
 };
 
 static bool cb_map(void *data, void *ex) {
-    struct cb_data *cb = (struct cb_data *)ex;
+    struct cb_map_data*cb = (struct cb_map_data*)ex;
     struct unit *u = (struct unit *)data;
     cb->call(cb->r, u, cb->data);
     return true;
@@ -95,7 +95,7 @@ static bool cb_map(void *data, void *ex) {
 void travelthru_map(region * r, void(*cb)(region *, struct unit *, void *), void *data)
 {
     attrib *a;
-    struct cb_data cbdata;
+    struct cb_map_data cbdata;
     
     assert(r);
     cbdata.call = cb;

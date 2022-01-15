@@ -36,7 +36,7 @@ msgid "unholypower_effect"
 msgstr "\"$unit($mage) tranforms $unit($target) to $race($race,0).\""
 
 msgid "give_person"
-msgstr "\"$unit($unit) transfers $int($amount) person$if($eq($amount,1),\"\",\"s\") to $unit($target).\""
+msgstr "\"$unit($unit) transfers $int($amount) $if($eq($amount,1),\"person\",\"persons\") to $unit($target).\""
 
 msgid "transfer_unit"
 msgstr "\"$unit($unit) joins our faction.\""
@@ -590,7 +590,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - You must build 
 msgid "feedback_unit_not_found"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit could not be found.\""
 
-msgid "feedback_unit_not_found"
+msgid "feedback_not_inside"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not the owner of a ship or building.\""
 
 msgid "error206"
@@ -691,9 +691,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot
 
 msgid "error85"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - No email address was supplied.\""
-
-msgid "error125"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - No banner text was supplied.\""
 
 msgid "starvation"
 msgstr "\"$unit($unit) loses $int($dead) of $int($add($live,$dead)) people due to starvation in $region($region).\""
@@ -2232,7 +2229,7 @@ msgid "summondragon"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) calls dragons to $region($target).\""
 
 msgid "use_antimagiccrystal"
-msgstr "\"$unit($unit) uses an antimagic crystal.\""
+msgstr "\"$unit($unit) uses $int($used) antimagic $if($eq($used,1),\"crystal\",\"crystals\").."
 
 msgid "cast_stun_effect"
 msgstr "\"$unit($mage) casts $spell($spell): $int($amount) fighters were momentarily stunned.\""

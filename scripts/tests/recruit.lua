@@ -45,6 +45,68 @@ function test_bug_1795_demons()
   assert_equal(peasants, r:get_resource("peasant"))
 end
 
+function test_guarded_empty_units_cannot_recruit()
+    local r = region.create(0, 0, 'plain')
+
+    local f1 = faction.create('human')
+    local f2 = faction.create('human')
+    local u1 = unit.create(f1, r, 1)
+    local u2 = unit.create(f2, r, 1)
+
+    r.peasants = 1000
+    u2:add_item("sword", 1)
+    u2:set_skill("melee", 1)
+    u2.guard = true
+
+    u1.name='Xolthar'
+    u1:add_item("money", 100)
+    u1:add_order("GIB 0 ALLES PERSONEN")
+    u1:add_order("REKRUTIERE 1")
+    process_orders()
+
+    local count = 0
+    local zero = 0
+    for u in f1.units do
+      if u.number == 0 then zero = zero + 1 end
+      count = count + 1
+    end
+    assert_equal(0, zero)
+    assert_equal(0, count)
+end
+
+function test_guarded_temp_cannot_recruit()
+    local r = region.create(0, 0, 'plain')
+
+    local f1 = faction.create('human')
+    local f2 = faction.create('human')
+    local u1 = unit.create(f1, r, 1)
+    local u2 = unit.create(f2, r, 1)
+
+    r.peasants = 1000
+
+    u2:add_item("sword", 1)
+    u2:set_skill("melee", 1)
+    u2.guard = true
+
+    u1:add_item("money", 100)
+    u1:add_order("MACHE TEMP x")
+    u1:add_order("REKRUTIERE 1")
+    u1:add_order("ENDE")
+    u1:add_order("MACHE TEMP y")
+    u1:add_order("ENDE")
+    u1:add_order("GIB TEMP y 1 PERSON")
+    process_orders()
+
+    local count = 0
+    local zero = 0
+    for u in f1.units do
+      if u.number == 0 then zero = zero + 1 end
+      count = count + 1
+    end
+    assert_equal(0, zero)
+    assert_equal(1, count)
+end
+
 function test_recruit_empty()
     local r = region.create(0, 0, 'plain')
 
@@ -85,4 +147,3 @@ function test_recruit_empty()
     assert_equal(0, zero)
     assert_equal(1, count)
 end
-

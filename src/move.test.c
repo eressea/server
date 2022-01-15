@@ -749,6 +749,81 @@ static void test_movement_speed_dragon(CuTest *tc) {
     test_teardown();
 }
 
+static void test_movement_speed_unicorns(CuTest *tc) {
+    unit *u;
+    item_type* it_unicorn;
+    item_type const *it_horse;
+
+    test_setup();
+    init_resources();
+    it_horse = it_find("horse");
+    it_unicorn = test_create_itemtype("elvenhorse");
+    it_unicorn->flags |= ITF_ANIMAL;
+    it_unicorn->weight = it_horse->weight;
+    it_unicorn->capacity = it_horse->capacity;
+
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    scale_number(u, 10);
+    i_change(&u->items, it_unicorn, 5);
+
+    /* 5 animals can carry 2 people each: */
+    set_level(u, SK_RIDING, 1);
+    CuAssertIntEquals(tc, u->number / 2, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    /* at level 1, riders can move 2 animals each */
+    i_change(&u->items, it_unicorn, 15);
+    CuAssertIntEquals(tc, 2 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    /* any more animals, and they walk: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 2 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* up to 5 animals per person can we walked: */
+    i_change(&u->items, it_unicorn, 29);
+    CuAssertIntEquals(tc, 5 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* but no more! */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 5 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, 0, movement_speed(u));
+
+    /* at level 5, unicorns give a speed boost: */
+    set_level(u, SK_RIDING, 5);
+    /* we can now ride at most 10 animals each: */
+    i_change(&u->items, it_unicorn, 49);
+    CuAssertIntEquals(tc, 10 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+
+    /* too many animals, we must walk: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 10 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* at level 5, we can each walk 21 animals: */
+    i_change(&u->items, it_unicorn, 109);
+    CuAssertIntEquals(tc, 21 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* too many animals, we cannot move: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 21 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, 0, movement_speed(u));
+
+    /* max animals for riding, then add one (slow) horse */
+    i_change(&u->items, it_unicorn, -112);
+    CuAssertIntEquals(tc, 10 * u->number - 1, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+    i_change(&u->items, it_horse, 1);
+    CuAssertIntEquals(tc, 1, i_get(u->items, it_horse));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    test_teardown();
+}
+
 static void test_make_movement_order(CuTest *tc) {
     order *ord;
     char buffer[32];
@@ -774,6 +849,7 @@ CuSuite *get_move_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_movement_speed);
     SUITE_ADD_TEST(suite, test_movement_speed_dragon);
+    SUITE_ADD_TEST(suite, test_movement_speed_unicorns);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);

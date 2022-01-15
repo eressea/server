@@ -653,12 +653,12 @@ static void test_reserve_cmd(CuTest *tc) {
     const resource_type *rtype;
 
     test_setup();
-    test_create_world();
+    init_resources();
 
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
@@ -670,6 +670,39 @@ static void test_reserve_cmd(CuTest *tc) {
     CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
     CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_reserve_all(CuTest *tc) {
+    unit *u1, *u2;
+    faction *f;
+    region *r;
+    order *ord;
+    const resource_type *rtype;
+    struct locale *loc;
+
+    test_setup();
+    init_resources();
+    loc = test_create_locale();
+    locale_setstring(loc, parameters[P_ANY], "ALLES");
+    init_parameters(loc);
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    ord = create_order(K_RESERVE, f->locale, "ALLES SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 100, reserve_cmd(u1, ord));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
     free_order(ord);
     test_teardown();
 }
@@ -1312,7 +1345,6 @@ static void test_banner_cmd(CuTest *tc) {
     order *ord;
 
     test_setup();
-    mt_create_error(125);
     mt_create_va(mt_new("changebanner", NULL), "value:string", MT_NEW_END);
     u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
 
@@ -1325,8 +1357,8 @@ static void test_banner_cmd(CuTest *tc) {
 
     ord = create_order(K_BANNER, f->locale, NULL);
     banner_cmd(u, ord);
-    CuAssertStrEquals(tc, "Hodor!", faction_getbanner(f));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error125"));
+    CuAssertStrEquals(tc, NULL, faction_getbanner(f));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "changebanner"));
     free_order(ord);
     test_clear_messages(f);
 
@@ -1967,8 +1999,25 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_temp(CuTest* tc) {
+    unit* u, * u2;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u2 = test_create_unit(test_create_faction(), u->region);
+
+    u->orders = create_order(K_MAKETEMP, u->faction->locale, "1");
+    new_units();
+    u2 = u2->next;
+
+    CuAssertPtrNotNull(tc, u2);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_teardown();
+}
+
 static void test_cansee_empty(CuTest *tc) {
-    unit *u, *u2, *utemp;
+    unit *u, *u2;
     faction *f;
 
     test_setup();
@@ -1980,14 +2029,6 @@ static void test_cansee_empty(CuTest *tc) {
     u2->number = 0;
     set_level(u2, SK_STEALTH, 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
-
-    u2->number = 1;
-    u->orders = create_order(K_MAKETEMP, f->locale, "1");
-    new_units();
-    utemp = u2->next;
-
-    CuAssertPtrNotNull(tc, utemp);
-    CuAssertTrue(tc, cansee(u->faction, u->region, utemp, 0));
 
     test_teardown();
 }
@@ -2466,8 +2507,9 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_can_guard);
     SUITE_ADD_TEST(suite, test_fleeing_cannot_guard);
     SUITE_ADD_TEST(suite, test_unskilled_cannot_guard);
-    SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
+    SUITE_ADD_TEST(suite, test_reserve_self);
+    SUITE_ADD_TEST(suite, test_reserve_all);
     SUITE_ADD_TEST(suite, test_pay_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd_other_building);
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
@@ -2503,6 +2545,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_sphere);
     SUITE_ADD_TEST(suite, test_cansee_monsters);
     SUITE_ADD_TEST(suite, test_cansee_empty);
+    SUITE_ADD_TEST(suite, test_cansee_temp);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);

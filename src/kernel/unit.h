@@ -55,7 +55,7 @@ extern "C" {
 #define UFL_SAVEMASK (UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 128 * 1024
-    extern int maxheroes(const struct faction *f);
+    extern int max_heroes(int num_people);
     extern int countheroes(const struct faction *f);
 
     typedef struct reservation {
@@ -132,8 +132,8 @@ extern "C" {
     bool has_skill(const unit * u, enum skill_t sk);
     int effskill(const struct unit *u, enum skill_t sk, const struct region *r);
 
-    void set_level(struct unit *u, enum skill_t id, int level);
-    int get_level(const struct unit *u, enum skill_t id);
+    void set_level(struct unit *u, enum skill_t id, unsigned int level);
+    unsigned int get_level(const struct unit *u, enum skill_t id);
     void transfermen(struct unit *src, struct unit *dst, int n);
     void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
 

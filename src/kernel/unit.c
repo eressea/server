@@ -538,7 +538,7 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
     return id;
 }
 
-int get_level(const unit * u, skill_t id)
+unsigned int get_level(const unit * u, skill_t id)
 {
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
@@ -553,12 +553,12 @@ int get_level(const unit * u, skill_t id)
     return 0;
 }
 
-void set_level(unit * u, skill_t sk, int value)
+void set_level(unit * u, skill_t sk, unsigned int value)
 {
     skill *sv = u->skills;
 
     assert(sk != SK_MAGIC || value==0 || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
-    assert(value <= CHAR_MAX && value >= CHAR_MIN);
+    assert(value <= UCHAR_MAX && value >= 0);
     if (!skill_enabled(sk))
         return;
 
@@ -777,23 +777,23 @@ void clone_men(const unit * u, unit * dst, int n)
                 double dlevel = 0.0;
 
                 if (sv && sv->level) {
-                    dlevel += (sv->level + 1 - sv->weeks / (sv->level + 1.0)) * n;
+                    dlevel += (sv->level + 1.0 - sv->weeks / (sv->level + 1.0)) * n;
                     level += sv->level * n;
                 }
                 if (sn && sn->level) {
                     dlevel +=
-                        (sn->level + 1 - sn->weeks / (sn->level + 1.0)) * dst->number;
+                        (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * dst->number;
                     level += sn->level * dst->number;
                 }
 
-                dlevel = dlevel / (n + dst->number);
-                level = level / (n + dst->number);
+                dlevel /= ((double)n + dst->number);
+                level /= (n + dst->number);
                 if (level <= dlevel) {
                     /* apply the remaining fraction to the number of weeks to go.
                      * subtract the according number of weeks, getting closer to the
                      * next level */
                     level = (int)dlevel;
-                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1));
+                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
                 }
                 else {
                     /* make it harder to reach the next level.
@@ -1426,11 +1426,17 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
     return u;
 }
 
-int maxheroes(const struct faction *f)
+int max_heroes(int num_people)
 {
-    int nsize = f->num_people;
-    if (nsize == 0)
+    static int config;
+    static int rule_offset;
+    if (config_changed(&config)) {
+        rule_offset = config_get_int("rules.heroes.offset", 0);
+    }
+    int nsize = num_people - rule_offset;
+    if (nsize <= 0) {
         return 0;
+    }
     else {
         int nmax = (int)(log10(nsize / 50.0) * 20);
         return (nmax < 0) ? 0 : nmax;

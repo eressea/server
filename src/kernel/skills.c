@@ -1,6 +1,5 @@
 #include <platform.h>
 #include <kernel/config.h>
-#include "skill.h"
 
 #include "curse.h"
 #include "region.h"
@@ -36,7 +35,7 @@ attrib_type at_skillmod = {
     ATF_PRESERVE
 };
 
-attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus)
+attrib *make_skillmod(enum skill_t sk, skillmod_fun special, double multiplier, int bonus)
 {
     attrib *a = a_new(&at_skillmod);
     skillmod_data *smd = (skillmod_data *)a->data.v;
@@ -50,7 +49,7 @@ attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int b
 }
 
 int
-skillmod(const unit * u, const region * r, skill_t sk, int value)
+skillmod(const unit * u, const region * r, enum skill_t sk, int value)
 {
     const attrib * a = u->attribs;
     for (a = a_find((attrib *)a, &at_skillmod); a && a->type == &at_skillmod;
@@ -70,29 +69,7 @@ skillmod(const unit * u, const region * r, skill_t sk, int value)
     return value;
 }
 
-int level_days(int level)
-{
-    /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
-    return 30 * ((level + 1) * level / 2);
-}
-
-int level(int days)
-{
-    int i;
-    static int ldays[64];
-    static bool init = false;
-    if (!init) {
-        init = true;
-        for (i = 0; i != 64; ++i)
-            ldays[i] = level_days(i + 1);
-    }
-    for (i = 0; i != 64; ++i)
-        if (ldays[i] > days)
-            return i;
-    return i;
-}
-
-void sk_set(skill * sv, int level)
+void sk_set(skill * sv, unsigned int level)
 {
     assert(sv && level != 0);
     sv->weeks = skill_weeks(level);
@@ -109,12 +86,12 @@ static bool rule_random_progress(void)
     return rule != 0;
 }
 
-int skill_weeks(int level)
+unsigned int skill_weeks(unsigned int level)
 /* how many weeks must i study to get from level to level+1 */
 {
     if (rule_random_progress()) {
-        int coins = 2 * level;
-        int heads = 1;
+        unsigned int coins = 2 * level;
+        unsigned int heads = 1;
         while (coins--) {
             heads += rng_int() % 2;
         }
@@ -123,7 +100,7 @@ int skill_weeks(int level)
     return level + 1;
 }
 
-void increase_skill(unit * u, skill_t sk, int weeks)
+void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
     assert(weeks >= 0);
@@ -138,9 +115,9 @@ void increase_skill(unit * u, skill_t sk, int weeks)
     assert(sv->weeks <= sv->level * 2 + 1);
 }
 
-void reduce_skill(unit * u, skill * sv, int weeks)
+void reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
-    int max_weeks = sv->level + 1;
+    unsigned int max_weeks = sv->level + 1;
 
     assert(weeks >= 0);
     if (rule_random_progress()) {

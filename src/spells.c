@@ -4463,8 +4463,8 @@ int sp_icastle(castorder * co)
         return 0;
     }
 
-    if ((type =
-        findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
+    type = findbuildingtype(pa->param[0]->data.xs, mage->faction->locale);
+    if (type == NULL) {
         type = bt_find("castle");
     }
 
