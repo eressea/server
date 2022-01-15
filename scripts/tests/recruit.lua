@@ -45,7 +45,7 @@ function test_bug_1795_demons()
   assert_equal(peasants, r:get_resource("peasant"))
 end
 
-function skip_test_guarded_temp_cannot_recruit()
+function test_guarded_temp_cannot_recruit()
     local r = region.create(0, 0, 'plain')
 
     local f1 = faction.create('human')
