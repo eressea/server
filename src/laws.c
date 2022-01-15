@@ -2855,7 +2855,7 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
-void maketemp_cmd(unit *u, order **olist) 
+static void maketemp_cmd(unit *u, order **olist) 
 {
     order *makeord;
     int err = checkunitnumber(u->faction, 1);
@@ -4039,7 +4039,7 @@ typedef enum cansee_t {
 static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
 {
     enum cansee_t result = CANSEE_HIDDEN;
-    if (rings >= target->number) {
+    if (rings > 0 && rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (rtype) {
             int amulet = i_get(u->items, rtype->itype);
@@ -4139,14 +4139,14 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
         }
     }
     if (is_exposed(u)) {
-        /* obviosuly visibile, we only need a viewer in the region */
+        /* obviously visible, we only need a viewer in the region */
         return true;
     }
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    if (rings < u->number && stealth <= 0) {
+    if (rings > 0 && rings < u->number && stealth <= 0) {
         return true;
     }
 
