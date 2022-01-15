@@ -2017,7 +2017,7 @@ static void test_cansee_temp(CuTest* tc) {
 }
 
 static void test_cansee_empty(CuTest *tc) {
-    unit *u, *u2, *utemp;
+    unit *u, *u2;
     faction *f;
 
     test_setup();
@@ -2029,14 +2029,6 @@ static void test_cansee_empty(CuTest *tc) {
     u2->number = 0;
     set_level(u2, SK_STEALTH, 1);
     CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
-
-    u2->number = 1;
-    u->orders = create_order(K_MAKETEMP, f->locale, "1");
-    new_units();
-    utemp = u2->next;
-
-    CuAssertPtrNotNull(tc, utemp);
-    CuAssertTrue(tc, cansee(u->faction, u->region, utemp, 0));
 
     test_teardown();
 }
