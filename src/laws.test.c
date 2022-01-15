@@ -1999,6 +1999,23 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_temp(CuTest* tc) {
+    unit* u, * u2;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u2 = test_create_unit(test_create_faction(), u->region);
+
+    u->orders = create_order(K_MAKETEMP, u->faction->locale, "1");
+    new_units();
+    u2 = u2->next;
+
+    CuAssertPtrNotNull(tc, u2);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_teardown();
+}
+
 /**
  * Hidden monsters are seen in oceans if they are big enough.
  */
@@ -2509,6 +2526,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
     SUITE_ADD_TEST(suite, test_cansee_monsters);
+    SUITE_ADD_TEST(suite, test_cansee_temp);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
