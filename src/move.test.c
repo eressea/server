@@ -467,14 +467,16 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     test_teardown();
 }
 
-extern double damage_overload(double overload);
+extern double damage_overload(double overload, double damage_max);
 
 static void test_ship_damage_overload(CuTest *tc) {
-    CuAssertDblEquals(tc, 0.0, damage_overload(1), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.05, damage_overload(1.1), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.05, damage_overload(1.5), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.21, damage_overload(3.25), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.37, damage_overload(5), ASSERT_DBL_DELTA);
+    double damage_max = 0.37;
+    CuAssertDblEquals(tc, 0.0, damage_overload(1, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.1, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.5, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.21, damage_overload(3.25, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.37, damage_overload(5, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.0, damage_overload(5, 0.0), ASSERT_DBL_DELTA);
 }
 
 static void test_follow_unit(CuTest *tc) {
