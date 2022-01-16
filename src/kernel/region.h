@@ -241,7 +241,8 @@ extern "C" {
 
     const char *regionname(const struct region *r, const struct faction *f);
 
-	int region_maxworkers(const struct region *r);
+	int region_production(const struct region *r);
+    int region_maxworkers(const struct region* r, int size);
     const char *region_getname(const struct region *self);
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
