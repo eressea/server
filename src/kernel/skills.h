@@ -39,10 +39,9 @@ extern "C" {
 
     void increase_skill(struct unit * u, enum skill_t sk, unsigned int weeks);
     void reduce_skill(struct unit *u, skill * sv, unsigned int weeks);
-    unsigned int skill_weeks(unsigned int level);
-    int skill_compare(const skill * sk, const skill * sc);
-
+    int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
     void sk_set(skill * sv, unsigned int level);
+    int skill_compare(const skill* sk, const skill* sc);
 
 #ifdef __cplusplus
 }
