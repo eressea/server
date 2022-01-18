@@ -653,8 +653,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 
         /* Grundchance 1.0% */
         /* Jeder Elf in der Region erhoeht die Chance marginal */
-        mp = mp / 8;
-        if (elves > mp) elves = mp;
+        if (elves > mp / 8) elves = mp / 8;
         if (elves) {
             seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
         }
@@ -676,6 +675,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
                     }
                 }
                 seeds += rtrees(r, 0);
+                if (seeds > mp) seeds = mp;
                 rsettrees(r, 0, seeds);
             }
         }
