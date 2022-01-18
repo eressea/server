@@ -107,6 +107,9 @@
 #define HORSEMOVE   3
 /* Vermehrungschance pro Baum */
 #define FORESTGROWTH 10000      /* In Millionstel */
+/* Promillesatz sterbender überschüssiger Bäume */
+/* 5 Promill entspricht Halbwertszeit ~160 Runden */
+#define TREESTARVATION1000 5
 
 /** Ausbreitung und Vermehrung */
 #define MAXDEMAND      25
@@ -739,6 +742,21 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             rsettrees(r, 0, rtrees(r, 0) - seeds);
             /* zu den Sproesslinge hinzufuegen */
             rsettrees(r, 1, rtrees(r, 1) + seeds);
+        }
+    }
+
+    /* Überbevölkerung */
+    grownup_trees = rtrees(r, 2);
+    sprout = rtrees(r, 1);
+    if (grownup_trees + sprout / 2 > 1 + 2 * max_production(r) / TREESIZE) {
+        int starvation = 1 + (grownup_trees + sprout) * TREESTARVATION1000 / 1000;
+        if (starvation > 0) {
+            if (starvation <= sprout)
+                rsettrees(r, 1, sprout - starvation);
+            else {
+                rsettrees(r, 1, 0);
+                rsettrees(r, 2, grownup_trees - (starvation - sprout));
+            }
         }
     }
 }
