@@ -1321,8 +1321,7 @@ bool nmr_death(const faction * f, int turn, int timeout)
 static void remove_idle_players(void)
 {
     faction **fp;
-    int i, timeout = NMRTimeout();
-
+    int timeout = NMRTimeout();
     log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
     for (fp = &factions; *fp;) {
@@ -1344,25 +1343,25 @@ static void remove_idle_players(void)
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
-    i = turn + 1;
-    if (i < 4) i = 4;
-    for (fp = &factions; *fp;) {
-        faction *f = *fp;
-        if (!is_monsters(f)) {
-            if (RemoveNMRNewbie() && !fval(f, FFL_PAUSED|FFL_NOIDLEOUT)) {
-                if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
-                    ++newbies[f->age];
-                }
-                if (f->age == 2 || f->age == 3) {
-                    if (f->lastorders == turn - 2) {
-                        ++dropouts[f->age - 2];
-                        destroyfaction(fp);
-                        continue;
+    if (RemoveNMRNewbie()) {
+        for (fp = &factions; *fp;) {
+            faction* f = *fp;
+            if (!is_monsters(f)) {
+                if (!fval(f, FFL_PAUSED | FFL_NOIDLEOUT)) {
+                    if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
+                        ++newbies[f->age];
+                    }
+                    if (f->age == 2 || f->age == 3) {
+                        if (f->lastorders == turn - 2) {
+                            ++dropouts[f->age - 2];
+                            destroyfaction(fp);
+                            continue;
+                        }
                     }
                 }
             }
+            fp = &f->next;
         }
-        fp = &f->next;
     }
 }
 
