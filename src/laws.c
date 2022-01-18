@@ -632,8 +632,9 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         int mp, elves = count_race(r, rc_elf);
         direction_t d;
 
-        a = a_find(r->attribs, &at_germs);
-        if (a && last_weeks_season == SEASON_SPRING) {
+        if (last_weeks_season == SEASON_SPRING) {
+          a = a_find(r->attribs, &at_germs);
+          if (a) {
             /* ungekeimte Samen bleiben erhalten, Sproesslinge wachsen */
             sprout = rtrees(r, 1);
             if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
@@ -643,6 +644,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             rsettrees(r, 2, rtrees(r, 2) + sprout);
 
             a_removeall(&r->attribs, &at_germs);
+          }
         }
 
         mp = max_production(r);
@@ -732,6 +734,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         if (i > 0) {
             seeds = rtrees(r, 0);
             if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
+            if (seeds > i / TREESIZE * 2) seeds = i / TREESIZE * 2;
             /* aus dem gesamt Samenpool abziehen */
             rsettrees(r, 0, rtrees(r, 0) - seeds);
             /* zu den Sproesslinge hinzufuegen */
