@@ -105,6 +105,9 @@
 #define HORSEGROWTH 4
 /* Wanderungschance pro Pferd */
 #define HORSEMOVE   3
+/* Prozentsatz verhungernder überschüssiger Pferde */
+/* 1 Prozent entspricht Halbwertszeit ~60 Runden */
+#define HORSESTARVATION 1
 /* Vermehrungschance pro Baum */
 #define FORESTGROWTH 10000      /* In Millionstel */
 /* Promillesatz sterbender überschüssiger Bäume */
@@ -522,6 +525,13 @@ static void horses(region * r)
             rsethorses(r, rhorses(r) - pt);
         }
     }
+
+    horses = rhorses(r);
+    if (horses > maxhorses + 1) {
+        horses -= 1 + (horses - maxhorses) * HORSESTARVATION / 100;
+        rsethorses(r, horses);
+    }
+
     assert(rhorses(r) >= 0);
 }
 
