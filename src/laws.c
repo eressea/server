@@ -395,6 +395,7 @@ static void peasants(region * r, int rule)
     if (dead > 0) {
         ADDMSG(&r->msgs, msg_message("phunger", "dead", dead));
         peasants -= dead;
+        deathcounts(r, dead);
     }
 
     rsetpeasants(r, peasants);
