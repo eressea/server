@@ -1350,7 +1350,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                     fprintf(F, "%d;Unterh\n", entertainmoney(r));
                 }
                 fprintf(F, "%d;Rekruten\n", max_recruits(r));
-                if (max_production(r)) {
+                if (region_space(r)) {
                     /* Im CR steht der Bauernlohn, der bei Trauer nur 10 ist */
                     bool mourn = is_mourning(r, turn);
                     int p_wage = peasant_wage(r, mourn);

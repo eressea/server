@@ -122,16 +122,39 @@ const char *regionname(const region * r, const faction * f)
     return write_regionname(r, f, buf[index], sizeof(buf[index]));
 }
 
-int region_maxworkers(const region* r, int size)
+/** ENNO:
+ * ich denke, das das hier nicht sein sollte.
+ * statt dessen sollte ein attribut an der region sein, dass das erledigt,
+ * egal ob durch den spell oder anderes angelegt.
+ **/
+#include "curse.h"
+int region_space(const region * r)
+{
+    /* muss rterrain(r) sein, nicht rterrain() wegen rekursion */
+    int p = r->terrain->size;
+    if (curse_active(get_curse(r->attribs, &ct_drought))) {
+        p /= 2;
+    }
+
+    return p;
+}
+
+static int region_farmland_quick(const region* r, int size)
 {
     return size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
 }
 
-int region_production(const region* r)
+int region_farmland(const region* r)
 {
-    int size = max_production(r);
-    int treespace = region_maxworkers(r, size);
-    size /=10;
+    int size = region_space(r);
+    return region_farmland_quick(r, size);
+}
+
+int region_jobs(const region* r)
+{
+    int size = region_space(r);
+    int treespace = region_farmland_quick(r, size);
+    size /= 10;
     if (size > 200) size = 200;
     if (treespace < size) treespace = size;
     return treespace;
@@ -1101,7 +1124,7 @@ void init_region(region *r)
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
         int p_wage = 1 + peasant_wage(r, false) + rng_int() % 5;
-        peasants = (region_production(r) * (20 + dice(6, 10))) / 100;
+        peasants = (region_farmland(r) * (20 + dice(6, 10))) / 100;
         if (peasants < 100) peasants = 100;
         rsetmoney(r, rsetpeasants(r, peasants) * p_wage);
     }
@@ -1275,23 +1298,6 @@ void terraform_region(region * r, const terrain_type * terrain)
         init_region(r);
     }
 
-}
-
-/** ENNO:
- * ich denke, das das hier nicht sein sollte.
- * statt dessen sollte ein attribut an der region sein, dass das erledigt,
- * egal ob durch den spell oder anderes angelegt.
- **/
-#include "curse.h"
-int max_production(const region * r)
-{
-    /* muss rterrain(r) sein, nicht rterrain() wegen rekursion */
-    int p = r->terrain->size;
-    if (curse_active(get_curse(r->attribs, &ct_drought))) {
-        p /= 2;
-    }
-
-    return p;
 }
 
 void resolve_region(region *r)
@@ -1538,4 +1544,3 @@ void destroy_all_roads(region * r)
         rsetroad(r, (direction_t)i, 0);
     }
 }
-

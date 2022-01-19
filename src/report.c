@@ -867,30 +867,29 @@ static void report_region_description(struct stream *out, const region * r, fact
     /* Trees */
     trees = rtrees(r, 2);
     saplings = rtrees(r, 1);
-    if (max_production(r)) {
-        if (trees > 0 || saplings > 0) {
-            sbs_strcat(&sbs, ", ");
-            sbs_strcat(&sbs, str_itoa(trees));
-            sbs_strcat(&sbs, "/");
-            sbs_strcat(&sbs, str_itoa(saplings));
-            sbs_strcat(&sbs, " ");
+    if (trees > 0 || saplings > 0) {
+        sbs_strcat(&sbs, ", ");
+        sbs_strcat(&sbs, str_itoa(trees));
+        sbs_strcat(&sbs, "/");
+        sbs_strcat(&sbs, str_itoa(saplings));
+        sbs_strcat(&sbs, " ");
 
-            if (fval(r, RF_MALLORN)) {
-                if (trees == 1) {
-                    sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree"));
-                }
-                else {
-                    sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree_p"));
-                }
-            }
-            else if (trees == 1) {
-                sbs_strcat(&sbs, LOC(f->locale, "tree"));
+        if (fval(r, RF_MALLORN)) {
+            if (trees == 1) {
+                sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree"));
             }
             else {
-                sbs_strcat(&sbs, LOC(f->locale, "tree_p"));
+                sbs_strcat(&sbs, LOC(f->locale, "nr_mallorntree_p"));
             }
         }
+        else if (trees == 1) {
+            sbs_strcat(&sbs, LOC(f->locale, "tree"));
+        }
+        else {
+            sbs_strcat(&sbs, LOC(f->locale, "tree_p"));
+        }
     }
+
     pump_paragraph(&sbs, out, REPORTWIDTH, false);
 
     /* iron & stone */
@@ -1177,7 +1176,7 @@ static void report_statistics(struct stream *out, const region * r, const factio
         paragraph(out, buf, 2, 2, 0);
         msg_release(m);
     }
-    if (max_production(r) && (!fval(r->terrain, SEA_REGION)
+    if (region_space(r) && (!fval(r->terrain, SEA_REGION)
         || f->race == get_race(RC_AQUARIAN))) {
         if (markets_module()) {     /* hack */
             bool mourn = is_mourning(r, turn);

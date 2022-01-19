@@ -273,9 +273,9 @@ static void live(region * r)
 void peasant_migration(region * r)
 {
     int i;
-    int maxp = region_maxworkers(r, region_maxworkers(r));
+    int jobs = region_farmland(r);
     int rp = rpeasants(r);
-    int max_immigrants = MAX_IMMIGRATION(maxp - rp);
+    int max_immigrants = MAX_IMMIGRATION(jobs - rp);
 
     if (volcano_module()) {
         static int terrain_cache;
@@ -298,9 +298,9 @@ void peasant_migration(region * r)
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
             int max_emigration;
             int rp2 = rpeasants(rc);
-            int maxp2 = region_maxworkers(rc, max_production(rc));
-            if (maxp2 < 0) maxp2 = 0;
-            max_emigration = MAX_EMIGRATION(rp2 - maxp2);
+            int jobs2 = region_farmland(rc);
+            if (jobs2 < 0) jobs2 = 0;
+            max_emigration = MAX_EMIGRATION(rp2 - jobs2);
             if (max_emigration > 0) {
                 if (max_emigration > max_immigrants) max_emigration = max_immigrants;
                 if (max_emigration + r->land->newpeasants > USHRT_MAX) {
@@ -335,14 +335,14 @@ static double peasant_luck_factor(void)
 
 #define ROUND_BIRTHS(growth) (int)ceil(growth)
 
-int peasant_luck_effect(int peasants, int luck, int maxp, double variance)
+int peasant_luck_effect(int peasants, int luck, int space, double variance)
 {
     int births = 0;
     double mean;
     if (luck == 0) return 0;
     mean = fmin(luck, peasants);
     mean *= peasant_luck_factor() * peasant_growth_factor();
-    mean *= ((peasants / (double)maxp < .9) ? 1 : PEASANTFORCE);
+    mean *= ((peasants / (double)space < .9) ? 1 : PEASANTFORCE);
 
     births = ROUND_BIRTHS(normalvariate(mean, variance * mean));
     if (births <= 0)
@@ -356,10 +356,10 @@ static void peasants(region * r, int rule)
 {
     int rp = rpeasants(r);
     int money = rmoney(r);
-    int maxp = max_production(r);
+    int space = region_space(r);
     int n, dead = 0, peasants = rp;
     int satiated = money / maintenance_cost(NULL);
-    int max_survive = (maxp < satiated) ? maxp : satiated;
+    int max_survive = (space < satiated) ? space : satiated;
 
     if (peasants > 0 && rule > 0 && peasants < max_survive) {
         int luck = 0;
@@ -372,7 +372,7 @@ static void peasants(region * r, int rule)
             luck = a->data.i * 1000;
         }
 
-        luck = peasant_luck_effect(peasants, luck, maxp, .5);
+        luck = peasant_luck_effect(peasants, luck, space, .5);
         if (luck > 0) {
             ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
             births += luck;
@@ -478,7 +478,7 @@ static void horses(region * r)
     direction_t n;
 
     /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
-    maxhorses = region_production(r) / 10;
+    maxhorses = region_jobs(r) / 10;
     horses = rhorses(r);
     if (horses > 0) {
         if (maxhorses > 0) {
@@ -661,7 +661,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
           }
         }
 
-        mp = max_production(r);
+        mp = region_space(r);
         if (mp <= 0)
             return;
 
@@ -702,14 +702,15 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 region *r2 = rconnect(r, d);
-                if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
+                int space2 = r2?region_space(r2):0;
+                if (r2 && fval(r2->terrain, LAND_REGION) && space2 > 0) {
                     /* Eine Landregion, wir versuchen Samen zu verteilen:
                      * Die Chance, das Samen ein Stueck Boden finden, in dem sie
                      * keimen koennen, haengt von der Bewuchsdichte und der
                      * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
                      * Moeglichkeiten als in Ebenen. */
                     sprout = 0;
-                    seedchance = (1000.0 * region_production(r2)) / r2->terrain->size;
+                    seedchance = (1000.0 * region_farmland(r2)) / space2;
                     for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                         if (rng_int() % 10000 < seedchance)
                             sprout++;
@@ -744,7 +745,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
 
         /* Samenwachstum, wenn noch Platz für Sprößlinge ist: */
-        i = region_maxworkers(r, max_production(r));
+        i = region_farmland(r);
         if (i > 0) {
             seeds = rtrees(r, 0);
             if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
@@ -759,7 +760,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
     /* ÃœberbevÃ¶lkerung */
     grownup_trees = rtrees(r, 2);
     sprout = rtrees(r, 1);
-    if (grownup_trees + sprout / 2 > 1 + 2 * max_production(r) / TREESIZE) {
+    if (grownup_trees + sprout / 2 > 1 + 2 * region_space(r) / TREESIZE) {
         int starvation = 1 + (grownup_trees + sprout) * TREESTARVATION1000 / 1000;
         if (starvation > 0) {
             if (starvation <= sprout)
@@ -809,7 +810,7 @@ void immigration(void)
             int peasants = rpeasants(r);
             bool mourn = is_mourning(r, turn);
             int income = peasant_wage(r, mourn) - maintenance_cost(NULL) + 1;
-            if (income >= 0 && r->land && (peasants < repopulate) && region_production(r) >(peasants + 30) * 2) {
+            if (income >= 0 && r->land && (peasants < repopulate) && region_farmland(r) > (peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
                 for (u = r->units; u; u = u->next) {
@@ -900,7 +901,7 @@ void demographics(void)
                 peasants(r, peasant_rules);
 
                 if (r->age > 20 && rpeasants(r) > 42) {
-                    double mwp = fmax(region_production(r), 1);
+                    double mwp = fmax(region_jobs(r), 1);
                     bool mourn = is_mourning(r, turn);
                     int p_wage = peasant_wage(r, mourn);
                     double prob =

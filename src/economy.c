@@ -2311,7 +2311,7 @@ void auto_work(region * r)
         }
     }
     if (nextrequest != econ_requests) {
-        expandwork(r, econ_requests, nextrequest, region_production(r), total);
+        expandwork(r, econ_requests, nextrequest, region_jobs(r), total);
     }
 }
 
@@ -2508,7 +2508,7 @@ void produce(struct region *r)
     if (entertaining > 0) {
         expandentertainment(r, econ_requests, nextrequest, entertaining);
     }
-    expandwork(r, econ_requests, nextrequest, region_production(r), working);
+    expandwork(r, econ_requests, nextrequest, region_jobs(r), working);
 
     if (taxorders) {
         expandtax(r, taxorders);

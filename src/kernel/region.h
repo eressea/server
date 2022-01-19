@@ -219,7 +219,6 @@ extern "C" {
     extern const int delta_x[MAXDIRECTIONS];
     extern const int delta_y[MAXDIRECTIONS];
     direction_t dir_invert(direction_t dir);
-    int max_production(const struct region *r);
 
     void region_set_owner(struct region *r, struct faction *owner, int turn);
     struct faction *region_get_owner(const struct region *r);
@@ -241,8 +240,9 @@ extern "C" {
 
     const char *regionname(const struct region *r, const struct faction *f);
 
-	int region_production(const struct region *r);
-    int region_maxworkers(const struct region* r, int size);
+    int region_space(const struct region *r);
+    int region_farmland(const struct region* r);
+    int region_jobs(const struct region *r);
     const char *region_getname(const struct region *self);
     void region_setname(struct region *self, const char *name);
     const char *region_getinfo(const struct region *self);
