@@ -867,7 +867,7 @@ void demographics(void)
                 peasant_migration(r);
                 peasants(r, peasant_rules);
 
-                if (r->age > 20) {
+                if (r->age > 20 && rpeasants(r) > 42) {
                     double mwp = fmax(region_production(r), 1);
                     bool mourn = is_mourning(r, turn);
                     int p_wage = peasant_wage(r, mourn);
