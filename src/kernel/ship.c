@@ -566,5 +566,9 @@ int ship_damage_percent(const ship *sh) {
     /* Schaden muss granularer sein als Größe, deshalb ist er skaliert
      * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Größenpunkt.
      */
-    return ((DAMAGE_SCALE - 1) + sh->damage * 100) / (sh->size * sh->number * DAMAGE_SCALE);
+    if (sh->damage > 0) {
+        double d = (sh->damage * 100.) / ((double)DAMAGE_SCALE * sh->size * sh->number);
+        return (int)ceil(d);
+    }
+    return 0;
 }
