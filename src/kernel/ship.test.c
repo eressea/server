@@ -427,7 +427,7 @@ static ship *setup_ship(void) {
 
     config_set("movement.shipspeed.skillbonus", "0");
     r = test_create_ocean(0, 0);
-    stype = test_create_shiptype("longboat");
+    stype = test_create_shiptype("junk");
     stype->cptskill = 1;
     stype->sumskill = 10;
     stype->minskill = 1;
@@ -563,6 +563,8 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
 
 static void test_ship_damage(CuTest *tc) {
     ship *sh;
+
+    test_setup();
     sh = setup_ship();
     damage_ship(sh, 0.5);
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
@@ -575,9 +577,22 @@ static void test_ship_damage(CuTest *tc) {
     damage_ship(sh, 0.5);
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    test_teardown();
 }
 
-static void test_shipspeed_damage(CuTest *tc) {
+static void test_ship_damage_report(CuTest* tc) {
+    ship* sh;
+
+    test_setup();
+    sh = setup_ship();
+    sh->damage = 999;
+    sh->size = 250;
+    /* 3.996% damage should be rounded up to 4, not down to 3: */
+    CuAssertIntEquals(tc, 4, ship_damage_percent(sh));
+    test_teardown();
+}
+
+static void test_shipspeed_damage(CuTest* tc) {
     ship *sh;
     unit *cap, *crew;
 
@@ -730,6 +745,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_crew_skill);
     SUITE_ADD_TEST(suite, test_ship_damage);
+    SUITE_ADD_TEST(suite, test_ship_damage_report);
     SUITE_ADD_TEST(suite, test_shipspeed);
     SUITE_ADD_TEST(suite, test_shipspeed_speedy);
     SUITE_ADD_TEST(suite, test_shipspeed_stormwind);
