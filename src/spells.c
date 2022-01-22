@@ -784,7 +784,7 @@ static int sp_transferaura(castorder * co)
 /* ------------------------------------------------------------- */
 /* DRUIDE */
 /* ------------------------------------------------------------- */
-/* Name:       Guenstige Winde
+/* Name:       Guenstige Winde / Wasserelementar
  * Stufe:      4
  * Gebiet:     Gwyrrd
  * Wirkung:

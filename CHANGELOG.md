@@ -3,6 +3,7 @@
   - Neue Formel zur Vermischung von Talenten bei GIB PERSON und REKRUTIERE
   - Bauern in üvervölkerten Regionen vermehren sich nicht
   - Schiffe nehmen durch Überladung keinen Schaden mehr
+  - Dracoide werden rekrutiert wie andere Einheiten [2106]
   - Heldenreform
 
 # 3.30.2
