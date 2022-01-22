@@ -89,12 +89,15 @@ local sets = {
             if pick==1 then
                 u:set_skill('melee', math.random(4)+2)
                 u:add_item('sword', u.number)
+                u.status = 1
             elseif pick==2 then
                 u:set_skill('polearm', math.random(4)+2)
                 u:add_item('spear', u.number)
+                u.status = 1
             else
                 u:set_skill('bow', math.random(3)+1)
                 u:add_item('bow', u.number)
+                u.status = 2
             end
         end
     }

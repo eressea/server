@@ -5,6 +5,9 @@
   - Schiffe nehmen durch Überladung keinen Schaden mehr
   - Heldenreform
 
+# 3.30.2
+  - Anzeige des Schiffsschaden im Report aufrunden [2797]
+
 # 3.30.1
   - Schiffsschaden von Flotte falsch berechnet [2760]
 

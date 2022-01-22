@@ -494,6 +494,11 @@ const char* rc_key(const char *rcname, name_t n, char *name, size_t size)
     return NULL;
 }
 
+const char* race_name(const race* rc)
+{
+    return rc->_name;
+}
+
 const char* rc_name(const race * rc, name_t n, char *name, size_t size)
 {
     if (!rc) {

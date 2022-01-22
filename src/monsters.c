@@ -629,7 +629,19 @@ static bool check_overpopulated(const unit * u)
     return false;
 }
 
-static void recruit_dracoids(unit * dragon, int size)
+static void recruit_dracoids(unit* u, int size)
+{
+    unit* un;
+    const struct locale* lang = u->faction->locale;
+
+    un = create_unit(u->region, u->faction, 0, get_race(RC_DRACOID), 0, NULL, u);
+    name_unit(un);
+    unit_setstatus(un, ST_FIGHT);
+    fset(un, UFL_ISNEW | UFL_MOVED);
+    unit_addorder(un, create_order(K_RECRUIT, lang, "%d", size));
+}
+
+static void recruit_dracoids_orig(unit * dragon, int size)
 {
     faction *f = dragon->faction;
     region *r = dragon->region;
@@ -739,6 +751,7 @@ static order *plan_dragon(unit * u)
             if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
                 int ra = 20 + rng_int() % 100;
                 if (get_money(u) > ra * 50 + 100 && rng_int() % 100 < 50) {
+                    stats_count("monsters.create.dracoid", 1);
                     recruit_dracoids(u, ra);
                 }
             }
