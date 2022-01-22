@@ -641,30 +641,6 @@ static void recruit_dracoids(unit* u, int size)
     unit_addorder(un, create_order(K_RECRUIT, lang, "%d", size));
 }
 
-static void recruit_dracoids_orig(unit * dragon, int size)
-{
-    faction *f = dragon->faction;
-    region *r = dragon->region;
-    const struct item *weapon = NULL;
-    unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
-    stats_count("monsters.create.dracoid", 1);
-
-    fset(un, UFL_ISNEW | UFL_MOVED);
-
-    name_unit(un);
-    change_money(dragon, -un->number * 50);
-    equip_unit(un, "new_dracoid");
-
-    unit_setstatus(un, ST_FIGHT);
-    for (weapon = un->items; weapon; weapon = weapon->next) {
-        const weapon_type *wtype = weapon->type->rtype->wtype;
-        if (wtype && wtype->flags & WTF_MISSILE) {
-            unit_setstatus(un, ST_BEHIND);
-            break;
-        }
-    }
-}
-
 static order *plan_dragon(unit * u)
 {
     attrib *ta = a_find(u->attribs, &at_targetregion);
