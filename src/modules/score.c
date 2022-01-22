@@ -96,7 +96,6 @@ void score(void)
                 continue;
             }
             else if (rc->recruitcost>0) {
-                assert(playerrace(rc));
                 f->score += (rc->recruitcost * u->number) / 50;
             }
             f->score += get_money(u) / 50;

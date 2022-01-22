@@ -683,7 +683,7 @@
     <attack type="1" damage="1d4"/>
   </race>
 
-  <race name="dracoid" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveperson="yes" getitem="yes" equipment="yes">
+  <race name="dracoid" recruitcost="50" recruitethereal="yes" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" walk="yes" teach="no" giveperson="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes"/>
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
