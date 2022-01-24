@@ -273,7 +273,7 @@ static void live(region * r)
 void peasant_migration(region * r)
 {
     int i;
-    int maxp = region_production(r);
+    int maxp = region_maxworkers(r, region_maxworkers(r));
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
 
@@ -296,10 +296,11 @@ void peasant_migration(region * r)
         region *rc = rconnect(r, (direction_t)dir);
 
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
+            int max_emigration;
             int rp2 = rpeasants(rc);
-            int maxp2 = region_production(rc);
-            int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
-
+            int maxp2 = region_maxworkers(rc, max_production(rc));
+            if (maxp2 < 0) maxp2 = 0;
+            max_emigration = MAX_EMIGRATION(rp2 - maxp2);
             if (max_emigration > 0) {
                 if (max_emigration > max_immigrants) max_emigration = max_immigrants;
                 if (max_emigration + r->land->newpeasants > USHRT_MAX) {
