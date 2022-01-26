@@ -100,6 +100,7 @@ static void test_ship_capacity(CuTest* tc)
     sh->damage = 2500; /* 1% damage */
     CuAssertIntEquals(tc, 247500, ship_capacity(sh));
     CuAssertIntEquals(tc, 24750, ship_cabins(sh));
+    CuAssertIntEquals(tc, 24750, ship_cabins(sh));
     test_teardown();
 }
 
@@ -570,11 +571,16 @@ static void test_ship_damage(CuTest *tc) {
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
     sh->number = 2;
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    sh->number = 1;
+    scale_ship(sh, 2);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    sh->damage /= 2;
     CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
 
     sh->damage = 0;
     damage_ship(sh, 0.5);
-    CuAssertIntEquals(tc, sh->size * sh->number * DAMAGE_SCALE / 2, sh->damage);
+    CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
     test_teardown();
 }
