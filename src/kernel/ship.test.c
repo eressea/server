@@ -561,25 +561,60 @@ static void test_shipspeed_race_bonus(CuTest *tc) {
     test_teardown();
 }
 
+static void test_scale_ship(CuTest* tc) {
+    ship* sh;
+
+    test_setup();
+    sh = setup_ship();
+    CuAssertIntEquals(tc, 1, sh->number);
+    CuAssertIntEquals(tc, 0, sh->damage);
+    CuAssertIntEquals(tc, sh->type->construction->maxsize, sh->size);
+    sh->damage = DAMAGE_SCALE;
+
+    scale_ship(sh, 2);
+    CuAssertIntEquals(tc, 2, sh->number);
+    CuAssertIntEquals(tc, DAMAGE_SCALE * sh->number, sh->damage);
+    CuAssertIntEquals(tc, sh->type->construction->maxsize * sh->number, sh->size);
+
+    scale_ship(sh, 1);
+    CuAssertIntEquals(tc, 1, sh->number);
+    CuAssertIntEquals(tc, DAMAGE_SCALE, sh->damage);
+    CuAssertIntEquals(tc, sh->type->construction->maxsize, sh->size);
+}
+
 static void test_ship_damage(CuTest *tc) {
     ship *sh;
 
     test_setup();
     sh = setup_ship();
+
+    /* damage is relative to total size, number of ships has no effect on it: */
     damage_ship(sh, 0.5);
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
     sh->number = 2;
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
-    sh->number = 1;
-    scale_ship(sh, 2);
-    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
-    sh->damage /= 2;
-    CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
+
+    /* reset the ship to setup state: */
     sh->damage = 0;
+    sh->number = 1;
+
+    /* damaging a fleet works just like damaging a ship: */
+    scale_ship(sh, 2);
     damage_ship(sh, 0.5);
     CuAssertIntEquals(tc, sh->size * DAMAGE_SCALE / 2, sh->damage);
     CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+
+    /* scaling a fleet does not affect it's degree of damage, all ships are considered equally broken: */
+    scale_ship(sh, 1);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+    scale_ship(sh, 2);
+    CuAssertIntEquals(tc, 50, ship_damage_percent(sh));
+
+    /* percentage of damage scales linearly with points of damage: */
+    sh->damage /= 2;
+    CuAssertIntEquals(tc, 25, ship_damage_percent(sh));
+
     test_teardown();
 }
 
@@ -760,6 +795,7 @@ CuSuite *get_ship_suite(void)
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_same_faction_after_leave);
     SUITE_ADD_TEST(suite, test_shipowner_goes_to_empty_unit_after_leave);
     SUITE_ADD_TEST(suite, test_crew_skill);
+    SUITE_ADD_TEST(suite, test_scale_ship);
     SUITE_ADD_TEST(suite, test_ship_damage);
     SUITE_ADD_TEST(suite, test_ship_damage_report);
     SUITE_ADD_TEST(suite, test_shipspeed);
