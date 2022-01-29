@@ -100,7 +100,6 @@ static void test_ship_capacity(CuTest* tc)
     sh->damage = 2500; /* 1% damage */
     CuAssertIntEquals(tc, 247500, ship_capacity(sh));
     CuAssertIntEquals(tc, 24750, ship_cabins(sh));
-    CuAssertIntEquals(tc, 24750, ship_cabins(sh));
     test_teardown();
 }
 
@@ -605,12 +604,25 @@ static void test_shipspeed_damage(CuTest* tc) {
     setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
+    CuAssertIntEquals_Msg(tc, "undamaged ships have full range", 2, shipspeed(sh, cap));
     sh->damage = 1;
     CuAssertIntEquals_Msg(tc, "minimally damaged ships lose no range", 2, shipspeed(sh, cap));
+    sh->damage = sh->size * DAMAGE_SCALE / 2 - 1;
+    CuAssertIntEquals_Msg(tc, "lightly damaged ships lose no range", 2, shipspeed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE / 2;
     CuAssertIntEquals_Msg(tc, "damaged ships lose range", 1, shipspeed(sh, cap));
     sh->damage = sh->size * DAMAGE_SCALE;
     CuAssertIntEquals_Msg(tc, "fully damaged ships have no range", 0, shipspeed(sh, cap));
+
+    /* Flotten */
+    sh->number = 2;
+    sh->size *= 2;
+    sh->damage = 0;
+    CuAssertIntEquals_Msg(tc, "undamaged fleets have full range", 2, shipspeed(sh, cap));
+    sh->damage = sh->size * DAMAGE_SCALE / 2 - 1;
+    CuAssertIntEquals_Msg(tc, "lightly damaged fleets lose no range", 2, shipspeed(sh, cap));
+    sh->damage = sh->size * DAMAGE_SCALE / 2;
+    CuAssertIntEquals_Msg(tc, "damaged fleets lose range", 1, shipspeed(sh, cap));
     test_teardown();
 }
 
