@@ -262,9 +262,9 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
     spname = spell_name(mkname_spell(sp), lang);
     if (strchr(spname, ' ') != NULL) {
         /* contains spaces, needs quotes */
-        sbs_strcat(&sbs, " '");
+        sbs_strcat(&sbs, " \"");
         sbs_strcat(&sbs, spname);
-        sbs_strcat(&sbs, "'");
+        sbs_strcat(&sbs, "\"");
     }
     else {
         sbs_strcat(&sbs, " ");
