@@ -1,4 +1,4 @@
-Copyright (c) 1998-2019, Enno Rehling <enno@eressea.de>
+Copyright (c) 1998-2022, Enno Rehling <enno@eressea.de>
 
 Eressea is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
 
