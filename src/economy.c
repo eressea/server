@@ -309,7 +309,6 @@ static int forget_cmd(unit * u, order * ord)
 static bool maintain(building * b)
 {
     int c;
-    region *r = b->region;
     bool paid = true;
     unit *u;
 
