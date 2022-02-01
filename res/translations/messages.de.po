@@ -245,9 +245,6 @@ msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die 
 msgid "spellfail_pump"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) wusste trotz intensivem Verhör nichts über $region($tregion) zu berichten.\""
 
-msgid "maintenance_nowork"
-msgstr "\"$building($building) hat diese Woche nicht funktioniert, da zu Beginn der Woche der Unterhalt nicht gezahlt werden konnte.\""
-
 msgid "error_spell_on_flying_ship"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es ist zu gefährlich, diesen Zauber auf das fliegende Schiff $ship($ship) zu legen.\""
 
@@ -2077,9 +2074,6 @@ msgstr "\"Beim Vulkanausbruch in $region($region) sterben $int($dead) Personen i
 
 msgid "curseinfo::warmth_1"
 msgstr "\"$int($number) $if($eq($number,1), \"Person\", \"Personen\") von $unit($unit) $if($eq($number,1), \"fühlt\", \"fühlen\") sich vor Kälte geschützt. ($int36($id))\""
-
-msgid "maintenance_noowner"
-msgstr "\"Der Unterhalt von $building($building) konnte nicht gezahlt werden, das Gebäude war diese Woche nicht funktionstüchtig.\""
 
 msgid "error27"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl zu verkaufender Produkte fehlt.\""

@@ -466,8 +466,6 @@ static void setup_economy(void) {
     mt_create_va(mt_new("recruit", NULL), "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END);
     mt_create_va(mt_new("maintenance", NULL), "unit:unit", "building:building", MT_NEW_END);
     mt_create_va(mt_new("maintenancefail", NULL), "unit:unit", "building:building", MT_NEW_END);
-    mt_create_va(mt_new("maintenance_nowork", NULL), "building:building", MT_NEW_END);
-    mt_create_va(mt_new("maintenance_noowner", NULL), "building:building", MT_NEW_END);
 }
 
 /** 
@@ -511,7 +509,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
     test_clear_messagelist(&f->msgs);
     test_clear_messagelist(&r->msgs);
     
@@ -522,7 +520,6 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     CuAssertPtrEquals(tc, NULL, r->msgs);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
@@ -532,7 +529,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
     test_clear_messagelist(&r->msgs);
 
     test_teardown();

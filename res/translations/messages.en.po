@@ -245,9 +245,6 @@ msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region)
 msgid "spellfail_pump"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Despite intense questioning, $unit($target) did not have anything to tell about $region($tregion).\""
 
-msgid "maintenance_nowork"
-msgstr "\"$building($building) was nonfunctional because upkeep could not be paid at the beginning of the week.\""
-
 msgid "error_spell_on_flying_ship"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - It is far too dangerous to put this spell on the flying ship $ship($ship).\""
 
@@ -2077,9 +2074,6 @@ msgstr "\"$int($dead) people in $unit($unit) perish when the volcano in $region(
 
 msgid "curseinfo::warmth_1"
 msgstr "\"$int($number) $if($eq($number,1), \"member\", \"members\") of $unit($unit) $if($eq($number,1), \"is\", \"are\") protected from the cold. ($int36($id))\""
-
-msgid "maintenance_noowner"
-msgstr "\"The upkeep for $building($building) was not paid, the building was not operational this week.\""
 
 msgid "error27"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The amount of items for sale is missing.\""

@@ -314,25 +314,28 @@ static bool maintain(building * b)
     unit *u;
 
     if (b->type == NULL || b->type->maintenance == NULL) {
+        /* building needs no maintenance, works, no message required */
         return true;
+    }
+    if (fval(b, BLD_DONTPAY)) {
+        /* building is intentionally unmaintained, does not work, no message */
+        return false;
     }
     u = building_owner(b);
     if (u == NULL) {
-        /* no owner - send a message to the entire region */
-        ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
+        /* building has no owner, doe not work, no message, since everyone can see */
         return false;
     }
-    /* If the owner is the region owner, check if dontpay flag is set for the building he is in */
+    /* E3: if the owner is the region owner, he might pay for certain buildings */
     if (b != u->building) {
-        if (!config_token("rules.region_owner_pay_building", b->type->_name)) {
-            /* no owner - send a message to the entire region */
-            ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
+        if (u->building && fval(u->building, BLD_DONTPAY)) {
+            /* building is intentionally unmaintained, does not work, no message */
             return false;
         }
-    }
-    if (fval(u->building, BLD_DONTPAY)) {
-        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
-        return false;
+        if (config_token("rules.region_owner_pay_building", b->type->_name)) {
+            /* this is a building that region owners should maintain (but refuses to) */
+            return false;
+        }
     }
     for (c = 0; b->type->maintenance[c].number && paid; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -347,7 +350,6 @@ static bool maintain(building * b)
     }
     if (!paid) {
         ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
-        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
         return paid;
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {

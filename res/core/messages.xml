@@ -775,11 +775,6 @@
       <arg name="sender" type="unit"/>
     </type>
   </message>
-  <message name="maintenance_nowork" section="events">
-    <type>
-      <arg name="building" type="building"/>
-    </type>
-  </message>
   <message name="icastle_dissolve" section="events">
     <type>
       <arg name="building" type="building"/>
@@ -5426,11 +5421,6 @@
   <message name="maintenancefail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
-      <arg name="building" type="building"/>
-    </type>
-  </message>
-  <message name="maintenance_noowner" section="errors">
-    <type>
       <arg name="building" type="building"/>
     </type>
   </message>
