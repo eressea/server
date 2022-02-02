@@ -517,12 +517,22 @@ static void test_maintain_buildings(CuTest *tc) {
     
     /* we can afford to pay: */
     i_change(&u->items, itype, 100);
+    /* but we don't want to: */
+    b->flags = BLD_DONTPAY;
+    maintain_buildings(r);
+    CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
+    CuAssertIntEquals(tc, 100, i_get(u->items, itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
+
+    /* if we want to, items get used: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrEquals(tc, NULL, r->msgs);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(r->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
