@@ -168,6 +168,61 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     test_teardown();
 }
 
+static void test_ship_allowed_insect(CuTest * tc)
+{
+    region *rg, *ro;
+    ship * sh;
+    terrain_type *gtype, *otype;
+    ship_type *stype;
+    faction *fi, *fh;
+    unit *ui, *uh;
+    building_type *btype;
+    building *b;
+
+    test_setup();
+    gtype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
+    otype = test_create_terrain("ocean", SEA_REGION);
+    stype = test_create_shiptype("derp");
+    free(stype->coasts);
+    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+
+    rg = test_create_region(1, 0, gtype);
+    ro = test_create_region(4, 0, otype);
+    sh = test_create_ship(0, stype);
+    sh->region = ro;
+
+    fi = test_create_faction_ex(test_create_race("insect"), NULL);
+    ui = test_create_unit(fi, ro);
+    ui->ship = sh;
+    ship_set_owner(ui);
+
+    /* coast takes precedence over insect */
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, ro));
+    CuAssertIntEquals_Msg(tc, "coast trumps insect", SA_NO_COAST, check_ship_allowed(sh, rg));
+    stype->coasts[0] = gtype;
+    CuAssertIntEquals_Msg(tc, "insect", SA_NO_INSECT, check_ship_allowed(sh, rg));
+
+    /* harbour does not beat insect */
+    btype = test_create_buildingtype("harbour");
+    b = test_create_building(rg, btype);
+    uh = test_create_unit(fi, rg);
+    uh->building = b;
+    building_set_owner(uh);
+
+    CuAssertIntEquals(tc, SA_NO_INSECT, check_ship_allowed(sh, rg));
+
+    /* insect passenger can enter */
+    fh = test_create_faction_ex(test_create_race("human"), NULL);
+    uh = test_create_unit(fh, test_create_region(0, 0, NULL));
+
+    uh->ship = sh;
+    ship_set_owner(uh);
+
+    CuAssertIntEquals_Msg(tc, "insect passenger okay", SA_COAST, check_ship_allowed(sh, rg));
+    test_teardown();
+}
+
+
 static void test_walkingcapacity(CuTest *tc) {
     unit *u;
     int cap;
@@ -859,6 +914,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
+    SUITE_ADD_TEST(suite, test_ship_allowed_insect);
     SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);
