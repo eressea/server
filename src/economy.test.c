@@ -466,6 +466,8 @@ static void setup_economy(void) {
     mt_create_va(mt_new("recruit", NULL), "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END);
     mt_create_va(mt_new("maintenance", NULL), "unit:unit", "building:building", MT_NEW_END);
     mt_create_va(mt_new("maintenancefail", NULL), "unit:unit", "building:building", MT_NEW_END);
+    mt_create_va(mt_new("maintenance_nowork", NULL), "building:building", MT_NEW_END);
+    mt_create_va(mt_new("maintenance_noowner", NULL), "building:building", MT_NEW_END);
 }
 
 /** 
@@ -509,17 +511,28 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenancefail"));
-    CuAssertPtrEquals(tc, NULL, r->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
     test_clear_messagelist(&f->msgs);
     test_clear_messagelist(&r->msgs);
     
     /* we can afford to pay: */
     i_change(&u->items, itype, 100);
+    /* but we don't want to: */
+    b->flags = BLD_DONTPAY;
+    maintain_buildings(r);
+    CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
+    CuAssertIntEquals(tc, 100, i_get(u->items, itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
+    test_clear_messagelist(&r->msgs);
+
+    /* if we want to, items get used: */
     b->flags = 0;
     maintain_buildings(r);
     CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertPtrEquals(tc, NULL, r->msgs);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(r->msgs, "maintenance_nowork"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
     test_clear_messagelist(&f->msgs);
 
@@ -529,7 +542,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
-    CuAssertPtrEquals(tc, NULL, r->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
     test_clear_messagelist(&r->msgs);
 
     test_teardown();

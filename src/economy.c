@@ -309,32 +309,30 @@ static int forget_cmd(unit * u, order * ord)
 static bool maintain(building * b)
 {
     int c;
+    region *r = b->region;
     bool paid = true;
     unit *u;
 
     if (b->type == NULL || b->type->maintenance == NULL) {
-        /* building needs no maintenance, works, no message required */
         return true;
-    }
-    if (fval(b, BLD_DONTPAY)) {
-        /* building is intentionally unmaintained, does not work, no message */
-        return false;
     }
     u = building_owner(b);
     if (u == NULL) {
-        /* building has no owner, doe not work, no message, since everyone can see */
+        /* no owner - send a message to the entire region */
+        ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
         return false;
     }
-    /* E3: if the owner is the region owner, he might pay for certain buildings */
+    /* If the owner is the region owner, check if dontpay flag is set for the building he is in */
     if (b != u->building) {
-        if (u->building && fval(u->building, BLD_DONTPAY)) {
-            /* building is intentionally unmaintained, does not work, no message */
+        if (!config_token("rules.region_owner_pay_building", b->type->_name)) {
+            /* no owner - send a message to the entire region */
+            ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
             return false;
         }
-        if (config_token("rules.region_owner_pay_building", b->type->_name)) {
-            /* this is a building that region owners should maintain (but refuses to) */
-            return false;
-        }
+    }
+    if (fval(u->building, BLD_DONTPAY)) {
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
+        return false;
     }
     for (c = 0; b->type->maintenance[c].number && paid; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -349,6 +347,7 @@ static bool maintain(building * b)
     }
     if (!paid) {
         ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
         return paid;
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
