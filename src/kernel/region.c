@@ -679,9 +679,13 @@ void rsetherbtype(region *r, const struct item_type *itype) {
                     return;
                 }
             }
+            i = rng_int() % i;
+            r->land->herbtype = r->terrain->herbs[i];
         }
-        log_debug("attempt to set herbtype=%s for terrain=%s in %s", itype->rtype->_name, r->terrain->_name, regionname(r, 0));
-        r->land->herbtype = itype;
+        else {
+            r->land->herbtype = itype;
+        }
+        log_warning("attempted to set herbtype=%s for terrain=%s in %s", itype->rtype->_name, r->terrain->_name, regionname(r, 0));
     }
 }
 
