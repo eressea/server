@@ -1476,12 +1476,12 @@ void unit_sethp(unit * u, int hp)
     u->hp = hp;
 }
 
-status_t unit_getstatus(const unit * u)
+enum status_t unit_getstatus(const unit * u)
 {
     return u->status;
 }
 
-void unit_setstatus(unit * u, status_t status)
+void unit_setstatus(unit * u, enum status_t status)
 {
     u->status = status;
 }

@@ -1,4 +1,6 @@
 #include "monsters.h"
+
+#include "battle.h"
 #include "guard.h"
 #include "reports.h"
 #include "study.h"

@@ -51,15 +51,6 @@ typedef enum {
 
 /* ------------------ Status von Einheiten --------------------- */
 
-typedef enum {
-  ST_AGGRO,
-  ST_FIGHT,
-  ST_BEHIND,
-  ST_CHICKEN,
-  ST_AVOID,
-  ST_FLEE
-} status_t;
-
 typedef enum {                  /* Fehler und Meldungen im Report */
   MSG_BATTLE,
   MSG_EVENT,

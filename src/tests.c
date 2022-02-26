@@ -2,16 +2,18 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include "tests.h"
-#include "prefix.h"
+
+#include "battle.h"
 #include "creport.h"
+#include "prefix.h"
 #include "report.h"
 #include "reports.h"
 #include "vortex.h"
 
 #include "kernel/build.h"
+#include "kernel/config.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
-#include "kernel/config.h"
 #include "kernel/alliance.h"
 #include "kernel/equipment.h"
 #include "kernel/messages.h"

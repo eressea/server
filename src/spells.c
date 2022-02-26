@@ -1,15 +1,16 @@
 #include "spells.h"
 
+#include "battle.h"
 #include "contact.h"
+#include "direction.h"
 #include "guard.h"
+#include "laws.h"
+#include "monsters.h"
+#include "randenc.h"
 #include "reports.h"
 #include "spy.h"
-#include "vortex.h"
-#include "laws.h"
-#include "direction.h"
-#include "randenc.h"
-#include "monsters.h"
 #include "teleport.h"
+#include "vortex.h"
 
 /* triggers includes */
 #include <triggers/changefaction.h>

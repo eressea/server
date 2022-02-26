@@ -1,11 +1,12 @@
 #include "monsters.h"
 
+#include "battle.h"
 #include "economy.h"
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
-#include "study.h"
 #include "move.h"
+#include "study.h"
 
 /* kernel includes */
 #include "kernel/attrib.h"

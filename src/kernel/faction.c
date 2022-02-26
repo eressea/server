@@ -3,6 +3,7 @@
 #endif
 #include "faction.h"
 
+#include "battle.h"
 #include "calendar.h"
 #include "config.h"
 #include "database.h"
