@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "ally.h"
 #include "pool.h"
 #include "magic.h"

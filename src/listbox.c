@@ -1,13 +1,8 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
-#include <curses.h>
-
 #include "listbox.h"
 #include "gmtool_structs.h"
 
 #include <util/strings.h>
+#include <curses.h>
 
 #include <stdbool.h>
 #include <stdlib.h>

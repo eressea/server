@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <stdlib.h>
 #include "move.h"
 
 #include "contact.h"
@@ -28,7 +26,9 @@
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <stdlib.h>
 
 static void setup_move(void) {
     mt_create_va(mt_new("travel", NULL),

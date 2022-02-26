@@ -1,11 +1,11 @@
-#include <platform.h>
+#include "building.h"
 
-#include <kernel/calendar.h>
-#include <kernel/config.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/building.h>
-#include <kernel/unit.h>
+
+#include "calendar.h"
+#include "config.h"
+#include "race.h"
+#include "region.h"
+#include "unit.h"
 
 #include <util/language.h>
 #include <util/strings.h>

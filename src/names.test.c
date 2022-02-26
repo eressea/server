@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "names.h"
 
 #include <kernel/race.h>

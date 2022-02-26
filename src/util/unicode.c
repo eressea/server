@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "unicode.h"
 
 #include <assert.h>

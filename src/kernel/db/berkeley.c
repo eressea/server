@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "driver.h"
 
 #include <assert.h>

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "market.h"
 #include "tests.h"
 

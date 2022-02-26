@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "give.h"
 
 #include "contact.h"

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "reports.h"
 
 #include "guard.h"

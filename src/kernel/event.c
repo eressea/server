@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "event.h"
 #include "attrib.h"
 

@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "spy.h"
 #include "guard.h"
 #include "laws.h"

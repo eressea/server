@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "giveitem.h"
 
 /* kernel includes */

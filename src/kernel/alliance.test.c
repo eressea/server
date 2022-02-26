@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "alliance.h"
 
 #include <kernel/config.h>

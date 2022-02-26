@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "attrib.h"
 
 #include <util/log.h>

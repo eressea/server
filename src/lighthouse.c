@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "lighthouse.h"
 
 #include <kernel/config.h>

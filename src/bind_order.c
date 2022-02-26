@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 /* kernel includes */
 #include <kernel/order.h>
 #include <util/parser.h>

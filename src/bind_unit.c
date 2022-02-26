@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_unit.h"
 #include "alchemy.h"
 #include "bindings.h"

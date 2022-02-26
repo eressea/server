@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "goodies.h"
 
 /* libc includes */

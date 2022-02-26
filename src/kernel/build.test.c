@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "alchemy.h"
 #include "build.h"
 #include "building.h"

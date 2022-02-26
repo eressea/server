@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "shipcurse.h"
 
 /* kernel includes */

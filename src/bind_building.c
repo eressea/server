@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_building.h"
 #include "bind_unit.h"
 

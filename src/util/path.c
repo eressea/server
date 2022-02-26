@@ -1,8 +1,5 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "path.h"
+
 #include "strings.h"
 
 #include <assert.h>

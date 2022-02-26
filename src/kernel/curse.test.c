@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/save.h>

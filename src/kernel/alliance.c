@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "alliance.h"
 
 /* kernel includes */

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "renumber.h"
 
 #include "laws.h"

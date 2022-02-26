@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "messages.h"
 
 #include "unit.h"

@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "password.h"
 
 #include "crypto/crypto.h"

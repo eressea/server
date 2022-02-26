@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "guard.h"
 #include "laws.h"
 #include "monsters.h"

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "changerace.h"
 #include "timeout.h"
 

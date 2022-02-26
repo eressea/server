@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "targetregion.h"
 
 #include <kernel/config.h>

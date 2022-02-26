@@ -1,6 +1,3 @@
-#include <platform.h>
-#include <stdlib.h>
-
 #include "monsters.h"
 #include "guard.h"
 #include "reports.h"
@@ -29,6 +26,7 @@
 #include <tests.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 extern void plan_monsters(struct faction *f);

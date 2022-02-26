@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "study.h"
 
 #include <kernel/ally.h>

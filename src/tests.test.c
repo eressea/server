@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include <kernel/types.h>
 #include <kernel/item.h>
 #include <kernel/region.h>

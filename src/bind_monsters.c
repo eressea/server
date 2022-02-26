@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "monsters.h"
 
 #include <spells/flyingship.h>

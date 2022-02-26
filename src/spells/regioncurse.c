@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "regioncurse.h"
 #include "magic.h"
 

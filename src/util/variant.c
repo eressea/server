@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "variant.h"
 
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include <platform.h>
+#include "monsters.h"
 
 /* kernel includes */
 #include <kernel/race.h>
@@ -9,8 +9,6 @@
 
 /* util iclude */
 #include <util/rng.h>
-
-#include "monsters.h"
 
 /* libc includes */
 #include <stdlib.h>

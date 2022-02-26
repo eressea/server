@@ -1,6 +1,5 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#include <platform.h>
 #endif
 
 #include "economy.h"

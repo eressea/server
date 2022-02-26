@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "buildingcurse.h"
 
 /* kernel includes */

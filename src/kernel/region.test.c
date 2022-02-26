@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "region.h"
 #include "resources.h"
 #include "building.h"

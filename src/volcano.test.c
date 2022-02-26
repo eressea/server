@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <tests.h>
 #include "volcano.h"
 #include "alchemy.h"
 
@@ -17,6 +15,7 @@
 #include "util/rand.h"
 #include "util/rng.h"
 
+#include <tests.h>
 #include <CuTest.h>
 
 static void test_volcano_update(CuTest *tc) {

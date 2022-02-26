@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "morale.h"
 
 #include "kernel/calendar.h"

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "donations.h"
 
 #include <kernel/faction.h>

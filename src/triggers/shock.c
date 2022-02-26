@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-# include <platform.h>
-#endif
-
 #include "shock.h"
 
 #include <magic.h>

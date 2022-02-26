@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "attributes/dict.h"
 
 #include "helpers.h"

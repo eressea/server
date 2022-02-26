@@ -1,5 +1,3 @@
-#include <platform.h>
-
 /* kernel includes */
 #include <kernel/race.h>
 #include <kernel/region.h>

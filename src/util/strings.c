@@ -1,7 +1,6 @@
 #ifdef _MSC_VER
 #undef HAVE__ITOA
 #endif
-#include <platform.h>
 
 #include "strings.h"
 

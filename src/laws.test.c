@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "laws.h"
 #include "battle.h"
 #include "contact.h"

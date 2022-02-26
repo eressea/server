@@ -1,4 +1,3 @@
-#include <platform.h>
 #include <kernel/curse.h>
 #include <kernel/messages.h>
 #include <util/language.h>
