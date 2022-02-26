@@ -631,3 +631,22 @@ void close_orders(void) {
         reset_order();
     }
 }
+
+order *default_order(const struct locale *lang)
+{
+    int i = locale_index(lang);
+    keyword_t kwd;
+    const char * str;
+
+    assert(i < MAXLOCALES);
+    kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
+    str = config_get("orders.default");
+    if (str) {
+        kwd = findkeyword(str);
+    }
+    if (kwd != NOKEYWORD) {
+        return create_order(kwd, lang, NULL);
+    }
+    return NULL;
+}
+

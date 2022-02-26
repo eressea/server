@@ -9,6 +9,7 @@ extern "C" {
 #include <stdbool.h>
 
     struct param;
+    struct locale;
     struct _dictionary_;
 
 #define DISPLAYSIZE         4096 /* max. Laenge einer Beschreibung, incl trailing 0 */
@@ -103,8 +104,6 @@ extern "C" {
     bool config_changed(int *cache_key);
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
-
-    struct order *default_order(const struct locale *lang);
 
     void free_gamedata(void);
     void free_config(void);
