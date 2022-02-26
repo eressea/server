@@ -34,6 +34,7 @@
 #include "listbox.h"
 #include "teleport.h"
 
+#include <util/stb_sprintf.h>
 #include <selist.h>
 
 #include <assert.h>
@@ -699,7 +700,7 @@ static faction *select_faction(state * st)
 
     while (f) {
         char buffer[32];
-        sprintf(buffer, "%.4s %.26s", itoa36(f->no), f->name);
+        stbsp_sprintf(buffer, "%.4s %.26s", itoa36(f->no), f->name);
         insert_selection(iinsert, NULL, buffer, (void *)f);
         f = f->next;
     }
@@ -832,7 +833,7 @@ static void select_regions(state * st, int selectmode)
     doupdate();
     findmode = getch();
     if (findmode == 'n') {        /* none */
-        sprintf(sbuffer, "%snone", status);
+        stbsp_sprintf(sbuffer, "%snone", status);
         statusline(st->wnd_status->handle, sbuffer);
         if (selectmode & MODE_SELECT) {
             int i;
@@ -855,7 +856,7 @@ static void select_regions(state * st, int selectmode)
     else if (findmode == 'v') {
         region *r;
         /* fresh virgin regions */
-        sprintf(sbuffer, "%svirgin", status);
+        stbsp_sprintf(sbuffer, "%svirgin", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             if (r->age == 0) {
@@ -871,7 +872,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 'c') {
         region *r;
-        sprintf(sbuffer, "%schaos", status);
+        stbsp_sprintf(sbuffer, "%schaos", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             if (fval(r, RF_CHAOTIC)) {
@@ -887,7 +888,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 'm') {
         region *r;
-        sprintf(sbuffer, "%smonsters", status);
+        stbsp_sprintf(sbuffer, "%smonsters", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             unit *u = r->units;
@@ -908,7 +909,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 'p') {
         region *r;
-        sprintf(sbuffer, "%splayers", status);
+        stbsp_sprintf(sbuffer, "%splayers", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             unit *u = r->units;
@@ -929,7 +930,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 'u') {
         region *r;
-        sprintf(sbuffer, "%sunits", status);
+        stbsp_sprintf(sbuffer, "%sunits", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             if (r->units) {
@@ -945,7 +946,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 's') {
         region *r;
-        sprintf(sbuffer, "%sships", status);
+        stbsp_sprintf(sbuffer, "%sships", status);
         statusline(st->wnd_status->handle, sbuffer);
         for (r = regions; r; r = r->next) {
             if (r->ships) {
@@ -961,7 +962,7 @@ static void select_regions(state * st, int selectmode)
     }
     else if (findmode == 'f') {
         char fbuffer[12];
-        sprintf(sbuffer, "%sfaction:", status);
+        stbsp_sprintf(sbuffer, "%sfaction:", status);
         askstring(st->wnd_status->handle, sbuffer, fbuffer, 12);
         if (fbuffer[0]) {
             faction *f = findfaction(atoi36(fbuffer));
@@ -969,7 +970,7 @@ static void select_regions(state * st, int selectmode)
             if (f != NULL) {
                 unit *u;
 
-                sprintf(sbuffer, "%sfaction: %s", status, itoa36(f->no));
+                stbsp_sprintf(sbuffer, "%sfaction: %s", status, itoa36(f->no));
                 statusline(st->wnd_status->handle, sbuffer);
                 for (u = f->units; u; u = u->nextF) {
                     region *r = u->region;
@@ -990,18 +991,18 @@ static void select_regions(state * st, int selectmode)
         }
     }
     else if (findmode == 'i') {
-        sprintf(sbuffer, "%swand: ", status);
+        stbsp_sprintf(sbuffer, "%swand: ", status);
         statusline(st->wnd_status->handle, sbuffer);
         select_island(st, selectmode);
     }
     else if (findmode == 't') {
         const struct terrain_type *terrain;
-        sprintf(sbuffer, "%sterrain: ", status);
+        stbsp_sprintf(sbuffer, "%sterrain: ", status);
         statusline(st->wnd_status->handle, sbuffer);
         terrain = select_terrain(st, NULL);
         if (terrain != NULL) {
             region *r;
-            sprintf(sbuffer, "%sterrain: %s", status, terrain->_name);
+            stbsp_sprintf(sbuffer, "%sterrain: %s", status, terrain->_name);
             statusline(st->wnd_status->handle, sbuffer);
             for (r = regions; r; r = r->next) {
                 if (r->terrain == terrain) {
@@ -1422,7 +1423,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", loc);
+                stbsp_snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", loc);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(loc));
                 if (f == NULL) {
