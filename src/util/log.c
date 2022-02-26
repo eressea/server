@@ -7,8 +7,6 @@
 #include "strings.h"
 #include "unicode.h"
 
-#include "stb_sprintf.h"
-
 #include <assert.h>
 #include <errno.h>
 #include <limits.h>
@@ -109,7 +107,7 @@ void log_rotate(const char *filename, int maxindex)
     int dst = 1;
     assert(strlen(filename) < sizeof(buffer[0]) - 4);
 
-    stbsp_sprintf(buffer[dst], "%s.%d", filename, maxindex);
+    sprintf(buffer[dst], "%s.%d", filename, maxindex);
     if (remove(buffer[dst]) != 0) {
         if (errno != ENOENT) {
             fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
@@ -119,7 +117,7 @@ void log_rotate(const char *filename, int maxindex)
 
     while (maxindex > 0) {
         int src = 1 - dst;
-        stbsp_sprintf(buffer[src], "%s.%d", filename, --maxindex);
+        sprintf(buffer[src], "%s.%d", filename, --maxindex);
         if (rename(buffer[src], buffer[dst]) != 0) {
             if (errno != ENOENT) {
                 fprintf(stderr, "log rotate %s: %d %s", buffer[dst], errno, strerror(errno));
@@ -171,7 +169,7 @@ static void _log_write(FILE * stream, int codepage, const char *format, va_list 
     if (codepage) {
         char buffer[MAXLENGTH];
         unsigned char converted[MAXLENGTH];
-        stbsp_vsnprintf(buffer, sizeof(buffer), format, args);
+        vsnprintf(buffer, sizeof(buffer), format, args);
         if (cp_convert(buffer, converted, MAXLENGTH, codepage) == 0) {
             fputs((char *)converted, stream);
         }

@@ -44,7 +44,6 @@ language.c
 lists.c
 log.c
 stats.c
-stb.c
 message.c
 mt19937ar.c
 nrmessage.c
