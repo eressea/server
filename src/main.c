@@ -177,7 +177,7 @@ static int parse_args(int argc, char **argv)
         else if (argi[1] == '-') {     /* long format */
             if (strcmp(argi + 2, "version") == 0) {
                 printf("Eressea version %s, "
-                    "Copyright (C) 2019 Enno Rehling et al.\n",
+                    "Copyright (C) 2022 Enno Rehling et al.\n",
                     eressea_version());
                 return 1;
 #ifdef USE_CURSES          
