@@ -47,7 +47,7 @@ static int keys_lower_bound(int *base, int k, int l, int r) {
     return l;
 }
 
-static int keys_size(int n) {
+static unsigned int keys_size(int n) {
     /* TODO maybe use log2 from https://graphics.stanford.edu/~seander/bithacks.html#IntegerLog */
     assert(n > 0 && n <= 4096);
     if (n <= 1) return 1;
@@ -105,8 +105,8 @@ static int read_keyval_orig(gamedata *data, int *keys, int n) {
 #endif
 
 static int a_readkeys(variant *var, void *owner, gamedata *data) {
-    int n, ksn, *keys;
-
+    int n, *keys;
+    size_t ksn;
     READ_INT(data->store, &n);
     assert(n < 4096 && n >= 0);
     if (n == 0) {
@@ -120,7 +120,7 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
     else if (data->version >= KEYVAL_VERSION) {
         int m = read_keyval_orig(data, keys + 1, n);
         if (n != m) {
-            int ksm = keys_size(m);
+            size_t ksm = keys_size(m);
             if (ksm != ksn) {
                 int *nkeys = (int *)realloc(keys, (ksm * 2 + 1) * sizeof(int));
                 if (nkeys != NULL) {
@@ -155,20 +155,21 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
                 }
                 else {
                     if (e > l) {
-                        memmove(keys + 2 * l + 3, keys + 2 * l + 1, (e - l) * 2 * sizeof(int));
+                        int d = 2 * (e - l);
+                        memmove(keys + l + l + 3, keys + l + l + 1, d * sizeof(int));
                     }
-                    keys[2 * l + 1] = k;
-                    keys[2 * l + 2] = v;
+                    keys[l + l + 1] = k;
+                    keys[l + l + 2] = v;
                 }
             }
             ++e;
         }
         if (e != n) {
-            int sz = keys_size(n);
+            size_t sz = keys_size(n);
             if (e > sz) {
                 int *k;
                 sz = keys_size(e);
-                k = realloc(keys, sizeof(int)*(2 * sz + 1));
+                k = realloc(keys, (2 * sz + 1) * sizeof(int));
                 if (!k) {
                     free(keys);
                     abort();
@@ -224,7 +225,7 @@ static int* keys_get(int *base, int i)
 {
     int n = base[0];
     assert(i >= 0 && i < n);
-    return base + 1 + i * 2;
+    return base + 1 + i + i;
 }
 
 static int *keys_update(int *base, int key, int val)
@@ -238,9 +239,9 @@ static int *keys_update(int *base, int key, int val)
             kv[1] = val;
         }
         else {
-            int sz = keys_size(n);
+            size_t sz = keys_size(n);
             assert(kv[0] > key);
-            if (n + 1 > sz) {
+            if (n >= sz) {
                 int *tmp;
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
@@ -250,14 +251,15 @@ static int *keys_update(int *base, int key, int val)
                 kv = base + diff;
             }
             base[0] = n + 1;
-            memmove(kv + 2, kv, 2 * sizeof(int) * (n - l));
+            n -= l;
+            memmove(kv + 2, kv, 2 * sizeof(int) * n);
             kv[0] = key;
             kv[1] = val;
         }
     }
     else {
-        int sz = keys_size(n);
-        if (n + 1 > sz) {
+        size_t sz = keys_size(n);
+        if (n >= sz) {
             void * tmp;
             sz = keys_size(n + 1);
             tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
@@ -283,7 +285,7 @@ void key_set(attrib ** alist, int key, int val)
     }
     keys = (int *)a->data.v;
     if (!keys) {
-        int sz = keys_size(1);
+        size_t sz = keys_size(1);
         a->data.v = keys = malloc((2 * sz + 1) * sizeof(int));
         if (!keys) abort();
         keys[0] = 1;
