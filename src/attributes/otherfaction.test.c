@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "otherfaction.h"
 
 #include <kernel/config.h>

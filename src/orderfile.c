@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "orderfile.h"
 
 #include "kernel/calendar.h"

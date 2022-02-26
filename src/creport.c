@@ -722,6 +722,12 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
     }
 }
 
+int level_days(unsigned int level)
+{
+    /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
+    return 30 * ((level + 1) * level / 2);
+}
+
 /** prints all that belongs to a unit
 * @param f observers faction
 * @param u unit to report
@@ -1592,7 +1598,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     i = countheroes(f);
     if (i > 0)
         fprintf(F, "%d;heroes\n", i);
-    i = maxheroes(f);
+    i = max_heroes(f->num_people);
     if (i > 0)
         fprintf(F, "%d;max_heroes\n", i);
 

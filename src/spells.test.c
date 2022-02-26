@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "spells.h"
 #include "teleport.h"
 

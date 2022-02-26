@@ -1,10 +1,9 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
+#include "functions.h"
+
 #include <CuTest.h>
+
 #include <stdio.h>
 #include <string.h>
-#include "functions.h"
 
 
 static void test_functions(CuTest * tc)

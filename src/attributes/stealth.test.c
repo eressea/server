@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "stealth.h"
 
 #include <kernel/unit.h>

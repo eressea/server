@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "language.h"
 
 #include <CuTest.h>

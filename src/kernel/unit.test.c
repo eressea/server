@@ -1,7 +1,5 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #endif
 #include <kernel/ally.h>
 #include <kernel/config.h>
@@ -616,6 +614,10 @@ static void test_transfer_hitpoints(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * A transfer of men between two units with the same skill 
+ * does not change their skills.
+ */
 static void test_transfer_skills(CuTest *tc) {
     unit *u1, *u2;
     region *r;
@@ -640,12 +642,47 @@ static void test_transfer_skills(CuTest *tc) {
     CuAssertIntEquals(tc, 2, effskill(u1, SK_ALCHEMY, NULL));
     CuAssertIntEquals(tc, 200, u2->number);
     CuAssertIntEquals(tc, 2, effskill(u2, SK_ALCHEMY, NULL));
-    remove_skill(u1, SK_ALCHEMY);
-    transfermen(u1, u2, 100);
-    CuAssertIntEquals(tc, 300, u2->number);
+    sv = unit_skill(u2, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 3, sv->weeks);
+    test_teardown();
+}
+
+/**
+ * A transfer of men between two units with different progress
+ * merges their skill progress.
+ */
+static void test_transfer_skills_merge(CuTest *tc) {
+    unit *u1, *u2, *u3;
+    region *r;
+    faction *f;
+    skill *sv;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction();
+
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 5);
+
+    u2 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+    u3 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+
+    transfermen(u1, u2, 2);
+    CuAssertIntEquals(tc, 3, u1->number);
+    CuAssertIntEquals(tc, 3, u2->number);
     sv = unit_skill(u2, SK_ALCHEMY);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+
+    transfermen(u1, u3, 3);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertIntEquals(tc, 4, u3->number);
+    sv = unit_skill(u3, SK_ALCHEMY);
+    CuAssertPtrEquals(tc, NULL, sv);
+
     test_teardown();
 }
 
@@ -788,6 +825,23 @@ static void test_gift_items(CuTest *tc) {
     test_teardown();
 }
 
+static void test_max_heroes(CuTest* tc) {
+    CuAssertIntEquals(tc, 0, max_heroes(56));
+    CuAssertIntEquals(tc, 1, max_heroes(57));
+    CuAssertIntEquals(tc, 1, max_heroes(62));
+    CuAssertIntEquals(tc, 2, max_heroes(63));
+    CuAssertIntEquals(tc, 2, max_heroes(70));
+    CuAssertIntEquals(tc, 3, max_heroes(71));
+    config_set_int("rules.heroes.offset", 500);
+    CuAssertIntEquals(tc, 0, max_heroes(556));
+    CuAssertIntEquals(tc, 1, max_heroes(557));
+    CuAssertIntEquals(tc, 1, max_heroes(562));
+    CuAssertIntEquals(tc, 2, max_heroes(563));
+    CuAssertIntEquals(tc, 2, max_heroes(570));
+    CuAssertIntEquals(tc, 3, max_heroes(571));
+}
+
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -799,6 +853,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_clone_men);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
+    SUITE_ADD_TEST(suite, test_transfer_skills_merge);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
@@ -821,5 +876,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
     SUITE_ADD_TEST(suite, test_maintenance_cost);
+    SUITE_ADD_TEST(suite, test_max_heroes);
     return suite;
 }

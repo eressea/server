@@ -1,7 +1,7 @@
 #ifdef _MSC_VER
-#include <platform.h>
 #undef HAVE__ITOA
 #endif
+
 #include "strings.h"
 
 /* libc includes */

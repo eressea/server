@@ -5,6 +5,8 @@ extern "C" {
 #endif
 
     struct gamedata;
+    struct unit;
+    struct faction;
 
     typedef struct group {
         struct group *next;

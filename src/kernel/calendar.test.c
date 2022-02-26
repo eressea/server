@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "calendar.h"
 
 #include <kernel/config.h>

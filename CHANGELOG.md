@@ -1,3 +1,35 @@
+# 27.1
+ 
+  - Neue Formel zur Vermischung von Talenten bei GIB PERSON und REKRUTIERE
+  - Bauern in üvervölkerten Regionen vermehren sich nicht
+  - Schiffe nehmen durch Überladung keinen Schaden mehr
+  - Dracoide werden rekrutiert wie andere Einheiten [2106]
+  - Heldenreform
+
+# 3.30.2
+  - Anzeige des Schiffsschaden im Report aufrunden [2797]
+
+# 3.30.1
+  - Schiffsschaden von Flotte falsch berechnet [2760]
+
+# 3.30
+  - Flottenschaden wurde falsch berechnet [2795]
+  - Magier bekam wöchentlich einen Tiegel mit Krötenschleim [2783]
+  - Magier blieben zu lange Kröte [2766]
+  - Schiffsschaden von Flotte falsch berechnet [2760]
+  - Nicht sichtbare Einheit wurde erfolgreich ausspioniert [2776]
+  - Insekten hungern in Gletscher trotz Kälteschutz [2778]
+  - Immer noch Schlümpfe unter den Dämonen [2779]
+  - Banner wird nicht gelöscht [2774]
+
+# 3.29
+
+  - Seeschlange konnte nicht attackiert werden obwohl sie gesehen wird [2763]
+  - Flucht auf Schiffen erlauben [2764]
+  - Befehle wurden wegen non-breaking spaces ignoriert [2753]
+  - Portale haben alle Einheiten in die selbe Zielregion geschickt [2738]
+  - Noch eine Reparatur für Langzeitschlümpfe [2758]
+ 
 # 3.28
 
   - Bugfix für Schild des Fisches (Solthar)

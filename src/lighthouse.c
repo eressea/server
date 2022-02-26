@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "lighthouse.h"
 
 #include <kernel/config.h>
@@ -59,8 +58,9 @@ void update_lighthouse(building * lh)
                 a = a_find(r2->attribs, &at_lighthouse);
                 while (a && a->type == &at_lighthouse) {
                     building *b = (building *)a->data.v;
-                    if (b == lh)
+                    if (b == lh) {
                         break;
+                    }
                     a = a->next;
                 }
                 if (!a) {
@@ -72,16 +72,17 @@ void update_lighthouse(building * lh)
     }
 }
 
-void remove_lighthouse(const building *lh) {
-    building *b;
-    region * r = lh->region;
-
-    r->flags &= ~RF_LIGHTHOUSE;
-    for (b = r->buildings; b; b = b->next) {
-        if (b != lh && is_lighthouse(b->type)) {
-            update_lighthouse(b);
+bool update_lighthouses(region *r) {
+    if ((r->flags & RF_LIGHTHOUSE) == 0) {
+        building *b;
+        for (b = r->buildings; b; b = b->next) {
+            if (is_lighthouse(b->type)) {
+                update_lighthouse(b);
+            }
         }
+        return true;
     }
+    return false;
 }
 
 int lighthouse_range(const building * b)
@@ -94,7 +95,7 @@ int lighthouse_range(const building * b)
 
 int lighthouse_view_distance(const building * b, const unit *u)
 {
-    if (b->size >= 10 && (b->flags & BLD_MAINTAINED)) {
+    if (b->size >= 10 && building_is_active(b)) {
         int maxd = lighthouse_range(b);
 
         if (maxd > 0 && u && skill_enabled(SK_PERCEPTION)) {
@@ -117,7 +118,7 @@ bool lighthouse_guarded(const region * r)
     for (a = a_find(r->attribs, &at_lighthouse); a && a->type == &at_lighthouse;
         a = a->next) {
         building *b = (building *)a->data.v;
-        if (b->flags & BLD_MAINTAINED) {
+        if (building_is_active(b)) {
             if (r == b->region) {
                 return true;
             }

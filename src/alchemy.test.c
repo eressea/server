@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "alchemy.h"
 #include "move.h"
 

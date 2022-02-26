@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "magic.h"
 
 #include <kernel/callbacks.h>

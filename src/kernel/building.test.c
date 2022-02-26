@@ -1,11 +1,11 @@
-#include <platform.h>
+#include "building.h"
 
-#include <kernel/calendar.h>
-#include <kernel/config.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/building.h>
-#include <kernel/unit.h>
+
+#include "calendar.h"
+#include "config.h"
+#include "race.h"
+#include "region.h"
+#include "unit.h"
 
 #include <util/language.h>
 #include <util/strings.h>
@@ -332,17 +332,16 @@ static void test_buildingtype_exists(CuTest * tc)
 
     CuAssertTrue(tc, buildingtype_exists(r, btype, false));
     b->size = 9;
-    fset(b, BLD_MAINTAINED);
     CuAssertTrue(tc, !buildingtype_exists(r, btype, false));
     btype->maxsize = 0;
-    freset(b, BLD_MAINTAINED);
+    fset(b, BLD_UNMAINTAINED);
     CuAssertTrue(tc, buildingtype_exists(r, btype, false));
     btype->maxsize = 10;
     b->size = 10;
 
-    fset(b, BLD_MAINTAINED);
+    freset(b, BLD_UNMAINTAINED);
     CuAssertTrue(tc, buildingtype_exists(r, btype, true));
-    freset(b, BLD_MAINTAINED);
+    fset(b, BLD_UNMAINTAINED);
     CuAssertTrue(tc, !buildingtype_exists(r, btype, true));
     test_teardown();
 }
@@ -359,10 +358,6 @@ static void test_active_building(CuTest *tc) {
     assert(btype && btype->maxsize == -1);
     b = test_create_building(r = test_create_region(0, 0, NULL), btype);
     u = test_create_unit(test_create_faction(), r);
-    CuAssertIntEquals(tc, false, building_is_active(b));
-    CuAssertPtrEquals(tc, NULL, active_building(u, btype));
-
-    b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, true, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     u_set_building(u, b);
@@ -376,7 +371,7 @@ static void test_active_building(CuTest *tc) {
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     btype->maxsize = -1;
-    b->flags &= ~BLD_MAINTAINED;
+    b->flags |= BLD_UNMAINTAINED;
     CuAssertIntEquals(tc, false, building_is_active(b));
     CuAssertPtrEquals(tc, NULL, active_building(u, btype));
     test_teardown();
@@ -401,6 +396,22 @@ static void test_safe_building(CuTest *tc) {
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
     u1->building->size = 3;
     CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    test_teardown();
+}
+
+static void test_visible_building(CuTest *tc) {
+    building_type *bt_castle, *bt_light;
+    building *b;
+
+    test_setup();
+    bt_light = test_create_buildingtype("lighthouse");
+    bt_castle = test_create_buildingtype("castle");
+
+    b = test_create_building(test_create_plain(0, 0), bt_light);
+    CuAssertPtrEquals(tc, bt_light, (void *)visible_building(b));
+    make_icastle(b, bt_castle, 1);
+    CuAssertPtrEquals(tc, bt_castle, (void *)visible_building(b));
+
     test_teardown();
 }
 
@@ -706,6 +717,7 @@ CuSuite *get_building_suite(void)
     SUITE_ADD_TEST(suite, test_building_type);
     SUITE_ADD_TEST(suite, test_active_building);
     SUITE_ADD_TEST(suite, test_buildingtype_exists);
+    SUITE_ADD_TEST(suite, test_visible_building);
     SUITE_ADD_TEST(suite, test_safe_building);
     return suite;
 }

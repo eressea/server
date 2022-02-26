@@ -1,6 +1,5 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#include <platform.h>
 #endif
 
 #include "economy.h"
@@ -306,30 +305,33 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-static int maintain(building * b)
+static bool maintain(building * b)
 {
     int c;
     region *r = b->region;
     bool paid = true;
     unit *u;
 
-    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
-        return BLD_MAINTAINED;
-    }
-    if (fval(b, BLD_DONTPAY)) {
-        return 0;
+    if (b->type == NULL || b->type->maintenance == NULL) {
+        return true;
     }
     u = building_owner(b);
     if (u == NULL) {
         /* no owner - send a message to the entire region */
         ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
-        return 0;
+        return false;
     }
-    /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
-    if (config_token("rules.region_owner_pay_building", b->type->_name)) {
-        if (fval(u->building, BLD_DONTPAY)) {
-            return 0;
+    /* If the owner is the region owner, check if dontpay flag is set for the building he is in */
+    if (b != u->building) {
+        if (!config_token("rules.region_owner_pay_building", b->type->_name)) {
+            /* no owner - send a message to the entire region */
+            ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
+            return false;
         }
+    }
+    if (fval(u->building, BLD_DONTPAY)) {
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
+        return false;
     }
     for (c = 0; b->type->maintenance[c].number && paid; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -342,14 +344,10 @@ static int maintain(building * b)
             paid = false;
         }
     }
-    if (fval(b, BLD_DONTPAY)) {
-        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
-        return 0;
-    }
     if (!paid) {
         ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
         ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
-        return 0;
+        return paid;
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -364,7 +362,7 @@ static int maintain(building * b)
         assert(cost == 0);
     }
     ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-    return BLD_MAINTAINED;
+    return true;
 }
 
 void maintain_buildings(region * r)
@@ -372,12 +370,11 @@ void maintain_buildings(region * r)
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
-        int flags = BLD_MAINTAINED;
-
         if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
-            flags = maintain(b);
+            if (!maintain(b)) {
+                fset(b, BLD_UNMAINTAINED);
+            }
         }
-        fset(b, flags);
         bp = &b->next;
     }
 }

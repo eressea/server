@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "key.h"
 #include "dict.h"
 

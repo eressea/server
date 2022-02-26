@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "xerewards.h"
 
 #include "magic.h"

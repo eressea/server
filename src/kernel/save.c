@@ -481,7 +481,7 @@ unit *read_unit(gamedata *data)
     }
 
     READ_INT(data->store, &n);
-    unit_setstatus(u, (status_t)n);
+    unit_setstatus(u, (enum status_t)n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
     if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
@@ -1622,18 +1622,6 @@ static void read_regions(gamedata *data) {
                 *up = u;
                 up = &u->next;
                 update_interval(u->faction, r);
-            }
-        }
-    }
-
-    log_debug("updating area information for lighthouses.");
-    for (r = regions; r; r = r->next) {
-        if (r->flags & RF_LIGHTHOUSE) {
-            building *b;
-            for (b = r->buildings; b; b = b->next) {
-                if (is_lighthouse(b->type)) {
-                    update_lighthouse(b);
-                }
             }
         }
     }

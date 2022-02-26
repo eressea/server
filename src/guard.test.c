@@ -1,6 +1,6 @@
-#include <platform.h>
-
 #include "guard.h"
+
+#include "battle.h"
 #include "laws.h"
 #include "monsters.h"
 

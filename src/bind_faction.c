@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_faction.h"
 #include "bind_unit.h"
 #include "bindings.h"
@@ -85,7 +81,7 @@ int tolua_faction_add_item(lua_State * L)
 static int tolua_faction_get_maxheroes(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    lua_pushinteger(L, maxheroes(f));
+    lua_pushinteger(L, max_heroes(f->num_people));
     return 1;
 }
 

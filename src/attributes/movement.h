@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+    struct attrib;
+    struct attrib_type;
 
     bool get_movement(struct attrib *const *alist, int type);
     void set_movement(struct attrib **alist, int type);

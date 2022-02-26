@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "flyingship.h"
 
 #include <spells/shipcurse.h>

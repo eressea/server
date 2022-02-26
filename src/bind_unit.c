@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_unit.h"
 #include "alchemy.h"
 #include "bindings.h"
@@ -364,7 +360,7 @@ static int tolua_unit_get_status(lua_State * L)
 static int tolua_unit_set_status(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, 0);
-    unit_setstatus(u, (status_t)tolua_tonumber(L, 2, 0));
+    unit_setstatus(u, (enum status_t)tolua_tonumber(L, 2, 0));
     return 0;
 }
 

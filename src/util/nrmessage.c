@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "nrmessage.h"
 
 /* util includes */

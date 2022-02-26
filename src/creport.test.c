@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "creport.h"
 #include "move.h"
 #include "spy.h"

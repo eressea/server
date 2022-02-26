@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "createunit.h"
 
 /* kernel includes */

@@ -78,6 +78,8 @@ extern "C" {
 
     void close_orders(void);
 
+    struct order *default_order(const struct locale *lang);
+
 #ifdef __cplusplus
 }
 #endif

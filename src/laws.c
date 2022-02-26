@@ -350,13 +350,15 @@ static void peasants(region * r, int rule)
     int rp = rpeasants(r);
     int money = rmoney(r);
     int maxp = max_production(r);
-    int n, satiated;
-    int dead = 0, peasants = rp;
+    int n, dead = 0, peasants = rp;
+    int satiated = money / maintenance_cost(NULL);
+    int max_survive = (maxp < satiated) ? maxp : satiated;
 
-    if (peasants > 0 && rule > 0) {
+    if (peasants > 0 && rule > 0 && peasants < max_survive) {
         int luck = 0;
         double fraction = peasants * peasant_growth_factor();
         int births = ROUND_BIRTHS(fraction);
+
         attrib *a = a_find(r->attribs, &at_peasantluck);
 
         if (a != NULL) {
@@ -364,14 +366,19 @@ static void peasants(region * r, int rule)
         }
 
         luck = peasant_luck_effect(peasants, luck, maxp, .5);
-        if (luck > 0)
+        if (luck > 0) {
             ADDMSG(&r->msgs, msg_message("peasantluck_success", "births", luck));
-        peasants += births + luck;
+            births += luck;
+        }
+        if (peasants + births > max_survive) {
+            /* if we cannot afford to breed, we don't */
+            births = max_survive - peasants;
+        }
+        peasants += births;
     }
 
     /* Alle werden satt, oder halt soviele fuer die es auch Geld gibt */
 
-    satiated = money / maintenance_cost(NULL);
     if (satiated > peasants) satiated = peasants;
     rsetmoney(r, money - satiated * maintenance_cost(NULL));
 
@@ -944,7 +951,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
     }
 
     hnow = countheroes(fdst);
-    hmax = maxheroes(fdst);
+    hmax = max_heroes(fdst->num_people);
     u = fsrc->units;
     while (u) {
         unit *unext = u->nextF;
@@ -1314,8 +1321,7 @@ bool nmr_death(const faction * f, int turn, int timeout)
 static void remove_idle_players(void)
 {
     faction **fp;
-    int i, timeout = NMRTimeout();
-
+    int timeout = NMRTimeout();
     log_info(" - beseitige Spieler, die sich zu lange nicht mehr gemeldet haben...");
 
     for (fp = &factions; *fp;) {
@@ -1337,25 +1343,25 @@ static void remove_idle_players(void)
     }
     log_info(" - beseitige Spieler, die sich nach der Anmeldung nicht gemeldet haben...");
 
-    i = turn + 1;
-    if (i < 4) i = 4;
-    for (fp = &factions; *fp;) {
-        faction *f = *fp;
-        if (!is_monsters(f)) {
-            if (RemoveNMRNewbie() && !fval(f, FFL_PAUSED|FFL_NOIDLEOUT)) {
-                if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
-                    ++newbies[f->age];
-                }
-                if (f->age == 2 || f->age == 3) {
-                    if (f->lastorders == turn - 2) {
-                        ++dropouts[f->age - 2];
-                        destroyfaction(fp);
-                        continue;
+    if (RemoveNMRNewbie()) {
+        for (fp = &factions; *fp;) {
+            faction* f = *fp;
+            if (!is_monsters(f)) {
+                if (!fval(f, FFL_PAUSED | FFL_NOIDLEOUT)) {
+                    if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
+                        ++newbies[f->age];
+                    }
+                    if (f->age == 2 || f->age == 3) {
+                        if (f->lastorders == turn - 2) {
+                            ++dropouts[f->age - 2];
+                            destroyfaction(fp);
+                            continue;
+                        }
                     }
                 }
             }
+            fp = &f->next;
         }
-        fp = &f->next;
     }
 }
 
@@ -2382,10 +2388,10 @@ int promotion_cmd(unit * u, struct order *ord)
         return 0;
     }
 
-    if (maxheroes(u->faction) < countheroes(u->faction) + u->number) {
+    if (max_heroes(u->faction->num_people) < countheroes(u->faction) + u->number) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "heroes_maxed", "max count",
-                maxheroes(u->faction), countheroes(u->faction)));
+                max_heroes(u->faction->num_people), countheroes(u->faction)));
         return 0;
     }
     if (!valid_race(u->faction, u_race(u))) {
@@ -2668,11 +2674,11 @@ static void age_stonecircle(building *b) {
                         i_change(&u->items, rtype->itype, 1);
                         ++unicorns;
                     }
-                    if (unicorns) {
-                        ADDMSG(&u->faction->msgs, msg_message("scunicorn",
-                                                              "unit amount rtype",
-                                                              u, unicorns, rtype));
-                    }
+                }
+                if (unicorns) {
+                    ADDMSG(&u->faction->msgs, msg_message("scunicorn",
+                        "unit amount rtype",
+                        u, unicorns, rtype));
                 }
             }
         }
@@ -2848,7 +2854,7 @@ int checkunitnumber(const faction * f, int add)
     return 0;
 }
 
-void maketemp_cmd(unit *u, order **olist) 
+static void maketemp_cmd(unit *u, order **olist) 
 {
     order *makeord;
     int err = checkunitnumber(u->faction, 1);
@@ -4032,7 +4038,7 @@ typedef enum cansee_t {
 static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
 {
     enum cansee_t result = CANSEE_HIDDEN;
-    if (rings >= target->number) {
+    if (rings > 0 && rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (rtype) {
             int amulet = i_get(u->items, rtype->itype);
@@ -4061,7 +4067,7 @@ static bool big_sea_monster(const unit *u, const region *r) {
     return ((r->terrain->flags & SEA_REGION) && (u_race(u)->weight >= 5000));
 }
 
-bool 
+bool
 cansee_unit(const unit * u, const region *r, const unit * target, int modifier)
 /* r kann != u->region sein, wenn es um durchreisen geht */
 {
@@ -4128,18 +4134,18 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
             u = (unit *)a->data.v;
         }
         else {
-            return false;
+            return true;
         }
     }
     if (is_exposed(u)) {
-        /* obviosuly visibile, we only need a viewer in the region */
+        /* obviously visible, we only need a viewer in the region */
         return true;
     }
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
 
-    if (rings < u->number && stealth <= 0) {
+    if (rings > 0 && rings < u->number && stealth <= 0) {
         return true;
     }
 

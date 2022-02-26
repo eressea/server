@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "recruit.h"
 
 #include "alchemy.h"
@@ -154,6 +150,7 @@ static recruitment *select_recruitment(recruit_request ** rop,
 void add_recruits(unit * u, int number, int wanted, int ordered)
 {
     region *r = u->region;
+    const struct race* rc = u_race(u);
     assert(number <= wanted);
     if (number > 0) {
         unit *unew;
@@ -166,10 +163,10 @@ void add_recruits(unit * u, int number, int wanted, int ordered)
             unew = u;
         }
         else {
-            unew = create_unit(r, u->faction, number, u_race(u), 0, NULL, u);
+            unew = create_unit(r, u->faction, number, rc, 0, NULL, u);
         }
 
-        len = snprintf(equipment, sizeof(equipment), "new_%s", u_race(u)->_name);
+        len = snprintf(equipment, sizeof(equipment), "new_%s", race_name(rc));
         if (len > 0 && (size_t)len < sizeof(equipment)) {
             equip_unit(unew, equipment);
         }
@@ -314,7 +311,7 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
 
 static int recruit_cost(const faction * f, const race * rc)
 {
-    if (is_monsters(f) || valid_race(f, rc)) {
+    if (valid_race(f, rc)) {
         return rc->recruitcost;
     }
     return -1;

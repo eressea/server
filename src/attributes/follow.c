@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "follow.h"
 
 #include <kernel/config.h>

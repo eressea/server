@@ -1,6 +1,5 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#include <platform.h>
 #endif
 
 #include <kernel/config.h>
@@ -140,7 +139,7 @@ static void init_rules(void)
     rule_nat_armor = config_get_int("rules.combat.nat_armor", 0);
     rule_tactics_formula = config_get_int("rules.tactics.formula", 0);
     rule_goblin_bonus = config_get_int("rules.combat.goblinbonus", 10);
-    rule_hero_speed = (unsigned char)config_get_int("rules.combat.herospeed", 10);
+    rule_hero_speed = (unsigned char)config_get_int("rules.heroes.combat_speed", 10);
     rule_population_damage = config_get_int("rules.combat.populationdamage", 20);
     rule_anon_battle = config_get_int("rules.stealth.anon_battle", 1) != 0;
     rule_igjarjuk_curse = config_get_int("rules.combat.igjarjuk_curse", 0) != 0;

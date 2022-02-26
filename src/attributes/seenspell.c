@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include <kernel/faction.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>

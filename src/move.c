@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "alchemy.h"
 #include "contact.h"
 #include "direction.h"
@@ -431,42 +427,47 @@ bool canswim(unit * u)
     return false;
 }
 
-static int walk_mode(const unit * u)
+static int walk_speed(const unit * u)
 {
-    int horses = 0, maxhorses, unicorns = 0, maxunicorns;
+    int horses = 0, maxhorses, unicorns = 0;
     int skill;
     item *itm;
-    const item_type *it_horse, *it_elvenhorse, *it_charger;
+    const item_type *it_elvenhorse;
     const resource_type *rtype;
 
-    it_horse = ((rtype = get_resourcetype(R_HORSE)) != NULL) ? rtype->itype : 0;
     it_elvenhorse = ((rtype = get_resourcetype(R_UNICORN)) != NULL) ? rtype->itype : 0;
-    it_charger = ((rtype = get_resourcetype(R_CHARGER)) != NULL) ? rtype->itype : 0;
 
     for (itm = u->items; itm; itm = itm->next) {
-        if (itm->type == it_horse || itm->type == it_charger) {
+        if (itm->type->flags & ITF_ANIMAL) {
+            if (itm->type == it_elvenhorse) {
+                unicorns += itm->number;
+            }
             horses += itm->number;
         }
-        else if (itm->type == it_elvenhorse) {
-            unicorns += itm->number;
-        }
+    }
+
+    if ((u_race(u)->flags & RCF_HORSE) && !horses) {
+        return BP_RIDING;
     }
 
     skill = effskill(u, SK_RIDING, NULL);
-    maxunicorns = (skill / 5) * u->number;
     maxhorses = riding_horse_limit(u, skill);
 
-    if (!(u_race(u)->flags & RCF_HORSE)
-        && ((horses == 0 && unicorns == 0)
-            || horses > maxhorses || unicorns > maxunicorns)) {
-        return BP_WALKING;
-    }
-
-    if (ridingcapacity(u) - eff_weight(u) >= 0) {
-        if (horses == 0 && unicorns >= u->number && !(u_race(u)->flags & RCF_HORSE)) {
-            return BP_UNICORN;
+    if (horses > maxhorses) {
+        if (horses <= walking_horse_limit(u, skill)) {
+            return BP_WALKING;
         }
-        return BP_RIDING;
+        return 0;
+    }
+    if (ridingcapacity(u) - eff_weight(u) >= 0) {
+        if (horses) {
+            if (horses == unicorns) {
+                if (skill >= 5) {
+                    return BP_UNICORN;
+                }
+            }
+            return BP_RIDING;
+        }
     }
 
     return BP_WALKING;
@@ -676,6 +677,31 @@ static bool is_freezing(const unit * u)
 int check_ship_allowed(struct ship *sh, const region * r)
 {
     const building_type *bt_harbour = bt_find("harbour");
+    int reason = SA_NO_COAST;
+
+    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+        unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+        if (!harbourmaster || !sh->_owner) {
+            reason = SA_HARBOUR;
+        }
+        else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+            reason = SA_HARBOUR;
+        }
+    }
+    if (reason == SA_NO_COAST && fval(r->terrain, SEA_REGION)) {
+        reason = SA_COAST;
+    }
+    if (reason == SA_NO_COAST && sh->type->coasts) {
+        int c;
+        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            if (sh->type->coasts[c] == r->terrain) {
+                reason = SA_COAST;
+            }
+        }
+    }
+
+    if (reason == SA_NO_COAST)
+      return SA_NO_COAST;
 
     if (sh->region && r_insectstalled(r)) {
         /* insekten duerfen nicht hier rein. haben wir welche? */
@@ -686,27 +712,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         }
     }
 
-    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-        if (!harbourmaster || !sh->_owner) {
-            return SA_HARBOUR;
-        }
-        else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-            return SA_HARBOUR;
-        }
-    }
-    if (fval(r->terrain, SEA_REGION)) {
-        return SA_COAST;
-    }
-    if (sh->type->coasts) {
-        int c;
-        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
-                return SA_COAST;
-            }
-        }
-    }
-    return SA_NO_COAST;
+    return reason;
 }
 
 static enum direction_t set_coast(ship * sh, region * r, region * rnext)
@@ -742,7 +748,7 @@ static double overload_max_damage(void) {
     return config_get_flt("rules.ship.overload.damage.max", 0.37);
 }
 
-double damage_overload(double overload)
+double damage_overload(double overload, double damage_max)
 {
     double damage, badness;
     if (overload < overload_start())
@@ -752,7 +758,7 @@ double damage_overload(double overload)
     if (badness >= 0) {
         assert(overload_worst() > overload_worse() || !"overload.worst must be > overload.worse");
         damage += fmin(badness, overload_worst() - overload_worse()) *
-            (overload_max_damage() - damage) /
+            (damage_max - damage) /
             (overload_worst() - overload_worse());
     }
     return damage;
@@ -818,6 +824,7 @@ static void drifting_ships(region * r)
             unit* firstu = r->units, * lastu = NULL;
             direction_t dir = NODIRECTION;
             double ovl;
+            double damage_max = overload_max_damage();
             const char* reason = "ship_drift";
 
             if (sh->type->fishing > 0) {
@@ -863,19 +870,22 @@ static void drifting_ships(region * r)
                 msg_to_passengers(sh, &firstu, &lastu, msg);
             }
 
-            if (ovl >= overload_start()) {
-                damage_ship(sh, damage_overload(ovl));
-                msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+            if (damage_max > 0) {
+                if (ovl >= overload_start()) {
+                    damage_ship(sh, damage_overload(ovl, damage_max));
+                    msg_to_passengers(sh, &firstu, &lastu, msg_message("massive_overload", "ship", sh));
+                }
+                else {
+                    damage_ship(sh, damage_drift);
+                }
+                if (ship_damage_percent(sh) >= 100) {
+                    msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
+                    sink_ship(sh);
+                    remove_ship(shp, sh);
+                    continue;
+                }
             }
-            else {
-                damage_ship(sh, damage_drift);
-            }
-            if (ship_damage_percent(sh) >= 100) {
-                msg_to_passengers(sh, &firstu, &lastu, msg_message("shipsink", "ship", sh));
-                sink_ship(sh);
-                remove_ship(shp, sh);
-            }
-            else if (rnext) {
+            if (rnext) {
                 /* Das Schiff und alle Einheiten darin werden nun von r
                     * nach rnext verschoben. Danach eine Meldung. */
                 add_regionlist(&route, rnext);
@@ -889,6 +899,11 @@ static void drifting_ships(region * r)
             }
         }
     }
+}
+
+static bool is_present(region* r, unit* u)
+{
+    return (u && u->region == r);
 }
 
 static void caught_target_ship(region* r, unit* u)
@@ -925,7 +940,7 @@ static void caught_target(region * r, unit * u)
     if (a) {
         unit *target = (unit *)a->data.v;
 
-        if (target == u || r != target->region) {
+        if (target == u || !is_present(r, target)) {
             ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                 target, u));
         }
@@ -1192,12 +1207,19 @@ static bool can_move(const unit * u)
     return true;
 }
 
-static void init_transportation(void)
+static void init_movement(void)
 {
     region *r;
 
     for (r = regions; r; r = r->next) {
         unit *u;
+        building *b;
+
+        for (b = r->buildings; b; b = b->next) {
+            if (is_lighthouse(b->type)) {
+                update_lighthouse(b);
+            }
+        }
 
         /* This is just a simple check for non-corresponding K_TRANSPORT/
          * K_DRIVE. This is time consuming for an error check, but there
@@ -1436,7 +1458,7 @@ int movement_speed(const unit * u)
             mp = BP_DRAGON;
         }
         else {
-            mp = walk_mode(u);
+            mp = walk_speed(u);
             if (mp >= BP_RIDING) {
                 dk = 1.0;
             }
@@ -1636,7 +1658,7 @@ static const region_list *travel_route(unit * u,
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
         }
-        else if (walk_mode(u) >= BP_RIDING) {
+        else if (walk_speed(u) >= BP_RIDING) {
             walkmode = 1;
             produceexp(u, SK_RIDING, u->number);
         }
@@ -1891,7 +1913,7 @@ static void sail(unit * u, order * ord, bool drifting)
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there.. */
                 if (reason == SA_NO_INSECT) {
-                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, sh->region));
+                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
                 }
                 else if (lighthouse_guarded(current_point)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
@@ -2550,7 +2572,7 @@ void move_ships(void) {
 void movement(void)
 {
     /* Initialize the additional encumbrance by transported units */
-    init_transportation();
+    init_movement();
 
     /* Move ships in last phase, others first
      * This is to make sure you can't land someplace and then get off the ship

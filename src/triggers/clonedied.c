@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "clonedied.h"
 
 #include "magic.h"

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "variant.h"
 
 #include <CuTest.h>

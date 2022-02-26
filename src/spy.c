@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "spy.h"
 #include "guard.h"
 #include "laws.h"
@@ -51,7 +48,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     sbstring sbs;
 
     sbs_init(&sbs, status, sizeof(status));
-    report_status(u, u->faction->locale, &sbs);
+    report_status(target, u->faction->locale, &sbs);
 
     ADDMSG(&u->faction->msgs, msg_message("spyreport", "spy target status", u,
         target, status));

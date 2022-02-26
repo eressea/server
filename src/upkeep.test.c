@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "upkeep.h"
 
 #include <kernel/ally.h>

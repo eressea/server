@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "json.h"
 #include "tests.h"
 

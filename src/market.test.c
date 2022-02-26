@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "market.h"
 #include "tests.h"
 
@@ -65,7 +64,6 @@ static void test_market_curse(CuTest * tc)
     }
     r = findregion(1, 1);
     b = test_create_building(r, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = b->type->maxsize;
 
     f = test_create_faction();

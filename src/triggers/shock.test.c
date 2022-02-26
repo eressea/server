@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "shock.h"
 
 #include <magic.h>

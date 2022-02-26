@@ -1,19 +1,16 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "spells.h"
 
+#include "battle.h"
 #include "contact.h"
+#include "direction.h"
 #include "guard.h"
+#include "laws.h"
+#include "monsters.h"
+#include "randenc.h"
 #include "reports.h"
 #include "spy.h"
-#include "vortex.h"
-#include "laws.h"
-#include "direction.h"
-#include "randenc.h"
-#include "monsters.h"
 #include "teleport.h"
+#include "vortex.h"
 
 /* triggers includes */
 #include <triggers/changefaction.h>
@@ -784,7 +781,7 @@ static int sp_transferaura(castorder * co)
 /* ------------------------------------------------------------- */
 /* DRUIDE */
 /* ------------------------------------------------------------- */
-/* Name:       Guenstige Winde
+/* Name:       Guenstige Winde / Wasserelementar
  * Stufe:      4
  * Gebiet:     Gwyrrd
  * Wirkung:
@@ -4463,8 +4460,8 @@ int sp_icastle(castorder * co)
         return 0;
     }
 
-    if ((type =
-        findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
+    type = findbuildingtype(pa->param[0]->data.xs, mage->faction->locale);
+    if (type == NULL) {
         type = bt_find("castle");
     }
 

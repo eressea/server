@@ -1,5 +1,5 @@
-#include <platform.h>
 #include "report.h"
+
 #include "move.h"
 #include "travelthru.h"
 
@@ -230,6 +230,7 @@ static void test_report_travelthru(CuTest *tc) {
     test_setup();
     lang = get_or_create_locale("de");
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
+    locale_setstring(lang, "list_and", " und ");
     CuAssertIntEquals(tc, 0, mstream_init(&out));
     r = test_create_region(0, 0, NULL);
     r->flags |= RF_TRAVELUNIT;
@@ -255,10 +256,21 @@ static void test_report_travelthru(CuTest *tc) {
     CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
     CuAssertStrEquals_Msg(tc, "list one unit", "\nDurchreise: Hodor (1).\n", buf);
     mstream_done(&out);
-
     buf[0] = '\0';
+
     CuAssertIntEquals(tc, 0, mstream_init(&out));
-    move_unit(u, r, 0);
+    travelthru_add(r, u);
+    travelthru_add(r, u);
+    report_travelthru(&out, r, f);
+    out.api->write(out.handle, "", 1);
+    out.api->rewind(out.handle);
+    CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
+    CuAssertStrEquals_Msg(tc, "list three units", "\nDurchreise: Hodor (1), Hodor (1) und Hodor (1).\n", buf);
+    mstream_done(&out);
+    buf[0] = '\0';
+
+    CuAssertIntEquals(tc, 0, mstream_init(&out));
+    move_unit(u, r, NULL);
     report_travelthru(&out, r, f);
     out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);

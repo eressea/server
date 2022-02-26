@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_building.h"
 #include "bind_unit.h"
 
@@ -39,15 +35,15 @@ static int tolua_building_set_working(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
     bool flag = !!lua_toboolean(L, 2);
-    if (flag) self->flags |= BLD_MAINTAINED;
-    else self->flags &= ~BLD_MAINTAINED;
-    return 1;
+    if (flag) self->flags &= ~BLD_UNMAINTAINED;
+    else self->flags |= BLD_UNMAINTAINED;
+    return 0;
 }
 
 static int tolua_building_get_working(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
-    bool flag = (self->flags&BLD_MAINTAINED) != 0;
+    bool flag = (self->flags & BLD_UNMAINTAINED) == 0;
     lua_pushboolean(L, flag);
     return 1;
 }

@@ -1,7 +1,5 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #endif
 #include "order_parser.h"
 #include "strings.h"
@@ -28,6 +26,7 @@ static void copy_line(void *udata, const char *str) {
 static void test_parse_orders(CuTest *tc) {
     OP_Parser parser;
     char lastline[1024];
+    const char* input;
 
     parser = OP_ParserCreate();
     OP_SetUserData(parser, lastline);
@@ -35,34 +34,72 @@ static void test_parse_orders(CuTest *tc) {
     CuAssertPtrNotNull(tc, parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World", 11, 1));
+    input = "Hello World";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Error;\nHello World", 18, 1));
+    input = "Error;\nHello World";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\\nError", 19, 1));
+    input = "Hello World; Comment\nError";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
+    CuAssertStrEquals(tc, "Error", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    input = "Hello \"World;\"";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
+    CuAssertStrEquals(tc, input, lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    input = "Hello 'World;'";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
+    CuAssertStrEquals(tc, input, lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    input = "Hello \"';World;\"";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
+    CuAssertStrEquals(tc, input, lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    input = "Hello World;\\\nError";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World;\\", 13, 0));
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nError", 6, 1));
+    input = "SAY \"Hello; World\"";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
+    CuAssertStrEquals(tc, "SAY \"Hello; World\"", lastline);
+    OP_ParserReset(parser);
+
+    lastline[0] = 0;
+    input = "Hello World;\\";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 0));
+    input = "\nError";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello \\", 7, 0));
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "\nWorld", 6, 1));
+    input = "Hello \\";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 0));
+    input = "\nWorld";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 
     lastline[0] = 0;
-    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, "Hello World\n", 12, 1));
+    input = "Hello World\n";
+    CuAssertIntEquals(tc, OP_STATUS_OK, OP_Parse(parser, input, strlen(input), 1));
     CuAssertStrEquals(tc, "Hello World", lastline);
     OP_ParserReset(parser);
 

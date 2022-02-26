@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "changefaction.h"
 
 /* kernel includes */
