@@ -8,8 +8,8 @@
 #include <util/language.h>
 #include <util/functions.h>
 
+#include <tests.h>
 #include <CuTest.h>
-#include "tests.h"
 
 static void test_names(CuTest * tc)
 {

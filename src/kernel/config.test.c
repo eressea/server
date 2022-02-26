@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <stdlib.h>
 
 #include <kernel/config.h>
 #include <kernel/terrain.h>
@@ -13,9 +12,10 @@
 #include <kernel/attrib.h>
 
 #include <iniparser.h>
-
 #include <CuTest.h>
 #include <tests.h>
+
+#include <stdlib.h>
 
 struct critbit_tree;
 

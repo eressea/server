@@ -1,5 +1,5 @@
 #include <platform.h>
-#include "types.h"
+
 #include "ally.h"
 #include "faction.h"
 
