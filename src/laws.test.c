@@ -2186,7 +2186,7 @@ static void test_peasant_migration(CuTest *tc) {
     rsettrees(r1, 0, 0);
     rsettrees(r1, 1, 0);
     rsettrees(r1, 2, 0);
-    rmax = region_maxworkers(r1);
+    rmax = region_production(r1);
     r2 = test_create_plain(0, 1);
     rsettrees(r2, 0, 0);
     rsettrees(r2, 1, 0);

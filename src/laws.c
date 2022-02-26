@@ -267,7 +267,7 @@ static void live(region * r)
 void peasant_migration(region * r)
 {
     int i;
-    int maxp = region_maxworkers(r);
+    int maxp = region_production(r);
     int rp = rpeasants(r);
     int max_immigrants = MAX_IMMIGRATION(maxp - rp);
 
@@ -291,7 +291,7 @@ void peasant_migration(region * r)
 
         if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
             int rp2 = rpeasants(rc);
-            int maxp2 = region_maxworkers(rc);
+            int maxp2 = region_production(rc);
             int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
 
             if (max_emigration > 0) {
@@ -470,7 +470,7 @@ static void horses(region * r)
     direction_t n;
 
     /* Logistisches Wachstum, Optimum bei halbem Maximalbesatz. */
-    maxhorses = region_maxworkers(r) / 10;
+    maxhorses = region_production(r) / 10;
     horses = rhorses(r);
     if (horses > 0) {
         if (maxhorses > 0) {
@@ -692,7 +692,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
                      * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
                      * Moeglichkeiten als in Ebenen. */
                     sprout = 0;
-                    seedchance = (1000.0 * region_maxworkers(r2)) / r2->terrain->size;
+                    seedchance = (1000.0 * region_production(r2)) / r2->terrain->size;
                     for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                         if (rng_int() % 10000 < seedchance)
                             sprout++;
@@ -726,13 +726,16 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
 
-        /* Samenwachstum */
-        seeds = rtrees(r, 0);
-        if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
-        /* aus dem gesamt Samenpool abziehen */
-        rsettrees(r, 0, rtrees(r, 0) - seeds);
-        /* zu den Sproesslinge hinzufuegen */
-        rsettrees(r, 1, rtrees(r, 1) + seeds);
+        /* Samenwachstum, wenn noch Platz für Sprößlinge ist: */
+        i = region_maxworkers(r, max_production(r));
+        if (i > 0) {
+            seeds = rtrees(r, 0);
+            if (seeds > a->data.sa[0]) seeds = a->data.sa[0];
+            /* aus dem gesamt Samenpool abziehen */
+            rsettrees(r, 0, rtrees(r, 0) - seeds);
+            /* zu den Sproesslinge hinzufuegen */
+            rsettrees(r, 1, rtrees(r, 1) + seeds);
+        }
     }
 }
 
@@ -773,7 +776,7 @@ void immigration(void)
             int peasants = rpeasants(r);
             bool mourn = is_mourning(r, turn);
             int income = peasant_wage(r, mourn) - maintenance_cost(NULL) + 1;
-            if (income >= 0 && r->land && (peasants < repopulate) && region_maxworkers(r) >(peasants + 30) * 2) {
+            if (income >= 0 && r->land && (peasants < repopulate) && region_production(r) >(peasants + 30) * 2) {
                 int badunit = 0;
                 unit *u;
                 for (u = r->units; u; u = u->next) {
@@ -864,7 +867,7 @@ void demographics(void)
                 peasants(r, peasant_rules);
 
                 if (r->age > 20) {
-                    double mwp = fmax(region_maxworkers(r), 1);
+                    double mwp = fmax(region_production(r), 1);
                     bool mourn = is_mourning(r, turn);
                     int p_wage = peasant_wage(r, mourn);
                     double prob =

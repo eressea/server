@@ -118,10 +118,15 @@ const char *regionname(const region * r, const faction * f)
     return write_regionname(r, f, buf[index], sizeof(buf[index]));
 }
 
-int region_maxworkers(const region *r)
+int region_maxworkers(const region* r, int size)
+{
+    return size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+}
+
+int region_production(const region* r)
 {
     int size = max_production(r);
-    int treespace = size - (rtrees(r, 2) + rtrees(r, 1) / 2) * TREESIZE;
+    int treespace = region_maxworkers(r, size);
     size /=10;
     if (size > 200) size = 200;
     if (treespace < size) treespace = size;
@@ -1096,7 +1101,7 @@ void init_region(region *r)
     if (!fval(r, RF_CHAOTIC)) {
         int peasants;
         int p_wage = 1 + peasant_wage(r, false) + rng_int() % 5;
-        peasants = (region_maxworkers(r) * (20 + dice(6, 10))) / 100;
+        peasants = (region_production(r) * (20 + dice(6, 10))) / 100;
         if (peasants < 100) peasants = 100;
         rsetmoney(r, rsetpeasants(r, peasants) * p_wage);
     }
