@@ -166,7 +166,7 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
         }
         if (e != n) {
             size_t sz = keys_size(n);
-            if (e > sz) {
+            if ((size_t)e > sz) {
                 int *k;
                 sz = keys_size(e);
                 k = realloc(keys, (2 * sz + 1) * sizeof(int));
@@ -241,7 +241,7 @@ static int *keys_update(int *base, int key, int val)
         else {
             size_t sz = keys_size(n);
             assert(kv[0] > key);
-            if (n >= sz) {
+            if ((size_t)n >= sz) {
                 int *tmp;
                 ptrdiff_t diff = kv - base;
                 sz = keys_size(n + 1);
@@ -259,7 +259,7 @@ static int *keys_update(int *base, int key, int val)
     }
     else {
         size_t sz = keys_size(n);
-        if (n >= sz) {
+        if ((size_t)n >= sz) {
             void * tmp;
             sz = keys_size(n + 1);
             tmp = realloc(base, (sz * 2 + 1) * sizeof(int));
