@@ -5,6 +5,8 @@
 #include "types.h"
 #include "database.h"
 #include "skills.h"
+#include "status.h"
+
 #include <stddef.h>
 
 struct skill;
@@ -13,7 +15,6 @@ struct sc_mage;
 struct gamedata;
 struct item_type;
 enum skill_t;
-enum status_t;
 
 #define MAXUNITS 1048573       /* should be prime for hashing. 524287 was >90% full */
 
@@ -93,7 +94,7 @@ typedef struct unit {
 
     int flags;
     struct attrib* attribs;
-    enum status_t status;
+    status_t status;
     int n;                      /* helper temporary variable, used in economy, enno: attribut? */
     int wants;                  /* enno: attribut? */
 } unit;

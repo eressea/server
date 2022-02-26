@@ -1,6 +1,7 @@
 #ifndef H_KRNL_BATTLE
 #define H_KRNL_BATTLE
 
+#include "kernel/status.h"
 #include <stdbool.h>
 
 struct message;
@@ -33,15 +34,6 @@ union variant;
 #define FL_STUNNED    32      /* eine Runde keinen Angriff */
 #define FL_HIT        64      /* the person at attacked */
 #define FL_HEALING_USED 128   /* has used a healing potion */
-
-typedef enum status_t {
-    ST_AGGRO,
-    ST_FIGHT,
-    ST_BEHIND,
-    ST_CHICKEN,
-    ST_AVOID,
-    ST_FLEE
-} status_t;
 
 typedef struct bfaction {
     struct bfaction* next;
