@@ -4,7 +4,7 @@
 extern "C" {
 #endif
 
-  typedef enum {
+  typedef enum objtype_t {
     TYP_UNIT,
     TYP_REGION,
     TYP_BUILDING,

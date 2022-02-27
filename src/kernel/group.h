@@ -2,12 +2,8 @@
 #ifndef H_KERNEL_GROUP
 #define H_KERNEL_GROUP
 
-struct gamedata;
-struct unit;
-struct faction;
-
 typedef struct group {
-        struct group *next;
+    struct group *next;
     struct group *nexthash;
     struct faction *f;
     struct attrib *attribs;
@@ -16,6 +12,10 @@ typedef struct group {
     int gid;
     int members;
 } group;
+
+struct gamedata;
+struct unit;
+struct faction;
 
 extern struct attrib_type at_group;   /* attribute for units assigned to a group */
 
