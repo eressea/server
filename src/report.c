@@ -11,7 +11,6 @@
 #include <modules/score.h>
 
 /* attributes includes */
-#include <attributes/overrideroads.h>
 #include <attributes/otherfaction.h>
 #include <attributes/reduceproduction.h>
 #include <attributes/seenspell.h>
@@ -829,12 +828,69 @@ static void report_region_resource(sbstring *sbp, const struct locale *lang, con
     }
 }
 
+static void report_roads(sbstring *sbs, const region *r, const faction* f, const bool see[])
+{
+    attrib* a;
+    int d, nrd = 0;
+    bool dh = false;
+
+    /* Nachbarregionen, die gesehen werden, ermitteln */
+    for (d = 0; d != MAXDIRECTIONS; d++) {
+        if (see[d] && rconnect(r, d))
+            nrd++;
+    }
+
+    /* list directions */
+    for (d = 0; d != MAXDIRECTIONS; d++) {
+        if (see[d]) {
+            region* r2 = rconnect(r, d);
+            if (!r2)
+                continue;
+            nrd--;
+            if (dh) {
+                char regname[128], trail[256];
+                if (nrd == 0) {
+                    sbs_strcat(sbs, " ");
+                    sbs_strcat(sbs, LOC(f->locale, "nr_nb_final"));
+                }
+                else {
+                    sbs_strcat(sbs, LOC(f->locale, "nr_nb_next"));
+                }
+                sbs_strcat(sbs, LOC(f->locale, directions[d]));
+                sbs_strcat(sbs, " ");
+                f_regionid(r2, f, regname, sizeof(regname));
+                snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
+                sbs_strcat(sbs, trail);
+            }
+            else {
+                message* msg = msg_message("nr_vicinitystart", "dir region", d, r2);
+                sbs_strcat(sbs, " ");
+                append_message(sbs, msg, f);
+                msg_release(msg);
+                dh = true;
+            }
+        }
+    }
+    if (dh) {
+        sbs_strcat(sbs, ".");
+    }
+    /* Spezielle Richtungen */
+    for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
+        a = a->next) {
+        spec_direction* spd = (spec_direction*)(a->data.v);
+        sbs_strcat(sbs, " ");
+        sbs_strcat(sbs, LOC(f->locale, spd->desc));
+        sbs_strcat(sbs, " (\"");
+        sbs_strcat(sbs, LOC(f->locale, spd->keyword));
+        sbs_strcat(sbs, "\").");
+    }
+}
+
 static void report_region_description(struct stream *out, const region * r, faction * f, const bool see[])
 {
     int n;
     int trees;
     int saplings;
-    attrib *a;
     const char *tname;
     char buf[4096];
     sbstring sbs;
@@ -963,67 +1019,8 @@ static void report_region_description(struct stream *out, const region * r, fact
     }
 
     pump_paragraph(&sbs, out, REPORTWIDTH, false);
-    a = a_find(r->attribs, &at_overrideroads);
-    if (a) {
-        sbs_strcat(&sbs, " ");
-        sbs_strcat(&sbs, (const char *)a->data.v);
-        sbs_strcat(&sbs, ".");
-    }
-    else {
-        int d, nrd = 0;
-        bool dh = false;
 
-        /* Nachbarregionen, die gesehen werden, ermitteln */
-        for (d = 0; d != MAXDIRECTIONS; d++) {
-            if (see[d] && rconnect(r, d))
-                nrd++;
-        }
-
-        /* list directions */
-        for (d = 0; d != MAXDIRECTIONS; d++) {
-            if (see[d]) {
-                region *r2 = rconnect(r, d);
-                if (!r2)
-                    continue;
-                nrd--;
-                if (dh) {
-                    char regname[128], trail[256];
-                    if (nrd == 0) {
-                        sbs_strcat(&sbs, " ");
-                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_final"));
-                    }
-                    else {
-                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_next"));
-                    }
-                    sbs_strcat(&sbs, LOC(f->locale, directions[d]));
-                    sbs_strcat(&sbs, " ");
-                    f_regionid(r2, f, regname, sizeof(regname));
-                    snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
-                    sbs_strcat(&sbs, trail);
-                }
-                else {
-                    message * msg = msg_message("nr_vicinitystart", "dir region", d, r2);
-                    sbs_strcat(&sbs, " ");
-                    append_message(&sbs, msg, f);
-                    msg_release(msg);
-                    dh = true;
-                }
-            }
-        }
-        if (dh) {
-            sbs_strcat(&sbs, ".");
-        }
-        /* Spezielle Richtungen */
-        for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
-            a = a->next) {
-            spec_direction *spd = (spec_direction *)(a->data.v);
-            sbs_strcat(&sbs, " ");
-            sbs_strcat(&sbs, LOC(f->locale, spd->desc));
-            sbs_strcat(&sbs, " (\"");
-            sbs_strcat(&sbs, LOC(f->locale, spd->keyword));
-            sbs_strcat(&sbs, "\").");
-        }
-    }
+    report_roads(&sbs, r, f, see);
     pump_paragraph(&sbs, out, REPORTWIDTH, true);
 }
 

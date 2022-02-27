@@ -14,7 +14,6 @@
 #include "magic.h"
 #include "movement.h"
 #include "otherfaction.h"
-#include "overrideroads.h"
 #include "racename.h"
 #include "raceprefix.h"
 #include "reduceproduction.h"
@@ -198,7 +197,6 @@ void register_attributes(void)
     at_register(&at_stealth);
     at_register(&at_unitdissolve);
     at_register(&at_observer);
-    at_register(&at_overrideroads);
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);
