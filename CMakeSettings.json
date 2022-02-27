@@ -12,11 +12,6 @@
       "ctestCommandArgs": "",
       "variables": [
         {
-          "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake",
-          "type": "STRING"
-        },
-        {
           "name": "CMAKE_MODULE_PATH",
           "value": "${workspaceRoot}/cmake/Modules",
           "type": "STRING"
