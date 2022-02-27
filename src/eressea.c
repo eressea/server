@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "eressea.h"
 
 #include "donations.h"
@@ -46,6 +49,8 @@
 #include "spells.h"
 #include "vortex.h"
 #include "wormhole.h"
+
+#include <util/strings.h>
 
 #include <assert.h>
 #include <errno.h>

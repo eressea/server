@@ -9,7 +9,6 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
-    struct param;
     struct locale;
     struct _dictionary_;
 
@@ -88,13 +87,6 @@ extern "C" {
     } settings;
 
     extern settings global;
-
-    void set_param(struct param **p, const char *key, const char *value);
-    const char *get_param(const struct param *p, const char *key);
-    int get_param_int(const struct param *p, const char *key, int def);
-    int check_param(const struct param *p, const char *key, const char *searchvalue);
-    double get_param_flt(const struct param *p, const char *key, double def);
-    void free_params(struct param **pp);
 
     void config_set(const char *key, const char *value);
     void config_set_int(const char *key, int value);
