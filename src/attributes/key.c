@@ -198,14 +198,6 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
     return AT_READ_OK;
 }
 
-static int a_readkey(variant *var, void *owner, struct gamedata *data) {
-    int res = a_readint(var, owner, data);
-    if (data->version >= KEYVAL_VERSION) {
-        return AT_READ_FAIL;
-    }
-    return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
-}
-
 attrib_type at_keys = {
     "keys",
     NULL,
@@ -214,26 +206,6 @@ attrib_type at_keys = {
     a_writekeys,
     a_readkeys,
     NULL
-};
-
-static void a_upgradekeys(attrib **alist, attrib *abegin) {
-    attrib *a, *ak;
-
-    ak = a_find(*alist, &at_keys);
-    if (ak) alist = &ak;
-    for (a = abegin; a && a->type == abegin->type; a = a->next) {
-        key_set(alist, a->data.i, 1);
-    }
-}
-
-attrib_type at_key = {
-    "key",
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    a_readkey,
-    a_upgradekeys
 };
 
 static struct key_value* keys_get(keys_data *keys, unsigned int i)
@@ -246,7 +218,10 @@ static keys_data* keys_insert(keys_data* keys, unsigned int index, unsigned int 
 {
     unsigned int sz = keys_size(keys->count);
     assert(index <= keys->count);
-    if (keys->count >= sz) {
+    if (keys->count < sz) {
+        ++keys->count;
+    }
+    else {
         /* a resize is required */
         keys_data* tmp = keys_realloc(keys, keys->count + 1);
         if (tmp == NULL) {
@@ -255,12 +230,13 @@ static keys_data* keys_insert(keys_data* keys, unsigned int index, unsigned int 
             return NULL;
         }
         keys = tmp;
-        /* move the tail and overwrite at l */
+    }
+    /* move the tail and overwrite at l */
+    if (index < keys->count) {
         memmove(keys->data + index + 1, keys->data + index, (keys->count - index - 1) * sizeof(struct key_value));
     }
     keys->data[index].key = key;
     keys->data[index].value = val;
-    ++keys->count;
     return keys;
 }
 
@@ -280,13 +256,13 @@ static keys_data* keys_update(keys_data* keys, unsigned int key, int val)
 
 void key_set(attrib ** alist, unsigned int key, int val)
 {
-    keys_data *keys;
-    attrib *a;
+    keys_data* keys;
+    attrib* a;
     a = a_find(*alist, &at_keys);
     if (!a) {
         a = a_add(alist, a_new(&at_keys));
     }
-    keys = (keys_data *)a->data.v;
+    keys = (keys_data*)a->data.v;
     if (!keys) {
         a->data.v = keys = keys_alloc(1);
         if (!keys) abort();
@@ -334,3 +310,32 @@ int key_get(attrib *alist, unsigned int key) {
     }
     return 0;
 }
+
+static int a_readkey(variant* var, void* owner, struct gamedata* data) {
+    int res = a_readint(var, owner, data);
+    if (data->version >= KEYVAL_VERSION) {
+        return AT_READ_FAIL;
+    }
+    return (res != AT_READ_FAIL) ? AT_READ_DEPR : res;
+}
+
+static void a_upgradekeys(attrib** alist, attrib* abegin) {
+    attrib* a, * ak;
+
+    ak = a_find(*alist, &at_keys);
+    if (ak) alist = &ak;
+    for (a = abegin; a && a->type == abegin->type; a = a->next) {
+        key_set(alist, a->data.i, 1);
+    }
+}
+
+attrib_type at_key = {
+    "key",
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    a_readkey,
+    a_upgradekeys
+};
+
