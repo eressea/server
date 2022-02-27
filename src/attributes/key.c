@@ -100,9 +100,9 @@ static int read_keyval(gamedata *data, struct key_value *kv, unsigned int n) {
 #endif
 
 #ifdef FIXATKEYS_VERSION
-static int read_keyval_orig(gamedata *data, struct key_value *kv, unsigned int n) {
-    unsigned int i;
-    int j = 0, dk = -1;
+static unsigned int read_keyval_orig(gamedata *data, struct key_value *kv, unsigned int n) {
+    unsigned int i, j = 0;
+    int dk = -1;
     for (i = 0; i != n; ++i) {
         int key, val;
         READ_UINT(data->store, &key);
@@ -173,7 +173,7 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
         n = read_flags(data, keys->data, n);
     }
     else {
-        int m = read_keyval_orig(data, keys->data, n);
+        unsigned int m = read_keyval_orig(data, keys->data, n);
         if (n != m) {
             unsigned int ksm = keys_size(m);
             if (ksm < keys->count) {
@@ -265,17 +265,15 @@ static keys_data* keys_insert(keys_data* keys, unsigned int index, unsigned int 
 
 static keys_data* keys_update(keys_data* keys, unsigned int key, int val)
 {
-    struct key_value *kv;
     unsigned int l = keys_lower_bound(keys, key, 0, keys->count);
     if (l < keys->count) {
-        kv = keys_get(keys, l);
+        struct key_value* kv = keys_get(keys, l);
         if (kv->key == key) {
             kv->value = val;
             return keys;
         }
     }
     /* insert entry at index l */
-    assert(kv->key > key);
     return keys_insert(keys, l, key, val);
 }
 
