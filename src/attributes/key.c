@@ -281,7 +281,6 @@ void key_set(attrib ** alist, unsigned int key, int val)
 {
     keys_data *keys;
     attrib *a;
-    assert(key != 0);
     a = a_find(*alist, &at_keys);
     if (!a) {
         a = a_add(alist, a_new(&at_keys));
@@ -319,7 +318,6 @@ void key_unset(attrib ** alist, unsigned int key)
 
 int key_get(attrib *alist, unsigned int key) {
     attrib *a;
-    assert(key != 0);
     a = a_find(alist, &at_keys);
     if (a) {
         keys_data* keys = (keys_data*)a->data.v;
