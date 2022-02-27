@@ -44,13 +44,14 @@ static unsigned int keys_lower_bound(keys_data const *keys, unsigned int k, unsi
     while (l != r) {
         unsigned int m = (l + r) / 2;
         km = p[m].key;
-        if (km < k) {
-            if (l == m) l = r;
-            else l = m;
+        if (km == k) {
+            return m;
+        }
+        else if (k < km) {
+            r = m;
         }
         else {
-            if (r == m) r = l;
-            else r = m;
+            l = m + 1;
         }
     }
     return l;
