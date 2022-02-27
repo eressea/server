@@ -2,7 +2,6 @@
 #ifndef _UCURSE_H
 #define _UCURSE_H
 
-#include <kernel/objtypes.h>
 extern const struct curse_type ct_slavery;
 extern const struct curse_type ct_calmmonster;
 extern const struct curse_type ct_speed;
