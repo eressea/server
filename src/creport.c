@@ -274,14 +274,15 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
             a = a->next;
         }
         else if (a->type == &at_effect && self) {
-            effect_data *data = (effect_data *)a->data.v;
-            if (data->value > 0) {
-                const char *key = resourcename(data->type->rtype, 0);
+            int value = effect_value(a);
+            if (value > 0) {
+                const struct item_type *itype = effect_type(a);
+                const char *key = resourcename(itype->rtype, 0);
                 if (!header) {
                     header = 1;
                     stream_printf(out, "EFFECTS\n");
                 }
-                stream_printf(out, "\"%d %s\"\n", data->value, translate(key,
+                stream_printf(out, "\"%d %s\"\n", value, translate(key,
                     LOC(viewer->locale, key)));
             }
             a = a->next;

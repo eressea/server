@@ -514,10 +514,11 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
             msg = msg_curse(c, obj, typ, self);
         }
         else if (a->type == &at_effect && self) {
-            effect_data *data = (effect_data *)a->data.v;
-            if (data->value > 0) {
+            int value = effect_value(a);
+            if (value > 0) {
+                const struct item_type* itype = effect_type(a);
                 msg = msg_message("nr_potion_effect", "potion left",
-                    data->type->rtype, data->value);
+                    itype->rtype, value);
             }
         }
         if (msg) {

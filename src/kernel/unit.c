@@ -745,7 +745,6 @@ void move_unit(unit * u, region * r, unit ** ulist)
 
 void clone_men(const unit * u, unit * dst, int n)
 {
-    const attrib *a;
     region *r = u->region;
 
     if (n == 0)
@@ -775,13 +774,7 @@ void clone_men(const unit * u, unit * dst, int n)
                 sn->weeks = result.weeks;
             }
         }
-        a = a_find(u->attribs, &at_effect);
-        while (a && a->type == &at_effect) {
-            effect_data *olde = (effect_data *)a->data.v;
-            if (olde->value)
-                change_effect(dst, olde->type, olde->value);
-            a = a->next;
-        }
+        clone_effects(u, dst);
         sh = leftship(u);
         if (sh != NULL)
             set_leftship(dst, sh);
@@ -794,16 +787,7 @@ void clone_men(const unit * u, unit * dst, int n)
         set_number(dst, dst->number + n);
         dst->hp += (long long)u->hp * n / u->number;
         assert(dst->hp >= dst->number);
-        /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
-        a = a_find(dst->attribs, &at_effect);
-        while (a && a->type == &at_effect) {
-            attrib *an = a->next;
-            effect_data *olde = (effect_data *)a->data.v;
-            int e = get_effect(u, olde->type);
-            if (e != 0)
-                change_effect(dst, olde->type, -e);
-            a = an;
-        }
+        clone_effects(u, dst);
     }
     else if (r->land) {
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
@@ -1548,14 +1532,8 @@ void scale_number(unit * u, int n)
     }
     if (u->number > 0) {
         if (n > 0) {
-            const attrib *a = a_find(u->attribs, &at_effect);
-
             u->hp = (long long)u->hp * n / u->number;
-
-            for (; a && a->type == &at_effect; a = a->next) {
-                effect_data *data = (effect_data *)a->data.v;
-                data->value = (long long)data->value * n / u->number;
-            }
+            scale_effects(u->attribs, n, u->number);
         }
         else {
             u->hp = 0;
