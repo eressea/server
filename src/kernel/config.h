@@ -87,6 +87,8 @@ extern "C" {
         void *vm_state;
     } settings;
 
+    extern settings global;
+
     void set_param(struct param **p, const char *key, const char *value);
     const char *get_param(const struct param *p, const char *key);
     int get_param_int(const struct param *p, const char *key, int def);
@@ -107,7 +109,6 @@ extern "C" {
 
     void free_config(void);
     void free_ids(void);
-    extern settings global;
 
 #ifdef __cplusplus
 }

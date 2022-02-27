@@ -1,21 +1,15 @@
+#pragma once
 #ifndef H_LUA_CONSOLE
 #define H_LUA_CONSOLE
 
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct lua_State;
 
-  struct lua_State;
+int lua_console(struct lua_State *L);
+int lua_do(struct lua_State *L);
 
-  extern int lua_console(struct lua_State *L);
-  extern int lua_do(struct lua_State *L);
+typedef int (*readline_fun) (struct lua_State *, char *, size_t, const char *);
+void set_readline(readline_fun foo);
 
-  typedef int (*readline_fun) (struct lua_State *, char *, size_t, const char *);
-  extern void set_readline(readline_fun foo);
-
-#ifdef __cplusplus
-}
-#endif
 #endif

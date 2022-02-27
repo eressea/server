@@ -7,7 +7,7 @@ struct order_data;
 
 typedef unsigned int dbrow_id;
 
-extern void odata_create(struct order_data **pdata, size_t len, const char *str);
+void odata_create(struct order_data **pdata, size_t len, const char *str);
 
 typedef enum database_t {
     DB_SWAP,
