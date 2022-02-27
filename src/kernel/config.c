@@ -4,11 +4,9 @@
 #include "config.h"
 
 /* kernel includes */
-#include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
 #include "curse.h"
-#include "connection.h"
 #include "building.h"
 #include "direction.h"
 #include "faction.h"
@@ -22,12 +20,9 @@
 #include "pool.h"
 #include "race.h"
 #include "reports.h"
-#include "region.h"
 #include "ship.h"
 #include "skill.h"
-#include "terrain.h"
 #include "types.h"
-#include "unit.h"
 
 /* util includes */
 #include <kernel/attrib.h>
@@ -35,7 +30,6 @@
 
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/keyword.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>
@@ -50,7 +44,6 @@
 #include <util/translation.h>
 #include <util/umlaut.h>
 
-#include "donations.h"
 #include "guard.h"
 #include "prefix.h"
 
@@ -132,110 +125,6 @@ int newcontainerid(void)
         }
     }
     return random_no;
-}
-
-void init_terrains_translation(const struct locale *lang) {
-    void **tokens;
-    const terrain_type *terrain;
-
-    tokens = get_translations(lang, UT_TERRAINS);
-    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-        variant var;
-        const char *name;
-        var.v = (void *)terrain;
-        name = locale_string(lang, terrain->_name, false);
-        if (name) {
-            addtoken((struct tnode **)tokens, name, var);
-        }
-        else {
-            log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
-        }
-    }
-}
-
-void init_options_translation(const struct locale * lang) {
-    void **tokens;
-    int i;
-
-    tokens = get_translations(lang, UT_OPTIONS);
-    for (i = 0; i != MAXOPTIONS; ++i) {
-        variant var;
-        var.i = i;
-        if (options[i]) {
-            const char *name = locale_string(lang, options[i], false);
-            if (name) {
-                addtoken((struct tnode **)tokens, name, var);
-            }
-            else {
-                log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
-            }
-        }
-    }
-}
-
-void init_races(struct locale *lang)
-{
-    const struct race *rc;
-    void **tokens;
-
-    tokens = get_translations(lang, UT_RACES);
-    for (rc = races; rc; rc = rc->next) {
-        const char *name;
-        variant var;
-        var.v = (void *)rc;
-        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-    }
-}
-
-static void init_magic(struct locale *lang)
-{
-    void **tokens;
-    tokens = get_translations(lang, UT_MAGIC);
-    if (tokens) {
-        const char *str = config_get("rules.magic.playerschools");
-        char *sstr, *tok;
-        if (str == NULL) {
-            str = "gwyrrd illaun draig cerddor tybied";
-        }
-
-        sstr = str_strdup(str);
-        tok = strtok(sstr, " ");
-        while (tok) {
-            variant var;
-            const char *name;
-            int i;
-            for (i = 0; i != MAXMAGIETYP; ++i) {
-                if (strcmp(tok, magic_school[i]) == 0) break;
-            }
-            assert(i != MAXMAGIETYP);
-            var.i = i;
-            name = LOC(lang, mkname("school", tok));
-            if (name) {
-                addtoken((struct tnode **)tokens, name, var);
-            }
-            else {
-                log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
-            }
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-}
-
-void init_locale(struct locale *lang)
-{
-    init_magic(lang);
-    init_directions(lang);
-    init_keywords(lang);
-    init_skills(lang);
-    init_races(lang);
-    init_parameters(lang);
-
-    init_options_translation(lang);
-    init_terrains_translation(lang);
 }
 
 typedef struct param {
@@ -590,29 +479,6 @@ void free_config(void) {
     ++config_cache_key;
 }
 
-/** releases all memory associated with the game state.
- * call this function before calling read_game() to load a new game
- * if you have a previously loaded state in memory.
- */
-void free_gamedata(void)
-{
-    free(forbidden_ids);
-    forbidden_ids = NULL;
-
-    free_factions();
-    free_donations();
-    free_units();
-    free_regions();
-    free_borders();
-    free_alliances();
-
-    while (planes) {
-        plane *pl = planes;
-        planes = planes->next;
-        free_plane(pl);
-    }
-}
-
 const char * game_name(void)
 {
     const char * param = config_get("game.name");
@@ -640,4 +506,10 @@ const char * game_mailcmd(void)
 
 int game_id(void) {
     return config_get_int("game.id", 0);
+}
+
+void free_ids(void)
+{
+    free(forbidden_ids);
+    forbidden_ids = NULL;
 }

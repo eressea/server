@@ -1,6 +1,8 @@
 #include <kernel/types.h>
 
 #include "vortex.h"
+
+#include "eressea.h"
 #include "move.h"
 #include "tests.h"
 

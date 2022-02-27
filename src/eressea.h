@@ -1,13 +1,12 @@
+#pragma once
 #ifndef H_ERESSEA_LIB
 #define H_ERESSEA_LIB
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct locale;
 
-    void game_init(void);
-    void game_done(void);
+void game_init(void);
+void game_done(void);
 
-#ifdef __cplusplus
-}
-#endif
+void free_gamedata(void);
+void init_locale(struct locale *lang);
+
 #endif

@@ -78,7 +78,7 @@ static void test_readwrite_unit(CuTest * tc)
     write_unit(&data, u);
     
     data.strm.api->rewind(data.strm.handle);
-    free_gamedata();
+    test_reset();
     f = test_create_faction();
     r = test_create_region(0, 0, NULL);
     renumber_faction(f, fno);
@@ -112,7 +112,7 @@ static void test_readwrite_faction(CuTest * tc)
     write_faction(&data, f);
     
     data.strm.api->rewind(data.strm.handle);
-    free_gamedata();
+    test_reset();
     gamedata_init(&data, &store, RELEASE_VERSION);
     f = read_faction(&data);
     CuAssertPtrNotNull(tc, f);
@@ -144,7 +144,7 @@ static void test_readwrite_region(CuTest * tc)
     write_region(&data, r);
     
     data.strm.api->rewind(data.strm.handle);
-    free_gamedata();
+    test_reset();
     gamedata_init(&data, &store, RELEASE_VERSION);
     r = read_region(&data);
     CuAssertPtrNotNull(tc, r);
@@ -175,7 +175,7 @@ static void test_readwrite_building(CuTest * tc)
     write_building(&data, b);
     
     data.strm.api->rewind(data.strm.handle);
-    free_gamedata();
+    test_reset();
     r = test_create_region(0, 0, NULL);
     gamedata_init(&data, &store, RELEASE_VERSION);
     b = read_building(&data);
@@ -208,7 +208,7 @@ static void test_readwrite_ship(CuTest * tc)
     write_ship(&data, sh);
     
     data.strm.api->rewind(data.strm.handle);
-    free_gamedata();
+    test_reset();
     r = test_create_region(0, 0, NULL);
     gamedata_init(&data, &store, RELEASE_VERSION);
     sh = read_ship(&data);
@@ -279,7 +279,7 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertTrue(tc, !f->_alive);
     CuAssertPtrEquals(tc, f2, factions);
     write_game(&data);
-    free_gamedata();
+    test_reset();
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
     CuAssertPtrEquals(tc, NULL, findfaction(fno));
@@ -312,7 +312,7 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     CuAssertTrue(tc, !f->_alive);
     remove_empty_units();
     write_game(&data);
-    free_gamedata();
+    test_reset();
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
     mstream_done(&data.strm);
@@ -345,7 +345,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_game(&data);
-    free_gamedata();
+    test_reset();
     f = NULL;
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);
@@ -382,7 +382,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_game(&data);
-    free_gamedata();
+    test_reset();
     f = NULL;
     data.strm.api->rewind(data.strm.handle);
     read_game(&data);

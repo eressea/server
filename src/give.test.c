@@ -2,6 +2,7 @@
 
 #include "contact.h"
 #include "economy.h"
+#include "eressea.h"
 
 #include <kernel/ally.h>
 #include <kernel/config.h>

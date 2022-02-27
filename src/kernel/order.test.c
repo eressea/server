@@ -1,5 +1,6 @@
-#include <kernel/config.h>
 #include "order.h"
+
+#include "eressea.h"
 
 #include <kernel/skills.h>
 #include <kernel/unit.h>

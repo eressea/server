@@ -1,6 +1,7 @@
 #include "laws.h"
 #include "battle.h"
 #include "contact.h"
+#include "eressea.h"
 #include "guard.h"
 #include "monsters.h"
 

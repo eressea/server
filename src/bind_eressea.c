@@ -3,6 +3,7 @@
 #endif
 #include "bind_eressea.h"
 
+#include "eressea.h"
 #include "json.h"
 #include "orderfile.h"
 

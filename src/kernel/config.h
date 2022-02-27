@@ -1,5 +1,6 @@
-#ifndef ERESSEA_H
-#define ERESSEA_H
+#pragma once
+#ifndef ERESSEA_CONF_H
+#define ERESSEA_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +31,6 @@ extern "C" {
     int game_id(void);
     /* returns a value between [0..xpct_2], generated with two dice */
 
-    void init_locale(struct locale *lang);
     void init_races(struct locale *lang);
 
     bool forbiddenid(int id);
@@ -105,9 +105,8 @@ extern "C" {
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
 
-    void free_gamedata(void);
     void free_config(void);
-
+    void free_ids(void);
     extern settings global;
 
 #ifdef __cplusplus

@@ -2,9 +2,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "kernel/types.h"
-
 #include "jsonconf.h"
+
+#include "eressea.h"
 
 #include "kernel/config.h"
 #include "kernel/building.h"
