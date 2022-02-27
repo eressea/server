@@ -7,8 +7,8 @@ extern struct attrib_type at_keys;
 
 struct attrib;
 
-void key_set(struct attrib **alist, int key, int value);
-void key_unset(struct attrib **alist, int key);
-int key_get(struct attrib *alist, int key);
+void key_set(struct attrib **alist, unsigned int key, int value);
+void key_unset(struct attrib **alist, unsigned int key);
+int key_get(struct attrib *alist, unsigned int key);
 
 #endif
