@@ -2428,8 +2428,11 @@ static void loot_items(fighter * corpse)
         return;
 
     while (itm) {
-        float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
-        int maxloot = (int)((float)itm->number * lootfactor);
+        int maxloot = itm->number;
+        if (u->number != dead) {
+            int quota = u->number / dead;
+            maxloot = maxloot / quota;
+        }
         if (maxloot > 0) {
             int i = (maxloot > 10) ? 10 : maxloot;
             for (; i != 0; --i) {
@@ -2442,7 +2445,7 @@ static void loot_items(fighter * corpse)
                     /* mustloot: we absolutely, positively must have somebody loot this thing */
                     int mustloot = itm->type->flags & (ITF_CURSED | ITF_NOTLOST);
 
-                    itm->number -= loot;
+                    item_add(itm, -loot);
                     maxloot -= loot;
 
                     if (is_monsters(u->faction) && (rule_loot & LOOT_MONSTERS)) {

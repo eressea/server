@@ -200,6 +200,7 @@ extern "C" {
     void write_items(struct storage *store, struct item *it);
 
     /* convenience: */
+    void item_add(item* itm, int delta);
     item *i_change(item ** items, const item_type * it, int delta);
     int i_get(const item * items, const item_type * it);
 

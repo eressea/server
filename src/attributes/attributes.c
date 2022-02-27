@@ -183,6 +183,7 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
+    at_deprecate("roads_override", a_readstring);
     at_deprecate("npcfaction", a_readint);
     at_deprecate("siege", a_readint);
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
