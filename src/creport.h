@@ -5,6 +5,7 @@
 #include <stdbool.h>
 
 struct stream;
+struct unit;
 struct region;
 struct faction;
 enum seen_mode;
