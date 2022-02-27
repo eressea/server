@@ -38,7 +38,7 @@ struct unit;
 struct weapon_type;
 
 /* seen_mode: visibility in the report */
-typedef enum {
+typedef enum seen_mode {
     seen_none,
     seen_neighbour,
     seen_lighthouse_land,
