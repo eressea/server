@@ -401,7 +401,7 @@ unit *read_unit(gamedata *data)
         while (u->attribs) {
             a_remove(&u->attribs, u->attribs);
         }
-        i_freeall(u->items);
+        i_freeall(&u->items);
         free(u->skills);
         u->skills = 0;
         u->skill_size = 0;
