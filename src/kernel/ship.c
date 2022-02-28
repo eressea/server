@@ -5,23 +5,28 @@
 #include <spells/shipcurse.h>
 
 /* kernel includes */
+#include "attrib.h"
+#include "event.h"
 #include "build.h"
 #include "curse.h"
 #include "faction.h"
-#include "unit.h"
 #include "item.h"
+#include "messages.h"
+#include "order.h"
 #include "race.h"
 #include "region.h"
 #include "skill.h"
+#include "unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/param.h>
+#include <util/parser.h>
 #include <util/rng.h>
 #include <util/strings.h>
 #include <util/umlaut.h>
@@ -157,6 +162,15 @@ static ship *sfindhash(int i)
 struct ship *findship(int i)
 {
     return sfindhash(i);
+}
+
+ship* getship(const struct region* r)
+{
+    ship* sh = findship(getid());
+    if (sh != NULL && sh->number > 0 && sh->region == r) {
+        return sh;
+    }
+    return NULL;
 }
 
 void damage_ship(ship * sh, double percent)
@@ -567,4 +581,128 @@ int ship_damage_percent(const ship *sh) {
         return (int)ceil(d);
     }
     return 0;
+}
+
+static void build_ship(unit* u, ship* sh, int want)
+{
+    const construction* construction = sh->type->construction;
+    int size = (sh->size * DAMAGE_SCALE - sh->damage) / DAMAGE_SCALE;
+    int n;
+    int can = build(u, sh->number, construction, size, want, 0);
+
+    if ((n = ship_maxsize(sh) - sh->size) > 0 && can > 0) {
+        if (can >= n) {
+            sh->size += n;
+            can -= n;
+        }
+        else {
+            sh->size += can;
+            n = can;
+            can = 0;
+        }
+    }
+
+    if (sh->damage && can) {
+        int repair = can * DAMAGE_SCALE;
+        if (repair > sh->damage) repair = sh->damage;
+        n += repair / DAMAGE_SCALE;
+        if (repair % DAMAGE_SCALE)
+            ++n;
+        sh->damage = sh->damage - repair;
+    }
+
+    if (n)
+        ADDMSG(&u->faction->msgs,
+            msg_message("buildship", "ship unit size", sh, u, n));
+}
+
+void create_ship(unit* u, const struct ship_type* newtype, int want,
+    struct order* ord)
+{
+    ship* sh;
+    int msize;
+    const construction* cons = newtype->construction;
+    struct order* new_order;
+    region* r = u->region;
+
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
+        cmistake(u, ord, 100, MSG_PRODUCE);
+        return;
+    }
+
+    /* check if skill and material for 1 size is available */
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+            "error_build_skill_low", "value", cons->minskill));
+        return;
+    }
+
+    msize = maxbuild(u, cons);
+    if (msize == 0) {
+        cmistake(u, ord, 88, MSG_PRODUCE);
+        return;
+    }
+    if (want <= 0 || want > msize) {
+        want = msize;
+    }
+
+    sh = new_ship(newtype, r, u->faction->locale);
+
+    if (leave(u, false)) {
+        if (fval(u_race(u), RCF_CANSAIL)) {
+            u_set_ship(u, sh);
+        }
+    }
+    new_order =
+        create_order(K_MAKE, u->faction->locale, "%s %i", LOC(u->faction->locale,
+            parameters[P_SHIP]), sh->no);
+    replace_order(&u->orders, ord, new_order);
+    free_order(new_order);
+
+    build_ship(u, sh, want);
+}
+
+void continue_ship(unit* u, int want)
+{
+    const construction* cons;
+    ship* sh;
+    int msize;
+    region* r = u->region;
+
+    if (!effskill(u, SK_SHIPBUILDING, NULL)) {
+        cmistake(u, u->thisorder, 100, MSG_PRODUCE);
+        return;
+    }
+
+    /* Die Schiffsnummer bzw der Schiffstyp wird eingelesen */
+    sh = getship(r);
+
+    if (!sh)
+        sh = u->ship;
+
+    if (!sh) {
+        cmistake(u, u->thisorder, 20, MSG_PRODUCE);
+        return;
+    }
+    msize = ship_maxsize(sh);
+    if (sh->size >= msize && !sh->damage) {
+        cmistake(u, u->thisorder, 16, MSG_PRODUCE);
+        return;
+    }
+    cons = sh->type->construction;
+    if (effskill(u, cons->skill, NULL) < cons->minskill) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
+            "error_build_skill_low", "value", cons->minskill));
+        return;
+    }
+    msize = maxbuild(u, cons);
+    if (msize == 0) {
+        cmistake(u, u->thisorder, 88, MSG_PRODUCE);
+        return;
+    }
+    if (want <= 0 || want > msize) {
+        want = msize;
+    }
+
+    build_ship(u, sh, want);
 }

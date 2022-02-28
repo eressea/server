@@ -86,6 +86,7 @@ extern "C" {
 
     struct message * steal_message(const struct unit * u, struct order *ord);
     void steal_cmd(struct unit * u, struct order *ord, struct econ_request ** stealorders);
+    int destroy_cmd(struct unit* u, struct order* ord);
     void expandstealing(struct region * r, struct econ_request * stealorders);
 
 #ifdef __cplusplus

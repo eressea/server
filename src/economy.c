@@ -424,6 +424,169 @@ void economics(region * r)
     }
 }
 
+static void destroy_road(unit* u, int nmax, struct order* ord)
+{
+    char token[128];
+    const char* s = gettoken(token, sizeof(token));
+    direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
+    if (d == NODIRECTION) {
+        /* Die Richtung wurde nicht erkannt */
+        cmistake(u, ord, 71, MSG_PRODUCE);
+    }
+    else {
+        unit* u2;
+        region* r = u->region;
+        int road, n = nmax;
+
+        if (nmax > SHRT_MAX) {
+            n = SHRT_MAX;
+        }
+        else if (nmax < 0) {
+            n = 0;
+        }
+
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction != u->faction && is_guard(u2)
+                && cansee(u2->faction, u->region, u, 0)
+                && !alliedunit(u, u2->faction, HELP_GUARD)) {
+                cmistake(u, ord, 70, MSG_EVENT);
+                return;
+            }
+        }
+
+        road = rroad(r, d);
+        if (n > road) n = road;
+
+        if (n != 0) {
+            region* r2 = rconnect(r, d);
+            int willdo = effskill(u, SK_ROAD_BUILDING, NULL) * u->number;
+            if (willdo > n) willdo = n;
+            if (willdo == 0) {
+                /* TODO: error message */
+            }
+            else if (willdo > SHRT_MAX)
+                road = 0;
+            else
+                road = (short)(road - willdo);
+            rsetroad(r, d, road);
+            if (willdo > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                    "unit from to", u, r, r2));
+            }
+        }
+    }
+}
+
+int destroy_cmd(unit* u, struct order* ord)
+{
+    char token[128];
+    ship* sh;
+    unit* u2;
+    region* r = u->region;
+    int size = 0;
+    const char* s;
+    int n = INT_MAX;
+
+    if (u->number < 1)
+        return 1;
+
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return 52;
+    }
+
+    init_order(ord, NULL);
+    s = gettoken(token, sizeof(token));
+
+    if (s && *s) {
+        ERRNO_CHECK();
+        n = atoi(s);
+        errno = 0;
+        if (n <= 0) {
+            n = INT_MAX;
+        }
+        else {
+            s = gettoken(token, sizeof(token));
+        }
+    }
+
+    if (s && isparam(s, u->faction->locale, P_ROAD)) {
+        destroy_road(u, n, ord);
+        return 0;
+    }
+
+    if (u->building) {
+        building* b = u->building;
+
+        if (u != building_owner(b)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (fval(b->type, BTF_INDESTRUCTIBLE)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (n >= b->size) {
+            building_stage* stage;
+            /* destroy completly */
+            /* all units leave the building */
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (u2->building == b) {
+                    leave_building(u2);
+                }
+            }
+            ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
+            for (stage = b->type->stages; stage; stage = stage->next) {
+                size = recycle(u, &stage->construction, size);
+            }
+            remove_building(&r->buildings, b);
+        }
+        else {
+            /* TODO: partial destroy does not recycle */
+            b->size -= n;
+            ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
+                "building unit", b, u));
+        }
+    }
+    else if (u->ship) {
+        sh = u->ship;
+
+        if (u != ship_owner(sh)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (fval(r->terrain, SEA_REGION)) {
+            cmistake(u, ord, 14, MSG_EVENT);
+            return 14;
+        }
+
+        if (n >= (sh->size * 100) / ship_maxsize(sh)) {
+            /* destroy completly */
+            /* all units leave the ship */
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (u2->ship == sh) {
+                    leave_ship(u2);
+                }
+            }
+            ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
+                "unit region ship", u, r, sh));
+            size = recycle(u, sh->type->construction, size);
+            remove_ship(&sh->region->ships, sh);
+        }
+        else {
+            /* partial destroy */
+            sh->size -= (ship_maxsize(sh) * n) / 100;
+            ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
+                "unit region ship", u, r, sh));
+        }
+    }
+    else {
+        cmistake(u, ord, 138, MSG_PRODUCE);
+        return 138;
+    }
+    return 0;
+}
+
 void destroy(region *r) {
     unit *u;
     for (u = r->units; u; u = u->next) {

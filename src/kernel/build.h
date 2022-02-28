@@ -36,19 +36,12 @@ extern "C" {
 
     void construction_init(struct construction *con, int minskill, skill_t sk, int reqsize, int maxsize);
     void free_construction(struct construction *cons);
-    int destroy_cmd(struct unit *u, struct order *ord);
-    int leave_cmd(struct unit *u, struct order *ord);
+    int recycle(struct unit* u, construction* con, int size);
 
     void build_road(struct unit *u, int size, direction_t d);
-    void create_ship(struct unit *u, const struct ship_type *newtype,
-        int size, struct order *ord);
-    void continue_ship(struct unit *u, int size);
 
     struct building *getbuilding(const struct region *r);
-    struct ship *getship(const struct region *r);
 
-    void shash(struct ship *sh);
-    void sunhash(struct ship *sh);
     int roqf_factor(void);
 
     int build(struct unit *u, int number, const construction * ctype, int completed, int want, int skill_mod);

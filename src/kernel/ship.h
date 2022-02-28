@@ -73,6 +73,7 @@ typedef struct ship {
 
 struct locale;
 struct storage;
+struct order;
 
 extern struct selist* shiptypes;
 
@@ -82,43 +83,51 @@ const ship_type* st_find(const char* name);
 ship_type* st_get_or_create(const char* name);
 void free_shiptypes(void);
 
-void damage_ship(struct ship * sh, double percent);
+void damage_ship(ship * sh, double percent);
 void ship_set_owner(struct unit * u);
-struct unit *ship_owner(const struct ship *sh);
-void ship_update_owner(struct ship * sh);
+struct unit *ship_owner(const ship *sh);
+void ship_update_owner(ship * sh);
 
-const char *shipname(const struct ship *self);
-int ship_capacity(const struct ship *sh);
-int ship_cabins(const struct ship *sh);
-int ship_maxsize(const struct ship *sh);
-bool ship_finished(const struct ship *sh);
-void getshipweight(const struct ship *sh, int *weight, int *cabins);
+const char *shipname(const ship *self);
+int ship_capacity(const ship *sh);
+int ship_cabins(const ship *sh);
+int ship_maxsize(const ship *sh);
+bool ship_finished(const ship *sh);
+void getshipweight(const ship *sh, int *weight, int *cabins);
 
-ship *new_ship(const struct ship_type *stype, struct region *r,
+ship *new_ship(const ship_type *stype, struct region *r,
     const struct locale *lang);
-const char *write_shipname(const struct ship *sh, char *buffer,
+const char *write_shipname(const ship *sh, char *buffer,
     size_t size);
-struct ship *findship(int n);
+ship *findship(int n);
+ship* getship(const struct region* r);
 
-const struct ship_type *findshiptype(const char *s,
+const ship_type *findshiptype(const char *s,
     const struct locale *lang);
 
-void write_ship_reference(const struct ship *sh,
+void write_ship_reference(const ship *sh,
 struct storage *store);
 
-void remove_ship(struct ship **slist, struct ship *s);
-void free_ship(struct ship *s);
+void remove_ship(ship **slist, ship *s);
+void free_ship(ship *s);
 void free_ships(void);
 
-const char *ship_getname(const struct ship *sh);
-void ship_setname(struct ship *self, const char *name);
-int shipspeed(const struct ship *sh, const struct unit *u);
+const char *ship_getname(const ship *sh);
+void ship_setname(ship *self, const char *name);
+int shipspeed(const ship *sh, const struct unit *u);
 
-bool ship_crewed(const struct ship *sh, const struct unit *cap);
-int crew_skill(const struct ship *sh);
-int ship_captain_minskill(const struct ship *sh);
+bool ship_crewed(const ship *sh, const struct unit *cap);
+int crew_skill(const ship *sh);
+int ship_captain_minskill(const ship *sh);
 
-int ship_damage_percent(const struct ship *sh);
-void scale_ship(struct ship *sh, int n);
+int ship_damage_percent(const ship *sh);
+void scale_ship(ship *sh, int n);
+
+void create_ship(struct unit* u, const ship_type* newtype,
+    int size, struct order* ord);
+void continue_ship(struct unit* u, int size);
+
+void shash(ship* sh);
+void sunhash(ship* sh);
 
 #endif

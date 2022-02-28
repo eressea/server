@@ -73,7 +73,6 @@ const char *skillname(skill_t sk, const struct locale *lang)
 {
     if (skill_disabled[sk]) return 0;
     return LOC(lang, mkname("skill", skillnames[sk]));
-
 }
 
 void enable_skill(skill_t sk, bool value)
