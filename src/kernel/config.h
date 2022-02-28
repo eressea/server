@@ -12,6 +12,9 @@ extern "C" {
     struct locale;
     struct _dictionary_;
 
+    /* alle vierstelligen zahlen: */
+#define MAX_CONTAINER_NR (36*36*36*36-1)
+
 #define DISPLAYSIZE         4096 /* max. Laenge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           4096 /* max. length of an order */
 #define NAMESIZE            128 /* max. Laenge eines Namens, incl trailing 0 */

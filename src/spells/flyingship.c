@@ -1,18 +1,19 @@
 #include "flyingship.h"
 
+#include <magic.h>
+
 #include <spells/shipcurse.h>
 
 #include <kernel/build.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
+#include <kernel/gamedata.h>
 #include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 
-#include <kernel/gamedata.h>
-
-#include <magic.h>
+#include <util/message.h>
 
 #include <storage.h>
 

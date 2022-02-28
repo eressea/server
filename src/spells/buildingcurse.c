@@ -1,18 +1,19 @@
 #include "buildingcurse.h"
 
 /* kernel includes */
-#include <kernel/messages.h>
-#include <kernel/objtypes.h>
-#include <kernel/building.h>
-#include <kernel/ship.h>
-#include <kernel/curse.h>
+#include "kernel/messages.h"
+#include "kernel/objtypes.h"
+#include "kernel/building.h"
+#include "kernel/ship.h"
+#include "kernel/curse.h"
 
 /* util includes */
-#include <util/nrmessage.h>
-#include <util/base36.h>
-#include <util/functions.h>
-#include <util/language.h>
-#include <util/macros.h>
+#include "util/nrmessage.h"
+#include "util/base36.h"
+#include "util/functions.h"
+#include "util/language.h"
+#include "util/macros.h"
+#include "util/message.h"
 
 /* libc includes */
 #include <string.h>

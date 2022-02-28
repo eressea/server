@@ -13,6 +13,7 @@
 #include <kernel/item.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>

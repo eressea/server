@@ -1,7 +1,6 @@
 #ifndef H_KRNL_BUILD
 #define H_KRNL_BUILD
 
-#include "types.h"
 #include "direction.h"
 #include "skill.h"
 

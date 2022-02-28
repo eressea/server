@@ -1,6 +1,5 @@
 #include "group.h"
 
-#include "types.h"
 #include "ally.h"
 #include "eressea.h"
 #include "faction.h"

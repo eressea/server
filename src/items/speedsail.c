@@ -15,6 +15,7 @@
 #include <kernel/attrib.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 /* libc includes */
 #include <assert.h>

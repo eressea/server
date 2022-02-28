@@ -12,6 +12,7 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
+#include "util/message.h"
 #include "util/rand.h"
 #include "util/rng.h"
 

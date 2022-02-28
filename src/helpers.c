@@ -46,8 +46,8 @@ lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *o
     if (len > 0 && (size_t)len < sizeof(fname)) {
         lua_getglobal(L, fname);
         if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, s, TOLUA_CAST "unit");
-            tolua_pushusertype(L, d, TOLUA_CAST "unit");
+            tolua_pushusertype(L, s, "unit");
+            tolua_pushusertype(L, d, "unit");
             tolua_pushstring(L, iname);
             lua_pushinteger(L, n);
 
@@ -79,7 +79,7 @@ static int limit_resource_lua(const region * r, const resource_type * rtype)
     if (len > 0 && (size_t)len < sizeof(fname)) {
         lua_getglobal(L, fname);
         if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
+            tolua_pushusertype(L, (void *)r, "region");
 
             if (lua_pcall(L, 1, 1, 0) != 0) {
                 const char *error = lua_tostring(L, -1);
@@ -110,7 +110,7 @@ produce_resource_lua(region * r, const resource_type * rtype, int norders)
     if (len > 0 && (size_t)len < sizeof(fname)) {
         lua_getglobal(L, fname);
         if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, (void *)r, TOLUA_CAST "region");
+            tolua_pushusertype(L, (void *)r, "region");
             lua_pushinteger(L, norders);
 
             if (lua_pcall(L, 2, 0, 0) != 0) {
@@ -155,7 +155,7 @@ static bool lua_equipunit(unit *u, const char *eqname, int mask) {
     }
     lua_getglobal(L, "equip_unit");
     if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, u, TOLUA_CAST "unit");
+        tolua_pushusertype(L, u, "unit");
         lua_pushstring(L, eqname);
         lua_pushinteger(L, mask);
         if (lua_pcall(L, 3, 1, 0) != 0) {
@@ -185,8 +185,8 @@ static int lua_callspell(castorder * co, const char *fname)
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
         int nparam = 4;
-        tolua_pushusertype(L, r, TOLUA_CAST "region");
-        tolua_pushusertype(L, caster, TOLUA_CAST "unit");
+        tolua_pushusertype(L, r, "region");
+        tolua_pushusertype(L, caster, "unit");
         lua_pushinteger(L, co->level);
         lua_pushnumber(L, co->force);
         if (co->sp->parameter && co->par->length) {
@@ -238,7 +238,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
     if (len > 0 && (size_t)len < sizeof(fname)) {
         lua_getglobal(L, fname);
         if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, u, TOLUA_CAST "unit");
+            tolua_pushusertype(L, u, "unit");
             lua_pushinteger(L, delta);
 
             if (lua_pcall(L, 2, 1, 0) != 0) {
@@ -267,10 +267,10 @@ lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, st
 
     lua_getglobal(L, fname);
     if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
+        tolua_pushusertype(L, (void *)u, "unit");
         lua_pushinteger(L, amount);
         lua_pushstring(L, getstrtoken());
-        tolua_pushusertype(L, (void *)ord, TOLUA_CAST "order");
+        tolua_pushusertype(L, (void *)ord, "order");
         if (lua_pcall(L, 4, 1, 0) != 0) {
             const char *error = lua_tostring(L, -1);
             log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);

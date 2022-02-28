@@ -2,7 +2,7 @@
 
 #include "eressea.h"
 
-#include <kernel/skills.h>
+#include <kernel/skill.h>
 #include <kernel/unit.h>
 
 #include "util/param.h"

@@ -59,11 +59,11 @@ void bind_monsters(lua_State *L)
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_function(L, TOLUA_CAST "levitate_ship", tolua_levitate_ship);
-        tolua_function(L, TOLUA_CAST "plan_monsters", tolua_planmonsters);
-        tolua_function(L, TOLUA_CAST "spawn_undead", tolua_spawn_undead);
-        tolua_function(L, TOLUA_CAST "spawn_dragons", tolua_spawn_dragons);
-        tolua_function(L, TOLUA_CAST "get_monsters", tolua_get_monsters);
+        tolua_function(L, "levitate_ship", tolua_levitate_ship);
+        tolua_function(L, "plan_monsters", tolua_planmonsters);
+        tolua_function(L, "spawn_undead", tolua_spawn_undead);
+        tolua_function(L, "spawn_dragons", tolua_spawn_dragons);
+        tolua_function(L, "get_monsters", tolua_get_monsters);
     }
     tolua_endmodule(L);
 }

@@ -1,7 +1,7 @@
 #include "xerewards.h"
 
-#include "magic.h"
-#include "study.h"
+#include <magic.h>
+#include <study.h>
 
 /* kernel includes */
 #include <kernel/item.h>
@@ -11,11 +11,11 @@
 #include <kernel/curse.h>
 #include <kernel/messages.h>
 #include <kernel/pool.h>
+#include <kernel/skills.h>
 
 /* util includes */
 #include <util/functions.h>
-
-#include <study.h>
+#include <util/message.h>
 
 /* libc includes */
 #include <assert.h>

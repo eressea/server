@@ -27,7 +27,7 @@ static int tolua_storage_create(lua_State * L)
 
     data = gamedata_open(filename, type, RELEASE_VERSION);
     if (data) {
-        tolua_pushusertype(L, (void *)data, TOLUA_CAST "storage");
+        tolua_pushusertype(L, (void *)data, "storage");
         return 1;
     }
     log_error("could not open %s, mode %s (%s).", filename, type, strerror(errno));
@@ -38,7 +38,7 @@ static int tolua_storage_read_unit(lua_State * L)
 {
     gamedata *data = (gamedata *)tolua_tousertype(L, 1, 0);
     struct unit *u = read_unit(data);
-    tolua_pushusertype(L, (void *)u, TOLUA_CAST "unit");
+    tolua_pushusertype(L, (void *)u, "unit");
     return 1;
 }
 
@@ -106,23 +106,23 @@ static int tolua_storage_close(lua_State * L)
 void tolua_storage_open(lua_State * L)
 {
     /* register user types */
-    tolua_usertype(L, TOLUA_CAST "storage");
+    tolua_usertype(L, "storage");
 
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_cclass(L, TOLUA_CAST "storage", TOLUA_CAST "storage", TOLUA_CAST "",
+        tolua_cclass(L, "storage", "storage", "",
             NULL);
-        tolua_beginmodule(L, TOLUA_CAST "storage");
+        tolua_beginmodule(L, "storage");
         {
-            tolua_function(L, TOLUA_CAST "__tostring", tolua_storage_tostring);
-            tolua_function(L, TOLUA_CAST "write", tolua_storage_write);
-            tolua_function(L, TOLUA_CAST "read_int", tolua_storage_read_int);
-            tolua_function(L, TOLUA_CAST "read_float", tolua_storage_read_float);
-            tolua_function(L, TOLUA_CAST "write_unit", tolua_storage_write_unit);
-            tolua_function(L, TOLUA_CAST "read_unit", tolua_storage_read_unit);
-            tolua_function(L, TOLUA_CAST "close", tolua_storage_close);
-            tolua_function(L, TOLUA_CAST "create", tolua_storage_create);
+            tolua_function(L, "__tostring", tolua_storage_tostring);
+            tolua_function(L, "write", tolua_storage_write);
+            tolua_function(L, "read_int", tolua_storage_read_int);
+            tolua_function(L, "read_float", tolua_storage_read_float);
+            tolua_function(L, "write_unit", tolua_storage_write_unit);
+            tolua_function(L, "read_unit", tolua_storage_read_unit);
+            tolua_function(L, "close", tolua_storage_close);
+            tolua_function(L, "create", tolua_storage_create);
         }
         tolua_endmodule(L);
     }

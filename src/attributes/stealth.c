@@ -1,5 +1,6 @@
 #include <kernel/unit.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 #include <kernel/attrib.h>
 #include <attributes/stealth.h>
 

@@ -24,6 +24,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -31,6 +32,7 @@
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>

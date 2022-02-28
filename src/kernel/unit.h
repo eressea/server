@@ -2,21 +2,13 @@
 #define H_KRNL_UNIT_H
 
 #include <util/resolve.h>
-#include "types.h"
 #include "database.h"
-#include "skills.h"
 #include "status.h"
 
 #include <stddef.h>
 
-struct skill;
-struct item;
-struct sc_mage;
-struct gamedata;
-struct item_type;
-enum skill_t;
-
-#define MAXUNITS 1048573       /* should be prime for hashing. 524287 was >90% full */
+/* alle vierstelligen zahlen: */
+#define MAX_UNIT_NR (36*36*36*36-1)
 
 #define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
@@ -53,8 +45,6 @@ enum skill_t;
 #define UFL_SAVEMASK (UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 128 * 1024
-extern int max_heroes(int num_people);
-extern int countheroes(const struct faction* f);
 
 typedef struct reservation {
     struct reservation* next;
@@ -104,6 +94,18 @@ extern struct attrib_type at_potionuser;
 extern struct attrib_type at_effect;
 extern struct attrib_type at_private;
 extern struct attrib_type at_showskchange;
+
+struct faction;
+struct unit;
+struct race;
+struct skill;
+struct item;
+struct locale;
+struct gamedata;
+enum skill_t;
+
+int max_heroes(int num_people);
+int countheroes(const struct faction* f);
 
 int ualias(const struct unit* u);
 void usetalias(unit* u, int alias);

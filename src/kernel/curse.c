@@ -20,6 +20,7 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/rand.h>
 #include <util/resolve.h>

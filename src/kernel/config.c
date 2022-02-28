@@ -22,7 +22,6 @@
 #include "reports.h"
 #include "ship.h"
 #include "skill.h"
-#include "types.h"
 
 /* util includes */
 #include <kernel/attrib.h>
@@ -35,6 +34,7 @@
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/path.h>

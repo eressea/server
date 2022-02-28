@@ -4,6 +4,8 @@
 #include "faction.h"
 #include "order.h"
 
+#include <util/message.h>
+
 #include <CuTest.h>
 #include <tests.h>
 

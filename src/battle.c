@@ -2,7 +2,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
 #include "guard.h"
@@ -20,6 +19,7 @@
 #include "kernel/alliance.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
+#include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
 #include "kernel/faction.h"
@@ -50,6 +50,7 @@
 #include "util/lists.h"
 #include "util/log.h"
 #include "util/macros.h"
+#include "util/message.h"
 #include "util/parser.h"
 #include "util/strings.h"
 #include "util/stats.h"

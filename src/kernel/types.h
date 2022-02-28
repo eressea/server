@@ -49,29 +49,6 @@ typedef enum seen_mode {
     seen_battle
 } seen_mode;
 
-/* ------------------ Status von Einheiten --------------------- */
-
-typedef enum {                  /* Fehler und Meldungen im Report */
-  MSG_BATTLE,
-  MSG_EVENT,
-  MSG_MOVE,
-  MSG_INCOME,
-  MSG_COMMERCE,
-  MSG_PRODUCE,
-  MSG_MESSAGE,
-  MSG_MAGIC,
-  MAX_MSG
-} msg_t;
-
-enum {                          /* Message-Level */
-  ML_IMPORTANT,                 /* Sachen, die IMO erscheinen _muessen_ */
-  ML_DEBUG,
-  ML_MISTAKE,
-  ML_WARN,
-  ML_INFO,
-  ML_MAX
-};
-
 /* --------------- Reports Typen ------------------------------- */
 
 enum {
@@ -104,21 +81,7 @@ typedef enum magic_t {
   M_NONE = -1
 } magic_t;
 
-#define DONT_HELP      0
-#define HELP_MONEY     1        /* Mitversorgen von Einheiten */
-#define HELP_FIGHT     2        /* Bei Verteidigung mithelfen */
-#define HELP_OBSERVE   4        /* Bei Wahrnehmung mithelfen */
-#define HELP_GIVE      8        /* Dinge annehmen ohne KONTAKTIERE */
-#define HELP_GUARD    16        /* Laesst Steuern eintreiben etc. */
-#define HELP_FSTEALTH 32        /* Parteitarnung anzeigen. */
-#define HELP_TRAVEL   64        /* Laesst Regionen betreten. */
-#define HELP_ALL    (127-HELP_TRAVEL-HELP_OBSERVE)      /* Alle "positiven" HELPs zusammen */
-/* HELP_OBSERVE deaktiviert */
 /* ------------------------------------------------------------- */
 /* Prototypen */
-
-/* alle vierstelligen zahlen: */
-#define MAX_UNIT_NR (36*36*36*36-1)
-#define MAX_CONTAINER_NR (36*36*36*36-1)
 
 #endif

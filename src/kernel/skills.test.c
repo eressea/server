@@ -1,6 +1,7 @@
 #include "skills.h"
 
 #include "config.h"
+#include "skill.h"
 #include "unit.h"
 
 #include <CuTest.h>

@@ -22,6 +22,7 @@
 #include "spellbook.h"
 #include "ship.h"
 #include "skill.h"
+#include "skills.h"
 #include "terrain.h"
 #include "terrainid.h"
 
@@ -103,8 +104,9 @@ unit *findunitr(const region * r, int n)
     return (u && u->region == r) ? u : 0;
 }
 
-#define UMAXHASH MAXUNITS
+#define UMAXHASH 1048573 /* should be prime. 524287 was >90% full */
 static unit *unithash[UMAXHASH];
+
 static unit *delmarker = (unit *)unithash;     /* a funny hack */
 
 #define HASH_STATISTICS 1

@@ -2,22 +2,23 @@
 
 #include "vortex.h"
 
-#include <kernel/connection.h>
-#include <kernel/curse.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
-#include <kernel/messages.h>
-#include <kernel/region.h>
-#include <kernel/terrain.h>
-#include <kernel/unit.h>
+#include "kernel/connection.h"
+#include "kernel/curse.h"
+#include "kernel/config.h"
+#include "kernel/faction.h"
+#include "kernel/messages.h"
+#include "kernel/region.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
-#include <util/language.h>
-#include <util/macros.h>
-#include <util/rand.h>
-#include <util/rng.h>
-#include <util/resolve.h>
+#include "kernel/attrib.h"
+#include "kernel/gamedata.h"
+#include "util/language.h"
+#include "util/macros.h"
+#include "util/message.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/resolve.h"
 
 #include <storage.h>
 

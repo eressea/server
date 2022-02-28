@@ -17,6 +17,7 @@
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/rng.h>
 #include <util/strings.h>

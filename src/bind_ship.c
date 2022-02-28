@@ -26,7 +26,7 @@ int tolua_shiplist_next(lua_State * L)
     ship **ship_ptr = (ship **)lua_touserdata(L, lua_upvalueindex(1));
     ship *u = *ship_ptr;
     if (u != NULL) {
-        tolua_pushusertype(L, (void *)u, TOLUA_CAST "ship");
+        tolua_pushusertype(L, (void *)u, "ship");
         *ship_ptr = u->next;
         return 1;
     }
@@ -81,7 +81,7 @@ static int tolua_ship_get_region(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
     if (sh) {
-        tolua_pushusertype(L, sh->region, TOLUA_CAST "region");
+        tolua_pushusertype(L, sh->region, "region");
         return 1;
     }
     return 0;
@@ -127,7 +127,7 @@ static int tolua_ship_get_units(lua_State * L)
 
     while (u && u->ship != sh)
         u = u->next;
-    luaL_getmetatable(L, TOLUA_CAST "unit");
+    luaL_getmetatable(L, "unit");
     lua_setmetatable(L, -2);
 
     *unit_ptr = u;
@@ -145,7 +145,7 @@ static int tolua_ship_create(lua_State * L)
         if (stype) {
             ship *sh = new_ship(stype, r, default_locale);
             sh->size = stype->construction ? stype->construction->maxsize : 1;
-            tolua_pushusertype(L, (void *)sh, TOLUA_CAST "ship");
+            tolua_pushusertype(L, (void *)sh, "ship");
             return 1;
         }
         else {
@@ -244,38 +244,38 @@ static int tolua_ship_has_attrib(lua_State *L) {
 void tolua_ship_open(lua_State * L)
 {
     /* register user types */
-    tolua_usertype(L, TOLUA_CAST "ship");
+    tolua_usertype(L, "ship");
 
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_cclass(L, TOLUA_CAST "ship", TOLUA_CAST "ship", TOLUA_CAST "", NULL);
-        tolua_beginmodule(L, TOLUA_CAST "ship");
+        tolua_cclass(L, "ship", "ship", "", NULL);
+        tolua_beginmodule(L, "ship");
         {
-            tolua_function(L, TOLUA_CAST "__tostring", tolua_ship_tostring);
-            tolua_variable(L, TOLUA_CAST "id", tolua_ship_get_id, NULL);
-            tolua_variable(L, TOLUA_CAST "number", tolua_ship_get_number, tolua_ship_set_number);
-            tolua_variable(L, TOLUA_CAST "name", tolua_ship_get_name,
+            tolua_function(L, "__tostring", tolua_ship_tostring);
+            tolua_variable(L, "id", tolua_ship_get_id, NULL);
+            tolua_variable(L, "number", tolua_ship_get_number, tolua_ship_set_number);
+            tolua_variable(L, "name", tolua_ship_get_name,
                 tolua_ship_set_name);
-            tolua_variable(L, TOLUA_CAST "size", tolua_ship_get_size,
+            tolua_variable(L, "size", tolua_ship_get_size,
                 tolua_ship_set_size);
-            tolua_variable(L, TOLUA_CAST "info", tolua_ship_get_display,
+            tolua_variable(L, "info", tolua_ship_get_display,
                 tolua_ship_set_display);
-            tolua_variable(L, TOLUA_CAST "units", tolua_ship_get_units, NULL);
-            tolua_variable(L, TOLUA_CAST "flags", &tolua_ship_get_flags,
+            tolua_variable(L, "units", tolua_ship_get_units, NULL);
+            tolua_variable(L, "flags", &tolua_ship_get_flags,
                 tolua_ship_set_flags);
-            tolua_variable(L, TOLUA_CAST "region", tolua_ship_get_region,
+            tolua_variable(L, "region", tolua_ship_get_region,
                 tolua_ship_set_region);
-            tolua_variable(L, TOLUA_CAST "coast", tolua_ship_get_coast,
+            tolua_variable(L, "coast", tolua_ship_get_coast,
                 tolua_ship_set_coast);
-            tolua_variable(L, TOLUA_CAST "type", tolua_ship_get_type, 0);
-            tolua_variable(L, TOLUA_CAST "damage", tolua_ship_get_damage,
+            tolua_variable(L, "type", tolua_ship_get_type, 0);
+            tolua_variable(L, "damage", tolua_ship_get_damage,
                 tolua_ship_set_damage);
 
-            tolua_function(L, TOLUA_CAST "get_curse", &tolua_ship_get_curse);
-            tolua_function(L, TOLUA_CAST "has_attrib", &tolua_ship_has_attrib);
+            tolua_function(L, "get_curse", &tolua_ship_get_curse);
+            tolua_function(L, "has_attrib", &tolua_ship_has_attrib);
 
-            tolua_function(L, TOLUA_CAST "create", tolua_ship_create);
+            tolua_function(L, "create", tolua_ship_create);
         }
         tolua_endmodule(L);
     }

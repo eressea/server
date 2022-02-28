@@ -7,6 +7,7 @@
 #include "kernel/unit.h"
 
 #include "util/base36.h"
+#include "util/message.h"
 #include "util/param.h"
 #include "util/parser.h"
 

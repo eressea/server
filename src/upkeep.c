@@ -12,7 +12,8 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
-#include <util/rand.h>
+#include "util/message.h"
+#include "util/rand.h"
 
 #include <spells/unitcurse.h>
 

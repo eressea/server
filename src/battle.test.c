@@ -7,28 +7,29 @@
 #include "guard.h"
 #include "reports.h"
 
-#include <kernel/config.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/curse.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
+#include "spells/buildingcurse.h"
+
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/curse.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
 #include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
-#include <spells/buildingcurse.h>
-
-#include <util/base36.h>
-#include <util/functions.h>
+#include "util/base36.h"
+#include "util/functions.h"
 #include "util/keyword.h"
-#include <util/language.h>
-#include <util/message.h>
-#include <util/rand.h>
-#include <util/rng.h>
-#include <util/strings.h>
+#include "util/language.h"
+#include "util/message.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/strings.h"
 
 #include <CuTest.h>
 

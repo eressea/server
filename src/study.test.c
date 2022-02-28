@@ -1,6 +1,7 @@
 #include "study.h"
 
 #include <kernel/ally.h>
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -8,8 +9,9 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
-#include <kernel/attrib.h>
+
 #include <util/rand.h>
 #include <util/message.h>
 #include <util/language.h>

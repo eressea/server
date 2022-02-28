@@ -7,6 +7,7 @@
 #include <kernel/faction.h>
 #include <kernel/messages.h>
 #include <kernel/spell.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 
 /* util includes */
@@ -16,6 +17,7 @@
 #include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 

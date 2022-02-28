@@ -17,6 +17,7 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>

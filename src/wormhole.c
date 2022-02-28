@@ -15,6 +15,7 @@
 #include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 

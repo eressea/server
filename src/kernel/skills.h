@@ -1,8 +1,6 @@
 #ifndef H_KRNL_SKILL
 #define H_KRNL_SKILL
 
-#include "skill.h"
-
 struct race;
 struct unit;
 struct region;

@@ -15,6 +15,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -25,6 +26,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>

@@ -1,9 +1,11 @@
-#include <kernel/types.h>
 #include "donations.h"
 
-#include <kernel/faction.h>
-#include <kernel/region.h>
-#include <kernel/messages.h>
+#include "kernel/faction.h"
+#include "kernel/region.h"
+#include "kernel/messages.h"
+
+#include "util/message.h"
+
 #include <selist.h>
 
 #include <stdlib.h>

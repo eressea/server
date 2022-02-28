@@ -1,7 +1,6 @@
 #ifndef H_KRNL_BUILDING
 #define H_KRNL_BUILDING
 
-#include "types.h"
 #include "build.h"
 
 #include <util/resolve.h>

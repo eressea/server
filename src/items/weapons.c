@@ -10,6 +10,7 @@
 
 /* util includes */
 #include <util/functions.h>
+#include <util/message.h>
 #include <util/rng.h>
 
 /* libc includes */

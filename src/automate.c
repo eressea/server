@@ -9,6 +9,7 @@
 
 #include "util/keyword.h"
 #include "util/log.h"
+#include "util/message.h"
 #include "util/stats.h"
 
 #include "automate.h"

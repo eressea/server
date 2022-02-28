@@ -2,7 +2,6 @@
 #define RECRUITFRACTION 40      /* 100/RECRUITFRACTION% */
 
  /* TODO: move these settings to settings.h or into configuration files */
-#define TREESIZE (8)            /* space used by trees (in #peasants) */
 
 /* Gebaeudegroesse = Minimalbelagerer */
 #define SIEGEFACTOR     2

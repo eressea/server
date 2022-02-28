@@ -49,6 +49,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include "util/message.h"
 #include "util/param.h"
 #include <util/parser.h>
 #include <util/rng.h>

@@ -1,5 +1,6 @@
-#include "alchemy.h"
 #include "build.h"
+
+#include "alchemy.h"
 #include "building.h"
 #include "config.h"
 #include "faction.h"
@@ -9,11 +10,11 @@
 #include "order.h"
 #include "race.h"
 #include "region.h"
-#include "types.h"
 #include "unit.h"
 
-#include "util/language.h"
-#include "util/param.h"
+#include <util/language.h>
+#include <util/param.h>
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>

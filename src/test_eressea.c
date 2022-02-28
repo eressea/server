@@ -108,6 +108,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(item);
     ADD_SUITE(magic);
     ADD_SUITE(magicresistance);
+    ADD_SUITE(regioncurse);
     ADD_SUITE(messages);
     ADD_SUITE(plane);
     ADD_SUITE(pool);

@@ -13,6 +13,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 

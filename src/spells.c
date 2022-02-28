@@ -48,6 +48,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>

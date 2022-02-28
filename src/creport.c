@@ -52,6 +52,8 @@ static char g_bigbuf[BUFFERSIZE];
 #include "kernel/region.h"
 #include "kernel/resources.h"
 #include "kernel/ship.h"
+#include "kernel/skills.h"
+
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"

@@ -12,7 +12,6 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include "kernel/types.h"
 
 #include <util/base36.h>
 #include <util/language.h>
@@ -38,7 +37,7 @@ int tolua_factionlist_next(lua_State * L)
     faction **faction_ptr = (faction **)lua_touserdata(L, lua_upvalueindex(1));
     faction *f = *faction_ptr;
     if (f != NULL) {
-        tolua_pushusertype(L, (void *)f, TOLUA_CAST "faction");
+        tolua_pushusertype(L, (void *)f, "faction");
         *faction_ptr = f->next;
         return 1;
     }
@@ -51,7 +50,7 @@ static int tolua_faction_get_units(lua_State * L)
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     unit **unit_ptr = (unit **)lua_newuserdata(L, sizeof(unit *));
 
-    luaL_getmetatable(L, TOLUA_CAST "unit");
+    luaL_getmetatable(L, "unit");
     lua_setmetatable(L, -2);
 
     *unit_ptr = f->units;
@@ -355,7 +354,7 @@ static int tolua_faction_get(lua_State * L)
 {
     int no = tolua_toid(L, 1, 0);
     faction *f = findfaction(no);
-    tolua_pushusertype(L, f, TOLUA_CAST "faction");
+    tolua_pushusertype(L, f, "faction");
     return 1;
 }
 
@@ -373,7 +372,7 @@ static int tolua_faction_create(lua_State * L)
     if (!f) {
         log_error("cannot create %s faction for %s, unknown race.", racename, email);
     }
-    tolua_pushusertype(L, f, TOLUA_CAST "faction");
+    tolua_pushusertype(L, f, "faction");
     return 1;
 }
 
@@ -557,7 +556,7 @@ static int tolua_faction_get_ally(lua_State * L)
 static int tolua_faction_get_alliances(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    tolua_pushusertype(L, f_get_alliance(f), TOLUA_CAST "alliance");
+    tolua_pushusertype(L, f_get_alliance(f), "alliance");
     return 1;
 }
 
@@ -576,7 +575,7 @@ static int tolua_faction_get_items(lua_State * L)
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     item **item_ptr = (item **)lua_newuserdata(L, sizeof(item *));
 
-    luaL_getmetatable(L, TOLUA_CAST "item");
+    luaL_getmetatable(L, "item");
     lua_setmetatable(L, -2);
 
     *item_ptr = f->items;
@@ -596,80 +595,80 @@ static int tolua_faction_tostring(lua_State * L)
 void tolua_faction_open(lua_State * L)
 {
     /* register user types */
-    tolua_usertype(L, TOLUA_CAST "faction");
-    tolua_usertype(L, TOLUA_CAST "faction_list");
+    tolua_usertype(L, "faction");
+    tolua_usertype(L, "faction_list");
 
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_function(L, TOLUA_CAST "get_faction", tolua_faction_get);
-        tolua_beginmodule(L, TOLUA_CAST "eressea");
-        tolua_function(L, TOLUA_CAST "faction", tolua_faction_get);
+        tolua_function(L, "get_faction", tolua_faction_get);
+        tolua_beginmodule(L, "eressea");
+        tolua_function(L, "faction", tolua_faction_get);
         tolua_endmodule(L);
-        tolua_cclass(L, TOLUA_CAST "faction", TOLUA_CAST "faction", TOLUA_CAST "",
+        tolua_cclass(L, "faction", "faction", "",
             NULL);
-        tolua_beginmodule(L, TOLUA_CAST "faction");
+        tolua_beginmodule(L, "faction");
         {
-            tolua_function(L, TOLUA_CAST "__tostring", tolua_faction_tostring);
+            tolua_function(L, "__tostring", tolua_faction_tostring);
 
-            tolua_variable(L, TOLUA_CAST "id", tolua_faction_get_id,
+            tolua_variable(L, "id", tolua_faction_get_id,
                 tolua_faction_set_id);
-            tolua_variable(L, TOLUA_CAST "uid", tolua_faction_get_uid,
+            tolua_variable(L, "uid", tolua_faction_get_uid,
                 tolua_faction_set_uid);
-            tolua_variable(L, TOLUA_CAST "name", tolua_faction_get_name,
+            tolua_variable(L, "name", tolua_faction_get_name,
                 tolua_faction_set_name);
-            tolua_variable(L, TOLUA_CAST "info", tolua_faction_get_info,
+            tolua_variable(L, "info", tolua_faction_get_info,
                 tolua_faction_set_info);
-            tolua_variable(L, TOLUA_CAST "units", tolua_faction_get_units, NULL);
-            tolua_variable(L, TOLUA_CAST "heroes", tolua_faction_get_heroes, NULL);
-            tolua_variable(L, TOLUA_CAST "maxheroes", tolua_faction_get_maxheroes,
+            tolua_variable(L, "units", tolua_faction_get_units, NULL);
+            tolua_variable(L, "heroes", tolua_faction_get_heroes, NULL);
+            tolua_variable(L, "maxheroes", tolua_faction_get_maxheroes,
                 NULL);
-            tolua_variable(L, TOLUA_CAST "password", tolua_faction_get_password,
+            tolua_variable(L, "password", tolua_faction_get_password,
                 tolua_faction_set_password);
-            tolua_variable(L, TOLUA_CAST "email", tolua_faction_get_email,
+            tolua_variable(L, "email", tolua_faction_get_email,
                 tolua_faction_set_email);
-            tolua_variable(L, TOLUA_CAST "locale", tolua_faction_get_locale,
+            tolua_variable(L, "locale", tolua_faction_get_locale,
                 tolua_faction_set_locale);
-            tolua_variable(L, TOLUA_CAST "race", tolua_faction_get_race,
+            tolua_variable(L, "race", tolua_faction_get_race,
                 tolua_faction_set_race);
-            tolua_variable(L, TOLUA_CAST "score", tolua_faction_get_score, NULL);
-            tolua_variable(L, TOLUA_CAST "magic", tolua_faction_get_magic,
+            tolua_variable(L, "score", tolua_faction_get_score, NULL);
+            tolua_variable(L, "magic", tolua_faction_get_magic,
                 tolua_faction_set_magic);
-            tolua_variable(L, TOLUA_CAST "age", tolua_faction_get_age,
+            tolua_variable(L, "age", tolua_faction_get_age,
                 tolua_faction_set_age);
-            tolua_variable(L, TOLUA_CAST "options", tolua_faction_get_options,
+            tolua_variable(L, "options", tolua_faction_get_options,
                 tolua_faction_set_options);
-            tolua_variable(L, TOLUA_CAST "flags", tolua_faction_get_flags, tolua_faction_set_flags);
-            tolua_variable(L, TOLUA_CAST "lastturn", tolua_faction_get_lastturn,
+            tolua_variable(L, "flags", tolua_faction_get_flags, tolua_faction_set_flags);
+            tolua_variable(L, "lastturn", tolua_faction_get_lastturn,
                 tolua_faction_set_lastturn);
 
-            tolua_variable(L, TOLUA_CAST "alliance", tolua_faction_get_alliances,
+            tolua_variable(L, "alliance", tolua_faction_get_alliances,
                 tolua_faction_set_alliance);
 
-            tolua_variable(L, TOLUA_CAST "allies", tolua_faction_get_allies, NULL);
-            tolua_function(L, TOLUA_CAST "set_ally", tolua_faction_set_ally);
-            tolua_function(L, TOLUA_CAST "get_ally", tolua_faction_get_ally);
+            tolua_variable(L, "allies", tolua_faction_get_allies, NULL);
+            tolua_function(L, "set_ally", tolua_faction_set_ally);
+            tolua_function(L, "get_ally", tolua_faction_get_ally);
 
-            tolua_function(L, TOLUA_CAST "get_origin", tolua_faction_get_origin);
-            tolua_function(L, TOLUA_CAST "set_origin", tolua_faction_set_origin);
-            tolua_function(L, TOLUA_CAST "normalize", tolua_faction_normalize);
+            tolua_function(L, "get_origin", tolua_faction_get_origin);
+            tolua_function(L, "set_origin", tolua_faction_set_origin);
+            tolua_function(L, "normalize", tolua_faction_normalize);
 
-            tolua_function(L, TOLUA_CAST "add_item", tolua_faction_add_item);
-            tolua_variable(L, TOLUA_CAST "items", tolua_faction_get_items, NULL);
+            tolua_function(L, "add_item", tolua_faction_add_item);
+            tolua_variable(L, "items", tolua_faction_get_items, NULL);
 
-            tolua_function(L, TOLUA_CAST "renumber", tolua_faction_renumber);
-            tolua_function(L, TOLUA_CAST "create", tolua_faction_create);
-            tolua_function(L, TOLUA_CAST "get", tolua_faction_get);
-            tolua_function(L, TOLUA_CAST "destroy", tolua_faction_destroy);
-            tolua_function(L, TOLUA_CAST "add_notice", tolua_faction_addnotice);
+            tolua_function(L, "renumber", tolua_faction_renumber);
+            tolua_function(L, "create", tolua_faction_create);
+            tolua_function(L, "get", tolua_faction_get);
+            tolua_function(L, "destroy", tolua_faction_destroy);
+            tolua_function(L, "add_notice", tolua_faction_addnotice);
 
             /* tech debt hack, siehe https://paper.dropbox.com/doc/Weihnachten-2015-5tOx5r1xsgGDBpb0gILrv#:h=Probleme-mit-Tests-(Nachtrag-0 */
-            tolua_function(L, TOLUA_CAST "count_msg_type", tolua_faction_count_msg_type);
-            tolua_variable(L, TOLUA_CAST "messages", tolua_faction_get_messages, NULL);
-            tolua_function(L, TOLUA_CAST "debug_messages", tolua_faction_debug_messages);
+            tolua_function(L, "count_msg_type", tolua_faction_count_msg_type);
+            tolua_variable(L, "messages", tolua_faction_get_messages, NULL);
+            tolua_function(L, "debug_messages", tolua_faction_debug_messages);
 
-            tolua_function(L, TOLUA_CAST "get_key", tolua_faction_getkey);
-            tolua_function(L, TOLUA_CAST "set_key", tolua_faction_setkey);
+            tolua_function(L, "get_key", tolua_faction_getkey);
+            tolua_function(L, "set_key", tolua_faction_setkey);
         }
         tolua_endmodule(L);
     }
