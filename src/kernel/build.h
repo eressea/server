@@ -27,6 +27,13 @@ extern "C" {
         requirement *materials;     /* material req'd to build one object */
     } construction;
 
+    struct race;
+    struct ship_type;
+    struct ship;
+    struct order;
+    struct region;
+    struct unit;
+
     void construction_init(struct construction *con, int minskill, skill_t sk, int reqsize, int maxsize);
     void free_construction(struct construction *cons);
     int destroy_cmd(struct unit *u, struct order *ord);

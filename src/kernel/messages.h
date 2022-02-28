@@ -15,7 +15,7 @@ typedef struct message_list {
     struct mlist *begin, **end;
 } message_list;
 
-typedef enum {                  /* Fehler und Meldungen im Report */
+typedef enum msg_t {                  /* Fehler und Meldungen im Report */
     MSG_BATTLE,
     MSG_EVENT,
     MSG_MOVE,
@@ -38,6 +38,7 @@ enum {                          /* Message-Level */
 
 struct faction;
 struct unit;
+struct region;
 struct order;
 struct message;
 enum msg_t;

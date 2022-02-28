@@ -104,6 +104,7 @@ extern "C" {
         int flags;
     } building;
 
+    struct order;
 
     const struct building_type *visible_building(const struct building *b);
     const char *buildingtype(const building_type * btype,

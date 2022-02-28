@@ -19,7 +19,6 @@ extern "C" {
     struct attrib_type;
     struct gamedata;
     struct selist;
-    enum magic_t;
 
     /* faction flags */
 #define FFL_NOAID         (1<<0)  /* Hilfsflag Kampf */
@@ -64,7 +63,7 @@ extern "C" {
         int age;
         struct origin *origin;
         const struct race *race;
-        enum magic_t magiegebiet;
+        int magiegebiet;
         int newbies;
         int num_people;             /* Anzahl Personen ohne Monster */
         int num_units;

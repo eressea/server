@@ -68,8 +68,11 @@ typedef struct ship {
     int damage;                 /* damage in 100th of a point of size */
     int flags;
     const struct ship_type *type;
-    enum direction_t coast;
+    int coast;
 } ship;
+
+struct locale;
+struct storage;
 
 extern struct selist* shiptypes;
 

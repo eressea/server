@@ -12,11 +12,13 @@ extern "C" {
 #endif
 
     typedef struct skill {
-        enum skill_t id : 8;
+        int id : 8;
         unsigned int level : 8;
         unsigned int weeks : 8;
         unsigned int old : 8;
     } skill;
+
+    enum skill_t;
 
     typedef int(*skillmod_fun) (const struct unit *, const struct region *,
             enum skill_t, int);
