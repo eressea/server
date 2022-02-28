@@ -200,7 +200,8 @@ static void astral_crumble(unit *u) {
                 ADDMSG(&u->faction->msgs, msg_message("itemcrumble",
                     "unit region item amount",
                     u, u->region, itm->type->rtype, itm->number));
-                i_free(i_remove(itemp, itm));
+                *itemp = itm->next;
+                i_free(itm);
                 continue;
             }
         }

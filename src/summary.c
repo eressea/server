@@ -404,7 +404,7 @@ summary *make_summary(void)
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {
                 int rc = old_race(f->race);
-                if (rc >= 0) {
+                if (rc >= 0 && rc < MAXRACES) {
                     s->factionrace[rc]++;
                 }
             }
@@ -438,7 +438,7 @@ summary *make_summary(void)
             s->peasantmoney += rmoney(r);
 
             for (u = r->units; u; u = u->next) {
-                int orace;
+                race_t orace;
                 f = u->faction;
                 if (!is_monsters(u->faction)) {
                     skill *sv;
@@ -471,8 +471,8 @@ summary *make_summary(void)
                     }
                 }
 
-                orace = (int)old_race(u_race(u));
-                if (orace >= 0) {
+                orace = old_race(u_race(u));
+                if (orace >= 0 && orace < MAXRACES) {
                     s->poprace[orace] += u->number;
                 }
             }
