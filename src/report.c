@@ -1245,8 +1245,7 @@ static void report_statistics(struct stream *out, const region * r, const factio
                 LOC(f->locale, resourcename(itm->type->rtype, GR_PLURAL)), itm->number);
             paragraph(out, buf, 2, 2, 0);
         }
-        while (items)
-            i_free(i_remove(&items, items));
+        i_freeall(&items);
     }
 }
 
