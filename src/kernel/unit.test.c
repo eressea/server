@@ -12,7 +12,6 @@
 #include "order.h"
 #include "race.h"
 #include "region.h"
-#include "skill.h"
 #include "skills.h"
 #include "spell.h"
 #include "terrain.h"

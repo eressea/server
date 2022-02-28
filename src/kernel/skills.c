@@ -5,7 +5,6 @@
 #include "unit.h"
 
 #include <kernel/attrib.h>
-#include <kernel/skill.h>
 #include <kernel/skills.h>
 
 #include <util/goodies.h>

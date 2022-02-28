@@ -28,7 +28,6 @@
 #include "region.h"
 #include "resources.h"
 #include "ship.h"
-#include "skill.h"
 #include "skills.h"
 #include "spellbook.h"
 #include "spell.h"

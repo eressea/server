@@ -21,7 +21,6 @@
 #include "spell.h"
 #include "spellbook.h"
 #include "ship.h"
-#include "skill.h"
 #include "skills.h"
 #include "terrain.h"
 #include "terrainid.h"
