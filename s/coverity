@@ -1,5 +1,5 @@
 #!/bin/bash
-#set -e
+set -xe
 VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $VERSION"
 cd Debug

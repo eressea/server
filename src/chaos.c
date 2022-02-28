@@ -43,6 +43,7 @@ static const terrain_type *chaosterrain(void)
                     types[n++] = terrain;
                 }
             }
+            numtypes = n;
         }
     }
     if (numtypes > 0) {
