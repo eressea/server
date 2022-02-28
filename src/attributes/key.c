@@ -179,7 +179,7 @@ static int a_readkeys(variant *var, void *owner, gamedata *data) {
             if (ksm < keys->count) {
                 keys_data* nkeys = (keys_data *)realloc(keys, sizeof(keys_data) + sizeof(struct key_value) * ksm);
                 if (nkeys != NULL) {
-                    keys = nkeys;
+                    var->v = nkeys;
                 }
                 else {
                     log_error("a_readkeys allocation failed: %s", strerror(errno));

@@ -680,7 +680,9 @@ void rsetherbtype(region *r, const struct item_type *itype) {
                     return;
                 }
             }
-            i = rng_int() % i;
+            if (i > 0) {
+                i = rng_int() % i;
+            }
             r->land->herbtype = r->terrain->herbs[i];
         }
         else {

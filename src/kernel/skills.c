@@ -106,7 +106,6 @@ void sk_set(skill* sv, unsigned int level)
 void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
-    assert(weeks >= 0);
     if (!sv) {
         sv = add_skill(u, sk);
     }
@@ -122,7 +121,6 @@ void reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
     unsigned int max_weeks = sv->level + 1;
 
-    assert(weeks >= 0);
     if (rule_random_progress()) {
         max_weeks += sv->level;
     }

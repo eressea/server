@@ -461,7 +461,6 @@ void
 report_building(const struct building *b, const char **name,
     const char **illusion)
 {
-    *illusion = NULL;
     if (name) {
         *name = buildingtype(b->type, b, b->size);
     }
@@ -469,6 +468,9 @@ report_building(const struct building *b, const char **name,
         const building_type *btype = visible_building(b);
         if (btype != b->type) {
             *illusion = buildingtype(btype, b, b->size);
+        }
+        else {
+            *illusion = NULL;
         }
     }
 }
