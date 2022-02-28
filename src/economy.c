@@ -59,12 +59,13 @@
 #include "util/rng.h"
 
 /* libs includes */
+#include <assert.h>
+#include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <limits.h>
 
 #define MAX_REQUESTS 1024
 static struct econ_request econ_requests[MAX_REQUESTS];

@@ -10,6 +10,11 @@ typedef struct skill {
     unsigned int old : 8;
 } skill;
 
+struct race;
+struct unit;
+struct region;
+struct attrib;
+
 typedef int(*skillmod_fun) (const struct unit*, const struct region*,
     enum skill_t, int);
 
@@ -20,11 +25,6 @@ typedef struct skillmod_data {
     int number;
     int bonus;
 } skillmod_data;
-
-struct race;
-struct unit;
-struct region;
-struct attrib;
 
 extern struct attrib_type at_skillmod;
 
