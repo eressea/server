@@ -304,7 +304,7 @@ fighter *select_corpse(battle * b, fighter * af)
                  * werden! */
                 int dead = dead_fighters(df);
                 const race *rc = u_race(df->unit);
-                /* Untote sinc für immer tot */
+                /* Untote sinc fï¿½r immer tot */
                 if (!undeadrace(rc)) {
                     if (af && !helping(af->side, df->side))
                         continue;
@@ -3391,9 +3391,7 @@ static void free_fighter(fighter * fig)
         *ap = a->next;
         free(a);
     }
-    while (fig->loot) {
-        i_free(i_remove(&fig->loot, fig->loot));
-    }
+    i_freeall(&fig->loot);
     free(fig->person);
     free(fig->weapons);
 

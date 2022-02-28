@@ -55,7 +55,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     if (spy > 20) {
         magic_t mtype = unit_get_magic(target);
         /* for mages, spells and magic school */
-        if (mtype != M_GRAY) {
+        if (mtype != M_GRAY && mtype < MAXMAGIETYP && mtype != M_NONE) {
             ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target type", u,
                 target, magic_school[mtype]));
         }
@@ -205,7 +205,7 @@ static void stealth_race(unit *u, const char *s) {
                 u->irace = trace;
             }
         }
-        /* Singdrachen können sich nur als Drachen tarnen */
+        /* Singdrachen kï¿½nnen sich nur als Drachen tarnen */
         else if (u_race(u) == get_race(RC_SONGDRAGON)
             || u_race(u) == get_race(RC_BIRTHDAYDRAGON)) {
             if (trace == get_race(RC_SONGDRAGON) || trace == get_race(RC_FIREDRAGON)
@@ -214,7 +214,7 @@ static void stealth_race(unit *u, const char *s) {
             }
         }
 
-        /* Schablonen können sich als alles mögliche tarnen */
+        /* Schablonen kï¿½nnen sich als alles mï¿½gliche tarnen */
         else if (u_race(u)->flags & RCF_SHAPESHIFT) {
             u->irace = trace;
             set_racename(&u->attribs, NULL);

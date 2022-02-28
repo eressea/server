@@ -40,7 +40,7 @@ int read_triggers(struct gamedata *data, trigger ** tp)
         ttype = tt_find(zText);
         assert(ttype || !"unknown trigger-type");
         tr = t_new(ttype);
-        assert(tr->next == NULL);
+        if (!tr) abort();
         if (ttype->read) {
             int i = ttype->read(tr, data);
             switch (i) {

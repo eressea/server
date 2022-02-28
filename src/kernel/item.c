@@ -422,7 +422,9 @@ void i_merge(item ** pi, item ** si)
             if (*pi && (*pi)->type == i->type) {
                 (*pi)->number += i->number;
                 assert((*pi)->number >= 0);
-                i_free(i_remove(&i, i));
+                itmp = i;
+                i = i->next;
+                i_free(itmp);
             }
             else {
                 itmp = i->next;
