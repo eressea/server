@@ -17,6 +17,7 @@ extern "C" {
     struct stream;
     struct seen_region;
     struct region;
+    enum seen_mode;
 
     /* Alter, ab dem der Score angezeigt werden soll: */
 #define DISPLAYSCORE 12
@@ -47,14 +48,14 @@ extern "C" {
     void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
     void spunit(struct strlist **SP, const struct faction *f,
-        const struct unit *u, unsigned int indent, seen_mode mode);
+        const struct unit *u, unsigned int indent, enum seen_mode mode);
 
     int reports(void);
     int write_reports(struct faction *f, const char *password);
     int init_reports(void);
     void reorder_units(struct region * r);
 
-    int stealth_modifier(const struct region *r, const struct faction *f, seen_mode mode);
+    int stealth_modifier(const struct region *r, const struct faction *f, enum seen_mode mode);
 
     typedef struct report_context {
         struct faction *f;
@@ -74,10 +75,10 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit_depr(const struct faction *f, const struct unit *u, seen_mode mode,
+    int bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
         char *buf, size_t size);
     void bufunit(const struct faction * f, const struct unit * u,
-        const struct faction *fv, seen_mode mode, int getarnt, 
+        const struct faction *fv, enum seen_mode mode, int getarnt,
         struct sbstring *sbp);
 
     const char *trailinto(const struct region *r,
@@ -100,7 +101,7 @@ extern "C" {
         int level;
     } resource_report;
     int report_resources(const struct region *r, struct resource_report res[MAX_RAWMATERIALS],
-        const struct faction *viewer, seen_mode mode);
+        const struct faction *viewer, enum seen_mode mode);
     int report_items(const struct unit *u, struct item *result, int size,
         const struct unit *owner, const struct faction *viewer);
     void report_warnings(struct faction *f, int now);
@@ -123,7 +124,7 @@ extern "C" {
     int count_travelthru(struct region *r, const struct faction *f);
     const char *get_mailcmd(const struct locale *loc);
 
-    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, seen_mode mode);
+    bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, enum seen_mode mode);
 
     bool see_schemes(const struct region *r);
 

@@ -1,8 +1,6 @@
 #ifndef ERESSEA_TYPES_H
 #define ERESSEA_TYPES_H
 
-#include <settings.h>
-
 struct attrib;
 struct attrib_type;
 struct ally;
@@ -36,18 +34,6 @@ struct strlist;
 struct terrain_type;
 struct unit;
 struct weapon_type;
-
-/* seen_mode: visibility in the report */
-typedef enum seen_mode {
-    seen_none,
-    seen_neighbour,
-    seen_lighthouse_land,
-    seen_lighthouse,
-    seen_travel,
-    seen_unit,
-    seen_spell,
-    seen_battle
-} seen_mode;
 
 /* --------------- Reports Typen ------------------------------- */
 

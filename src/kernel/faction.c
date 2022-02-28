@@ -252,8 +252,8 @@ faction *addfaction(const char *email, const char *password,
     return f;
 }
 
-#define PEASANT_MIN (10 * RECRUITFRACTION)
-#define PEASANT_MAX (20 * RECRUITFRACTION)
+#define PEASANT_MIN (10 * RECRUIT_FRACTION)
+#define PEASANT_MAX (20 * RECRUIT_FRACTION)
 
 unit *addplayer(region * r, faction * f)
 {

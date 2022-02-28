@@ -1059,7 +1059,7 @@ void spawn_undead(void)
 static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
-    double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
+    double multi = newterrain(T_PLAIN)->size / 20000.0;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
     int p = rpeasants(u->region);

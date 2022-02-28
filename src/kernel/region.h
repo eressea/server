@@ -78,6 +78,18 @@ typedef struct land_region {
     struct region_owner *ownership;
 } land_region;
 
+/* seen_mode: visibility in the report */
+typedef enum seen_mode {
+    seen_none,
+    seen_neighbour,
+    seen_lighthouse_land,
+    seen_lighthouse,
+    seen_travel,
+    seen_unit,
+    seen_spell,
+    seen_battle
+} seen_mode;
+
 typedef struct region {
     struct region *next;
     struct land_region *land;
@@ -104,7 +116,7 @@ typedef struct region {
     struct rawmaterial *resources;
     struct region *connect[MAXDIRECTIONS];      /* use rconnect(r, dir) to access */
     struct {
-        enum seen_mode mode;
+        seen_mode mode;
     } seen;
 } region;
 
@@ -119,6 +131,7 @@ typedef struct {
 
 struct message;
 struct message_list;
+struct resource_type;
 struct item_type;
 struct faction;
 struct gamedata;

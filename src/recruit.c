@@ -63,6 +63,7 @@
 #include <limits.h>
 
 #define RECRUIT_MERGE 1
+
 static int rules_recruit = -1;
 
 typedef struct recruit_request {
@@ -287,7 +288,7 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
     recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
     if (recruits) {
         int orc_recruited, orc_peasants = rpeasants(r) * 2;
-        int orc_frac = orc_peasants / RECRUITFRACTION;      /* anzahl orks. 2 ork = 1 bauer */
+        int orc_frac = orc_peasants / RECRUIT_FRACTION;      /* anzahl orks. 2 ork = 1 bauer */
         if (orc_total < orc_frac)
             orc_frac = orc_total;
         orc_recruited = do_recruiting(recruits, orc_frac);
@@ -323,7 +324,7 @@ int max_recruits(const struct region *r)
     if (is_cursed(r->attribs, &ct_riotzone)) {
         return 0;
     }
-    return rpeasants(r) / RECRUITFRACTION;
+    return rpeasants(r) / RECRUIT_FRACTION;
 }
 
 message *can_recruit(unit *u, const race *rc, order *ord, int now)

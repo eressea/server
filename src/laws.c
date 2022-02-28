@@ -477,7 +477,7 @@ static void horses(region * r)
     if (horses > 0) {
         if (maxhorses > 0) {
             double growth =
-                (RESOURCE_QUANTITY * (HORSEGROWTH * 200.0 * ((double)maxhorses -
+                ((HORSEGROWTH * 100.0 * ((double)maxhorses -
                     horses))) / (double)maxhorses;
 
             if (growth > 0) {
@@ -626,7 +626,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 {
     int grownup_trees, i, seeds, sprout;
     attrib *a;
-    double seedchance = config_get_flt("rules.treeseeds.chance", 0.01F) * RESOURCE_QUANTITY;
+    double seedchance = config_get_flt("rules.treeseeds.chance", 0.005F);
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
         const struct race* rc_elf = get_race(RC_ELF);
@@ -655,7 +655,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         mp = mp / 8;
         if (elves > mp) elves = mp;
         if (elves) {
-            seedchance += 1.0 - pow(0.99999, elves * RESOURCE_QUANTITY);
+            seedchance += 1.0 - pow(0.99999, elves / 2);
         }
         grownup_trees = rtrees(r, 2);
         seeds = 0;

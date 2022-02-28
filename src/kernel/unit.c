@@ -57,6 +57,8 @@
 #include <string.h>
 #include <math.h>
 
+#define BAGCAPACITY 20000   /* soviel passt in einen Bag of Holding */
+
 int weight(const unit * u)
 {
     int w = 0, n = 0, in_bag = 0;

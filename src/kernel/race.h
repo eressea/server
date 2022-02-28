@@ -25,6 +25,8 @@ extern "C" {
 
 #define RACE_ATTACKS 10         /* maximum number of attacks */
 
+#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
+
     struct param;
     struct spell;
     struct spellref;

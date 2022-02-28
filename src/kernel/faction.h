@@ -36,6 +36,7 @@ extern "C" {
 #define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED|FFL_PAUSED)
+#define RECRUIT_FRACTION 40      /* 100/RECRUIT_FRACTION% */
 
     typedef struct origin {
         struct origin *next;

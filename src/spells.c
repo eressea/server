@@ -1150,7 +1150,7 @@ static int sp_hain(castorder * co)
         return 0;
     }
 
-    trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
+    trees = lovar((int)(force * 5)) + (int)force;
     rsettrees(r, 1, rtrees(r, 1) + trees);
 
     /* melden, 1x pro Partei */
@@ -1196,7 +1196,7 @@ static int sp_mallornhain(castorder * co)
         return 0;
     }
 
-    trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
+    trees = lovar((int)(force * 5)) + (int)force;
     rsettrees(r, 1, rtrees(r, 1) + trees);
 
     /* melden, 1x pro Partei */
@@ -1508,7 +1508,7 @@ static int sp_create_irongolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int number = (int)((co->force * 4 + lovar(co->force * 4)) * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 4 + lovar(co->force * 4)) / 2);
     static int cache;
     static const race * golem_rc;
 
@@ -1577,7 +1577,7 @@ static int sp_create_stonegolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int number = (int)((co->force * 2 + lovar(co->force * 3)) * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 2 + lovar(co->force * 3)) / 2);
     static int cache;
     static const race * golem_rc;
 
