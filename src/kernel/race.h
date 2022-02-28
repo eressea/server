@@ -81,7 +81,7 @@ extern "C" {
         RC_TEMPLATE,
         RC_CLONE,
         MAXRACES,
-        NORACE = -1
+        NORACE
     } race_t;
 
 #define MAX_START_RACE RC_ORC
