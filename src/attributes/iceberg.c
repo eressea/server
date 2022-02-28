@@ -1,7 +1,8 @@
-#include <kernel/config.h>
 #include "iceberg.h"
 
 #include <kernel/attrib.h>
+
+#include <stdlib.h>
 
 attrib_type at_iceberg = {
     "iceberg_drift",

@@ -1,7 +1,6 @@
 #include "alchemy.h"
 #include "move.h"
 
-#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>

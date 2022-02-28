@@ -2,6 +2,8 @@
 #ifndef H_ATTRIBUTE_MOVEMENT
 #define H_ATTRIBUTE_MOVEMENT
 
+#include <stdbool.h>
+
 extern struct attrib_type at_movement;
 extern struct attrib_type at_speedup;
 

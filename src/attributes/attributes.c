@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "attributes.h"
 
 #include "laws.h"
@@ -98,7 +97,7 @@ static attrib *make_observer(faction *f, int perception, int timer)
 }
 
 int get_observer(const region *r, const faction *f) {
-    if (fval(r, RF_OBSERVER)) {
+    if (r->flags & RF_OBSERVER) {
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {
             obs_data *od = (obs_data *)a->data.v;
@@ -114,7 +113,7 @@ int get_observer(const region *r, const faction *f) {
 void set_observer(region *r, faction *f, int skill, int turns)
 {
     update_interval(f, r);
-    if (fval(r, RF_OBSERVER)) {
+    if (r->flags & RF_OBSERVER) {
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {
             obs_data *od = (obs_data *)a->data.v;
@@ -127,7 +126,7 @@ void set_observer(region *r, faction *f, int skill, int turns)
         }
     }
     else {
-        fset(r, RF_OBSERVER);
+        r->flags |= RF_OBSERVER;
     }
     a_add(&r->attribs, make_observer(f, skill, turns));
 }

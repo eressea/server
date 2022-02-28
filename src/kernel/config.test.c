@@ -1,4 +1,5 @@
 #include <kernel/config.h>
+#include <kernel/faction.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>

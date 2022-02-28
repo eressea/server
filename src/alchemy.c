@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "alchemy.h"
 #include "guard.h"
 #include "study.h"

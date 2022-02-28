@@ -1,6 +1,5 @@
 #include "follow.h"
 
-#include <kernel/config.h>
 #include <kernel/unit.h>
 
 #include <kernel/attrib.h>

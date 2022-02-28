@@ -858,3 +858,20 @@ void change_locale(faction *f, const struct locale *lang, bool del ) {
     f->locale = lang;
 }
 
+bool rule_stealth_other(void)
+{
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.other", 1);
+    }
+    return rule != 0;
+}
+
+bool rule_stealth_anon(void)
+{
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.anon", 1);
+    }
+    return rule != 0;
+}

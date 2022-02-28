@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "hate.h"
 
 #include <kernel/unit.h>

@@ -93,7 +93,8 @@ extern "C" {
     void fhash(struct faction *f);
     void funhash(struct faction *f);
 
-    int faction_ally_status(const faction *f, const faction *f2);
+    bool rule_stealth_other(void); /* units can pretend to be another faction, TARNE PARTEI <no> */
+    bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
 
     struct faction *findfaction(int n);
     int max_magicians(const faction * f);

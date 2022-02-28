@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "dict.h"
 #include "key.h"
 
@@ -40,7 +39,7 @@ typedef struct dict_data {
 static int dict_read(variant * var, void *owner, gamedata *data)
 {
     storage *store = data->store;
-    char name[NAMESIZE];
+    char name[128];
     dict_data *dd = (dict_data *)var->v;
     int n;
 
