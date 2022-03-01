@@ -9,7 +9,6 @@
 
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/config.h>
 #include <kernel/save.h>
 
 #include <util/language.h>

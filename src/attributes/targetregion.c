@@ -1,6 +1,5 @@
 #include "targetregion.h"
 
-#include <kernel/config.h>
 #include <kernel/region.h>
 
 #include <kernel/attrib.h>

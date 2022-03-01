@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "reduceproduction.h"
 #include <kernel/region.h>
 #include <kernel/messages.h>

@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "direction.h"
 #include "vortex.h"
 

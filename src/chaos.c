@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "chaos.h"
 #include "monsters.h"
 #include "move.h"

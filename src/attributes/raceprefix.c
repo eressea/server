@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include "raceprefix.h"
 
 #include <kernel/attrib.h>
