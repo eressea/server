@@ -655,7 +655,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         mp = mp / 8;
         if (elves > mp) elves = mp;
         if (elves) {
-            seedchance += 1.0 - pow(0.99999, elves / 2);
+            seedchance += 1.0 - pow(0.99999, elves / 2.0);
         }
         grownup_trees = rtrees(r, 2);
         seeds = 0;
