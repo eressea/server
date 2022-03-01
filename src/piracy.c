@@ -136,7 +136,7 @@ void piracy_cmd(unit * u)
 
     /* Wenn nicht, sehen wir, ob wir ein Ziel finden. */
 
-    if (target_dir == NODIRECTION && target_dir < MAXDIRECTIONS) {
+    if (target_dir == NODIRECTION || target_dir >= MAXDIRECTIONS) {
         int saff = 0;
         direction_t dir;
         /* Einheit ist also Kapitaen. Jetzt gucken, in wievielen
@@ -189,7 +189,7 @@ void piracy_cmd(unit * u)
     free(il);
 
     /* Wenn kein Ziel gefunden, entsprechende Meldung generieren */
-    if (target_dir == NODIRECTION) {
+    if (target_dir == NODIRECTION || target_dir >= MAXDIRECTIONS) {
         ADDMSG(&u->faction->msgs, msg_message("piratenovictim",
             "ship unit region", sh, u, r));
         return;
