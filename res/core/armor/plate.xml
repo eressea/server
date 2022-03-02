@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <eressea><resources>
 <resource name="plate">
-  <item weight="400" score="150">
+  <item weight="400" score="150" deny="cat">
     <construction skill="armorer" minskill="4">
       <requirement type="iron" quantity="5"/>
     </construction>
