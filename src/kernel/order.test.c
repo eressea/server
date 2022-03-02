@@ -92,7 +92,23 @@ static void test_parse_order(CuTest *tc) {
     test_teardown();
 }
 
-static void test_parse_make(CuTest *tc) {
+static void test_parse_parameters(CuTest* tc) {
+    struct locale* lang;
+
+    test_setup();
+    lang = get_or_create_locale("en");
+
+    locale_setstring(lang, parameters[P_NEXT], "NAECHSTER");
+    init_locale(lang);
+    CuAssertIntEquals(tc, NOPARAM, findparam("N", lang));
+    CuAssertIntEquals(tc, NOPARAM, findparam("NA", lang));
+    CuAssertIntEquals(tc, P_NEXT, findparam("NAE", lang));
+    CuAssertIntEquals(tc, P_NEXT, findparam("NAECHSTER", lang));
+    CuAssertIntEquals(tc, NOPARAM, findparam("NAECHSTERSTER", lang));
+    test_teardown();
+}
+
+static void test_parse_make(CuTest* tc) {
     char cmd[32];
     order *ord;
     struct locale * lang;
@@ -165,7 +181,7 @@ static void test_parse_make_temp(CuTest *tc) {
     init_locale(lang);
 
     CuAssertPtrEquals(tc, NULL, parse_order("M T herp", lang));
-    ord = parse_order("MA TE herp", lang);
+    ord = parse_order("MA TEM herp", lang);
     CuAssertPtrNotNull(tc, ord);
     CuAssertIntEquals(tc, K_MAKETEMP, getkeyword(ord));
     CuAssertStrEquals(tc, "MAKETEMP herp", get_command(ord, lang, cmd, sizeof(cmd)));
@@ -587,6 +603,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_study_order_unknown_quoted);
     SUITE_ADD_TEST(suite, test_study_order_quoted);
     SUITE_ADD_TEST(suite, test_parse_order);
+    SUITE_ADD_TEST(suite, test_parse_parameters);
     SUITE_ADD_TEST(suite, test_parse_make);
     SUITE_ADD_TEST(suite, test_parse_autostudy);
     SUITE_ADD_TEST(suite, test_parse_make_temp);
