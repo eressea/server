@@ -163,7 +163,7 @@ int parseorders(FILE *F)
     OP_SetUserData(parser, &state);
 
     while (!done) {
-        int len = (int)fread(buf, 1, sizeof(buf), F);
+        size_t len = fread(buf, 1, sizeof(buf), F);
         if (ferror(F)) {
             /* TODO: error message */
             err = errno;
