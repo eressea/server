@@ -69,7 +69,6 @@ param_t findparam(const char *s, const struct locale * lang)
     char * str = s ? transliterate(buffer, sizeof(buffer) - sizeof(int), s) : NULL;
 
     if (str && str[0] && str[1]) {
-        int i;
         void * match;
         void **tokens = get_translations(lang, UT_PARAMS);
         critbit_tree *cb = (critbit_tree *)*tokens;
@@ -77,8 +76,12 @@ param_t findparam(const char *s, const struct locale * lang)
             log_warning("no parameters defined in locale %s", locale_name(lang));
         }
         else if (cb_find_prefix(cb, str, strlen(str), &match, 1, 0)) {
-            cb_get_kv(match, &i, sizeof(int));
-            result = (param_t)i;
+            const char* key = (const char*)match;
+            if (str[2] || strlen(key) < 3) {
+                int i;
+                cb_get_kv(match, &i, sizeof(i));
+                result = (param_t)i;
+            }
         }
     }
     return result;
