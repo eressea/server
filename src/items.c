@@ -294,7 +294,7 @@ struct order *ord)
             change_race(u, duration, rcfailure, NULL);
         }
     }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+    use_pooled(u, itype->rtype, GET_DEFAULT,
         amount);
 
     ADDMSG(&u->faction->msgs, msg_message("use_item",

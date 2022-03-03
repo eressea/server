@@ -2405,14 +2405,14 @@ int promotion_cmd(unit * u, struct order *ord)
         return 0;
     }
     people = u->faction->num_people * u->number;
-    money = get_pooled(u, rsilver, GET_ALL, people);
+    money = get_pooled(u, rsilver, GET_DEFAULT, people);
 
     if (people > money) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "heroes_cost", "cost have", people, money));
         return 0;
     }
-    use_pooled(u, rsilver, GET_ALL, people);
+    use_pooled(u, rsilver, GET_DEFAULT, people);
     fset(u, UFL_HERO);
     ADDMSG(&u->faction->msgs, msg_message("hero_promotion", "unit cost",
         u, people));

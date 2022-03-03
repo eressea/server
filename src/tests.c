@@ -482,6 +482,7 @@ item_type * test_create_itemtype(const char * name) {
     item_type * itype;
 
     rtype = rt_get_or_create(name);
+    rtype->flags = RTF_POOLED|RTF_ITEM;
     itype = it_get_or_create(rtype);
 
     return itype;

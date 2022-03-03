@@ -359,7 +359,7 @@ static bool maintain(building * b)
             cost = cost * b->size;
         }
         cost -=
-            use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+            use_pooled(u, m->rtype, GET_DEFAULT,
                 cost);
         assert(cost == 0);
     }
