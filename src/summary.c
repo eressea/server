@@ -30,8 +30,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#undef SUMMARY_BOM              /* write a BOM in the summary file */
-
 typedef struct summary {
     int waffen;
     int factions;
@@ -250,12 +248,6 @@ void report_summary(const summary * s, bool full)
         perror(zText);
         return;
     }
-#ifdef SUMMARY_BOM
-    else {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-        fwrite(utf8_bom, 1, 3, F);
-    }
-#endif
     log_info("writing summary to file: parteien.\n");
     fprintf(F, "%s\n%s\n\n", game_name(), gamedate2(default_locale));
     fprintf(F, "Auswertung Nr:         %8d\n\n", turn);
