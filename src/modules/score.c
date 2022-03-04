@@ -163,9 +163,6 @@ void score(void)
         path_join(basepath(), "score.alliances", path, sizeof(path));
         scoreFP = fopen(path, "w");
         if (scoreFP) {
-            const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-            fwrite(utf8_bom, 1, 3, scoreFP);
-
             fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
             for (a = alliances; a; a = a->next) {
