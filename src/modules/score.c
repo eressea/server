@@ -140,9 +140,7 @@ void score(void)
     path_join(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
     if (scoreFP) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
         faction *f;
-        fwrite(utf8_bom, 1, 3, scoreFP);
         for (f = factions; f; f = f->next)
             if (!fval(f, FFL_NPC) && f->num_people != 0) {
                 char score[32];
