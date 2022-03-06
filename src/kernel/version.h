@@ -1,5 +1,6 @@
-#ifndef H_KERNEL_VERSION
-#define H_KERNEL_VERSION
+#pragma once
+#ifndef H_ERESSEA_VERSION
+#define H_ERESSEA_VERSION
 
 const char *eressea_version(void);
 int version_no(const char *str);

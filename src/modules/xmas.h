@@ -1,17 +1,11 @@
 #ifndef H_MOD_XMAS
 #define H_MOD_XMAS
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-  struct region;
-  struct unit;
+struct building;
+struct trigger;
 
-  extern struct trigger *trigger_xmasgate(struct building *b);
+struct trigger *trigger_xmasgate(struct building *b);
 
-  extern void register_xmas(void);
+void register_xmas(void);
 
-#ifdef __cplusplus
-}
-#endif
 #endif

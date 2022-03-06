@@ -1,9 +1,7 @@
 #ifndef TERRAIN_H
 #define TERRAIN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct region;
 
     /* diverse Flags */
     /* Strassen und Gebaeude koennen gebaut werden, wenn max_road > 0 */
@@ -62,7 +60,4 @@ extern "C" {
     void init_terrains(void);
     void free_terrains(void);
 
-#ifdef __cplusplus
-}
-#endif
 #endif                          /* TERRAIN_H */

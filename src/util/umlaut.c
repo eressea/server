@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "umlaut.h"
 
 #include "assert.h"

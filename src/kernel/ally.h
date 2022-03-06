@@ -5,14 +5,24 @@
 extern "C" {
 #endif
 
-struct attrib_type;
+#define DONT_HELP      0
+#define HELP_MONEY     1        /* Mitversorgen von Einheiten */
+#define HELP_FIGHT     2        /* Bei Verteidigung mithelfen */
+#define HELP_OBSERVE   4        /* Bei Wahrnehmung mithelfen */
+#define HELP_GIVE      8        /* Dinge annehmen ohne KONTAKTIERE */
+#define HELP_GUARD    16        /* Laesst Steuern eintreiben etc. */
+#define HELP_FSTEALTH 32        /* Parteitarnung anzeigen. */
+#define HELP_TRAVEL   64        /* Laesst Regionen betreten. */
+#define HELP_ALL    (127-HELP_TRAVEL-HELP_OBSERVE)      /* Alle "positiven" HELPs zusammen */
+/* HELP_OBSERVE deaktiviert */
+
+extern struct attrib_type at_npcfaction;
+
 struct faction;
 struct group;
 struct gamedata;
 struct unit;
 struct allies;
-
-extern struct attrib_type at_npcfaction;
 
 int ally_status(const char *s);
 int ally_get(struct allies *al, const struct faction *f);

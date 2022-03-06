@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "attributes.h"
 
 #include "laws.h"
@@ -15,7 +13,6 @@
 #include "magic.h"
 #include "movement.h"
 #include "otherfaction.h"
-#include "overrideroads.h"
 #include "racename.h"
 #include "raceprefix.h"
 #include "reduceproduction.h"
@@ -100,7 +97,7 @@ static attrib *make_observer(faction *f, int perception, int timer)
 }
 
 int get_observer(const region *r, const faction *f) {
-    if (fval(r, RF_OBSERVER)) {
+    if (r->flags & RF_OBSERVER) {
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {
             obs_data *od = (obs_data *)a->data.v;
@@ -116,7 +113,7 @@ int get_observer(const region *r, const faction *f) {
 void set_observer(region *r, faction *f, int skill, int turns)
 {
     update_interval(f, r);
-    if (fval(r, RF_OBSERVER)) {
+    if (r->flags & RF_OBSERVER) {
         attrib *a = a_find(r->attribs, &at_observer);
         while (a && a->type == &at_observer) {
             obs_data *od = (obs_data *)a->data.v;
@@ -129,7 +126,7 @@ void set_observer(region *r, faction *f, int skill, int turns)
         }
     }
     else {
-        fset(r, RF_OBSERVER);
+        r->flags |= RF_OBSERVER;
     }
     a_add(&r->attribs, make_observer(f, skill, turns));
 }
@@ -185,6 +182,7 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
+    at_deprecate("roads_override", a_readstring);
     at_deprecate("npcfaction", a_readint);
     at_deprecate("siege", a_readint);
     at_deprecate("maxmagicians", a_readint); /* factions with differnt magician limits, probably unused */
@@ -199,7 +197,6 @@ void register_attributes(void)
     at_register(&at_stealth);
     at_register(&at_unitdissolve);
     at_register(&at_observer);
-    at_register(&at_overrideroads);
     at_register(&at_raceprefix);
     at_register(&at_iceberg);
     at_register(&at_key);

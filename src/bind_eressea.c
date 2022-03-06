@@ -1,16 +1,14 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #endif
 #include "bind_eressea.h"
 
+#include "eressea.h"
 #include "json.h"
 #include "orderfile.h"
 
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/config.h>
 #include <kernel/save.h>
 
 #include <util/language.h>

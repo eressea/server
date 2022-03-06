@@ -1,9 +1,6 @@
-#include <platform.h>
-
 #include "alchemy.h"
 #include "move.h"
 
-#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
@@ -81,9 +78,44 @@ static void test_herbsearch(CuTest * tc)
     test_teardown();
 }
 
+static void test_scale_effects(CuTest* tc) {
+    unit* u;
+    const struct item_type* ptype;
+
+    test_setup();
+    ptype = it_get_or_create(rt_get_or_create("hodor"));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    change_effect(u, ptype, 2);
+    scale_effects(u->attribs, 2, 4);
+    CuAssertIntEquals(tc, 1, get_effect(u, ptype));
+
+    u->hp = 35;
+    CuAssertIntEquals(tc, 1, u->number);
+    CuAssertIntEquals(tc, 35, u->hp);
+    CuAssertIntEquals(tc, 1, get_effect(u, ptype));
+    scale_number(u, 2);
+    CuAssertIntEquals(tc, 2, u->number);
+    CuAssertIntEquals(tc, 35 * u->number, u->hp);
+    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
+    scale_number(u, 8237);
+    CuAssertIntEquals(tc, 8237, u->number);
+    CuAssertIntEquals(tc, 35 * u->number, u->hp);
+    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
+    scale_number(u, 8100);
+    CuAssertIntEquals(tc, 8100, u->number);
+    CuAssertIntEquals(tc, 35 * u->number, u->hp);
+    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
+    set_level(u, SK_ALCHEMY, 1);
+    scale_number(u, 0);
+    CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
+    test_teardown();
+}
+
 CuSuite *get_alchemy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_herbsearch);
+    SUITE_ADD_TEST(suite, test_scale_effects);
     return suite;
 }

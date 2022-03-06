@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "bind_locale.h"
 #include "util/language.h"
 #include "direction.h"

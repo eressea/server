@@ -1,7 +1,7 @@
-#include <platform.h>
 #include "laws.h"
 #include "battle.h"
 #include "contact.h"
+#include "eressea.h"
 #include "guard.h"
 #include "monsters.h"
 
@@ -14,6 +14,7 @@
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
+#include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
@@ -718,10 +719,9 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     building *b;
     building_type *btcastle;
 
-    test_create_world();
+    test_setup();
     f = test_create_faction();
-    r = findregion(0, 0);
-    assert(r && f);
+    r = test_create_plain(0, 0);
     btcastle = test_create_buildingtype("castle");
     btcastle->taxes = 100;
     b = test_create_building(r, btcastle);
@@ -733,6 +733,81 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     u_set_building(fix->u2, b);
     assert(building_owner(b) == fix->u1);
     test_translate_param(f->locale, P_NOT, "NOT");
+}
+
+static void test_promotion_cmd(CuTest* tc)
+{
+    unit* u, *u2;
+    const item_type* itype;
+
+    test_setup();
+    mt_create_va(mt_new("heroes_maxed", NULL),
+        "unit:unit", "region:region", "command:order", 
+        "max:int", "count:int", MT_NEW_END);
+    mt_create_va(mt_new("heroes_cost", NULL), 
+        "unit:unit", "region:region", "command:order",
+        "cost:int", "have:int", MT_NEW_END);
+    mt_create_va(mt_new("hero_promotion", NULL), "unit:unit", "cost:int", MT_NEW_END);
+    itype = test_create_silver();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u->thisorder = create_order(K_PROMOTION, u->faction->locale, NULL);
+    u2 = test_create_unit(u->faction, u->region);
+
+    /* not enough people to allow promotion: */
+    i_change(&u->items, itype, 57);
+    scale_number(u2, 55);
+    CuAssertIntEquals(tc, 56, u->faction->num_people);
+    promotion_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "heroes_maxed"));
+    CuAssertIntEquals(tc, 0, u->flags & UFL_HERO);
+    CuAssertIntEquals(tc, 57, i_get(u->items, itype));
+    test_clear_messages(u->faction);
+
+    /* enough people and money for promotion: */
+    scale_number(u2, 56);
+    CuAssertIntEquals(tc, 57, u->faction->num_people);
+    promotion_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "hero_promotion"));
+    CuAssertIntEquals(tc, UFL_HERO, u->flags & UFL_HERO);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    u->flags -= UFL_HERO;
+    test_clear_messages(u->faction);
+
+    /* not enough money (in pool) for promotion: */
+    i_change(&u2->items, itype, 56);
+    promotion_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "heroes_cost"));
+    CuAssertIntEquals(tc, 0, u->flags & UFL_HERO);
+    CuAssertIntEquals(tc, 56, i_get(u2->items, itype));
+    test_clear_messages(u->faction);
+
+    /* enough people and money (using pool) for promotion: */
+    i_change(&u->items, itype, 1);
+    promotion_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "hero_promotion"));
+    CuAssertIntEquals(tc, UFL_HERO, u->flags & UFL_HERO);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, itype));
+
+    /* cannot promote a unit twice: */
+    i_change(&u2->items, itype, 57);
+    promotion_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 57, i_get(u2->items, itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "heroes_cost"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "heroes_promotion"));
+    test_clear_messages(u->faction);
+    u->flags -= UFL_HERO;
+    test_clear_messages(u->faction);
+
+    /* not using reserved money from pool for promotion: */
+    set_resvalue(u2, itype, 1); /* RESERVIERE 1 Silber */
+    promotion_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "heroes_cost"));
+    CuAssertIntEquals(tc, 0, u->flags & UFL_HERO);
+    CuAssertIntEquals(tc, 57, i_get(u2->items, itype));
+    test_clear_messages(u->faction);
+
+    test_teardown();
 }
 
 static void test_pay_cmd(CuTest *tc) {
@@ -1999,6 +2074,41 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_temp(CuTest* tc) {
+    unit* u, * u2;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u2 = test_create_unit(test_create_faction(), u->region);
+
+    u->orders = create_order(K_MAKETEMP, u->faction->locale, "1");
+    new_units();
+    u2 = u2->next;
+
+    CuAssertPtrNotNull(tc, u2);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_teardown();
+}
+
+static void test_cansee_empty(CuTest *tc) {
+    unit *u, *u2;
+    faction *f;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
+    u2 = test_create_unit(test_create_faction(), u->region);
+
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    u2->number = 0;
+    set_level(u2, SK_STEALTH, 1);
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_teardown();
+}
+
+
 /**
  * Hidden monsters are seen in oceans if they are big enough.
  */
@@ -2152,7 +2262,7 @@ static void test_peasant_migration(CuTest *tc) {
     rsettrees(r1, 0, 0);
     rsettrees(r1, 1, 0);
     rsettrees(r1, 2, 0);
-    rmax = region_maxworkers(r1);
+    rmax = region_production(r1);
     r2 = test_create_plain(0, 1);
     rsettrees(r2, 0, 0);
     rsettrees(r2, 1, 0);
@@ -2475,6 +2585,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_all);
+    SUITE_ADD_TEST(suite, test_promotion_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd_other_building);
     SUITE_ADD_TEST(suite, test_pay_cmd_must_be_owner);
@@ -2509,6 +2620,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
     SUITE_ADD_TEST(suite, test_cansee_monsters);
+    SUITE_ADD_TEST(suite, test_cansee_empty);
+    SUITE_ADD_TEST(suite, test_cansee_temp);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "races.h"
 
 #include <kernel/building.h>

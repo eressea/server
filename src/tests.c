@@ -1,19 +1,20 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#endif
 #include "tests.h"
-#include "prefix.h"
+
+#include "battle.h"
 #include "creport.h"
+#include "eressea.h"
+#include "prefix.h"
 #include "report.h"
 #include "reports.h"
 #include "vortex.h"
 
 #include "kernel/build.h"
+#include "kernel/config.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
-#include "kernel/config.h"
 #include "kernel/alliance.h"
 #include "kernel/equipment.h"
 #include "kernel/messages.h"
@@ -234,7 +235,12 @@ void test_log_stderr(int flags) {
 
 }
 
-static void test_reset(void) {
+void test_reset(void)
+{
+    free_gamedata();
+}
+
+static void test_reset_full(void) {
     int i;
     turn = 1;
     default_locale = 0;
@@ -245,7 +251,8 @@ static void test_reset(void) {
         log_error("errno: %d (%s)", error, strerror(error));
     }
     memset(&callbacks, 0, sizeof(callbacks));
-    free_gamedata();
+
+    test_reset();
     free_terrains();
     free_resources();
     free_functions();
@@ -308,7 +315,7 @@ void test_create_calendar(void) {
 
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
-    test_reset();
+    test_reset_full();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
     if (tc) {
         log_debug("start test: %s", tc->name);
@@ -322,7 +329,7 @@ void test_setup_test(CuTest *tc, const char *file, int line) {
 void test_teardown(void)
 {
     message_handle_missing(MESSAGE_MISSING_IGNORE);
-    test_reset();
+    test_reset_full();
     test_log_stderr(0);
 }
 
@@ -475,6 +482,7 @@ item_type * test_create_itemtype(const char * name) {
     item_type * itype;
 
     rtype = rt_get_or_create(name);
+    rtype->flags = RTF_POOLED|RTF_ITEM;
     itype = it_get_or_create(rtype);
 
     return itype;

@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include <curses.h>
 
 #include "bind_gmtool.h"
@@ -40,7 +36,7 @@ static int tolua_current_region(lua_State * L)
 {
     map_region *mr =
         cursor_region(&current_state->display, &current_state->cursor);
-    tolua_pushusertype(L, mr ? mr->r : NULL, TOLUA_CAST "region");
+    tolua_pushusertype(L, mr ? mr->r : NULL, "region");
     return 1;
 }
 
@@ -116,7 +112,7 @@ static int tolua_tags_next(lua_State * L)
 {
     tag_iterator *iter = (tag_iterator *)lua_touserdata(L, lua_upvalueindex(1));
     if (iter->node) {
-        tolua_pushusertype(L, (void *)iter->r, TOLUA_CAST "region");
+        tolua_pushusertype(L, (void *)iter->r, "region");
         tag_advance(iter);
         return 1;
     }
@@ -180,7 +176,7 @@ static void lua_paint_info(struct window *wnd, const struct state *st)
         const char *error = lua_tostring(L, -1);
         log_error("paint function failed: %s\n", error);
         lua_pop(L, 1);
-        tolua_error(L, TOLUA_CAST "event handler call failed", NULL);
+        tolua_error(L, "event handler call failed", NULL);
     }
     else {
         const char *result = lua_tostring(L, -1);
@@ -226,7 +222,7 @@ static int tolua_make_block(lua_State * L)
     int x = (int)tolua_tonumber(L, 1, 0);
     int y = (int)tolua_tonumber(L, 2, 0);
     int r = (int)tolua_tonumber(L, 3, 6);
-    const char *str = tolua_tostring(L, 4, TOLUA_CAST "ocean");
+    const char *str = tolua_tostring(L, 4, "ocean");
     const struct terrain_type *ter = get_terrain(str);
 
     make_block(x, y, r, ter);
@@ -236,27 +232,27 @@ static int tolua_make_block(lua_State * L)
 void tolua_gmtool_open(lua_State * L)
 {
     /* register user types */
-    tolua_usertype(L, TOLUA_CAST "tag_iterator");
+    tolua_usertype(L, "tag_iterator");
 
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
-        tolua_module(L, TOLUA_CAST "gmtool", 0);
-        tolua_beginmodule(L, TOLUA_CAST "gmtool");
+        tolua_module(L, "gmtool", 0);
+        tolua_beginmodule(L, "gmtool");
         {
-            tolua_function(L, TOLUA_CAST "open", &tolua_state_open);
-            tolua_function(L, TOLUA_CAST "close", &tolua_state_close);
+            tolua_function(L, "open", &tolua_state_open);
+            tolua_function(L, "close", &tolua_state_close);
 
-            tolua_function(L, TOLUA_CAST "editor", &tolua_run_mapper);
-            tolua_function(L, TOLUA_CAST "get_selection", &tolua_selected_regions);
-            tolua_function(L, TOLUA_CAST "get_cursor", &tolua_current_region);
-            tolua_function(L, TOLUA_CAST "highlight", &tolua_highlight_region);
-            tolua_function(L, TOLUA_CAST "select", &tolua_select_region);
-            tolua_function(L, TOLUA_CAST "select_at", &tolua_select_coordinate);
-            tolua_function(L, TOLUA_CAST "set_display", &tolua_set_display);
+            tolua_function(L, "editor", &tolua_run_mapper);
+            tolua_function(L, "get_selection", &tolua_selected_regions);
+            tolua_function(L, "get_cursor", &tolua_current_region);
+            tolua_function(L, "highlight", &tolua_highlight_region);
+            tolua_function(L, "select", &tolua_select_region);
+            tolua_function(L, "select_at", &tolua_select_coordinate);
+            tolua_function(L, "set_display", &tolua_set_display);
 
-            tolua_function(L, TOLUA_CAST "make_block", &tolua_make_block);
-            tolua_function(L, TOLUA_CAST "make_island", &tolua_make_island);
+            tolua_function(L, "make_block", &tolua_make_block);
+            tolua_function(L, "make_island", &tolua_make_island);
         }
         tolua_endmodule(L);
     }

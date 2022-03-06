@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "magic.h"
 
 #include "contact.h"
@@ -19,6 +17,7 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/unit.h>
@@ -517,7 +516,6 @@ static void test_magic_resistance(CuTest *tc) {
     btype = test_create_buildingtype("stonecircle");
     btype->magresbonus = 20; /* this building gives +20% magic resistance */
     u->building = test_create_building(u->region, btype);
-    u->building->flags = BLD_MAINTAINED;
     CuAssertTrue(tc, frac_equal(frac_make(1, 5), magic_resistance(u)));
     u->building = NULL;
 

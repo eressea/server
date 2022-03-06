@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "xerewards.h"
 #include "study.h"
 #include "magic.h"
@@ -8,6 +6,7 @@
 #include <kernel/item.h>
 #include <kernel/pool.h>
 #include <kernel/region.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 
 #include <tests.h>

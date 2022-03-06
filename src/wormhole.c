@@ -1,4 +1,3 @@
-#include <platform.h>
 #include <kernel/config.h>
 
 #include "wormhole.h"
@@ -16,6 +15,7 @@
 #include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 

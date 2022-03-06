@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-# include <platform.h>
-#endif
-
 #include "weapons.h"
 #include "battle.h"
 
@@ -14,6 +10,7 @@
 
 /* util includes */
 #include <util/functions.h>
+#include <util/message.h>
 #include <util/rng.h>
 
 /* libc includes */
@@ -117,7 +114,7 @@ int *casualties)
     }
 
     if (rtype) {
-        use_pooled(au, rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1);
+        use_pooled(au, rtype, GET_DEFAULT, 1);
     }
 
     while (--enemies >= 0) {

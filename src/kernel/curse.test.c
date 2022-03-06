@@ -1,21 +1,22 @@
-#include <platform.h>
+#include "curse.h"
 
-#include <kernel/config.h>
+#include "eressea.h"
+
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/unit.h>
 #include <kernel/attrib.h>
-#include <util/rng.h>
 #include <kernel/gamedata.h>
+
 #include <util/message.h>
+#include <util/rng.h>
+
 #include <binarystore.h>
 #include <filestream.h>
 #include <memstream.h>
 #include <storage.h>
 #include <stream.h>
 #include <tests.h>
-
-#include "curse.h"
 
 #include <stdlib.h>
 #include <string.h>

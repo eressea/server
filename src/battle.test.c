@@ -1,7 +1,5 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
-#endif
 #endif
 
 #include "battle.h"
@@ -9,28 +7,29 @@
 #include "guard.h"
 #include "reports.h"
 
-#include <kernel/config.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/curse.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
+#include "spells/buildingcurse.h"
+
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/curse.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
 #include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
-#include <spells/buildingcurse.h>
-
-#include <util/base36.h>
-#include <util/functions.h>
+#include "util/base36.h"
+#include "util/functions.h"
 #include "util/keyword.h"
-#include <util/language.h>
-#include <util/message.h>
-#include <util/rand.h>
-#include <util/rng.h>
-#include <util/strings.h>
+#include "util/language.h"
+#include "util/message.h"
+#include "util/rand.h"
+#include "util/rng.h"
+#include "util/strings.h"
 
 #include <CuTest.h>
 
@@ -779,7 +778,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     test_teardown();
 }
 
-static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, int level, int week, int weekmax)
+static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, unsigned int level, unsigned int week, unsigned int weekmax)
 {
     skill *sv = unit_skill(u, sk);
     if (sv) {

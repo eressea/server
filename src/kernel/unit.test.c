@@ -1,30 +1,27 @@
 #ifdef _MSC_VER
-#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#endif
-#include <kernel/ally.h>
-#include <kernel/config.h>
-#include <kernel/curse.h>
-#include <kernel/item.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/spell.h>
-#include <kernel/terrain.h>
-#include <kernel/attrib.h>
+#include "unit.h"
+
+#include "ally.h"
+#include "config.h"
+#include "curse.h"
+#include "item.h"
+#include "building.h"
+#include "faction.h"
+#include "order.h"
+#include "race.h"
+#include "region.h"
+#include "skills.h"
+#include "spell.h"
+#include "terrain.h"
+#include "attrib.h"
+
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/strings.h>
 #include <util/rng.h>
-#include <spells/regioncurse.h>
-#include <alchemy.h>
-#include <laws.h>
-#include <spells.h>
-#include "unit.h"
 
 #include <CuTest.h>
 #include <tests.h>
@@ -106,29 +103,21 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
 
 static void test_scale_number(CuTest *tc) {
     unit *u;
-    const struct item_type *ptype;
 
     test_setup();
-    test_create_world();
-    ptype = it_get_or_create(rt_get_or_create("hodor"));
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
-    change_effect(u, ptype, 1);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->hp = 35;
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 35, u->hp);
-    CuAssertIntEquals(tc, 1, get_effect(u, ptype));
     scale_number(u, 2);
     CuAssertIntEquals(tc, 2, u->number);
     CuAssertIntEquals(tc, 35 * u->number, u->hp);
-    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
     scale_number(u, 8237);
     CuAssertIntEquals(tc, 8237, u->number);
     CuAssertIntEquals(tc, 35 * u->number, u->hp);
-    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
     scale_number(u, 8100);
     CuAssertIntEquals(tc, 8100, u->number);
     CuAssertIntEquals(tc, 35 * u->number, u->hp);
-    CuAssertIntEquals(tc, u->number, get_effect(u, ptype));
     set_level(u, SK_ALCHEMY, 1);
     scale_number(u, 0);
     CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
@@ -616,6 +605,10 @@ static void test_transfer_hitpoints(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * A transfer of men between two units with the same skill 
+ * does not change their skills.
+ */
 static void test_transfer_skills(CuTest *tc) {
     unit *u1, *u2;
     region *r;
@@ -640,12 +633,47 @@ static void test_transfer_skills(CuTest *tc) {
     CuAssertIntEquals(tc, 2, effskill(u1, SK_ALCHEMY, NULL));
     CuAssertIntEquals(tc, 200, u2->number);
     CuAssertIntEquals(tc, 2, effskill(u2, SK_ALCHEMY, NULL));
-    remove_skill(u1, SK_ALCHEMY);
-    transfermen(u1, u2, 100);
-    CuAssertIntEquals(tc, 300, u2->number);
+    sv = unit_skill(u2, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 3, sv->weeks);
+    test_teardown();
+}
+
+/**
+ * A transfer of men between two units with different progress
+ * merges their skill progress.
+ */
+static void test_transfer_skills_merge(CuTest *tc) {
+    unit *u1, *u2, *u3;
+    region *r;
+    faction *f;
+    skill *sv;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    r = test_create_region(0, 0, NULL);
+    f = test_create_faction();
+
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 5);
+
+    u2 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+    u3 = test_create_unit(f, r);
+    set_level(u2, SK_ALCHEMY, 2);
+
+    transfermen(u1, u2, 2);
+    CuAssertIntEquals(tc, 3, u1->number);
+    CuAssertIntEquals(tc, 3, u2->number);
     sv = unit_skill(u2, SK_ALCHEMY);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+
+    transfermen(u1, u3, 3);
+    CuAssertIntEquals(tc, 0, u1->number);
+    CuAssertIntEquals(tc, 4, u3->number);
+    sv = unit_skill(u3, SK_ALCHEMY);
+    CuAssertPtrEquals(tc, NULL, sv);
+
     test_teardown();
 }
 
@@ -676,40 +704,6 @@ static void test_get_modifier(CuTest *tc) {
     CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 1, NULL, true));
     /* only get terrain effect if they have at least level 1: */
     CuAssertIntEquals(tc, 0, get_modifier(u, SK_TAXING, 0, r, true));
-
-    test_teardown();
-}
-
-static void test_get_modifier_cursed(CuTest *tc) {
-    region *r;
-    unit *u, *u2, *u3;
-    curse *c;
-
-    test_setup();
-    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
-    u2 = test_create_unit(u->faction, r); /* allied */
-    u3 = test_create_unit(test_create_faction(), r); /* not allied */
-    set_level(u2, SK_TAXING, 1);
-    set_level(u3, SK_TAXING, 1);
-
-    /* default: no effects: */
-    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
-    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
-
-    /* cursed with good dreams */
-    c = create_curse(u, &r->attribs, &ct_gbdream, 1, 1, 1, 0);
-    CuAssertIntEquals(tc, 1, get_modifier(u2, SK_TAXING, 1, r, true));
-    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
-
-    /* cursed with good dreams, but magician just died */
-    u->number = 0;
-    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
-    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
-
-    /* cursed with good dreams, but magician is dead */
-    c->magician = NULL;
-    CuAssertIntEquals(tc, 0, get_modifier(u2, SK_TAXING, 1, r, true));
-    CuAssertIntEquals(tc, 0, get_modifier(u3, SK_TAXING, 1, r, true));
 
     test_teardown();
 }
@@ -816,6 +810,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_clone_men);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
+    SUITE_ADD_TEST(suite, test_transfer_skills_merge);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
@@ -835,7 +830,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
     SUITE_ADD_TEST(suite, test_get_modifier);
-    SUITE_ADD_TEST(suite, test_get_modifier_cursed);
     SUITE_ADD_TEST(suite, test_gift_items);
     SUITE_ADD_TEST(suite, test_maintenance_cost);
     SUITE_ADD_TEST(suite, test_max_heroes);

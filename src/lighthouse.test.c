@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "lighthouse.h"
 
 #include <kernel/attrib.h>
@@ -37,8 +35,6 @@ static void test_lighthouse_range(CuTest * tc)
     set_level(u1, SK_PERCEPTION, 3);
     set_level(u2, SK_PERCEPTION, 3);
 
-    CuAssertIntEquals(tc, 0, lighthouse_view_distance(b, u1));
-    b->flags |= BLD_MAINTAINED;
     CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
     set_level(u1, SK_PERCEPTION, 6);
     CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u2));
@@ -52,6 +48,9 @@ static void test_lighthouse_range(CuTest * tc)
     CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u2));
     b->size = 99;
     CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u1));
+
+    b->flags |= BLD_UNMAINTAINED;
+    CuAssertIntEquals(tc, 0, lighthouse_view_distance(b, u1));
 
     test_teardown();
 }
@@ -70,7 +69,7 @@ static void test_lighthouse_update(CuTest * tc)
     r3 = test_create_region(2, 0, t_ocean);
     r4 = test_create_region(0, 1, t_plain);
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));
-    b->flags |= BLD_MAINTAINED;
+    update_lighthouse(b);
     CuAssertIntEquals(tc, RF_LIGHTHOUSE, r1->flags&RF_LIGHTHOUSE);
     CuAssertPtrEquals(tc, NULL, r1->attribs);
     CuAssertPtrEquals(tc, NULL, r2->attribs);
@@ -112,7 +111,6 @@ static void test_lighthouse_guard(CuTest * tc) {
     r3 = test_create_region(2, 0, t_ocean);
     r4 = test_create_region(0, 1, t_plain);
     b = test_create_building(r1, test_create_buildingtype("lighthouse"));
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     CuAssertIntEquals(tc, 2, lighthouse_range(b));
     update_lighthouse(b);

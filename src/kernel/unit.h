@@ -2,23 +2,13 @@
 #define H_KRNL_UNIT_H
 
 #include <util/resolve.h>
-#include "types.h"
 #include "database.h"
-#include "skills.h"
+#include "status.h"
+
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    struct skill;
-    struct item;
-    struct sc_mage;
-    struct gamedata;
-    struct item_type;
-    enum skill_t;
-
-#define MAXUNITS 1048573       /* should be prime for hashing. 524287 was >90% full */
+/* alle vierstelligen zahlen: */
+#define MAX_UNIT_NR (36*36*36*36-1)
 
 #define UFL_DEAD          (1<<0)
 #define UFL_ISNEW         (1<<1)        /* 2 */
@@ -34,7 +24,7 @@ extern "C" {
 #define UFL_WERE          (1<<14)
 #define UFL_ENTER         (1<<15)       /* unit has entered a ship/building and will not leave it */
 
-    /* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
+/* warning: von 512/1024 gewechslet, wegen konflikt mit NEW_FOLLOW */
 #define UFL_LOCKED        (1<<16)       /* Einheit kann keine Personen aufnehmen oder weggeben, nicht rekrutieren. */
 #define UFL_FLEEING       (1<<17)       /* unit was in a battle, fleeing. */
 #define UFL_STORM         (1<<19)       /* Kapitaen war in einem Sturm */
@@ -55,192 +45,199 @@ extern "C" {
 #define UFL_SAVEMASK (UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 
 #define UNIT_MAXSIZE 128 * 1024
-    extern int max_heroes(int num_people);
-    extern int countheroes(const struct faction *f);
 
-    typedef struct reservation {
-        struct reservation *next;
-        const struct item_type *type;
-        int value;
-    } reservation;
+typedef struct reservation {
+    struct reservation* next;
+    const struct item_type* type;
+    int value;
+} reservation;
 
-    typedef struct unit {
-        struct unit *next;          /* needs to be first entry, for region's unitlist */
-        struct unit *nextF;         /* naechste Einheit der Partei */
-        struct unit *prevF;         /* vorherige Einheit der Partei */
-        struct region *region;
-        int no;                     /* id */
-        int hp;
-        char *_name;
-        dbrow_id display_id;
-        struct faction *faction;
-        struct building *building;
-        struct ship *ship;
-        int number;      /* persons */
-        int age;
+typedef struct unit {
+    struct unit* next;          /* needs to be first entry, for region's unitlist */
+    struct unit* nextF;         /* naechste Einheit der Partei */
+    struct unit* prevF;         /* vorherige Einheit der Partei */
+    struct region* region;
+    int no;                     /* id */
+    int hp;
+    char* _name;
+    dbrow_id display_id;
+    struct faction* faction;
+    struct building* building;
+    struct ship* ship;
+    int number;      /* persons */
+    int age;
 
-        /* skill data */
-        int skill_size;
-        struct skill *skills;
-        struct item *items;
-        reservation *reservations;
+    /* skill data */
+    int skill_size;
+    struct skill* skills;
+    struct item* items;
+    reservation* reservations;
 
-        /* orders */
-        struct order *orders;
-        struct order *thisorder;
-        struct order *old_orders;
+    /* orders */
+    struct order* orders;
+    struct order* thisorder;
+    struct order* old_orders;
 
-        /* race and illusionary race */
-        const struct race *_race;
-        const struct race *irace;
+    /* race and illusionary race */
+    const struct race* _race;
+    const struct race* irace;
 
-        int flags;
-        struct attrib *attribs;
-        status_t status;
-        int n;                      /* helper temporary variable, used in economy, enno: attribut? */
-        int wants;                  /* enno: attribut? */
-    } unit;
+    int flags;
+    struct attrib* attribs;
+    status_t status;
+    int n;                      /* helper temporary variable, used in economy, enno: attribut? */
+    int wants;                  /* enno: attribut? */
+} unit;
 
-    extern struct attrib_type at_creator;
-    extern struct attrib_type at_potionuser;
-    extern struct attrib_type at_effect;
-    extern struct attrib_type at_private;
-    extern struct attrib_type at_showskchange;
+extern struct attrib_type at_creator;
+extern struct attrib_type at_potionuser;
+extern struct attrib_type at_effect;
+extern struct attrib_type at_private;
+extern struct attrib_type at_showskchange;
 
-    int ualias(const struct unit *u);
-    void usetalias(unit *u, int alias);
+struct faction;
+struct unit;
+struct race;
+struct skill;
+struct item;
+struct locale;
+struct gamedata;
+enum skill_t;
 
-    int weight(const struct unit *u);
+int max_heroes(int num_people);
+int countheroes(const struct faction* f);
 
-    void renumber_unit(struct unit *u, int no);
-    bool count_unit(const unit *u); /* unit counts towards faction.num_units and faction.num_people */
+int ualias(const struct unit* u);
+void usetalias(unit* u, int alias);
 
-    const struct race *u_irace(const struct unit *u);
-    const struct race *u_race(const struct unit *u);
-    void u_setrace(struct unit *u, const struct race *);
+int weight(const struct unit* u);
 
-    const char *uprivate(const struct unit *u);
-    void usetprivate(struct unit *u, const char *c);
+void renumber_unit(struct unit* u, int no);
+bool count_unit(const unit* u); /* unit counts towards faction.num_units and faction.num_people */
 
-    struct unit *findnewunit(const struct region *r, const struct faction *f,
-        int alias);
+const struct race* u_irace(const struct unit* u);
+const struct race* u_race(const struct unit* u);
+void u_setrace(struct unit* u, const struct race*);
 
-    const char *u_description(const unit * u, const struct locale *lang);
-    struct skill *add_skill(struct unit *u, enum skill_t id);
-    void remove_skill(struct unit *u, enum skill_t sk);
-    struct skill *unit_skill(const struct unit *u, enum skill_t id);
-    bool has_skill(const unit * u, enum skill_t sk);
-    int effskill(const struct unit *u, enum skill_t sk, const struct region *r);
+const char* uprivate(const struct unit* u);
+void usetprivate(struct unit* u, const char* c);
 
-    void set_level(struct unit *u, enum skill_t id, int level);
-    int get_level(const struct unit *u, enum skill_t id);
-    void transfermen(struct unit *src, struct unit *dst, int n);
-    void clone_men(const struct unit *src, struct unit *dst, int n); /* like transfer, but do not subtract from src */
+struct unit* findnewunit(const struct region* r, const struct faction* f,
+    int alias);
 
-    int eff_skill(const struct unit *u, const struct skill *sv, const struct region *r);
-    int effskill_study(const struct unit *u, enum skill_t sk);
+const char* u_description(const unit* u, const struct locale* lang);
+struct skill* add_skill(struct unit* u, enum skill_t id);
+void remove_skill(struct unit* u, enum skill_t sk);
+struct skill* unit_skill(const struct unit* u, enum skill_t id);
+bool has_skill(const unit* u, enum skill_t sk);
+int effskill(const struct unit* u, enum skill_t sk, const struct region* r);
 
-    int get_modifier(const struct unit *u, enum skill_t sk, int level,
-        const struct region *r, bool noitem);
-    int remove_unit(struct unit **ulist, struct unit *u);
-    void leave_region(struct unit* u);
+void set_level(struct unit* u, enum skill_t id, unsigned int level);
+unsigned int get_level(const struct unit* u, enum skill_t id);
+void transfermen(struct unit* src, struct unit* dst, int n);
+void clone_men(const struct unit* src, struct unit* dst, int n); /* like transfer, but do not subtract from src */
 
-    /* looking up dead units' factions: */
-    struct faction *dfindhash(int no);
+int eff_skill(const struct unit* u, const struct skill* sv, const struct region* r);
+int effskill_study(const struct unit* u, enum skill_t sk);
+
+int get_modifier(const struct unit* u, enum skill_t sk, int level,
+    const struct region* r, bool noitem);
+int remove_unit(struct unit** ulist, struct unit* u);
+void leave_region(struct unit* u);
+
+/* looking up dead units' factions: */
+struct faction* dfindhash(int no);
 
 #define GIFT_SELF     1<<0
 #define GIFT_FRIENDS  1<<1
 #define GIFT_PEASANTS 1<<2
-    int gift_items(struct unit *u, int flags);
-    void make_zombie(struct unit * u);
+int gift_items(struct unit* u, int flags);
+void make_zombie(struct unit* u);
 
-    /* see resolve.h */
+/* see resolve.h */
 #define RESOLVE_UNIT (TYP_UNIT << 24)
-    void resolve_unit(struct unit *u);
-    void write_unit_reference(const struct unit *u, struct storage *store);
-    int read_unit_reference(struct gamedata * data, struct unit **up, resolve_fun fun);
+void resolve_unit(struct unit* u);
+void write_unit_reference(const struct unit* u, struct storage* store);
+int read_unit_reference(struct gamedata* data, struct unit** up, resolve_fun fun);
 
-    bool leave(struct unit *u, bool force);
-    bool can_leave(struct unit *u);
+bool leave(struct unit* u, bool force);
+bool can_leave(struct unit* u);
 
-    double u_heal_factor(const struct unit * u);
-    void u_set_building(struct unit * u, struct building * b);
-    void u_set_ship(struct unit * u, struct ship * sh);
-    void leave_ship(struct unit * u);
-    void leave_building(struct unit * u);
+double u_heal_factor(const struct unit* u);
+void u_set_building(struct unit* u, struct building* b);
+void u_set_ship(struct unit* u, struct ship* sh);
+void leave_ship(struct unit* u);
+void leave_building(struct unit* u);
 
-    void set_leftship(struct unit *u, struct ship *sh);
-    struct ship *leftship(const struct unit *);
-    bool can_survive(const struct unit *u, const struct region *r);
-    void move_unit(struct unit *u, struct region *target,
-        struct unit **ulist);
+void set_leftship(struct unit* u, struct ship* sh);
+struct ship* leftship(const struct unit*);
+bool can_survive(const struct unit* u, const struct region* r);
+void move_unit(struct unit* u, struct region* target,
+    struct unit** ulist);
 
-    struct building *inside_building(const struct unit *u);
+struct building* inside_building(const struct unit* u);
 
-    /* cleanup code for this module */
-    void free_units(void);
-    void u_setfaction(struct unit *u, struct faction *f);
-    void u_freeorders(struct unit *u);
-    void set_number(struct unit *u, int count);
+/* cleanup code for this module */
+void free_units(void);
+void u_setfaction(struct unit* u, struct faction* f);
+void u_freeorders(struct unit* u);
+void set_number(struct unit* u, int count);
 
-    int invisible(const struct unit *target, const struct unit *viewer);
-    void free_unit(struct unit *u);
+int invisible(const struct unit* target, const struct unit* viewer);
+void free_unit(struct unit* u);
 
-    void name_unit(struct unit *u);
-    struct unit *unit_create(int id);
-    struct unit *create_unit(struct region *r1, struct faction *f,
-        int number, const struct race *rc, int id, const char *dname,
-        struct unit *creator);
+void name_unit(struct unit* u);
+struct unit* unit_create(int id);
+struct unit* create_unit(struct region* r1, struct faction* f,
+    int number, const struct race* rc, int id, const char* dname,
+    struct unit* creator);
 
-    void uhash(struct unit *u);
-    void uunhash(struct unit *u);
-    struct unit *ufindhash(int i);
+void uhash(struct unit* u);
+void uunhash(struct unit* u);
+struct unit* ufindhash(int i);
 
-    const char *unit_getname(const struct unit *u);
-    void unit_setname(struct unit *u, const char *name);
-    const char *unit_getinfo(const struct unit *u);
-    void unit_setinfo(struct unit *u, const char *name);
-    int unit_getid(const unit * u);
-    void unit_setid(unit * u, int id);
-    int unit_gethp(const unit * u);
-    void unit_sethp(unit * u, int id);
-    status_t unit_getstatus(const unit * u);
-    void unit_setstatus(unit * u, status_t status);
-    int unit_getweight(const unit * u);
-    int unit_getcapacity(const unit * u);
-    void unit_addorder(unit * u, struct order *ord);
-    int unit_max_hp(const struct unit *u);
-    void scale_number(struct unit *u, int n);
+const char* unit_getname(const struct unit* u);
+void unit_setname(struct unit* u, const char* name);
+const char* unit_getinfo(const struct unit* u);
+void unit_setinfo(struct unit* u, const char* name);
+int unit_getid(const unit* u);
+void unit_setid(unit* u, int id);
+int unit_gethp(const unit* u);
+void unit_sethp(unit* u, int id);
+enum status_t unit_getstatus(const unit* u);
+void unit_setstatus(unit* u, enum status_t status);
+int unit_getweight(const unit* u);
+int unit_getcapacity(const unit* u);
+void unit_addorder(unit* u, struct order* ord);
+int unit_max_hp(const struct unit* u);
+void scale_number(struct unit* u, int n);
 
-    void remove_empty_units_in_region(struct region * r);
-    void remove_empty_units(void);
+void remove_empty_units_in_region(struct region* r);
+void remove_empty_units(void);
 
-    struct unit *findunit(int n);
-    struct unit *findunitr(const struct region *r, int n);
+struct unit* findunit(int n);
+struct unit* findunitr(const struct region* r, int n);
 
-    void default_name(const unit *u, char name[], int len);
-    const char *unitname(const struct unit *u);
-    char *write_unitname(const struct unit *u, char *buffer, size_t size);
-    bool unit_name_equals_race(const struct unit *u);
+void default_name(const unit* u, char name[], int len);
+const char* unitname(const struct unit* u);
+char* write_unitname(const struct unit* u, char* buffer, size_t size);
+bool unit_name_equals_race(const struct unit* u);
 
-    void unit_convert_race(struct unit *u, const struct race *rc, const char *rcname);
-    void translate_orders(struct unit *u, const struct locale *lang, struct order **list, bool del);
+void unit_convert_race(struct unit* u, const struct race* rc, const char* rcname);
+void translate_orders(struct unit* u, const struct locale* lang, struct order** list, bool del);
 
-    /* getunit results: */
+/* getunit results: */
 #define GET_UNIT 0
 #define GET_NOTFOUND 1
 #define GET_PEASANTS 2
 
-    int getunit(const struct region * r, const struct faction * f, struct unit **uresult);
-    int read_unitid(const struct faction *f, const struct region *r);
+int getunit(const struct region* r, const struct faction* f, struct unit** uresult);
+int read_unitid(const struct faction* f, const struct region* r);
 
-    /* !< sets combatstatus of a unit */
-    bool has_horses(const struct unit *u);
-    int maintenance_cost(const struct unit *u);
-    bool has_limited_skills(const struct unit *u);
-    bool is_limited_skill(enum skill_t sk);
+/* !< sets combatstatus of a unit */
+bool has_horses(const struct unit* u);
+int maintenance_cost(const struct unit* u);
+bool has_limited_skills(const struct unit* u);
+bool is_limited_skill(enum skill_t sk);
 
-#ifdef __cplusplus
-}
-#endif
 #endif

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "reports.h"
 
 #include "guard.h"
@@ -503,7 +502,6 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     r1 = test_create_region(0, 0, t_plain);
     r2 = test_create_region(1, 0, t_ocean);
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     u1 = test_create_unit(test_create_faction(), r1);
@@ -561,7 +559,6 @@ static void test_prepare_lighthouse(CuTest *tc) {
     r4 = test_create_region(0, 1, t_plain);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     u = test_create_unit(f, r1);
@@ -605,7 +602,6 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     r3 = test_create_region(3, 0, t_ocean);
     btype = test_create_buildingtype("lighthouse");
     b = test_create_building(r1, btype);
-    b->flags |= BLD_MAINTAINED;
     b->size = 10;
     update_lighthouse(b);
     test_create_unit(f, r1);
@@ -877,7 +873,8 @@ static void test_visible_unit(CuTest* tc) {
     rc->flags |= RCF_UNARMEDGUARD;
 
     /* visibility on land */
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    test_create_unit(f, u->region);
     CuAssertTrue(tc, cansee(f, u->region, u, 0));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_unit));
     CuAssertTrue(tc, visible_unit(u, f, 0, seen_spell));
@@ -898,6 +895,7 @@ static void test_visible_unit(CuTest* tc) {
 
     /* visibility of stealthed units in oceans */
     u = test_create_unit(u->faction, test_create_ocean(0, 1));
+    test_create_unit(f, u->region);
     set_level(u, SK_STEALTH, 2);
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_none));
     CuAssertTrue(tc, !visible_unit(u, f, 0, seen_neighbour));

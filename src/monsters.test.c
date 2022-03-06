@@ -1,7 +1,6 @@
-#include <platform.h>
-#include <stdlib.h>
-
 #include "monsters.h"
+
+#include "battle.h"
 #include "guard.h"
 #include "reports.h"
 #include "study.h"
@@ -15,7 +14,7 @@
 #include <kernel/region.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
@@ -29,10 +28,11 @@
 #include <tests.h>
 #include <assert.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-extern void plan_monsters(struct faction *f);
-extern int monster_attacks(unit * monster, bool rich_only);
+void plan_monsters(struct faction *f);
+int monster_attacks(unit * monster, bool rich_only);
 
 static order *find_order(const char *expected, const unit *u)
 {
@@ -210,7 +210,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
     test_teardown();
 }
 
-extern void random_growl(const unit *u, region *tr, int rand);
+void random_growl(const unit *u, region *tr, int rand);
 
 static void test_dragon_moves(CuTest * tc)
 {

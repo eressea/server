@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "prefix.h"
 
 #include <util/log.h>

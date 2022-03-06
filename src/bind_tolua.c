@@ -1,8 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-#pragma warning(push)
-#pragma warning(disable: 4100)
 #include "config.pkg.c"
 #include "eressea.pkg.c"
 #include "game.pkg.c"
@@ -10,7 +5,6 @@
 #include "log.pkg.c"
 #include "process.pkg.c"
 #include "settings.pkg.c"
-#pragma warning(pop)
 
 #include <lua.h>
 

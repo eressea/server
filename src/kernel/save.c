@@ -1,19 +1,22 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/config.h>
-#include <kernel/version.h>
 #include "save.h"
 
 #include "alchemy.h"
 #include "alliance.h"
 #include "ally.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
+#include "config.h"
 #include "connection.h"
+#include "event.h"
 #include "faction.h"
+#include "gamedata.h"
 #include "group.h"
 #include "item.h"
+#include "lighthouse.h"
 #include "magic.h"
 #include "messages.h"
 #include "move.h"
@@ -26,12 +29,14 @@
 #include "resources.h"
 #include "ship.h"
 #include "skill.h"
+#include "skills.h"
 #include "spell.h"
+#include "spellbook.h"
 #include "teleport.h"
 #include "terrain.h"
 #include "terrainid.h"          /* only for conversion code */
 #include "unit.h"
-#include "lighthouse.h"
+#include "version.h"
 
 /* attributes includes */
 #include <attributes/attributes.h>
@@ -42,16 +47,13 @@
 #include <triggers/shock.h>
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <kernel/event.h>
-#include <kernel/gamedata.h>
-#include <kernel/spellbook.h>
 
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
@@ -480,7 +482,7 @@ unit *read_unit(gamedata *data)
     }
 
     READ_INT(data->store, &n);
-    unit_setstatus(u, (status_t)n);
+    unit_setstatus(u, (enum status_t)n);
     READ_INT(data->store, &u->flags);
     u->flags &= UFL_SAVEMASK;
     if ((u->flags & UFL_ANON_FACTION) && !rule_stealth_anon()) {
@@ -1632,18 +1634,6 @@ static void read_regions(gamedata *data) {
                 *up = u;
                 up = &u->next;
                 update_interval(u->faction, r);
-            }
-        }
-    }
-
-    log_debug("updating area information for lighthouses.");
-    for (r = regions; r; r = r->next) {
-        if (r->flags & RF_LIGHTHOUSE) {
-            building *b;
-            for (b = r->buildings; b; b = b->next) {
-                if (is_lighthouse(b->type)) {
-                    update_lighthouse(b);
-                }
             }
         }
     }

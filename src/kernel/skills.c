@@ -1,12 +1,12 @@
-#include <platform.h>
 #include <kernel/config.h>
-#include "skill.h"
 
 #include "curse.h"
 #include "region.h"
 #include "unit.h"
 
 #include <kernel/attrib.h>
+#include <kernel/skills.h>
+
 #include <util/goodies.h>
 #include <util/language.h>
 #include <util/log.h>
@@ -15,6 +15,7 @@
 /* libc includes */
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -36,7 +37,7 @@ attrib_type at_skillmod = {
     ATF_PRESERVE
 };
 
-attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int bonus)
+attrib *make_skillmod(enum skill_t sk, skillmod_fun special, double multiplier, int bonus)
 {
     attrib *a = a_new(&at_skillmod);
     skillmod_data *smd = (skillmod_data *)a->data.v;
@@ -50,7 +51,7 @@ attrib *make_skillmod(skill_t sk, skillmod_fun special, double multiplier, int b
 }
 
 int
-skillmod(const unit * u, const region * r, skill_t sk, int value)
+skillmod(const unit * u, const region * r, enum skill_t sk, int value)
 {
     const attrib * a = u->attribs;
     for (a = a_find((attrib *)a, &at_skillmod); a && a->type == &at_skillmod;
@@ -70,36 +71,6 @@ skillmod(const unit * u, const region * r, skill_t sk, int value)
     return value;
 }
 
-int level_days(int level)
-{
-    /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
-    return 30 * ((level + 1) * level / 2);
-}
-
-int level(int days)
-{
-    int i;
-    static int ldays[64];
-    static bool init = false;
-    if (!init) {
-        init = true;
-        for (i = 0; i != 64; ++i)
-            ldays[i] = level_days(i + 1);
-    }
-    for (i = 0; i != 64; ++i)
-        if (ldays[i] > days)
-            return i;
-    return i;
-}
-
-void sk_set(skill * sv, int level)
-{
-    assert(sv && level != 0);
-    sv->weeks = skill_weeks(level);
-    sv->level = level;
-    assert(sv->weeks <= sv->level * 2 + 1);
-}
-
 static bool rule_random_progress(void)
 {
     static int rule, config;
@@ -109,24 +80,32 @@ static bool rule_random_progress(void)
     return rule != 0;
 }
 
-int skill_weeks(int level)
-/* how many weeks must i study to get from level to level+1 */
+static int progress_weeks(unsigned int level, bool random_progress)
+/* how many weeks must i study to get from level-1 to level */
 {
-    if (rule_random_progress()) {
-        int coins = 2 * level;
+    assert(level > 0);
+    if (random_progress) {
+        unsigned int coins = 2 * (level - 1);
         int heads = 1;
         while (coins--) {
             heads += rng_int() % 2;
         }
         return heads;
     }
-    return level + 1;
+    return level;
 }
 
-void increase_skill(unit * u, skill_t sk, int weeks)
+void sk_set(skill* sv, unsigned int level)
+{
+    assert(sv && level != 0);
+    sv->weeks = progress_weeks(level + 1, rule_random_progress());
+    sv->level = level;
+    assert(sv->weeks <= sv->level * 2 + 3);
+}
+
+void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
-    assert(weeks >= 0);
     if (!sv) {
         sv = add_skill(u, sk);
     }
@@ -135,14 +114,13 @@ void increase_skill(unit * u, skill_t sk, int weeks)
         sk_set(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
-    assert(sv->weeks <= sv->level * 2 + 1);
+    assert(sv->weeks <= sv->level * 2 + 3);
 }
 
-void reduce_skill(unit * u, skill * sv, int weeks)
+void reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
-    int max_weeks = sv->level + 1;
+    unsigned int max_weeks = sv->level + 1;
 
-    assert(weeks >= 0);
     if (rule_random_progress()) {
         max_weeks += sv->level;
     }
@@ -154,9 +132,9 @@ void reduce_skill(unit * u, skill * sv, int weeks)
     }
     if (sv->level == 0) {
         /* reroll */
-        sv->weeks = skill_weeks(sv->level);
+        sv->weeks = progress_weeks(sv->level + 1, rule_random_progress());
     }
-    assert(sv->weeks <= sv->level * 2 + 1);
+    assert(sv->weeks <= sv->level * 2 + 3);
 }
 
 int skill_compare(const skill * sk, const skill * sc)
@@ -170,4 +148,49 @@ int skill_compare(const skill * sk, const skill * sc)
     if (sk->weeks > sc->weeks)
         return -1;
     return 0;
+}
+
+static int weeks_from_level(int level)
+{
+    return level * (level + 1) / 2;
+}
+
+static int level_from_weeks(int weeks, int n)
+{
+    return (int)(sqrt(1.0 + (weeks * 8.0 / n)) - 1) / 2;
+}
+
+static int weeks_studied(const skill* sv)
+{
+    int expect = progress_weeks(sv->level + 1, false);
+    return expect - sv->weeks;
+}
+
+int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
+{
+    /* number of person-weeks the units have studied: */
+    int total = add + n;
+    int weeks = (sn ? weeks_from_level(sn->level) : 0) * n
+        + (sv ? weeks_from_level(sv->level) : 0) * add;
+    /* level that combined unit should be at: */
+    int level = level_from_weeks(weeks, total);
+
+    result->level = level;
+    /* how long it should take to the next level: */
+    result->weeks = progress_weeks(level + 1, false);
+
+    /* see if we have any remaining weeks: */
+    weeks -= weeks_from_level(level) * total;
+    /* adjusted by how much we already studied: */
+    if (sv) weeks += weeks_studied(sv) * add;
+    if (sn) weeks += weeks_studied(sn) * n;
+    if (weeks / total) {
+        weeks = result->weeks - weeks / total;
+        while (weeks < 0) {
+            ++result->level;
+            weeks += progress_weeks(result->level, false);
+        }
+        result->weeks = weeks;
+    }
+    return result->level;
 }

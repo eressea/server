@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "vortex.h"
 
 #include <kernel/config.h>

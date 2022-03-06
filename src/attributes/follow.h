@@ -1,16 +1,12 @@
+#pragma once
 #ifndef H_ATTRIBUTE_FOLLOW
 #define H_ATTRIBUTE_FOLLOW
-#ifdef __cplusplus
-extern "C" {
-#endif
 
-    extern struct attrib_type at_follow;
+extern struct attrib_type at_follow;
 
-    struct unit;
+struct unit;
+struct attrib;
 
-    struct attrib *make_follow(struct unit *u);
+struct attrib *make_follow(struct unit *u);
 
-#ifdef __cplusplus
-}
-#endif
 #endif

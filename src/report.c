@@ -11,7 +11,6 @@
 #include <modules/score.h>
 
 /* attributes includes */
-#include <attributes/overrideroads.h>
 #include <attributes/otherfaction.h>
 #include <attributes/reduceproduction.h>
 #include <attributes/seenspell.h>
@@ -262,9 +261,9 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
     spname = spell_name(mkname_spell(sp), lang);
     if (strchr(spname, ' ') != NULL) {
         /* contains spaces, needs quotes */
-        sbs_strcat(&sbs, " '");
+        sbs_strcat(&sbs, " \"");
         sbs_strcat(&sbs, spname);
-        sbs_strcat(&sbs, "'");
+        sbs_strcat(&sbs, "\"");
     }
     else {
         sbs_strcat(&sbs, " ");
@@ -514,10 +513,11 @@ nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ
             msg = msg_curse(c, obj, typ, self);
         }
         else if (a->type == &at_effect && self) {
-            effect_data *data = (effect_data *)a->data.v;
-            if (data->value > 0) {
+            int value = effect_value(a);
+            if (value > 0) {
+                const struct item_type* itype = effect_type(a);
                 msg = msg_message("nr_potion_effect", "potion left",
-                    data->type->rtype, data->value);
+                    itype->rtype, value);
             }
         }
         if (msg) {
@@ -828,12 +828,69 @@ static void report_region_resource(sbstring *sbp, const struct locale *lang, con
     }
 }
 
+static void report_roads(sbstring *sbs, const region *r, const faction* f, const bool see[])
+{
+    attrib* a;
+    int d, nrd = 0;
+    bool dh = false;
+
+    /* Nachbarregionen, die gesehen werden, ermitteln */
+    for (d = 0; d != MAXDIRECTIONS; d++) {
+        if (see[d] && rconnect(r, d))
+            nrd++;
+    }
+
+    /* list directions */
+    for (d = 0; d != MAXDIRECTIONS; d++) {
+        if (see[d]) {
+            region* r2 = rconnect(r, d);
+            if (!r2)
+                continue;
+            nrd--;
+            if (dh) {
+                char regname[128], trail[256];
+                if (nrd == 0) {
+                    sbs_strcat(sbs, " ");
+                    sbs_strcat(sbs, LOC(f->locale, "nr_nb_final"));
+                }
+                else {
+                    sbs_strcat(sbs, LOC(f->locale, "nr_nb_next"));
+                }
+                sbs_strcat(sbs, LOC(f->locale, directions[d]));
+                sbs_strcat(sbs, " ");
+                f_regionid(r2, f, regname, sizeof(regname));
+                snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
+                sbs_strcat(sbs, trail);
+            }
+            else {
+                message* msg = msg_message("nr_vicinitystart", "dir region", d, r2);
+                sbs_strcat(sbs, " ");
+                append_message(sbs, msg, f);
+                msg_release(msg);
+                dh = true;
+            }
+        }
+    }
+    if (dh) {
+        sbs_strcat(sbs, ".");
+    }
+    /* Spezielle Richtungen */
+    for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
+        a = a->next) {
+        spec_direction* spd = (spec_direction*)(a->data.v);
+        sbs_strcat(sbs, " ");
+        sbs_strcat(sbs, LOC(f->locale, spd->desc));
+        sbs_strcat(sbs, " (\"");
+        sbs_strcat(sbs, LOC(f->locale, spd->keyword));
+        sbs_strcat(sbs, "\").");
+    }
+}
+
 static void report_region_description(struct stream *out, const region * r, faction * f, const bool see[])
 {
     int n;
     int trees;
     int saplings;
-    attrib *a;
     const char *tname;
     char buf[4096];
     sbstring sbs;
@@ -962,67 +1019,8 @@ static void report_region_description(struct stream *out, const region * r, fact
     }
 
     pump_paragraph(&sbs, out, REPORTWIDTH, false);
-    a = a_find(r->attribs, &at_overrideroads);
-    if (a) {
-        sbs_strcat(&sbs, " ");
-        sbs_strcat(&sbs, (const char *)a->data.v);
-        sbs_strcat(&sbs, ".");
-    }
-    else {
-        int d, nrd = 0;
-        bool dh = false;
 
-        /* Nachbarregionen, die gesehen werden, ermitteln */
-        for (d = 0; d != MAXDIRECTIONS; d++) {
-            if (see[d] && rconnect(r, d))
-                nrd++;
-        }
-
-        /* list directions */
-        for (d = 0; d != MAXDIRECTIONS; d++) {
-            if (see[d]) {
-                region *r2 = rconnect(r, d);
-                if (!r2)
-                    continue;
-                nrd--;
-                if (dh) {
-                    char regname[128], trail[256];
-                    if (nrd == 0) {
-                        sbs_strcat(&sbs, " ");
-                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_final"));
-                    }
-                    else {
-                        sbs_strcat(&sbs, LOC(f->locale, "nr_nb_next"));
-                    }
-                    sbs_strcat(&sbs, LOC(f->locale, directions[d]));
-                    sbs_strcat(&sbs, " ");
-                    f_regionid(r2, f, regname, sizeof(regname));
-                    snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
-                    sbs_strcat(&sbs, trail);
-                }
-                else {
-                    message * msg = msg_message("nr_vicinitystart", "dir region", d, r2);
-                    sbs_strcat(&sbs, " ");
-                    append_message(&sbs, msg, f);
-                    msg_release(msg);
-                    dh = true;
-                }
-            }
-        }
-        if (dh) {
-            sbs_strcat(&sbs, ".");
-        }
-        /* Spezielle Richtungen */
-        for (a = a_find(r->attribs, &at_direction); a && a->type == &at_direction;
-            a = a->next) {
-            spec_direction *spd = (spec_direction *)(a->data.v);
-            sbs_strcat(&sbs, " ");
-            sbs_strcat(&sbs, LOC(f->locale, spd->desc));
-            sbs_strcat(&sbs, " (\"");
-            sbs_strcat(&sbs, LOC(f->locale, spd->keyword));
-            sbs_strcat(&sbs, "\").");
-        }
-    }
+    report_roads(&sbs, r, f, see);
     pump_paragraph(&sbs, out, REPORTWIDTH, true);
 }
 
@@ -1826,15 +1824,15 @@ static void nr_paragraph(struct stream *out, message * m, const faction * f)
     paragraph(out, buf, 0, 0, 0);
 }
 
-typedef struct cb_data {
+typedef struct travelthru_data {
     struct stream *out;
     char *handle_start, *writep;
     size_t size;
     const faction *f;
     int maxtravel, counter;
-} cb_data;
+} travelthru_data;
 
-static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
+static void init_cb(travelthru_data *data, struct stream *out, char *buffer, size_t size, const faction *f) {
     data->out = out;
     data->writep = buffer;
     data->handle_start = buffer;
@@ -1845,7 +1843,7 @@ static void init_cb(cb_data *data, struct stream *out, char *buffer, size_t size
 }
 
 static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
-    cb_data *data = (cb_data *)cbdata;
+    travelthru_data *data = (travelthru_data *)cbdata;
     const faction *f = data->f;
 
     if (data->counter >= data->maxtravel) {
@@ -1878,7 +1876,7 @@ static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
                 else {
                     str = ", ";
                 }
-                len = strlen(str);
+                len = str ? strlen(str) : 0;
                 if (len < size) {
                     memcpy(writep, str, len);
                     writep += len;
@@ -1907,14 +1905,16 @@ void report_travelthru(struct stream *out, region *r, const faction *f)
         int maxtravel = count_travelthru(r, f);
 
         if (maxtravel > 0) {
-            cb_data cbdata;
-            char buf[8192];
+            travelthru_data cbdata;
+            char buf[256];
+            size_t bytes;
 
             newline(out);
             init_cb(&cbdata, out, buf, sizeof(buf), f);
             cbdata.maxtravel = maxtravel;
-            cbdata.writep +=
-                str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+            bytes = str_strlcpy(buf, LOC(f->locale, "travelthru_header"), sizeof(buf));
+            assert(bytes < sizeof(buf));
+            cbdata.writep += bytes;
             travelthru_map(r, cb_write_travelthru, &cbdata);
             return;
         }

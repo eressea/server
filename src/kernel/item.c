@@ -437,6 +437,15 @@ void i_merge(item ** pi, item ** si)
     *si = NULL;
 }
 
+void item_add(item* itm, int delta)
+{
+    itm->number += delta;
+    if (itm->number < 0) {
+        log_error("serious accounting error. number of items is %d.", itm->number);
+        itm->number = 0;
+    }
+}
+
 item *i_change(item ** pi, const item_type * itype, int delta)
 {
     assert(itype);
@@ -456,11 +465,7 @@ item *i_change(item ** pi, const item_type * itype, int delta)
     }
     else {
         item *i = *pi;
-        i->number += delta;
-        if (i->number < 0) {
-            log_error("serious accounting error. number of items is %d.", i->number);
-            i->number = 0;
-        }
+        item_add(i, delta);
         if (i->number == 0) {
             *pi = i->next;
             i_free(i);
@@ -637,6 +642,8 @@ void init_resources(void)
     rtype->flags |= RTF_ITEM | RTF_LIMITED;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
+    rtype->itype->weight = 5000;
+    rtype->itype->capacity = 7000;
 
     /* "special" spell components */
     rtype = rt_get_or_create(resourcenames[R_AURA]);

@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 

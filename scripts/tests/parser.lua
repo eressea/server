@@ -267,4 +267,5 @@ function test_promote_after_recruit()
     assert_equal(offset + 56, u2.number)
     assert_equal(fl + 128, u1.flags) -- UFL_HERO
     assert_equal(0, u1:get_item('money'))
+    assert_equal(fl + 128, u1.flags) -- UFL_HERO
 end

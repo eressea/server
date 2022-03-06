@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "gamedb.h"
 
 #include "kernel/config.h"

@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "items.h"
 
 #include "alchemy.h"
@@ -9,36 +6,37 @@
 #include "economy.h"
 #include "magic.h"
 
-#include <spells/shipcurse.h>
-#include <spells/unitcurse.h>
-#include <spells/regioncurse.h>
+#include "spells/shipcurse.h"
+#include "spells/unitcurse.h"
+#include "spells/regioncurse.h"
 
-#include <kernel/curse.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
-#include <kernel/pool.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/spell.h>
-#include <kernel/skill.h>
-#include <kernel/skills.h>
-#include <kernel/unit.h>
+#include "kernel/curse.h"
+#include "kernel/config.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/order.h"
+#include "kernel/pool.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
+#include "kernel/skills.h"
+#include "kernel/unit.h"
 
 /* triggers includes */
-#include <triggers/changerace.h>
-#include <triggers/timeout.h>
+#include "triggers/changerace.h"
+#include "triggers/timeout.h"
 
-#include <kernel/attrib.h>
-#include <kernel/event.h>
-#include <util/keyword.h>
-#include <util/macros.h>
-#include <util/parser.h>
-#include <util/rand.h>
-#include <util/rng.h>
+#include "kernel/attrib.h"
+#include "kernel/event.h"
+
+#include "util/keyword.h"
+#include "util/macros.h"
+#include "util/message.h"
+#include "util/parser.h"
+#include "util/rand.h"
+#include "util/rng.h"
 
 #include <assert.h>
 #include <stddef.h>
@@ -296,7 +294,7 @@ struct order *ord)
             change_race(u, duration, rcfailure, NULL);
         }
     }
-    use_pooled(u, itype->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+    use_pooled(u, itype->rtype, GET_DEFAULT,
         amount);
 
     ADDMSG(&u->faction->msgs, msg_message("use_item",

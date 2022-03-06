@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "key.h"
 #include "dict.h"
 
@@ -9,13 +8,16 @@
 
 static void test_get_set_keys(CuTest *tc) {
     attrib *a = 0;
+    key_set(&a, 0, 42);
     key_set(&a, 42, 1);
     key_set(&a, 43, 2);
     key_set(&a, 44, 3);
+    CuAssertIntEquals(tc, 42, key_get(a, 0));
     CuAssertIntEquals(tc, 1, key_get(a, 42));
     CuAssertIntEquals(tc, 2, key_get(a, 43));
     CuAssertIntEquals(tc, 3, key_get(a, 44));
     key_unset(&a, 42);
+    CuAssertIntEquals(tc, 42, key_get(a, 0));
     CuAssertIntEquals(tc, 0, key_get(a, 42));
     CuAssertIntEquals(tc, 2, key_get(a, 43));
     CuAssertIntEquals(tc, 3, key_get(a, 44));

@@ -1,14 +1,13 @@
-#include <platform.h>
+#include "resolve.h"
+
+#include "storage.h"
+#include "variant.h"
 
 #include <selist.h>
 
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "resolve.h"
-#include "storage.h"
-#include "variant.h"
 
 typedef struct unresolved {
     int id;

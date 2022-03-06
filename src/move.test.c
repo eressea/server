@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <stdlib.h>
 #include "move.h"
 
 #include "contact.h"
@@ -28,7 +26,9 @@
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <stdlib.h>
 
 static void setup_move(void) {
     mt_create_va(mt_new("travel", NULL),
@@ -84,7 +84,6 @@ static void setup_harbor(move_fixture *mf) {
     r = test_create_region(0, 0, ttype);
 
     b = test_create_building(r, btype);
-    b->flags |= BLD_MAINTAINED;
 
     u = test_create_unit(test_create_faction(), r);
     u->ship = sh;
@@ -168,6 +167,61 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
 }
+
+static void test_ship_allowed_insect(CuTest * tc)
+{
+    region *rg, *ro;
+    ship * sh;
+    terrain_type *gtype, *otype;
+    ship_type *stype;
+    faction *fi, *fh;
+    unit *ui, *uh;
+    building_type *btype;
+    building *b;
+
+    test_setup();
+    gtype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
+    otype = test_create_terrain("ocean", SEA_REGION);
+    stype = test_create_shiptype("derp");
+    free(stype->coasts);
+    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+
+    rg = test_create_region(1, 0, gtype);
+    ro = test_create_region(4, 0, otype);
+    sh = test_create_ship(0, stype);
+    sh->region = ro;
+
+    fi = test_create_faction_ex(test_create_race("insect"), NULL);
+    ui = test_create_unit(fi, ro);
+    ui->ship = sh;
+    ship_set_owner(ui);
+
+    /* coast takes precedence over insect */
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, ro));
+    CuAssertIntEquals_Msg(tc, "coast trumps insect", SA_NO_COAST, check_ship_allowed(sh, rg));
+    stype->coasts[0] = gtype;
+    CuAssertIntEquals_Msg(tc, "insect", SA_NO_INSECT, check_ship_allowed(sh, rg));
+
+    /* harbour does not beat insect */
+    btype = test_create_buildingtype("harbour");
+    b = test_create_building(rg, btype);
+    uh = test_create_unit(fi, rg);
+    uh->building = b;
+    building_set_owner(uh);
+
+    CuAssertIntEquals(tc, SA_NO_INSECT, check_ship_allowed(sh, rg));
+
+    /* insect passenger can enter */
+    fh = test_create_faction_ex(test_create_race("human"), NULL);
+    uh = test_create_unit(fh, test_create_region(0, 0, NULL));
+
+    uh->ship = sh;
+    ship_set_owner(uh);
+
+    CuAssertIntEquals_Msg(tc, "insect passenger okay", SA_COAST, check_ship_allowed(sh, rg));
+    test_teardown();
+}
+
 
 static void test_walkingcapacity(CuTest *tc) {
     unit *u;
@@ -468,14 +522,16 @@ static void test_ship_ridiculous_overload_bad(CuTest *tc) {
     test_teardown();
 }
 
-extern double damage_overload(double overload);
+extern double damage_overload(double overload, double damage_max);
 
 static void test_ship_damage_overload(CuTest *tc) {
-    CuAssertDblEquals(tc, 0.0, damage_overload(1), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.05, damage_overload(1.1), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.05, damage_overload(1.5), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.21, damage_overload(3.25), ASSERT_DBL_DELTA);
-    CuAssertDblEquals(tc, 0.37, damage_overload(5), ASSERT_DBL_DELTA);
+    double damage_max = 0.37;
+    CuAssertDblEquals(tc, 0.0, damage_overload(1, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.1, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.05, damage_overload(1.5, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.21, damage_overload(3.25, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.37, damage_overload(5, damage_max), ASSERT_DBL_DELTA);
+    CuAssertDblEquals(tc, 0.0, damage_overload(5, 0.0), ASSERT_DBL_DELTA);
 }
 
 static void test_follow_unit(CuTest *tc) {
@@ -749,6 +805,81 @@ static void test_movement_speed_dragon(CuTest *tc) {
     test_teardown();
 }
 
+static void test_movement_speed_unicorns(CuTest *tc) {
+    unit *u;
+    item_type* it_unicorn;
+    item_type const *it_horse;
+
+    test_setup();
+    init_resources();
+    it_horse = it_find("horse");
+    it_unicorn = test_create_itemtype("elvenhorse");
+    it_unicorn->flags |= ITF_ANIMAL;
+    it_unicorn->weight = it_horse->weight;
+    it_unicorn->capacity = it_horse->capacity;
+
+    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    scale_number(u, 10);
+    i_change(&u->items, it_unicorn, 5);
+
+    /* 5 animals can carry 2 people each: */
+    set_level(u, SK_RIDING, 1);
+    CuAssertIntEquals(tc, u->number / 2, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    /* at level 1, riders can move 2 animals each */
+    i_change(&u->items, it_unicorn, 15);
+    CuAssertIntEquals(tc, 2 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    /* any more animals, and they walk: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 2 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* up to 5 animals per person can we walked: */
+    i_change(&u->items, it_unicorn, 29);
+    CuAssertIntEquals(tc, 5 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* but no more! */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 5 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, 0, movement_speed(u));
+
+    /* at level 5, unicorns give a speed boost: */
+    set_level(u, SK_RIDING, 5);
+    /* we can now ride at most 10 animals each: */
+    i_change(&u->items, it_unicorn, 49);
+    CuAssertIntEquals(tc, 10 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+
+    /* too many animals, we must walk: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 10 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* at level 5, we can each walk 21 animals: */
+    i_change(&u->items, it_unicorn, 109);
+    CuAssertIntEquals(tc, 21 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+
+    /* too many animals, we cannot move: */
+    i_change(&u->items, it_unicorn, 1);
+    CuAssertIntEquals(tc, 1 + 21 * u->number, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, 0, movement_speed(u));
+
+    /* max animals for riding, then add one (slow) horse */
+    i_change(&u->items, it_unicorn, -112);
+    CuAssertIntEquals(tc, 10 * u->number - 1, i_get(u->items, it_unicorn));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+    i_change(&u->items, it_horse, 1);
+    CuAssertIntEquals(tc, 1, i_get(u->items, it_horse));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+
+    test_teardown();
+}
+
 static void test_make_movement_order(CuTest *tc) {
     order *ord;
     char buffer[32];
@@ -774,6 +905,7 @@ CuSuite *get_move_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_movement_speed);
     SUITE_ADD_TEST(suite, test_movement_speed_dragon);
+    SUITE_ADD_TEST(suite, test_movement_speed_unicorns);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
@@ -782,6 +914,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);
+    SUITE_ADD_TEST(suite, test_ship_allowed_insect);
     SUITE_ADD_TEST(suite, test_ship_trails);
     SUITE_ADD_TEST(suite, test_age_trails);
     SUITE_ADD_TEST(suite, test_ship_no_overload);

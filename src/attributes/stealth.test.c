@@ -1,9 +1,8 @@
-#include <platform.h>
-
 #include "stealth.h"
 
 #include <kernel/unit.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 
 #include <CuTest.h>
 #include <tests.h>

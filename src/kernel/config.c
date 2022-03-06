@@ -4,11 +4,9 @@
 #include "config.h"
 
 /* kernel includes */
-#include "alliance.h"
 #include "ally.h"
 #include "alchemy.h"
 #include "curse.h"
-#include "connection.h"
 #include "building.h"
 #include "direction.h"
 #include "faction.h"
@@ -22,12 +20,8 @@
 #include "pool.h"
 #include "race.h"
 #include "reports.h"
-#include "region.h"
 #include "ship.h"
 #include "skill.h"
-#include "terrain.h"
-#include "types.h"
-#include "unit.h"
 
 /* util includes */
 #include <kernel/attrib.h>
@@ -35,28 +29,26 @@
 
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/keyword.h>
 #include <util/language.h>
 #include <util/functions.h>
 #include <util/log.h>
 #include <util/lists.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/translation.h>
 #include <util/umlaut.h>
 
-#include "donations.h"
 #include "guard.h"
 #include "prefix.h"
 
 /* external libraries */
+#include <strings.h>
 #include <iniparser.h>
-#include <critbit.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -132,196 +124,6 @@ int newcontainerid(void)
         }
     }
     return random_no;
-}
-
-void init_terrains_translation(const struct locale *lang) {
-    void **tokens;
-    const terrain_type *terrain;
-
-    tokens = get_translations(lang, UT_TERRAINS);
-    for (terrain = terrains(); terrain != NULL; terrain = terrain->next) {
-        variant var;
-        const char *name;
-        var.v = (void *)terrain;
-        name = locale_string(lang, terrain->_name, false);
-        if (name) {
-            addtoken((struct tnode **)tokens, name, var);
-        }
-        else {
-            log_debug("no translation for terrain %s in locale %s", terrain->_name, locale_name(lang));
-        }
-    }
-}
-
-void init_options_translation(const struct locale * lang) {
-    void **tokens;
-    int i;
-
-    tokens = get_translations(lang, UT_OPTIONS);
-    for (i = 0; i != MAXOPTIONS; ++i) {
-        variant var;
-        var.i = i;
-        if (options[i]) {
-            const char *name = locale_string(lang, options[i], false);
-            if (name) {
-                addtoken((struct tnode **)tokens, name, var);
-            }
-            else {
-                log_debug("no translation for OPTION %s in locale %s", options[i], locale_name(lang));
-            }
-        }
-    }
-}
-
-void init_races(struct locale *lang)
-{
-    const struct race *rc;
-    void **tokens;
-
-    tokens = get_translations(lang, UT_RACES);
-    for (rc = races; rc; rc = rc->next) {
-        const char *name;
-        variant var;
-        var.v = (void *)rc;
-        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-    }
-}
-
-static void init_magic(struct locale *lang)
-{
-    void **tokens;
-    tokens = get_translations(lang, UT_MAGIC);
-    if (tokens) {
-        const char *str = config_get("rules.magic.playerschools");
-        char *sstr, *tok;
-        if (str == NULL) {
-            str = "gwyrrd illaun draig cerddor tybied";
-        }
-
-        sstr = str_strdup(str);
-        tok = strtok(sstr, " ");
-        while (tok) {
-            variant var;
-            const char *name;
-            int i;
-            for (i = 0; i != MAXMAGIETYP; ++i) {
-                if (strcmp(tok, magic_school[i]) == 0) break;
-            }
-            assert(i != MAXMAGIETYP);
-            var.i = i;
-            name = LOC(lang, mkname("school", tok));
-            if (name) {
-                addtoken((struct tnode **)tokens, name, var);
-            }
-            else {
-                log_warning("no translation for magic school %s in locale %s", tok, locale_name(lang));
-            }
-            tok = strtok(NULL, " ");
-        }
-        free(sstr);
-    }
-}
-
-void init_locale(struct locale *lang)
-{
-    init_magic(lang);
-    init_directions(lang);
-    init_keywords(lang);
-    init_skills(lang);
-    init_races(lang);
-    init_parameters(lang);
-
-    init_options_translation(lang);
-    init_terrains_translation(lang);
-}
-
-typedef struct param {
-    critbit_tree cb;
-} param;
-
-size_t pack_keyval(const char *key, const char *value, char *data, size_t len) {
-    size_t klen = strlen(key);
-    size_t vlen = strlen(value);
-    assert(klen + vlen + 2 + sizeof(vlen) <= len);
-    memcpy(data, key, klen + 1);
-    memcpy(data + klen + 1, value, vlen + 1);
-    return klen + vlen + 2;
-}
-
-void set_param(struct param **p, const char *key, const char *value)
-{
-    struct param *par;
-    assert(p);
-
-    par = *p;
-    if (!par && value) {
-        *p = par = calloc(1, sizeof(param));
-        if (!par) abort();
-    }
-    if (par) {
-        void *match;
-        size_t klen = strlen(key) + 1;
-        if (cb_find_prefix(&par->cb, key, klen, &match, 1, 0) > 0) {
-            const char * kv = (const char *)match;
-            size_t vlen = strlen(kv + klen) + 1;
-            cb_erase(&par->cb, kv, klen + vlen);
-        }
-    }
-    if (value) {
-        char data[512];
-        size_t sz = pack_keyval(key, value, data, sizeof(data));
-        cb_insert(&par->cb, data, sz);
-    }
-}
-
-void free_params(struct param **pp) {
-    param *p = *pp;
-    if (p) {
-        cb_clear(&p->cb);
-        free(p);
-    }
-    *pp = 0;
-}
-
-const char *get_param(const struct param *p, const char *key)
-{
-    void *match;
-    if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
-        cb_get_kv_ex(match, &match);
-        return (const char *)match;
-    }
-    return NULL;
-}
-
-int get_param_int(const struct param *p, const char *key, int def)
-{
-    const char * str = get_param(p, key);
-    return str ? atoi(str) : def;
-}
-
-int check_param(const struct param *p, const char *key, const char *searchvalue)
-{
-    int result = 0;
-    const char *value = get_param(p, key);
-    char *v, *p_value;
-    if (!value) {
-        return 0;
-    }
-    p_value = str_strdup(value);
-    v = strtok(p_value, " ,;");
-
-    while (v != NULL) {
-        if (strcmp(v, searchvalue) == 0) {
-            result = 1;
-            break;
-        }
-        v = strtok(NULL, " ,;");
-    }
-    free(p_value);
-    return result;
 }
 
 static const char *g_basedir;
@@ -423,24 +225,6 @@ void kernel_done(void)
     mt_clear();
 }
 
-bool rule_stealth_other(void)
-{
-    static int rule, config;
-    if (config_changed(&config)) {
-        rule = config_get_int("stealth.faction.other", 1);
-    }
-    return rule != 0;
-}
-
-bool rule_stealth_anon(void)
-{
-    static int rule, config;
-    if (config_changed(&config)) {
-        rule = config_get_int("stealth.faction.anon", 1);
-    }
-    return rule != 0;
-}
-
 bool rule_region_owners(void)
 {
     static int rule, config;
@@ -488,24 +272,6 @@ void kernel_init(void)
     register_reports();
     mt_clear();
     translation_init();
-}
-
-order *default_order(const struct locale *lang)
-{
-    int i = locale_index(lang);
-    keyword_t kwd;
-    const char * str;
-
-    assert(i < MAXLOCALES);
-    kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
-    str = config_get("orders.default");
-    if (str) {
-        kwd = findkeyword(str);
-    }
-    if (kwd != NOKEYWORD) {
-        return create_order(kwd, lang, NULL);
-    }
-    return NULL;
 }
 
 int rule_give(void)
@@ -608,29 +374,6 @@ void free_config(void) {
     ++config_cache_key;
 }
 
-/** releases all memory associated with the game state.
- * call this function before calling read_game() to load a new game
- * if you have a previously loaded state in memory.
- */
-void free_gamedata(void)
-{
-    free(forbidden_ids);
-    forbidden_ids = NULL;
-
-    free_factions();
-    free_donations();
-    free_units();
-    free_regions();
-    free_borders();
-    free_alliances();
-
-    while (planes) {
-        plane *pl = planes;
-        planes = planes->next;
-        free_plane(pl);
-    }
-}
-
 const char * game_name(void)
 {
     const char * param = config_get("game.name");
@@ -658,4 +401,10 @@ const char * game_mailcmd(void)
 
 int game_id(void) {
     return config_get_int("game.id", 0);
+}
+
+void free_ids(void)
+{
+    free(forbidden_ids);
+    forbidden_ids = NULL;
 }

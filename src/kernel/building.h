@@ -1,7 +1,6 @@
 #ifndef H_KRNL_BUILDING
 #define H_KRNL_BUILDING
 
-#include "types.h"
 #include "build.h"
 
 #include <util/resolve.h>
@@ -81,7 +80,7 @@ extern "C" {
     bool in_safe_building(struct unit *u1, struct unit *u2);
 
 #define BFL_NONE           0x00
-#define BLD_MAINTAINED     0x01 /* vital maintenance paid for */
+#define BLD_UNMAINTAINED     0x01 /* vital maintenance not paid for */
 #define BLD_DONTPAY        0x02 /* PAY NOT */
 #define BLD_UNGUARDED      0x04 /* you can enter this building anytime */
 #define BLD_EXPANDED       0x08 /* has been expanded this turn */
@@ -105,7 +104,9 @@ extern "C" {
         int flags;
     } building;
 
+    struct order;
 
+    const struct building_type *visible_building(const struct building *b);
     const char *buildingtype(const building_type * btype,
         const struct building *b, int bsize);
     const char *write_buildingname(const building *b, char *ibuf,

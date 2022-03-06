@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-# include <platform.h>
-#endif
 #include <kernel/config.h>
 #include "unit.h"
 
@@ -24,7 +21,7 @@
 #include "spell.h"
 #include "spellbook.h"
 #include "ship.h"
-#include "skill.h"
+#include "skills.h"
 #include "terrain.h"
 #include "terrainid.h"
 
@@ -58,6 +55,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#define BAGCAPACITY 20000   /* soviel passt in einen Bag of Holding */
 
 int weight(const unit * u)
 {
@@ -106,8 +105,9 @@ unit *findunitr(const region * r, int n)
     return (u && u->region == r) ? u : 0;
 }
 
-#define UMAXHASH MAXUNITS
+#define UMAXHASH 1048573 /* should be prime. 524287 was >90% full */
 static unit *unithash[UMAXHASH];
+
 static unit *delmarker = (unit *)unithash;     /* a funny hack */
 
 #define HASH_STATISTICS 1
@@ -538,7 +538,7 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
     return id;
 }
 
-int get_level(const unit * u, skill_t id)
+unsigned int get_level(const unit * u, enum skill_t id)
 {
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
@@ -553,12 +553,12 @@ int get_level(const unit * u, skill_t id)
     return 0;
 }
 
-void set_level(unit * u, skill_t sk, int value)
+void set_level(unit * u, enum skill_t sk, unsigned int value)
 {
     skill *sv = u->skills;
 
     assert(sk != SK_MAGIC || value==0 || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
-    assert(value <= CHAR_MAX && value >= CHAR_MIN);
+    assert(value <= UCHAR_MAX);
     if (!skill_enabled(sk))
         return;
 
@@ -742,12 +742,12 @@ void move_unit(unit * u, region * r, unit ** ulist)
     u->region = r;
 }
 
+
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
 void clone_men(const unit * u, unit * dst, int n)
 {
-    const attrib *a;
     region *r = u->region;
 
     if (n == 0)
@@ -756,75 +756,28 @@ void clone_men(const unit * u, unit * dst, int n)
     /* "hat attackiert"-status wird uebergeben */
 
     if (dst) {
-        skill_t sk;
+        enum skill_t sk;
         ship *sh;
 
         assert(dst->number + n > 0);
 
         for (sk = 0; sk != MAXSKILLS; ++sk) {
-            int weeks, level = 0;
+            int level;
             skill *sv = unit_skill(u, sk);
             skill *sn = unit_skill(dst, sk);
-
+            skill result;
             if (sv == NULL && sn == NULL)
                 continue;
-            if (sn == NULL && dst->number == 0) {
-                /* new unit, easy to solve */
-                level = sv->level;
-                weeks = sv->weeks;
-            }
-            else {
-                double dlevel = 0.0;
-
-                if (sv && sv->level) {
-                    dlevel += (sv->level + 1.0 - sv->weeks / (sv->level + 1.0)) * n;
-                    level += sv->level * n;
-                }
-                if (sn && sn->level) {
-                    dlevel +=
-                        (sn->level + 1.0 - sn->weeks / (sn->level + 1.0)) * dst->number;
-                    level += sn->level * dst->number;
-                }
-
-                dlevel /= ((double)n + dst->number);
-                level /= (n + dst->number);
-                if (level <= dlevel) {
-                    /* apply the remaining fraction to the number of weeks to go.
-                     * subtract the according number of weeks, getting closer to the
-                     * next level */
-                    level = (int)dlevel;
-                    weeks = (level + 1) - (int)((dlevel - level) * (level + 1.0));
-                }
-                else {
-                    /* make it harder to reach the next level.
-                     * weeks+level is the max difficulty, 1 - the fraction between
-                     * level and dlevel applied to the number of weeks between this
-                     * and the previous level is the added difficutly */
-                    level = (int)dlevel + 1;
-                    weeks = 1 + 2 * level - (int)((1 + dlevel - level) * level);
-                }
-            }
-            if (level) {
-                if (sn == NULL)
+            level = merge_skill(sv, sn, &result, dst->number, n);
+            if (level > 0) {
+                if (sn == NULL) {
                     sn = add_skill(dst, sk);
-                sn->level = (unsigned char)level;
-                sn->weeks = (unsigned char)weeks;
-                assert(sn->weeks > 0 && sn->weeks <= sn->level * 2 + 1);
-                assert(dst->number != 0 || (sv && sn->level == sv->level
-                    && sn->weeks == sv->weeks));
-            }
-            else if (sn) {
-                remove_skill(dst, sk);
-                sn = NULL;
+                }
+                sn->level = result.level;
+                sn->weeks = result.weeks;
             }
         }
-        a = a_find(u->attribs, &at_effect);
-        while (a && a->type == &at_effect) {
-            effect_data *olde = (effect_data *)a->data.v;
-            if (olde->value)
-                change_effect(dst, olde->type, olde->value);
-            a = a->next;
-        }
+        clone_effects(u, dst);
         sh = leftship(u);
         if (sh != NULL)
             set_leftship(dst, sh);
@@ -837,16 +790,7 @@ void clone_men(const unit * u, unit * dst, int n)
         set_number(dst, dst->number + n);
         dst->hp += (long long)u->hp * n / u->number;
         assert(dst->hp >= dst->number);
-        /* TODO: Das ist schnarchlahm! und gehoert nicht hierhin */
-        a = a_find(dst->attribs, &at_effect);
-        while (a && a->type == &at_effect) {
-            attrib *an = a->next;
-            effect_data *olde = (effect_data *)a->data.v;
-            int e = get_effect(u, olde->type);
-            if (e != 0)
-                change_effect(dst, olde->type, -e);
-            a = an;
-        }
+        clone_effects(u, dst);
     }
     else if (r->land) {
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
@@ -960,7 +904,7 @@ void set_number(unit * u, int count)
     u->number = count;
 }
 
-void remove_skill(unit * u, skill_t sk)
+void remove_skill(unit * u, enum skill_t sk)
 {
     int i;
     for (i = 0; i != u->skill_size; ++i) {
@@ -984,7 +928,7 @@ static void remove_skills(unit * u) {
     u->skill_size = 0;
 }
 
-skill *add_skill(unit * u, skill_t sk)
+skill *add_skill(unit * u, enum skill_t sk)
 {
     skill *sv;
     int i;
@@ -1015,7 +959,7 @@ skill *add_skill(unit * u, skill_t sk)
     return sv;
 }
 
-skill *unit_skill(const unit * u, skill_t sk)
+skill *unit_skill(const unit * u, enum skill_t sk)
 {
     skill *sv = u->skills;
     while (sv != u->skills + u->skill_size && sv->id <= sk) {
@@ -1027,7 +971,7 @@ skill *unit_skill(const unit * u, skill_t sk)
     return NULL;
 }
 
-bool has_skill(const unit * u, skill_t sk)
+bool has_skill(const unit * u, enum skill_t sk)
 {
     skill *sv = u->skills;
     while (sv != u->skills + u->skill_size && sv->id <= sk) {
@@ -1046,7 +990,7 @@ static int item_invis(const unit *u) {
         + (rsphere ? i_get(u->items, rsphere->itype) * 100 : 0);
 }
 
-static int att_modification(const unit * u, skill_t sk)
+static int att_modification(const unit * u, enum skill_t sk)
 {
     double result = 0;
 
@@ -1095,7 +1039,7 @@ static int att_modification(const unit * u, skill_t sk)
     return (int)result;
 }
 
-static int terrain_mod(const race * rc, skill_t sk, const region *r)
+static int terrain_mod(const race * rc, enum skill_t sk, const region *r)
 {
     static int rc_cache, t_cache;
     static const race *rc_dwarf, *rc_insect, *rc_elf;
@@ -1140,7 +1084,7 @@ static int terrain_mod(const race * rc, skill_t sk, const region *r)
     return 0;
 }
 
-static int rc_skillmod(const struct race *rc, skill_t sk)
+static int rc_skillmod(const struct race *rc, enum skill_t sk)
 {
     if (!skill_enabled(sk)) {
         return 0;
@@ -1148,7 +1092,7 @@ static int rc_skillmod(const struct race *rc, skill_t sk)
     return rc->bonus[sk];
 }
 
-int get_modifier(const unit * u, skill_t sk, int level, const region * r, bool noitem)
+int get_modifier(const unit * u, enum skill_t sk, int level, const region * r, bool noitem)
 {
     const struct race *rc = u_race(u);
     int bskill = level;
@@ -1196,7 +1140,7 @@ int eff_skill(const unit * u, const skill *sv, const region *r)
     return 0;
 }
 
-int effskill_study(const unit * u, skill_t sk)
+int effskill_study(const unit * u, enum skill_t sk)
 {
     skill *sv = unit_skill(u, sk);
     if (sv && sv->level > 0) {
@@ -1519,12 +1463,12 @@ void unit_sethp(unit * u, int hp)
     u->hp = hp;
 }
 
-status_t unit_getstatus(const unit * u)
+enum status_t unit_getstatus(const unit * u)
 {
     return u->status;
 }
 
-void unit_setstatus(unit * u, status_t status)
+void unit_setstatus(unit * u, enum status_t status)
 {
     u->status = status;
 }
@@ -1591,14 +1535,8 @@ void scale_number(unit * u, int n)
     }
     if (u->number > 0) {
         if (n > 0) {
-            const attrib *a = a_find(u->attribs, &at_effect);
-
             u->hp = (long long)u->hp * n / u->number;
-
-            for (; a && a->type == &at_effect; a = a->next) {
-                effect_data *data = (effect_data *)a->data.v;
-                data->value = (long long)data->value * n / u->number;
-            }
+            scale_effects(u->attribs, n, u->number);
         }
         else {
             u->hp = 0;
@@ -1646,7 +1584,7 @@ void u_setrace(struct unit *u, const struct race *rc)
     }
 }
 
-int effskill(const unit * u, skill_t sk, const region *r)
+int effskill(const unit * u, enum skill_t sk, const region *r)
 {
     assert(u);
 

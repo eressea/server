@@ -1,7 +1,7 @@
-#include <platform.h>
 #include <kernel/config.h>
 #include "guard.h"
 
+#include "battle.h"
 #include "contact.h"
 #include "laws.h"
 #include "monsters.h"

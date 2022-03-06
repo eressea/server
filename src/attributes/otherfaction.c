@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "otherfaction.h"
 
 #include <kernel/ally.h>
@@ -8,8 +6,8 @@
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
 
-#include <storage.h>
 #include <assert.h>
+#include <storage.h>
 
 /*
  * simple attributes that do not yet have their own file

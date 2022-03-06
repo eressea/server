@@ -1,10 +1,8 @@
-#include <platform.h>
-
 #include "summary.h"
 #include "kernel/calendar.h"
 
+#include <tests.h>
 #include <CuTest.h>
-#include "tests.h"
 
 #include <stdio.h>
 

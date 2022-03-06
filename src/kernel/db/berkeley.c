@@ -1,11 +1,10 @@
-#include <sys/types.h>
-#include <db.h>
-
-#include <platform.h>
 #include "driver.h"
 
 #include <assert.h>
 #include <string.h>
+
+#include <sys/types.h>
+#include <db.h>
 
 static DB *g_dbp;
 

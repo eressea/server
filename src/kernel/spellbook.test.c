@@ -1,7 +1,7 @@
-#include <platform.h>
+#include "spellbook.h"
 
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
+#include "spell.h"
+
 #include <util/language.h>
 
 #include <CuTest.h>

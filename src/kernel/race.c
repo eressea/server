@@ -306,7 +306,7 @@ bool rc_changed(int *cache) {
     return false;
 }
 
-bool rc_can_use(const struct race *rc, const struct item_type *itype)
+bool rc_can_use(const race *rc, const item_type *itype)
 {
     if (itype->mask_allow) {
         return (itype->mask_allow & rc->mask_item) != 0;
@@ -491,6 +491,11 @@ const char* rc_key(const char *rcname, name_t n, char *name, size_t size)
         return name;
     }
     return NULL;
+}
+
+const char* race_name(const race* rc)
+{
+    return rc->_name;
 }
 
 const char* rc_name(const race * rc, name_t n, char *name, size_t size)

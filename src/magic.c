@@ -40,7 +40,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include "kernel/skill.h"
+#include "kernel/skills.h"
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
 #include <kernel/terrain.h>
@@ -53,6 +53,7 @@
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/rand.h>
@@ -1303,7 +1304,7 @@ static void do_fumble(castorder * co)
         if (rc_changed(&rc_cache)) {
             rc_toad = get_race(RC_TOAD);
         }
-        duration = rng_int() % level / 2;
+        duration = 1 + (rng_int() % level) / 2;
         trestore = change_race(mage, duration, rc_toad, NULL);
         if (trestore) {
             if (chance(0.7)) {

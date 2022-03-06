@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "recruit.h"
 
 #include "alchemy.h"
@@ -53,6 +49,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include "util/message.h"
 #include "util/param.h"
 #include <util/parser.h>
 #include <util/rng.h>
@@ -66,6 +63,7 @@
 #include <limits.h>
 
 #define RECRUIT_MERGE 1
+
 static int rules_recruit = -1;
 
 typedef struct recruit_request {
@@ -154,6 +152,7 @@ static recruitment *select_recruitment(recruit_request ** rop,
 void add_recruits(unit * u, int number, int wanted, int ordered)
 {
     region *r = u->region;
+    const struct race* rc = u_race(u);
     assert(number <= wanted);
     if (number > 0) {
         unit *unew;
@@ -166,10 +165,10 @@ void add_recruits(unit * u, int number, int wanted, int ordered)
             unew = u;
         }
         else {
-            unew = create_unit(r, u->faction, number, u_race(u), 0, NULL, u);
+            unew = create_unit(r, u->faction, number, rc, 0, NULL, u);
         }
 
-        len = snprintf(equipment, sizeof(equipment), "new_%s", u_race(u)->_name);
+        len = snprintf(equipment, sizeof(equipment), "new_%s", race_name(rc));
         if (len > 0 && (size_t)len < sizeof(equipment)) {
             equip_unit(unew, equipment);
         }
@@ -289,7 +288,7 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
     recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
     if (recruits) {
         int orc_recruited, orc_peasants = rpeasants(r) * 2;
-        int orc_frac = orc_peasants / RECRUITFRACTION;      /* anzahl orks. 2 ork = 1 bauer */
+        int orc_frac = orc_peasants / RECRUIT_FRACTION;      /* anzahl orks. 2 ork = 1 bauer */
         if (orc_total < orc_frac)
             orc_frac = orc_total;
         orc_recruited = do_recruiting(recruits, orc_frac);
@@ -314,7 +313,7 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
 
 static int recruit_cost(const faction * f, const race * rc)
 {
-    if (is_monsters(f) || valid_race(f, rc)) {
+    if (valid_race(f, rc)) {
         return rc->recruitcost;
     }
     return -1;
@@ -325,7 +324,7 @@ int max_recruits(const struct region *r)
     if (is_cursed(r->attribs, &ct_riotzone)) {
         return 0;
     }
-    return rpeasants(r) / RECRUITFRACTION;
+    return rpeasants(r) / RECRUIT_FRACTION;
 }
 
 message *can_recruit(unit *u, const race *rc, order *ord, int now)

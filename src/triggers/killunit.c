@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "killunit.h"
 
 #include <kernel/region.h>

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "password.h"
 #include <CuTest.h>
 #include <string.h>

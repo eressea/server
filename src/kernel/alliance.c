@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "alliance.h"
 
 /* kernel includes */
@@ -18,6 +17,7 @@
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/rng.h>
 #include <util/strings.h>

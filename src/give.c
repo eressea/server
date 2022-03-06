@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include <kernel/config.h>
 #include "give.h"
 
@@ -35,6 +32,7 @@
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
 
@@ -1031,6 +1029,6 @@ message *check_give(const unit *u, const unit *u2, order * ord) {
     if (!can_give(u, u2, NULL, GIVE_ALLITEMS)) {
         return msg_feedback(u, ord, "feedback_give_forbidden", "");
     }
-    return 0;
+    return NULL;
 }
 

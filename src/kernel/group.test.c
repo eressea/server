@@ -1,8 +1,7 @@
-#include <platform.h>
-#include "config.h"
-#include "types.h"
-#include "ally.h"
 #include "group.h"
+
+#include "ally.h"
+#include "eressea.h"
 #include "faction.h"
 #include "unit.h"
 #include "region.h"

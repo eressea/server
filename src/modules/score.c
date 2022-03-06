@@ -13,6 +13,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/unit.h>
 #include <kernel/pool.h>
 
@@ -96,7 +97,6 @@ void score(void)
                 continue;
             }
             else if (rc->recruitcost>0) {
-                assert(playerrace(rc));
                 f->score += (rc->recruitcost * u->number) / 50;
             }
             f->score += get_money(u) / 50;
@@ -140,9 +140,7 @@ void score(void)
     path_join(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
     if (scoreFP) {
-        const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
         faction *f;
-        fwrite(utf8_bom, 1, 3, scoreFP);
         for (f = factions; f; f = f->next)
             if (!fval(f, FFL_NPC) && f->num_people != 0) {
                 char score[32];
@@ -165,9 +163,6 @@ void score(void)
         path_join(basepath(), "score.alliances", path, sizeof(path));
         scoreFP = fopen(path, "w");
         if (scoreFP) {
-            const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
-            fwrite(utf8_bom, 1, 3, scoreFP);
-
             fprintf(scoreFP, "# alliance:factions:persons:score\n");
 
             for (a = alliances; a; a = a->next) {

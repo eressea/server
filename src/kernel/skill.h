@@ -4,7 +4,6 @@
 #define H_SKILL_H
 
 #include <stdbool.h>
-struct locale;
 
 typedef enum skill_t {
     SK_ALCHEMY,
@@ -39,6 +38,8 @@ typedef enum skill_t {
     MAXSKILLS,
     NOSKILL = -1
 } skill_t;
+
+struct locale;
 
 extern const char *skillnames[];
 

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "rng.h"
 
 #include <assert.h>

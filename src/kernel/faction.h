@@ -2,7 +2,6 @@
 #define H_KRNL_FACTION
 
 #include "skill.h"
-#include "types.h"
 #include "db/driver.h"
 
 #include <util/resolve.h>
@@ -36,6 +35,7 @@ extern "C" {
 #define FFL_NOIDLEOUT     (1<<24) /* Partei stirbt nicht an NMRs */
 #define FFL_NPC           (1<<25) /* eine Partei mit Monstern */
 #define FFL_SAVEMASK (FFL_NPC|FFL_NOIDLEOUT|FFL_CURSED|FFL_PAUSED)
+#define RECRUIT_FRACTION 40      /* 100/RECRUIT_FRACTION% */
 
     typedef struct origin {
         struct origin *next;
@@ -63,7 +63,7 @@ extern "C" {
         int age;
         struct origin *origin;
         const struct race *race;
-        magic_t magiegebiet;
+        int magiegebiet;
         int newbies;
         int num_people;             /* Anzahl Personen ohne Monster */
         int num_units;
@@ -93,7 +93,8 @@ extern "C" {
     void fhash(struct faction *f);
     void funhash(struct faction *f);
 
-    int faction_ally_status(const faction *f, const faction *f2);
+    bool rule_stealth_other(void); /* units can pretend to be another faction, TARNE PARTEI <no> */
+    bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
 
     struct faction *findfaction(int n);
     int max_magicians(const faction * f);

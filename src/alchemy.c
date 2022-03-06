@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "alchemy.h"
 #include "guard.h"
 #include "study.h"
@@ -20,6 +18,7 @@
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include "util/message.h"
 #include <util/rand.h>
 
 #include <storage.h>
@@ -29,6 +28,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+
+typedef struct effect_data {
+    const struct item_type* type;
+    int value;
+} effect_data;
 
 typedef struct potion_type {
     struct potion_type *next;
@@ -267,4 +271,37 @@ bool display_potions(struct unit *u)
         }
     }
     return (c > 0);
+}
+
+void clone_effects(const unit* u, unit* dst)
+{
+    attrib * a = a_find(u->attribs, &at_effect);
+    while (a && a->type == &at_effect) {
+        effect_data* olde = (effect_data*)a->data.v;
+        if (olde->value)
+            change_effect(dst, olde->type, olde->value);
+        a = a->next;
+    }
+}
+
+int effect_value(const struct attrib* a)
+{
+    const effect_data* data = (const effect_data*)a->data.v;
+    return data->value;
+}
+
+const struct item_type* effect_type(const struct attrib* a)
+{
+    const effect_data* data = (const effect_data*)a->data.v;
+    return data->type;
+}
+
+void scale_effects(attrib* alist, int n, int size)
+{
+    const attrib* a = a_find(alist, &at_effect);
+
+    for (; a && a->type == &at_effect; a = a->next) {
+        effect_data* data = (effect_data*)a->data.v;
+        data->value = (long long)data->value * n / size;
+    }
 }

@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "functions.h"
 
 #include <critbit.h>

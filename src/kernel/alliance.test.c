@@ -1,10 +1,11 @@
-#include <platform.h>
+#include "alliance.h"
+
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
 #include <util/base36.h>
-#include "alliance.h"
+
 #include <CuTest.h>
 #include <tests.h>
 #include <selist.h>

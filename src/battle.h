@@ -1,25 +1,20 @@
 #ifndef H_KRNL_BATTLE
 #define H_KRNL_BATTLE
 
-#include <kernel/types.h>
+#include "kernel/status.h"
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+struct message;
+struct selist;
+union variant;
 
-    struct message;
-    struct selist;
-    union variant;
-
-    /** more defines **/
+/** more defines **/
 #define FS_ENEMY 1
 #define FS_HELP  2
 
-    /***** Verteidigungslinien.
-    * Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthaelt Summen
-    */
-
+/***** Verteidigungslinien.
+* Eressea hat 4 Verteidigungslinien. 1 ist vorn, 5. enthaelt Summen
+*/
 #define NUMROWS 5
 #define SUM_ROW 0
 #define FIGHT_ROW 1
@@ -30,70 +25,7 @@ extern "C" {
 #define LAST_ROW FLEE_ROW
 #define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
-    typedef struct bfaction {
-        struct bfaction *next;
-        struct side *sides;
-        struct faction *faction;
-        bool attacker;
-    } bfaction;
-
-    typedef struct tactics {
-        struct selist *fighters;
-        int value;
-    } tactics;
-
-#define SIDE_STEALTH   1<<0
-#define SIDE_HASGUARDS  1<<1
-    typedef struct side {
-        struct side *nextF;         /* next army of same faction */
-        struct battle *battle;
-        struct bfaction *bf;        /* battle info that goes with the faction */
-        struct faction *faction;    /* cache optimization for bf->faction */
-        const struct group *group;
-        struct tactics leader;      /* this army's best tactician */
-# define E_ENEMY 1
-# define E_FRIEND 2
-# define E_ATTACKING 4
-        unsigned char relations[MAXSIDES];
-        struct side *enemies[MAXSIDES];
-        struct fighter *fighters;
-        unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
-        int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
-        int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
-        int alive;                  /* Die Partei hat den Kampf verlassen */
-        int removed;                /* stoned */
-        int flee;
-        int dead;
-        int casualties;             /* those dead that were real people, not undead! */
-        int healed;
-        unsigned int flags;
-        const struct faction *stealthfaction;
-    } side;
-
-    typedef struct battle {
-        struct selist *leaders;
-        struct region *region;
-        struct plane *plane;
-        bfaction *factions;
-        int nfactions;
-        int nfighters;
-        side sides[MAXSIDES];
-        int nsides;
-        struct selist *meffects;
-        int max_tactics;
-        unsigned char turn;
-        signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
-        bool has_tactics_turn;
-        bool reelarrow;
-    } battle;
-
-    typedef struct weapon {
-        const struct weapon_type *type;
-        int attackskill;
-        int defenseskill;
-    } weapon;
-
-    /*** fighter::person::flags ***/
+/*** fighter::person::flags ***/
 #define FL_TIRED      1
 #define FL_DAZZLED  2           /* durch Untote oder Daemonen eingeschuechtert */
 #define FL_PANICED  4
@@ -103,144 +35,207 @@ extern "C" {
 #define FL_HIT        64      /* the person at attacked */
 #define FL_HEALING_USED 128   /* has used a healing potion */
 
-    typedef struct troop {
-        struct fighter *fighter;
-        int index;
-    } troop;
+typedef struct bfaction {
+    struct bfaction* next;
+    struct side* sides;
+    struct faction* faction;
+    bool attacker;
+} bfaction;
 
-    typedef struct armor {
-        struct armor *next; /* TODO: make this an array, not a list, like weapon */
-        const struct armor_type *atype;
-        int count;
-    } armor;
+typedef struct tactics {
+    struct selist* fighters;
+    int value;
+} tactics;
 
-    /*** fighter::flags ***/
+#define SIDE_STEALTH   1<<0
+#define SIDE_HASGUARDS  1<<1
+
+#define E_ENEMY 1
+#define E_FRIEND 2
+#define E_ATTACKING 4
+
+typedef struct side {
+    struct side* nextF;         /* next army of same faction */
+    struct battle* battle;
+    struct bfaction* bf;        /* battle info that goes with the faction */
+    struct faction* faction;    /* cache optimization for bf->faction */
+    const struct group* group;
+    struct tactics leader;      /* this army's best tactician */
+    unsigned char relations[MAXSIDES];
+    struct side* enemies[MAXSIDES];
+    struct fighter* fighters;
+    unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
+    int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
+    int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
+    int alive;                  /* Die Partei hat den Kampf verlassen */
+    int removed;                /* stoned */
+    int flee;
+    int dead;
+    int casualties;             /* those dead that were real people, not undead! */
+    int healed;
+    unsigned int flags;
+    const struct faction* stealthfaction;
+} side;
+
+typedef struct battle {
+    struct selist* leaders;
+    struct region* region;
+    struct plane* plane;
+    bfaction* factions;
+    int nfactions;
+    int nfighters;
+    side sides[MAXSIDES];
+    int nsides;
+    struct selist* meffects;
+    int max_tactics;
+    unsigned char turn;
+    signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
+    bool has_tactics_turn;
+    bool reelarrow;
+} battle;
+
+typedef struct weapon {
+    const struct weapon_type* type;
+    int attackskill;
+    int defenseskill;
+} weapon;
+
+typedef struct troop {
+    struct fighter* fighter;
+    int index;
+} troop;
+
+typedef struct armor {
+    struct armor* next; /* TODO: make this an array, not a list, like weapon */
+    const struct armor_type* atype;
+    int count;
+} armor;
+
+/*** fighter::flags ***/
 #define FIG_ATTACKER   1<<0
 #define FIG_NOLOOT     1<<1
-    typedef struct fighter {
-        struct fighter *next;
-        struct side *side;
-        struct unit *unit;          /* Die Einheit, die hier kaempft */
-        struct building *building;  /* Gebaeude, in dem die Einheit evtl. steht */
-        status_t status;            /* Kampfstatus */
-        struct weapon *weapons;
-        struct armor *armors;       /* Anzahl Ruestungen jeden Typs */
-        int alive;                  /* Anzahl der noch nicht Toten in der Einheit */
-        int fighting;               /* Anzahl der Kaempfer in der aktuellen Runde */
-        int removed;                /* Anzahl Kaempfer, die nicht tot sind, aber
-                                       aus dem Kampf raus sind (zB weil sie
-                                       versteinert wurden).  Diese werden auch
-                                       in alive noch mitgezaehlt! */
-        int magic;                  /* Magietalent der Einheit  */
-        int horses;                 /* Anzahl brauchbarer Pferde der Einheit */
-        int elvenhorses;            /* Anzahl brauchbarer Elfenpferde der Einheit */
-        struct item *loot;
-        int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
-        struct person {
-            int hp;                   /* Trefferpunkte der Personen */
-            int flags;
-            int attack;  /* weapon skill bonus for attacker */
-            int defense; /* weapon skill bonus for defender */
-            char damage;  /* bonus damage for melee attacks (e.g. troll belt) */
-            unsigned char speed;
-            unsigned char reload;
-            unsigned char last_action;
-            struct weapon *missile;   /* missile weapon */
-            struct weapon *melee;     /* melee weapon */
-        } *person;
-        unsigned int flags;
-        struct {
-            int number;               /* number of people who fled */
-            int hp;                   /* accumulated hp of fleeing people */
-        } run;
-        int kills;
-        int hits;
-    } fighter;
+typedef struct fighter {
+    struct fighter* next;
+    struct side* side;
+    struct unit* unit;          /* Die Einheit, die hier kaempft */
+    struct building* building;  /* Gebaeude, in dem die Einheit evtl. steht */
+    status_t status;            /* Kampfstatus */
+    struct weapon* weapons;
+    struct armor* armors;       /* Anzahl Ruestungen jeden Typs */
+    int alive;                  /* Anzahl der noch nicht Toten in der Einheit */
+    int fighting;               /* Anzahl der Kaempfer in der aktuellen Runde */
+    int removed;                /* Anzahl Kaempfer, die nicht tot sind, aber
+                                   aus dem Kampf raus sind (zB weil sie
+                                   versteinert wurden).  Diese werden auch
+                                   in alive noch mitgezaehlt! */
+    int magic;                  /* Magietalent der Einheit  */
+    int horses;                 /* Anzahl brauchbarer Pferde der Einheit */
+    int elvenhorses;            /* Anzahl brauchbarer Elfenpferde der Einheit */
+    struct item* loot;
+    int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
+    struct person {
+        int hp;                   /* Trefferpunkte der Personen */
+        int flags;
+        int attack;  /* weapon skill bonus for attacker */
+        int defense; /* weapon skill bonus for defender */
+        char damage;  /* bonus damage for melee attacks (e.g. troll belt) */
+        unsigned char speed;
+        unsigned char reload;
+        unsigned char last_action;
+        struct weapon* missile;   /* missile weapon */
+        struct weapon* melee;     /* melee weapon */
+    } *person;
+    unsigned int flags;
+    struct {
+        int number;               /* number of people who fled */
+        int hp;                   /* accumulated hp of fleeing people */
+    } run;
+    int kills;
+    int hits;
+} fighter;
 
-    /* schilde */
+/* schilde */
 
-    enum {
-        SHIELD_REDUCE,
-        SHIELD_ARMOR,
-        SHIELD_WIND,
-        SHIELD_BLOCK,
-        SHIELD_MAX
-    };
+enum {
+    SHIELD_REDUCE,
+    SHIELD_ARMOR,
+    SHIELD_WIND,
+    SHIELD_BLOCK,
+    SHIELD_MAX
+};
 
-    typedef struct meffect {
-        fighter *magician;          /* Der Zauberer, der den Schild gezaubert hat */
-        int typ;                    /* Wirkungsweise des Schilds */
-        int effect;
-        int duration;
-    } meffect;
+typedef struct meffect {
+    fighter* magician;          /* Der Zauberer, der den Schild gezaubert hat */
+    int typ;                    /* Wirkungsweise des Schilds */
+    int effect;
+    int duration;
+} meffect;
 
-    extern const troop no_troop;
+extern const troop no_troop;
 
-    /* BEGIN battle interface */
-    side * find_side(battle * b, const struct faction * f, const struct group * g, unsigned int flags, const struct faction * stealthfaction);
-    side * get_side(battle * b, const struct unit * u);
-    /* END battle interface */
+/* BEGIN battle interface */
+side* find_side(battle* b, const struct faction* f, const struct group* g, unsigned int flags, const struct faction* stealthfaction);
+side* get_side(battle* b, const struct unit* u);
+/* END battle interface */
 
-    void do_battles(void);
+void do_battles(void);
 
-    /* for combat spells and special attacks */
-    enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
-    enum { ALLY_SELF, ALLY_ANY };
+/* for combat spells and special attacks */
+enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
+enum { ALLY_SELF, ALLY_ANY };
 
-    int get_unitrow(const fighter * af, const side * vs);
+int get_unitrow(const fighter* af, const side* vs);
 
-    troop select_enemy(struct fighter *af, int minrow, int maxrow,
-        int select);
-    troop select_ally(struct fighter *af, int minrow, int maxrow,
-        int allytype);
+troop select_enemy(struct fighter* af, int minrow, int maxrow,
+    int select);
+troop select_ally(struct fighter* af, int minrow, int maxrow,
+    int allytype);
 
-    int count_enemies(struct battle *b, const struct fighter *af,
-        int minrow, int maxrow, int select);
-    int natural_armor(struct unit * u);
-    const struct armor_type *select_armor(struct troop t, bool shield);
-    struct weapon *select_weapon(const struct troop t, bool attacking, bool ismissile);
-    int calculate_armor(troop dt, const struct weapon_type *dwtype, const struct weapon_type *awtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
-    int apply_resistance(int damage, struct troop dt, const struct weapon_type *dwtype, const struct armor_type *armor, const struct armor_type *shield, bool magic);
-    bool terminate(troop dt, troop at, int type, const char *damage,
-        bool missile);
-    void message_all(battle * b, struct message *m);
-    int hits(troop at, troop dt, weapon * awp);
-    void damage_building(struct battle *b, struct building *bldg,
-        int damage_abs);
+int count_enemies(struct battle* b, const struct fighter* af,
+    int minrow, int maxrow, int select);
+int natural_armor(struct unit* u);
+const struct armor_type* select_armor(struct troop t, bool shield);
+struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);
+int calculate_armor(troop dt, const struct weapon_type* dwtype, const struct weapon_type* awtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
+int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
+bool terminate(troop dt, troop at, int type, const char* damage,
+    bool missile);
+void message_all(battle* b, struct message* m);
+int hits(troop at, troop dt, weapon* awp);
+void damage_building(struct battle* b, struct building* bldg,
+    int damage_abs);
 
-    typedef bool(*select_fun)(const struct side *vs, const struct fighter *fig, void *cbdata);
-    struct selist *select_fighters(struct battle *b, const struct side *vs, int mask, select_fun cb, void *cbdata);
-    struct selist *fighters(struct battle *b, const struct side *vs,
-        int minrow, int maxrow, int mask);
+typedef bool(*select_fun)(const struct side* vs, const struct fighter* fig, void* cbdata);
+struct selist* select_fighters(struct battle* b, const struct side* vs, int mask, select_fun cb, void* cbdata);
+struct selist* fighters(struct battle* b, const struct side* vs,
+    int minrow, int maxrow, int mask);
 
-    int count_allies(const struct side *as, int minrow, int maxrow,
-        int select, int allytype);
-    bool helping(const struct side *as, const struct side *ds);
-    void rmfighter(fighter * df, int i);
-    struct fighter *select_corpse(struct battle *b, struct fighter *af);
-    int statusrow(int status);
-    void drain_exp(struct unit *u, int d);
-    void kill_troop(troop dt);
-    void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
+int count_allies(const struct side* as, int minrow, int maxrow,
+    int select, int allytype);
+bool helping(const struct side* as, const struct side* ds);
+void rmfighter(fighter* df, int i);
+struct fighter* select_corpse(struct battle* b, struct fighter* af);
+int statusrow(int status);
+void drain_exp(struct unit* u, int d);
+void kill_troop(troop dt);
+void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
-    bool is_attacker(const fighter * fig);
-    struct battle *make_battle(struct region * r);
-    void free_battle(struct battle * b);
-    struct fighter *make_fighter(struct battle *b, struct unit *u,
-    struct side * s, bool attack);
-    int join_battle(struct battle * b, struct unit * u, bool attack, struct fighter ** cp);
-    struct side *make_side(struct battle * b, const struct faction * f,
-        const struct group * g, unsigned int flags,
-        const struct faction * stealthfaction);
-    int skilldiff(troop at, troop dt, int dist);
-    void force_leave(struct region *r, struct battle *b);
-    bool seematrix(const struct faction * f, const struct side * s);
-    const char *sidename(const struct side * s);
-    void battle_message_faction(struct battle * b, struct faction * f, struct message *m);
+bool is_attacker(const fighter* fig);
+struct battle* make_battle(struct region* r);
+void free_battle(struct battle* b);
+struct fighter* make_fighter(struct battle* b, struct unit* u,
+    struct side* s, bool attack);
+int join_battle(struct battle* b, struct unit* u, bool attack, struct fighter** cp);
+struct side* make_side(struct battle* b, const struct faction* f,
+    const struct group* g, unsigned int flags,
+    const struct faction* stealthfaction);
+int skilldiff(troop at, troop dt, int dist);
+void force_leave(struct region* r, struct battle* b);
+bool seematrix(const struct faction* f, const struct side* s);
+const char* sidename(const struct side* s);
+void battle_message_faction(struct battle* b, struct faction* f, struct message* m);
 
-    double tactics_chance(const struct unit *u, int skilldiff);
-    int meffect_apply(struct meffect *me, int damage);
-#ifdef __cplusplus
-}
-#endif
+double tactics_chance(const struct unit* u, int skilldiff);
+int meffect_apply(struct meffect* me, int damage);
+
 #endif

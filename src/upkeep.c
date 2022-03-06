@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "upkeep.h"
 
 #include <kernel/ally.h>
@@ -15,7 +12,8 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
-#include <util/rand.h>
+#include "util/message.h"
+#include "util/rand.h"
 
 #include <spells/unitcurse.h>
 

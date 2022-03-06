@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "gate.h"
 
  /* kernel includes */

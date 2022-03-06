@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "piracy.h"
 
 #include "direction.h"

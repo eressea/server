@@ -1,6 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
 #include "combatspells.h"
 
 #include <spells/buildingcurse.h>
@@ -15,10 +12,10 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/unit.h>
+#include <kernel/skills.h>
 #include <kernel/spell.h>
-#include <kernel/race.h>
 #include <kernel/terrain.h>
+#include <kernel/unit.h>
 
 #include <guard.h>
 #include <battle.h>
@@ -29,6 +26,7 @@
 #include <util/base36.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 #include <util/rand.h>
 #include <util/rng.h>
 

@@ -1,23 +1,22 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "chaos.h"
 #include "monsters.h"
 #include "move.h"
 #include "spy.h"
 
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/terrain.h>
-#include <kernel/terrainid.h>
-#include <kernel/unit.h>
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/terrain.h"
+#include "kernel/terrainid.h"
+#include "kernel/unit.h"
 
-#include <kernel/attrib.h>
-#include <util/rng.h>
+#include "kernel/attrib.h"
+#include "util/message.h"
+#include "util/rng.h"
 
 #include <stdlib.h>
 #include <assert.h>

@@ -1,12 +1,10 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
+#include "base36.h"
 
 #include <CuTest.h>
-#include "base36.h"
+
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 
 static void test_atoi36(CuTest * tc)
 {

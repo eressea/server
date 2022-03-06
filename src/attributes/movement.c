@@ -1,5 +1,3 @@
-#include <platform.h>
-#include <kernel/config.h>
 #include "movement.h"
 
 #include <kernel/attrib.h>
@@ -8,8 +6,8 @@
 
 #include <storage.h>
 
-#include <limits.h>
 #include <assert.h>
+#include <limits.h>
 
 static int read_movement(variant *var, void *owner, gamedata *data)
 {

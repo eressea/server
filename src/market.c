@@ -1,20 +1,21 @@
-#include <platform.h>
 #include <kernel/config.h>
 #include "market.h"
 
-#include <assert.h>
+#include "kernel/attrib.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/messages.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/unit.h"
 
-#include <kernel/attrib.h>
+#include "util/rng.h"
+#include "util/message.h"
+
 #include <selist.h>
-#include <util/rng.h>
 
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/unit.h>
+#include <assert.h>
 
 static unsigned int get_markets(region * r, unit ** results, size_t size)
 {

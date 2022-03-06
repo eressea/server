@@ -1,9 +1,7 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#include <platform.h>
 #endif
 
-#include <kernel/config.h>
 #include "battle.h"
 #include "alchemy.h"
 #include "guard.h"
@@ -21,6 +19,7 @@
 #include "kernel/alliance.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
+#include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
 #include "kernel/faction.h"
@@ -51,6 +50,7 @@
 #include "util/lists.h"
 #include "util/log.h"
 #include "util/macros.h"
+#include "util/message.h"
 #include "util/parser.h"
 #include "util/strings.h"
 #include "util/stats.h"
@@ -2429,8 +2429,11 @@ static void loot_items(fighter * corpse)
         return;
 
     while (itm) {
-        float lootfactor = (float)dead / (float)u->number; /* only loot the dead! */
-        int maxloot = (int)((float)itm->number * lootfactor);
+        int maxloot = itm->number;
+        if (u->number != dead) {
+            int quota = u->number / dead;
+            maxloot = maxloot / quota;
+        }
         if (maxloot > 0) {
             int i = (maxloot > 10) ? 10 : maxloot;
             for (; i != 0; --i) {
@@ -2443,7 +2446,7 @@ static void loot_items(fighter * corpse)
                     /* mustloot: we absolutely, positively must have somebody loot this thing */
                     int mustloot = itm->type->flags & (ITF_CURSED | ITF_NOTLOST);
 
-                    itm->number -= loot;
+                    item_add(itm, -loot);
                     maxloot -= loot;
 
                     if (is_monsters(u->faction) && (rule_loot & LOOT_MONSTERS)) {
@@ -3031,12 +3034,123 @@ static int tactics_bonus(int num) {
     return bonus;
 }
 
-fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
+/* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
+* ihr kaempfen koennten, und was ihr Wert darin ist. */
+static void equip_weapons(fighter* fig)
 {
 #define WMAX 20
+    item* itm;
+    unit* u = fig->unit;
     weapon weapons[WMAX];
+    int owp[WMAX];
+    int dwp[WMAX];
+    int wcount[WMAX];
+    int wused[WMAX];
+    int oi = 0, di = 0, w = 0;
+    int i;
+
+    for (itm = u->items; itm && w != WMAX; itm = itm->next) {
+        const weapon_type* wtype = resource2weapon(itm->type->rtype);
+        if (wtype == NULL || itm->number == 0)
+            continue;
+        weapons[w].attackskill = weapon_skill(wtype, u, true);
+        weapons[w].defenseskill = weapon_skill(wtype, u, false);
+        if (weapons[w].attackskill >= 0 || weapons[w].defenseskill >= 0) {
+            weapons[w].type = wtype;
+            wused[w] = 0;
+            wcount[w] = itm->number;
+            ++w;
+        }
+        assert(w != WMAX);
+    }
+    fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
+    memcpy(fig->weapons, weapons, w * sizeof(weapon));
+    fig->weapons[w].type = NULL;
+
+    for (i = 0; i != w; ++i) {
+        int j, o = 0, d = 0;
+        for (j = 0; j != i; ++j) {
+            if (weapon_weight(fig->weapons + j,
+                true) >= weapon_weight(fig->weapons + i, true))
+                ++d;
+            if (weapon_weight(fig->weapons + j,
+                false) >= weapon_weight(fig->weapons + i, false))
+                ++o;
+        }
+        for (j = i + 1; j != w; ++j) {
+            if (weapon_weight(fig->weapons + j,
+                true) > weapon_weight(fig->weapons + i, true))
+                ++d;
+            if (weapon_weight(fig->weapons + j,
+                false) > weapon_weight(fig->weapons + i, false))
+                ++o;
+        }
+        owp[o] = i;
+        dwp[d] = i;
+    }
+    /* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
+     * oi and di are the current index to the sorted owp/dwp arrays
+     * owp, dwp contain indices to the figther::weapons array */
+
+     /* hand out melee weapons: */
+    for (i = 0; i != fig->alive; ++i) {
+        int wpless = weapon_skill(NULL, u, true);
+        while (oi != w
+            && (wused[owp[oi]] == wcount[owp[oi]]
+                || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
+            ++oi;
+        }
+        if (oi == w)
+            break;                  /* no more weapons available */
+        if (weapon_weight(fig->weapons + owp[oi], false) <= wpless) {
+            continue;               /* we fight better with bare hands */
+        }
+        fig->person[i].melee = &fig->weapons[owp[oi]];
+        ++wused[owp[oi]];
+    }
+    /* hand out missile weapons (from back to front, in case of mixed troops). */
+    for (di = 0, i = fig->alive; i-- != 0;) {
+        while (di != w && (wused[dwp[di]] == wcount[dwp[di]]
+            || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
+            ++di;
+        }
+        if (di == w)
+            break;                  /* no more weapons available */
+        if (weapon_weight(fig->weapons + dwp[di], true) > 0) {
+            fig->person[i].missile = &fig->weapons[dwp[di]];
+            ++wused[dwp[di]];
+        }
+    }
+}
+static void equip_armor(fighter* fig)
+{
+    item* itm;
+    unit* u = fig->unit;
+
+    for (itm = u->items; itm; itm = itm->next) {
+        if (itm->type->rtype->atype) {
+            if (i_canuse(u, itm->type)) {
+                struct armor* adata = malloc(sizeof(armor)), ** aptr;
+                if (adata) {
+                    adata->atype = itm->type->rtype->atype;
+                    adata->count = itm->number;
+                    for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
+                        if (adata->atype->prot > (*aptr)->atype->prot) {
+                            break;
+                        }
+                    }
+                    adata->next = *aptr;
+                    *aptr = adata;
+                }
+            }
+        }
+    }
+
+}
+
+fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
+{
     region *r = b->region;
-    item *itm;
     fighter *fig = NULL;
     int h, i, tactics = effskill(u, SK_TACTICS, NULL);
     int berserk;
@@ -3141,87 +3255,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         }
     }
 
-    /* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
-     * ihr kaempfen koennten, und was ihr Wert darin ist. */
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
-        int owp[WMAX];
-        int dwp[WMAX];
-        int wcount[WMAX];
-        int wused[WMAX];
-        int oi = 0, di = 0;
-        int w = 0;
-        for (itm = u->items; itm && w != WMAX; itm = itm->next) {
-            const weapon_type *wtype = resource2weapon(itm->type->rtype);
-            if (wtype == NULL || itm->number == 0)
-                continue;
-            weapons[w].attackskill = weapon_skill(wtype, u, true);
-            weapons[w].defenseskill = weapon_skill(wtype, u, false);
-            if (weapons[w].attackskill >= 0 || weapons[w].defenseskill >= 0) {
-                weapons[w].type = wtype;
-                wused[w] = 0;
-                wcount[w] = itm->number;
-                ++w;
-            }
-            assert(w != WMAX);
-        }
-        fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
-        memcpy(fig->weapons, weapons, w * sizeof(weapon));
-        fig->weapons[w].type = NULL;
-
-        for (i = 0; i != w; ++i) {
-            int j, o = 0, d = 0;
-            for (j = 0; j != i; ++j) {
-                if (weapon_weight(fig->weapons + j,
-                    true) >= weapon_weight(fig->weapons + i, true))
-                    ++d;
-                if (weapon_weight(fig->weapons + j,
-                    false) >= weapon_weight(fig->weapons + i, false))
-                    ++o;
-            }
-            for (j = i + 1; j != w; ++j) {
-                if (weapon_weight(fig->weapons + j,
-                    true) > weapon_weight(fig->weapons + i, true))
-                    ++d;
-                if (weapon_weight(fig->weapons + j,
-                    false) > weapon_weight(fig->weapons + i, false))
-                    ++o;
-            }
-            owp[o] = i;
-            dwp[d] = i;
-        }
-        /* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
-         * oi and di are the current index to the sorted owp/dwp arrays
-         * owp, dwp contain indices to the figther::weapons array */
-
-         /* hand out melee weapons: */
-        for (i = 0; i != fig->alive; ++i) {
-            int wpless = weapon_skill(NULL, u, true);
-            while (oi != w
-                && (wused[owp[oi]] == wcount[owp[oi]]
-                    || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
-                ++oi;
-            }
-            if (oi == w)
-                break;                  /* no more weapons available */
-            if (weapon_weight(fig->weapons + owp[oi], false) <= wpless) {
-                continue;               /* we fight better with bare hands */
-            }
-            fig->person[i].melee = &fig->weapons[owp[oi]];
-            ++wused[owp[oi]];
-        }
-        /* hand out missile weapons (from back to front, in case of mixed troops). */
-        for (di = 0, i = fig->alive; i-- != 0;) {
-            while (di != w && (wused[dwp[di]] == wcount[dwp[di]]
-                || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
-                ++di;
-            }
-            if (di == w)
-                break;                  /* no more weapons available */
-            if (weapon_weight(fig->weapons + dwp[di], true) > 0) {
-                fig->person[i].missile = &fig->weapons[dwp[di]];
-                ++wused[dwp[di]];
-            }
-        }
+        equip_weapons(fig);
     }
 
     s1->size[statusrow(fig->status)] += u->number;
@@ -3247,22 +3282,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
 
     if (u_race(u)->battle_flags & BF_EQUIPMENT) {
-        for (itm = u->items; itm; itm = itm->next) {
-            if (itm->type->rtype->atype) {
-                if (i_canuse(u, itm->type)) {
-                    struct armor *adata = malloc(sizeof(armor)), **aptr;
-                    adata->atype = itm->type->rtype->atype;
-                    adata->count = itm->number;
-                    for (aptr = &fig->armors; *aptr; aptr = &(*aptr)->next) {
-                        if (adata->atype->prot > (*aptr)->atype->prot) {
-                            break;
-                        }
-                    }
-                    adata->next = *aptr;
-                    *aptr = adata;
-                }
-            }
-        }
+        equip_armor(fig);
     }
 
     /* Jetzt muss noch geschaut werden, wo die Einheit die jeweils besten

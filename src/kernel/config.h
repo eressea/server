@@ -1,17 +1,19 @@
-#ifndef ERESSEA_H
-#define ERESSEA_H
+#pragma once
+#ifndef ERESSEA_CONF_H
+#define ERESSEA_CONF_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /* this should always be the first thing included after platform.h */
 #include <stddef.h>
 #include <stdbool.h>
-#include "types.h"
 
-    struct param;
+    struct locale;
     struct _dictionary_;
+
+    /* alle vierstelligen zahlen: */
+#define MAX_CONTAINER_NR (36*36*36*36-1)
 
 #define DISPLAYSIZE         4096 /* max. Laenge einer Beschreibung, incl trailing 0 */
 #define ORDERSIZE           4096 /* max. length of an order */
@@ -31,15 +33,12 @@ extern "C" {
     int game_id(void);
     /* returns a value between [0..xpct_2], generated with two dice */
 
-    void init_locale(struct locale *lang);
     void init_races(struct locale *lang);
 
     bool forbiddenid(int id);
     int newcontainerid(void);
 
     bool rule_region_owners(void);
-    bool rule_stealth_other(void); /* units can pretend to be another faction, TARNE PARTEI <no> */
-    bool rule_stealth_anon(void);  /* units can anonymize their faction, TARNE PARTEI [NICHT] */
     int rule_alliance_limit(void);
     int rule_faction_limit(void);
 #define HARVEST_WORK  0x02
@@ -88,12 +87,7 @@ extern "C" {
         void *vm_state;
     } settings;
 
-    void set_param(struct param **p, const char *key, const char *value);
-    const char *get_param(const struct param *p, const char *key);
-    int get_param_int(const struct param *p, const char *key, int def);
-    int check_param(const struct param *p, const char *key, const char *searchvalue);
-    double get_param_flt(const struct param *p, const char *key, double def);
-    void free_params(struct param **pp);
+    extern settings global;
 
     void config_set(const char *key, const char *value);
     void config_set_int(const char *key, int value);
@@ -106,12 +100,8 @@ extern "C" {
 
     char * join_path(const char *p1, const char *p2, char *dst, size_t len);
 
-    struct order *default_order(const struct locale *lang);
-
-    void free_gamedata(void);
     void free_config(void);
-
-    extern settings global;
+    void free_ids(void);
 
 #ifdef __cplusplus
 }

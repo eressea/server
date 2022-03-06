@@ -1,9 +1,10 @@
-#include <platform.h>
 #include "messages.h"
 
 #include "unit.h"
 #include "faction.h"
 #include "order.h"
+
+#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>

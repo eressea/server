@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "gamedata.h"
 
 #include <CuTest.h>

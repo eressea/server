@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/messages.h"
@@ -11,6 +9,7 @@
 
 #include "util/keyword.h"
 #include "util/log.h"
+#include "util/message.h"
 #include "util/stats.h"
 
 #include "automate.h"

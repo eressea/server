@@ -1,7 +1,3 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include <kernel/config.h>
 #include "building.h"
 
@@ -410,9 +406,6 @@ building *new_building(const struct building_type * btype, region * r,
         bptr = &(*bptr)->next;
     *bptr = b;
 
-    if (is_lighthouse(b->type)) {
-        update_lighthouse(b);
-    }
     bname = LOC(lang, btype->_name);
     if (!bname) {
         bname = LOC(lang, parameters[P_GEBAEUDE]);
@@ -451,9 +444,6 @@ void remove_building(building ** blist, building * b)
         if (u->building == b) leave(u, true);
     }
 
-    if (is_lighthouse(b->type)) {
-        remove_lighthouse(b);
-    }
     b->size = 0;
     bunhash(b);
 
@@ -518,6 +508,16 @@ int buildingeffsize(const building * b, bool imaginary)
         btype = b->type;
     }
     return bt_effsize(btype, b, b->size);
+}
+
+const building_type *visible_building(const building *b) {
+    if (b->attribs) {
+        const attrib *a = a_find(b->attribs, &at_icastle);
+        if (a != NULL) {
+            return icastle_type(a);
+        }
+    }
+    return b->type;
 }
 
 int bt_effsize(const building_type * btype, const building * b, int bsize)
@@ -645,7 +645,7 @@ buildingtype_exists(const region * r, const building_type * bt, bool working)
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
-        if (b->type == bt && (!working || fval(b, BLD_MAINTAINED)) && building_finished(b)) {
+        if (b->type == bt && !(working && fval(b, BLD_UNMAINTAINED)) && building_finished(b)) {
             return true;
         }
     }
@@ -658,7 +658,7 @@ bool building_finished(const struct building *b) {
 }
 
 bool building_is_active(const struct building *b) {
-    return b && fval(b, BLD_MAINTAINED) && building_finished(b);
+    return b && !fval(b, BLD_UNMAINTAINED) && building_finished(b);
 }
 
 building *active_building(const unit *u, const struct building_type *btype) {
@@ -689,12 +689,15 @@ void building_setregion(building * b, region * r)
 bool in_safe_building(unit *u1, unit *u2) {
     if (u1->building) {
         building * b = inside_building(u1);
-        if (b && b->type->flags & BTF_FORTIFICATION) {
-            if (!u2->building) {
-                return true;
-            }
-            if (u2->building != b || b != inside_building(u2)) {
-                return true;
+        if (b) {
+            const building_type *btype = visible_building(b);
+            if (btype->flags & BTF_FORTIFICATION) {
+                if (!u2->building) {
+                    return true;
+                }
+                if (u2->building != b || b != inside_building(u2)) {
+                    return true;
+                }
             }
         }
     }

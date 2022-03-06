@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "shipcurse.h"
 
 /* kernel includes */
@@ -14,6 +13,7 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <storage.h>
 

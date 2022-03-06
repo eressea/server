@@ -41,6 +41,7 @@
 #include "kernel/region.h"
 #include "kernel/resources.h"
 #include "kernel/ship.h"
+#include "kernel/skills.h"
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"
@@ -55,6 +56,7 @@
 #include "util/lists.h"
 #include "util/log.h"
 #include "util/macros.h"
+#include "util/message.h"
 #include "util/path.h"
 #include "util/password.h"
 #include "util/strings.h"
@@ -463,13 +465,12 @@ report_building(const struct building *b, const char **name,
         *name = buildingtype(b->type, b, b->size);
     }
     if (illusion) {
-        *illusion = NULL;
-
-        if (b->attribs && is_building_type(b->type, "illusioncastle")) {
-            const attrib *a = a_find(b->attribs, &at_icastle);
-            if (a != NULL) {
-                *illusion = buildingtype(icastle_type(a), b, b->size);
-            }
+        const building_type *btype = visible_building(b);
+        if (btype != b->type) {
+            *illusion = buildingtype(btype, b, b->size);
+        }
+        else {
+            *illusion = NULL;
         }
     }
 }
@@ -1654,9 +1655,13 @@ static void check_messages_exist(void) {
 int init_reports(void)
 {
     region *r;
+    bool update = true;
     check_messages_exist();
     create_directories();
     for (r = regions; r; r = r->next) {
+        if (update) {
+            update = update_lighthouses(r);
+        }
         reorder_units(r);
     }
     return 0;

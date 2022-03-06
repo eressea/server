@@ -1,19 +1,14 @@
+#pragma once
 #ifndef STEALTH_H
 #define STEALTH_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+extern struct attrib_type at_stealth;
 
-    struct unit;
-    struct region;
-    extern struct attrib_type at_stealth;
-    int eff_stealth(const struct unit *u, const struct region *r);
-    void u_seteffstealth(struct unit *u, int value);
-    int u_geteffstealth(const struct unit *u);
+struct unit;
+struct region;
 
-#ifdef __cplusplus
-}
-#endif
+int eff_stealth(const struct unit *u, const struct region *r);
+void u_seteffstealth(struct unit *u, int value);
+int u_geteffstealth(const struct unit *u);
 
 #endif

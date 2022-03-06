@@ -1,19 +1,16 @@
-#ifdef _MSC_VER
-#include <platform.h>
-#endif
-
 #include "spells.h"
 
+#include "battle.h"
 #include "contact.h"
+#include "direction.h"
 #include "guard.h"
+#include "laws.h"
+#include "monsters.h"
+#include "randenc.h"
 #include "reports.h"
 #include "spy.h"
-#include "vortex.h"
-#include "laws.h"
-#include "direction.h"
-#include "randenc.h"
-#include "monsters.h"
 #include "teleport.h"
+#include "vortex.h"
 
 /* triggers includes */
 #include <triggers/changefaction.h>
@@ -51,6 +48,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/spell.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
@@ -784,7 +782,7 @@ static int sp_transferaura(castorder * co)
 /* ------------------------------------------------------------- */
 /* DRUIDE */
 /* ------------------------------------------------------------- */
-/* Name:       Guenstige Winde
+/* Name:       Guenstige Winde / Wasserelementar
  * Stufe:      4
  * Gebiet:     Gwyrrd
  * Wirkung:
@@ -1152,7 +1150,7 @@ static int sp_hain(castorder * co)
         return 0;
     }
 
-    trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
+    trees = lovar((int)(force * 5)) + (int)force;
     rsettrees(r, 1, rtrees(r, 1) + trees);
 
     /* melden, 1x pro Partei */
@@ -1198,7 +1196,7 @@ static int sp_mallornhain(castorder * co)
         return 0;
     }
 
-    trees = lovar((int)(force * 10 * RESOURCE_QUANTITY)) + (int)force;
+    trees = lovar((int)(force * 5)) + (int)force;
     rsettrees(r, 1, rtrees(r, 1) + trees);
 
     /* melden, 1x pro Partei */
@@ -1510,7 +1508,7 @@ static int sp_create_irongolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int number = (int)((co->force * 4 + lovar(co->force * 4)) * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 4 + lovar(co->force * 4)) / 2);
     static int cache;
     static const race * golem_rc;
 
@@ -1579,7 +1577,7 @@ static int sp_create_stonegolem(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int number = (int)((co->force * 2 + lovar(co->force * 3)) * RESOURCE_QUANTITY);
+    int number = (int)((co->force * 2 + lovar(co->force * 3)) / 2);
     static int cache;
     static const race * golem_rc;
 
@@ -4463,8 +4461,8 @@ int sp_icastle(castorder * co)
         return 0;
     }
 
-    if ((type =
-        findbuildingtype(pa->param[0]->data.xs, mage->faction->locale)) == NULL) {
+    type = findbuildingtype(pa->param[0]->data.xs, mage->faction->locale);
+    if (type == NULL) {
         type = bt_find("castle");
     }
 

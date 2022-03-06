@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "kernel/config.h"
 #include "util/language.h"
 #include "skill.h"

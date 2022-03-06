@@ -52,6 +52,8 @@ static char g_bigbuf[BUFFERSIZE];
 #include "kernel/region.h"
 #include "kernel/resources.h"
 #include "kernel/ship.h"
+#include "kernel/skills.h"
+
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
 #include "kernel/terrain.h"
@@ -274,14 +276,15 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
             a = a->next;
         }
         else if (a->type == &at_effect && self) {
-            effect_data *data = (effect_data *)a->data.v;
-            if (data->value > 0) {
-                const char *key = resourcename(data->type->rtype, 0);
+            int value = effect_value(a);
+            if (value > 0) {
+                const struct item_type *itype = effect_type(a);
+                const char *key = resourcename(itype->rtype, 0);
                 if (!header) {
                     header = 1;
                     stream_printf(out, "EFFECTS\n");
                 }
-                stream_printf(out, "\"%d %s\"\n", data->value, translate(key,
+                stream_printf(out, "\"%d %s\"\n", value, translate(key,
                     LOC(viewer->locale, key)));
             }
             a = a->next;
@@ -720,6 +723,12 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
             }
         }
     }
+}
+
+int level_days(unsigned int level)
+{
+    /* FIXME STUDYDAYS * ((level + 1) * level / 2); */
+    return 30 * ((level + 1) * level / 2);
 }
 
 /** prints all that belongs to a unit

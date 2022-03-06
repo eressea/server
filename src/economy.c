@@ -1,6 +1,5 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
-#include <platform.h>
 #endif
 
 #include "economy.h"
@@ -19,11 +18,11 @@
 #include "morale.h"
 #include "reports.h"
 
-#include <attributes/reduceproduction.h>
-#include <attributes/racename.h>
-#include <spells/buildingcurse.h>
-#include <spells/regioncurse.h>
-#include <spells/unitcurse.h>
+#include "attributes/reduceproduction.h"
+#include "attributes/racename.h"
+#include "spells/buildingcurse.h"
+#include "spells/regioncurse.h"
+#include "spells/unitcurse.h"
 
 /* kernel includes */
 #include "kernel/ally.h"
@@ -49,22 +48,24 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <util/base36.h>
-#include <util/goodies.h>
-#include <util/language.h>
-#include <util/lists.h>
-#include <util/log.h>
+#include "util/base36.h"
+#include "util/goodies.h"
+#include "util/language.h"
+#include "util/lists.h"
+#include "util/log.h"
+#include "util/message.h"
 #include "util/param.h"
-#include <util/parser.h>
-#include <util/rng.h>
+#include "util/parser.h"
+#include "util/rng.h"
 
 /* libs includes */
+#include <assert.h>
+#include <errno.h>
+#include <limits.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
-#include <limits.h>
 
 #define MAX_REQUESTS 1024
 static struct econ_request econ_requests[MAX_REQUESTS];
@@ -306,30 +307,33 @@ static int forget_cmd(unit * u, order * ord)
     return 0;
 }
 
-static int maintain(building * b)
+static bool maintain(building * b)
 {
     int c;
     region *r = b->region;
     bool paid = true;
     unit *u;
 
-    if (fval(b, BLD_MAINTAINED) || b->type == NULL || b->type->maintenance == NULL) {
-        return BLD_MAINTAINED;
-    }
-    if (fval(b, BLD_DONTPAY)) {
-        return 0;
+    if (b->type == NULL || b->type->maintenance == NULL) {
+        return true;
     }
     u = building_owner(b);
     if (u == NULL) {
         /* no owner - send a message to the entire region */
         ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
-        return 0;
+        return false;
     }
-    /* If the owner is the region owner, check if dontpay flag is set for the building where he is in */
-    if (config_token("rules.region_owner_pay_building", b->type->_name)) {
-        if (fval(u->building, BLD_DONTPAY)) {
-            return 0;
+    /* If the owner is the region owner, check if dontpay flag is set for the building he is in */
+    if (b != u->building) {
+        if (!config_token("rules.region_owner_pay_building", b->type->_name)) {
+            /* no owner - send a message to the entire region */
+            ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
+            return false;
         }
+    }
+    if (fval(u->building, BLD_DONTPAY)) {
+        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
+        return false;
     }
     for (c = 0; b->type->maintenance[c].number && paid; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -342,14 +346,10 @@ static int maintain(building * b)
             paid = false;
         }
     }
-    if (fval(b, BLD_DONTPAY)) {
-        ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
-        return 0;
-    }
     if (!paid) {
         ADDMSG(&u->faction->msgs, msg_message("maintenancefail", "unit building", u, b));
         ADDMSG(&r->msgs, msg_message("maintenance_nowork", "building", b));
-        return 0;
+        return paid;
     }
     for (c = 0; b->type->maintenance[c].number; ++c) {
         const maintenance *m = b->type->maintenance + c;
@@ -359,12 +359,12 @@ static int maintain(building * b)
             cost = cost * b->size;
         }
         cost -=
-            use_pooled(u, m->rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK,
+            use_pooled(u, m->rtype, GET_DEFAULT,
                 cost);
         assert(cost == 0);
     }
     ADDMSG(&u->faction->msgs, msg_message("maintenance", "unit building", u, b));
-    return BLD_MAINTAINED;
+    return true;
 }
 
 void maintain_buildings(region * r)
@@ -372,12 +372,11 @@ void maintain_buildings(region * r)
     building **bp = &r->buildings;
     while (*bp) {
         building *b = *bp;
-        int flags = BLD_MAINTAINED;
-
         if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
-            flags = maintain(b);
+            if (!maintain(b)) {
+                fset(b, BLD_UNMAINTAINED);
+            }
         }
-        fset(b, flags);
         bp = &b->next;
     }
 }
@@ -424,6 +423,169 @@ void economics(region * r)
             }
         }
     }
+}
+
+static void destroy_road(unit* u, int nmax, struct order* ord)
+{
+    char token[128];
+    const char* s = gettoken(token, sizeof(token));
+    direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
+    if (d == NODIRECTION) {
+        /* Die Richtung wurde nicht erkannt */
+        cmistake(u, ord, 71, MSG_PRODUCE);
+    }
+    else {
+        unit* u2;
+        region* r = u->region;
+        int road, n = nmax;
+
+        if (nmax > SHRT_MAX) {
+            n = SHRT_MAX;
+        }
+        else if (nmax < 0) {
+            n = 0;
+        }
+
+        for (u2 = r->units; u2; u2 = u2->next) {
+            if (u2->faction != u->faction && is_guard(u2)
+                && cansee(u2->faction, u->region, u, 0)
+                && !alliedunit(u, u2->faction, HELP_GUARD)) {
+                cmistake(u, ord, 70, MSG_EVENT);
+                return;
+            }
+        }
+
+        road = rroad(r, d);
+        if (n > road) n = road;
+
+        if (n != 0) {
+            region* r2 = rconnect(r, d);
+            int willdo = effskill(u, SK_ROAD_BUILDING, NULL) * u->number;
+            if (willdo > n) willdo = n;
+            if (willdo == 0) {
+                /* TODO: error message */
+            }
+            else if (willdo > SHRT_MAX)
+                road = 0;
+            else
+                road = (short)(road - willdo);
+            rsetroad(r, d, road);
+            if (willdo > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("destroy_road",
+                    "unit from to", u, r, r2));
+            }
+        }
+    }
+}
+
+int destroy_cmd(unit* u, struct order* ord)
+{
+    char token[128];
+    ship* sh;
+    unit* u2;
+    region* r = u->region;
+    int size = 0;
+    const char* s;
+    int n = INT_MAX;
+
+    if (u->number < 1)
+        return 1;
+
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return 52;
+    }
+
+    init_order(ord, NULL);
+    s = gettoken(token, sizeof(token));
+
+    if (s && *s) {
+        ERRNO_CHECK();
+        n = atoi(s);
+        errno = 0;
+        if (n <= 0) {
+            n = INT_MAX;
+        }
+        else {
+            s = gettoken(token, sizeof(token));
+        }
+    }
+
+    if (s && isparam(s, u->faction->locale, P_ROAD)) {
+        destroy_road(u, n, ord);
+        return 0;
+    }
+
+    if (u->building) {
+        building* b = u->building;
+
+        if (u != building_owner(b)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (fval(b->type, BTF_INDESTRUCTIBLE)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (n >= b->size) {
+            building_stage* stage;
+            /* destroy completly */
+            /* all units leave the building */
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (u2->building == b) {
+                    leave_building(u2);
+                }
+            }
+            ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
+            for (stage = b->type->stages; stage; stage = stage->next) {
+                size = recycle(u, &stage->construction, size);
+            }
+            remove_building(&r->buildings, b);
+        }
+        else {
+            /* TODO: partial destroy does not recycle */
+            b->size -= n;
+            ADDMSG(&u->faction->msgs, msg_message("destroy_partial",
+                "building unit", b, u));
+        }
+    }
+    else if (u->ship) {
+        sh = u->ship;
+
+        if (u != ship_owner(sh)) {
+            cmistake(u, ord, 138, MSG_PRODUCE);
+            return 138;
+        }
+        if (fval(r->terrain, SEA_REGION)) {
+            cmistake(u, ord, 14, MSG_EVENT);
+            return 14;
+        }
+
+        if (n >= (sh->size * 100) / ship_maxsize(sh)) {
+            /* destroy completly */
+            /* all units leave the ship */
+            for (u2 = r->units; u2; u2 = u2->next) {
+                if (u2->ship == sh) {
+                    leave_ship(u2);
+                }
+            }
+            ADDMSG(&u->faction->msgs, msg_message("shipdestroy",
+                "unit region ship", u, r, sh));
+            size = recycle(u, sh->type->construction, size);
+            remove_ship(&sh->region->ships, sh);
+        }
+        else {
+            /* partial destroy */
+            sh->size -= (ship_maxsize(sh) * n) / 100;
+            ADDMSG(&u->faction->msgs, msg_message("shipdestroy_partial",
+                "unit region ship", u, r, sh));
+        }
+    }
+    else {
+        cmistake(u, ord, 138, MSG_PRODUCE);
+        return 138;
+    }
+    return 0;
 }
 
 void destroy(region *r) {
@@ -2313,7 +2475,7 @@ void auto_work(region * r)
         }
     }
     if (nextrequest != econ_requests) {
-        expandwork(r, econ_requests, nextrequest, region_maxworkers(r), total);
+        expandwork(r, econ_requests, nextrequest, region_production(r), total);
     }
 }
 
@@ -2510,7 +2672,7 @@ void produce(struct region *r)
     if (entertaining > 0) {
         expandentertainment(r, econ_requests, nextrequest, entertaining);
     }
-    expandwork(r, econ_requests, nextrequest, region_maxworkers(r), working);
+    expandwork(r, econ_requests, nextrequest, region_production(r), working);
 
     if (taxorders) {
         expandtax(r, taxorders);

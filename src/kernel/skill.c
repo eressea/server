@@ -46,15 +46,16 @@ const char *skillnames[MAXSKILLS] = {
     "unarmed"
 };
 
-bool skill_disabled[MAXSKILLS];
+static bool skill_disabled[MAXSKILLS];
 
 bool skill_enabled(skill_t sk) {
     assert(sk != NOSKILL);
     return !skill_disabled[sk];
 }
 
-static const char * skill_key(int sk) {
-    assert(sk < MAXPARAMS && sk >= 0);
+static const char * skill_key(int i) {
+    skill_t sk = (skill_t)i;
+    assert(sk < MAXSKILLS && sk >= 0);
     return skill_disabled[sk] ? 0 : mkname("skill", skillnames[sk]);
 }
 
@@ -72,7 +73,6 @@ const char *skillname(skill_t sk, const struct locale *lang)
 {
     if (skill_disabled[sk]) return 0;
     return LOC(lang, mkname("skill", skillnames[sk]));
-
 }
 
 void enable_skill(skill_t sk, bool value)

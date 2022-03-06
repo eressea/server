@@ -1,11 +1,12 @@
 #include "monsters.h"
 
+#include "battle.h"
 #include "economy.h"
 #include "give.h"
 #include "guard.h"
 #include "laws.h"
-#include "study.h"
 #include "move.h"
+#include "study.h"
 
 /* kernel includes */
 #include "kernel/attrib.h"
@@ -25,6 +26,7 @@
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
+#include "kernel/skills.h"
 #include "kernel/terrain.h"
 #include "kernel/terrainid.h"
 #include "kernel/unit.h"
@@ -34,6 +36,7 @@
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/log.h"
+#include "util/message.h"
 #include "util/stats.h"
 #include "util/rand.h"
 #include "util/rng.h"
@@ -629,28 +632,16 @@ static bool check_overpopulated(const unit * u)
     return false;
 }
 
-static void recruit_dracoids(unit * dragon, int size)
+static void recruit_dracoids(unit* u, int size)
 {
-    faction *f = dragon->faction;
-    region *r = dragon->region;
-    const struct item *weapon = NULL;
-    unit *un = create_unit(r, f, size, get_race(RC_DRACOID), 0, NULL, NULL);
-    stats_count("monsters.create.dracoid", 1);
+    unit* un;
+    const struct locale* lang = u->faction->locale;
 
-    fset(un, UFL_ISNEW | UFL_MOVED);
-
+    un = create_unit(u->region, u->faction, 0, get_race(RC_DRACOID), 0, NULL, u);
     name_unit(un);
-    change_money(dragon, -un->number * 50);
-    equip_unit(un, "new_dracoid");
-
     unit_setstatus(un, ST_FIGHT);
-    for (weapon = un->items; weapon; weapon = weapon->next) {
-        const weapon_type *wtype = weapon->type->rtype->wtype;
-        if (wtype && wtype->flags & WTF_MISSILE) {
-            unit_setstatus(un, ST_BEHIND);
-            break;
-        }
-    }
+    fset(un, UFL_ISNEW | UFL_MOVED);
+    unit_addorder(un, create_order(K_RECRUIT, lang, "%d", size));
 }
 
 static order *plan_dragon(unit * u)
@@ -739,6 +730,7 @@ static order *plan_dragon(unit * u)
             if (r->land && !fval(r->terrain, FORBIDDEN_REGION)) {
                 int ra = 20 + rng_int() % 100;
                 if (get_money(u) > ra * 50 + 100 && rng_int() % 100 < 50) {
+                    stats_count("monsters.create.dracoid", 1);
                     recruit_dracoids(u, ra);
                 }
             }
@@ -1067,7 +1059,7 @@ void spawn_undead(void)
 static void eaten_by_monster(unit * u)
 {
     /* adjustment for smaller worlds */
-    double multi = RESOURCE_QUANTITY * newterrain(T_PLAIN)->size / 10000.0;
+    double multi = newterrain(T_PLAIN)->size / 20000.0;
     const resource_type *rhorse = get_resourcetype(R_HORSE);
     const race *rc = u_race(u);
     int p = rpeasants(u->region);

@@ -25,6 +25,8 @@ extern "C" {
 
 #define RACE_ATTACKS 10         /* maximum number of attacks */
 
+#define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
+
     struct param;
     struct spell;
     struct spellref;
@@ -164,6 +166,7 @@ extern "C" {
 
     bool rc_can_use(const struct race *rc, const struct item_type *itype);
 
+    const char* race_name(const race* rc);
     typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
     const char * rc_name_s(const race *rc, name_t n);
     const char * rc_key(const char *rcname, name_t n, char *name, size_t size);

@@ -3,6 +3,7 @@
 #endif
 #include "faction.h"
 
+#include "battle.h"
 #include "calendar.h"
 #include "config.h"
 #include "database.h"
@@ -34,6 +35,7 @@
 #include <util/lists.h>
 #include <util/language.h>
 #include <util/log.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/password.h>
 #include <util/path.h>
@@ -250,8 +252,8 @@ faction *addfaction(const char *email, const char *password,
     return f;
 }
 
-#define PEASANT_MIN (10 * RECRUITFRACTION)
-#define PEASANT_MAX (20 * RECRUITFRACTION)
+#define PEASANT_MIN (10 * RECRUIT_FRACTION)
+#define PEASANT_MAX (20 * RECRUIT_FRACTION)
 
 unit *addplayer(region * r, faction * f)
 {
@@ -565,7 +567,7 @@ void faction_setpassword(faction * f, const char *pwhash)
 
 bool valid_race(const struct faction *f, const struct race *rc)
 {
-    if (f->race == rc)
+    if (is_monsters(f) || f->race == rc)
         return true;
     else {
         return rc_otherrace(f->race) == rc;
@@ -856,3 +858,20 @@ void change_locale(faction *f, const struct locale *lang, bool del ) {
     f->locale = lang;
 }
 
+bool rule_stealth_other(void)
+{
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.other", 1);
+    }
+    return rule != 0;
+}
+
+bool rule_stealth_anon(void)
+{
+    static int rule, config;
+    if (config_changed(&config)) {
+        rule = config_get_int("stealth.faction.anon", 1);
+    }
+    return rule != 0;
+}

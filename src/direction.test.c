@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include "direction.h"
 #include "tests.h"
 

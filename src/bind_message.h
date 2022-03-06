@@ -1,10 +1,10 @@
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
-  struct lua_State;
-  void tolua_message_open(struct lua_State *L);
+#ifndef H_BIND_MESSAGE
+#define H_BIND_MESSAGE
 
-#ifdef __cplusplus
-}
+struct lua_State;
+ 
+void tolua_message_open(struct lua_State *L);
+
 #endif

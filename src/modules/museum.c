@@ -1,5 +1,3 @@
-#include <platform.h>
-
 #include <kernel/config.h>
 
 #include "museum.h"
@@ -27,6 +25,7 @@
 #include <util/strings.h>
 #include <util/language.h>
 #include <util/macros.h>
+#include <util/message.h>
 
 #include <storage.h>
 

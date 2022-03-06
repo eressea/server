@@ -1,4 +1,4 @@
-#include <platform.h>
+#include "triggers.h"
 
 /* triggers includes */
 #include <triggers/changefaction.h>

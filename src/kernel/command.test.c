@@ -1,4 +1,3 @@
-#include <platform.h>
 #include "command.h"
 
 #include "unit.h"

@@ -37,6 +37,7 @@ extern "C" {
 #define test_setup_ex(tc) test_setup_test(tc, __FILE__, __LINE__)
 
     void test_teardown(void);
+    void test_reset(void);
     void test_log_stderr(int on);
     struct log_t * test_log_start(int flags, struct strlist **slist);
     void test_log_stop(struct log_t *log, struct strlist *slist);
