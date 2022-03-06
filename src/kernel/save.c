@@ -43,11 +43,12 @@
 
 /* util includes */
 #include <kernel/attrib.h>
-#include <util/base36.h>
 #include <kernel/event.h>
 #include <kernel/gamedata.h>
+#include <kernel/spellbook.h>
+
+#include <util/base36.h>
 #include <util/goodies.h>
-#include <kernel/gamedata.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
