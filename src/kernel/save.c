@@ -28,9 +28,11 @@
 #include "region.h"
 #include "resources.h"
 #include "ship.h"
+#include "skill.h"
 #include "skills.h"
-#include "spellbook.h"
 #include "spell.h"
+#include "spellbook.h"
+#include "teleport.h"
 #include "terrain.h"
 #include "terrainid.h"          /* only for conversion code */
 #include "unit.h"
@@ -45,6 +47,7 @@
 #include <triggers/shock.h>
 
 /* util includes */
+
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
@@ -741,6 +744,11 @@ static region *readregion(gamedata *data, int x, int y)
         log_error("Unknown terrain '%s'", name);
         assert(!"unknown terrain");
     }
+    if (r->_plane && r->_plane == get_astralplane()) {
+        if (fval(terrain, SEA_REGION)) {
+            terrain = get_terrain("fog");
+        }
+    }
     r->terrain = terrain;
     READ_INT(data->store, &r->flags);
     READ_INT(data->store, &n);
@@ -905,6 +913,12 @@ void writeregion(gamedata *data, const region * r)
     assert(data);
 
     WRITE_INT(data->store, r->uid);
+    if (r->_plane && r->_plane == get_astralplane()) {
+        if (fval(r->terrain, SEA_REGION)) {
+            log_error("astral region is %s", r->terrain->_name);
+            abort();
+        }
+    }
     WRITE_TOK(data->store, r->terrain->_name);
     WRITE_INT(data->store, r->flags & RF_SAVEMASK);
     WRITE_INT(data->store, r->age);
