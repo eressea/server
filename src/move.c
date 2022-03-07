@@ -103,7 +103,13 @@ get_followers(unit * u, region * r, const region_list * route_end,
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
-            const attrib *a = a_find(uf->attribs, &at_follow);
+            const attrib* a;
+            if (uf->ship) {
+                if (uf == ship_owner(uf->ship)) {
+                    continue;
+                }
+            }
+            a = a_find(uf->attribs, &at_follow);
             while (a) {
                 if (a->data.v == u) {
                     follower *fnew = (follower *)malloc(sizeof(follower));
@@ -1540,7 +1546,15 @@ static const region_list *travel_route(unit * u,
         /* check movement from/to oceans.
          * aquarian special, flying units, horses, the works */
         if ((u_race(u)->flags & RCF_FLY) == 0) {
-            if (!fval(next->terrain, SEA_REGION)) {
+            if (fval(next->terrain, SEA_REGION)) {
+                /* Ozeanfelder koennen nur von Einheiten mit Schwimmen und ohne
+                 * Pferde betreten werden. */
+                if (!(canswim(u) || canfly(u))) {
+                    ADDMSG(&u->faction->msgs, msg_message("detectocean",
+                        "unit region terrain", u, next, terrain_name(next)));
+                    break;
+                }
+            } else {
                 /* next region is land */
                 if (fval(current->terrain, SEA_REGION)) {
                     int moving = u_race(u)->flags & (RCF_SWIM | RCF_WALK | RCF_COASTAL);
@@ -1561,15 +1575,6 @@ static const region_list *travel_route(unit * u,
                 }
                 else if (landing) {
                     /* wir sind diese woche angelandet */
-                    ADDMSG(&u->faction->msgs, msg_message("detectocean",
-                        "unit region terrain", u, next, terrain_name(next)));
-                    break;
-                }
-            }
-            else {
-                /* Ozeanfelder koennen nur von Einheiten mit Schwimmen und ohne
-                 * Pferde betreten werden. */
-                if (!(canswim(u) || canfly(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
                         "unit region terrain", u, next, terrain_name(next)));
                     break;
