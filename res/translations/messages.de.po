@@ -2792,6 +2792,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür müssen 
 msgid "error329"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist zu klein für einen Konvoi dieser Größe.\""
 
+msgid "error330"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Schiffe können nur andere Schiffe verfolgen.\""
+
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl der $localize($resource) fehlt.\""
 

@@ -22,6 +22,7 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/base36.h"
+#include "util/param.h"
 #include "util/parser.h"
 
 #include <CuTest.h>
@@ -534,6 +535,37 @@ static void test_ship_damage_overload(CuTest *tc) {
     CuAssertDblEquals(tc, 0.0, damage_overload(5, 0.0), ASSERT_DBL_DELTA);
 }
 
+static void test_follow_bad_target(CuTest* tc) {
+    unit* u, * u2;
+    region* r;
+    faction* f;
+
+    test_setup();
+    mt_create_va(mt_new("error330", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("error146", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+
+    r = test_create_ocean(1, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, test_create_ocean(0, 0));
+    u2 = test_create_unit(f, test_create_ocean(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    unit_addorder(u, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no)));
+    unit_addorder(u2, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_SHIP]), itoa36(u->ship->no)));
+    follow_cmds(u);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error330"));
+    CuAssertIntEquals(tc, 0, fval(u, UFL_NOTMOVING | UFL_LONGACTION));
+    test_clear_messages(f);
+
+    follow_cmds(u2);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error146"));
+    CuAssertIntEquals(tc, 0, fval(u2, UFL_NOTMOVING | UFL_LONGACTION));
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
 static void test_follow_unit(CuTest *tc) {
     unit *u, *u2;
     order *ord;
@@ -929,6 +961,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
     SUITE_ADD_TEST(suite, test_follow_unit);
+    SUITE_ADD_TEST(suite, test_follow_bad_target);
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);

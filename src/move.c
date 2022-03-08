@@ -104,11 +104,6 @@ get_followers(unit * u, region * r, const region_list * route_end,
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
             const attrib* a;
-            if (uf->ship) {
-                if (uf == ship_owner(uf->ship)) {
-                    continue;
-                }
-            }
             a = a_find(uf->attribs, &at_follow);
             while (a) {
                 if (a->data.v == u) {
@@ -2610,7 +2605,14 @@ void follow_cmds(unit * u)
             init_order(ord, NULL);
             p = getparam(lang);
             if (p == P_UNIT) {
-                int id = read_unitid(u->faction, r);
+                int id;
+                if (u->ship) {
+                    if (u == ship_owner(u->ship)) {
+                        cmistake(u, ord, 330, MSG_MOVE);
+                        continue;
+                    }
+                }
+                id = read_unitid(u->faction, r);
                 if (id == u->no) {
                     ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                         u, u));
@@ -2628,7 +2630,12 @@ void follow_cmds(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                int id = getid();
+                int id;
+                if (!u->ship || u != ship_owner(u->ship)) {
+                    cmistake(u, ord, 146, MSG_MOVE);
+                    continue;
+                }
+                id = getid();
                 if (id <= 0) {
                     cmistake(u, ord, 20, MSG_MOVE);
                 }
