@@ -537,7 +537,6 @@ static void test_ship_damage_overload(CuTest *tc) {
 
 static void test_follow_bad_target(CuTest* tc) {
     unit* u, * u2;
-    region* r;
     faction* f;
 
     test_setup();
@@ -546,7 +545,6 @@ static void test_follow_bad_target(CuTest* tc) {
     mt_create_va(mt_new("error146", NULL),
         "unit:unit", "region:region", "command:order", MT_NEW_END);
 
-    r = test_create_ocean(1, 0);
     f = test_create_faction();
     u = test_create_unit(f, test_create_ocean(0, 0));
     u2 = test_create_unit(f, test_create_ocean(0, 0));
@@ -570,11 +568,13 @@ static void test_follow_unit(CuTest *tc) {
     unit *u, *u2;
     order *ord;
     faction *f;
+    region *r;
 
     test_setup();
 
     f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
+    r = test_create_plain(1, 0);
     u2 = test_create_unit(test_create_faction(), u->region);
     ord = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
     unit_addorder(u2, ord);
