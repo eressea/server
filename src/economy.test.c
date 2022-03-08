@@ -383,7 +383,7 @@ static void test_buy_cmd(CuTest *tc) {
     b->size = 2;
     produce(r);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
-    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "error102"));
+    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "skill_needed"));
     test_clear_messages(u->faction);
     freset(u, UFL_LONGACTION);
 
