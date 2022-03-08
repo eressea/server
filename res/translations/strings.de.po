@@ -116,8 +116,8 @@ msgctxt "spell"
 msgid "eternal_walls"
 msgstr "Mauern der Ewigkeit"
 
-msgid "JEDEM"
-msgstr "JEDEM"
+msgid "JE"
+msgstr "JE"
 
 msgctxt "skill"
 msgid "sailing"
