@@ -1433,7 +1433,13 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+    k = effskill(u, SK_TRADE, NULL);
+    if (k <= 0) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, u->thisorder, "skill_needed", "skill", SK_TRADE));
+        return;
+    }
+    k = u->number * 10 * k;
 
     /* hat der Haendler bereits gehandelt, muss die Menge der bereits
      * verkauften/gekauften Gueter abgezogen werden */
