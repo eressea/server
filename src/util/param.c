@@ -17,7 +17,7 @@
 const char *parameters[MAXPARAMS] = {
     "LOCALE",
     "ALLES",
-    "JEDEM",
+    "JE",
     "BAUERN",
     "BURG",
     "EINHEIT",

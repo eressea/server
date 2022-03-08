@@ -111,7 +111,7 @@ msgstr "elven bows"
 msgid "person"
 msgstr "man"
 
-msgid "JEDEM"
+msgid "JE"
 msgstr "EACH"
 
 msgctxt "spell"

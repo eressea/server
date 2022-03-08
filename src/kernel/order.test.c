@@ -99,12 +99,15 @@ static void test_parse_parameters(CuTest* tc) {
     lang = get_or_create_locale("en");
 
     locale_setstring(lang, parameters[P_NEXT], "NAECHSTER");
+    locale_setstring(lang, parameters[P_EACH], "JE");
     init_locale(lang);
     CuAssertIntEquals(tc, NOPARAM, findparam("N", lang));
     CuAssertIntEquals(tc, NOPARAM, findparam("NA", lang));
     CuAssertIntEquals(tc, P_NEXT, findparam("NAE", lang));
     CuAssertIntEquals(tc, P_NEXT, findparam("NAECHSTER", lang));
     CuAssertIntEquals(tc, NOPARAM, findparam("NAECHSTERSTER", lang));
+    CuAssertIntEquals(tc, P_EACH, findparam("JE", lang));
+    CuAssertIntEquals(tc, NOPARAM, findparam("J", lang));
     test_teardown();
 }
 
