@@ -677,39 +677,41 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    const building_type *bt_harbour = bt_find("harbour");
     int reason = SA_NO_COAST;
 
-    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-        if (!harbourmaster || !sh->_owner) {
-            reason = SA_HARBOUR;
-        }
-        else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-            reason = SA_HARBOUR;
-        }
+    if (fval(r->terrain, SEA_REGION)) {
+        return SA_COAST;
     }
-    if (reason == SA_NO_COAST && fval(r->terrain, SEA_REGION)) {
-        reason = SA_COAST;
-    }
-    if (reason == SA_NO_COAST && sh->type->coasts) {
-        int c;
-        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
-                reason = SA_COAST;
+    else {
+        const building_type* bt_harbour = bt_find("harbour");
+        if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+            unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+            if (!harbourmaster || !sh->_owner) {
+                reason = SA_HARBOUR;
+            }
+            else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                reason = SA_HARBOUR;
+            }
+            else {
+                return SA_NO_HARBOUR;
             }
         }
-    }
+        if (sh->type->coasts) {
+            int c;
+            for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+                if (sh->type->coasts[c] == r->terrain) {
+                    reason = SA_COAST;
+                    break;
+                }
+            }
+        }
+        if (reason >= 0 && sh->region && r_insectstalled(r)) {
+            /* insekten duerfen nicht hier rein. haben wir welche? */
+            unit* u = ship_owner(sh);
 
-    if (reason == SA_NO_COAST)
-      return SA_NO_COAST;
-
-    if (sh->region && r_insectstalled(r)) {
-        /* insekten duerfen nicht hier rein. haben wir welche? */
-        unit *u = ship_owner(sh);
-
-        if (u && is_freezing(u)) {
-            return SA_NO_INSECT;
+            if (u && is_freezing(u)) {
+                return SA_NO_INSECT;
+            }
         }
     }
 
@@ -1835,7 +1837,7 @@ static void sail(unit * u, order * ord, bool drifting)
                         stormchance = 0;
                     }
                 }
-                if (rng_int() % 10000 < stormchance * sh->type->storm
+                if (stormchance && rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
                     if (!is_cursed(sh->attribs, &ct_nodrift)) {
                         region *rnext = NULL;
@@ -1911,9 +1913,12 @@ static void sail(unit * u, order * ord, bool drifting)
 
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
-                /* for some reason or another, we aren't allowed in there.. */
+                /* for some reason or another, we aren't allowed in there. */
                 if (reason == SA_NO_INSECT) {
                     ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
+                }
+                else if (reason == SA_NO_HARBOUR) {
+                    ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
                 }
                 else if (lighthouse_guarded(current_point)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));

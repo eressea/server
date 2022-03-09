@@ -2300,6 +2300,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Einheiten in de
 msgid "sailnolanding"
 msgstr "\"Die $ship($ship) konnte in $region($region) nicht einreisen, die Küste ist zu gefährlich für das Schiff.\""
 
+msgid "harbor_denied"
+msgstr "\"Die $ship($ship) durfte in den Hafen von $region($region) nicht einlaufen.\""
+
 msgid "error116"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nummer kann nicht vergeben werden.\""
 

@@ -2300,6 +2300,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Units from the 
 msgid "sailnolanding"
 msgstr "\"The $ship($ship) could not berth in $region($region). The coast is too dangerous for the vessel.\""
 
+msgid "harbor_denied"
+msgstr "\"The $ship($ship) was denied entry into the harbor of $region($region).\""
+
 msgid "error116"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Number cannot be assigned.\""
 
