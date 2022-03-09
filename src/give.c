@@ -1032,3 +1032,55 @@ message *check_give(const unit *u, const unit *u2, order * ord) {
     return NULL;
 }
 
+static int reserve_i(unit* u, struct order* ord, int flags)
+{
+    if (u->number > 0) {
+        char token[128];
+        int use, count;
+        const item_type* itype;
+        const char* s;
+        param_t p = NOPARAM;
+
+        init_order(ord, NULL);
+        s = gettoken(token, sizeof(token));
+        count = s ? atoip(s) : 0;
+        if (count == 0) {
+            p = findparam(s, u->faction->locale);
+            if (p == P_EACH) {
+                count = getint() * u->number;
+            }
+        }
+        s = gettoken(token, sizeof(token));
+        itype = s ? finditemtype(s, u->faction->locale) : 0;
+        if (itype == NULL)
+            return 0;
+
+        set_resvalue(u, itype, 0);      /* make sure the pool is empty */
+
+        if (p == P_ANY) {
+            count = get_resource(u, itype->rtype);
+        }
+        if (count > 0) {
+            if (itype->flags & ITF_CURSED) {
+                flags &= ~GET_POOLED_SLACK;
+                cmistake(u, ord, 25, MSG_EVENT);
+            }
+            use = use_pooled(u, itype->rtype, flags, count);
+            if (use) {
+                set_resvalue(u, itype, use);
+                change_resource(u, itype->rtype, use);
+                return use;
+            }
+        }
+    }
+    return 0;
+}
+
+int reserve_cmd(unit* u, struct order* ord) {
+    return reserve_i(u, ord, GET_DEFAULT);
+}
+
+int reserve_self(unit* u, struct order* ord) {
+    return reserve_i(u, ord, GET_RESERVE | GET_SLACK);
+}
+

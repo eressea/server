@@ -2,6 +2,7 @@
 
 #include "battle.h"
 #include "economy.h"
+#include "give.h"
 #include "laws.h"
 #include "magic.h"
 #include "market.h"

@@ -646,68 +646,6 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
     test_teardown();
 }
 
-static void test_reserve_cmd(CuTest *tc) {
-    unit *u1, *u2;
-    faction *f;
-    region *r;
-    order *ord;
-    const resource_type *rtype;
-
-    test_setup();
-    init_resources();
-
-    rtype = get_resourcetype(R_SILVER);
-    assert(rtype && rtype->itype);
-    f = test_create_faction();
-    r = test_create_plain(0, 0);
-    assert(r && f);
-    u1 = test_create_unit(f, r);
-    u2 = test_create_unit(f, r);
-    assert(u1 && u2);
-    ord = create_order(K_RESERVE, f->locale, "200 SILBER");
-    assert(ord);
-    i_change(&u1->items, rtype->itype, 100);
-    i_change(&u2->items, rtype->itype, 100);
-    CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
-    CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
-    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
-    free_order(ord);
-    test_teardown();
-}
-
-static void test_reserve_all(CuTest *tc) {
-    unit *u1, *u2;
-    faction *f;
-    region *r;
-    order *ord;
-    const resource_type *rtype;
-    struct locale *loc;
-
-    test_setup();
-    init_resources();
-    loc = test_create_locale();
-    locale_setstring(loc, parameters[P_ANY], "ALLES");
-    init_parameters(loc);
-
-    rtype = get_resourcetype(R_SILVER);
-    assert(rtype && rtype->itype);
-    f = test_create_faction();
-    r = test_create_plain(0, 0);
-    assert(r && f);
-    u1 = test_create_unit(f, r);
-    u2 = test_create_unit(f, r);
-    assert(u1 && u2);
-    ord = create_order(K_RESERVE, f->locale, "ALLES SILBER");
-    assert(ord);
-    i_change(&u1->items, rtype->itype, 100);
-    i_change(&u2->items, rtype->itype, 100);
-    CuAssertIntEquals(tc, 100, reserve_cmd(u1, ord));
-    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
-    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
-    free_order(ord);
-    test_teardown();
-}
-
 struct pay_fixture {
     unit *u1;
     unit *u2;
@@ -1003,38 +941,6 @@ static void test_fleeing_cannot_guard(CuTest *tc) {
     CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
-    test_teardown();
-}
-
-static void test_reserve_self(CuTest *tc) {
-    unit *u1, *u2;
-    faction *f;
-    region *r;
-    order *ord;
-    const resource_type *rtype;
-    const struct locale *loc;
-
-    test_setup();
-    init_resources();
-
-    rtype = get_resourcetype(R_SILVER);
-    assert(rtype && rtype->itype);
-    f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
-    assert(r && f);
-    u1 = test_create_unit(f, r);
-    u2 = test_create_unit(f, r);
-    assert(u1 && u2);
-    loc = test_create_locale();
-    assert(loc);
-    ord = create_order(K_RESERVE, loc, "200 SILBER");
-    assert(ord);
-    i_change(&u1->items, rtype->itype, 100);
-    i_change(&u2->items, rtype->itype, 100);
-    CuAssertIntEquals(tc, 100, reserve_self(u1, ord));
-    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
-    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
-    free_order(ord);
     test_teardown();
 }
 
@@ -2582,9 +2488,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_can_guard);
     SUITE_ADD_TEST(suite, test_fleeing_cannot_guard);
     SUITE_ADD_TEST(suite, test_unskilled_cannot_guard);
-    SUITE_ADD_TEST(suite, test_reserve_cmd);
-    SUITE_ADD_TEST(suite, test_reserve_self);
-    SUITE_ADD_TEST(suite, test_reserve_all);
     SUITE_ADD_TEST(suite, test_promotion_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd);
     SUITE_ADD_TEST(suite, test_pay_cmd_other_building);

@@ -10,6 +10,7 @@
 #include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
+#include <kernel/pool.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -45,6 +46,7 @@ static void setup_give(struct give *env) {
     env->src = test_create_unit(env->f1, env->r);
     env->itype = it_get_or_create(rt_get_or_create("money"));
     env->itype->flags |= ITF_HERB;
+    env->itype->rtype->flags |= RTF_POOLED;
     if (env->f2) {
         ally_set(&env->f2->allies, env->f1, HELP_GIVE);
         env->dst = test_create_unit(env->f2, env->r);
@@ -547,7 +549,7 @@ static void test_give_invalid_target(CuTest *tc) {
 
     test_setup_ex(tc);
     env.f1 = test_create_faction();
-    env.f2 = 0;
+    env.f2 = NULL;
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
@@ -557,6 +559,135 @@ static void test_give_invalid_target(CuTest *tc) {
     give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_give_item_cursed(CuTest* tc)
+{
+    struct give env = { 0 };
+    order* ord;
+    faction* f;
+
+    test_setup_ex(tc);
+    f = test_create_faction();
+    env.f2 = env.f1 = f;
+    setup_give(&env);
+    env.itype->flags |= ITF_CURSED;
+
+    i_change(&env.src->items, env.itype, 10);
+    ord = create_order(K_GIVE, f->locale, "%s 10 %s", itoa36(env.dst->no),
+        LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    assert(ord);
+
+    give_cmd(env.src, ord);
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    CuAssertIntEquals(tc, 0, i_get(env.dst->items, env.itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error25"));
+    free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_RESERVE, f->locale, "10 %s", LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    CuAssertIntEquals(tc, 0, reserve_cmd(env.dst, ord));
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    CuAssertIntEquals(tc, 0, i_get(env.dst->items, env.itype));
+    CuAssertIntEquals(tc, 0, get_reservation(env.dst, env.itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error25"));
+    free_order(ord);
+
+    test_teardown();
+}
+
+static void test_reserve_cmd(CuTest* tc) {
+    unit* u1, * u2;
+    faction* f;
+    region* r;
+    order* ord;
+    const resource_type* rtype;
+
+    test_setup();
+    init_resources();
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    ord = create_order(K_RESERVE, f->locale, "200 SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 200, reserve_cmd(u1, ord));
+    CuAssertIntEquals(tc, 200, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, rtype->itype));
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_reserve_all(CuTest* tc) {
+    unit* u1, * u2;
+    faction* f;
+    region* r;
+    order* ord;
+    const resource_type* rtype;
+    struct locale* loc;
+
+    test_setup();
+    init_resources();
+    loc = test_create_locale();
+    locale_setstring(loc, parameters[P_ANY], "ALLES");
+    init_parameters(loc);
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    ord = create_order(K_RESERVE, f->locale, "ALLES SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 100, reserve_cmd(u1, ord));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
+    free_order(ord);
+    test_teardown();
+}
+
+static void test_reserve_self(CuTest* tc) {
+    unit* u1, * u2;
+    faction* f;
+    region* r;
+    order* ord;
+    const resource_type* rtype;
+    const struct locale* loc;
+
+    test_setup();
+    init_resources();
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_region(0, 0, NULL);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    loc = test_create_locale();
+    assert(loc);
+    ord = create_order(K_RESERVE, loc, "200 SILBER");
+    assert(ord);
+    i_change(&u1->items, rtype->itype, 100);
+    i_change(&u2->items, rtype->itype, 100);
+    CuAssertIntEquals(tc, 100, reserve_self(u1, ord));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
     free_order(ord);
     test_teardown();
 }
@@ -590,5 +721,9 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_invalid_target);
     SUITE_ADD_TEST(suite, test_give_new_unit);
     SUITE_ADD_TEST(suite, test_give_dead_unit);
+    SUITE_ADD_TEST(suite, test_give_item_cursed);
+    SUITE_ADD_TEST(suite, test_reserve_cmd);
+    SUITE_ADD_TEST(suite, test_reserve_self);
+    SUITE_ADD_TEST(suite, test_reserve_all);
     return suite;
 }

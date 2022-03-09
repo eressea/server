@@ -75,8 +75,6 @@ extern "C" {
     int guard_off_cmd(struct unit *u, struct order *ord);
     int reshow_cmd(struct unit *u, struct order *ord);
     int mail_cmd(struct unit *u, struct order *ord);
-    int reserve_cmd(struct unit *u, struct order *ord);
-    int reserve_self(struct unit *u, struct order *ord);
     int claim_cmd(struct unit *u, struct order *ord);
     void transfer_faction(struct faction *fsrc, struct faction *fdst);
     void peasant_migration(struct region * r);
