@@ -1,7 +1,8 @@
 # 27.1
  
   - Neue Formel zur Vermischung von Talenten bei GIB PERSON und REKRUTIERE
-  - Bauern in üvervölkerten Regionen vermehren sich nicht
+  - Bauern in übervölkerten Regionen vermehren sich nicht
+  - Samen wachsen nicht zu Schößlingen heran, wenn sie dadurch Bauern die Felder wegnehmen.
   - Schiffe nehmen durch Überladung keinen Schaden mehr
   - Dracoide werden rekrutiert wie andere Einheiten [2106]
   - Heldenreform
