@@ -170,6 +170,9 @@ static order *monster_attack(unit * u, const unit * target)
 {
     assert(u->region == target->region);
     assert(u->faction != target->faction);
+    if (target->faction->flags & FFL_NPC) {
+        return NULL;
+    }
     if (is_paused(target->faction)) {
         return NULL;
     }
@@ -770,9 +773,7 @@ void plan_monsters(faction * f)
 {
     region *r;
     
-    assert(f);
     attack_chance = config_get_flt("rules.monsters.attack_chance", 0.4);
-    f->lastorders = turn;
 
     for (r = regions; r; r = r->next) {
         unit *u;
@@ -785,11 +786,20 @@ void plan_monsters(faction * f)
             bool guarding;
 
             /* Ab hier nur noch Befehle fuer NPC-Einheiten. */
-            if (u->faction != f || u->number <= 0) {
+            if (u->number <= 0 || (u->faction->flags & FFL_NPC) == 0) {
                 continue;
             }
+            if (f) {
+                if (u->faction != f) {
+                    continue;
+                }
+                f->lastorders = turn;
+            }
+            else {
+                u->faction->lastorders = turn;
+            }
 
-            /* Parteitarnung von Monstern ist doof: */
+            /* Parteitarnung von NPCs ist doof: */
             if (fval(u, UFL_ANON_FACTION)) {
                 u->flags &= ~UFL_ANON_FACTION;
             }
@@ -863,7 +873,7 @@ void plan_monsters(faction * f)
                 }
                 else {
                     if (can_move && rc == get_race(RC_SEASERPENT)) {
-                        long_order = create_order(K_PIRACY, f->locale, NULL);
+                        long_order = create_order(K_PIRACY, u->faction->locale, NULL);
                     }
                     else {
                         if (monster_can_learn(rc)) {
@@ -878,8 +888,8 @@ void plan_monsters(faction * f)
                 if (rc->bonus[SK_WEAPONLESS] != -99) {
                     if (effskill(u, SK_WEAPONLESS, NULL) < 1) {
                         long_order =
-                            create_order(K_STUDY, f->locale, "'%s'",
-                                skillname(SK_WEAPONLESS, f->locale));
+                            create_order(K_STUDY, u->faction->locale, "'%s'",
+                                skillname(SK_WEAPONLESS, u->faction->locale));
                     }
                 }
             }

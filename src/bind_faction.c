@@ -6,6 +6,7 @@
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -16,6 +17,7 @@
 
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/log.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
@@ -513,6 +515,20 @@ static int cb_ally_push(struct allies *af, struct faction *f, int status, void *
     return 0;
 }
 
+static int tolua_faction_reset_allies(lua_State * L) {
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+
+    freelist(f->allies);
+    f->allies = NULL;
+    while (f->groups) {
+        group* g = f->groups;
+        f->groups = g->next;
+        free_group(g);
+    }
+
+    return 1;
+}
+
 static int tolua_faction_get_allies(lua_State * L) {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     lua_newtable(L);
@@ -645,6 +661,7 @@ void tolua_faction_open(lua_State * L)
             tolua_variable(L, "alliance", tolua_faction_get_alliances,
                 tolua_faction_set_alliance);
 
+            tolua_function(L, "reset_allies", tolua_faction_reset_allies);
             tolua_variable(L, "allies", tolua_faction_get_allies, NULL);
             tolua_function(L, "set_ally", tolua_faction_set_ally);
             tolua_function(L, "get_ally", tolua_faction_get_ally);

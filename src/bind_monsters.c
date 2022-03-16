@@ -26,10 +26,9 @@ static int tolua_levitate_ship(lua_State * L)
 
 static int tolua_planmonsters(lua_State * L)
 {
-    faction *f = (faction *)tolua_tousertype(L, 1, get_monsters());
-    if (f) {
-        plan_monsters(f);
-    }
+    faction *f = (faction *)tolua_tousertype(L, 1, NULL);
+
+    plan_monsters(f);
 
     return 0;
 }

@@ -26,11 +26,13 @@
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
-/* util includes */
 #include <kernel/attrib.h>
-#include <util/base36.h>
 #include <kernel/event.h>
 #include <kernel/gamedata.h>
+
+/* util includes */
+#include <util/base36.h>
+#include <util/lists.h>
 #include <util/goodies.h>
 #include <util/lists.h>
 #include <util/language.h>
