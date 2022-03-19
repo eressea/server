@@ -273,9 +273,11 @@ target_link_libraries(test_eressea
   )
 
 set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
-if (IWYU_PATH)
-set_target_properties(test_eressea eressea PROPERTIES C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
-endif(IWYU_PATH)
+
+if (iwyu_path)
+set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+set_property(TARGET test_eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+endif (iwyu_path)
 
 add_test(server test_eressea)
 #add_test(NAME E3
