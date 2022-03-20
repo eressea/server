@@ -1,9 +1,7 @@
-/* kernel includes */
 #include <kernel/order.h>
-#include <util/parser.h>
-#include <util/macros.h>
 
-/* lua includes */
+#include <util/parser.h>
+
 #include <lua.h>
 #include <tolua.h>
 

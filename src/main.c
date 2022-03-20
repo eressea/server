@@ -6,7 +6,6 @@
 #include <kernel/config.h>
 #include <kernel/messages.h>
 #include <kernel/version.h>
-#include <kernel/save.h>
 
 #include <util/language.h>
 #include <util/log.h>
