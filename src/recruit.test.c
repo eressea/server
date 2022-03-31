@@ -126,17 +126,17 @@ static void test_recruit_orcs(CuTest* tc)
     CuAssertIntEquals(tc, 2, msg->parameters[3].i);
     test_clear_messages(f);
 
-    /* enough peasants for just one orc recruit */
+    /* Bug: region must have >= 40 peasants to recruit */
     i_change(&u->items, it_money, 51);
     r->land->peasants = RECRUIT_FRACTION / 2;
     recruit(r);
-    CuAssertIntEquals(tc, 5, u->number);
-    CuAssertIntEquals(tc, 50, i_get(u->items, it_money));
+    CuAssertIntEquals(tc, 4, u->number);
+    CuAssertIntEquals(tc, 100, i_get(u->items, it_money));
     CuAssertIntEquals(tc, RECRUIT_FRACTION / 2 - 1, r->land->peasants);
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "recruit"));
     CuAssertPtrEquals(tc, u, (unit*)msg->parameters[0].v);
     CuAssertPtrEquals(tc, r, (region*)msg->parameters[1].v);
-    CuAssertIntEquals(tc, 1, msg->parameters[2].i);
+    CuAssertIntEquals(tc, 0, msg->parameters[2].i);
     CuAssertIntEquals(tc, 2, msg->parameters[3].i);
     test_clear_messages(f);
 
