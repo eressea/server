@@ -235,6 +235,7 @@ set(TESTS_SRC
   orderfile.test.c
   piracy.test.c
   prefix.test.c
+  recruit.test.c
   renumber.test.c
   report.test.c
   reports.test.c
