@@ -287,8 +287,9 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
     /* peasant limited: */
     recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
     if (recruits) {
-        int orc_recruited, orc_peasants = rpeasants(r) * 2;
-        int orc_frac = orc_peasants / RECRUIT_FRACTION;      /* anzahl orks. 2 ork = 1 bauer */
+        int peasants = rpeasants(r);
+        int orc_recruited, orc_peasants = peasants * 2;
+        int orc_frac = peasants / RECRUIT_FRACTION * 2;      /* anzahl orks. 2 ork = 1 bauer */
         if (orc_total < orc_frac)
             orc_frac = orc_total;
         orc_recruited = do_recruiting(recruits, orc_frac);
@@ -307,8 +308,6 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
         }
         free_recruitments(recruits);
     }
-
-    assert(recruitorders == NULL);
 }
 
 static int recruit_cost(const faction * f, const race * rc)

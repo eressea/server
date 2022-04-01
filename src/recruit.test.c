@@ -132,7 +132,7 @@ static void test_recruit_orcs(CuTest* tc)
     recruit(r);
     CuAssertIntEquals(tc, 4, u->number);
     CuAssertIntEquals(tc, 100, i_get(u->items, it_money));
-    CuAssertIntEquals(tc, RECRUIT_FRACTION / 2 - 1, r->land->peasants);
+    CuAssertIntEquals(tc, RECRUIT_FRACTION / 2, r->land->peasants);
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(f->msgs, "recruit"));
     CuAssertPtrEquals(tc, u, (unit*)msg->parameters[0].v);
     CuAssertPtrEquals(tc, r, (region*)msg->parameters[1].v);
@@ -143,10 +143,60 @@ static void test_recruit_orcs(CuTest* tc)
     test_teardown();
 }
 
+static void test_recruit_split(CuTest* tc)
+{
+    region* r;
+    unit *u1, *u2;
+    faction* f1, *f2;
+    race* rc;
+    item_type* it_money;
+
+    test_setup();
+    setup_recruit();
+    it_money = it_find("money");
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f2, r);
+    rc = test_create_race("human");
+    u_setrace(u1, rc);
+    u_setrace(u2, rc);
+
+    /* happy case: */
+    unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 1));
+    unit_addorder(u2, create_order(K_RECRUIT, f2->locale, "%d", 1));
+    i_change(&u1->items, it_money, 100);
+    i_change(&u2->items, it_money, 100);
+    r->land->peasants = RECRUIT_FRACTION * 2;
+    recruit(r);
+    CuAssertIntEquals(tc, 2, u1->number);
+    CuAssertIntEquals(tc, 2, u2->number);
+    CuAssertIntEquals(tc, 0, i_get(u1->items, it_money));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_money));
+    CuAssertIntEquals(tc, RECRUIT_FRACTION * 2 - 2, r->land->peasants);
+    free_orders(&u1->orders);
+    free_orders(&u2->orders);
+
+    /* not enough peasants */
+    unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 2));
+    unit_addorder(u2, create_order(K_RECRUIT, f2->locale, "%d", 2));
+    i_change(&u1->items, it_money, 200);
+    i_change(&u2->items, it_money, 200);
+    r->land->peasants = RECRUIT_FRACTION * 2;
+    recruit(r);
+    CuAssertIntEquals(tc, 3, u1->number);
+    CuAssertIntEquals(tc, 3, u2->number);
+    CuAssertIntEquals(tc, RECRUIT_FRACTION * 2 - 2, r->land->peasants);
+
+    test_teardown();
+}
+
 CuSuite* get_recruit_suite(void)
 {
     CuSuite* suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_recruit_orcs);
+    SUITE_ADD_TEST(suite, test_recruit_split);
     return suite;
 }
