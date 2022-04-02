@@ -258,7 +258,8 @@ static void test_recruit_orcs_split_one_peasant(CuTest* tc)
     i_change(&u2->items, it_money, 100);
     r->land->peasants = RECRUIT_FRACTION;
     recruit(r);
-    CuAssertIntEquals(tc, 3, u1->number + u2->number);
+    CuAssertIntEquals(tc, 2, u1->number);
+    CuAssertIntEquals(tc, 2, u2->number);
     CuAssertIntEquals(tc, RECRUIT_FRACTION - 1, r->land->peasants);
 
     test_teardown();

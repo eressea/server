@@ -196,7 +196,7 @@ static int any_recruiters(const struct race *rc, int qty)
 
 static int do_recruiting(recruitment ** recruits, int available)
 {
-    int recruited = 0;
+    int recruited = 0, tipjar = 0;
     size_t i, len = arrlen(recruits);
 
     /* try to assign recruits to factions fairly */
@@ -250,8 +250,19 @@ static int do_recruiting(recruitment ** recruits, int available)
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
             int multi = ORCS_PER_PEASANT / rc->recruit_multi;
-            int number = get / multi;
+            int number;
 
+            if (tipjar) {
+                get += tipjar;
+                tipjar = 0;
+            }
+
+            if (multi > 1 && (get % multi)) {
+                tipjar = get % multi;
+                get -= tipjar;
+            }
+
+            number = get / multi;
             if (number > req->qty) number = req->qty;
             if (rc->recruitcost) {
                 int afford = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
