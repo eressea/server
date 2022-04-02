@@ -47,12 +47,13 @@
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include "util/message.h"
 #include "util/param.h"
 #include <util/parser.h>
 #include <util/rng.h>
+
+#include "stb_ds.h"
 
 /* libs includes */
 #include <math.h>
@@ -68,7 +69,6 @@
 static int rules_recruit = -1;
 
 typedef struct recruit_request {
-    struct recruit_request *next;
     struct unit *unit;
     struct order *ord;
     int qty;
@@ -77,7 +77,7 @@ typedef struct recruit_request {
 typedef struct recruitment {
     struct recruitment *next;
     faction *f;
-    recruit_request *requests;
+    recruit_request **requests;
     int total, assigned;
 } recruitment;
 
@@ -91,12 +91,13 @@ static void recruit_init(void)
     }
 }
 
-static void free_requests(recruit_request *requests) {
-    while (requests) {
-        recruit_request *req = requests->next;
-        free(requests);
-        requests = req;
+void free_requests(recruit_request** requests)
+{
+    size_t len = arrlen(requests);
+    for (unsigned u = 0; u != len; ++u) {
+        free(requests[u]);
     }
+    arrfree(requests);
 }
 
 void free_recruitments(recruitment * recruits)
@@ -112,39 +113,41 @@ void free_recruitments(recruitment * recruits)
 /** Creates a list of recruitment structs, one for each faction. Adds every quantifyable production
  * to the faction's struct and to total.
  */
-static recruitment *select_recruitment(recruit_request ** rop,
+static recruitment *select_recruitment(recruit_request ** requests,
     int(*quantify) (const struct race *, int), int *total)
 {
     recruitment *recruits = NULL;
+    size_t len = arrlen(requests);
 
-    while (*rop) {
+    for (size_t i = 0; i != len; ++i) {
         recruitment *rec = recruits;
-        recruit_request *ro = *rop;
-        unit *u = ro->unit;
-        const race *rc = u_race(u);
-        int qty = quantify(rc, ro->qty);
+        recruit_request *ro = requests[i];
+        if (ro) {
+            unit* u = ro->unit;
+            const race* rc = u_race(u);
+            int qty = quantify(rc, ro->qty);
 
-        if (qty < 0) {
-            rop = &ro->next;          /* skip this one */
-        }
-        else {
-            *rop = ro->next;          /* remove this one */
-            while (rec && rec->f != u->faction)
-                rec = rec->next;
-            if (rec == NULL) {
-                rec = (recruitment *)malloc(sizeof(recruitment));
-                if (!rec) abort();
-                rec->f = u->faction;
-                rec->total = 0;
-                rec->assigned = 0;
-                rec->requests = NULL;
-                rec->next = recruits;
-                recruits = rec;
+            if (qty > 0) {
+                while (rec && rec->f != u->faction)
+                    rec = rec->next;
+                if (rec == NULL) {
+                    rec = (recruitment*)malloc(sizeof(recruitment));
+                    if (!rec) abort();
+                    rec->f = u->faction;
+                    rec->total = 0;
+                    rec->assigned = 0;
+                    rec->requests = NULL;
+                    rec->next = recruits;
+                    recruits = rec;
+                }
+                else {
+                    assert(rec->requests);
+                }
+                *total += qty;
+                rec->total += qty;
+                arrpush(rec->requests, ro);
+                requests[i] = NULL;
             }
-            *total += qty;
-            rec->total += qty;
-            ro->next = rec->requests;
-            rec->requests = ro;
         }
     }
     return recruits;
@@ -235,10 +238,10 @@ static int do_recruiting(recruitment * recruits, int available)
 
     /* do actual recruiting */
     for (rec = recruits; rec != NULL; rec = rec->next) {
-        recruit_request *req;
         int get = rec->assigned;
-
-        for (req = rec->requests; req; req = req->next) {
+        size_t len = arrlen(rec->requests);
+        for (size_t i = 0; i != len; ++i) {
+            recruit_request* req = rec->requests[i];
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
             int multi = ORCS_PER_PEASANT / rc->recruit_multi;
@@ -279,13 +282,13 @@ static int do_recruiting(recruitment * recruits, int available)
 }
 
 /* Rekrutierung */
-static void expandrecruit(region * r, recruit_request * recruitorders)
+static void expandrecruit(region * r, recruit_request ** recruitorders)
 {
     recruitment *recruits;
     int orc_total = 0;
 
     /* peasant limited: */
-    recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
+    recruits = select_recruitment(recruitorders, any_recruiters, &orc_total);
     if (recruits) {
         int peasants = rpeasants(r);
         int orc_recruited, orc_peasants = peasants * ORCS_PER_PEASANT;
@@ -299,7 +302,7 @@ static void expandrecruit(region * r, recruit_request * recruitorders)
     }
 
     /* no limit: */
-    recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
+    recruits = select_recruitment(recruitorders, any_recruiters, &orc_total);
     if (recruits) {
         int recruited, peasants = rpeasants(r) * ORCS_PER_PEASANT;
         recruited = do_recruiting(recruits, INT_MAX);
@@ -380,7 +383,7 @@ message *can_recruit(unit *u, const race *rc, order *ord, int now)
     return NULL;
 }
 
-static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruitorders)
+static recruit_request* recruit_cmd(unit * u, struct order *ord)
 {
     region *r = u->region;
     recruit_request *o;
@@ -394,7 +397,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     n = getint();
     if (n <= 0) {
         syntax_error(u, ord);
-        return;
+        return NULL;
     }
 
     if (u->number == 0) {
@@ -427,13 +430,13 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
 
         if (pl && (pl->flags & PFL_NORECRUITS)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_pflnorecruit", ""));
-            return;
+            return NULL;
         }
 
         pool = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
         if (pool < recruitcost) {
             cmistake(u, ord, 142, MSG_EVENT);
-            return;
+            return NULL;
         }
         pool /= recruitcost;
         if (n > pool) n = pool;
@@ -441,12 +444,12 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
 
     if (!n) {
         cmistake(u, ord, 142, MSG_EVENT);
-        return;
+        return NULL;
     }
     if (has_skill(u, SK_ALCHEMY)) {
         if (faction_count_skill(u->faction, SK_ALCHEMY) + n > faction_skill_limit(u->faction, SK_ALCHEMY)) {
             cmistake(u, ord, 156, MSG_EVENT);
-            return;
+            return NULL;
         }
     }
 
@@ -455,7 +458,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     if (msg) {
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
-        return;
+        return NULL;
     }
 
     u_setrace(u, rc);
@@ -464,13 +467,13 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     o->qty = n;
     o->unit = u;
     o->ord = ord;
-    addlist(recruitorders, o);
+    return o;
 }
 
 void recruit(region * r)
 {
     unit *u;
-    recruit_request *recruitorders = NULL;
+    recruit_request **recruitorders = NULL;
 
     if (rules_recruit < 0)
         recruit_init();
@@ -482,7 +485,10 @@ void recruit(region * r)
         if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
             for (ord = u->orders; ord; ord = ord->next) {
                 if (getkeyword(ord) == K_RECRUIT) {
-                    recruit_cmd(u, ord, &recruitorders);
+                    recruit_request *o = recruit_cmd(u, ord);
+                    if (o) {
+                        arrpush(recruitorders, o);
+                    }
                     break;
                 }
             }
@@ -491,6 +497,7 @@ void recruit(region * r)
 
     if (recruitorders) {
         expandrecruit(r, recruitorders);
+        free_requests(recruitorders);
     }
     remove_empty_units_in_region(r);
 }

@@ -9,6 +9,8 @@
 
 #include "util/message.h"
 
+#include "stb_ds.h"
+
 #include <tests.h>
 #include <CuTest.h>
 
@@ -17,6 +19,20 @@ static void setup_recruit(void)
     init_resources();
     mt_create_va(mt_new("recruit", NULL),
         "unit:unit", "region:region", "amount:int", "want:int", MT_NEW_END);
+}
+
+static void test_stb(CuTest* tc)
+{
+    void** varr;
+    int* arr = NULL;
+    arrpush(arr, 42);
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    arrpush(arr, 47);
+    CuAssertIntEquals(tc, 42, arr[0]);
+    CuAssertIntEquals(tc, 47, arr[1]);
+    varr = NULL;
+    arrpush(varr, NULL);
+    CuAssertIntEquals(tc, 1, (int)arrlen(varr));
 }
 
 static void test_recruit(CuTest* tc)
@@ -146,8 +162,8 @@ static void test_recruit_orcs(CuTest* tc)
 static void test_recruit_split(CuTest* tc)
 {
     region* r;
-    unit *u1, *u2;
-    faction* f1, *f2;
+    unit* u1, * u2;
+    faction* f1, * f2;
     race* rc;
     item_type* it_money;
 
@@ -195,8 +211,8 @@ static void test_recruit_split(CuTest* tc)
 static void test_recruit_split_one_peasant(CuTest* tc)
 {
     region* r;
-    unit *u1, *u2;
-    faction* f1, *f2;
+    unit* u1, * u2;
+    faction* f1, * f2;
     race* rc;
     item_type* it_money;
 
@@ -228,8 +244,8 @@ static void test_recruit_split_one_peasant(CuTest* tc)
 static void test_recruit_mixed_race(CuTest* tc)
 {
     region* r;
-    unit *u1, *u2;
-    faction* f1, *f2;
+    unit* u1, * u2;
+    faction* f1, * f2;
     race* rc;
     item_type* it_money;
 
@@ -263,6 +279,7 @@ static void test_recruit_mixed_race(CuTest* tc)
 CuSuite* get_recruit_suite(void)
 {
     CuSuite* suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_stb);
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_recruit_orcs);
     SUITE_ADD_TEST(suite, test_recruit_split);
