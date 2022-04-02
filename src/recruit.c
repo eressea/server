@@ -75,7 +75,6 @@ typedef struct recruit_request {
 } recruit_request;
 
 typedef struct recruitment {
-    struct recruitment *next;
     faction *f;
     recruit_request **requests;
     int total, assigned;
@@ -93,43 +92,47 @@ static void recruit_init(void)
 
 void free_requests(recruit_request** requests)
 {
-    size_t len = arrlen(requests);
-    for (unsigned u = 0; u != len; ++u) {
-        free(requests[u]);
+    size_t i, len = arrlen(requests);
+    for (i = 0; i != len; ++i) {
+        free(requests[i]);
     }
     arrfree(requests);
 }
 
-void free_recruitments(recruitment * recruits)
+void free_recruitments(recruitment ** recruits)
 {
-    while (recruits) {
-        recruitment *rec = recruits;
-        recruits = rec->next;
-        free_requests(rec->requests);
-        free(rec);
+    size_t i, len = arrlen(recruits);
+    for (i = 0; i != len; ++i) {
+        free(recruits[i]);
     }
+    arrfree(recruits);
 }
 
 /** Creates a list of recruitment structs, one for each faction. Adds every quantifyable production
  * to the faction's struct and to total.
  */
-static recruitment *select_recruitment(recruit_request ** requests,
+static recruitment **select_recruitment(recruit_request ** requests,
     int(*quantify) (const struct race *, int), int *total)
 {
-    recruitment *recruits = NULL;
-    size_t len = arrlen(requests);
+    recruitment **recruits = NULL;
+    size_t ui, len = arrlen(requests);
 
-    for (size_t i = 0; i != len; ++i) {
-        recruitment *rec = recruits;
-        recruit_request *ro = requests[i];
+    for (ui = 0; ui != len; ++ui) {
+        recruit_request *ro = requests[ui];
         if (ro) {
             unit* u = ro->unit;
             const race* rc = u_race(u);
             int qty = quantify(rc, ro->qty);
 
             if (qty > 0) {
-                while (rec && rec->f != u->faction)
-                    rec = rec->next;
+                recruitment* rec = NULL;
+                size_t i, len = arrlen(recruits);
+                for (i = 0; i != len; ++i) {
+                    if (recruits[i]->f == u->faction) {
+                        rec = recruits[i];
+                        break;
+                    }
+                }
                 if (rec == NULL) {
                     rec = (recruitment*)malloc(sizeof(recruitment));
                     if (!rec) abort();
@@ -137,8 +140,7 @@ static recruitment *select_recruitment(recruit_request ** requests,
                     rec->total = 0;
                     rec->assigned = 0;
                     rec->requests = NULL;
-                    rec->next = recruits;
-                    recruits = rec;
+                    arrpush(recruits, rec);
                 }
                 else {
                     assert(rec->requests);
@@ -146,7 +148,7 @@ static recruitment *select_recruitment(recruit_request ** requests,
                 *total += qty;
                 rec->total += qty;
                 arrpush(rec->requests, ro);
-                requests[i] = NULL;
+                requests[ui] = NULL;
             }
         }
     }
@@ -192,10 +194,10 @@ static int any_recruiters(const struct race *rc, int qty)
     return (int)(qty * 2 / rc->recruit_multi);
 }
 
-static int do_recruiting(recruitment * recruits, int available)
+static int do_recruiting(recruitment ** recruits, int available)
 {
-    recruitment *rec;
     int recruited = 0;
+    size_t i, len = arrlen(recruits);
 
     /* try to assign recruits to factions fairly */
     while (available > 0) {
@@ -203,7 +205,8 @@ static int do_recruiting(recruitment * recruits, int available)
         int rest, mintotal = INT_MAX;
 
         /* find smallest production */
-        for (rec = recruits; rec != NULL; rec = rec->next) {
+        for (i = 0; i != len; ++i) {
+            recruitment* rec = recruits[i];
             int want = rec->total - rec->assigned;
             if (want > 0) {
                 if (mintotal > want)
@@ -220,7 +223,8 @@ static int do_recruiting(recruitment * recruits, int available)
 
         /* assign size of smallest production for everyone if possible; in the end roll dice to assign
          * small rest */
-        for (rec = recruits; rec != NULL; rec = rec->next) {
+        for (i = 0; i != len; ++i) {
+            recruitment* rec = recruits[i];
             int want = rec->total - rec->assigned;
 
             if (want > 0) {
@@ -237,11 +241,12 @@ static int do_recruiting(recruitment * recruits, int available)
     }
 
     /* do actual recruiting */
-    for (rec = recruits; rec != NULL; rec = rec->next) {
+    for (i = 0; i != len; ++i) {
+        recruitment* rec = recruits[i];
         int get = rec->assigned;
-        size_t len = arrlen(rec->requests);
-        for (size_t i = 0; i != len; ++i) {
-            recruit_request* req = rec->requests[i];
+        size_t ui, len = arrlen(rec->requests);
+        for (ui = 0; ui != len; ++ui) {
+            recruit_request* req = rec->requests[ui];
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
             int multi = ORCS_PER_PEASANT / rc->recruit_multi;
@@ -284,7 +289,7 @@ static int do_recruiting(recruitment * recruits, int available)
 /* Rekrutierung */
 static void expandrecruit(region * r, recruit_request ** recruitorders)
 {
-    recruitment *recruits;
+    recruitment **recruits;
     int orc_total = 0;
 
     /* peasant limited: */
