@@ -442,7 +442,7 @@ void destroyfaction(faction ** fp)
                     int h = rhorses(u->region);
                     item *itm;
 
-                    p += (int)(u->number * rc->recruit_multi);
+                    p += (int)(u->number / rc->recruit_multi);
                     for (itm = u->items; itm; itm = itm->next) {
                         if (itm->type->flags & ITF_ANIMAL) {
                             h += itm->number;

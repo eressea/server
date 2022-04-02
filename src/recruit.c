@@ -47,12 +47,13 @@
 #include <util/base36.h>
 #include <util/goodies.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/log.h>
 #include "util/message.h"
 #include "util/param.h"
 #include <util/parser.h>
 #include <util/rng.h>
+
+#include "stb_ds.h"
 
 /* libs includes */
 #include <math.h>
@@ -63,20 +64,19 @@
 #include <limits.h>
 
 #define RECRUIT_MERGE 1
+#define ORCS_PER_PEASANT 2
 
 static int rules_recruit = -1;
 
 typedef struct recruit_request {
-    struct recruit_request *next;
     struct unit *unit;
     struct order *ord;
     int qty;
 } recruit_request;
 
 typedef struct recruitment {
-    struct recruitment *next;
     faction *f;
-    recruit_request *requests;
+    recruit_request **requests;
     int total, assigned;
 } recruitment;
 
@@ -90,60 +90,66 @@ static void recruit_init(void)
     }
 }
 
-static void free_requests(recruit_request *requests) {
-    while (requests) {
-        recruit_request *req = requests->next;
-        free(requests);
-        requests = req;
+void free_requests(recruit_request** requests)
+{
+    size_t i, len = arrlen(requests);
+    for (i = 0; i != len; ++i) {
+        free(requests[i]);
     }
+    arrfree(requests);
 }
 
-void free_recruitments(recruitment * recruits)
+void free_recruitments(recruitment ** recruits)
 {
-    while (recruits) {
-        recruitment *rec = recruits;
-        recruits = rec->next;
-        free_requests(rec->requests);
-        free(rec);
+    size_t i, len = arrlen(recruits);
+    for (i = 0; i != len; ++i) {
+        free(recruits[i]);
     }
+    arrfree(recruits);
 }
 
 /** Creates a list of recruitment structs, one for each faction. Adds every quantifyable production
  * to the faction's struct and to total.
  */
-static recruitment *select_recruitment(recruit_request ** rop,
+static recruitment **select_recruitment(recruit_request ** requests,
     int(*quantify) (const struct race *, int), int *total)
 {
-    recruitment *recruits = NULL;
+    recruitment **recruits = NULL;
+    size_t ui, len = arrlen(requests);
 
-    while (*rop) {
-        recruitment *rec = recruits;
-        recruit_request *ro = *rop;
-        unit *u = ro->unit;
-        const race *rc = u_race(u);
-        int qty = quantify(rc, ro->qty);
+    for (ui = 0; ui != len; ++ui) {
+        recruit_request *ro = requests[ui];
+        if (ro) {
+            unit* u = ro->unit;
+            const race* rc = u_race(u);
+            int qty = quantify(rc, ro->qty);
 
-        if (qty < 0) {
-            rop = &ro->next;          /* skip this one */
-        }
-        else {
-            *rop = ro->next;          /* remove this one */
-            while (rec && rec->f != u->faction)
-                rec = rec->next;
-            if (rec == NULL) {
-                rec = (recruitment *)malloc(sizeof(recruitment));
-                if (!rec) abort();
-                rec->f = u->faction;
-                rec->total = 0;
-                rec->assigned = 0;
-                rec->requests = NULL;
-                rec->next = recruits;
-                recruits = rec;
+            if (qty > 0) {
+                recruitment* rec = NULL;
+                size_t i, len = arrlen(recruits);
+                for (i = 0; i != len; ++i) {
+                    if (recruits[i]->f == u->faction) {
+                        rec = recruits[i];
+                        break;
+                    }
+                }
+                if (rec == NULL) {
+                    rec = (recruitment*)malloc(sizeof(recruitment));
+                    if (!rec) abort();
+                    rec->f = u->faction;
+                    rec->total = 0;
+                    rec->assigned = 0;
+                    rec->requests = NULL;
+                    arrpush(recruits, rec);
+                }
+                else {
+                    assert(rec->requests);
+                }
+                *total += qty;
+                rec->total += qty;
+                arrpush(rec->requests, ro);
+                requests[ui] = NULL;
             }
-            *total += qty;
-            rec->total += qty;
-            ro->next = rec->requests;
-            rec->requests = ro;
         }
     }
     return recruits;
@@ -185,13 +191,13 @@ void add_recruits(unit * u, int number, int wanted, int ordered)
 
 static int any_recruiters(const struct race *rc, int qty)
 {
-    return (int)(qty * 2 * rc->recruit_multi);
+    return (int)(qty * 2 / rc->recruit_multi);
 }
 
-static int do_recruiting(recruitment * recruits, int available)
+static int do_recruiting(recruitment ** recruits, int available)
 {
-    recruitment *rec;
-    int recruited = 0;
+    int recruited = 0, tipjar = 0;
+    size_t i, len = arrlen(recruits);
 
     /* try to assign recruits to factions fairly */
     while (available > 0) {
@@ -199,7 +205,8 @@ static int do_recruiting(recruitment * recruits, int available)
         int rest, mintotal = INT_MAX;
 
         /* find smallest production */
-        for (rec = recruits; rec != NULL; rec = rec->next) {
+        for (i = 0; i != len; ++i) {
+            recruitment* rec = recruits[i];
             int want = rec->total - rec->assigned;
             if (want > 0) {
                 if (mintotal > want)
@@ -216,7 +223,8 @@ static int do_recruiting(recruitment * recruits, int available)
 
         /* assign size of smallest production for everyone if possible; in the end roll dice to assign
          * small rest */
-        for (rec = recruits; rec != NULL; rec = rec->next) {
+        for (i = 0; i != len; ++i) {
+            recruitment* rec = recruits[i];
             int want = rec->total - rec->assigned;
 
             if (want > 0) {
@@ -233,17 +241,28 @@ static int do_recruiting(recruitment * recruits, int available)
     }
 
     /* do actual recruiting */
-    for (rec = recruits; rec != NULL; rec = rec->next) {
-        recruit_request *req;
+    for (i = 0; i != len; ++i) {
+        recruitment* rec = recruits[i];
         int get = rec->assigned;
-
-        for (req = rec->requests; req; req = req->next) {
+        size_t ui, len = arrlen(rec->requests);
+        for (ui = 0; ui != len; ++ui) {
+            recruit_request* req = rec->requests[ui];
             unit *u = req->unit;
             const race *rc = u_race(u); /* race is set in recruit() */
+            int multi = ORCS_PER_PEASANT / rc->recruit_multi;
             int number;
-            double multi = 2.0 * rc->recruit_multi;
 
-            number = (int)(get / multi);
+            if (tipjar) {
+                get += tipjar;
+                tipjar = 0;
+            }
+
+            if (multi > 1 && (get % multi)) {
+                tipjar = get % multi;
+                get -= tipjar;
+            }
+
+            number = get / multi;
             if (number > req->qty) number = req->qty;
             if (rc->recruitcost) {
                 int afford = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT,
@@ -279,32 +298,32 @@ static int do_recruiting(recruitment * recruits, int available)
 }
 
 /* Rekrutierung */
-static void expandrecruit(region * r, recruit_request * recruitorders)
+static void expandrecruit(region * r, recruit_request ** recruitorders)
 {
-    recruitment *recruits;
+    recruitment **recruits;
     int orc_total = 0;
 
     /* peasant limited: */
-    recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
+    recruits = select_recruitment(recruitorders, any_recruiters, &orc_total);
     if (recruits) {
         int peasants = rpeasants(r);
-        int orc_recruited, orc_peasants = peasants * 2;
-        int orc_frac = peasants / RECRUIT_FRACTION * 2;      /* anzahl orks. 2 ork = 1 bauer */
+        int orc_recruited, orc_peasants = peasants * ORCS_PER_PEASANT;
+        int orc_frac = peasants / RECRUIT_FRACTION * ORCS_PER_PEASANT;      /* anzahl orks. 2 ork = 1 bauer */
         if (orc_total < orc_frac)
             orc_frac = orc_total;
         orc_recruited = do_recruiting(recruits, orc_frac);
         assert(orc_recruited <= orc_frac);
-        rsetpeasants(r, (orc_peasants - orc_recruited) / 2);
+        rsetpeasants(r, (orc_peasants - orc_recruited) / ORCS_PER_PEASANT);
         free_recruitments(recruits);
     }
 
     /* no limit: */
-    recruits = select_recruitment(&recruitorders, any_recruiters, &orc_total);
+    recruits = select_recruitment(recruitorders, any_recruiters, &orc_total);
     if (recruits) {
-        int recruited, peasants = rpeasants(r) * 2;
+        int recruited, peasants = rpeasants(r) * ORCS_PER_PEASANT;
         recruited = do_recruiting(recruits, INT_MAX);
         if (recruited > 0) {
-            rsetpeasants(r, (peasants - recruited) / 2);
+            rsetpeasants(r, (peasants - recruited) / ORCS_PER_PEASANT);
         }
         free_recruitments(recruits);
     }
@@ -380,7 +399,7 @@ message *can_recruit(unit *u, const race *rc, order *ord, int now)
     return NULL;
 }
 
-static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruitorders)
+static recruit_request* recruit_cmd(unit * u, struct order *ord)
 {
     region *r = u->region;
     recruit_request *o;
@@ -394,7 +413,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     n = getint();
     if (n <= 0) {
         syntax_error(u, ord);
-        return;
+        return NULL;
     }
 
     if (u->number == 0) {
@@ -427,13 +446,13 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
 
         if (pl && (pl->flags & PFL_NORECRUITS)) {
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_pflnorecruit", ""));
-            return;
+            return NULL;
         }
 
         pool = get_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, recruitcost * n);
         if (pool < recruitcost) {
             cmistake(u, ord, 142, MSG_EVENT);
-            return;
+            return NULL;
         }
         pool /= recruitcost;
         if (n > pool) n = pool;
@@ -441,12 +460,12 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
 
     if (!n) {
         cmistake(u, ord, 142, MSG_EVENT);
-        return;
+        return NULL;
     }
     if (has_skill(u, SK_ALCHEMY)) {
         if (faction_count_skill(u->faction, SK_ALCHEMY) + n > faction_skill_limit(u->faction, SK_ALCHEMY)) {
             cmistake(u, ord, 156, MSG_EVENT);
-            return;
+            return NULL;
         }
     }
 
@@ -455,7 +474,7 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     if (msg) {
         add_message(&u->faction->msgs, msg);
         msg_release(msg);
-        return;
+        return NULL;
     }
 
     u_setrace(u, rc);
@@ -464,13 +483,13 @@ static void recruit_cmd(unit * u, struct order *ord, recruit_request ** recruito
     o->qty = n;
     o->unit = u;
     o->ord = ord;
-    addlist(recruitorders, o);
+    return o;
 }
 
 void recruit(region * r)
 {
     unit *u;
-    recruit_request *recruitorders = NULL;
+    recruit_request **recruitorders = NULL;
 
     if (rules_recruit < 0)
         recruit_init();
@@ -482,7 +501,10 @@ void recruit(region * r)
         if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
             for (ord = u->orders; ord; ord = ord->next) {
                 if (getkeyword(ord) == K_RECRUIT) {
-                    recruit_cmd(u, ord, &recruitorders);
+                    recruit_request *o = recruit_cmd(u, ord);
+                    if (o) {
+                        arrpush(recruitorders, o);
+                    }
                     break;
                 }
             }
@@ -491,6 +513,7 @@ void recruit(region * r)
 
     if (recruitorders) {
         expandrecruit(r, recruitorders);
+        free_requests(recruitorders);
     }
     remove_empty_units_in_region(r);
 }

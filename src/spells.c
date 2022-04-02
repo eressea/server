@@ -3956,10 +3956,10 @@ static int sp_recruit(castorder * co)
      * Bauer, nur die Kosten steigen. */
     n = (pow(force, 1.6) * 100) / f->race->recruitcost;
     if (rc->recruit_multi > 0) {
-        double multp = (double)maxp / rc->recruit_multi;
-        n = fmin(multp, n);
-        n = fmax(n, 1);
-        rsetpeasants(r, maxp - (int)(n * rc->recruit_multi));
+        int multp = maxp * rc->recruit_multi;
+        if (n > multp) n = multp;
+        if (n < 1) n = 1;
+        rsetpeasants(r, maxp - (int)(n / rc->recruit_multi));
     }
     else {
         n = fmin(maxp, n);

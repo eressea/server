@@ -75,7 +75,7 @@ struct race *test_create_race(const char *name)
     rc->hitpoints = 20;
     rc->maxaura = 100;
     rc->recruitcost = 100;
-    rc->recruit_multi = 1.0;
+    rc->recruit_multi = 1;
     rc->flags |= (RCF_WALK|RCF_PLAYABLE);
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;

@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.13)
 
+project (eressea-server C)
+
 set(CMAKE_C_STANDARD 99)
 if (WIN32)
 file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
 endif(WIN32)
 
-project (eressea-server C)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 if (WIN32)
 # make subdirectories build to the same output folders (DLLs):
@@ -69,6 +70,8 @@ endif (MSVC)
 find_program(iwyu_path NAMES include-what-you-use iwyu)
 
 enable_testing()
+
+include_directories(includes)
 
 add_subdirectory (tools)
 add_subdirectory (storage)
