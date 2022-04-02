@@ -1,15 +1,15 @@
 #include "vortex.h"
 
-#include <kernel/config.h>
-#include <kernel/region.h>
+#include "kernel/config.h"
+#include "kernel/region.h"
 
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
-#include <util/language.h>
-#include <util/log.h>
-#include <util/strings.h>
-#include <util/umlaut.h>
-#include <util/variant.h>
+#include "kernel/attrib.h"
+#include "kernel/gamedata.h"
+#include "util/language.h"
+#include "util/log.h"
+#include "util/strings.h"
+#include "util/umlaut.h"
+#include "util/variant.h"
 
 #include <storage.h>
 

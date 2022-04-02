@@ -1,21 +1,23 @@
-#include <kernel/config.h>
-#include <kernel/build.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/unit.h>
-#include <kernel/curse.h>
+#include "attrib.h"
+#include "build.h"
+#include "config.h"
+#include "curse.h"
+#include "race.h"
+#include "region.h"
+#include "ship.h"
+#include "skill.h"
+#include "unit.h"
 
-#include <kernel/attrib.h>
+#include <util/variant.h>
 
 #include <spells/shipcurse.h>
 #include <attributes/movement.h>
 
 #include <CuTest.h>
 #include <tests.h>
-#include <stdlib.h>
-#include <string.h>
+
 #include <assert.h>
+#include <stdlib.h>
 
 static void test_register_ship(CuTest * tc)
 {

@@ -1,7 +1,7 @@
 #ifndef H_KRNL_REGION
 #define H_KRNL_REGION
 
-#include <util/resolve.h>
+#include "../util/resolve.h"
 
 #include "direction.h"
 

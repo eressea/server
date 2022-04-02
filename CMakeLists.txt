@@ -71,7 +71,7 @@ find_program(iwyu_path NAMES include-what-you-use iwyu)
 
 enable_testing()
 
-include_directories(includes)
+include_directories(include)
 
 add_subdirectory (tools)
 add_subdirectory (storage)

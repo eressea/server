@@ -1,34 +1,33 @@
 #include "monsters.h"
 
-#include "battle.h"
 #include "guard.h"
-#include "reports.h"
 #include "study.h"
 
-#include <kernel/attrib.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
+#include "kernel/attrib.h"
+#include "kernel/config.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/skills.h"
+#include "kernel/status.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
-#include <util/language.h>
-#include <util/message.h>
-#include <util/nrmessage.h>
+#include "util/language.h"
+#include "util/language.h"
+#include "util/message.h"
 
-#include <attributes/hate.h>
+#include "attributes/hate.h"
 
 #include <CuTest.h>
 #include <tests.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void plan_monsters(struct faction *f);

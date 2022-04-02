@@ -4,7 +4,7 @@
 
 #include "battle.h"
 
-#include "guard.h"
+#include "magic.h"
 #include "reports.h"
 
 #include "spells/buildingcurse.h"
@@ -20,20 +20,20 @@
 #include "kernel/ship.h"
 #include "kernel/skill.h"
 #include "kernel/skills.h"
+#include "kernel/status.h"
 #include "kernel/unit.h"
 
 #include "util/base36.h"
-#include "util/functions.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/rng.h"
 #include "util/strings.h"
+#include "util/variant.h"
 
 #include <CuTest.h>
 
-#include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "tests.h"

@@ -4,32 +4,28 @@
 #include "unit.h"
 
 #include "ally.h"
-#include "config.h"
-#include "curse.h"
-#include "item.h"
+#include "attrib.h"
 #include "building.h"
+#include "config.h"
 #include "faction.h"
-#include "order.h"
+#include "item.h"
+#include "magic.h"
 #include "race.h"
 #include "region.h"
+#include "skill.h"
 #include "skills.h"
-#include "spell.h"
 #include "terrain.h"
-#include "attrib.h"
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/macros.h>
-#include <util/strings.h>
 #include <util/rng.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 static void test_remove_empty_units(CuTest *tc) {
     unit *u;
