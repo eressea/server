@@ -55,6 +55,7 @@ path.c
 pofile.c
 rand.c
 resolve.c
+stb.c
 strings.c
 translation.c
 umlaut.c
