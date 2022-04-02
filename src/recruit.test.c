@@ -40,7 +40,6 @@ static void test_recruit(CuTest* tc)
     region* r;
     unit* u;
     faction* f;
-    race* rc;
     item_type* it_money;
     message* msg;
 
@@ -50,8 +49,6 @@ static void test_recruit(CuTest* tc)
     r = test_create_plain(0, 0);
     f = test_create_faction();
     u = test_create_unit(f, r);
-    u_setrace(u, rc = test_create_race("human"));
-    rc->recruitcost = 100;
     unit_addorder(u, create_order(K_RECRUIT, f->locale, "%d", 1));
 
     /* happy case: */
@@ -106,8 +103,8 @@ static void test_recruit_orcs(CuTest* tc)
     f = test_create_faction();
     f->race = rc = test_create_race("orc");
     rc->recruit_multi = 2;
-    u = test_create_unit(f, r);
     rc->recruitcost = 50;
+    u = test_create_unit(f, r);
     unit_addorder(u, create_order(K_RECRUIT, f->locale, "%d", 2));
 
     /* happy case, two new recruits for one peasant */
@@ -164,7 +161,6 @@ static void test_recruit_split(CuTest* tc)
     region* r;
     unit* u1, * u2;
     faction* f1, * f2;
-    race* rc;
     item_type* it_money;
 
     test_setup();
@@ -175,9 +171,6 @@ static void test_recruit_split(CuTest* tc)
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
-    rc = test_create_race("human");
-    u_setrace(u1, rc);
-    u_setrace(u2, rc);
 
     /* happy case: */
     unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 1));
@@ -213,7 +206,6 @@ static void test_recruit_split_one_peasant(CuTest* tc)
     region* r;
     unit* u1, * u2;
     faction* f1, * f2;
-    race* rc;
     item_type* it_money;
 
     test_setup();
@@ -224,9 +216,40 @@ static void test_recruit_split_one_peasant(CuTest* tc)
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
     u2 = test_create_unit(f2, r);
-    rc = test_create_race("human");
-    u_setrace(u1, rc);
-    u_setrace(u2, rc);
+
+    /* only one peasant can be recruited, someone will win it: */
+    unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 1));
+    unit_addorder(u2, create_order(K_RECRUIT, f2->locale, "%d", 1));
+    i_change(&u1->items, it_money, 100);
+    i_change(&u2->items, it_money, 100);
+    r->land->peasants = RECRUIT_FRACTION;
+    recruit(r);
+    CuAssertIntEquals(tc, 3, u1->number + u2->number);
+    CuAssertIntEquals(tc, RECRUIT_FRACTION - 1, r->land->peasants);
+
+    test_teardown();
+}
+
+static void test_recruit_orcs_split_one_peasant(CuTest* tc)
+{
+    region* r;
+    unit* u1, * u2;
+    faction* f1, * f2;
+    race* rc;
+    item_type* it_money;
+
+    test_setup();
+    setup_recruit();
+    it_money = it_find("money");
+    r = test_create_plain(0, 0);
+    rc = test_create_race("orc");
+    rc->recruit_multi = 2;
+    f1 = test_create_faction();
+    f1->race = rc;
+    f2 = test_create_faction();
+    f2->race = rc;
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f2, r);
 
     /* only one peasant can be recruited, someone will win it: */
     unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 1));
@@ -255,13 +278,11 @@ static void test_recruit_mixed_race(CuTest* tc)
     r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
-    u1 = test_create_unit(f1, r);
-    u2 = test_create_unit(f2, r);
-    rc = test_create_race("human");
-    u_setrace(u1, rc);
     rc = test_create_race("orc");
     rc->recruit_multi = 2;
-    u_setrace(u2, rc);
+    f2->race = rc;
+    u1 = test_create_unit(f1, r);
+    u2 = test_create_unit(f2, r);
 
     /* only one peasant can be recruited: */
     unit_addorder(u1, create_order(K_RECRUIT, f1->locale, "%d", 1));
@@ -282,8 +303,9 @@ CuSuite* get_recruit_suite(void)
     SUITE_ADD_TEST(suite, test_stb);
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_recruit_orcs);
+    SUITE_ADD_TEST(suite, test_recruit_mixed_race);
     SUITE_ADD_TEST(suite, test_recruit_split);
     SUITE_ADD_TEST(suite, test_recruit_split_one_peasant);
-    SUITE_ADD_TEST(suite, test_recruit_mixed_race);
+    SUITE_ADD_TEST(suite, test_recruit_orcs_split_one_peasant);
     return suite;
 }
