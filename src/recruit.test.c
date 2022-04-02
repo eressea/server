@@ -89,7 +89,7 @@ static void test_recruit_orcs(CuTest* tc)
     r = test_create_plain(0, 0);
     f = test_create_faction();
     f->race = rc = test_create_race("orc");
-    rc->recruit_multi = 0.5;
+    rc->recruit_multi = 2;
     u = test_create_unit(f, r);
     rc->recruitcost = 50;
     unit_addorder(u, create_order(K_RECRUIT, f->locale, "%d", 2));
@@ -244,7 +244,7 @@ static void test_recruit_mixed_race(CuTest* tc)
     rc = test_create_race("human");
     u_setrace(u1, rc);
     rc = test_create_race("orc");
-    rc->recruit_multi = .5;
+    rc->recruit_multi = 2;
     u_setrace(u2, rc);
 
     /* only one peasant can be recruited: */

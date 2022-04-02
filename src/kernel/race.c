@@ -336,7 +336,7 @@ race *rc_create(const char *zName)
     rc->weight = PERSON_WEIGHT;
     rc->capacity = 540;
     rc->income = 20;
-    rc->recruit_multi = 1.0F;
+    rc->recruit_multi = 1;
     rc->regaura = 1.0F;
     rc->speed = 1.0F;
     rc->battle_flags = 0;
@@ -451,7 +451,7 @@ int rc_migrants_formula(const race *rc)
 
 void rc_set_param(struct race *rc, const char *key, const char *value) {
     if (strcmp(key, "recruit_multi") == 0) {
-        rc->recruit_multi = atof(value);
+        rc->recruit_multi = atoi(value);
     }
     else if (strcmp(key, "other_race")==0) {
         rc_setoption(rc, RCO_OTHER, value);

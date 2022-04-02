@@ -796,7 +796,7 @@ void clone_men(const unit * u, unit * dst, int n)
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
             const race *rc = u_race(u);
             int p = rpeasants(r);
-            p += (int)(n * rc->recruit_multi);
+            p += (n / rc->recruit_multi);
             rsetpeasants(r, p);
         }
     }
