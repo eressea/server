@@ -328,11 +328,11 @@ int walkingcapacity(const struct unit *u)
     if (rhorse) {
         int tmp = get_effect(u, oldpotiontype[P_STRONG]);
         if (tmp > 0) {
-            int horsecap = rhorse->itype->capacity;
+            int horsecap = rhorse->itype->capacity - rhorse->itype->weight;
             if (tmp > people) {
                 tmp = people;
             }
-            n += tmp * (horsecap - personcapacity(u));
+            n += tmp * (horsecap - u_race(u)->capacity);
         }
     }
     if (rbelt) {
