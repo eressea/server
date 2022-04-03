@@ -3391,7 +3391,7 @@ int pay_cmd(unit * u, struct order *ord)
             /* If the unit is not the owner of the building: error */
             if (owner->no != u->no) {
                 /* The building is not ours error */
-                cmistake(u, ord, 1222, MSG_EVENT);
+                cmistake(u, ord, 5, MSG_EVENT);
             }
             else {
                 /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
@@ -3412,7 +3412,7 @@ int pay_cmd(unit * u, struct order *ord)
                         else
                         {
                             /* The building is not ours error */
-                            cmistake(u, ord, 1222, MSG_EVENT);
+                            cmistake(u, ord, 5, MSG_EVENT);
                         }
 
                     }

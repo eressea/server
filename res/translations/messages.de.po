@@ -1526,9 +1526,6 @@ msgstr "\"$unit($unit) ist im Traum eine Fee erschienen. ($int36($id))\""
 msgid "rust_effect_0"
 msgstr "\"$unit($mage) ruft ein fürchterliches Unwetter über seine Feinde, doch es gab niemanden mehr, den dies treffen konnte.\""
 
-msgid "error1222"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude gehört uns nicht.\""
-
 msgid "header_battle"
 msgstr "\"In $region($region) findet ein Kampf statt.\""
 

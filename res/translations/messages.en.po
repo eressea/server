@@ -1526,9 +1526,6 @@ msgstr "\"In a dream, a fairy appears to $unit($unit). ($int36($id))\""
 msgid "rust_effect_0"
 msgstr "\"$unit($mage) calls forth a terrible torment over the enemy side, but there was nobody who could be affected by it.\""
 
-msgid "error1222"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The building is not ours.\""
-
 msgid "header_battle"
 msgstr "\"There is a battle in $region($region).\""
 

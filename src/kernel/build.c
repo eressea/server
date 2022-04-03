@@ -626,7 +626,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         if (!rule_other) {
             unit *owner = building_owner(b);
             if (!owner || owner->faction != u->faction) {
-                cmistake(u, ord, 1222, MSG_PRODUCE);
+                cmistake(u, ord, 5, MSG_PRODUCE);
                 return 0;
             }
         }
