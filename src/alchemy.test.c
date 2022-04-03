@@ -1,18 +1,20 @@
 #include "alchemy.h"
-#include "move.h"
 
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 
 #include "guard.h"
 
-#include <limits.h>
-
 #include <CuTest.h>
 #include "tests.h"
+
+#include <limits.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 static void test_herbsearch(CuTest * tc)
 {

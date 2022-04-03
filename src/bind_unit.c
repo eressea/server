@@ -14,6 +14,8 @@
 #include "kernel/skill.h"
 #include <kernel/event.h>
 #include "kernel/skills.h"
+#include "kernel/status.h"
+#include "kernel/types.h"
 #include <kernel/building.h>
 #include <kernel/curse.h>
 #include "kernel/equipment.h"
@@ -33,7 +35,6 @@
 /*  util includes */
 #include <util/base36.h>
 #include <util/log.h>
-#include <util/macros.h>
 #include "util/strings.h"
 #include "util/variant.h"
 

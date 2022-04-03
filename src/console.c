@@ -2,7 +2,6 @@
 
 /* lua includes */
 #include <lua.h>
-#include <luaconf.h>
 #include <lauxlib.h>
 
 /* libc includes */

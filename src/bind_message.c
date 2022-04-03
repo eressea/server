@@ -9,7 +9,6 @@
 
 /* util includes */
 #include <util/language.h>
-#include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/variant.h>
@@ -23,6 +22,7 @@
 #include <stdlib.h>
 
 struct order;
+struct ship;
 
 #define E_OK 0
 #define E_INVALID_MESSAGE 1
@@ -138,7 +138,7 @@ static int msg_set_ship(lua_message * msg, const char *param, const struct ship 
     return E_INVALID_MESSAGE;
 }
 
-static int msg_set_region(lua_message * msg, const char *param, const region * r)
+static int msg_set_region(lua_message * msg, const char *param, const struct region * r)
 {
     if (msg->mtype) {
         int i = mtype_get_param(msg->mtype, param);
@@ -295,7 +295,7 @@ static int tolua_msg_set_region(lua_State * L)
 {
     lua_message *lmsg = (lua_message *)tolua_tousertype(L, 1, 0);
     const char *param = tolua_tostring(L, 2, 0);
-    region *value = (region *)tolua_tousertype(L, 3, 0);
+    struct region *value = (struct region *)tolua_tousertype(L, 3, 0);
     int result = msg_set_region(lmsg, param, value);
     lua_pushinteger(L, result);
     return 1;
