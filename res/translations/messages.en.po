@@ -2798,6 +2798,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit has to
 msgid "error330"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ships can only follow other ships.\""
 
+msgid "error331"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must be on board a ship.\""
+
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Missign number of $localize($resource,0).\""
 

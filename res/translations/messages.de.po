@@ -2795,6 +2795,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist
 msgid "error330"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Schiffe können nur andere Schiffe verfolgen.\""
 
+msgid "error331"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht auf einem Schiff.\""
+
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl der $localize($resource) fehlt.\""
 

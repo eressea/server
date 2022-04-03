@@ -3368,7 +3368,9 @@ int use_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 50, MSG_PRODUCE);
         break;
     default:
-        /* no error */
+        if (err < 0) {
+            cmistake(u, ord, -err, MSG_PRODUCE);
+        }
         break;
     }
     return err;

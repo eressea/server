@@ -96,7 +96,7 @@ struct order *ord)
     double effect;
     ship *sh = u->ship;
     if (!sh) {
-        cmistake(u, ord, 20, MSG_MOVE);
+        cmistake(u, ord, 331, MSG_MOVE);
         return -1;
     }
     if (sh->number > 1) {
