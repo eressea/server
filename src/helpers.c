@@ -282,7 +282,7 @@ lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, st
         }
     }
     lua_pop(L, 1);
-    return 0;
+    return EUNUSABLE;
 }
 
 static int
@@ -293,7 +293,6 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
 
     len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
     if (len > 0 && (size_t)len < sizeof(fname)) {
-        int result;
         int(*callout)(unit *, const item_type *, int, struct order *);
 
         /* check if we have a register_item_use function */
@@ -302,24 +301,17 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
             return callout(u, itype, amount, ord);
         }
 
-        /* check if we have a matching lua function */
-        result = lua_use_item(u, itype, fname, amount, ord);
-        if (result != 0) {
-            return result;
-        }
-
-        /* if the item is a potion, try use_potion, the generic function for 
-         * potions that add an effect: */
+        /* if the item is a potion, try use_potion,
+         * the generic function for potions that add an effect: */
         if (itype->flags & ITF_POTION) {
             return use_potion(u, itype, amount, ord);
         }
-        else {
-            log_error("no such callout: %s", fname);
-        }
-        log_error("use(%s) calling '%s': not a function.\n", unitname(u), fname);
+
+        /* finally, check if we have a matching lua function */
+        return lua_use_item(u, itype, fname, amount, ord);
     }
 
-    return 0;
+    return EUNUSABLE;
 }
 
 /* compat code for old data files */
