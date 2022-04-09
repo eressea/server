@@ -63,30 +63,32 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
 }
 
 typedef struct move_fixture {
-    region *r;
-    ship *sh;
-    building * b;
-    unit *u;
+    struct region *r;
+    struct ship *sh;
+    struct terrain_type* ttype;
+    struct ship_type* stype;
+    struct building * b;
+    struct unit *u;
 } move_fixture;
 
 static void setup_harbor(move_fixture *mf, region *r_ship) {
     region *r;
     ship * sh;
-    terrain_type * ttype;
     building_type * btype;
     building * b;
     unit *u;
 
-    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
+    mf->ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     btype = test_create_buildingtype("harbour");
 
-    r = test_create_region(0, 0, ttype);
+    r = test_create_region(0, 0, mf->ttype);
     b = test_create_building(r, btype);
 
+    mf->stype = test_create_shiptype("kayak");
     if (!r_ship) {
         r_ship = r;
     }
-    sh = test_create_ship(r_ship, NULL);
+    sh = test_create_ship(r_ship, mf->stype);
     u = test_create_unit(test_create_faction(), r_ship);
     set_level(u, SK_SAILING, sh->type->sumskill);
     u->ship = sh;
@@ -96,6 +98,33 @@ static void setup_harbor(move_fixture *mf, region *r_ship) {
     mf->u = u;
     mf->sh = sh;
     mf->b = b;
+}
+
+static void test_ship_allowed_coast_ignores_harbor(CuTest* tc)
+{
+    move_fixture mf;
+    unit* u;
+
+    test_setup();
+    setup_harbor(&mf, NULL);
+
+    /* ship cannot sail into a glacier, so the harbor gets used: */
+    CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
+
+    /* now the harbot belongs to someone who is not our ally: */
+    u = test_create_unit(test_create_faction(), mf.r);
+    u->building = mf.b;
+    building_set_owner(u);
+
+    /* ship cannot sail in becasue of the harbor: */
+    CuAssertIntEquals(tc, SA_NO_HARBOUR, check_ship_allowed(mf.sh, mf.r));
+
+    /* make it so our ship can enter glaciers: */
+    mf.stype->coasts[0] = mf.ttype;
+    /* ship cannot sail in becasue of the harbor: */
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(mf.sh, mf.r));
+
+    test_teardown();
 }
 
 static void test_ship_allowed_without_harbormaster(CuTest * tc)
@@ -186,8 +215,6 @@ static void test_ship_allowed_insect(CuTest * tc)
     gtype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     otype = test_create_terrain("ocean", SEA_REGION);
     stype = test_create_shiptype("derp");
-    free(stype->coasts);
-    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
 
     rg = test_create_region(1, 0, gtype);
     ro = test_create_region(4, 0, otype);
@@ -201,7 +228,7 @@ static void test_ship_allowed_insect(CuTest * tc)
 
     /* coast takes precedence over insect */
     CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, ro));
-    CuAssertIntEquals_Msg(tc, "coast trumps insect", SA_NO_COAST, check_ship_allowed(sh, rg));
+    CuAssertIntEquals_Msg(tc, "no-coast trumps insect as reason", SA_NO_COAST, check_ship_allowed(sh, rg));
     stype->coasts[0] = gtype;
     CuAssertIntEquals_Msg(tc, "insect", SA_NO_INSECT, check_ship_allowed(sh, rg));
 
@@ -221,7 +248,7 @@ static void test_ship_allowed_insect(CuTest * tc)
     uh->ship = sh;
     ship_set_owner(uh);
 
-    CuAssertIntEquals_Msg(tc, "insect passenger okay", SA_NO_HARBOUR, check_ship_allowed(sh, rg));
+    CuAssertIntEquals_Msg(tc, "insect passenger okay", SA_COAST, check_ship_allowed(sh, rg));
     test_teardown();
 }
 
@@ -978,6 +1005,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
+    SUITE_ADD_TEST(suite, test_ship_allowed_coast_ignores_harbor);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);

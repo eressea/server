@@ -677,14 +677,22 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    int reason = SA_NO_COAST;
-
     if (fval(r->terrain, SEA_REGION)) {
         return SA_COAST;
     }
     else {
+        int reason = SA_NO_COAST;
         const building_type* bt_harbour = bt_find("harbour");
-        if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+        if (sh->type->coasts) {
+            int c;
+            for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+                if (sh->type->coasts[c] == r->terrain) {
+                    reason = SA_COAST;
+                    break;
+                }
+            }
+        }
+        if (reason != SA_COAST && bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
             unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
             if (!harbourmaster || !sh->_owner) {
                 reason = SA_HARBOUR;
@@ -696,15 +704,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
                 return SA_NO_HARBOUR;
             }
         }
-        if (sh->type->coasts) {
-            int c;
-            for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-                if (sh->type->coasts[c] == r->terrain) {
-                    reason = SA_COAST;
-                    break;
-                }
-            }
-        }
         if (reason >= 0 && sh->region && r_insectstalled(r)) {
             /* insekten duerfen nicht hier rein. haben wir welche? */
             unit* u = ship_owner(sh);
@@ -713,9 +712,8 @@ int check_ship_allowed(struct ship *sh, const region * r)
                 return SA_NO_INSECT;
             }
         }
+        return reason;
     }
-
-    return reason;
 }
 
 static enum direction_t set_coast(ship * sh, region * r, region * rnext)
