@@ -2155,6 +2155,12 @@
       <arg name="region" type="region"/>
     </type>
   </message>
+  <message name="harbor_denied" section="errors">
+    <type>
+      <arg name="ship" type="ship"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
   <message name="sailnolandingstorm" section="errors">
     <type>
       <arg name="ship" type="ship"/>
