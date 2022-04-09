@@ -541,7 +541,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
     test_clear_messagelist(&r->msgs);
 
     test_teardown();

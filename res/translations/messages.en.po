@@ -246,7 +246,7 @@ msgid "spellfail_pump"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Despite intense questioning, $unit($target) did not have anything to tell about $region($tregion).\""
 
 msgid "maintenance_nowork"
-msgstr "\"$building($building) was nonfunctional because upkeep could not be paid at the beginning of the week.\""
+msgstr "\"$building($building) was nonfunctional because the owner did not pay for upkeep.\""
 
 msgid "error_spell_on_flying_ship"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - It is far too dangerous to put this spell on the flying ship $ship($ship).\""

@@ -246,7 +246,7 @@ msgid "spellfail_pump"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) wusste trotz intensivem Verhör nichts über $region($tregion) zu berichten.\""
 
 msgid "maintenance_nowork"
-msgstr "\"$building($building) hat diese Woche nicht funktioniert, da zu Beginn der Woche der Unterhalt nicht gezahlt werden konnte.\""
+msgstr "\"$building($building) hat diese Woche nicht funktioniert, da der Unterhalt nicht gezahlt wurde.\""
 
 msgid "error_spell_on_flying_ship"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es ist zu gefährlich, diesen Zauber auf das fliegende Schiff $ship($ship) zu legen.\""
