@@ -294,12 +294,6 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
     int len;
     char fname[64];
 
-    /* if the item is a potion, try use_potion, the generic function for
-     * potions that add an effect: */
-    if (itype->flags & ITF_POTION) {
-        return use_potion(u, itype, amount, ord);
-    }
-
     len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
     if (len > 0 && (size_t)len < sizeof(fname)) {
         int(*callout)(unit *, const item_type *, int, struct order *);
@@ -309,7 +303,13 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
         if (callout) {
             return callout(u, itype, amount, ord);
         }
-        /* check if we have a matching lua function */
+        /* if the item is a potion, try use_potion,
+         * the generic function for potions that add an effect: */
+        if (itype->flags & ITF_POTION) {
+            return use_potion(u, itype, amount, ord);
+        }
+
+        /* finally, check if we have a matching lua function */
         return lua_use_item(u, itype, fname, amount, ord);
     }
 
