@@ -18,6 +18,8 @@ if [ ! -e $ROOT/$BUILD ]; then
   exit
 fi
 
+eval `luarocks path`
+
 cd $ROOT/tests
 $UNIT_TESTS
 $RUN_TESTS -v1 ../scripts/run-tests.lua
