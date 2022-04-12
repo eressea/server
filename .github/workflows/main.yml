@@ -36,6 +36,7 @@ jobs:
           cmakeoptions: '--config Debug'
           ctestoptions: ''
   test:
+    runs-on: debian-buster
     needs: build
     steps:
       - name: Tests
