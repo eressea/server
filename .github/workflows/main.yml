@@ -38,8 +38,9 @@ jobs:
   test:
     needs: build
     steps:
-      - working-directory: tests
-      - run: ../build/eressea/eressea -v1 ../scripts/run-tests.lua
-      - run: ../build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
-      - run: ../build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
+      - name: Tests
+        working-directory: tests
+        run: ../build/eressea/eressea -v1 ../scripts/run-tests.lua
+        run: ../build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
+        run: ../build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
 
