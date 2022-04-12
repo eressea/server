@@ -27,7 +27,7 @@ jobs:
       - name: Update APT
         run: sudo apt update
       - name: Install dependencies
-        run: sudo apt install libexpat1-dev libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck luarocks clang-tools iwyu
+        run: sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
       - name: Run CTest
         uses: HorstBaerbel/action-ctest@1.1
         with:
