@@ -41,6 +41,8 @@ jobs:
       - name: Tests
         working-directory: tests
         run: ../build/eressea/eressea -v1 ../scripts/run-tests.lua
+      - name: Tests (E2) 
         run: ../build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
+      - name: Tests (E3)
         run: ../build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
 
