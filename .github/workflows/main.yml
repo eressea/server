@@ -38,15 +38,12 @@ jobs:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
           run-test: true
-  test:
-    runs-on: ubuntu-latest 
-    needs: build
-    steps:
       - name: Tests
         working-directory: tests
-        run: ../build/eressea/eressea -v1 ../scripts/run-tests.lua
-      - name: Tests (E2) 
-        run: ../build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
-      - name: Tests (E3)
-        run: ../build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
+        run: |
+          eval $(luarocks path)
+          export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
+          ../build/eressea/eressea -v1 ../scripts/run-tests.lua
+          ../build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
+          ../build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
 
