@@ -303,6 +303,7 @@ use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord
         if (callout) {
             return callout(u, itype, amount, ord);
         }
+
         /* if the item is a potion, try use_potion,
          * the generic function for potions that add an effect: */
         if (itype->flags & ITF_POTION) {

@@ -8,13 +8,13 @@ file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
 endif(WIN32)
 
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 if (WIN32)
 # make subdirectories build to the same output folders (DLLs):
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif (WIN32)
 
 if (MSVC)
+  set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
   find_package (PDCurses)
   set (CURSES_FOUND ${PDCURSES_FOUND})
   set (CURSES_LIBRARIES ${PDCURSES_LIBRARY})
@@ -31,17 +31,20 @@ if (NOT CURSES_FOUND)
   endif(NOT CURSES_FOUND)  
 endif (NOT CURSES_FOUND)
 
-find_package (ToLua 5.2 REQUIRED)
-#find_package (BerkeleyDB REQUIRED)
-find_package (SQLite3 REQUIRED)
-find_package (IniParser REQUIRED)
-find_package (CJSON REQUIRED)
 find_package (EXPAT REQUIRED)
+find_package (Lua 5.2 REQUIRED)
 
-find_package (Lua)
-if (NOT LUA_FOUND)
-find_package (Lua51 REQUIRED)
-endif()
+find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
+find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h REQUIRED)
+
+find_library(CJSON_LIBRARY cjson REQUIRED)
+find_path(CJSON_INCLUDE_DIR NAMES cJSON.h PATH_SUFFIXES cjson REQUIRED)
+
+find_library(INIPARSER_LIBRARY iniparser REQUIRED)
+find_path(INIPARSER_INCLUDE_DIR NAMES iniparser.h PATH_SUFFIXES iniparser REQUIRED)
+
+find_library(TOLUA_LIBRARY tolua REQUIRED)
+find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
 
 if (MSVC)
 set (HAVE_STRDUP 0)
@@ -69,15 +72,20 @@ endif (MSVC)
 
 find_program(iwyu_path NAMES include-what-you-use iwyu)
 
-enable_testing()
-
 include_directories(include)
+
+enable_testing()
 
 add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
+
+if (UNIX)
+  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  set_property(TEST runtests PROPERTY LABELS ci-only)
+endif (UNIX)
 
 install(DIRECTORY etc DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.txt")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.po")

@@ -22,16 +22,19 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # - uses: lukka/get-cmake@latest
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - name: Install dependencies
-        run: sudo apt install libexpat1-dev libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck luarocks clang-tools
-      - name: Run .travis.yml build script
-        uses: ktomk/run-travis-yml@v1
+      - name: Checkout repository
+        uses: actions/checkout@v2
         with:
-          file: .travis.yml
-          steps: |
-            install
-            script
-          allow-failure: false
+          submodules: true
+      - name: Update APT
+        run: sudo apt update
+      - name: Install dependencies
+        run: sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
+      - name: Build and Test
+        uses: ashutoshvarma/action-cmake-build@master
+        with:
+          build-dir: ${{ runner.workspace }}/build
+          build-type: Debug
+          run-test: true
