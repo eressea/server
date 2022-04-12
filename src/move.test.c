@@ -25,8 +25,9 @@
 #include "util/param.h"
 #include "util/parser.h"
 
-#include <CuTest.h>
+#include <stb_ds.h>
 #include <tests.h>
+#include <CuTest.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -48,8 +49,7 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
     test_setup();
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     stype = test_create_shiptype("derp");
-    free(stype->coasts);
-    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+    arrsetlen(stype->coasts, 1);
 
     r1 = test_create_region(0, 0, ttype);
     r2 = test_create_ocean(1, 0);

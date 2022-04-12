@@ -24,6 +24,7 @@
 #include "util/strings.h"
 
 #include <expat.h>
+#include <stb_ds.h>
 
 #include <assert.h>
 #include <string.h>
@@ -671,13 +672,13 @@ static void handle_maintenance(parseinfo *pi, const XML_Char *el, const XML_Char
 
 #define COASTS_MAX 16
 static int ncoasts;
-static struct terrain_type *coasts[COASTS_MAX];
+static const struct terrain_type *coasts[COASTS_MAX];
 
 static void handle_coast(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const XML_Char *tname = attr_get(attr, "terrain");
 
     if (tname) {
-        terrain_type *coast = get_or_create_terrain(tname);
+        const terrain_type *coast = get_or_create_terrain(tname);
         assert(ncoasts < COASTS_MAX);
         coasts[ncoasts++] = coast;
     }
@@ -1465,10 +1466,9 @@ static void end_ships(parseinfo *pi, const XML_Char *el) {
     }
     else if (xml_strequal(el, "ship")) {
         if (ncoasts > 0) {
-            stype->coasts = malloc((1 + (size_t)ncoasts) * sizeof(terrain_type *));
+            arrsetlen(stype->coasts, ncoasts);
             if (!stype->coasts) abort();
             memcpy(stype->coasts, coasts, sizeof(terrain_type *) * ncoasts);
-            stype->coasts[ncoasts] = NULL;
             ncoasts = 0;
         }
         pi->object = NULL;

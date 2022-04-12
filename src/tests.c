@@ -45,6 +45,7 @@
 #include "util/param.h"
 #include "util/rand.h"
 
+#include <stb_ds.h>
 #include <CuTest.h>
 
 #include <assert.h>
@@ -389,14 +390,10 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->skill = SK_SHIPBUILDING;
     }
 
-    if (stype->coasts) {
-        free(stype->coasts);
-    }
-    stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *) * 2);
+    arrsetlen(stype->coasts, 1);
+    if (!stype->coasts) abort();
     stype->coasts[0] = test_create_terrain("plain",
         LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
-    stype->coasts[1] = NULL;
     if (default_locale) {
         const char* str = locale_getstring(default_locale, name);
         if (!str || strcmp(name, str) != 0) {

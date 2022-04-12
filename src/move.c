@@ -62,6 +62,7 @@
 #include <util/strings.h>
 
 #include <storage.h>
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -684,8 +685,9 @@ int check_ship_allowed(struct ship *sh, const region * r)
         int reason = SA_NO_COAST;
         const building_type* bt_harbour = bt_find("harbour");
         if (sh->type->coasts) {
-            int c;
-            for (c = 0; sh->type->coasts[c] != NULL; ++c) {
+            unsigned c;
+            size_t n = arrlen(sh->type->coasts);
+            for (c = 0; c != n; ++c) {
                 if (sh->type->coasts[c] == r->terrain) {
                     reason = SA_COAST;
                     break;

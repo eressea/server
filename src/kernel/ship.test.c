@@ -403,7 +403,7 @@ static void test_stype_defaults(CuTest *tc) {
     CuAssertPtrNotNull(tc, stype);
     CuAssertStrEquals(tc, "hodor", stype->_name);
     CuAssertPtrEquals(tc, NULL, stype->construction);
-    CuAssertPtrEquals(tc, NULL, stype->coasts);
+    CuAssertPtrEquals(tc, NULL, (void *)stype->coasts);
     CuAssertDblEquals(tc, 0.0, stype->damage, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->storm, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->tac_bonus, 0.01);

@@ -35,6 +35,8 @@
 #include <selist.h>
 #include <critbit.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <math.h>
@@ -269,7 +271,7 @@ void free_ship(ship * s)
 static void free_shiptype(void *ptr) {
     ship_type *stype = (ship_type *)ptr;
     free(stype->_name);
-    free(stype->coasts);
+    arrfree(stype->coasts);
     if (stype->construction) {
         free_construction(stype->construction);
     }

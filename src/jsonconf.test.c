@@ -23,9 +23,12 @@
 #include "move.h"
 #include "prefix.h"
 
-#include <CuTest.h>
-#include <cJSON.h>
 #include <tests.h>
+
+#include <stb_ds.h>
+#include <cJSON.h>
+#include <CuTest.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -300,8 +303,8 @@ static void test_ships(CuTest * tc)
     CuAssertPtrNotNull(tc, ter);
 
     CuAssertPtrNotNull(tc, st->coasts);
+    CuAssertIntEquals(tc, 1, (int)arrlen(st->coasts));
     CuAssertPtrEquals(tc, (void *)ter, (void *)st->coasts[0]);
-    CuAssertPtrEquals(tc, NULL, (void *)st->coasts[1]);
 
     cJSON_Delete(json);
     test_teardown();
