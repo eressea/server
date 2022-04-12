@@ -1,17 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 
-project (eressea-server C)
-
 set(CMAKE_C_STANDARD 99)
+
 if (WIN32)
 file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
-endif(WIN32)
-
-if (WIN32)
 # make subdirectories build to the same output folders (DLLs):
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif (WIN32)
+
+project (server C)
 
 if (MSVC)
   set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
