@@ -90,6 +90,8 @@
 #include <selist.h>
 #include <iniparser.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -173,8 +175,10 @@ static bool RemoveNMRNewbie(void)
 static void dumbeffect(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
-        skill *sv = u->skills, *sb = NULL;
-        while (sv != u->skills + u->skill_size) {
+        size_t s, n = arrlen(u->skills);
+        skill *sb = NULL;
+        for (s = 0; s != n; ++s) {
+            skill* sv = u->skills + s;
             if (sb == NULL || skill_compare(sv, sb) > 0) {
                 sb = sv;
             }
@@ -946,10 +950,9 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
     for (u = fdst->units; u != NULL; u = u->nextF) {
         if (u->skills) {
-            int i;
-            for (i = 0; i != u->skill_size; ++i) {
-                const skill *sv = u->skills + i;
-                skill_t sk = (skill_t)sv->id;
+            size_t s, len = arrlen(u->skills);
+            for (s = 0; s != len; ++s) {
+                skill_t sk = (skill_t)u->skills[s].id;
                 skill_count[sk] += u->number;
             }
         }
@@ -980,16 +983,16 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                 }
 
                 if (u->skills) {
-                    int i;
-                    for (i = 0; i != u->skill_size; ++i) {
-                        const skill *sv = u->skills + i;
+                    size_t s, len = arrlen(u->skills);
+                    for (s = 0; s != len; ++s) {
+                        const skill *sv = u->skills + s;
                         skill_t sk = (skill_t)sv->id;
 
                         if (skill_count[sk] + u->number > skill_limit[sk]) {
                             break;
                         }
                     }
-                    if (i != u->skill_size) {
+                    if (s != len) {
                         u = unext;
                         continue;
                     }

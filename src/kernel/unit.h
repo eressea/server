@@ -68,7 +68,6 @@ typedef struct unit {
     int age;
 
     /* skill data */
-    int skill_size;
     struct skill* skills;
     struct item* items;
     reservation* reservations;

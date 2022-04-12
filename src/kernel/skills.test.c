@@ -4,8 +4,10 @@
 #include "skill.h"
 #include "unit.h"
 
-#include <CuTest.h>
 #include <tests.h>
+
+#include <stb_ds.h>
+#include <CuTest.h>
 
 static void test_skills(CuTest * tc)
 {
@@ -15,18 +17,16 @@ static void test_skills(CuTest * tc)
     config_set_int("study.random_progress", 0);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     CuAssertPtrEquals(tc, NULL, u->skills);
-    CuAssertIntEquals(tc, 0, u->skill_size);
     CuAssertIntEquals(tc, 0, get_level(u, SK_CROSSBOW));
     set_level(u, SK_CROSSBOW, 1);
     CuAssertPtrNotNull(tc, u->skills);
-    CuAssertIntEquals(tc, 1, u->skill_size);
+    CuAssertIntEquals(tc, 1, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_CROSSBOW, u->skills->id);
     CuAssertIntEquals(tc, 1, u->skills->level);
     CuAssertIntEquals(tc, 2, u->skills->weeks);
     CuAssertIntEquals(tc, 1, get_level(u, SK_CROSSBOW));
     set_level(u, SK_CROSSBOW, 0);
     CuAssertPtrEquals(tc, NULL, u->skills);
-    CuAssertIntEquals(tc, 0, u->skill_size);
     test_teardown();
 }
 

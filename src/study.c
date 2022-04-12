@@ -42,6 +42,8 @@
 
 #include <selist.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <limits.h>
@@ -834,11 +836,11 @@ void change_skill_days(unit *u, skill_t sk, int days) {
  */
 void demon_skillchange(unit *u)
 {
-    skill *sv = u->skills;
     int upchance = 15, downchance = 10;
     static int config;
     static bool rule_hunger;
     static int cfgup, cfgdown;
+    size_t s, len;
 
     if (config_changed(&config)) {
         rule_hunger = config_get_int("hunger.demon.skills", 0) != 0;
@@ -860,7 +862,8 @@ void demon_skillchange(unit *u)
         }
     }
 
-    while (sv != u->skills + u->skill_size) {
+    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
         int roll = rng_int() % 100;
         if (sv->level > 0 && roll < upchance + downchance) {
             int weeks = 1 + rng_int() % 3;

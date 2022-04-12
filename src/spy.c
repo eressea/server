@@ -33,6 +33,8 @@
 #include <util/rng.h>
 #include <util/strings.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -74,11 +76,13 @@ void spy_message(int spy, const unit * u, const unit * target)
     if (spy > 0) {
         int first = 1;
         int found = 0;
-        skill *sv;
         char buf[4096];
+        size_t s, n = arrlen(target->skills);
 
         buf[0] = 0;
-        for (sv = target->skills; sv != target->skills + target->skill_size; ++sv) {
+        for (s = 0; s != n; ++s) {
+            skill* sv = target->skills + s;
+
             if (sv->level > 0) {
                 found++;
                 if (first == 1) {

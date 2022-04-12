@@ -76,6 +76,7 @@
 #include <util/rng.h>
 
 #include <storage.h>
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -3437,12 +3438,13 @@ static bool can_charm(const unit * u, int maxlevel)
 {
     const skill_t expskills[] =
     { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
-    skill *sv = u->skills;
+    size_t s, len;
 
     if (fval(u, UFL_HERO))
         return false;
 
-    for (; sv != u->skills + u->skill_size; ++sv) {
+    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
         int l = 0, h = 5;
         skill_t sk = sv->id;
         assert(expskills[h] == NOSKILL);
@@ -4263,7 +4265,7 @@ static int sp_calm_monster(castorder * co)
 static int sp_headache(castorder * co)
 {
     skill *smax = NULL;
-    int i;
+    size_t s, len;
     unit *target;
     unit *caster = co_get_caster(co);
     spellparameter *pa = co->par;
@@ -4285,8 +4287,8 @@ static int sp_headache(castorder * co)
         return 0;
 
     /* finde das groesste Talent: */
-    for (i = 0; i != target->skill_size; ++i) {
-        skill *sv = target->skills + i;
+    for (len = arrlen(target->skills), s = 0; s != len; ++s) {
+        skill *sv = target->skills + s;
         if (smax == NULL || skill_compare(sv, smax) > 0) {
             smax = sv;
         }

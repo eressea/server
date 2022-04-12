@@ -25,6 +25,8 @@
 #include <util/path.h>
 #include <util/unicode.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -377,28 +379,28 @@ summary *make_summary(void)
     faction *f;
     region *r;
     unit *u;
-    summary *s = calloc(1, sizeof(summary));
+    summary *sum = calloc(1, sizeof(summary));
     const struct resource_type *rhorse = get_resourcetype(R_HORSE);
 
     for (f = factions; f; f = f->next) {
         const struct locale *lang = f->locale;
-        struct language *plang = s->languages;
+        struct language *plang = sum->languages;
         while (plang && plang->locale != lang)
             plang = plang->next;
         if (!plang) {
             plang = calloc(1, sizeof(struct language));
-            plang->next = s->languages;
-            s->languages = plang;
+            plang->next = sum->languages;
+            sum->languages = plang;
             plang->locale = lang;
         }
         ++plang->number;
         if (f->units) {
-            s->factions++;
+            sum->factions++;
             /* Problem mit Monsterpartei ... */
             if (!is_monsters(f)) {
                 int rc = old_race(f->race);
                 if (rc >= 0 && rc < MAXRACES) {
-                    s->factionrace[rc]++;
+                    sum->factionrace[rc]++;
                 }
             }
         }
@@ -407,70 +409,71 @@ summary *make_summary(void)
     /* count everything */
 
     for (r = regions; r; r = r->next) {
-        s->pferde += rhorses(r);
-        s->schiffe += listlen(r->ships);
-        s->gebaeude += listlen(r->buildings);
+        sum->pferde += rhorses(r);
+        sum->schiffe += listlen(r->ships);
+        sum->gebaeude += listlen(r->buildings);
         if (!fval(r->terrain, SEA_REGION)) {
-            s->landregionen++;
+            sum->landregionen++;
             if (r->units) {
-                s->landregionen_mit_spielern++;
+                sum->landregionen_mit_spielern++;
             }
             if (r->terrain == newterrain(T_VOLCANO)) {
-                s->inactive_volcanos++;
+                sum->inactive_volcanos++;
             }
             else if (r->terrain == newterrain(T_VOLCANO_SMOKING)) {
-                s->active_volcanos++;
+                sum->active_volcanos++;
             }
         }
         if (r->units) {
-            s->regionen_mit_spielern++;
+            sum->regionen_mit_spielern++;
         }
         if (rpeasants(r) || r->units) {
-            s->inhabitedregions++;
-            s->peasants += rpeasants(r);
-            s->peasantmoney += rmoney(r);
+            sum->inhabitedregions++;
+            sum->peasants += rpeasants(r);
+            sum->peasantmoney += rmoney(r);
 
             for (u = r->units; u; u = u->next) {
                 race_t orace;
                 f = u->faction;
                 if (!is_monsters(u->faction)) {
-                    skill *sv;
+                    size_t s, len;
                     item *itm;
 
-                    s->nunits++;
-                    s->playerpop += u->number;
+                    sum->nunits++;
+                    sum->playerpop += u->number;
                     if (u->flags & UFL_HERO) {
-                        s->heroes += u->number;
+                        sum->heroes += u->number;
                     }
-                    s->spielerpferde += i_get(u->items, rhorse->itype);
-                    s->playermoney += get_money(u);
-                    s->armed_men += armedmen(u, true);
+                    sum->spielerpferde += i_get(u->items, rhorse->itype);
+                    sum->playermoney += get_money(u);
+                    sum->armed_men += armedmen(u, true);
                     for (itm = u->items; itm; itm = itm->next) {
                         if (itm->type->rtype->wtype) {
-                            s->waffen += itm->number;
+                            sum->waffen += itm->number;
                         }
                         if (itm->type->rtype->atype) {
-                            s->ruestungen += itm->number;
+                            sum->ruestungen += itm->number;
                         }
                     }
 
-                    s->spielerpferde += i_get(u->items, rhorse->itype);
+                    sum->spielerpferde += i_get(u->items, rhorse->itype);
 
-                    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-                        skill_t sk = sv->id;
+                    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+                        skill_t sk = u->skills[s].id;
                         int aktskill = effskill(u, sk, r);
-                        if (aktskill > s->maxskill)
-                            s->maxskill = aktskill;
+                        if (aktskill > sum->maxskill) {
+                            sum->maxskill = aktskill;
+                        }
                     }
                 }
 
                 orace = old_race(u_race(u));
                 if (orace >= 0 && orace < MAXRACES) {
-                    s->poprace[orace] += u->number;
+                    sum->poprace[orace] += u->number;
                 }
             }
         }
     }
 
-    return s;
+    return sum;
 }

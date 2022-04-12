@@ -61,8 +61,11 @@
 #include "util/password.h"
 #include "util/strings.h"
 #include "util/translation.h"
+
 #include <stream.h>
 #include <selist.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -739,8 +742,9 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 
     dh = 0;
     if (u->faction == f) {
-        skill *sv;
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+        size_t s, len;
+        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+            skill* sv = u->skills + s;
             spskill(sbp, lang, u, sv, &dh);
         }
     }

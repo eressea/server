@@ -17,6 +17,8 @@
 #include <util/functions.h>
 #include <util/message.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <string.h>
@@ -31,13 +33,15 @@ struct order *ord)
      * currently saved, it doesn't look likely (can't make eressea::list
      * from them)
      */
-    int n;
-    for (n = 0; n != amount; ++n) {
-        skill *sv = u->skills;
-        while (sv != u->skills + u->skill_size) {
-            /* only one person learns for 3 weeks */
-            change_skill_days(u, (skill_t)sv->id, STUDYDAYS * 3);
-            ++sv;
+    if (u->skills) {
+        int n;
+        for (n = 0; n != amount; ++n) {
+            size_t s, len = arrlen(u->skills);
+            for (s = 0; s != len; ++s) {
+                skill* sv = u->skills + s;
+                /* only one person learns for 3 weeks */
+                change_skill_days(u, (skill_t)sv->id, STUDYDAYS * 3);
+            }
         }
     }
     ADDMSG(&u->faction->msgs, msg_message("skillpotion_use", "unit", u));

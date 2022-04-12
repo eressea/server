@@ -21,8 +21,10 @@
 #include <util/macros.h>
 #include <util/rng.h>
 
-#include <CuTest.h>
 #include <tests.h>
+
+#include <stb_ds.h>
+#include <CuTest.h>
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -321,20 +323,20 @@ static void test_skills(CuTest *tc) {
     sv = add_skill(u, SK_ALCHEMY);
     CuAssertPtrNotNull(tc, sv);
     CuAssertPtrEquals(tc, sv, u->skills);
-    CuAssertIntEquals(tc, 1, u->skill_size);
+    CuAssertIntEquals(tc, 1, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
     CuAssertIntEquals(tc, 0, sv->level);
     CuAssertIntEquals(tc, 1, sv->weeks);
     CuAssertIntEquals(tc, 0, sv->old);
     sv = add_skill(u, SK_BUILDING);
     CuAssertPtrNotNull(tc, sv);
-    CuAssertIntEquals(tc, 2, u->skill_size);
+    CuAssertIntEquals(tc, 2, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
     CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
     sv = add_skill(u, SK_LONGBOW);
     CuAssertPtrNotNull(tc, sv);
     CuAssertPtrEquals(tc, sv, unit_skill(u, SK_LONGBOW));
-    CuAssertIntEquals(tc, 3, u->skill_size);
+    CuAssertIntEquals(tc, 3, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
     CuAssertIntEquals(tc, SK_LONGBOW, u->skills[1].id);
     CuAssertIntEquals(tc, SK_BUILDING, u->skills[2].id);
@@ -343,13 +345,13 @@ static void test_skills(CuTest *tc) {
     CuAssertTrue(tc, has_skill(u, SK_LONGBOW));
     remove_skill(u, SK_LONGBOW);
     CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
-    CuAssertIntEquals(tc, 2, u->skill_size);
+    CuAssertIntEquals(tc, 2, (int)arrlen(u->skills));
     remove_skill(u, SK_LONGBOW);
     CuAssertIntEquals(tc, SK_BUILDING, u->skills[1].id);
-    CuAssertIntEquals(tc, 2, u->skill_size);
+    CuAssertIntEquals(tc, 2, (int)arrlen(u->skills));
     remove_skill(u, SK_BUILDING);
     CuAssertIntEquals(tc, SK_ALCHEMY, u->skills[0].id);
-    CuAssertIntEquals(tc, 1, u->skill_size);
+    CuAssertIntEquals(tc, 1, (int)arrlen(u->skills));
     CuAssertTrue(tc, !has_skill(u, SK_LONGBOW));
     test_teardown();
 }

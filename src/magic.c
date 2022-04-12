@@ -66,6 +66,8 @@
 #include <critbit.h>
 #include <storage.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -1086,7 +1088,7 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
     case TYP_UNIT:
     {
         int at, pa = 0;
-        const skill *sv;
+        size_t s, len;
         const unit *u = (const unit *)obj;
 
         if (ucontact(u, magician)) {
@@ -1094,10 +1096,12 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
         }
         at = effskill(magician, SK_MAGIC, NULL);
 
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+            const skill* sv = u->skills + s;
             int sk = eff_skill(u, sv, NULL);
-            if (pa < sk)
+            if (pa < sk) {
                 pa = sk;
+            }
         }
 
         /* Contest, probability = 0.05 * (10 + pa - at); */

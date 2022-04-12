@@ -69,9 +69,12 @@ static char g_bigbuf[BUFFERSIZE];
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
+
 #include <selist.h>
 #include <filestream.h>
 #include <stream.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -745,7 +748,6 @@ void cr_output_unit(stream *out, const faction * f,
     int pr;
     item *itm, *show = NULL;
     const char *pzTmp;
-    skill *sv;
     item result[MAX_INVENTORY];
     const faction *fother;
     const char *prefix;
@@ -847,6 +849,7 @@ void cr_output_unit(stream *out, const faction * f,
         const char *c;
         int i;
         struct sc_mage *mage;
+        size_t s, len;
 
         i = ualias(u);
         if (i > 0)
@@ -909,7 +912,8 @@ void cr_output_unit(stream *out, const faction * f,
 
         /* talents */
         pr = 0;
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+            skill* sv = u->skills + s;
             if (sv->level > 0) {
                 skill_t sk = sv->id;
                 int esk = effskill(u, sk, NULL);

@@ -22,6 +22,8 @@
 #include <util/language.h>
 #include <util/path.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <math.h>
@@ -89,7 +91,7 @@ void score(void)
         for (u = r->units; u; u = u->next) {
             item *itm;
             int itemscore = 0;
-            int i;
+            size_t s, len;
             faction *f = u->faction;
             const race *rc = u_race(u);
 
@@ -105,8 +107,8 @@ void score(void)
             }
             f->score += itemscore / 10;
 
-            for (i = 0; i != u->skill_size; ++i) {
-                skill *sv = u->skills + i;
+            for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+                skill *sv = u->skills + s;
                 switch (sv->id) {
                 case SK_MAGIC:
                     f->score += (score_t)(u->number * pow(sv->level, 4));
