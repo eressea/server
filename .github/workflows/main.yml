@@ -38,15 +38,3 @@ jobs:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
           run-test: true
-      - name: Tests
-        working-directory: ${{ runner.workspace }}/tests
-        run: |
-          eval $(luarocks path)
-          export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
-          pwd
-          ls -la ..
-          ls -la ${{ runner.workspace }}/build
-          ${{ runner.workspace }}/build/eressea/eressea -v1 ../scripts/run-tests.lua
-          ${{ runner.workspace }}/build/eressea/eressea -v1 ../scripts/run-tests-e2.lua
-          ${{ runner.workspace }}/build/eressea/eressea -v1 ../scripts/run-tests-e3.lua
-

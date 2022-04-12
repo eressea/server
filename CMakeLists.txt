@@ -71,6 +71,11 @@ endif (MSVC)
 
 enable_testing()
 
+if (UNIX)
+  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  set_property(TEST runtests PROPERTY LABELS ci-only)
+endif (UNIX)
+
 add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)
