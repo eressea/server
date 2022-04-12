@@ -7,6 +7,8 @@
 
 #include <CuTest.h>
 
+#include <stddef.h>
+
 static void test_add_donation(CuTest *tc) {
     faction *f1, *f2;
     region *r;

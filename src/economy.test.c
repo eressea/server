@@ -2,13 +2,12 @@
 #include "economy.h"
 #include "recruit.h"
 #include "guard.h"
+#include "direction.h"         // for D_EAST, directions
 
-#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
@@ -18,15 +17,22 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+#include "kernel/build.h"      // for construction, requirement
+#include "kernel/skill.h"      // for SK_ROAD_BUILDING, SK_WEAPONSMITH, SK_A...
 
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/param.h>
+#include "util/keyword.h"      // for K_BUY, K_DESTROY, K_RECRUIT, K_SELL
+#include "util/variant.h"      // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <stdbool.h>           // for false, true
+#include <stdlib.h>            // for NULL, calloc, free, malloc
 
 static void test_give_control_building(CuTest * tc)
 {
@@ -263,7 +269,7 @@ static void test_trade_limits(CuTest *tc) {
 }
 
 static void test_trade_needs_castle(CuTest *tc) {
-    /* Handeln ist nur in Regionen mit Burgen möglich. */
+    /* Handeln ist nur in Regionen mit Burgen mï¿½glich. */
     race *rc;
     region *r;
     unit *u;

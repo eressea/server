@@ -1,7 +1,6 @@
 #include "give.h"
 
 #include "contact.h"
-#include "economy.h"
 #include "eressea.h"
 
 #include <kernel/ally.h>
@@ -15,11 +14,13 @@
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include "kernel/skill.h"    // for SK_MAGIC
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
+#include "util/keyword.h"    // for K_GIVE, K_RESERVE
 
 #include <CuTest.h>
 #include <tests.h>

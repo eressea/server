@@ -81,7 +81,7 @@ add_subdirectory (process)
 add_subdirectory (src eressea)
 
 if (UNIX)
-  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests ${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
   set_property(TEST runtests PROPERTY LABELS ci-only)
 endif (UNIX)
 

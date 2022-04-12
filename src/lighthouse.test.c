@@ -1,16 +1,17 @@
 #include "lighthouse.h"
 
 #include <kernel/attrib.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
 #include <kernel/building.h>
 #include <kernel/terrain.h>
-
+#include "kernel/skill.h"     // for SK_PERCEPTION
 
 #include <CuTest.h>
 #include "tests.h"
+
+#include <stdbool.h>          // for false, true
+#include <stddef.h>           // for NULL
 
 static void test_lighthouse_range(CuTest * tc)
 {

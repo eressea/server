@@ -1,26 +1,18 @@
 #include "creport.h"
-#include "move.h"
 #include "spy.h"
-#include "travelthru.h"
 
 #include "attributes/racename.h"
 
-#include "util/keyword.h"
 #include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
 
+#include "kernel/build.h"         // for construction
+#include "kernel/skill.h"         // for SK_QUARRYING
 #include <kernel/ally.h>
-#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
-#include <kernel/ship.h>
 #include <kernel/unit.h>
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
 
 #include <stream.h>
 #include <memstream.h>
@@ -28,6 +20,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>              // for bool, false
+#include <stdlib.h>               // for atoi, calloc
 #include <string.h>
 
 static void test_cr_unit(CuTest *tc) {

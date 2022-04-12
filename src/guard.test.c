@@ -1,8 +1,6 @@
 #include "guard.h"
 
-#include "battle.h"
 #include "laws.h"
-#include "monsters.h"
 
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -12,11 +10,17 @@
 #include <kernel/terrain.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include "kernel/skill.h"    // for SK_MELEE
+#include "kernel/status.h"   // for ST_FIGHT, ST_FLEE
 
-#include <limits.h>
+#include "util/keyword.h"    // for K_GUARD
+#include "util/variant.h"    // for frac_zero
 
 #include <CuTest.h>
 #include "tests.h"
+
+#include <stdbool.h>         // for true, false
+#include <stddef.h>          // for NULL
 
 static void test_is_guarded(CuTest *tc) {
     unit *u1, *u2;

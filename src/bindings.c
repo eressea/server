@@ -10,10 +10,10 @@
 #include "laws.h"
 #include "magic.h"
 #include "reports.h"
-#include "study.h"
 #include "summary.h"
 #include "teleport.h"
 
+#include "kernel/attrib.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/alliance.h"
@@ -46,7 +46,6 @@
 
 #include <modules/score.h>
 
-#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
