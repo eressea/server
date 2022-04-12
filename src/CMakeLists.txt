@@ -205,11 +205,11 @@ target_link_libraries(game ${EXTRA_LIBS} parser version)
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   game
-  ${TOLUA_LIBRARIES}
+  ${TOLUA_LIBRARY}
   ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CJSON_LIBRARIES}
-  ${IniParser_LIBRARIES}
+  ${CJSON_LIBRARY}
+  ${INIPARSER_LIBRARY}
 )
 
 set(TESTS_SRC
@@ -268,8 +268,8 @@ target_link_libraries(test_eressea
   ${LUA_LIBRARIES}
   ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
-  ${CJSON_LIBRARIES}
-  ${IniParser_LIBRARIES}
+  ${CJSON_LIBRARY}
+  ${INIPARSER_LIBRARY}
   )
 
 set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
@@ -307,20 +307,13 @@ if (HAVE_LIBBSD)
 target_link_libraries(parser bsd)
 endif (HAVE_LIBBSD)
 
-target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIRS})
-target_include_directories (game PUBLIC ${IniParser_INCLUDE_DIRS})
+target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
 
-if (SQLite3_FOUND)
-target_include_directories (game PRIVATE ${SQLite3_INCLUDE_DIRS})
-target_link_libraries(eressea ${SQLite3_LIBRARIES})
-target_link_libraries(test_eressea ${SQLite3_LIBRARIES})
+target_include_directories (game PRIVATE ${SQLITE3_INCLUDE_DIR})
+target_link_libraries(eressea ${SQLITE3_LIBRARY})
+target_link_libraries(test_eressea ${SQLITE3_LIBRARY})
 target_compile_definitions(game PRIVATE USE_SQLITE)
-elseif (DB_FOUND)
-#include_directories (${DB_INCLUDE_DIR})
-target_link_libraries(eressea ${DB_LIBRARIES})
-target_link_libraries(test_eressea ${DB_LIBRARIES})
-target_compile_definitions(game PRIVATE USE_DB)
-endif(SQLite3_FOUND)
 
 if (READLINE_FOUND)
 #include_directories (${READLINE_INCLUDE_DIR})

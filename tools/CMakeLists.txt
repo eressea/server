@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 2.9)
 project (tools C)
 
 add_executable(inifile inifile.c)
-target_link_libraries(inifile ${IniParser_LIBRARIES})
-target_include_directories (inifile PRIVATE ${IniParser_INCLUDE_DIRS})
+target_link_libraries(inifile ${INIPARSER_LIBRARY})
+target_include_directories (inifile PRIVATE ${INIPARSER_INCLUDE_DIR})
 
 add_executable(gethash gethash.c)
 

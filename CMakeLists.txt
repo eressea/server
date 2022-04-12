@@ -7,13 +7,13 @@ file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
 endif(WIN32)
 
 project (eressea-server C)
-set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 if (WIN32)
 # make subdirectories build to the same output folders (DLLs):
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif (WIN32)
 
 if (MSVC)
+  set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
   find_package (PDCurses)
   set (CURSES_FOUND ${PDCURSES_FOUND})
   set (CURSES_LIBRARIES ${PDCURSES_LIBRARY})
@@ -30,14 +30,19 @@ if (NOT CURSES_FOUND)
   endif(NOT CURSES_FOUND)  
 endif (NOT CURSES_FOUND)
 
-find_package (SQLite3 REQUIRED)
-find_package (IniParser REQUIRED)
-find_package (CJSON REQUIRED)
 find_package (EXPAT REQUIRED)
 find_package (Lua 5.2 REQUIRED)
 
+find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
+find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h REQUIRED)
+
+find_library(CJSON_LIBRARY cjson REQUIRED)
+find_path(CJSON_INCLUDE_DIR NAMES cJSON.h PATH_SUFFIXES cjson REQUIRED)
+
+find_library(INIPARSER_LIBRARY iniparser REQUIRED)
+find_path(INIPARSER_INCLUDE_DIR NAMES iniparser.h PATH_SUFFIXES iniparser REQUIRED)
+
 find_library(TOLUA_LIBRARY tolua REQUIRED)
-set(TOLUA_LIBRARIES ${TOLUA_LIBRARY})
 find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
 
 if (MSVC)
