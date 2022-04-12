@@ -22,7 +22,7 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: lukka/get-cmake@latest
+      # - uses: lukka/get-cmake@latest
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -32,15 +32,11 @@ jobs:
         run: sudo apt update
       - name: Install dependencies
         run: sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
-      - name: Run CMake
-        uses: lukka/run-cmake@v10
-      - name: Run CTest
-        uses: HorstBaerbel/action-ctest@1.1
+      - name: Build and Test
+        uses: ashutoshvarma/action-cmake-build@master
         with:
-          sourcedir: '.'
-          builddir: build
-          cmakeoptions: '--config Debug'
-          ctestoptions: ''
+          build-dir: ${{ runner.workspace }}/build
+          run-test: true
   test:
     runs-on: ubuntu-latest 
     needs: build
