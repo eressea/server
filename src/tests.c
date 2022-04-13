@@ -205,7 +205,7 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
 
 static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
     strlist **slp = (strlist **)udata;
-    addstrlist(slp, format);
+    addstrlist(slp, str_strdup(format));
 }
 
 struct log_t * test_log_start(int flags, strlist **slist) {

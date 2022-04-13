@@ -86,12 +86,12 @@ unsigned int listlen(void *l)
     return i;
 }
 /* - String Listen --------------------------------------------- */
-void addstrlist(strlist ** SP, const char *s)
+void addstrlist(strlist ** SP, char *s)
 {
     strlist *slist = malloc(sizeof(strlist));
     if (!slist) abort();
     slist->next = NULL;
-    slist->s = str_strdup(s);
+    slist->s = s;
     addlist(SP, slist);
 }
 

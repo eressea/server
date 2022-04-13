@@ -9,7 +9,7 @@ extern "C" {
         char *s;
     } strlist;
 
-    void addstrlist(strlist ** SP, const char *s);
+    void addstrlist(strlist ** SP, char *s);
     void freestrlist(strlist * s);
     void addlist(void *l1, void *p1);
     void translist(void *l1, void *l2, void *p);

@@ -932,7 +932,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
         }
         memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
-        addstrlist(SP, buf); /* TODO: too much string copying, cut out this function */
+        addstrlist(SP, str_strdup(buf)); /* TODO: too much string copying, cut out this function */
         while (*cut == ' ') {
             ++cut;
         }
@@ -946,12 +946,8 @@ void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
     split_paragraph(SP, s, indent, REPORTWIDTH, mark);
 }
 
-void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
+static char * lparagraph(char *s, unsigned int indent, char mark)
 {
-    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
-     * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
-     * Vgl. spunit (). */
-
     char *buflocal = calloc(strlen(s) + indent + 1, sizeof(char));
     if (!buflocal) abort();
 
@@ -961,8 +957,7 @@ void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
             buflocal[indent - 2] = mark;
     }
     strcpy(buflocal + indent, s);
-    addstrlist(SP, buflocal);
-    free(buflocal);
+    return buflocal;
 }
 
 void
@@ -971,8 +966,9 @@ spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned in
 {
     char buf[DISPLAYSIZE];
     int dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
-    lparagraph(SP, buf, indent,
+    char * s = lparagraph(buf, indent,
         (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
+    addstrlist(SP, s);
 }
 
 struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,

@@ -45,7 +45,6 @@ extern "C" {
     int get_regions_distance_arr(struct region *r, int radius, struct region *result[], int size);
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
-    void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
     void spunit(struct strlist **SP, const struct faction *f,
         const struct unit *u, unsigned int indent, enum seen_mode mode);
