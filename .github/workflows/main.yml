@@ -31,7 +31,9 @@ jobs:
       - name: Update APT
         run: sudo apt update
       - name: Install dependencies
-        run: sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
+        run: |
+          sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
+          luarocks install lunitx --local
       - name: Build and Test
         uses: ashutoshvarma/action-cmake-build@master
         with:
