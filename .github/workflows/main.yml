@@ -38,3 +38,4 @@ jobs:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
           run-test: true
+          ctest-options: --output-on-failure
