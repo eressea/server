@@ -22,18 +22,19 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # - uses: lukka/get-cmake@latest
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          submodules: true
+      - name: Get latest CMake and ninja
+        uses: lukka/get-cmake@latest
       - name: Update APT
         run: sudo apt update
       - name: Install dependencies
         run: |
           sudo apt install libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
           luarocks install lunitx --local
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Build and Test
         uses: ashutoshvarma/action-cmake-build@master
         with:
