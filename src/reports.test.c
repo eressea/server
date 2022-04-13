@@ -1,11 +1,8 @@
 #include "reports.h"
 
 #include "guard.h"
-#include "util/keyword.h"
 #include "lighthouse.h"
 #include "laws.h"
-#include "move.h"
-#include "spells.h"
 #include "spy.h"
 #include "travelthru.h"
 
@@ -19,29 +16,26 @@
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
-#include "kernel/spell.h"
-#include "kernel/spellbook.h"
-#include "kernel/terrain.h"
 
-#include "kernel/attrib.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
 #include "util/nrmessage.h"
+#include "util/variant.h"
 
 #include "attributes/attributes.h"
 #include "attributes/key.h"
-#include "attributes/otherfaction.h"
 
 #include <selist.h>
-#include <stream.h>
-#include <memstream.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void test_reorder_units(CuTest * tc)
