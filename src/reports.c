@@ -934,7 +934,7 @@ int bufunit_depr(const faction * f, const unit * u, seen_mode mode,
     sbstring sbs;
 
     sbs_init(&sbs, buf, size);
-    bufunit(f, u, fv, mode, getarnt, &sbs);
+    bufunit(f, u, fv, mode, !!getarnt, &sbs);
     if (!getarnt) {
         if (alliedfaction(f, fv, HELP_ALL)) {
             return 1;
@@ -1003,17 +1003,6 @@ static char * lparagraph(char *s, unsigned int indent, char mark)
     }
     strcpy(buflocal + indent, s);
     return buflocal;
-}
-
-void
-spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned int indent,
-    seen_mode mode)
-{
-    char buf[DISPLAYSIZE];
-    int dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
-    char * s = lparagraph(buf, indent,
-        (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
-    addstrlist(SP, s);
 }
 
 struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,

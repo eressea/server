@@ -1220,6 +1220,12 @@
       <arg name="string" type="string"/>
     </type>
   </message>
+  <message name="battle_fighter" section="battle">
+    <type>
+      <arg name="string" type="string"/>
+      <arg name="unit" type="unit"/>
+    </type>
+  </message>
   <message name="para_army_index" section="battle">
     <type>
       <arg name="index" type="int"/>

@@ -2113,6 +2113,9 @@ msgstr "\"$unit($unit) fühlt sich einen Moment seltsam geschwächt.\""
 msgid "battle_msg"
 msgstr "\"$string\""
 
+msgid "battle_fighter"
+msgstr "\"$string\""
+
 msgid "error16"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist schon fertig.\""
 

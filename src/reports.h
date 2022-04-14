@@ -46,8 +46,6 @@ extern "C" {
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
-    void spunit(struct strlist **SP, const struct faction *f,
-        const struct unit *u, unsigned int indent, enum seen_mode mode);
 
     int reports(void);
     int write_reports(struct faction *f, const char *password);

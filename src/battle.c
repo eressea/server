@@ -2795,20 +2795,31 @@ static void aftermath(battle * b)
     reorder_fleeing(r);
 }
 
+void
+spunit(const struct faction* f, const unit* u, unsigned int indent,
+    struct sbstring *sbp)
+{
+    int getarnt = fval(u, UFL_ANON_FACTION);
+    const faction* fv = visible_faction(f, u);
+    bufunit(f, u, fv, seen_battle, !!getarnt, sbp);
+}
+
 static void battle_punit(unit * u, battle * b)
 {
     bfaction *bf;
 
     for (bf = b->factions; bf; bf = bf->next) {
-        faction *f = bf->faction;
-        strlist *S = 0, *x;
+        char buf[DISPLAYSIZE];
+        sbstring sbs;
+        faction* f = bf->faction;
 
-        spunit(&S, f, u, 4, seen_battle);
-        for (x = S; x; x = x->next) {
-            fbattlerecord(b, f, x->s);
+        sbs_init(&sbs, buf, sizeof(buf));
+        spunit(f, u, 4, &sbs);
+        if (sbs.begin != sbs.end) {
+            message* m = msg_message("battle_fighter", "string unit", buf, u);
+            battle_message_faction(b, f, m);
+            msg_release(m);
         }
-        if (S)
-            freestrlist(S);
     }
 }
 
