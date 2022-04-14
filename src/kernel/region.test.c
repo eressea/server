@@ -7,6 +7,7 @@
 
 #include <CuTest.h>
 #include <tests.h>
+#include <stdlib.h>
 
 void test_terraform(CuTest *tc) {
     region *r;

@@ -1,42 +1,46 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/config.h>
-#include <kernel/race.h>
-#include <attributes/key.h>
-
 #include "save.h"
+
+#include "config.h"
+#include "race.h"
 #include "version.h"
 #include "building.h"
 #include "ship.h"
+#include "skill.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
 #include "faction.h"
-#include "plane.h"
 #include "region.h"
+#include "attrib.h"
+#include "event.h"
+#include "gamedata.h"
+
+#include <attributes/key.h>
 
 #include <triggers/changefaction.h>
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
-#include <kernel/attrib.h>
+
 #include <util/base36.h>
-#include <kernel/event.h>
-#include <kernel/gamedata.h>
 #include <util/password.h>
 #include <util/path.h>
 #include <util/strings.h>
 
 #include <storage.h>
-
-#include <limits.h>
+#include <stream.h>
 #include <memstream.h>
+
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
 static void test_readwrite_data(CuTest * tc)
 {

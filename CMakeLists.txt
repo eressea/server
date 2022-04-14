@@ -68,8 +68,6 @@ if (HAVE_LIBBSD)
 endif (HAVE_LIBBSD)
 endif (MSVC)
 
-find_program(iwyu_path NAMES include-what-you-use iwyu)
-
 include_directories(include)
 
 enable_testing()

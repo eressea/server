@@ -10,6 +10,8 @@
 #include <tests.h>
 #include <CuTest.h>
 
+#include <stdlib.h>
+
 static void shock_setup(void) {
     mt_create_va(mt_new("shock", NULL),
         "mage:unit", "reason:string", MT_NEW_END);

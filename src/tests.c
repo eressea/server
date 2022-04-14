@@ -3,9 +3,10 @@
 #endif
 #include "tests.h"
 
-#include "battle.h"
 #include "creport.h"
+#include "direction.h"         // for init_direction, directions, MAXDIRECTIONS
 #include "eressea.h"
+#include "magic.h"             // for spell_component, create_castorder, ...
 #include "prefix.h"
 #include "report.h"
 #include "reports.h"
@@ -16,12 +17,13 @@
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
 #include "kernel/alliance.h"
-#include "kernel/equipment.h"
 #include "kernel/messages.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
+#include "kernel/skill.h"      // for enable_skill, skillnames, MAXSKILLS
+#include "kernel/status.h"     // for ST_FLEE
 #include "kernel/terrain.h"
-#include "kernel/terrainid.h"
+#include "kernel/types.h"      // for MAXMAGIETYP
 #include "kernel/item.h"
 #include "kernel/unit.h"
 #include "kernel/order.h"
@@ -30,9 +32,6 @@
 #include "kernel/building.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
-#include "kernel/spellbook.h"
-#include "kernel/terrain.h"
-
 #include "util/aliases.h"
 #include "util/functions.h"
 #include "util/keyword.h"
@@ -44,12 +43,16 @@
 #include "util/strings.h"
 #include "util/param.h"
 #include "util/rand.h"
+#include "util/variant.h"      // for variant, VAR_VOIDPTR, VAR_INT
 
 #include <stb_ds.h>
 #include <CuTest.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <stdarg.h>            // for va_list
+#include <stdbool.h>           // for true
+#include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
 #include <string.h>
 

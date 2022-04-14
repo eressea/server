@@ -5,6 +5,8 @@
 #include <CuTest.h>
 #include "tests.h"
 
+#include <stdlib.h>
+
 static void test_calendar_config(CuTest * tc)
 {
     gamedate gd;

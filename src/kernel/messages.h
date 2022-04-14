@@ -2,6 +2,8 @@
 #ifndef H_KRNL_MESSAGE
 #define H_KRNL_MESSAGE
 
+#include <util/message.h>
+
 #define MESSAGE_MISSING_IGNORE  0
 #define MESSAGE_MISSING_ERROR   1
 #define MESSAGE_MISSING_REPLACE 2

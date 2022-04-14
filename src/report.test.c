@@ -29,6 +29,7 @@
 #include <tests.h>
 
 #include <string.h>
+#include <stdlib.h>
 
 static void test_write_spaces(CuTest *tc) {
     stream out = { 0 };

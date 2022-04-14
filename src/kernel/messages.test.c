@@ -10,6 +10,7 @@
 #include <tests.h>
 
 #include <assert.h>
+#include <stdlib.h>
 
 void test_missing_message(CuTest *tc) {
     message *msg;
