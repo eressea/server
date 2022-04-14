@@ -867,7 +867,6 @@ static void bufunit_status(const unit* u, const struct locale *lang, struct sbst
 void bufunit(const faction * f, const unit * u, const faction *fv,
     seen_mode mode, bool getarnt, struct sbstring *sbp)
 {
-    int dh;
     bool isbattle = (mode == seen_battle);
     item *show = NULL;
     item results[MAX_INVENTORY];
@@ -901,7 +900,6 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
     }
 
     if (u->faction == f) {
-        dh = 0;
         bufunit_skills(u, lang, sbp);
     }
 
@@ -989,20 +987,6 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
 void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
 {
     split_paragraph(SP, s, indent, REPORTWIDTH, mark);
-}
-
-static char * lparagraph(char *s, unsigned int indent, char mark)
-{
-    char *buflocal = calloc(strlen(s) + indent + 1, sizeof(char));
-    if (!buflocal) abort();
-
-    if (indent) {
-        memset(buflocal, ' ', indent);
-        if (mark)
-            buflocal[indent - 2] = mark;
-    }
-    strcpy(buflocal + indent, s);
-    return buflocal;
 }
 
 struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,

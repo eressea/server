@@ -164,7 +164,7 @@ static void init_rules(void)
     }
 }
 
-static int army_index(side * s)
+static int army_index(const side * s)
 {
     return s->index;
 }
@@ -2858,6 +2858,18 @@ static void set_attacker(fighter * fig)
     fset(fig, FIG_ATTACKER);
 }
 
+static struct message * army_message(const battle* b, const faction* f, const side* s)
+{
+    const char* sname;
+    const faction* fv;
+
+    assert(f);
+    fv = seematrix(f, s) ? s->faction : s->stealthfaction;
+    sname = fv ? sidename(s) : LOC(f->locale, "unknown_faction");
+
+    return msg_message("para_army_index", "index name faction", army_index(s), sname, fv);
+}
+
 static void print_stats(battle * b)
 {
     side *s2;
@@ -2866,26 +2878,19 @@ static void print_stats(battle * b)
         bfaction *bf;
 
         for (bf = b->factions; bf; bf = bf->next) {
+            char buf[1024], *bufp = buf;
+            size_t rsize, size = sizeof(buf);
+            int komma = 0;
             faction *f = bf->faction;
-            const char *loc_army = LOC(f->locale, "battle_army");
-            char *bufp;
-            const char *header;
-            size_t rsize, size;
-            int komma;
-            const char *sname =
-                seematrix(f, s) ? sidename(s) : LOC(f->locale, "unknown_faction");
-            message *msg;
-            char buf[1024];
-
-            msg = msg_message("para_army_index", "index name", army_index(s), sname);
+            const char *loc_army, *header;
+            message* msg;
+            
+            msg = army_message(b, f, s);
             battle_message_faction(b, f, msg);
             msg_release(msg);
 
-            bufp = buf;
-            size = sizeof(buf);
-            komma = 0;
+            loc_army = LOC(f->locale, "battle_army");
             header = LOC(f->locale, "battle_opponents");
-
             for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
                 if (enemy(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";

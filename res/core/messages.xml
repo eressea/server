@@ -1230,6 +1230,7 @@
     <type>
       <arg name="index" type="int"/>
       <arg name="name" type="string"/>
+      <arg name="faction" type="faction"/>
     </type>
   </message>
 
