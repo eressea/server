@@ -77,7 +77,7 @@ extern "C" {
     int bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
         char *buf, size_t size);
     void bufunit(const struct faction * f, const struct unit * u,
-        const struct faction *fv, enum seen_mode mode, int getarnt,
+        const struct faction *fv, enum seen_mode mode, bool getarnt,
         struct sbstring *sbp);
 
     const char *trailinto(const struct region *r,
