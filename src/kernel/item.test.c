@@ -109,7 +109,7 @@ void test_change_item(CuTest * tc)
     test_create_itemtype("iron");
     init_resources();
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     test_uchange(tc, u, get_resourcetype(R_IRON));
     test_log_stderr(1);
     test_teardown();

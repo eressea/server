@@ -33,7 +33,7 @@ static void test_destroyfaction_allies(CuTest *tc) {
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     test_create_unit(f1, r);
     f2 = test_create_faction();
@@ -86,7 +86,7 @@ static void test_remove_dead_factions(CuTest *tc) {
     int fno;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     fm = get_or_create_monsters();
     f = test_create_faction();
     assert(fm && r && f);
@@ -252,7 +252,7 @@ static void test_max_migrants(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     f = test_create_faction_ex(rc, NULL);
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u = test_create_unit(f, test_create_plain(0, 0));
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
     rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
@@ -346,7 +346,7 @@ static void test_save_special_items(CuTest *tc) {
     itype = test_create_itemtype("banana");
     itype->flags |= ITF_NOTLOST;
     rc = test_create_race("template");
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     i_change(&u->items, itype, 1);
 
     /* when there is no monster in the region, a ghost of the dead unit is created: */

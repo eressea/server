@@ -243,7 +243,7 @@ static void test_ship_allowed_insect(CuTest * tc)
 
     /* insect passenger can enter */
     fh = test_create_faction_ex(test_create_race("human"), NULL);
-    uh = test_create_unit(fh, test_create_region(0, 0, NULL));
+    uh = test_create_unit(fh, test_create_plain(0, 0));
 
     uh->ship = sh;
     ship_set_owner(uh);
@@ -261,7 +261,7 @@ static void test_walkingcapacity(CuTest *tc) {
     test_setup();
     init_resources();
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     cap = u->number * (u->_race->capacity + u->_race->weight);
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
     scale_number(u, 2);
@@ -332,7 +332,7 @@ static void test_age_trails(CuTest *tc) {
     ship *sh;
 
     test_setup();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, NULL);
     sh = test_create_ship(r1, NULL);
     add_regionlist(&route, r1);
@@ -765,7 +765,7 @@ static void test_movement_speed(CuTest *tc) {
     test_setup();
     it_horse = test_create_horse();
     rc = test_create_race(NULL);
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
 
     rc->speed = 1.0;
     CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
@@ -895,7 +895,7 @@ static void test_movement_speed_dragon(CuTest *tc) {
     rc = test_create_race("dragon");
     rc->flags |= RCF_DRAGON;
     rc->speed = 1.5;
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     CuAssertIntEquals(tc, 6, movement_speed(u));
     test_teardown();
 }
@@ -913,7 +913,7 @@ static void test_movement_speed_unicorns(CuTest *tc) {
     it_unicorn->weight = it_horse->weight;
     it_unicorn->capacity = it_horse->capacity;
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     scale_number(u, 10);
     i_change(&u->items, it_unicorn, 5);
 

@@ -33,7 +33,7 @@ static void test_cr_unit(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(f, r);
     renumber_unit(u, 1234);
 
@@ -87,7 +87,7 @@ static void test_cr_resources(CuTest *tc) {
     setup_resources();
 
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(f, r);
     set_level(u, SK_QUARRYING, 1);
     r->land->horses = 1;
@@ -167,7 +167,7 @@ static void test_cr_lighthouse(CuTest *tc) {
     setup_resources();
 
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     r->land->horses = 1;
     r->land->peasants = 200;
     r->land->money = 300;
@@ -220,7 +220,7 @@ static void test_cr_mallorn(CuTest *tc) {
     setup_resources();
 
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     r->land->horses = 1;
     r->land->peasants = 200;
     r->land->money = 300;
@@ -336,7 +336,7 @@ static void test_cr_hiderace(CuTest *tc) {
     locale_setstring(lang, "race::elf", "elf");
     f1 = test_create_faction_ex(NULL, default_locale);
     f2 = test_create_faction_ex(NULL, default_locale);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(f1, r);
 
     mstream_init(&strm);
@@ -406,7 +406,7 @@ static void test_cr_factionstealth(CuTest *tc) {
     test_setup();
     f1 = test_create_faction();
     f2 = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(f1, r);
 
     /* report to ourselves */

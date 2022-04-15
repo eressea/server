@@ -67,7 +67,7 @@ static void setup_spy(spy_fixture *fix) {
         "ship:ship", "region:region", MT_NEW_END);
 
     if (fix) {
-        fix->r = test_create_region(0, 0, NULL);
+        fix->r = test_create_plain(0, 0);
         fix->spy = test_create_unit(test_create_faction(), fix->r);
         fix->victim = test_create_unit(test_create_faction(), fix->r);
     }
@@ -175,7 +175,7 @@ static void test_sabotage_self(CuTest *tc) {
 
     test_setup();
     setup_spy(NULL);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(), r);
     assert(u && u->faction && u->region == r);
@@ -232,7 +232,7 @@ static void test_sabotage_other_fail(CuTest *tc) {
     test_setup();
     setup_spy(NULL);
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
@@ -319,7 +319,7 @@ static void test_sabotage_other_success(CuTest *tc) {
 
     test_setup();
     setup_spy(NULL);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r);
     u = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);

@@ -36,7 +36,7 @@ static void test_otherfaction(CuTest *tc) {
     faction *f;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     f = test_create_faction_ex(u->faction->race, u->faction->locale);
     config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());

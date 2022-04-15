@@ -65,7 +65,7 @@ static void test_readwrite_unit(CuTest * tc)
     int fno;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     fno = f->no;
     u = test_create_unit(f, r);
@@ -84,7 +84,7 @@ static void test_readwrite_unit(CuTest * tc)
     data.strm.api->rewind(data.strm.handle);
     test_reset();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
@@ -137,7 +137,7 @@ static void test_readwrite_region(CuTest * tc)
     const char * lipsum = "Lorem ipsum dolor sit amet";
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     free(r->land->name);
     r->land->name = str_strdup("  Hodor  ");
     CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
@@ -169,7 +169,7 @@ static void test_readwrite_building(CuTest * tc)
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     b = test_create_building(r, NULL);
     free(b->name);
     b->name = str_strdup("  Hodor  ");
@@ -180,7 +180,7 @@ static void test_readwrite_building(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     test_reset();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     gamedata_init(&data, &store, RELEASE_VERSION);
     b = read_building(&data);
     CuAssertPtrNotNull(tc, b);
@@ -202,7 +202,7 @@ static void test_readwrite_ship(CuTest * tc)
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     sh = test_create_ship(r, NULL);
     free(sh->name);
     sh->name = str_strdup("  Hodor  ");
@@ -213,7 +213,7 @@ static void test_readwrite_ship(CuTest * tc)
     
     data.strm.api->rewind(data.strm.handle);
     test_reset();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     gamedata_init(&data, &store, RELEASE_VERSION);
     sh = read_ship(&data);
     CuAssertPtrNotNull(tc, sh);
@@ -270,7 +270,7 @@ static void test_readwrite_dead_faction_group(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, f->next);
     f2 = test_create_faction();
     CuAssertPtrEquals(tc, f2, factions->next);
-    u = test_create_unit(f2, test_create_region(0, 0, NULL));
+    u = test_create_unit(f2, test_create_plain(0, 0));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
@@ -310,7 +310,7 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
 
     config_set("rules.region_owners", "1");
     f = test_create_faction();
-    test_create_unit(f, r = test_create_region(0, 0, NULL));
+    test_create_unit(f, r = test_create_plain(0, 0));
     region_set_owner(r, f, 0);
     destroyfaction(&factions);
     CuAssertTrue(tc, !f->_alive);
@@ -339,7 +339,7 @@ static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
     test_setup();
     f = test_create_faction();
     f2 = test_create_faction();
-    u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
+    u = test_create_unit(f2, r = test_create_plain(0, 0));
     tr = trigger_changefaction(u, f);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_eventhandler));
@@ -376,7 +376,7 @@ static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     test_setup();
     f = test_create_faction();
     f2 = test_create_faction();
-    u = test_create_unit(f2, r = test_create_region(0, 0, NULL));
+    u = test_create_unit(f2, r = test_create_plain(0, 0));
     tr = trigger_createunit(r, f, f->race, 1);
     add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_eventhandler));

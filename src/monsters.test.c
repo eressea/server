@@ -68,7 +68,7 @@ static void create_monsters(unit **up, unit **um) {
 
     test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     *up = test_create_unit(fp, r);
     unit_setid(*up, 1);
@@ -271,7 +271,7 @@ static void test_spawn_seaserpent(CuTest *tc) {
     test_setup();
     rc = test_create_race("seaserpent");
     rc->flags &= ~RCF_PLAYABLE;
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);

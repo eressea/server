@@ -28,7 +28,7 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     region *r;
     faction *f;
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     while (r->attribs) {
         a_remove(&r->attribs, r->attribs);
     }

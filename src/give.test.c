@@ -675,7 +675,7 @@ static void test_reserve_self(CuTest* tc) {
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r && f);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);

@@ -35,7 +35,7 @@ static void test_flyingship(CuTest * tc)
     par_data.typ = SPP_SHIP;
     par_data.flag = 0;
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     u = test_create_unit(f, r);
 

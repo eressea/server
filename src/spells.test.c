@@ -67,7 +67,7 @@ static void test_dreams(CuTest *tc) {
     castorder co;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
@@ -154,7 +154,7 @@ static void test_view_reality(CuTest *tc) {
     free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     test_clear_messagelist(&f->msgs);
 
@@ -215,7 +215,7 @@ static void test_show_astral(CuTest *tc) {
     free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     move_unit(u, r, NULL);
 
     /* error: no target region */
@@ -270,7 +270,7 @@ static void test_watch_region(CuTest *tc) {
     region *r;
     faction *f;
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     set_observer(r, f, 0, 2);

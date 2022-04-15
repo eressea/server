@@ -38,7 +38,7 @@ static unit * setup_build(build_fixture *bf) {
     test_create_itemtype("stone");
     bf->btype = test_create_buildingtype("castle");
     bf->rc = test_create_race("human");
-    bf->r = test_create_region(0, 0, NULL);
+    bf->r = test_create_plain(0, 0);
     bf->f = test_create_faction_ex(bf->rc, NULL);
     assert(bf->rc && bf->f && bf->r);
     bf->u = test_create_unit(bf->f, bf->r);

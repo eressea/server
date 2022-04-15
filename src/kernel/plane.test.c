@@ -9,7 +9,7 @@ static void test_plane(CuTest *tc) {
     plane *pl;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     CuAssertPtrEquals(tc, NULL, findplane(0, 0));
     CuAssertPtrEquals(tc, NULL, getplane(r));
     CuAssertIntEquals(tc, 0, getplaneid(r));

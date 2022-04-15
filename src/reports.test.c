@@ -47,7 +47,7 @@ static void test_reorder_units(CuTest * tc)
     struct faction * f;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     b = test_create_building(r, NULL);
     s = test_create_ship(r, NULL);
     f = test_create_faction();
@@ -183,7 +183,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     f1->locale = lang;
     f2 = test_create_faction();
     f2->locale = lang;
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(f1, r);
     faction_setname(f1, "UFO");
     renumber_faction(f1, 1);
@@ -265,7 +265,7 @@ static void test_bufunit(CuTest *tc) {
     locale_setstring(lang, "skill::alchemy", "Alchemie");
     locale_setstring(lang, "status_aggressive", "aggressiv");
     init_skills(lang);
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     u->faction->locale = lang;
     faction_setname(u->faction, "UFO");
     renumber_faction(u->faction, 1);
@@ -351,7 +351,7 @@ static void test_prepare_travelthru(CuTest *tc) {
     test_setup();
     f = test_create_faction();
     f2 = test_create_faction();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(3, 0, 0);
     test_create_unit(f2, r1);
@@ -388,7 +388,7 @@ static void test_get_addresses(CuTest *tc) {
     f = test_create_faction();
     f1 = test_create_faction();
     f2 = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     test_create_unit(f, r);
     test_create_unit(f1, r);
     test_create_unit(f2, r);
@@ -415,7 +415,7 @@ static void test_get_addresses_fstealth(CuTest *tc) {
     f = test_create_faction();
     f1 = test_create_faction();
     f2 = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     test_create_unit(f, r);
     u = test_create_unit(f1, r);
     set_factionstealth(u, f2);
@@ -442,7 +442,7 @@ static void test_get_addresses_travelthru(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, 0);
     u = test_create_unit(f, r2);
     travelthru_add(r1, u);
@@ -620,7 +620,7 @@ static void test_prepare_report(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     prepare_report(&ctx, f, NULL);
     CuAssertPtrEquals(tc, NULL, ctx.first);
@@ -653,7 +653,7 @@ static void test_seen_neighbours(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, 0);
 
     test_create_unit(f, r1);
@@ -674,7 +674,7 @@ static void test_seen_travelthru(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, 0);
     r3 = test_create_region(2, 0, 0);
 
@@ -699,7 +699,7 @@ static void test_region_distance_max(CuTest *tc) {
     region *result[64];
     int x, y;
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     for (x=-3;x<=3;++x) {
         for (y = -3; y <= 3; ++y) {
             if (x != 0 || y != 0) {
@@ -718,7 +718,7 @@ static void test_region_distance(CuTest *tc) {
     region *r;
     region *result[8];
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
     CuAssertPtrEquals(tc, r, result[0]);
     CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 1, result, 8));
@@ -734,7 +734,7 @@ static void test_region_distance_ql(CuTest *tc) {
     region *r;
     selist *ql;
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ql = get_regions_distance(r, 0);
     CuAssertIntEquals(tc, 1, selist_length(ql));
     CuAssertPtrEquals(tc, r, selist_get(ql, 0));
@@ -755,7 +755,7 @@ static void test_report_far_vision(CuTest *tc) {
     region *r1, *r2;
     test_setup();
     f = test_create_faction();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     test_create_unit(f, r1);
     r2 = test_create_region(10, 0, 0);
     set_observer(r2, f, 10, 2);
@@ -777,7 +777,7 @@ static void test_stealth_modifier(CuTest *tc) {
 
     test_setup();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     CuAssertIntEquals(tc, 0, stealth_modifier(r, f, seen_unit));
     CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_travel));
     CuAssertIntEquals(tc, -1, stealth_modifier(r, f, seen_lighthouse));

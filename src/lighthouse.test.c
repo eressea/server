@@ -20,7 +20,7 @@ static void test_lighthouse_range(CuTest * tc)
     building *b;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     test_create_region(1, 0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);

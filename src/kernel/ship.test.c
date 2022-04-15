@@ -457,7 +457,7 @@ static void test_shipspeed_speedy(CuTest *tc) {
     stype->range = 5;
     stype->range_max = -1;
     stype->flags |= SFL_SPEEDY;
-    cap = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    cap = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     crw = test_create_unit(cap->faction, cap->region);
     sh = test_create_ship(cap->region, stype);
     cap->ship = sh;

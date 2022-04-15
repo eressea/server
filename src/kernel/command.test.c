@@ -30,7 +30,7 @@ static void test_command(CuTest * tc) {
     stree_add(st, "six", parser_six);
     CuAssertPtrNotNull(tc, st->root);
     CuAssertPtrEquals(tc, st->root, stree_find(st, loc));
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_ALLIANCE, loc, "two");
     do_command(st->root, u, u->thisorder);
     CuAssertIntEquals(tc, u->number, 2);
