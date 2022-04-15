@@ -736,7 +736,7 @@ static int tolua_unit_get_spells(lua_State * L)
     unit *u = (unit *) tolua_tousertype(L, 1, 0);
     struct sc_mage *mage = u ? get_mage(u) : NULL;
     spellbook *sb = mage_get_spellbook(mage);
-    selist *slist = 0;
+    selist *slist = NULL;
     if (sb) {
         selist **slist_ptr = &sb->spells;
         slist = *slist_ptr;

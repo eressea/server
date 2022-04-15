@@ -337,7 +337,7 @@ void free_flist(faction **fp) {
         free_faction(f);
         free(f);
     }
-    *fp = 0;
+    *fp = NULL;
 }
 
 static faction *dead_factions;

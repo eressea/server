@@ -299,7 +299,7 @@ static void test_ship_trails(CuTest *tc) {
     ship *sh;
     region *r1, *r2, *r3;
     terrain_type *otype;
-    region_list *route = 0;
+    region_list *route = NULL;
 
     test_setup();
     otype = test_create_terrain("ocean", SEA_REGION);
@@ -327,7 +327,7 @@ static void test_ship_trails(CuTest *tc) {
 }
 
 static void test_age_trails(CuTest *tc) {
-    region_list *route = 0;
+    region_list *route = NULL;
     region *r1, *r2;
     ship *sh;
 

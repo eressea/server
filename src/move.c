@@ -1230,7 +1230,7 @@ static void init_movement(void)
         for (u = r->units; u; u = u->next) {
             if (getkeyword(u->thisorder) == K_DRIVE && can_move(u)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
-                unit *ut = 0;
+                unit *ut = NULL;
 
                 init_order(u->thisorder, NULL);
                 if (getunit(r, u->faction, &ut) != GET_UNIT) {
@@ -1263,7 +1263,7 @@ static void init_movement(void)
                     if (getkeyword(ord) == K_TRANSPORT) {
                         init_order(ord, NULL);
                         for (;;) {
-                            unit *ut = 0;
+                            unit *ut = NULL;
 
                             if (getunit(r, u->faction, &ut) != GET_UNIT) {
                                 break;
@@ -2110,7 +2110,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
     /* transportation */
     for (ord = u->orders; ord; ord = ord->next) {
-        unit *ut = 0;
+        unit *ut = NULL;
 
         if (getkeyword(ord) != K_TRANSPORT)
             continue;

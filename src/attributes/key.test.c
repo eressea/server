@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 static void test_get_set_keys(CuTest *tc) {
-    attrib *a = 0;
+    attrib *a = NULL;
     key_set(&a, 0, 42);
     key_set(&a, 42, 1);
     key_set(&a, 43, 2);
@@ -31,7 +31,7 @@ static attrib *key_set_orig(attrib **alist, int key) {
 }
 
 static void test_upgrade_key(CuTest *tc) {
-    attrib *alist = 0;
+    attrib *alist = NULL;
     key_set_orig(&alist, 40);
     key_set_orig(&alist, 41);
     key_set_orig(&alist, 43);

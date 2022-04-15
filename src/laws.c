@@ -1911,7 +1911,7 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_UNIT:
         if (foreign) {
-            unit *u2 = 0;
+            unit *u2 = NULL;
 
             getunit(r, u->faction, &u2);
             if (!u2 || !cansee(u->faction, r, u2, 0)) {
@@ -2323,7 +2323,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
     bool found = false;
 
     if (s) {
-        const spell *sp = 0;
+        const spell *sp = NULL;
         const item_type *itype;
         const race *rc;
         /* check if it's an item */
@@ -2525,7 +2525,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     char token[128];
     const char *s;
     int level = 0;
-    spell *sp = 0;
+    spell *sp = NULL;
 
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
@@ -3196,7 +3196,7 @@ void defaultorders(void)
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
                     char lbuf[8192];
-                    order *new_order = 0;
+                    order *new_order = NULL;
                     const char *s;
                     init_order(ord, NULL);
                     s = gettoken(lbuf, sizeof(lbuf));
@@ -3438,7 +3438,7 @@ int claim_cmd(unit * u, struct order *ord)
     char token[128];
     const char *t;
     int n = 1;
-    const item_type *itype = 0;
+    const item_type *itype = NULL;
 
     init_order(ord, NULL);
 

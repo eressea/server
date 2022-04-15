@@ -51,7 +51,7 @@ struct order *ord)
     if (u->thisorder && init_order(u->thisorder, u->faction->locale) == K_STUDY) {
         char token[128];
         skill_t sk = NOSKILL;
-        skill *sv = 0;
+        skill *sv = NULL;
         const char * s = gettoken(token, sizeof(token));
 
         if (s) {

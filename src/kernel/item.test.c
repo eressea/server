@@ -46,7 +46,7 @@ static void test_resourcename_with_appearance(CuTest *tc) {
 static void test_uchange(CuTest * tc, unit * u, const resource_type * rtype) {
     int n;
     struct log_t *log;
-    strlist *sl = 0;
+    strlist *sl = NULL;
 
     assert(rtype);
     log = test_log_start(LOG_CPERROR, &sl);

@@ -418,7 +418,7 @@ static void test_tax_cmd(CuTest *tc) {
     region *r;
     unit *u;
     item_type *silver;
-    econ_request *taxorders = 0;
+    econ_request *taxorders = NULL;
 
     test_setup();
     setup_production();

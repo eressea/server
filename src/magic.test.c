@@ -35,7 +35,7 @@ void test_updatespells(CuTest * tc)
 {
     faction * f;
     spell * sp;
-    spellbook *book = 0;
+    spellbook *book = NULL;
 
     test_setup();
     test_create_race("human");

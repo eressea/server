@@ -214,7 +214,7 @@ static bool virgin_region(const region * r)
 
 static selist * get_island(region * root)
 {
-    selist * ql, *result = 0;
+    selist * ql, *result = NULL;
     int qi = 0;
 
     fset(root, RF_MARK);
@@ -366,7 +366,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
     int psize = 0;                /* players on this island */
     const terrain_type *volcano_terrain = get_terrain("volcano");
     static int nterrains = -1;
-    static const terrain_type **terrainarr = 0;
+    static const terrain_type **terrainarr = NULL;
     static int *distribution;
 
     assert(players);
@@ -691,8 +691,8 @@ static struct geo {
 
 const terrain_type *random_terrain(direction_t dir)
 {
-    static const terrain_type **terrainarr = 0;
-    static int *distribution = 0;
+    static const terrain_type **terrainarr = NULL;
+    static int *distribution = NULL;
 
     if (!distribution) {
         int n = 0;

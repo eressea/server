@@ -17,7 +17,7 @@ typedef struct transfer {
     int amount;
 } transfer;
 
-static selist *transfers = 0;
+static selist *transfers = NULL;
 
 int cmp_transfer(const void *v1, const void *v2) {
     const transfer *t1 = (const transfer *)v1;

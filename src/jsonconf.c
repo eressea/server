@@ -191,7 +191,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
     cJSON *child;
     assert(json->type == cJSON_Object);
     for (child = json->child; child; child = child->next) {
-        char **dst = 0;
+        char **dst = NULL;
         switch (child->type) {
         case cJSON_Number:
             if (strcmp(child->string, "chance") == 0) {

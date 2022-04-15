@@ -954,7 +954,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
 
     while (len > 0) {
         unsigned int j;
-        const char *cut = 0, *space = strchr(s, ' ');
+        const char *cut = NULL, *space = strchr(s, ' ');
         while (space && *space && (space - s) <= (ptrdiff_t)width) {
             cut = space;
             space = strchr(space + 1, ' ');

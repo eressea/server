@@ -253,7 +253,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
         *powner = owner;
     }
     else {
-        *powner = 0;
+        *powner = NULL;
     }
 }
 
@@ -982,7 +982,7 @@ void write_region(gamedata *data, const region *r)
 
 int get_spell_level_faction(const spell * sp, void * cbdata)
 {
-    static spellbook * common = 0;
+    static spellbook * common = NULL;
     spellbook * book;
     faction * f = (faction *)cbdata;
     spellbook_entry * sbe;
@@ -1605,7 +1605,7 @@ static void read_regions(gamedata *data) {
             shp = &sh->next;
         }
 
-        *shp = 0;
+        *shp = NULL;
 
         /* Einheiten */
 

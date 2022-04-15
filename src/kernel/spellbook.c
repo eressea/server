@@ -25,7 +25,7 @@ spellbook * create_spellbook(const char * name)
 void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spell * sp, void *), void * cbdata)
 {
     for (;;) {
-        spell *sp = 0;
+        spell *sp = NULL;
         char spname[64];
         int level = 0;
 

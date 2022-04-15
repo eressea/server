@@ -478,7 +478,7 @@ void rc_set_param(struct race *rc, const char *key, const char *value) {
 
 const char* rc_key(const char *rcname, name_t n, char *name, size_t size)
 {
-    const char * postfix = 0;
+    const char * postfix = NULL;
     switch (n) {
     case NAME_SINGULAR: postfix = ""; break;
     case NAME_PLURAL: postfix = "_p"; break;

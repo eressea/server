@@ -28,7 +28,7 @@ static void test_create_duplicate_spell(CuTest * tc)
 {
     spell *sp;
     struct log_t *log;
-    strlist *sl = 0;
+    strlist *sl = NULL;
 
     test_setup();
     test_log_stderr(0); /* suppress the "duplicate spell" error message */

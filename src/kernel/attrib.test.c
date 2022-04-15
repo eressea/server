@@ -25,7 +25,7 @@ static void test_attrib_add(CuTest * tc)
 {
     attrib_type at_foo = { "foo" };
     attrib_type at_bar = { "bar" };
-    attrib *a, *alist = 0;
+    attrib *a, *alist = NULL;
 
     CuAssertPtrNotNull(tc, (a = a_new(&at_foo)));
     CuAssertPtrEquals(tc, a, a_add(&alist, a));
@@ -45,7 +45,7 @@ static void test_attrib_add(CuTest * tc)
 
 static void test_attrib_remove_self(CuTest * tc) {
     attrib_type at_foo = { "foo" };
-    attrib *a, *alist = 0;
+    attrib *a, *alist = NULL;
 
     CuAssertPtrNotNull(tc, a_add(&alist, a_new(&at_foo)));
     CuAssertPtrNotNull(tc, a = a_add(&alist, a_new(&at_foo)));
@@ -59,7 +59,7 @@ static void test_attrib_remove_self(CuTest * tc) {
 static void test_attrib_removeall(CuTest * tc) {
     const attrib_type at_foo = { "foo" };
     const attrib_type at_bar = { "bar" };
-    attrib *alist = 0, *a;
+    attrib* a, * alist = NULL;
     a_add(&alist, a_new(&at_foo));
     a = a_add(&alist, a_new(&at_bar));
     a_add(&alist, a_new(&at_foo));
@@ -75,7 +75,7 @@ static void test_attrib_removeall(CuTest * tc) {
 static void test_attrib_remove(CuTest * tc)
 {
     attrib_type at_foo = { "foo" };
-    attrib *a, *alist = 0;
+    attrib *a, *alist = NULL;
 
     CuAssertPtrNotNull(tc, a_add(&alist, a_new(&at_foo)));
     CuAssertPtrNotNull(tc, a = a_add(&alist, a_new(&at_foo)));
@@ -89,7 +89,7 @@ static void test_attrib_nexttype(CuTest * tc)
 {
     attrib_type at_foo = { "foo" };
     attrib_type at_bar = { "bar" };
-    attrib *a, *alist = 0;
+    attrib *a, *alist = NULL;
     CuAssertPtrNotNull(tc, (a = a_new(&at_foo)));
     CuAssertPtrEquals(tc, NULL, a->nexttype);
     CuAssertPtrEquals(tc, a, a_add(&alist, a));

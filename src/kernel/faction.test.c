@@ -105,7 +105,7 @@ static void test_remove_dead_factions(CuTest *tc) {
 }
 
 static void test_addfaction(CuTest *tc) {
-    faction *f = 0;
+    faction *f = NULL;
     const struct race *rc;
     const struct locale *lang;
 

@@ -168,7 +168,7 @@ typedef struct buddy {
 
 static buddy *get_friends(const unit * u, int *numfriends)
 {
-    buddy *friends = 0;
+    buddy *friends = NULL;
     faction *f = u->faction;
     region *r = u->region;
     int number = 0;

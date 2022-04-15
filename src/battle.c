@@ -1569,7 +1569,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     side *s;
-    selist *fightervp = 0;
+    selist *fightervp = NULL;
 
     assert(vs != NULL);
 
@@ -1636,7 +1636,7 @@ static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
     castorder *co;
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fig = 0;
+        fighter *fig = NULL;
         if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
             spell *sp = find_spell("igjarjuk");
             if (sp) {
@@ -1940,7 +1940,7 @@ int getreload(troop at)
 int hits(troop at, troop dt, weapon * awp)
 {
     fighter *af = at.fighter, *df = dt.fighter;
-    const armor_type *armor, *shield = 0;
+    const armor_type *armor, *shield = NULL;
     int skdiff = 0;
     int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
     weapon *dwp = select_weapon(dt, false, dist > 1);
@@ -3286,8 +3286,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         fig->elvenhorses = 0;
     }
     else {
-        const resource_type *rt_horse = 0;
-        const resource_type *rt_elvenhorse = 0;
+        const resource_type *rt_horse = NULL;
+        const resource_type *rt_elvenhorse = NULL;
         rt_elvenhorse = get_resourcetype(R_UNICORN);
         rt_horse = get_resourcetype(R_CHARGER);
         if (!rt_horse) {
@@ -3933,7 +3933,7 @@ static void battle_flee(battle * b)
 static bool is_enemy(battle *b, unit *u1, unit *u2) {
     if (u1->faction != u2->faction) {
         if (b) {
-            side *es, *s1 = 0, *s2 = 0;
+            side *es, *s1 = NULL, *s2 = NULL;
             for (es = b->sides; es != b->sides + b->nsides; ++es) {
                 if (!s1 && es->faction == u1->faction) s1 = es;
                 else if (!s2 && es->faction == u2->faction) s2 = es;

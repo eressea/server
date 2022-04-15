@@ -137,7 +137,7 @@ static const char *sp_alias(const char *zname)
 spell *find_spell(const char *name)
 {
     const char * match;
-    spell * sp = 0;
+    spell * sp = NULL;
     match = cb_find_str(&cb_spells, name);
     if (!match) {
         const char * alias = sp_alias(name);

@@ -123,7 +123,7 @@ static void test_getunit(CuTest *tc) {
 
 static void test_get_set_param(CuTest * tc)
 {
-    struct param *par = 0;
+    struct param *par = NULL;
     test_setup();
     CuAssertStrEquals(tc, NULL, get_param(par, "foo"));
     set_param(&par, "foo", "bar");
@@ -140,7 +140,7 @@ static void test_get_set_param(CuTest * tc)
 
 static void test_param_int(CuTest * tc)
 {
-    struct param *par = 0;
+    struct param *par = NULL;
     test_setup();
     CuAssertIntEquals(tc, 13, get_param_int(par, "foo", 13));
     set_param(&par, "foo", "23");
@@ -153,7 +153,7 @@ static void test_param_int(CuTest * tc)
 
 static void test_param_flt(CuTest * tc)
 {
-    struct param *par = 0;
+    struct param *par = NULL;
     test_setup();
     CuAssertDblEquals(tc, 13, get_param_flt(par, "foo", 13), 0.01);
     set_param(&par, "foo", "23.0");

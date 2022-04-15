@@ -1093,9 +1093,9 @@ int make_cmd(unit * u, struct order *ord)
 {
     char token[32];
     region *r = u->region;
-    const building_type *btype = 0;
-    const ship_type *stype = 0;
-    const item_type *itype = 0;
+    const building_type *btype = NULL;
+    const ship_type *stype = NULL;
+    const item_type *itype = NULL;
     param_t p = NOPARAM;
     int m = INT_MAX;
     const char *s;
@@ -1500,7 +1500,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 {
     int money, max_products;
     int norders;
-    /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
     int hafencollected = 0;

@@ -68,7 +68,7 @@ void test_message(CuTest *tc) {
 }
 
 static void test_merge_split(CuTest *tc) {
-    message_list *mlist = 0, *append = 0;
+    message_list *mlist = NULL, *append = NULL;
     struct mlist **split; /* TODO: why is this a double asterisk? */
     message_type *mtype;
     message *msg;

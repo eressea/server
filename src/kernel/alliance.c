@@ -319,7 +319,7 @@ static syntaxtree * build_syntax(void) {
 
 static void execute(keyword_t kwd)
 {
-    struct syntaxtree *syntax = 0;
+    struct syntaxtree *syntax = NULL;
 
     region **rp = &regions;
     while (*rp) {

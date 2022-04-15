@@ -65,7 +65,7 @@ bool markets_module(void)
 
 void do_markets(void)
 {
-    selist *traders = 0;
+    selist *traders = NULL;
     unit *markets[MAX_MARKETS];
     region *r;
     for (r = regions; r; r = r->next) {

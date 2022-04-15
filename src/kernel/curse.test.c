@@ -164,7 +164,7 @@ static void test_write_flag(CuTest *tc) {
 
 static void test_curse_ids(CuTest *tc) {
     curse *c1, *c2;
-    attrib *a1 = 0, *a2 = 0;
+    attrib *a1 = NULL, *a2 = NULL;
 
     test_setup();
     rng_init(0);

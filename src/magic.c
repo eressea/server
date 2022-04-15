@@ -446,7 +446,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
         for (i = 0; i < num_spells; ++i) {
             int maxspell = numspells;
             int spellno = -1;
-            spellbook_entry *sbe = 0;
+            spellbook_entry *sbe = NULL;
             while (!sbe && maxspell > 0) {
                 spellno = rng_int() % maxspell;
                 sbe = commonspells[spellno];
@@ -1502,7 +1502,7 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
 {
     /* Einheit nicht gefunden */
     char tbuf[20];
-    const char *uid = 0;
+    const char *uid = NULL;
 
     if (spobj->typ == SPP_TEMP) {
         sprintf(tbuf, "%s %s", LOC(mage->faction->locale,

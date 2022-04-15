@@ -139,7 +139,7 @@ static void centre(struct stream *out, const char *s, bool breaking)
      * sind! */
 
     if (breaking && REPORTWIDTH < strlen(s)) {
-        strlist *T, *SP = 0;
+        strlist *T, *SP = NULL;
         sparagraph(&SP, s, 0, 0);
         T = SP;
         while (SP) {
@@ -158,7 +158,7 @@ void paragraph(struct stream *out, const char *str, ptrdiff_t indent,
     int hanging_indent, char marker)
 {
     size_t length = REPORTWIDTH;
-    const char *handle_end, *begin, *mark = 0;
+    const char *handle_end, *begin, *mark = NULL;
 
     if (!str) return;
     /* find out if there's a mark + indent already encoded in the string. */
@@ -504,7 +504,7 @@ static void
 nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
     for (; a; a = a->next) {
-        message *msg = 0;
+        message *msg = NULL;
 
         if (a->type == &at_curse) {
             curse *c = (curse *)a->data.v;

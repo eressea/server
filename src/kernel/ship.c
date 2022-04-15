@@ -207,7 +207,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
     static char buffer[32];
     ship *sh = (ship *)calloc(1, sizeof(ship));
-    const char *sname = 0;
+    const char *sname = NULL;
 
     if (!sh) abort();
     assert(stype);
@@ -520,7 +520,7 @@ void ship_set_owner(unit * u) {
 
 static unit * ship_owner_ex(const ship * sh, const struct faction * last_owner)
 {
-    unit *u, *heir = 0;
+    unit *u, *heir = NULL;
 
     /* Eigentuemer tot oder kein Eigentuemer vorhanden. Erste lebende Einheit
       * nehmen. */

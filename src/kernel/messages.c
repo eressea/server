@@ -311,7 +311,7 @@ message *add_message(message_list ** pm, message * m)
 }
 
 struct mlist ** merge_messages(message_list *mlist, message_list *append) {
-    struct mlist **split = 0;
+    struct mlist **split = NULL;
     assert(mlist);
     if (append) {
         split = mlist->end;
@@ -324,7 +324,7 @@ struct mlist ** merge_messages(message_list *mlist, message_list *append) {
 void split_messages(message_list *mlist, struct mlist **split) {
     assert(mlist);
     if (split) {
-        *split = 0;
+        *split = NULL;
         mlist->end = split;
     }
 }
