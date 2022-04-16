@@ -73,9 +73,9 @@ typedef struct unit {
     reservation* reservations;
 
     /* orders */
-    struct order* orders;
-    struct order* thisorder;
-    struct order* old_orders;
+    struct order* orders; /* orders to be executed this turn */
+    struct order* thisorder; /* long turn to be executed this turn */
+    struct order* old_orders; /* repeatable default orders to be saved for next turn */
 
     /* race and illusionary race */
     const struct race* _race;

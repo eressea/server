@@ -63,6 +63,7 @@ extern "C" {
         const char *password;
     } report_context;
 
+    void update_defaults(struct faction* f);
     void prepare_report(report_context *ctx, struct faction *f, const char *password);
     void finish_reports(report_context *ctx);
     void get_addresses(report_context * ctx);

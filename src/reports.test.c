@@ -13,6 +13,7 @@
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
+#include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
@@ -20,6 +21,7 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
@@ -498,7 +500,7 @@ void test_prepare_lighthouse_capacity(CuTest *tc) {
     b = test_create_building(r1, btype);
     b->size = 10;
     update_lighthouse(b);
-    u1 = test_create_unit(test_create_faction(), r1);
+    u1 = test_create_unit(NULL, r1);
     u1->number = 4;
     u1->building = b;
     set_level(u1, SK_PERCEPTION, 3);
@@ -599,7 +601,7 @@ static void test_prepare_lighthouse_owners(CuTest *tc)
     b->size = 10;
     update_lighthouse(b);
     test_create_unit(f, r1);
-    u = test_create_unit(test_create_faction(), r1);
+    u = test_create_unit(NULL, r1);
     u->building = b;
     region_set_owner(b->region, f, 0);
     CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
@@ -1010,7 +1012,27 @@ static void test_reports_genpassword(CuTest *tc) {
     test_teardown();
 }
 
-CuSuite *get_reports_suite(void)
+static void test_update_defaults(CuTest* tc) {
+    unit* u;
+    order* ord;
+
+    test_setup();
+    u = test_create_unit(NULL, NULL);
+
+    /* a long order gets promoted to the template, short order does not */
+    unit_addorder(u, ord = create_order(K_ENTERTAIN, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
+    CuAssertPtrEquals(tc, NULL, u->old_orders);
+    CuAssertPtrEquals(tc, ord, u->orders);
+    update_defaults(u->faction);
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrEquals(tc, ord, u->old_orders);
+    CuAssertPtrEquals(tc, NULL, ord->next);
+
+    test_teardown();
+}
+
+CuSuite* get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_region_distance);
@@ -1042,5 +1064,6 @@ CuSuite *get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_visible_unit);
     SUITE_ADD_TEST(suite, test_eval_functions);
     SUITE_ADD_TEST(suite, test_reports_genpassword);
+    SUITE_ADD_TEST(suite, test_update_defaults);
     return suite;
 }

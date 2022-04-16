@@ -1385,17 +1385,6 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     rps_nowrap(out, buf);
                     newline(out);
                 }
-                for (ord = u->orders; ord; ord = ord->next) {
-                    keyword_t kwd = getkeyword(ord);
-                    if (u->old_orders && is_repeated(kwd))
-                        continue;           /* unit has defaults */
-                    if (is_persistent(ord)) {
-                        strcpy(buf, "   ");
-                        write_order(ord, lang, buf + 2, sizeof(buf) - 2);
-                        rps_nowrap(out, buf);
-                        newline(out);
-                    }
-                }
 
                 /* If the lastorder begins with an @ it should have
                  * been printed in the loop before. */

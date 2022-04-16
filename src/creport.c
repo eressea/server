@@ -899,16 +899,6 @@ void cr_output_unit(stream *out, const faction * f,
                 swrite("\"\n", 1, 2, out);
             }
         }
-        for (ord = u->orders; ord; ord = ord->next) {
-            keyword_t kwd = getkeyword(ord);
-            if (u->old_orders && is_repeated(kwd))
-                continue;               /* unit has defaults */
-            if (is_persistent(ord)) {
-                swrite("\"", 1, 1, out);
-                stream_order(out, ord, lang, true);
-                swrite("\"\n", 1, 2, out);
-            }
-        }
 
         /* talents */
         pr = 0;

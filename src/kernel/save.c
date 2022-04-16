@@ -627,20 +627,6 @@ void write_unit(gamedata *data, const unit * u)
             break;
         }
     }
-    for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t kwd = getkeyword(ord);
-        if (u->old_orders && is_repeated(kwd))
-            continue;                 /* has new defaults */
-        if (is_persistent(ord)) {
-            if (++p < MAXPERSISTENT) {
-                writeorder(data, ord, u->faction->locale);
-            }
-            else {
-                log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
-                break;
-            }
-        }
-    }
     /* write an empty string to terminate the list */
     WRITE_STR(data->store, "");
     WRITE_SECTION(data->store);

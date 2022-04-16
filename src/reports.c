@@ -1479,6 +1479,37 @@ void report_warnings(faction *f, int now)
     }
 }
 
+void update_defaults(faction* f)
+{
+    unit* u;
+    for (u = f->units; u != NULL; u = u->nextF) {
+        order** ordi = &u->old_orders;
+        while (*ordi) {
+            order* ord = *ordi;
+            ordi = &ord->next;
+        }
+        if (u->orders) {
+            bool repeated = u->orders != NULL;
+            order** ordp = &u->orders;
+            while (*ordp) {
+                order* ord = *ordp;
+                keyword_t kwd = getkeyword(ord);
+                if ((repeated || !is_repeated(kwd)) && is_persistent(ord)) {
+                    *ordp = ord->next;
+                    *ordi = ord;
+                    ord->next = NULL;
+                    ordi = &ord->next;
+                }
+                else {
+                    ordp = &ord->next;
+                }
+            }
+            free_orders(&u->orders);
+        }
+    }
+}
+
+
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential
@@ -1602,6 +1633,8 @@ int write_reports(faction * f, const char *password)
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
+
+    update_defaults(f);
     if (noreports) {
         return false;
     }
