@@ -3167,11 +3167,11 @@ void monthly_healing(void)
     }
 }
 
-static void remove_exclusive(order ** ordp)
+static void remove_long(order ** ordp)
 {
     while (*ordp) {
         order *ord = *ordp;
-        if (is_exclusive(ord)) {
+        if (is_long(getkeyword(ord))) {
             *ordp = ord->next;
             ord->next = NULL;
             free_order(ord);
@@ -3210,7 +3210,7 @@ void defaultorders(void)
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders loeschen zu gunsten des neuen */
                         /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
-                        remove_exclusive(&u->old_orders);
+                        remove_long(&u->old_orders);
                         neworders = true;
                     }
                     if (new_order)
