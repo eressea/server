@@ -1489,20 +1489,21 @@ void update_defaults(faction* f)
             ordi = &ord->next;
         }
         if (u->orders) {
-            bool repeated = u->orders != NULL;
+            bool repeated = u->old_orders != NULL;
             order** ordp = &u->orders;
             while (*ordp) {
                 order* ord = *ordp;
                 keyword_t kwd = getkeyword(ord);
-                if ((repeated || !is_repeated(kwd)) && is_persistent(ord)) {
-                    *ordp = ord->next;
-                    *ordi = ord;
-                    ord->next = NULL;
-                    ordi = &ord->next;
+                if (!(repeated && is_repeated(kwd))) {
+                    if (is_persistent(ord)) {
+                        *ordp = ord->next;
+                        *ordi = ord;
+                        ord->next = NULL;
+                        ordi = &ord->next;
+                        continue;
+                    }
                 }
-                else {
-                    ordp = &ord->next;
-                }
+                ordp = &ord->next;
             }
             free_orders(&u->orders);
         }

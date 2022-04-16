@@ -4,6 +4,7 @@
 #include "eressea.h"
 #include "guard.h"
 #include "monsters.h"
+#include "reports.h"
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
@@ -563,13 +564,20 @@ static void test_defaultorders(CuTest* tc)
     CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
     CuAssertPtrEquals(tc, NULL, u->old_orders->next);
     free_orders(&u->old_orders);
+    free_orders(&u->orders);
 
-    /* empty DEFAULT clears repeated orders: */
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Sturmwind"));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Beulenpest"));
+    /* Bug 2843: empty DEFAULT clears repeated orders in template: */
+    u->old_orders = create_order(K_CAST, u->faction->locale, "Sturmwind");
+    u->old_orders->next = create_order(K_CAST, u->faction->locale, "Beulenpest");
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_WORK, u->faction->locale, NULL));
     defaultorders();
     CuAssertPtrEquals(tc, NULL, u->old_orders);
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
+    update_defaults(u->faction);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
+    CuAssertPtrEquals(tc, NULL, u->old_orders->next);
 
     test_teardown();
 }

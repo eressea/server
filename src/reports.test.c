@@ -1024,9 +1024,11 @@ static void test_update_defaults(CuTest* tc) {
     unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
     CuAssertPtrEquals(tc, NULL, u->old_orders);
     CuAssertPtrEquals(tc, ord, u->orders);
+    update_long_order(u);
+    CuAssertIntEquals(tc, ord->id, u->thisorder->id);
     update_defaults(u->faction);
     CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertPtrEquals(tc, ord, u->old_orders);
+    CuAssertIntEquals(tc, ord->id, u->old_orders->id);
     CuAssertPtrEquals(tc, NULL, ord->next);
 
     test_teardown();

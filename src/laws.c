@@ -3203,19 +3203,21 @@ void defaultorders(void)
                     if (s) {
                         new_order = parse_order(s, u->faction->locale);
                     }
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
+                    else {
+                        free_orders(&u->old_orders);
+                        neworders = true;
+                    }
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders loeschen zu gunsten des neuen */
                         /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
-                        remove_exclusive(&u->orders);
                         remove_exclusive(&u->old_orders);
                         neworders = true;
-                        ordp = &u->orders;  /* we could have broken ordp */
                     }
                     if (new_order)
                         addlist(&u->old_orders, new_order);
+                    *ordp = ord->next;
+                    ord->next = NULL;
+                    free_order(ord);
                 }
                 else
                     ordp = &ord->next;
