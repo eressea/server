@@ -45,6 +45,7 @@ static unit * setup_build(build_fixture *bf) {
     assert(bf->u);
 
     bf->cons.materials = calloc(2, sizeof(requirement));
+    assert(bf->cons.materials);
     bf->cons.materials[0].number = 1;
     bf->cons.materials[0].rtype = get_resourcetype(R_SILVER);
     bf->cons.skill = SK_ARMORER;
@@ -233,13 +234,15 @@ static void test_build_with_ring(CuTest *tc) {
     teardown_build(&bf);
 }
 
-static void test_build_with_potion(CuTest *tc) {
+static void test_build_with_potion(CuTest *tc)
+{
     build_fixture bf = { 0 };
     unit *u;
     const item_type *ptype;
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     oldpotiontype[P_DOMORE] = ptype = it_get_or_create(rt_get_or_create("hodor"));
     assert(rtype && ptype);
@@ -258,6 +261,32 @@ static void test_build_with_potion(CuTest *tc) {
     CuAssertIntEquals(tc, 4, get_effect(u, ptype));
     CuAssertIntEquals(tc, 4, build(u, 1, &bf.cons, 0, 20, 0));
     CuAssertIntEquals(tc, 2, get_effect(u, ptype));
+    teardown_build(&bf);
+}
+
+static void test_build_with_potion_and_ring(CuTest *tc)
+{
+    build_fixture bf = { 0 };
+    unit *u;
+    const item_type *ptype, *ring;
+    const struct resource_type *rtype;
+
+    u = setup_build(&bf);
+    ring = it_get_or_create(rt_get_or_create("roqf"));
+    assert(bf.cons.materials);
+    rtype = bf.cons.materials[0].rtype;
+    oldpotiontype[P_DOMORE] = ptype = it_get_or_create(rt_get_or_create("hodor"));
+    assert(rtype && ptype);
+
+    i_change(&u->items, rtype->itype, 200);
+    set_level(u, bf.cons.skill, bf.cons.minskill);
+    CuAssertIntEquals(tc, 1, build(u, 1, &bf.cons, 0, 200, 0));
+
+    i_change(&u->items, ring, 1);
+    change_effect(u, ptype, 4);
+    CuAssertIntEquals(tc, 20, build(u, 1, &bf.cons, 0, 200, 0));
+    CuAssertIntEquals(tc, 3, get_effect(u, ptype));
+
     teardown_build(&bf);
 }
 
@@ -337,6 +366,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_failure_completed);
     SUITE_ADD_TEST(suite, test_build_with_ring);
     SUITE_ADD_TEST(suite, test_build_with_potion);
+    SUITE_ADD_TEST(suite, test_build_with_potion_and_ring);
     SUITE_ADD_TEST(suite, test_build_building_success);
     SUITE_ADD_TEST(suite, test_build_building_stages);
     SUITE_ADD_TEST(suite, test_build_building_stage_continue);

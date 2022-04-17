@@ -1,3 +1,6 @@
+require 'tests.e2.produce'
+require 'tests.e2.manufacture'
+require 'tests.e2.build'
 require 'tests.e2.migration'
 require 'tests.e2.trolls'
 require 'tests.e2.trees'
