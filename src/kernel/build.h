@@ -44,6 +44,7 @@ extern "C" {
 
     int roqf_factor(void);
 
+    int build_skill(struct unit* u, int basesk, int skill_mod, skill_t sk);
     int build(struct unit *u, int number, const construction * ctype, int completed, int want, int skill_mod);
     int maxbuild(const struct unit *u, const construction * cons);
     struct message *msg_materials_required(struct unit *u, struct order *ord,
