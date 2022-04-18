@@ -748,7 +748,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
     region *r = u->region;
-    int dm = 0;
     allocation_list *alist;
     allocation *al;
     int amount, skill, skill_mod = 0;
