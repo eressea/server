@@ -54,6 +54,6 @@ function test_make_with_potion_and_ring()
     u:add_item('p3', 1)
     u:add_order('BENUTZE 1 Schaffenstrunk')
     process_orders()
-    assert_equal(12 * 2 * u.number, u:get_item('sword')) -- kaputt!
-    assert_equal(76 * u.number, u:get_item('iron'))
+    assert_equal(22 * u.number, u:get_item('sword')) -- kaputt!
+    assert_equal(78 * u.number, u:get_item('iron'))
 end

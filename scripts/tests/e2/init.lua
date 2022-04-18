@@ -1,8 +1,8 @@
-require 'tests.e2.roadwork'
+require 'tests.e2.manufacture'
 --[[
+require 'tests.e2.roadwork'
 require 'tests.e2.shipcraft'
 require 'tests.e2.produce'
-require 'tests.e2.manufacture'
 require 'tests.e2.building'
 require 'tests.e2.migration'
 require 'tests.e2.trolls'
@@ -43,4 +43,3 @@ require 'tests.production'
 require 'tests.undead'
 require 'tests.spells'
 ]]
-

@@ -139,9 +139,10 @@ static void test_build_requires_materials(CuTest *tc) {
     const struct item_type *itype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
+    itype = bf.cons.materials[0].rtype->itype;
     set_level(u, SK_ARMORER, 2);
     CuAssertIntEquals(tc, ENOMATERIALS, build(u, 1, &bf.cons, 0, 1, 0));
-    itype = bf.cons.materials[0].rtype->itype;
     i_change(&u->items, itype, 2);
     CuAssertIntEquals(tc, 1, build(u, 1, &bf.cons, 0, 1, 0));
     CuAssertIntEquals(tc, 1, i_get(u->items, itype));
@@ -154,6 +155,7 @@ static void test_build_failure_missing_skill(CuTest *tc) {
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     CuAssertIntEquals(tc, ENEEDSKILL, build(u, 1, &bf.cons, 1, 1, 0));
@@ -166,6 +168,7 @@ static void test_build_failure_low_skill(CuTest *tc) {
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill - 1);
@@ -179,6 +182,7 @@ static void test_build_failure_completed(CuTest *tc) {
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_ARMORER, bf.cons.minskill);
@@ -188,12 +192,52 @@ static void test_build_failure_completed(CuTest *tc) {
     teardown_build(&bf);
 }
 
+static void test_build_skill(CuTest* tc) {
+    unit* u;
+    const item_type* it_ring;
+
+    test_setup();
+    u = test_create_unit(NULL, NULL);
+    it_ring = it_get_or_create(rt_get_or_create("roqf"));
+    oldpotiontype[P_DOMORE] = it_get_or_create(rt_get_or_create("p3"));
+    scale_number(u, 3);
+    CuAssertIntEquals(tc, 3, build_skill(u, 1, 0, SK_BUILDING));
+    CuAssertIntEquals(tc, 6, build_skill(u, 1, 1, SK_BUILDING));
+
+    /* Ringe werden nicht verbraucht: */
+    i_change(&u->items, it_ring, 3);
+    CuAssertIntEquals(tc, 30, build_skill(u, 1, 0, SK_BUILDING));
+    CuAssertIntEquals(tc, 3, i_get(u->items, it_ring));
+    i_change(&u->items, it_ring, -1);
+    CuAssertIntEquals(tc, 21, build_skill(u, 1, 0, SK_BUILDING));
+    CuAssertIntEquals(tc, 2, i_get(u->items, it_ring));
+    i_change(&u->items, it_ring, -2);
+
+    /* Schaffenstrunk-Effekt wird verbraucht: */
+    change_effect(u, oldpotiontype[P_DOMORE], 5);
+    CuAssertIntEquals(tc, 6, build_skill(u, 1, 0, SK_BUILDING));
+    CuAssertIntEquals(tc, 2, get_effect(u, oldpotiontype[P_DOMORE]));
+
+    CuAssertIntEquals(tc, 10, build_skill(u, 1, 1, SK_BUILDING));
+    CuAssertIntEquals(tc, 0, get_effect(u, oldpotiontype[P_DOMORE]));
+
+    /* ring and potion combined is factor 11: */
+    i_change(&u->items, it_ring, 3);
+    change_effect(u, oldpotiontype[P_DOMORE], 6);
+    CuAssertIntEquals(tc, 33, build_skill(u, 1, 0, SK_BUILDING));
+    CuAssertIntEquals(tc, 66, build_skill(u, 1, 1, SK_BUILDING));
+    CuAssertIntEquals(tc, 0, get_effect(u, oldpotiontype[P_DOMORE]));
+
+    test_teardown();
+}
+
 static void test_build_limits(CuTest *tc) {
     build_fixture bf = { 0 };
     unit *u;
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     assert(rtype);
     i_change(&u->items, rtype->itype, 1);
@@ -222,6 +266,7 @@ static void test_build_with_ring(CuTest *tc) {
     const struct resource_type *rtype;
 
     u = setup_build(&bf);
+    assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
     ring = it_get_or_create(rt_get_or_create("roqf"));
     assert(rtype && ring);
@@ -244,7 +289,7 @@ static void test_build_with_potion(CuTest *tc)
     u = setup_build(&bf);
     assert(bf.cons.materials);
     rtype = bf.cons.materials[0].rtype;
-    oldpotiontype[P_DOMORE] = ptype = it_get_or_create(rt_get_or_create("hodor"));
+    oldpotiontype[P_DOMORE] = ptype = it_get_or_create(rt_get_or_create("p3"));
     assert(rtype && ptype);
 
     i_change(&u->items, rtype->itype, 20);
@@ -284,7 +329,7 @@ static void test_build_with_potion_and_ring(CuTest *tc)
 
     i_change(&u->items, ring, 1);
     change_effect(u, ptype, 4);
-    CuAssertIntEquals(tc, 20, build(u, 1, &bf.cons, 0, 200, 0));
+    CuAssertIntEquals(tc, 11, build(u, 1, &bf.cons, 0, 200, 0));
     CuAssertIntEquals(tc, 3, get_effect(u, ptype));
 
     teardown_build(&bf);
@@ -358,6 +403,7 @@ static void test_build_roqf_factor(CuTest *tc) {
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_build_skill);
     SUITE_ADD_TEST(suite, test_build_limits);
     SUITE_ADD_TEST(suite, test_build_roqf_factor);
     SUITE_ADD_TEST(suite, test_build_failure_low_skill);

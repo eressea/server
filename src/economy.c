@@ -751,7 +751,6 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
     int dm = 0;
     allocation_list *alist;
     allocation *al;
-    const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
     skill_t sk;
@@ -820,26 +819,9 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
                 itype->rtype));
         return;
     }
-    skill += skill_mod;
-    amount = skill * u->number;
-    /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
-
-    /* mit Flinkfingerring verzehnfacht sich die Produktion */
-    rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-    if (rring) {
-        int more = i_get(u->items, rring->itype);
-        if (more > u->number) more = u->number;
-        amount += skill * more * (roqf_factor() - 1);
-    }
-
-    /* Schaffenstrunk: */
-    if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-        if (dm > u->number) dm = u->number;
-        change_effect(u, oldpotiontype[P_DOMORE], -dm);
-        amount += dm * skill;       /* dm Personen produzieren doppelt */
-    }
-
-    amount /= itype->construction->minskill;
+    skill = build_skill(u, skill, skill_mod, sk);
+    /* amount die Gesamtproduktion der Einheit (in punkten) */
+    amount = skill / itype->construction->minskill;
 
     /* Limitierung durch Parameter m. */
     if (want > 0 && want < amount)
