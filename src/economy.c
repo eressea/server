@@ -1416,7 +1416,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     k = effskill(u, SK_TRADE, NULL);
     if (k <= 0) {
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, u->thisorder, "skill_needed", "skill", SK_TRADE));
+            msg_feedback(u, ord, "skill_needed", "skill", SK_TRADE));
         return;
     }
     k = u->number * 10 * k;
