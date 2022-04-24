@@ -12,7 +12,6 @@
 
 #include <CuTest.h>
 #include <tests.h>
-#include <assert.h>
 
 static void test_flyingship(CuTest * tc)
 {

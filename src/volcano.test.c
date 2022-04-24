@@ -7,14 +7,12 @@
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
-#include "kernel/messages.h"
 #include "kernel/region.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/rng.h"
 
 #include <tests.h>
 #include <CuTest.h>

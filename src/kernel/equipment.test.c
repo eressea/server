@@ -1,10 +1,7 @@
-#include "magic.h"
+#include "equipment.h"
 
-#include <kernel/callbacks.h>
-#include <kernel/equipment.h>
-#include <kernel/item.h>
-#include <kernel/unit.h>
-#include <kernel/spell.h>
+#include "callbacks.h"
+#include "unit.h"
 
 #include <CuTest.h>
 #include <tests.h>

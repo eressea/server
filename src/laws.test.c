@@ -3,11 +3,12 @@
 #include "contact.h"
 #include "eressea.h"
 #include "guard.h"
-#include "monsters.h"
 #include "reports.h"
+#include "magic.h"                   // for create_mage
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
+#include <kernel/attrib.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
 #include <kernel/building.h>
@@ -19,21 +20,26 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
+#include "kernel/skill.h"            // for SK_MELEE, SK_MAGIC, SK_STEALTH
+#include "kernel/status.h"           // for ST_FIGHT, ST_FLEE
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
+#include "kernel/types.h"            // for M_GWYRRD, M_DRAIG
 #include <kernel/unit.h>
 
-#include <kernel/attrib.h>
 #include <util/base36.h>
+#include "util/keyword.h"            // for K_NAME, K_WORK, K_MAKETEMP, K_BUY
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/rand.h>
+#include "util/variant.h"  // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <assert.h>
+#include <stdbool.h>                 // for false, true, bool
 #include <stdio.h>
 #include <string.h>
 

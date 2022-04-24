@@ -8,21 +8,15 @@
 #include <kernel/curse.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
-#include <kernel/order.h>
 #include <kernel/region.h>
-#include <kernel/spell.h>
 #include <kernel/unit.h>
 
 #include <util/message.h>
-#include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 /* TODO:
  * - ct_magicresistance on buildings

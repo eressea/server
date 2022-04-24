@@ -19,7 +19,6 @@
 
 #include <attributes/racename.h>
 
-#include "monsters.h"
 #include <CuTest.h>
 #include <tests.h>
 #include <selist.h>

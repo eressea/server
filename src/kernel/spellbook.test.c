@@ -2,10 +2,7 @@
 
 #include "spell.h"
 
-#include <util/language.h>
-
 #include <CuTest.h>
-#include <tests.h>
 
 #include <stdlib.h>
 

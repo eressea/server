@@ -1,5 +1,4 @@
-#include <kernel/spell.h>
-#include <kernel/spellbook.h>
+#include "spell.h"
 
 #include <util/log.h>
 #include <util/lists.h>

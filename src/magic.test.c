@@ -1,7 +1,6 @@
 #include "magic.h"
 
 #include "contact.h"
-#include "give.h"
 #include "teleport.h"
 
 #include <util/language.h>
@@ -29,7 +28,6 @@
 #include <tests.h>
 
 #include <stdlib.h>
-#include <string.h>
 
 void test_updatespells(CuTest * tc)
 {

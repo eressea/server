@@ -1,8 +1,6 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/config.h>
-
 #include "orderfile.h"
 
 #include "direction.h"
@@ -15,7 +13,6 @@
 #include <util/base36.h>
 #include <util/keyword.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/password.h>

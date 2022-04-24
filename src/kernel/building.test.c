@@ -7,13 +7,11 @@
 #include "region.h"
 #include "unit.h"
 
-#include <util/language.h>
 #include <util/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>
 #include <stdlib.h>
-#include <string.h>
 #include <assert.h>
 
 static void test_register_building(CuTest * tc)

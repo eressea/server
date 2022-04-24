@@ -1,17 +1,12 @@
-#include <kernel/types.h>
-
 #include "vortex.h"
 
 #include "eressea.h"
 #include "move.h"
 #include "tests.h"
 
-#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
-#include <kernel/faction.h>
-#include <kernel/race.h>
 
 #include <util/language.h>
 

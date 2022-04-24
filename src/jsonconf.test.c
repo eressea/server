@@ -6,17 +6,20 @@
 
 #include "eressea.h"
 
-#include "kernel/config.h"
+#include "kernel/build.h"     // for construction, requirement
 #include "kernel/building.h"
+#include "kernel/config.h"
 #include "kernel/item.h"
+#include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
-#include "kernel/order.h"
+#include "kernel/skill.h"     // for get_skill, skill_enabled, SK_ALCHEMY
 #include "kernel/terrain.h"
 
 #include "util/keyword.h"
 #include "util/language.h"
+#include "util/variant.h"     // for frac_equal, frac_one
 
 #include "kernel/calendar.h"
 #include "direction.h"

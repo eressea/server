@@ -1,21 +1,21 @@
 #include "spells.h"
+
+#include "magic.h"                   // for free_castorder, castorder
 #include "teleport.h"
 
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/spell.h>
+#include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/unit.h>
 #include <kernel/attrib.h>
-#include <util/language.h>
 #include <util/message.h>
-#include <spells/regioncurse.h>
+#include "util/variant.h"  // for variant
 
+#include <spells/regioncurse.h>
 #include <attributes/attributes.h>
 
 #include <triggers/changerace.h>
@@ -24,10 +24,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>                 // for false
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 static void test_good_dreams(CuTest *tc) {
     struct region *r;

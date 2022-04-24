@@ -2,7 +2,6 @@
 
 #include <kernel/config.h>
 #include <kernel/unit.h>
-#include <kernel/region.h>
 #include <kernel/faction.h>
 
 #include <kernel/attrib.h>
@@ -11,7 +10,6 @@
 #include <tests.h>
 
 #include <stdlib.h>
-#include <assert.h>
 
 static void test_rules(CuTest *tc) {
     test_setup();

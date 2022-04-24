@@ -1,4 +1,3 @@
-#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>

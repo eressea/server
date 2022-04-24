@@ -1,9 +1,7 @@
-#include "rng.h"
 #include "rand.h"
 #include "tests.h"
 
 #include <CuTest.h>
-#include <ctype.h>
 
 static void test_dice_rand(CuTest* tc)
 {
@@ -24,7 +22,7 @@ static void test_dice_rand(CuTest* tc)
     CuAssertIntEquals(tc, -6, dice_rand("-3*2"));
 }
 
-CuSuite *get_rng_suite(void)
+CuSuite *get_rand_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_dice_rand);

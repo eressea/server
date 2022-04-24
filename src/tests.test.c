@@ -1,9 +1,4 @@
-#include <kernel/types.h>
 #include <kernel/item.h>
-#include <kernel/region.h>
-#include <kernel/terrain.h>
-
-#include <util/language.h>
 
 #include <CuTest.h>
 #include <tests.h>

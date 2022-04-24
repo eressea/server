@@ -1,8 +1,11 @@
-#include <kernel/config.h>
 #include "plane.h"
+
 #include "faction.h"
+
 #include <tests.h>
 #include <CuTest.h>
+
+#include <stddef.h>
 
 static void test_plane(CuTest *tc) {
     struct region *r;

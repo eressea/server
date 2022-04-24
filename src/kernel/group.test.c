@@ -8,14 +8,11 @@
 #include "save.h"
 
 #include <kernel/gamedata.h>
-#include <kernel/attrib.h>
 #include <attributes/key.h>
 
 #include <stream.h>
-#include <filestream.h>
 #include <storage.h>
 #include <memstream.h>
-#include <binarystore.h>
 
 #include <CuTest.h>
 #include <tests.h>

@@ -1,25 +1,22 @@
 #include "report.h"
 
-#include "move.h"
+#include "magic.h"             // for BUILDINGSPELL, FARCASTING, SPELLLEVEL
 #include "travelthru.h"
 
 #include <kernel/ally.h>
-#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
-#include <kernel/ship.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+#include "kernel/build.h"      // for construction
+#include "kernel/skill.h"      // for SK_QUARRYING
 
 #include "util/keyword.h"
 #include "util/param.h"
 #include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
 #include <util/strings.h>
 
 #include <stream.h>
@@ -28,6 +25,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>           // for true
+#include <stdio.h>             // for EOF, snprintf
 #include <string.h>
 #include <stdlib.h>
 

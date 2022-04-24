@@ -1,10 +1,9 @@
 #include "eressea.h"
-#include "kernel/config.h"
+
 #include "util/log.h"
 #include "util/stats.h"
 #include "util/password.h"
 #include "util/strings.h"
-#include "util/variant.h"
 
 #include <CuTest.h>
 #include <stdio.h>
@@ -90,7 +89,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(strings);
     ADD_SUITE(log);
     ADD_SUITE(variant);
-    ADD_SUITE(rng);
+    ADD_SUITE(rand);
     /* items */
     ADD_SUITE(xerewards);
     /* kernel */

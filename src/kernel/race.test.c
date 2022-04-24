@@ -14,8 +14,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#include <assert.h>
 
 static void test_rc_name(CuTest *tc) {
     struct race *rc;

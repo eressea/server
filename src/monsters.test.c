@@ -18,7 +18,6 @@
 #include "kernel/unit.h"
 
 #include "util/language.h"
-#include "util/language.h"
 #include "util/message.h"
 
 #include "attributes/hate.h"

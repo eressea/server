@@ -12,15 +12,12 @@
 #include <util/rng.h>
 
 #include <binarystore.h>
-#include <filestream.h>
 #include <memstream.h>
 #include <storage.h>
 #include <stream.h>
 #include <tests.h>
 
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include <CuTest.h>
 

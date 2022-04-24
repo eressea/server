@@ -20,11 +20,10 @@ order_parser.test.c
 # param.test.c
 parser.test.c
 password.test.c
-# rand.test.c
+rand.test.c
+# rng.test.c
 # resolve.test.c
-rng.test.c
 strings.test.c
-functions.test.c
 log.test.c
 # translation.test.c
 umlaut.test.c

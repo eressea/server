@@ -8,8 +8,6 @@
 #include <util/language.h>
 #include <util/param.h>
 
-#include <kernel/attrib.h>
-
 #include <iniparser.h>
 #include <CuTest.h>
 #include <tests.h>

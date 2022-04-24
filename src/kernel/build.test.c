@@ -5,15 +5,10 @@
 #include "config.h"
 #include "faction.h"
 #include "item.h"
-#include "messages.h"
 #include "order.h"
 #include "race.h"
 #include "region.h"
 #include "unit.h"
-
-#include <util/language.h>
-#include <util/param.h>
-#include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>

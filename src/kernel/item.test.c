@@ -6,7 +6,6 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/functions.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -165,7 +164,6 @@ void test_findresourcetype(CuTest * tc)
     test_teardown();
 }
 
-#include <modules/autoseed.h>
 static void test_fix_demand(CuTest *tc) {
     region *r;
     terrain_type *tplain;

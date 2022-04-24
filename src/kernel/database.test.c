@@ -1,8 +1,6 @@
-#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 
-#include "database.h"
 #include "db/driver.h"
 
 #include <CuTest.h>

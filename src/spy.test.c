@@ -2,31 +2,30 @@
 
 #include <magic.h>
 
-#include <attributes/otherfaction.h>
-
 #include <kernel/config.h>
-#include <kernel/types.h>
+#include <kernel/faction.h>
+#include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/faction.h>
 #include <kernel/ship.h>
-#include <kernel/order.h>
-#include <kernel/item.h>
-#include <kernel/messages.h>
-#include <kernel/attrib.h>
+#include "kernel/skill.h"            // for SK_SPY, enable_skill, SK_MAGIC
+#include <kernel/types.h>
+#include <kernel/unit.h>
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
-#include <util/crmessage.h>
 #include <util/rand.h>
+#include "util/variant.h"  // for frac_zero
+#include "util/keyword.h"            // for K_SETSTEALTH, K_SABOTAGE, K_SPY
 
 #include <tests.h>
 #include <CuTest.h>
 
 #include <assert.h>
+#include <stdbool.h>                 // for true
 #include <stdio.h>
 
 typedef struct {
