@@ -203,22 +203,6 @@ function test_route_pause()
     assert_equal(r1, u.region)
 end
 
-function test_immunity_stops_guard()
-    eressea.settings.set("NewbieImmunity", 2)
-    local f = faction.create('human')
-    local r = region.create(0, 0, 'plain')
-    local u = unit.create(f, r)
-    u:set_skill('polearm', 2)
-    u:add_item('lance', 1)
-    u:add_order('BEWACHE')
-    process_orders()
-    assert_equal(f.age, 1)
-    assert_true(not u.guard)
-    process_orders()
-    assert_equal(f.age, 2)
-    assert_true(u.guard)
-end
-
 function test_region_keys()
     local r = region.create(0, 0, 'plain')
     assert_nil(r:get_key('test'))
