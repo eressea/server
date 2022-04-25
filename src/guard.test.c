@@ -228,13 +228,19 @@ static void test_guard_on(CuTest * tc)
     ug->status = ST_FIGHT;
 
     config_set("NewbieImmunity", "5");
+    ug->faction->age = 3;
     CuAssertIntEquals(tc, E_GUARD_NEWBIE, can_start_guarding(ug));
     guard_on_cmd(ug, ug->thisorder);
     CuAssertTrue(tc, !is_guard(ug));
     CuAssertPtrNotNull(tc, test_find_messagetype(ug->faction->msgs, "error304"));
-    config_set("NewbieImmunity", NULL);
-
     test_clear_messages(ug->faction);
+
+    ug->faction->age = 4;
+    CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(ug));
+    guard_on_cmd(ug, ug->thisorder);
+    CuAssertTrue(tc, is_guard(ug));
+    CuAssertPtrEquals(tc, NULL, ug->faction->msgs);
+
     test_teardown();
 }
 

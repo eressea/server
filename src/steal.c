@@ -154,7 +154,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
         return;
     }
 
-    if (IsImmune(u2->faction)) {
+    if (IsImmune(u2->faction, u2->faction->age)) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "newbie_immunity_error", "turns", NewbieImmunity()));
         return;

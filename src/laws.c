@@ -132,9 +132,9 @@ int NewbieImmunity(void)
     return result;
 }
 
-bool IsImmune(const faction * f)
+bool IsImmune(const faction * f, int age)
 {
-    return !fval(f, FFL_NPC) && f->age < NewbieImmunity();
+    return !fval(f, FFL_NPC) && age < NewbieImmunity();
 }
 
 int NMRTimeout(void)
