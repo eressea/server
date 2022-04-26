@@ -1,5 +1,4 @@
 require 'tests.e2.manufacture'
---[[
 require 'tests.e2.roadwork'
 require 'tests.e2.shipcraft'
 require 'tests.e2.produce'
@@ -42,4 +41,3 @@ require 'tests.xmas'
 require 'tests.production'
 require 'tests.undead'
 require 'tests.spells'
-]]
