@@ -97,7 +97,7 @@ extern "C" {
     bool LongHunger(const struct unit *u);
     int NMRTimeout(void);
     int NewbieImmunity(void);
-    bool IsImmune(const struct faction *f);
+    bool IsImmune(const struct faction *f, int age);
     bool help_enter(struct unit *uo, struct unit *u);
 
     enum param_t findparam_ex(const char *s, const struct locale * lang);

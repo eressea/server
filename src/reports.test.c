@@ -830,19 +830,16 @@ static void test_newbie_warning(CuTest *tc) {
     f->age = 0;
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunity"));
-    CuAssertIntEquals(tc, true, IsImmune(f));
     test_clear_messages(f);
 
     f->age = 1;
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunityending"));
-    CuAssertIntEquals(tc, true, IsImmune(f));
     test_clear_messages(f);
 
     f->age = 2;
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunityended"));
-    CuAssertIntEquals(tc, true, IsImmune(f));
     test_clear_messages(f);
 
     f->age = 3;
@@ -850,7 +847,6 @@ static void test_newbie_warning(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunityended"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunityending"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunity"));
-    CuAssertIntEquals(tc, false, IsImmune(f));
     test_clear_messages(f);
 
     test_teardown();

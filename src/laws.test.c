@@ -959,7 +959,9 @@ static void test_newbie_cannot_guard(CuTest *tc) {
 
     setup_guard(&fix, true);
     config_set("NewbieImmunity", "4");
-    CuAssertTrue(tc, IsImmune(fix.u->faction));
+    fix.u->faction->age = 3;
+    CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
+    fix.u->faction->age = 2;
     CuAssertIntEquals(tc, E_GUARD_NEWBIE, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
