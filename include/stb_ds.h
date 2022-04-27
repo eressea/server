@@ -756,15 +756,19 @@ size_t stbds_rehash_items;
 
 void *stbds_arrgrowf(void *a, size_t elemsize, size_t addlen, size_t min_cap)
 {
-    void *b;
-    size_t min_len = stbds_arrlen(a) + addlen;
-
-    // compute the minimum capacity needed
-    if (min_len > min_cap)
+    void* b;
+    size_t min_len = addlen;
+    if (a)
+    {
+        min_len += stbds_arrlen(a);
+        // compute the minimum capacity needed
+        if (min_len > min_cap)
+            min_cap = min_len;
+        if (min_cap <= stbds_arrcap(a))
+            return a;
+    }
+    else if (min_len > min_cap)
         min_cap = min_len;
-
-    if (min_cap <= stbds_arrcap(a))
-        return a;
 
     // increase needed capacity to guarantee O(1) amortized
     if (min_cap < 2 * stbds_arrcap(a))
@@ -800,7 +804,11 @@ void *stbds_arrgrowf(void *a, size_t elemsize, size_t addlen, size_t min_cap)
 #define STBDS_BUCKET_LENGTH      8
 #endif
 
-#define STBDS_BUCKET_SHIFT      (STBDS_BUCKET_LENGTH == 8 ? 3 : 2)
+#if STBDS_BUCKET_LENGTH == 8
+#define STBDS_BUCKET_SHIFT 3
+#else
+#define STBDS_BUCKET_SHIFT 2
+#endif
 #define STBDS_BUCKET_MASK       (STBDS_BUCKET_LENGTH-1)
 #define STBDS_CACHE_LINE_SIZE   64
 

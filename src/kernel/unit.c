@@ -944,6 +944,7 @@ static void remove_skills(unit * u) {
 skill *add_skill(unit * u, enum skill_t sk)
 {
     skill* sv;
+    skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
     assert(u);
     if (u->skills) {
         size_t s, len = arrlen(u->skills);
@@ -951,17 +952,13 @@ skill *add_skill(unit * u, enum skill_t sk)
             sv = u->skills + s;
             if (sv->id >= sk) break;
         }
-        stbds_arrinsn(u->skills, s, 1);
+        arrins(u->skills, s, skins);
         sv = u->skills + s;
     }
     else {
-        arrsetlen(u->skills, 1);
+        arrpush(u->skills, skins);
         sv = u->skills;
     }
-    sv->level = 0;
-    sv->weeks = 1;
-    sv->old = 0;
-    sv->id = sk;
     if (sk == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
         assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
