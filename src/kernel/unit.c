@@ -951,7 +951,7 @@ skill *add_skill(unit * u, enum skill_t sk)
             sv = u->skills + s;
             if (sv->id >= sk) break;
         }
-        arrinsn(u->skills, s, 1);
+        stbds_arrinsn(u->skills, s, 1);
         sv = u->skills + s;
     }
     else {

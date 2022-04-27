@@ -2,8 +2,8 @@
 
 #include "battle.h"
 #include "economy.h"
-#include "give.h"
 #include "guard.h"
+#include "give.h"
 #include "laws.h"
 #include "move.h"
 #include "study.h"

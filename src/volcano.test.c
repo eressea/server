@@ -13,9 +13,12 @@
 
 #include "util/message.h"
 #include "util/rand.h"
+#include "util/variant.h"                 // for variant, frac_zero
 
 #include <tests.h>
 #include <CuTest.h>
+
+#include <stddef.h>                       // for NULL
 
 static void test_volcano_update(CuTest *tc) {
     region *r;

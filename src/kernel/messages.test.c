@@ -4,7 +4,9 @@
 #include "faction.h"
 #include "order.h"
 
-#include <util/message.h>
+#include "util/message.h"
+#include "util/keyword.h"  // for K_ENTERTAIN, K_MOVE
+#include "util/variant.h"  // for variant
 
 #include <CuTest.h>
 #include <tests.h>

@@ -11,6 +11,7 @@
 #include <tests.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 static void test_resourcename_no_appearance(CuTest *tc) {
     const resource_type *rtype;

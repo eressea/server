@@ -9,6 +9,8 @@
 #include <stb_ds.h>
 #include <CuTest.h>
 
+#include <stddef.h>
+
 static void test_skills(CuTest * tc)
 {
     unit *u;

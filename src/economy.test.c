@@ -1,7 +1,6 @@
 #include <kernel/config.h>
 #include "economy.h"
 #include "recruit.h"
-#include "guard.h"
 #include "direction.h"         // for D_EAST, directions
 
 #include <kernel/building.h>
