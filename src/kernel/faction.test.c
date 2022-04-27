@@ -260,6 +260,32 @@ static void test_max_migrants(CuTest *tc) {
     test_teardown();
 }
 
+static void test_count_skill(CuTest* tc) {
+    unit* u;
+    region* r;
+    faction* f;
+
+    test_setup();
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(f, r);
+    set_level(u, SK_MAGIC, 1);
+    set_level(u, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_ALCHEMY));
+    u = test_create_unit(f, r);
+    set_level(u, SK_MAGIC, 1);
+    set_level(u, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_ALCHEMY));
+
+    // familiars do not count as magicians:
+    set_familiar(u, u);
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_ALCHEMY));
+    test_teardown();
+}
+
 static void test_skill_limit(CuTest *tc) {
     faction *f;
 
@@ -405,6 +431,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_addplayer);
     SUITE_ADD_TEST(suite, test_max_migrants);
     SUITE_ADD_TEST(suite, test_skill_limit);
+    SUITE_ADD_TEST(suite, test_count_skill);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);

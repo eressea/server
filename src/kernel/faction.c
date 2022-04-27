@@ -625,7 +625,7 @@ int faction_count_skill(faction * f, skill_t sk)
 
     for (u = f->units; u; u = u->nextF) {
         if (has_skill(u, sk)) {
-            if (!is_familiar(u)) {
+            if (sk != SK_MAGIC || !is_familiar(u)) {
                 n += u->number;
             }
         }
