@@ -107,7 +107,8 @@ int max_heroes(int num_people);
 int countheroes(const struct faction* f);
 
 int ualias(const struct unit* u);
-void usetalias(unit* u, int alias);
+void usetalias(struct unit* u, int alias);
+void setguard(struct unit * u, bool enabled);
 
 int weight(const struct unit* u);
 

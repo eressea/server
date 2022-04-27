@@ -709,6 +709,18 @@ bool can_survive(const unit * u, const region * r)
     return false;
 }
 
+void setguard(unit * u, bool enabled)
+{
+    if (!enabled) {
+        freset(u, UFL_GUARD);
+    } else {
+        assert(!fval(u, UFL_MOVED));
+        assert(u->status < ST_FLEE);
+        fset(u, UFL_GUARD);
+        fset(u->region, RF_GUARDED);
+    }
+}
+
 void leave_region(unit* u)
 {
     assert(u->region);
