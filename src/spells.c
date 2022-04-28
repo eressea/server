@@ -1847,7 +1847,7 @@ static int sp_treewalkenter(castorder * co)
             m = NULL;
             for (u2 = rt->units; u2; u2 = u2->next) {
                 if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, rt, u, 0)) {
+                    if (u2->faction == caster->faction || cansee(u2->faction, rt, u, 0)) {
                         fset(u2->faction, FFL_SELECT);
                         if (!m)
                             m = msg_message("astral_appear", "unit", u);
