@@ -785,8 +785,8 @@ int max_spell_level(unit * u, unit *caster, const spell * sp, int cast_level, in
                     else {
                         maxlevel = have / level_cost;
                     }
-                    need -= have;
                 }
+                need -= have;
             }
             if (reslist_p && need > 0) {
                 add_missing_component(reslist_p, spc, need);
