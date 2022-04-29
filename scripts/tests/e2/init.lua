@@ -1,3 +1,4 @@
+require 'tests.e2.battle'
 require 'tests.e2.manufacture'
 require 'tests.e2.roadwork'
 require 'tests.e2.shipcraft'
