@@ -1507,13 +1507,15 @@ static int get_tactics(const side * as, const side * ds)
 
     if (b->max_tactics > 0) {
         for (stac = b->sides; stac != b->sides + b->nsides; ++stac) {
-            if (stac->leader.value > result && helping(stac, as)) {
-                assert(ds == NULL || !helping(stac, ds));
-                result = stac->leader.value;
+            if (result < b->max_tactics && stac->leader.value > result && helping(stac, as)) {
+                if (ds == NULL || !helping(stac, ds)) {
+                    result = stac->leader.value;
+                }
             }
-            if (ds && stac->leader.value > defense && helping(stac, ds)) {
-                assert(!helping(stac, as));
-                defense = stac->leader.value;
+            if (ds && defense < b->max_tactics && stac->leader.value > defense && helping(stac, ds)) {
+                if (!helping(stac, as)) {
+                    defense = stac->leader.value;
+                }
             }
         }
     }
