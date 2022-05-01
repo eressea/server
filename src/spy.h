@@ -13,7 +13,6 @@ extern "C" {
 
     int setstealth_cmd(struct unit *u, struct order *ord);
     int spy_cmd(struct unit *u, struct order *ord);
-    int sabotage_cmd(struct unit *u, struct order *ord);
     void spy_message(int spy, const struct unit *u,
         const struct unit *target);
     void set_factionstealth(struct unit * u, struct faction * f);

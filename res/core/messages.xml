@@ -810,39 +810,6 @@
     </type>
   </message>
 
-  <message name="destroy_ship_0" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
-  <message name="destroy_ship_1" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
-  <message name="destroy_ship_2" section="events">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
-  <message name="destroy_ship_3" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
-  <message name="destroy_ship_4" section="events">
-    <type>
-      <arg name="ship" type="ship"/>
-    </type>
-  </message>
-
   <message name="sink_msg" section="events">
     <type>
       <arg name="ship" type="ship"/>

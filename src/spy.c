@@ -328,45 +328,6 @@ static int top_skill(region * r, faction * f, ship * sh, skill_t sk)
     return value;
 }
 
-static int try_destruction(unit * u, unit * u2, const ship * sh, int skilldiff)
-{
-    const char *destruction_success_msg = "destroy_ship_0";
-    const char *destruction_failed_msg = "destroy_ship_1";
-    const char *destruction_detected_msg = "destroy_ship_2";
-    const char *detect_failure_msg = "destroy_ship_3";
-    const char *object_destroyed_msg = "destroy_ship_4";
-
-    if (skilldiff == 0) {
-        /* tell the unit that the attempt failed: */
-        ADDMSG(&u->faction->msgs, msg_message(destruction_failed_msg, "ship unit",
-            sh, u));
-        /* tell the enemy about the attempt: */
-        if (u2) {
-            ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship", sh));
-        }
-        return 0;
-    }
-    else if (skilldiff < 0) {
-        /* tell the unit that the attempt was detected: */
-        ADDMSG(&u->faction->msgs, msg_message(destruction_detected_msg,
-            "ship unit", sh, u));
-        /* tell the enemy whodunit: */
-        if (u2) {
-            ADDMSG(&u2->faction->msgs, msg_message(detect_failure_msg, "ship", sh));
-        }
-        return 0;
-    }
-    else {
-        /* tell the unit that the attempt succeeded */
-        ADDMSG(&u->faction->msgs, msg_message(destruction_success_msg, "ship unit",
-            sh, u));
-        if (u2) {
-            ADDMSG(&u2->faction->msgs, msg_message(object_destroyed_msg, "ship", sh));
-        }
-    }
-    return 1;                     /* success */
-}
-
 void sink_ship(ship * sh)
 {
     unit *u;
@@ -406,46 +367,4 @@ void sink_ship(ship * sh)
     if (sink_msg) {
         msg_release(sink_msg);
     }
-}
-
-int sabotage_cmd(unit * u, struct order *ord)
-{
-    const char *s;
-    param_t p;
-    ship *sh;
-    unit *u2;
-    int skdiff = INT_MAX;
-
-    assert(u);
-    assert(ord);
-
-    init_order(ord, NULL);
-    s = getstrtoken();
-    p = findparam(s, u->faction->locale);
-    reset_order();
-
-    switch (p) {
-    case P_SHIP:
-        sh = u->ship;
-        if (!sh) {
-            cmistake(u, u->thisorder, 144, MSG_EVENT);
-            return 0;
-        }
-        u2 = ship_owner(sh);
-        if (u2->faction != u->faction) {
-            skdiff =
-                effskill(u, SK_SPY, NULL) - top_skill(u->region, u2->faction, sh, SK_PERCEPTION);
-        }
-        if (try_destruction(u, u2, sh, skdiff)) {
-            sink_ship(sh);
-            /* finally, get rid of the ship */
-            remove_ship(&sh->region->ships, sh);
-        }
-        break;
-    default:
-        cmistake(u, u->thisorder, 9, MSG_EVENT);
-        return 0;
-    }
-
-    return 0;
 }

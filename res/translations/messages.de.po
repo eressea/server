@@ -743,9 +743,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit bef
 msgid "error215"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Von hier aus kann man die astrale Ebene nicht erreichen.\""
 
-msgid "destroy_ship_4"
-msgstr "\"$ship($ship) wurde zerstört.\""
-
 msgid "error211"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff liegt bereits so ein Zauber.\""
 
@@ -1121,9 +1118,6 @@ msgstr "\"$unit($unit) gelingt es $spell($spell) zu zaubern, doch der Spruch zei
 
 msgid "shipdestroy"
 msgstr "\"$unit($unit) in $region($region) versenkt die $ship($ship).\""
-
-msgid "destroy_ship_3"
-msgstr "\"Es wurde versucht, $ship($ship) zu zerstören.\""
 
 msgid "error289"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Wie sollen wir uns tarnen?\""
@@ -1537,9 +1531,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Gebäude $int36
 msgid "nr_claims"
 msgstr "\"Einheiten können die folgenden Gegenstände beanspruchen: $resources($items)\""
 
-msgid "destroy_ship_2"
-msgstr "\"$unit($unit) wurde beim Versuch $ship($ship) zu zerstören entdeckt.\""
-
 msgid "destroy_magic_effect"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier zerstört $int($succ) Flüche auf ${target}.\""
 
@@ -1879,9 +1870,6 @@ msgstr "\"Bauerneinnahmen: $int($max) Silber\""
 
 msgid "income_magic_reduced"
 msgstr "\"$unit($unit) verdient in $region($region) $int($amount)$if($eq($wanted,$amount),\"\",\" statt $int($wanted)\") Silber durch Zauberei.\""
-
-msgid "destroy_ship_1"
-msgstr "\"$unit($unit) konnte $ship($ship) nicht zerstören.\""
 
 msgid "error314"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Partei kann nur einmal neu starten.\""
@@ -2309,9 +2297,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Schiff oder
 
 msgid "drought_effect_4"
 msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Das Eis zerbricht und eine gewaltige Flutwelle verschlingt die Region.\""
-
-msgid "destroy_ship_0"
-msgstr "\"$ship($ship) wurde von $unit($unit) zerstört.\""
 
 msgctxt "curseinfo"
 msgid "sparkle_16"

@@ -743,9 +743,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is nei
 msgid "error215"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot reach the astral plane from here.\""
 
-msgid "destroy_ship_4"
-msgstr "\"$ship($ship) was destroyed.\""
-
 msgid "error211"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is already under this spell.\""
 
@@ -1121,9 +1118,6 @@ msgstr "\"$unit($unit) manages to cast $spell($spell), but the spell seems to ha
 
 msgid "shipdestroy"
 msgstr "\"$unit($unit) sunk $ship($ship) in $region($region).\""
-
-msgid "destroy_ship_3"
-msgstr "\"Somebody attempted to destroy $ship($ship).\""
 
 msgid "error289"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - What should we disguise as?\""
@@ -1537,9 +1531,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Building $int36
 msgid "nr_claims"
 msgstr "\"Units can claim the following items: $resources($items)\""
 
-msgid "destroy_ship_2"
-msgstr "\"$unit($unit) was detected while trying to destroy $ship($ship).\""
-
 msgid "destroy_magic_effect"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician destroys $int($succ) spells on ${target}.\""
 
@@ -1879,9 +1870,6 @@ msgstr "\"peasant wages: $int($max) silver\""
 
 msgid "income_magic_reduced"
 msgstr "\"$unit($unit) in $region($region) earns $int($amount)$if($eq($wanted,$amount),\"\",\" instead of $int($wanted)\") silver through magic.\""
-
-msgid "destroy_ship_1"
-msgstr "\"$unit($unit) could not destroy $ship($ship).\""
 
 msgid "error314"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Restart can only be used once.\""
@@ -2309,9 +2297,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - A ship or a cas
 
 msgid "drought_effect_4"
 msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region). The ice melts and and the region is consumed by a tidal wave.\""
-
-msgid "destroy_ship_0"
-msgstr "\"$ship($ship) was destroyed by $unit($unit).\""
 
 msgctxt "curseinfo"
 msgid "sparkle_16"
