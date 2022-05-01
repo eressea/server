@@ -9,6 +9,8 @@
 #include <tests.h>
 #include <CuTest.h>
 
+#include <stddef.h>          // for NULL
+
 static void test_names(CuTest * tc)
 {
     unit *u;

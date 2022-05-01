@@ -1,28 +1,35 @@
 #include "study.h"
 
-#include <kernel/ally.h>
-#include <kernel/attrib.h>
-#include <kernel/config.h>
-#include <kernel/building.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/skills.h>
-#include <kernel/unit.h>
+#include "magic.h"            // for create_mage, get_mage, unit_get_magic
 
-#include <util/rand.h>
-#include <util/message.h>
-#include <util/language.h>
-#include <util/base36.h>
+#include "kernel/ally.h"
+#include "kernel/attrib.h"
+#include "kernel/config.h"
+#include "kernel/building.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/skill.h"     // for SK_CROSSBOW, SK_ALCHEMY, SK_MAGIC, skil...
+#include "kernel/skills.h"
+#include "kernel/types.h"     // for M_GWYRRD
+#include "kernel/unit.h"
+
+#include "util/base36.h"
+#include "util/keyword.h"     // for K_STUDY, K_TEACH
+#include "util/language.h"
+#include "util/message.h"
+#include "util/rand.h"
+#include "util/variant.h"     // for variant
+
 #include <tests.h>
 
 #include <CuTest.h>
 #include <selist.h>
 
 #include <assert.h>
-
+#include <stddef.h>           // for NULL
 
 #define MAXLOG 4
 typedef struct log_entry {

@@ -7,12 +7,16 @@
 #include "kernel/region.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"    // for K_RECRUIT
 #include "util/message.h"
+#include "util/variant.h"    // for variant
 
 #include "stb_ds.h"
 
 #include <tests.h>
 #include <CuTest.h>
+
+#include <stddef.h>          // for NULL
 
 static void setup_recruit(void)
 {

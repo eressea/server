@@ -20,6 +20,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdio.h>            // for fprintf, fclose, rewind, tmpfile, FILE
+
 static void test_unit_orders(CuTest *tc) {
     unit *u;
     faction *f;

@@ -1,15 +1,18 @@
 #include "piracy.h"
+#include "direction.h"       // for init_directions, D_EAST, directions
 
 #include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/ship.h>
+#include "kernel/skill.h"    // for SK_SAILING
 #include <kernel/terrain.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 
 #include <util/base36.h>
+#include "util/keyword.h"    // for K_PIRACY
 #include <util/language.h>
 #include <util/message.h>
 
@@ -18,6 +21,7 @@
 
 #include <tests.h>
 #include <assert.h>
+#include <stddef.h>          // for NULL
 
 static void setup_piracy(void) {
     struct locale *lang;

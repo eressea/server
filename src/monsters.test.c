@@ -1,6 +1,5 @@
 #include "monsters.h"
 
-#include "guard.h"
 #include "study.h"
 
 #include "kernel/attrib.h"
@@ -17,6 +16,7 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"     // for K_MOVE
 #include "util/language.h"
 #include "util/message.h"
 
