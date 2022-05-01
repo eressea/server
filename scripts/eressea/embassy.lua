@@ -41,7 +41,9 @@ function use_seashell(u, amount)
     if visit and u.region~= home then
         local turns = get_turn() - visit
         local msg = message.create('msg_event')
-        msg:set_string("string", u.name .. "(" .. itoa36(u.id) .. ") erzählt den Bewohnern von " .. u.region.name .. " von Muschelplateau, das die Partei " .. u.faction.name .. " vor " .. turns .. " Wochen besucht hat." )
+        msg:set_string("string", u.name .. " (" .. itoa36(u.id) .. ") erzählt den Bewohnern von " .. u.region.name .. " von Muschelplateau, das die Partei " .. u.faction.name .. " vor " .. turns .. " Wochen besucht hat." )
+        msg:set_unit('unit', u)
+        msg:set_region('region', u.region)
         msg:send_region(u.region)
         return 0
     end
