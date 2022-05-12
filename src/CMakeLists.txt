@@ -236,6 +236,7 @@ set(TESTS_SRC
   spy.test.c
   study.test.c
   summary.test.c
+  teleport.test.c
   test_eressea.c
   tests.c
   tests.test.c

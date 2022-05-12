@@ -1,10 +1,10 @@
+#include "travelthru.h"
+
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/attrib.h>
-#include <util/macros.h>
 
-#include "travelthru.h"
 #include "reports.h"
 #include "tests.h"
 
@@ -14,7 +14,7 @@ struct attrib;
 
 static void count_travelers(region *r, unit *u, void *cbdata) {
     int *n = (int *)cbdata;
-    UNUSED_ARG(r);
+    (void)r;
     *n += u->number;
 }
 

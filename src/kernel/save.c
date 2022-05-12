@@ -1741,6 +1741,9 @@ int read_game(gamedata *data)
     if (data->version < FIX_MIGRANT_AURA_VERSION) {
         fix_familiars(fix_fam_migrant);
     }
+    if (data->version < FIX_TELEPORT_PLANE_VERSION) {
+        create_teleport_plane();
+    }
 
     log_debug("Done loading turn %d.", turn);
 

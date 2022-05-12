@@ -143,6 +143,7 @@ int effskill_study(const struct unit* u, enum skill_t sk);
 int get_modifier(const struct unit* u, enum skill_t sk, int level,
     const struct region* r, bool noitem);
 int remove_unit(struct unit** ulist, struct unit* u);
+void erase_unit(struct unit** ulist, struct unit* u);
 void leave_region(struct unit* u);
 
 /* looking up dead units' factions: */

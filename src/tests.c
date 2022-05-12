@@ -297,6 +297,8 @@ static void test_reset_full(void) {
     mt_create_va(mt_new("malnourish", NULL),
         "unit:unit", "region:region", MT_NEW_END);
 
+    config_set_int("modules.astralspace", 0);
+
     if (errno) {
         int error = errno;
         errno = 0;
@@ -318,6 +320,13 @@ void test_create_calendar(void) {
     month_season[6] = SEASON_SPRING;
     month_season[7] = SEASON_SPRING;
     month_season[8] = SEASON_SUMMER;
+}
+
+void test_use_astral(void)
+{
+    config_set_int("modules.astralspace", 1);
+    test_create_terrain("fog", LAND_REGION);
+    test_create_terrain("thickfog", FORBIDDEN_REGION);
 }
 
 void test_setup_test(CuTest *tc, const char *file, int line) {

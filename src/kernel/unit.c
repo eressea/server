@@ -331,24 +331,15 @@ struct faction *dfindhash(int no) {
     return NULL;
 }
 
-int remove_unit(unit ** ulist, unit * u)
+void erase_unit(unit** ulist, unit* u)
 {
-    int result;
-
-    assert(ufindhash(u->no));
-    handle_event(u->attribs, "destroy", u);
-
-    result = gift_items(u, GIFT_SELF | GIFT_FRIENDS | GIFT_PEASANTS);
-    if (result != 0) {
-        make_zombie(u);
-        return -1;
-    }
-
     if (u->number) {
         set_number(u, 0);
     }
     leave(u, true);
     u->region = NULL;
+
+    if (u->items) i_freeall(&u->items);
 
     uunhash(u);
     if (ulist) {
@@ -380,7 +371,21 @@ int remove_unit(unit ** ulist, unit * u)
     deleted_units = u;
 
     u->region = NULL;
+}
 
+int remove_unit(unit ** ulist, unit * u)
+{
+    int result;
+
+    assert(ufindhash(u->no));
+    handle_event(u->attribs, "destroy", u);
+
+    result = gift_items(u, GIFT_SELF | GIFT_FRIENDS | GIFT_PEASANTS);
+    if (result != 0) {
+        make_zombie(u);
+        return -1;
+    }
+    erase_unit(ulist, u);
     return 0;
 }
 
@@ -744,7 +749,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 
     assert(u->faction || !"this unit is dead");
     if (!ulist) {
-        ulist = (&r->units);
+        ulist = &r->units;
     }
     if (u->region) {
         leave_region(u);
