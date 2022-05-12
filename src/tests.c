@@ -297,8 +297,6 @@ static void test_reset_full(void) {
     mt_create_va(mt_new("malnourish", NULL),
         "unit:unit", "region:region", MT_NEW_END);
 
-    config_set_int("modules.astralspace", 0);
-
     if (errno) {
         int error = errno;
         errno = 0;

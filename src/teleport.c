@@ -160,7 +160,7 @@ plane *get_astralplane(void)
     static bool rule_astralplane;
     
     if (config_changed(&config)) {
-        rule_astralplane = config_get_int("modules.astralspace", 1) != 0;
+        rule_astralplane = config_get_int("modules.astralspace", 0) != 0;
     }
     if (!rule_astralplane) {
         return NULL;
