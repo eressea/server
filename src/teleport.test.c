@@ -12,7 +12,6 @@
 #include <CuTest.h>
 
 static void test_update_teleport(CuTest *tc) {
-    int n = 0;
     region* r1, *r2, *ra;
     struct plane* aplane;
     const struct terrain_type *t_dense, *t_fog, *t_firewall;
