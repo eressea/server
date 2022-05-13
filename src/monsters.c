@@ -222,8 +222,9 @@ void monsters_desert(struct faction *monsters)
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
+                    faction* f = u->faction;
                     if (join_monsters(u, monsters)) {
-                        ADDMSG(&u->faction->msgs, msg_message("desertion",
+                        ADDMSG(&f->msgs, msg_message("desertion",
                             "unit region", u, r));
                     }
                 }
