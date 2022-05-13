@@ -1742,7 +1742,10 @@ int read_game(gamedata *data)
         fix_familiars(fix_fam_migrant);
     }
     if (data->version < FIX_TELEPORT_PLANE_VERSION) {
-        create_teleport_plane();
+        if (config_get_int("config.debug", 0) == 0)
+        {
+            create_teleport_plane();
+        }
     }
 
     log_debug("Done loading turn %d.", turn);

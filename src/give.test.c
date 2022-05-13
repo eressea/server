@@ -524,7 +524,7 @@ static void test_give_dead_unit(CuTest * tc) {
     env.f2 = test_create_faction();
     setup_give(&env);
     env.dst->number = 0;
-    freset(env.dst, UFL_ISNEW);
+    fset(env.dst, UFL_DEAD);
     CuAssertPtrNotNull(tc, msg = check_give(env.src, env.dst, NULL));
     msg_release(msg);
     test_teardown();

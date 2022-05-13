@@ -10,8 +10,8 @@
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 
-#define UFL_DEAD          (1<<0)
-#define UFL_ISNEW         (1<<1)        /* 2 */
+#define UFL_DEAD          (1<<0)        /* unit died in battle and cannot receive anything */
+#define UFL_ISNEW         (1<<1)        /* unit was created this turn */
 #define UFL_LONGACTION    (1<<2)        /* 4 */
 #define UFL_OWNER         (1<<3)        /* 8 */
 #define UFL_ANON_FACTION  (1<<4)        /* 16 */
