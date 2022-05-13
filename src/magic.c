@@ -1308,7 +1308,7 @@ static void do_fumble(castorder * co)
         if (rc_changed(&rc_cache)) {
             rc_toad = get_race(RC_TOAD);
         }
-        duration = 1 + (rng_int() % level) / 2;
+        duration = 2 + (rng_int() % level) / 2;
         trestore = change_race(mage, duration, rc_toad, NULL);
         if (trestore) {
             if (chance(0.7)) {
