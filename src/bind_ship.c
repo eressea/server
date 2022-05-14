@@ -97,6 +97,26 @@ static int tolua_ship_set_region(lua_State * L)
     return 0;
 }
 
+static int tolua_ship_get_owner(lua_State * L)
+{
+    ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
+    if (sh) {
+        tolua_pushusertype(L, ship_owner(sh), "unit");
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_ship_set_owner(lua_State * L)
+{
+    ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
+    unit *u = (unit *)tolua_tousertype(L, 2, NULL);
+    if (sh && u->ship == sh) {
+        ship_set_owner(u);
+    }
+    return 0;
+}
+
 static int tolua_ship_set_name(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
@@ -271,6 +291,8 @@ void tolua_ship_open(lua_State * L)
             tolua_variable(L, "type", tolua_ship_get_type, 0);
             tolua_variable(L, "damage", tolua_ship_get_damage,
                 tolua_ship_set_damage);
+            tolua_variable(L, "owner", tolua_ship_get_owner,
+                tolua_ship_set_owner);
 
             tolua_function(L, "get_curse", &tolua_ship_get_curse);
             tolua_function(L, "has_attrib", &tolua_ship_has_attrib);

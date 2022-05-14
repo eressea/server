@@ -454,6 +454,15 @@ static int tolua_unit_addnotice(lua_State * L)
     return 0;
 }
 
+static int tolua_unit_setowner(lua_State * L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, 0);
+
+    if (u->ship) ship_set_owner(u);
+    else if (u->building) building_set_owner(u);
+    return 0;
+}
+
 static int bind_unit_effect(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
@@ -1038,6 +1047,8 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, "set_skill", tolua_unit_setskill);
 
             tolua_function(L, "add_notice", tolua_unit_addnotice);
+
+            tolua_function(L, "set_owner", tolua_unit_setowner);
 
             tolua_variable(L, "race_name", tolua_unit_get_racename,
                 tolua_unit_set_racename);
