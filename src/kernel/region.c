@@ -1414,7 +1414,7 @@ void region_set_owner(struct region *r, struct faction *owner, int turn)
     }
 }
 
-faction *update_owners(region * r)
+faction *update_region_owners(region * r)
 {
     faction *f = NULL;
     if (r->land) {
