@@ -1,11 +1,8 @@
-#include <kernel/types.h>
-
 #include "wormhole.h"
 #include "tests.h"
 
 #include <kernel/building.h>
 #include <kernel/region.h>
-#include <kernel/terrain.h>
 #include <kernel/unit.h>
 
 #include <kernel/attrib.h>

@@ -90,7 +90,7 @@ static void test_alliance_cmd(CuTest *tc) {
     struct alliance *al;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
@@ -116,7 +116,7 @@ static void test_alliance_limits(CuTest *tc) {
     struct region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
 
@@ -141,7 +141,7 @@ static void test_alliance_cmd_kick(CuTest *tc) {
 
     test_setup();
     al = makealliance(42, "Hodor");
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);
@@ -160,7 +160,7 @@ static void test_alliance_cmd_no_invite(CuTest *tc) {
     struct region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     unit_addorder(u1, create_order(K_ALLIANCE, u1->faction->locale, "%s %s", alliance_kwd[ALLIANCE_NEW], itoa36(42)));
@@ -182,7 +182,7 @@ static void test_alliance_cmd_leave(CuTest *tc) {
 
     test_setup();
     al = makealliance(42, "Hodor");
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);
@@ -203,7 +203,7 @@ static void test_alliance_cmd_transfer(CuTest *tc) {
 
     test_setup();
     al = makealliance(42, "Hodor");
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     setalliance(u1->faction, al);

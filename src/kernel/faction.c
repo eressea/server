@@ -337,7 +337,7 @@ void free_flist(faction **fp) {
         free_faction(f);
         free(f);
     }
-    *fp = 0;
+    *fp = NULL;
 }
 
 static faction *dead_factions;
@@ -444,7 +444,7 @@ void destroyfaction(faction ** fp)
                     int h = rhorses(u->region);
                     item *itm;
 
-                    p += (int)(u->number * rc->recruit_multi);
+                    p += (int)(u->number / rc->recruit_multi);
                     for (itm = u->items; itm; itm = itm->next) {
                         if (itm->type->flags & ITF_ANIMAL) {
                             h += itm->number;
@@ -625,7 +625,7 @@ int faction_count_skill(faction * f, skill_t sk)
 
     for (u = f->units; u; u = u->nextF) {
         if (has_skill(u, sk)) {
-            if (!is_familiar(u)) {
+            if (sk != SK_MAGIC || !is_familiar(u)) {
                 n += u->number;
             }
         }

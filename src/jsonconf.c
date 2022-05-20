@@ -40,6 +40,7 @@
 #include "exparse.h"
 
 /* external libraries */
+#include <stb_ds.h>
 #include <cJSON.h>
 
 /* libc includes */
@@ -190,7 +191,7 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
     cJSON *child;
     assert(json->type == cJSON_Object);
     for (child = json->child; child; child = child->next) {
-        char **dst = 0;
+        char **dst = NULL;
         switch (child->type) {
         case cJSON_Number:
             if (strcmp(child->string, "chance") == 0) {
@@ -456,17 +457,17 @@ static void json_ship(cJSON *json, ship_type *st) {
             break;
         case cJSON_Array:
             n = cJSON_GetArraySize(child);
-            st->coasts = malloc(sizeof(terrain_type *) * (1 + (size_t)n));
-            if (!st->coasts) abort();
-            for (i = 0, iter = child->child; iter; iter = iter->next) {
-                if (iter->type == cJSON_String) {
-                    terrain_type *ter = get_or_create_terrain(iter->valuestring);
-                    if (ter) {
-                        st->coasts[i++] = ter;
+            if (n) {
+                arrsetlen(st->coasts, n);
+                for (i = 0, iter = child->child; iter; iter = iter->next) {
+                    if (iter->type == cJSON_String) {
+                        terrain_type* ter = get_or_create_terrain(iter->valuestring);
+                        if (ter) {
+                            st->coasts[i++] = ter;
+                        }
                     }
                 }
             }
-            st->coasts[n] = 0;
             break;
         case cJSON_Number:
             if (strcmp(child->string, "range") == 0) {

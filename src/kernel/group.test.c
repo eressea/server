@@ -8,14 +8,11 @@
 #include "save.h"
 
 #include <kernel/gamedata.h>
-#include <kernel/attrib.h>
 #include <attributes/key.h>
 
 #include <stream.h>
-#include <filestream.h>
 #include <storage.h>
 #include <memstream.h>
-#include <binarystore.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -36,7 +33,7 @@ static void test_group_readwrite_dead_faction(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, f->next);
     f2 = test_create_faction();
     CuAssertPtrEquals(tc, f2, factions->next);
-    u = test_create_unit(f2, test_create_region(0, 0, NULL));
+    u = test_create_unit(f2, test_create_plain(0, 0));
     CuAssertPtrNotNull(tc, u);
     g = join_group(u, "group");
     CuAssertPtrNotNull(tc, g);
@@ -120,7 +117,7 @@ static void test_group(CuTest * tc)
     group *g;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     assert(r && f);
     u = test_create_unit(f, r);

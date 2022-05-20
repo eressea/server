@@ -1,25 +1,22 @@
 #include "report.h"
 
-#include "move.h"
+#include "magic.h"             // for BUILDINGSPELL, FARCASTING, SPELLLEVEL
 #include "travelthru.h"
 
 #include <kernel/ally.h>
-#include <kernel/building.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
-#include <kernel/ship.h>
 #include <kernel/unit.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
+#include "kernel/build.h"      // for construction
+#include "kernel/skill.h"      // for SK_QUARRYING
 
 #include "util/keyword.h"
 #include "util/param.h"
 #include <util/language.h>
-#include <util/lists.h>
-#include <util/message.h>
 #include <util/strings.h>
 
 #include <stream.h>
@@ -28,7 +25,10 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>           // for true
+#include <stdio.h>             // for EOF, snprintf
 #include <string.h>
+#include <stdlib.h>
 
 static void test_write_spaces(CuTest *tc) {
     stream out = { 0 };
@@ -91,7 +91,7 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "see_travel", "durchgereist");
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
     r->land->peasants = 5;
@@ -232,7 +232,7 @@ static void test_report_travelthru(CuTest *tc) {
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
     locale_setstring(lang, "list_and", " und ");
     CuAssertIntEquals(tc, 0, mstream_init(&out));
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     r->flags |= RF_TRAVELUNIT;
     f = test_create_faction();
     f->locale = lang;

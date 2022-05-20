@@ -1,9 +1,9 @@
 #include "summary.h"
-#include "kernel/calendar.h"
 
 #include <tests.h>
 #include <CuTest.h>
 
+#include <stdbool.h>  // for true
 #include <stdio.h>
 
 static void test_summary(CuTest * tc)

@@ -14,8 +14,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#include <assert.h>
 
 static void test_rc_name(CuTest *tc) {
     struct race *rc;
@@ -45,11 +43,11 @@ static void test_rc_defaults(CuTest *tc) {
     test_setup();
     rc = rc_get_or_create("human");
     CuAssertStrEquals(tc, "human", rc->_name);
+    CuAssertIntEquals(tc, 1, rc->recruit_multi);
     CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, rc->magres.sa[0]);
     CuAssertIntEquals(tc, 0, rc->healing);
     CuAssertDblEquals(tc, 0.0, rc_maxaura(rc), 0.0);
-    CuAssertDblEquals(tc, 1.0, rc->recruit_multi, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->regaura, 0.0);
     CuAssertDblEquals(tc, 1.0, rc->speed, 0.0);
     CuAssertIntEquals(tc, RCF_DEFAULT, rc->flags);
@@ -112,8 +110,8 @@ static void test_rc_set_param(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     CuAssertPtrEquals(tc, NULL, rc->options);
-    rc_set_param(rc, "recruit_multi", "0.5");
-    CuAssertDblEquals(tc, 0.5, rc->recruit_multi, 0.0);
+    rc_set_param(rc, "recruit_multi", "2");
+    CuAssertIntEquals(tc, 2, rc->recruit_multi);
     rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, MIGRANTS_LOG10, rc_migrants_formula(rc));
     rc_set_param(rc, "scare", "400");
@@ -175,7 +173,7 @@ static void test_racename(CuTest *tc) {
     unit *u;
     struct locale * lang;
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->faction->locale = lang = get_or_create_locale(__FUNCTION__);
     locale_setstring(lang, "race::human_p", "Menschen");
     locale_setstring(lang, "race::human", "Mensch");

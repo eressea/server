@@ -139,7 +139,7 @@ static void centre(struct stream *out, const char *s, bool breaking)
      * sind! */
 
     if (breaking && REPORTWIDTH < strlen(s)) {
-        strlist *T, *SP = 0;
+        strlist *T, *SP = NULL;
         sparagraph(&SP, s, 0, 0);
         T = SP;
         while (SP) {
@@ -158,7 +158,7 @@ void paragraph(struct stream *out, const char *str, ptrdiff_t indent,
     int hanging_indent, char marker)
 {
     size_t length = REPORTWIDTH;
-    const char *handle_end, *begin, *mark = 0;
+    const char *handle_end, *begin, *mark = NULL;
 
     if (!str) return;
     /* find out if there's a mark + indent already encoded in the string. */
@@ -504,7 +504,7 @@ static void
 nr_curses_i(struct stream *out, int indent, const faction *viewer, objtype_t typ, const void *obj, attrib *a, int self)
 {
     for (; a; a = a->next) {
-        message *msg = 0;
+        message *msg = NULL;
 
         if (a->type == &at_curse) {
             curse *c = (curse *)a->data.v;
@@ -1384,17 +1384,6 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     write_order(ord, lang, buf + 2, sizeof(buf) - 2);
                     rps_nowrap(out, buf);
                     newline(out);
-                }
-                for (ord = u->orders; ord; ord = ord->next) {
-                    keyword_t kwd = getkeyword(ord);
-                    if (u->old_orders && is_repeated(kwd))
-                        continue;           /* unit has defaults */
-                    if (is_persistent(ord)) {
-                        strcpy(buf, "   ");
-                        write_order(ord, lang, buf + 2, sizeof(buf) - 2);
-                        rps_nowrap(out, buf);
-                        newline(out);
-                    }
                 }
 
                 /* If the lastorder begins with an @ it should have

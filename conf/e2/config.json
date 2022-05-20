@@ -5,6 +5,7 @@
 		"game.id": 2,
 		"orders.default": "work",
 		"NewbieImmunity": 8,
+		"modules.astralspace": true,
 		"modules.wormhole": true,
 		"modules.iceberg": true,
 		"monsters.spawn.chance": 50,
@@ -35,7 +36,7 @@
 		"rules.guard.region_type_stop_prob": 0.05,
 		"rules.economy.repopulate_maximum": 500,
 		"rules.lighthouse.unit_capacity": true,
-		"rules.tactics.formula": 0 
+		"rules.tactics.formula": 1
 	},
 	"disabled": [
 		"jsreport"

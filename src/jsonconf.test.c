@@ -6,26 +6,32 @@
 
 #include "eressea.h"
 
-#include "kernel/config.h"
+#include "kernel/build.h"     // for construction, requirement
 #include "kernel/building.h"
+#include "kernel/config.h"
 #include "kernel/item.h"
+#include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
-#include "kernel/order.h"
+#include "kernel/skill.h"     // for get_skill, skill_enabled, SK_ALCHEMY
 #include "kernel/terrain.h"
 
 #include "util/keyword.h"
 #include "util/language.h"
+#include "util/variant.h"     // for frac_equal, frac_one
 
 #include "kernel/calendar.h"
 #include "direction.h"
 #include "move.h"
 #include "prefix.h"
 
-#include <CuTest.h>
-#include <cJSON.h>
 #include <tests.h>
+
+#include <stb_ds.h>
+#include <cJSON.h>
+#include <CuTest.h>
+
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -300,8 +306,8 @@ static void test_ships(CuTest * tc)
     CuAssertPtrNotNull(tc, ter);
 
     CuAssertPtrNotNull(tc, st->coasts);
+    CuAssertIntEquals(tc, 1, (int)arrlen(st->coasts));
     CuAssertPtrEquals(tc, (void *)ter, (void *)st->coasts[0]);
-    CuAssertPtrEquals(tc, NULL, (void *)st->coasts[1]);
 
     cJSON_Delete(json);
     test_teardown();

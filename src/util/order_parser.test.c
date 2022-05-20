@@ -2,7 +2,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include "order_parser.h"
-#include "strings.h"
 
 #include <CuTest.h>
 

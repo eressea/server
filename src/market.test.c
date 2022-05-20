@@ -1,5 +1,4 @@
 #include "market.h"
-#include "tests.h"
 
 #include <kernel/building.h>
 #include <kernel/config.h>
@@ -10,14 +9,12 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <util/language.h>
 #include <util/message.h>
 
 #include <CuTest.h>
 #include <tests.h>
 
 #include <stdlib.h>
-#include <string.h>
 
 static void test_market_curse(CuTest * tc)
 {

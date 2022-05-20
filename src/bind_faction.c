@@ -13,12 +13,12 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/types.h>
 
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 #include <util/password.h>

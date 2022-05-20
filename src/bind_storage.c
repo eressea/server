@@ -7,7 +7,6 @@
 
 #include <kernel/gamedata.h>
 #include <util/log.h>
-#include <util/macros.h>
 
 #include <storage.h>
 

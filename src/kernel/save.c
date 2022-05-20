@@ -71,6 +71,8 @@
 #include <storage.h>
 #include <binarystore.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <string.h>
 #include <errno.h>
@@ -251,7 +253,7 @@ static void read_owner(gamedata *data, region_owner ** powner)
         *powner = owner;
     }
     else {
-        *powner = 0;
+        *powner = NULL;
     }
 }
 
@@ -328,29 +330,28 @@ static void read_skills(gamedata *data, unit *u)
 {
     if (data->version < SKILLSORT_VERSION) {
         skill skills[MAXSKILLS], *sv = skills;
+        size_t skill_size = 0;
 
-        u->skill_size = 0;
         for (;;) {
             read_skill(data, sv);
             if (sv->id == NOSKILL) break;
             if (sv->level > 0) {
                 ++sv;
-                ++u->skill_size;
+                ++skill_size;
             }
         }
-        if (u->skill_size > 0) {
-            size_t sz = u->skill_size * sizeof(skill);
-
-            qsort(skills, u->skill_size, sizeof(skill), skill_cmp);
-            u->skills = (skill *)malloc(sz);
-            memcpy(u->skills, skills, sz);
+        if (skill_size > 0) {
+            qsort(skills, skill_size, sizeof(skill), skill_cmp);
+            arrsetlen(u->skills, skill_size);
+            memcpy(u->skills, skills, skill_size * sizeof(skill));
         }
     }
     else {
+        int skill_size = 0;
         int i;
-        READ_INT(data->store, &u->skill_size);
-        u->skills = (skill *)malloc(sizeof(skill)*u->skill_size);
-        for (i = 0; i != u->skill_size; ++i) {
+        READ_INT(data->store, &skill_size);
+        arrsetlen(u->skills, skill_size);
+        for (i = 0; i != skill_size; ++i) {
             skill *sv = u->skills + i;
             read_skill(data, sv);
         }
@@ -358,10 +359,10 @@ static void read_skills(gamedata *data, unit *u)
 }
 
 static void write_skills(gamedata *data, const unit *u) {
-    int i;
+    int i, skill_size = (int)arrlen(u->skills);
     skill_t sk = NOSKILL;
-    WRITE_INT(data->store, u->skill_size);
-    for (i = 0; i != u->skill_size; ++i) {
+    WRITE_INT(data->store, skill_size);
+    for (i = 0; i != skill_size; ++i) {
         skill *sv = u->skills + i;
 #ifndef NDEBUG
         assert(sv->id > sk);
@@ -405,9 +406,7 @@ unit *read_unit(gamedata *data)
             a_remove(&u->attribs, u->attribs);
         }
         i_freeall(&u->items);
-        free(u->skills);
-        u->skills = 0;
-        u->skill_size = 0;
+        arrfree(u->skills);
         u_setfaction(u, NULL);
     }
     else {
@@ -626,20 +625,6 @@ void write_unit(gamedata *data, const unit * u)
         else {
             log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
             break;
-        }
-    }
-    for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t kwd = getkeyword(ord);
-        if (u->old_orders && is_repeated(kwd))
-            continue;                 /* has new defaults */
-        if (is_persistent(ord)) {
-            if (++p < MAXPERSISTENT) {
-                writeorder(data, ord, u->faction->locale);
-            }
-            else {
-                log_info("%s had %d or more persistent orders", unitname(u), MAXPERSISTENT);
-                break;
-            }
         }
     }
     /* write an empty string to terminate the list */
@@ -983,7 +968,7 @@ void write_region(gamedata *data, const region *r)
 
 int get_spell_level_faction(const spell * sp, void * cbdata)
 {
-    static spellbook * common = 0;
+    static spellbook * common = NULL;
     spellbook * book;
     faction * f = (faction *)cbdata;
     spellbook_entry * sbe;
@@ -1606,7 +1591,7 @@ static void read_regions(gamedata *data) {
             shp = &sh->next;
         }
 
-        *shp = 0;
+        *shp = NULL;
 
         /* Einheiten */
 
@@ -1755,6 +1740,12 @@ int read_game(gamedata *data)
     }
     if (data->version < FIX_MIGRANT_AURA_VERSION) {
         fix_familiars(fix_fam_migrant);
+    }
+    if (data->version < FIX_TELEPORT_PLANE_VERSION) {
+        if (config_get_int("config.debug", 0) == 0)
+        {
+            create_teleport_plane();
+        }
     }
 
     log_debug("Done loading turn %d.", turn);

@@ -571,7 +571,7 @@ void building_set_owner(struct unit * owner)
 
 static unit *building_owner_ex(const building * bld, const struct faction * last_owner)
 {
-    unit *u, *heir = 0;
+    unit *u, *heir = NULL;
     /* Eigentuemer tot oder kein Eigentuemer vorhanden.
      * Erste lebende Einheit nehmen. */
     for (u = bld->region->units; u; u = u->next) {

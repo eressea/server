@@ -7,6 +7,7 @@
 
 #include <CuTest.h>
 #include <tests.h>
+#include <stdlib.h>
 
 void test_terraform(CuTest *tc) {
     region *r;
@@ -40,7 +41,7 @@ static void test_region_get_owner(CuTest *tc) {
     unit *u1, *u2;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     b1 = test_create_building(r, NULL);
     b2 = test_create_building(r, NULL);
     b1->size = 5;
@@ -62,7 +63,7 @@ static void test_region_getset_resource(CuTest *tc) {
     itype = test_create_itemtype("iron");
     itype->construction = calloc(1, sizeof(construction));
     rmt_create(itype->rtype);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     region_setresource(r, itype->rtype, 50);
     CuAssertIntEquals(tc, 50, region_getresource(r, itype->rtype));
@@ -82,7 +83,7 @@ static void test_trees(CuTest *tc) {
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     rsettrees(r, 0, 1000);
     rsettrees(r, 1, 2000);
     rsettrees(r, 2, 3000);

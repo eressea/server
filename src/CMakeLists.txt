@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CRYPTO_INCLUDE_DIR})
 include_directories (${CLIBS_INCLUDE_DIR})
 include_directories (${STORAGE_INCLUDE_DIR})
 include_directories (${TOLUA_INCLUDE_DIR})
@@ -167,13 +166,6 @@ set (SERVER_SRC ${SERVER_SRC}
 )
 endif(CURSES_FOUND)
 
-#find_program(IWYU_PATH NAMES include-what-you-use iwyu)
-if(IWYU_PATH)
-  #  set(C_INCLUDE_WHAT_YOU_USE "${IWYU_PATH} -Xiwyu --no_fwd_decls")
-else(IWYU_PATH)
-	# message(STATUS "Could not find the program include-what-you-use")
-endif()
-
 add_library(version STATIC ${VERSION_SRC})
 if(DEFINED ERESSEA_VERSION)
   target_compile_definitions(version PRIVATE ERESSEA_VERSION="${ERESSEA_VERSION}")
@@ -235,6 +227,7 @@ set(TESTS_SRC
   orderfile.test.c
   piracy.test.c
   prefix.test.c
+  recruit.test.c
   renumber.test.c
   report.test.c
   reports.test.c
@@ -243,6 +236,7 @@ set(TESTS_SRC
   spy.test.c
   study.test.c
   summary.test.c
+  teleport.test.c
   test_eressea.c
   tests.c
   tests.test.c
@@ -273,9 +267,12 @@ target_link_libraries(test_eressea
   )
 
 set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
+
+find_program(IWYU_PATH NAMES include-what-you-use iwyu)
 if (IWYU_PATH)
-set_target_properties(test_eressea eressea PROPERTIES C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
-endif(IWYU_PATH)
+set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+set_property(TARGET test_eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
+endif (IWYU_PATH)
 
 add_test(server test_eressea)
 #add_test(NAME E3

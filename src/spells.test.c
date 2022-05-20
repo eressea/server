@@ -1,21 +1,20 @@
 #include "spells.h"
+
+#include "magic.h"                   // for free_castorder, castorder
 #include "teleport.h"
 
-#include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include <kernel/spell.h>
+#include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/unit.h>
 #include <kernel/attrib.h>
-#include <util/language.h>
 #include <util/message.h>
-#include <spells/regioncurse.h>
+#include "util/variant.h"  // for variant
 
+#include <spells/regioncurse.h>
 #include <attributes/attributes.h>
 
 #include <triggers/changerace.h>
@@ -24,10 +23,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>                 // for false
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 
 static void test_good_dreams(CuTest *tc) {
     struct region *r;
@@ -67,7 +64,7 @@ static void test_dreams(CuTest *tc) {
     castorder co;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
@@ -125,6 +122,7 @@ static void test_view_reality(CuTest *tc) {
     curse *c;
 
     test_setup();
+    test_use_astral();
     mt_create_error(216);
     mt_create_error(220);
     mt_create_va(mt_new("spell_astral_only", NULL),
@@ -154,7 +152,7 @@ static void test_view_reality(CuTest *tc) {
     free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     test_clear_messagelist(&f->msgs);
 
@@ -197,6 +195,8 @@ static void test_show_astral(CuTest *tc) {
     curse * c;
 
     test_setup();
+    r = test_create_plain(0, 0);
+    test_use_astral();
     mt_create_error(216);
     mt_create_error(220);
     mt_create_va(mt_new("spell_astral_forbidden", NULL),
@@ -215,7 +215,6 @@ static void test_show_astral(CuTest *tc) {
     free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
-    r = test_create_region(0, 0, NULL);
     move_unit(u, r, NULL);
 
     /* error: no target region */
@@ -270,14 +269,14 @@ static void test_watch_region(CuTest *tc) {
     region *r;
     faction *f;
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     set_observer(r, f, 0, 2);
     CuAssertIntEquals(tc, 0, get_observer(r, f));
     set_observer(r, f, 10, 2);
     CuAssertIntEquals(tc, 10, get_observer(r, f));
-    CuAssertIntEquals(tc, RF_OBSERVER, fval(r, RF_OBSERVER));
+    CuAssertIntEquals(tc, RF_OBSERVER, (r->flags & RF_OBSERVER));
     CuAssertPtrNotNull(tc, r->attribs);
     test_teardown();
 }

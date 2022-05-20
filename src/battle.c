@@ -164,7 +164,7 @@ static void init_rules(void)
     }
 }
 
-static int army_index(side * s)
+static int army_index(const side * s)
 {
     return s->index;
 }
@@ -1507,13 +1507,15 @@ static int get_tactics(const side * as, const side * ds)
 
     if (b->max_tactics > 0) {
         for (stac = b->sides; stac != b->sides + b->nsides; ++stac) {
-            if (stac->leader.value > result && helping(stac, as)) {
-                assert(ds == NULL || !helping(stac, ds));
-                result = stac->leader.value;
+            if (result < b->max_tactics && stac->leader.value > result && helping(stac, as)) {
+                if (ds == NULL || !helping(stac, ds)) {
+                    result = stac->leader.value;
+                }
             }
-            if (ds && stac->leader.value > defense && helping(stac, ds)) {
-                assert(!helping(stac, as));
-                defense = stac->leader.value;
+            if (ds && defense < b->max_tactics && stac->leader.value > defense && helping(stac, ds)) {
+                if (!helping(stac, as)) {
+                    defense = stac->leader.value;
+                }
             }
         }
     }
@@ -1569,7 +1571,7 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     side *s;
-    selist *fightervp = 0;
+    selist *fightervp = NULL;
 
     assert(vs != NULL);
 
@@ -1636,7 +1638,7 @@ static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
     castorder *co;
 
     for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        fighter *fig = 0;
+        fighter *fig = NULL;
         if (s->bf->attacker && fval(s->faction, FFL_CURSED)) {
             spell *sp = find_spell("igjarjuk");
             if (sp) {
@@ -1940,7 +1942,7 @@ int getreload(troop at)
 int hits(troop at, troop dt, weapon * awp)
 {
     fighter *af = at.fighter, *df = dt.fighter;
-    const armor_type *armor, *shield = 0;
+    const armor_type *armor, *shield = NULL;
     int skdiff = 0;
     int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
     weapon *dwp = select_weapon(dt, false, dist > 1);
@@ -2795,20 +2797,31 @@ static void aftermath(battle * b)
     reorder_fleeing(r);
 }
 
+void
+spunit(const struct faction* f, const unit* u, unsigned int indent,
+    struct sbstring *sbp)
+{
+    int getarnt = fval(u, UFL_ANON_FACTION);
+    const faction* fv = visible_faction(f, u);
+    bufunit(f, u, fv, seen_battle, !!getarnt, sbp);
+}
+
 static void battle_punit(unit * u, battle * b)
 {
     bfaction *bf;
 
     for (bf = b->factions; bf; bf = bf->next) {
-        faction *f = bf->faction;
-        strlist *S = 0, *x;
+        char buf[DISPLAYSIZE];
+        sbstring sbs;
+        faction* f = bf->faction;
 
-        spunit(&S, f, u, 4, seen_battle);
-        for (x = S; x; x = x->next) {
-            fbattlerecord(b, f, x->s);
+        sbs_init(&sbs, buf, sizeof(buf));
+        spunit(f, u, 4, &sbs);
+        if (sbs.begin != sbs.end) {
+            message* m = msg_message("battle_fighter", "string unit", buf, u);
+            battle_message_faction(b, f, m);
+            msg_release(m);
         }
-        if (S)
-            freestrlist(S);
     }
 }
 
@@ -2847,6 +2860,18 @@ static void set_attacker(fighter * fig)
     fset(fig, FIG_ATTACKER);
 }
 
+static struct message * army_message(const battle* b, const faction* f, const side* s)
+{
+    const char* sname;
+    const faction* fv;
+
+    assert(f);
+    fv = seematrix(f, s) ? s->faction : s->stealthfaction;
+    sname = fv ? sidename(s) : LOC(f->locale, "unknown_faction");
+
+    return msg_message("para_army_index", "index name faction", army_index(s), sname, fv);
+}
+
 static void print_stats(battle * b)
 {
     side *s2;
@@ -2855,26 +2880,19 @@ static void print_stats(battle * b)
         bfaction *bf;
 
         for (bf = b->factions; bf; bf = bf->next) {
+            char buf[1024], *bufp = buf;
+            size_t rsize, size = sizeof(buf);
+            int komma = 0;
             faction *f = bf->faction;
-            const char *loc_army = LOC(f->locale, "battle_army");
-            char *bufp;
-            const char *header;
-            size_t rsize, size;
-            int komma;
-            const char *sname =
-                seematrix(f, s) ? sidename(s) : LOC(f->locale, "unknown_faction");
-            message *msg;
-            char buf[1024];
-
-            msg = msg_message("para_army_index", "index name", army_index(s), sname);
+            const char *loc_army, *header;
+            message* msg;
+            
+            msg = army_message(b, f, s);
             battle_message_faction(b, f, msg);
             msg_release(msg);
 
-            bufp = buf;
-            size = sizeof(buf);
-            komma = 0;
+            loc_army = LOC(f->locale, "battle_army");
             header = LOC(f->locale, "battle_opponents");
-
             for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
                 if (enemy(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
@@ -3270,8 +3288,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
         fig->elvenhorses = 0;
     }
     else {
-        const resource_type *rt_horse = 0;
-        const resource_type *rt_elvenhorse = 0;
+        const resource_type *rt_horse = NULL;
+        const resource_type *rt_elvenhorse = NULL;
         rt_elvenhorse = get_resourcetype(R_UNICORN);
         rt_horse = get_resourcetype(R_CHARGER);
         if (!rt_horse) {
@@ -3917,7 +3935,7 @@ static void battle_flee(battle * b)
 static bool is_enemy(battle *b, unit *u1, unit *u2) {
     if (u1->faction != u2->faction) {
         if (b) {
-            side *es, *s1 = 0, *s2 = 0;
+            side *es, *s1 = NULL, *s2 = NULL;
             for (es = b->sides; es != b->sides + b->nsides; ++es) {
                 if (!s1 && es->faction == u1->faction) s1 = es;
                 else if (!s2 && es->faction == u2->faction) s2 = es;

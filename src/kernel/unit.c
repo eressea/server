@@ -48,6 +48,8 @@
 
 #include <storage.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -166,7 +168,7 @@ typedef struct buddy {
 
 static buddy *get_friends(const unit * u, int *numfriends)
 {
-    buddy *friends = 0;
+    buddy *friends = NULL;
     faction *f = u->faction;
     region *r = u->region;
     int number = 0;
@@ -329,24 +331,15 @@ struct faction *dfindhash(int no) {
     return NULL;
 }
 
-int remove_unit(unit ** ulist, unit * u)
+void erase_unit(unit** ulist, unit* u)
 {
-    int result;
-
-    assert(ufindhash(u->no));
-    handle_event(u->attribs, "destroy", u);
-
-    result = gift_items(u, GIFT_SELF | GIFT_FRIENDS | GIFT_PEASANTS);
-    if (result != 0) {
-        make_zombie(u);
-        return -1;
-    }
-
     if (u->number) {
         set_number(u, 0);
     }
     leave(u, true);
     u->region = NULL;
+
+    if (u->items) i_freeall(&u->items);
 
     uunhash(u);
     if (ulist) {
@@ -378,7 +371,21 @@ int remove_unit(unit ** ulist, unit * u)
     deleted_units = u;
 
     u->region = NULL;
+}
 
+int remove_unit(unit ** ulist, unit * u)
+{
+    int result;
+
+    assert(ufindhash(u->no));
+    handle_event(u->attribs, "destroy", u);
+
+    result = gift_items(u, GIFT_SELF | GIFT_FRIENDS | GIFT_PEASANTS);
+    if (result != 0) {
+        make_zombie(u);
+        return -1;
+    }
+    erase_unit(ulist, u);
     return 0;
 }
 
@@ -542,8 +549,9 @@ unsigned int get_level(const unit * u, enum skill_t id)
 {
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
-        skill *sv = u->skills;
-        while (sv != u->skills + u->skill_size && sv->id <= id) {
+        size_t s, len;
+        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+            skill* sv = u->skills + s;
             if (sv->id == id) {
                 return sv->level;
             }
@@ -555,7 +563,7 @@ unsigned int get_level(const unit * u, enum skill_t id)
 
 void set_level(unit * u, enum skill_t sk, unsigned int value)
 {
-    skill *sv = u->skills;
+    size_t s, len;
 
     assert(sk != SK_MAGIC || value==0 || !u->faction || u->number == 1 || fval(u->faction, FFL_NPC));
     assert(value <= UCHAR_MAX);
@@ -566,7 +574,8 @@ void set_level(unit * u, enum skill_t sk, unsigned int value)
         remove_skill(u, sk);
         return;
     }
-    while (sv != u->skills + u->skill_size && sv->id <= sk) {
+    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
         if (sv->id == sk) {
             sk_set(sv, value);
             return;
@@ -705,6 +714,18 @@ bool can_survive(const unit * u, const region * r)
     return false;
 }
 
+void setguard(unit * u, bool enabled)
+{
+    if (!enabled) {
+        freset(u, UFL_GUARD);
+    } else {
+        assert(!fval(u, UFL_MOVED));
+        assert(u->status < ST_FLEE);
+        fset(u, UFL_GUARD);
+        fset(u->region, RF_GUARDED);
+    }
+}
+
 void leave_region(unit* u)
 {
     assert(u->region);
@@ -728,7 +749,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 
     assert(u->faction || !"this unit is dead");
     if (!ulist) {
-        ulist = (&r->units);
+        ulist = &r->units;
     }
     if (u->region) {
         leave_region(u);
@@ -796,7 +817,7 @@ void clone_men(const unit * u, unit * dst, int n)
         if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
             const race *rc = u_race(u);
             int p = rpeasants(r);
-            p += (int)(n * rc->recruit_multi);
+            p += (n / rc->recruit_multi);
             rsetpeasants(r, p);
         }
     }
@@ -906,52 +927,43 @@ void set_number(unit * u, int count)
 
 void remove_skill(unit * u, enum skill_t sk)
 {
-    int i;
-    for (i = 0; i != u->skill_size; ++i) {
-        skill *sv = u->skills + i;
-        if (sv->id == sk) {
-            if (u->skill_size - i - 1 > 0) {
-                memmove(sv, sv + 1, (u->skill_size - i - 1) * sizeof(skill));
+    size_t len = arrlen(u->skills);
+    if (len == 1) {
+        arrfree(u->skills);
+    }
+    else if (len > 1) {
+        size_t s;
+        for (s = 0; s != len; ++s) {
+            if (u->skills[s].id == sk) {
+                arrdel(u->skills, s);
+                return;
             }
-            if (--u->skill_size == 0) {
-                free(u->skills);
-                u->skills = NULL;
-            }
-            return;
         }
     }
 }
 
 static void remove_skills(unit * u) {
-    free(u->skills);
-    u->skills = NULL;
-    u->skill_size = 0;
+    arrfree(u->skills);
 }
 
 skill *add_skill(unit * u, enum skill_t sk)
 {
-    skill *sv;
-    int i;
-
+    skill* sv;
+    skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
     assert(u);
-    for (i = 0; i != u->skill_size; ++i) {
-        sv = u->skills + i;
-        if (sv->id >= sk) break;
+    if (u->skills) {
+        size_t s, len = arrlen(u->skills);
+        for (s = 0; s != len; ++s) {
+            sv = u->skills + s;
+            if (sv->id >= sk) break;
+        }
+        arrins(u->skills, s, skins);
+        sv = u->skills + s;
     }
-    sv = realloc(u->skills, (1 + u->skill_size) * sizeof(skill));
-    assert(sv);
-    u->skills = sv;
-
-    sv = u->skills + i;
-    if (i < u->skill_size) {
-        assert(sv->id != sk);
-        memmove(sv + 1, sv, sizeof(skill) * (u->skill_size - i));
+    else {
+        arrpush(u->skills, skins);
+        sv = u->skills;
     }
-    ++u->skill_size;
-    sv->level = 0;
-    sv->weeks = 1;
-    sv->old = 0;
-    sv->id = sk;
     if (sk == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {
         assert(u->number <= 1);
         assert(max_magicians(u->faction) >= u->number);
@@ -961,20 +973,26 @@ skill *add_skill(unit * u, enum skill_t sk)
 
 skill *unit_skill(const unit * u, enum skill_t sk)
 {
-    skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size && sv->id <= sk) {
-        if (sv->id == sk) {
-            return sv;
+    assert(u);
+
+    if (u->skills) {
+        size_t len = arrlen(u->skills);
+        skill* sv = u->skills;
+        while (sv != u->skills + len && sv->id <= sk) {
+            if (sv->id == sk) {
+                return sv;
+            }
+            ++sv;
         }
-        ++sv;
     }
     return NULL;
 }
 
 bool has_skill(const unit * u, enum skill_t sk)
 {
+    size_t len = arrlen(u->skills);
     skill *sv = u->skills;
-    while (sv != u->skills + u->skill_size && sv->id <= sk) {
+    while (sv != u->skills + len && sv->id <= sk) {
         if (sv->id == sk) {
             return (sv->level > 0);
         }
@@ -1190,10 +1208,7 @@ void free_unit(unit * u)
         *pres = res->next;
         free(res);
     }
-    if (u->skills) {
-        free(u->skills);
-        u->skills = NULL;
-    }
+    arrfree(u->skills);
     while (u->items) {
         item *it = u->items->next;
         u->items->next = NULL;
@@ -1589,8 +1604,9 @@ int effskill(const unit * u, enum skill_t sk, const region *r)
     assert(u);
 
     if (skill_enabled(sk)) {
+        size_t len = arrlen(u->skills);
         skill *sv = u->skills;
-        while (sv != u->skills + u->skill_size) {
+        while (sv != u->skills + len) {
             if (sv->id == sk) {
                 return eff_skill(u, sv, r);
             }
@@ -1759,11 +1775,10 @@ bool is_limited_skill(skill_t sk)
 
 bool has_limited_skills(const struct unit * u)
 {
-    int i;
+    size_t s, len = arrlen(u->skills);
 
-    for (i = 0; i != u->skill_size; ++i) {
-        skill *sv = u->skills + i;
-        if (is_limited_skill(sv->id)) {
+    for (s = 0; s != len; ++s) {
+        if (is_limited_skill(u->skills[s].id)) {
             return true;
         }
     }

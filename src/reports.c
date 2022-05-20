@@ -61,8 +61,11 @@
 #include "util/password.h"
 #include "util/strings.h"
 #include "util/translation.h"
+
 #include <stream.h>
 #include <selist.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -556,26 +559,10 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
     return n;
 }
 
-static void spskill(sbstring *sbp, const struct locale * lang,
-    const struct unit * u, struct skill * sv, int *dh)
+static void spskill(struct skill* sv, const struct unit *u, const struct locale * lang, struct sbstring* sbp)
 {
     int effsk;
 
-    if (!u->number) {
-        return;
-    }
-    if (sv->level <= 0) {
-        if (sv->old <= 0 || (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) == 0) {
-            return;
-        }
-    }
-    sbs_strcat(sbp, ", ");
-
-    if (!*dh) {
-        sbs_strcat(sbp, LOC(lang, "nr_skills"));
-        sbs_strcat(sbp, ": ");
-        *dh = 1;
-    }
     sbs_strcat(sbp, skillname(sv->id, lang));
     sbs_strcat(sbp, " ");
 
@@ -618,78 +605,65 @@ static void spskill(sbstring *sbp, const struct locale * lang,
     }
 }
 
-void bufunit(const faction * f, const unit * u, const faction *fv,
-    seen_mode mode, int getarnt, struct sbstring *sbp)
+static void bufunit_info(const faction* f, const unit* u, const faction* fv,
+    bool getarnt, struct sbstring* sbp)
 {
-    int i, dh;
-    const char *pzTmp, *str;
-    bool isbattle = (mode == seen_battle);
-    item *itm, *show = NULL;
-    item results[MAX_INVENTORY];
-    const struct locale *lang = f->locale;
-
-    if (!fv) {
-        fv = visible_faction(f, u);
-    }
-    assert(f);
-    sbs_strcat(sbp, unitname(u));
-    if (!isbattle) {
-        if (u->faction == f) {
-            if (fval(u, UFL_GROUP)) {
-                group *g = get_group(u);
-                if (g) {
-                    sbs_strcat(sbp, ", ");
-                    sbs_strcat(sbp, groupid(g, f));
-                }
-            }
-            if (getarnt) {
+    const struct locale* lang = f->locale;
+    if (u->faction == f) {
+        if (fval(u, UFL_GROUP)) {
+            group* g = get_group(u);
+            if (g) {
                 sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, LOC(lang, "anonymous"));
+                sbs_strcat(sbp, groupid(g, f));
             }
-            else if (u->attribs) {
-                faction *otherf = get_otherfaction(u);
+        }
+        if (getarnt) {
+            sbs_strcat(sbp, ", ");
+            sbs_strcat(sbp, LOC(lang, "anonymous"));
+        }
+        else if (u->attribs) {
+            faction* otherf = get_otherfaction(u);
+            if (otherf) {
+                sbs_strcat(sbp, ", ");
+                sbs_strcat(sbp, factionname(otherf));
+            }
+        }
+    }
+    else {
+        if (getarnt) {
+            sbs_strcat(sbp, ", ");
+            sbs_strcat(sbp, LOC(lang, "anonymous"));
+        }
+        else {
+            if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
+                faction* otherf = get_otherfaction(u);
                 if (otherf) {
                     sbs_strcat(sbp, ", ");
                     sbs_strcat(sbp, factionname(otherf));
-                }
-            }
-        }
-        else {
-            if (getarnt) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, LOC(lang, "anonymous"));
-            }
-            else {
-                if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
-                    faction *otherf = get_otherfaction(u);
-                    if (otherf) {
-                        sbs_strcat(sbp, ", ");
-                        sbs_strcat(sbp, factionname(otherf));
-                        sbs_strcat(sbp, " (");
-                        sbs_strcat(sbp, factionname(u->faction));
-                        sbs_strcat(sbp, ")");
-                    }
-                    else {
-                        sbs_strcat(sbp, ", ");
-                        sbs_strcat(sbp, factionname(fv));
-                    }
+                    sbs_strcat(sbp, " (");
+                    sbs_strcat(sbp, factionname(u->faction));
+                    sbs_strcat(sbp, ")");
                 }
                 else {
                     sbs_strcat(sbp, ", ");
                     sbs_strcat(sbp, factionname(fv));
                 }
             }
+            else {
+                sbs_strcat(sbp, ", ");
+                sbs_strcat(sbp, factionname(fv));
+            }
         }
     }
+}
 
-    sbs_strcat(sbp, ", ");
-    sbs_strcat(sbp, str_itoa(u->number));
-    sbs_strcat(sbp, " ");
-
-    pzTmp = get_racename(u->attribs);
-    if (pzTmp) {
-        const char *name = locale_string(lang, mkname("race", pzTmp), false);
-        sbs_strcat(sbp, name ? name : pzTmp);
+static void bufunit_race(const faction* f, const unit* u, struct sbstring* sbp)
+{
+    const struct locale* lang = f->locale;
+    const char *str = get_racename(u->attribs);
+    if (str) {
+        const char* name = locale_string(lang, mkname("race", str), false);
+        sbs_strcat(sbp, name ? name : str);
         if (u->faction == f) {
             sbs_strcat(sbp, " (");
             sbs_strcat(sbp, racename(lang, u, u_race(u)));
@@ -697,8 +671,8 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
         }
     }
     else {
-        const race *irace = u_irace(u);
-        const race *urace = u_race(u);
+        const race* irace = u_irace(u);
+        const race* urace = u_race(u);
         sbs_strcat(sbp, racename(lang, u, irace));
         if (u->faction == f && irace != urace) {
             sbs_strcat(sbp, " (");
@@ -706,58 +680,40 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
             sbs_strcat(sbp, ")");
         }
     }
+}
 
-    if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
-        sbs_strcat(sbp, ", ");
-        sbs_strcat(sbp, LOC(lang, "hero"));
-    }
-    /* status */
-
-    if (u->number && (u->faction == f || isbattle)) {
-        const char *c = hp_status(u);
-        c = c ? LOC(lang, c) : 0;
-        sbs_strcat(sbp, ", ");
-        report_status(u, lang, sbp);
-        if (c || fval(u, UFL_HUNGER)) {
-            sbs_strcat(sbp, " (");
-            if (c) {
-                sbs_strcat(sbp, c);
+static void bufunit_skills(const unit* u, const struct locale* lang, struct sbstring* sbp)
+{
+    int dh = 0;
+    size_t s, len;
+    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
+        if (!u->number) {
+            continue;
+        }
+        if (sv->level <= 0) {
+            if (sv->old <= 0 || (u->faction->options & WANT_OPTION(O_SHOWSKCHANGE)) == 0) {
+                continue;
             }
-            if (fval(u, UFL_HUNGER)) {
-                if (c) {
-                    sbs_strcat(sbp, ", ");
-                }
-                sbs_strcat(sbp, LOC(lang, "unit_hungers"));
-            }
-            sbs_strcat(sbp, ")");
         }
-    }
-    if (is_guard(u)) {
         sbs_strcat(sbp, ", ");
-        sbs_strcat(sbp, LOC(lang, "unit_guards"));
-    }
 
-    dh = 0;
-    if (u->faction == f) {
-        skill *sv;
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-            spskill(sbp, lang, u, sv, &dh);
+        if (!dh) {
+            sbs_strcat(sbp, LOC(lang, "nr_skills"));
+            sbs_strcat(sbp, ": ");
+            dh = 1;
         }
+        spskill(sv, u, lang, sbp);
     }
+}
 
-    dh = 0;
-    if (f == u->faction || omniscient(f)) {
-        show = u->items;
-    }
-    else if (mode >= seen_unit) {
-        int n = report_items(u, results, MAX_INVENTORY, u, f);
-        assert(n >= 0);
-        if (n > 0) {
-            show = results;
-        }
-    }
-    for (itm = show; itm; itm = itm->next) {
-        const char *ic;
+static void bufunit_items(const item* items, const unit *u, const faction *f, struct sbstring* sbp)
+{
+    const struct locale* lang = f->locale;
+    int dh = 0;
+    const item* itm;
+    for (itm = items; itm; itm = itm->next) {
+        const char* ic;
         int in;
         report_item(u, itm, f, &ic, NULL, &in, false);
         if (in == 0 || ic == NULL) {
@@ -779,88 +735,41 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
             sbs_strcat(sbp, ic);
         }
     }
+}
 
-    if (u->faction == f) {
-        spellbook *book = unit_get_spellbook(u);
-
-        if (book) {
-            selist *ql = book->spells;
-            int qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
-            sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
-
-            for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-                spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
-                const spell *sp = spellref_get(&sbe->spref);
-                if (sbe->level <= maxlevel) {
-                    if (!header) {
-                        sbs_printf(sbp, ", %s: ", LOC(lang, "nr_spells"));
-                        header = 1;
-                    }
-                    else {
-                        sbs_strcat(sbp, ", ");
-                    }
-                    /* TODO: no need to deref the spellref here (spref->name is good) */
-                    sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
-                }
+static void bufunit_orders(const unit* u, struct sbstring* sbp)
+{
+    const struct locale* lang = u->faction->locale;
+    int printed = 0;
+    const order* ord;
+    for (ord = u->old_orders; ord; ord = ord->next) {
+        keyword_t kwd = getkeyword(ord);
+        if (is_repeated(kwd)) {
+            if (printed >= ORDERS_IN_NR) {
+                break;
             }
-
-            for (i = 0; i != MAXCOMBATSPELLS; ++i) {
-                if (get_combatspell(u, i))
-                    break;
-            }
-            if (i != MAXCOMBATSPELLS) {
-                sbs_printf(sbp, ", %s: ", LOC(lang, "nr_combatspells"));
-                dh = 0;
-                for (i = 0; i < MAXCOMBATSPELLS; i++) {
-                    const spell *sp;
-                    if (!dh) {
-                        dh = 1;
-                    }
-                    else {
-                        sbs_strcat(sbp, ", ");
-                    }
-                    sp = get_combatspell(u, i);
-                    if (sp) {
-                        int sl = get_combatspelllevel(u, i);
-                        sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
-                        if (sl > 0) {
-                            sbs_printf(sbp, "(%d)", sl);
-                        }
-                    }
-                    else {
-                        sbs_strcat(sbp, LOC(lang, "nr_nospells"));
-                    }
-                }
-            }
+            buforder(sbp, ord, lang, printed++);
         }
-        if (!isbattle) {
-            int printed = 0;
-            order *ord;
-            for (ord = u->old_orders; ord; ord = ord->next) {
-                keyword_t kwd = getkeyword(ord);
-                if (is_repeated(kwd)) {
-                    if (printed >= ORDERS_IN_NR) {
-                        break;
-                    }
-                    buforder(sbp, ord, u->faction->locale, printed++);
+    }
+    if (printed < ORDERS_IN_NR) {
+        for (ord = u->orders; ord; ord = ord->next) {
+            keyword_t kwd = getkeyword(ord);
+            if (is_repeated(kwd)) {
+                if (printed >= ORDERS_IN_NR) {
+                    break;
                 }
-            }
-            if (printed < ORDERS_IN_NR) {
-                for (ord = u->orders; ord; ord = ord->next) {
-                    keyword_t kwd = getkeyword(ord);
-                    if (is_repeated(kwd)) {
-                        if (printed >= ORDERS_IN_NR) {
-                            break;
-                        }
-                        buforder(sbp, ord, lang, printed++);
-                    }
-                }
+                buforder(sbp, ord, lang, printed++);
             }
         }
     }
-    i = 0;
+}
 
-    str = u_description(u, lang);
+static void bufunit_description(const unit* u, const struct faction* f, struct sbstring* sbp)
+{
+    const struct locale* lang = f->locale;
+    const char *str = u_description(u, lang);
+    int i = 0;
+
     if (str) {
         sbs_strcat(sbp, "; ");
         sbs_strcat(sbp, str);
@@ -869,12 +778,150 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
     if (i != '!' && i != '?' && i != '.') {
         sbs_strcat(sbp, ".");
     }
-    pzTmp = uprivate(u);
-    if (u->faction == f && pzTmp) {
+    str = uprivate(u);
+    if (u->faction == f && str) {
         sbs_strcat(sbp, " (Bem: ");
-        sbs_strcat(sbp, pzTmp);
+        sbs_strcat(sbp, str);
         sbs_strcat(sbp, ")");
     }
+}
+
+static void bufunit_spells(const unit* u, struct sbstring* sbp)
+{
+    const struct locale* lang = u->faction->locale;
+    spellbook* book = unit_get_spellbook(u);
+
+    if (book) {
+        selist* ql = book->spells;
+        int i, qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
+        sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
+
+        for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+            spellbook_entry* sbe = (spellbook_entry*)selist_get(ql, qi);
+            const spell* sp = spellref_get(&sbe->spref);
+            if (sbe->level <= maxlevel) {
+                if (!header) {
+                    sbs_printf(sbp, ", %s: ", LOC(lang, "nr_spells"));
+                    header = 1;
+                }
+                else {
+                    sbs_strcat(sbp, ", ");
+                }
+                /* TODO: no need to deref the spellref here (spref->name is good) */
+                sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
+            }
+        }
+
+        for (i = 0; i != MAXCOMBATSPELLS; ++i) {
+            if (get_combatspell(u, i))
+                break;
+        }
+        if (i != MAXCOMBATSPELLS) {
+            int dh = 0;
+            sbs_printf(sbp, ", %s: ", LOC(lang, "nr_combatspells"));
+            for (i = 0; i < MAXCOMBATSPELLS; i++) {
+                const spell* sp;
+                if (!dh) {
+                    dh = 1;
+                }
+                else {
+                    sbs_strcat(sbp, ", ");
+                }
+                sp = get_combatspell(u, i);
+                if (sp) {
+                    int sl = get_combatspelllevel(u, i);
+                    sbs_strcat(sbp, spell_name(mkname_spell(sp), lang));
+                    if (sl > 0) {
+                        sbs_printf(sbp, "(%d)", sl);
+                    }
+                }
+                else {
+                    sbs_strcat(sbp, LOC(lang, "nr_nospells"));
+                }
+            }
+        }
+    }
+}
+
+static void bufunit_status(const unit* u, const struct locale *lang, struct sbstring* sbp)
+{
+    const char* c = hp_status(u);
+    c = c ? LOC(lang, c) : 0;
+    sbs_strcat(sbp, ", ");
+    report_status(u, lang, sbp);
+    if (c || fval(u, UFL_HUNGER)) {
+        sbs_strcat(sbp, " (");
+        if (c) {
+            sbs_strcat(sbp, c);
+        }
+        if (fval(u, UFL_HUNGER)) {
+            if (c) {
+                sbs_strcat(sbp, ", ");
+            }
+            sbs_strcat(sbp, LOC(lang, "unit_hungers"));
+        }
+        sbs_strcat(sbp, ")");
+    }
+}
+
+void bufunit(const faction * f, const unit * u, const faction *fv,
+    seen_mode mode, bool getarnt, struct sbstring *sbp)
+{
+    bool isbattle = (mode == seen_battle);
+    item *show = NULL;
+    item results[MAX_INVENTORY];
+    const struct locale *lang = f->locale;
+
+    if (!fv) {
+        fv = visible_faction(f, u);
+    }
+    assert(f);
+    sbs_strcat(sbp, unitname(u));
+    if (!isbattle) {
+        bufunit_info(f, u, fv, getarnt, sbp);
+    }
+    sbs_strcat(sbp, ", ");
+    sbs_strcat(sbp, str_itoa(u->number));
+    sbs_strcat(sbp, " ");
+
+    bufunit_race(f, u, sbp);
+    if (fval(u, UFL_HERO) && (u->faction == f || omniscient(f))) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "hero"));
+    }
+    /* status */
+
+    if (u->number && (u->faction == f || isbattle)) {
+        bufunit_status(u, lang, sbp);
+    }
+    if (is_guard(u)) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "unit_guards"));
+    }
+
+    if (u->faction == f) {
+        bufunit_skills(u, lang, sbp);
+    }
+
+    if (f == u->faction || omniscient(f)) {
+        show = u->items;
+    }
+    else if (mode >= seen_unit) {
+        int n = report_items(u, results, MAX_INVENTORY, u, f);
+        assert(n >= 0);
+        if (n > 0) {
+            show = results;
+        }
+    }
+    bufunit_items(show, u, f, sbp);
+
+    if (u->faction == f) {
+        bufunit_spells(u, sbp);
+        if (!isbattle) {
+            bufunit_orders(u, sbp);
+        }
+    }
+    bufunit_description(u, f, sbp);
 }
 
 int bufunit_depr(const faction * f, const unit * u, seen_mode mode,
@@ -885,7 +932,7 @@ int bufunit_depr(const faction * f, const unit * u, seen_mode mode,
     sbstring sbs;
 
     sbs_init(&sbs, buf, size);
-    bufunit(f, u, fv, mode, getarnt, &sbs);
+    bufunit(f, u, fv, mode, !!getarnt, &sbs);
     if (!getarnt) {
         if (alliedfaction(f, fv, HELP_ALL)) {
             return 1;
@@ -907,7 +954,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
 
     while (len > 0) {
         unsigned int j;
-        const char *cut = 0, *space = strchr(s, ' ');
+        const char *cut = NULL, *space = strchr(s, ' ');
         while (space && *space && (space - s) <= (ptrdiff_t)width) {
             cut = space;
             space = strchr(space + 1, ' ');
@@ -928,7 +975,7 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
         }
         memcpy(buf + indent, s, cut - s);
         buf[indent + (cut - s)] = 0;
-        addstrlist(SP, buf); /* TODO: too much string copying, cut out this function */
+        addstrlist(SP, str_strdup(buf)); /* TODO: too much string copying, cut out this function */
         while (*cut == ' ') {
             ++cut;
         }
@@ -940,35 +987,6 @@ void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned
 void sparagraph(strlist ** SP, const char *s, unsigned int indent, char mark)
 {
     split_paragraph(SP, s, indent, REPORTWIDTH, mark);
-}
-
-void lparagraph(struct strlist **SP, char *s, unsigned int indent, char mark)
-{
-    /* Die Liste SP wird mit dem String s aufgefuellt, mit indent und einer
-     * mark, falls angegeben. SP wurde also auf 0 gesetzt vor dem Aufruf.
-     * Vgl. spunit (). */
-
-    char *buflocal = calloc(strlen(s) + indent + 1, sizeof(char));
-    if (!buflocal) abort();
-
-    if (indent) {
-        memset(buflocal, ' ', indent);
-        if (mark)
-            buflocal[indent - 2] = mark;
-    }
-    strcpy(buflocal + indent, s);
-    addstrlist(SP, buflocal);
-    free(buflocal);
-}
-
-void
-spunit(struct strlist **SP, const struct faction *f, const unit * u, unsigned int indent,
-    enum seen_mode mode)
-{
-    char buf[DISPLAYSIZE];
-    int dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
-    lparagraph(SP, buf, indent,
-        (char)((u->faction == f) ? '*' : (dh ? '+' : '-')));
 }
 
 struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
@@ -1362,6 +1380,38 @@ void report_warnings(faction *f, int now)
     }
 }
 
+void update_defaults(faction* f)
+{
+    unit* u;
+    for (u = f->units; u != NULL; u = u->nextF) {
+        order** ordi = &u->old_orders;
+        while (*ordi) {
+            order* ord = *ordi;
+            ordi = &ord->next;
+        }
+        if (u->orders) {
+            bool repeated = u->old_orders != NULL;
+            order** ordp = &u->orders;
+            while (*ordp) {
+                order* ord = *ordp;
+                keyword_t kwd = getkeyword(ord);
+                if (!(repeated && is_repeated(kwd))) {
+                    if (is_persistent(ord)) {
+                        *ordp = ord->next;
+                        *ordi = ord;
+                        ord->next = NULL;
+                        ordi = &ord->next;
+                        continue;
+                    }
+                }
+                ordp = &ord->next;
+            }
+            free_orders(&u->orders);
+        }
+    }
+}
+
+
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential
@@ -1485,6 +1535,8 @@ int write_reports(faction * f, const char *password)
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
+
+    update_defaults(f);
     if (noreports) {
         return false;
     }

@@ -150,25 +150,7 @@ void build_road(unit * u, int size, direction_t d)
     if (n < left) left = n;
 
     /* n = maximum by skill. try to maximize it */
-    n = u->number * effsk;
-    if (n < left) {
-        const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-        item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
-        if (itm != NULL && itm->number > 0) {
-            int rings = (u->number < itm->number) ? u->number : itm->number;
-            n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
-        }
-    }
-    if (n < left) {
-        int dm = get_effect(u, oldpotiontype[P_DOMORE]);
-        if (dm != 0) {
-            int todo = (left - n + effsk - 1) / effsk;
-            if (todo > u->number) todo = u->number;
-            if (dm > todo) dm = todo;
-            change_effect(u, oldpotiontype[P_DOMORE], -dm);
-            n += dm * effsk;
-        }                           /* Auswirkung Schaffenstrunk */
-    }
+    n = build_skill(u, effsk, 0, SK_ROAD_BUILDING);
 
     /* make minimum of possible and available: */
     if (n > left) n = left;
@@ -304,7 +286,8 @@ static int count_materials(unit *u, const construction *type, int n, int complet
     return n;
 }
 
-int build_skill(unit *u, int basesk, int skill_mod) {
+int build_skill(unit *u, int basesk, int skill_mod, skill_t sk)
+{
     int effsk, skills;
     int dm = get_effect(u, oldpotiontype[P_DOMORE]);
 
@@ -316,6 +299,18 @@ int build_skill(unit *u, int basesk, int skill_mod) {
     /* technically, nimblefinge and domore should be in a global set of
      * "game"-attributes, (as at_skillmod) but for a while, we're leaving
      * them in here. */
+
+     /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
+      * Talente */
+    if (faction_skill_limit(u->faction, sk) == INT_MAX) {
+        const resource_type* ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
+        item* itm = ring ? *i_find(&u->items, ring->itype) : 0;
+        int i = itm ? itm->number : 0;
+        if (i > 0) {
+            int rings = (u->number < i) ? u->number : i;
+            skills = skills * ((roqf_factor() - 1) * rings + u->number) / u->number;
+        }
+    }
 
     if (dm != 0) {
         /* Auswirkung Schaffenstrunk */
@@ -373,17 +368,6 @@ static int build_limited(unit * u, const construction * con, int completed, int 
         else {
             n = skills;
         }
-        /* Flinkfingerring wirkt nicht auf Mengenbegrenzte (magische)
-         * Talente */
-        if (faction_skill_limit(u->faction, con->skill) == INT_MAX) {
-            const resource_type *ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-            item *itm = ring ? *i_find(&u->items, ring->itype) : 0;
-            int i = itm ? itm->number : 0;
-            if (i > 0) {
-                int rings = (u->number < i) ? u->number : i;
-                n = n * ((roqf_factor() - 1) * rings + u->number) / u->number;
-            }
-        }
 
         if (want < n) n = want;
 
@@ -425,7 +409,7 @@ int build(unit * u, int number, const construction * con, int completed, int wan
         return ENEEDSKILL;
     }
 
-    skills = build_skill(u, basesk, skill_mod);
+    skills = build_skill(u, basesk, skill_mod, con->skill);
     made = build_limited(u, con, completed, number, want, basesk, &skills);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     if (made > 0) {
@@ -565,7 +549,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     assert(btype->stages);
 
     basesk = effskill(u, SK_BUILDING, NULL);
-    skills = build_skill(u, basesk, 0);
+    skills = build_skill(u, basesk, 0, SK_BUILDING);
     if (skills == 0) {
         cmistake(u, ord, 101, MSG_PRODUCE);
         return 0;
@@ -626,7 +610,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         if (!rule_other) {
             unit *owner = building_owner(b);
             if (!owner || owner->faction != u->faction) {
-                cmistake(u, ord, 1222, MSG_PRODUCE);
+                cmistake(u, ord, 5, MSG_PRODUCE);
                 return 0;
             }
         }

@@ -1,8 +1,7 @@
-#include <CuTest.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <string.h>
 #include "umlaut.h"
+
+#include <CuTest.h>
+#include <stdio.h>
 
 static void test_transliterate(CuTest * tc)
 {

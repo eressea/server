@@ -1,10 +1,9 @@
 #include "eressea.h"
-#include "kernel/config.h"
+
 #include "util/log.h"
 #include "util/stats.h"
 #include "util/password.h"
 #include "util/strings.h"
-#include "util/variant.h"
 
 #include <CuTest.h>
 #include <stdio.h>
@@ -90,7 +89,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(strings);
     ADD_SUITE(log);
     ADD_SUITE(variant);
-    ADD_SUITE(rng);
+    ADD_SUITE(rand);
     /* items */
     ADD_SUITE(xerewards);
     /* kernel */
@@ -122,7 +121,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(spells);
     ADD_SUITE(unit);
     /* gamecode */
-    ADD_SUITE(alchemy);
+    ADD_SUITE(teleport);
     ADD_SUITE(automate);
     ADD_SUITE(battle);
     ADD_SUITE(calendar);
@@ -144,6 +143,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
     ADD_SUITE(prefix);
+    ADD_SUITE(recruit);
     ADD_SUITE(renumber);
     ADD_SUITE(report);
     ADD_SUITE(shock);

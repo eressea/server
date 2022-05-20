@@ -4124,6 +4124,9 @@ msgctxt "spellinfo"
 msgid "generous"
 msgstr "This joyous song will spread like wildfire throughout the region and cause festive spirits in all the population. All the taverns and theaters will be packed to the brim and even the beggars will not go hungry."
 
+msgid "growl0"
+msgstr "Arooo..."
+
 msgid "growl1"
 msgstr "Tshrrrk..."
 

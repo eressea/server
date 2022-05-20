@@ -1,5 +1,4 @@
 #include "listbox.h"
-#include "gmtool_structs.h"
 
 #include <util/strings.h>
 #include <curses.h>

@@ -110,7 +110,7 @@ extern "C" {
         int healing;
         int maxaura;            /* Faktor auf Maximale Aura */
         double regaura;            /* Faktor auf Regeneration */
-        double recruit_multi;      /* Faktor fuer Bauernverbrauch */
+        int recruit_multi;      /* Faktor fuer Bauernverbrauch */
         int index;
         int recruitcost;
         int maintenance;

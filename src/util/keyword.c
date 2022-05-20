@@ -1,13 +1,12 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/config.h>
 #include "keyword.h"
 
-#include <util/language.h>
-#include <util/umlaut.h>
-#include <util/log.h>
-#include <util/strings.h>
+#include "language.h"
+#include "umlaut.h"
+#include "log.h"
+#include "strings.h"
 
 #include <critbit.h>
 
@@ -28,7 +27,7 @@ const char * keyword(keyword_t kwd)
 }
 
 static const char * keyword_key(int kwd) {
-    assert(kwd < MAXKEYWORDS && kwd >= 0);
+    assert(kwd < MAXKEYWORDS);
     return keyword((keyword_t)kwd);
 }
 
@@ -81,15 +80,15 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 static bool disabled_kwd[MAXKEYWORDS];
 
 void enable_keyword(keyword_t kwd, bool enabled) {
-    assert(kwd >= 0 && kwd < MAXKEYWORDS);
-    if (kwd >= 0 && kwd < MAXKEYWORDS) {
+    assert(kwd < MAXKEYWORDS);
+    if (kwd < MAXKEYWORDS) {
         disabled_kwd[kwd] = !enabled;
     }
 }
 
 bool keyword_disabled(keyword_t kwd) {
-    assert(kwd >= 0 && kwd < MAXKEYWORDS);
-    if (kwd >= 0 && kwd < MAXKEYWORDS) {
+    assert(kwd < MAXKEYWORDS);
+    if (kwd < MAXKEYWORDS) {
         return disabled_kwd[kwd];
     }
     return true;

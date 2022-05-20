@@ -22,6 +22,7 @@
 #include <util/rng.h>
 
 #include <storage.h>
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -39,7 +40,7 @@
 
 static void do_shock(unit * u, const char *reason)
 {
-    int i;
+    size_t s, len;
 
     if (u->number > 0) {
         /* HP - Verlust */
@@ -58,14 +59,14 @@ static void do_shock(unit * u, const char *reason)
     }
 
     /* Evt. Talenttageverlust */
-    for (i = 0; i != u->skill_size; ++i)
+    for (len = arrlen(u->skills), s = 0; s != len; ++s) {
         if (rng_int() % 5 == 0) {
-            skill *sv = u->skills + i;
+            skill* sv = u->skills + s;
             int weeks = (sv->level * sv->level - sv->level) / 2;
             int change = (weeks + 9) / 10;
             reduce_skill(u, sv, change);
         }
-
+    }
     /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage
      * zu loeschen wenn der Familiar getoetet wird. Da sollten wir ueber eine
      * saubere Implementation nachdenken. */

@@ -15,6 +15,7 @@
 #include "region.h"
 #include "resources.h"
 #include "ship.h"
+#include "teleport.h"
 #include "terrain.h"
 #include "terrainid.h"
 #include "unit.h"
@@ -800,7 +801,6 @@ region *new_region(int x, int y, struct plane *pl, int uid)
     r = region_create(uid);
     r->age = 0;
     add_region(r, x, y);
-    assert(pl == r->_plane);
     return r;
 }
 
@@ -1275,6 +1275,12 @@ void terraform_region(region * r, const terrain_type * terrain)
             reset_herbs(r);
         }
         init_region(r);
+    }
+    if (rplane(r) == get_homeplane()) {
+        struct plane* aplane = get_astralplane();
+        if (aplane) {
+            update_teleport_plane(r, aplane, NULL, NULL);
+        }
     }
 
 }

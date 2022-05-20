@@ -4,13 +4,17 @@
 #include "kernel/faction.h"
 #include "kernel/order.h"
 #include "kernel/region.h"
+#include "kernel/skill.h"
 #include "kernel/unit.h"
 
+#include "util/keyword.h"
 #include "util/message.h"
 
 #include "tests.h"
 
 #include <CuTest.h>
+
+#include <stddef.h>
 
 static void test_autostudy_init(CuTest *tc) {
     scholar scholars[4];

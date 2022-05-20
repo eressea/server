@@ -19,7 +19,6 @@
 
 #include <attributes/racename.h>
 
-#include "monsters.h"
 #include <CuTest.h>
 #include <tests.h>
 #include <selist.h>
@@ -33,7 +32,7 @@ static void test_destroyfaction_allies(CuTest *tc) {
     region *r;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     test_create_unit(f1, r);
     f2 = test_create_faction();
@@ -86,7 +85,7 @@ static void test_remove_dead_factions(CuTest *tc) {
     int fno;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     fm = get_or_create_monsters();
     f = test_create_faction();
     assert(fm && r && f);
@@ -105,7 +104,7 @@ static void test_remove_dead_factions(CuTest *tc) {
 }
 
 static void test_addfaction(CuTest *tc) {
-    faction *f = 0;
+    faction *f = NULL;
     const struct race *rc;
     const struct locale *lang;
 
@@ -252,12 +251,38 @@ static void test_max_migrants(CuTest *tc) {
     test_setup();
     rc = test_create_race("human");
     f = test_create_faction_ex(rc, NULL);
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u = test_create_unit(f, test_create_plain(0, 0));
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
     rc->flags |= RCF_MIGRANTS;
     CuAssertIntEquals(tc, 0, count_maxmigrants(f));
     scale_number(u, 250);
     CuAssertIntEquals(tc, 13, count_maxmigrants(f));
+    test_teardown();
+}
+
+static void test_count_skill(CuTest* tc) {
+    unit* u;
+    region* r;
+    faction* f;
+
+    test_setup();
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(f, r);
+    set_level(u, SK_MAGIC, 1);
+    set_level(u, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_ALCHEMY));
+    u = test_create_unit(f, r);
+    set_level(u, SK_MAGIC, 1);
+    set_level(u, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_ALCHEMY));
+
+    // familiars do not count as magicians:
+    set_familiar(u, u);
+    CuAssertIntEquals(tc, 1, faction_count_skill(f, SK_MAGIC));
+    CuAssertIntEquals(tc, 2, faction_count_skill(f, SK_ALCHEMY));
     test_teardown();
 }
 
@@ -346,7 +371,7 @@ static void test_save_special_items(CuTest *tc) {
     itype = test_create_itemtype("banana");
     itype->flags |= ITF_NOTLOST;
     rc = test_create_race("template");
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     i_change(&u->items, itype, 1);
 
     /* when there is no monster in the region, a ghost of the dead unit is created: */
@@ -406,6 +431,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_addplayer);
     SUITE_ADD_TEST(suite, test_max_migrants);
     SUITE_ADD_TEST(suite, test_skill_limit);
+    SUITE_ADD_TEST(suite, test_count_skill);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);

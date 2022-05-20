@@ -9,6 +9,8 @@
 #include <tests.h>
 #include <CuTest.h>
 
+#include <stddef.h>          // for NULL
+
 static void test_names(CuTest * tc)
 {
     unit *u;
@@ -25,7 +27,7 @@ static void test_names(CuTest * tc)
     CuAssertPtrNotNull(tc, get_function("name_dracoid"));
     default_locale = test_create_locale();
     rc = test_create_race("undead");
-    u = test_create_unit(test_create_faction_ex(rc, default_locale), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, default_locale), test_create_plain(0, 0));
     locale_setstring(default_locale, "undead_name_0", "Graue");
     locale_setstring(default_locale, "undead_postfix_0", "Kobolde");
     CuAssertPtrNotNull(tc, rc->name_unit);
@@ -48,7 +50,7 @@ static void test_monster_names(CuTest *tc) {
     rc = test_create_race("irongolem");
     f = test_create_faction_ex(rc, default_locale);
     f->flags |= FFL_NPC;
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u = test_create_unit(f, test_create_plain(0, 0));
     unit_setname(u, "Hodor");
     CuAssertPtrNotNull(tc, u->_name);
     name_unit(u);

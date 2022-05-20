@@ -20,7 +20,7 @@
 
 int json_import(struct stream * out) {
     cJSON *json, *child;
-    char buffer[1024], *data = 0;
+    char buffer[1024], *data = NULL;
     size_t sz = 0;
     assert(out && out->api);
     while (!out->api->readln(out->handle, buffer, sizeof(buffer))) {

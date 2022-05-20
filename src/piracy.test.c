@@ -1,21 +1,27 @@
 #include "piracy.h"
+#include "direction.h"       // for init_directions, D_EAST, directions
 
 #include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/ship.h>
+#include "kernel/skill.h"    // for SK_SAILING
 #include <kernel/terrain.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 
 #include <util/base36.h>
+#include "util/keyword.h"    // for K_PIRACY
 #include <util/language.h>
 #include <util/message.h>
 
+#include <stb_ds.h>
 #include <CuTest.h>
+
 #include <tests.h>
 #include <assert.h>
+#include <stddef.h>          // for NULL
 
 static void setup_piracy(void) {
     struct locale *lang;
@@ -61,10 +67,8 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     if (v_shiptype) {
         st_boat = st_get_or_create(v_shiptype);
         u_set_ship(*victim, test_create_ship((*victim)->region, st_boat));
-        free(st_boat->coasts);
-        st_boat->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+        arrsetlen(st_boat->coasts, 1);
         st_boat->coasts[0] = vterrain;
-        st_boat->coasts[1] = 0;
     }
 
     *pirate = create_unit(test_create_region(0, 0, get_or_create_terrain("terrain2")), f = test_create_faction(), 1, rc = rc_get_or_create("pirate"), 0, 0, 0);
@@ -74,10 +78,8 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     if (p_shiptype) {
         st_boat = st_get_or_create(p_shiptype);
         u_set_ship(*pirate, test_create_ship((*pirate)->region, st_boat));
-        free(st_boat->coasts);
-        st_boat->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+        arrsetlen(st_boat->coasts, 1);
         st_boat->coasts[0] = vterrain;
-        st_boat->coasts[1] = 0;
     }
 
     f->locale = get_or_create_locale("de");

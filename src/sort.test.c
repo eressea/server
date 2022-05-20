@@ -15,6 +15,8 @@
 #include "tests.h"
 #include <CuTest.h>
 
+#include <stddef.h>           // for NULL
+
 static void test_sort_after(CuTest *tc) {
     unit *u1, *u2;
     faction *f;

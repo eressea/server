@@ -760,7 +760,7 @@ const resource_type *findresourcetype(const char *name, const struct locale *lan
             cb_foreach(&cb_resources, "", 0, add_resourcename_cb, (void *)lang);
         }
         if (cb_find_prefix(cb, buffer, strlen(buffer), &match, 1, 0)) {
-            const resource_type * rtype = 0;
+            const resource_type * rtype = NULL;
             cb_get_kv(match, (void*)&rtype, sizeof(rtype));
             return rtype;
         }
@@ -813,7 +813,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
             cb_foreach(&cb_resources, "", 0, add_itemname_cb, (void *)lang);
         }
         if (cb_find_prefix(cb, buffer, strlen(buffer), &match, 1, 0)) {
-            const item_type * itype = 0;
+            const item_type * itype = NULL;
             cb_get_kv(match, (void*)&itype, sizeof(itype));
             return itype;
         }

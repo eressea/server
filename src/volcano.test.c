@@ -7,17 +7,18 @@
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
-#include "kernel/messages.h"
 #include "kernel/region.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/rng.h"
+#include "util/variant.h"                 // for variant, frac_zero
 
 #include <tests.h>
 #include <CuTest.h>
+
+#include <stddef.h>                       // for NULL
 
 static void test_volcano_update(CuTest *tc) {
     region *r;

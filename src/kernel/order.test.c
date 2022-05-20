@@ -252,7 +252,7 @@ static void test_skip_token(CuTest *tc) {
 }
 
 static void test_replace_order(CuTest *tc) {
-    order *orders = 0, *orig, *repl;
+    order *orders = NULL, *orig, *repl;
     struct locale * lang;
 
     test_setup();

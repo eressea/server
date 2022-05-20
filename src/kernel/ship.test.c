@@ -1,21 +1,23 @@
-#include <kernel/config.h>
-#include <kernel/build.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
-#include <kernel/unit.h>
-#include <kernel/curse.h>
+#include "attrib.h"
+#include "build.h"
+#include "config.h"
+#include "curse.h"
+#include "race.h"
+#include "region.h"
+#include "ship.h"
+#include "skill.h"
+#include "unit.h"
 
-#include <kernel/attrib.h>
+#include <util/variant.h>
 
 #include <spells/shipcurse.h>
 #include <attributes/movement.h>
 
 #include <CuTest.h>
 #include <tests.h>
-#include <stdlib.h>
-#include <string.h>
+
 #include <assert.h>
+#include <stdlib.h>
 
 static void test_register_ship(CuTest * tc)
 {
@@ -401,7 +403,7 @@ static void test_stype_defaults(CuTest *tc) {
     CuAssertPtrNotNull(tc, stype);
     CuAssertStrEquals(tc, "hodor", stype->_name);
     CuAssertPtrEquals(tc, NULL, stype->construction);
-    CuAssertPtrEquals(tc, NULL, stype->coasts);
+    CuAssertPtrEquals(tc, NULL, (void *)stype->coasts);
     CuAssertDblEquals(tc, 0.0, stype->damage, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->storm, 0.0);
     CuAssertDblEquals(tc, 1.0, stype->tac_bonus, 0.01);
@@ -455,7 +457,7 @@ static void test_shipspeed_speedy(CuTest *tc) {
     stype->range = 5;
     stype->range_max = -1;
     stype->flags |= SFL_SPEEDY;
-    cap = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    cap = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     crw = test_create_unit(cap->faction, cap->region);
     sh = test_create_ship(cap->region, stype);
     cap->ship = sh;

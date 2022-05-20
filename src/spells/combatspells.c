@@ -31,6 +31,7 @@
 #include <util/rng.h>
 
 #include <selist.h>
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -421,9 +422,10 @@ int sp_speed(struct castorder * co)
 static skill_t random_skill(unit * u, bool weighted)
 {
     int n = 0;
-    skill *sv;
+    size_t s, len = arrlen(u->skills);
 
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    for (s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
         if (sv->level > 0) {
             if (weighted)
                 n += sv->level;
@@ -437,7 +439,8 @@ static skill_t random_skill(unit * u, bool weighted)
 
     n = rng_int() % n;
 
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+    for (s = 0; s != len; ++s) {
+        skill* sv = u->skills + s;
         if (sv->level > 0) {
             if (weighted) {
                 if (n < (int)sv->level)

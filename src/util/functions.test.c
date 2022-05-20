@@ -2,10 +2,6 @@
 
 #include <CuTest.h>
 
-#include <stdio.h>
-#include <string.h>
-
-
 static void test_functions(CuTest * tc)
 {
     pf_generic fun;

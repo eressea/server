@@ -2,7 +2,7 @@
 #define ATTRIB_H
 
 #include <stdbool.h>
-#include <util/variant.h>
+#include "../util/variant.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

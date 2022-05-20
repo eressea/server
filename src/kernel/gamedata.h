@@ -49,9 +49,10 @@
 #define FIX_SHAPESHIFT_VERSION 371 /* shapeshifting demons */
 #define FIX_SEAROADS_VERSION 372 /* removing roads in ocean regions */
 #define FIX_SHAPESHIFT_SPELL_VERSION 373 /* shapeshift spell, bug 2719 */
-#define FIX_SHIP_DAMAGE_VERSION 374 /* shapeshift spell, bug 2719 */
+#define FIX_SHIP_DAMAGE_VERSION 374 /* ship damage for fleets */
+#define FIX_TELEPORT_PLANE_VERSION 375 /* astral space not created, bug 2856 */
 
-#define RELEASE_VERSION FIX_SHIP_DAMAGE_VERSION /* current datafile */
+#define RELEASE_VERSION FIX_TELEPORT_PLANE_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

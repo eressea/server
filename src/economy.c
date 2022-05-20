@@ -319,8 +319,7 @@ static bool maintain(building * b)
     }
     u = building_owner(b);
     if (u == NULL) {
-        /* no owner - send a message to the entire region */
-        ADDMSG(&r->msgs, msg_message("maintenance_noowner", "building", b));
+        /* no owner, no need to message the region, it's obvious what happened */
         return false;
     }
     /* If the owner is the region owner, check if dontpay flag is set for the building he is in */
@@ -749,10 +748,8 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
 {
     const item_type *itype = resource2item(rtype);
     region *r = u->region;
-    int dm = 0;
     allocation_list *alist;
     allocation *al;
-    const resource_type *rring;
     int amount, skill, skill_mod = 0;
     variant save_mod;
     skill_t sk;
@@ -821,26 +818,9 @@ static void allocate_resource(unit * u, const resource_type * rtype, int want)
                 itype->rtype));
         return;
     }
-    skill += skill_mod;
-    amount = skill * u->number;
-    /* nun ist amount die Gesamtproduktion der Einheit (in punkten) */
-
-    /* mit Flinkfingerring verzehnfacht sich die Produktion */
-    rring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-    if (rring) {
-        int more = i_get(u->items, rring->itype);
-        if (more > u->number) more = u->number;
-        amount += skill * more * (roqf_factor() - 1);
-    }
-
-    /* Schaffenstrunk: */
-    if ((dm = get_effect(u, oldpotiontype[P_DOMORE])) != 0) {
-        if (dm > u->number) dm = u->number;
-        change_effect(u, oldpotiontype[P_DOMORE], -dm);
-        amount += dm * skill;       /* dm Personen produzieren doppelt */
-    }
-
-    amount /= itype->construction->minskill;
+    skill = build_skill(u, skill, skill_mod, sk);
+    /* amount die Gesamtproduktion der Einheit (in punkten) */
+    amount = skill / itype->construction->minskill;
 
     /* Limitierung durch Parameter m. */
     if (want > 0 && want < amount)
@@ -1094,9 +1074,9 @@ int make_cmd(unit * u, struct order *ord)
 {
     char token[32];
     region *r = u->region;
-    const building_type *btype = 0;
-    const ship_type *stype = 0;
-    const item_type *itype = 0;
+    const building_type *btype = NULL;
+    const ship_type *stype = NULL;
+    const item_type *itype = NULL;
     param_t p = NOPARAM;
     int m = INT_MAX;
     const char *s;
@@ -1433,7 +1413,13 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+    k = effskill(u, SK_TRADE, NULL);
+    if (k <= 0) {
+        ADDMSG(&u->faction->msgs,
+            msg_feedback(u, ord, "skill_needed", "skill", SK_TRADE));
+        return;
+    }
+    k = u->number * 10 * k;
 
     /* hat der Haendler bereits gehandelt, muss die Menge der bereits
      * verkauften/gekauften Gueter abgezogen werden */
@@ -1495,7 +1481,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 {
     int money, max_products;
     int norders;
-    /* int m, n = 0; */
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
     int hafencollected = 0;
@@ -2645,10 +2630,6 @@ void produce(struct region *r)
 
         case K_SPY:
             spy_cmd(u, u->thisorder);
-            break;
-
-        case K_SABOTAGE:
-            sabotage_cmd(u, u->thisorder);
             break;
 
         case K_PLANT:

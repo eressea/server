@@ -1,18 +1,20 @@
 #include "alchemy.h"
-#include "move.h"
 
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 
 #include "guard.h"
 
-#include <limits.h>
-
 #include <CuTest.h>
 #include "tests.h"
+
+#include <limits.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 static void test_herbsearch(CuTest * tc)
 {
@@ -23,7 +25,7 @@ static void test_herbsearch(CuTest * tc)
     const item_type *itype;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     rc = rc_get_or_create("dragon");
     rc->flags |= RCF_UNARMEDGUARD;
     u2 = test_create_unit(test_create_faction_ex(rc, NULL), r);

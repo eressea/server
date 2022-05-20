@@ -1,11 +1,10 @@
-#include <kernel/config.h>
+#include "travelthru.h"
+
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/attrib.h>
-#include <util/macros.h>
 
-#include "travelthru.h"
 #include "reports.h"
 #include "tests.h"
 
@@ -15,7 +14,7 @@ struct attrib;
 
 static void count_travelers(region *r, unit *u, void *cbdata) {
     int *n = (int *)cbdata;
-    UNUSED_ARG(r);
+    (void)r;
     *n += u->number;
 }
 
@@ -28,7 +27,7 @@ static void setup_travelthru(travel_fixture *fix, int nunits) {
     region *r;
     faction *f;
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     while (r->attribs) {
         a_remove(&r->attribs, r->attribs);
     }

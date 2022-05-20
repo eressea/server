@@ -155,12 +155,12 @@ bool is_astral(const region * r)
 
 plane *get_astralplane(void)
 {
-    plane *astralspace = 0;
+    plane *astralspace = NULL;
     static int config;
     static bool rule_astralplane;
     
     if (config_changed(&config)) {
-        rule_astralplane = config_get_int("modules.astralspace", 1) != 0;
+        rule_astralplane = config_get_int("modules.astralspace", 0) != 0;
     }
     if (!rule_astralplane) {
         return NULL;
@@ -177,25 +177,55 @@ plane *get_astralplane(void)
 void create_teleport_plane(void)
 {
     region *r;
-    plane *hplane = get_homeplane();
-    plane *aplane = get_astralplane();
+    const struct plane *hplane = get_homeplane();
+    struct plane* aplane = get_astralplane();
 
     const terrain_type *fog = get_terrain("fog");
+    const terrain_type *tfog = get_terrain("thickfog");
 
     for (r = regions; r; r = r->next) {
-        plane *pl = rplane(r);
-        if (pl == hplane) {
-            region *ra = tpregion(r);
+        if (rplane(r) == hplane) {
+            update_teleport_plane(r, aplane, fog, tfog);
+        }
+    }
+}
 
-            if (ra == NULL) {
-                int x = real2tp(r->x);
-                int y = real2tp(r->y);
-                pnormalize(&x, &y, aplane);
+void update_teleport_plane(const region* r, plane* aplane, const terrain_type* terrain, const struct terrain_type* blocked)
+{
+    static region* rlast = NULL;
+    region* ra = tpregion(r);
+    const terrain_type* fog = terrain ? terrain : get_terrain("fog");
+    const terrain_type* tfog = blocked ? blocked : get_terrain("thickfog");
+    const terrain_type* ter = (r->terrain->flags & FORBIDDEN_REGION) ? tfog : fog;
 
-                ra = new_region(x, y, aplane, 0);
-                terraform_region(ra, fog);
+    if (ra == NULL) {
+        int x = real2tp(r->x);
+        int y = real2tp(r->y);
+        pnormalize(&x, &y, aplane);
+
+        ra = new_region(x, y, aplane, 0);
+        terraform_region(ra, ter);
+    }
+    else if (ra->terrain == fog && ter == tfog) {
+        /* try fixing this region, but only once: */
+        if (ra != rlast) {
+            rlast = ra;
+            if (ra->units) {
+                unit* u;
+                for (u = ra->units; u; u = u->next) {
+                    if (!is_monsters(u->faction)) {
+                        log_warning("astral space above %s should be impassable, but there are units of %s here.", regionname(r, NULL), factionname(u->faction));
+                        break;
+                    }
+                }
+                if (!u) {
+                    while (ra->units) {
+                        erase_unit(&ra->units, ra->units);
+                    }
+                }
             }
         }
+        terraform_region(ra, ter);
     }
 }
 

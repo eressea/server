@@ -1,9 +1,7 @@
-/* kernel includes */
 #include <kernel/order.h>
-#include <util/parser.h>
-#include <util/macros.h>
 
-/* lua includes */
+#include <util/parser.h>
+
 #include <lua.h>
 #include <tolua.h>
 
@@ -12,7 +10,7 @@
 static int tolua_order_get_token(lua_State *L) {
     order *ord = (order *)tolua_tousertype(L, 1, 0);
     int n = (int)tolua_tonumber(L, 2, 0);
-    const char * str = 0;
+    const char * str = NULL;
     init_order(ord, NULL);
     while (n-->0) {
         str = getstrtoken();

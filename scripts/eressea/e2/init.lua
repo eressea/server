@@ -26,12 +26,6 @@ local sets = {
     ['spo_dragon'] = {
         ['items'] = {
             ['dragonblood'] = 4,
-            ['seaserpenthead'] = 1
-        }
-    },
-    ['spo_dragon'] = {
-        ['items'] = {
-            ['dragonblood'] = 4,
             ['dragonhead'] = 1
         }
     },

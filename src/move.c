@@ -62,6 +62,7 @@
 #include <util/strings.h>
 
 #include <storage.h>
+#include <stb_ds.h>
 
 /* libc includes */
 #include <assert.h>
@@ -103,7 +104,8 @@ get_followers(unit * u, region * r, const region_list * route_end,
     unit *uf;
     for (uf = r->units; uf; uf = uf->next) {
         if (fval(uf, UFL_FOLLOWING) && !fval(uf, UFL_NOTMOVING)) {
-            const attrib *a = a_find(uf->attribs, &at_follow);
+            const attrib* a;
+            a = a_find(uf->attribs, &at_follow);
             while (a) {
                 if (a->data.v == u) {
                     follower *fnew = (follower *)malloc(sizeof(follower));
@@ -327,11 +329,11 @@ int walkingcapacity(const struct unit *u)
     if (rhorse) {
         int tmp = get_effect(u, oldpotiontype[P_STRONG]);
         if (tmp > 0) {
-            int horsecap = rhorse->itype->capacity;
+            int horsecap = rhorse->itype->capacity - rhorse->itype->weight;
             if (tmp > people) {
                 tmp = people;
             }
-            n += tmp * (horsecap - personcapacity(u));
+            n += tmp * (horsecap - u_race(u)->capacity);
         }
     }
     if (rbelt) {
@@ -676,43 +678,44 @@ static bool is_freezing(const unit * u)
 
 int check_ship_allowed(struct ship *sh, const region * r)
 {
-    const building_type *bt_harbour = bt_find("harbour");
-    int reason = SA_NO_COAST;
-
-    if (bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-        unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-        if (!harbourmaster || !sh->_owner) {
-            reason = SA_HARBOUR;
-        }
-        else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-            reason = SA_HARBOUR;
-        }
+    if (fval(r->terrain, SEA_REGION)) {
+        return SA_COAST;
     }
-    if (reason == SA_NO_COAST && fval(r->terrain, SEA_REGION)) {
-        reason = SA_COAST;
-    }
-    if (reason == SA_NO_COAST && sh->type->coasts) {
-        int c;
-        for (c = 0; sh->type->coasts[c] != NULL; ++c) {
-            if (sh->type->coasts[c] == r->terrain) {
-                reason = SA_COAST;
+    else {
+        int reason = SA_NO_COAST;
+        const building_type* bt_harbour = bt_find("harbour");
+        if (sh->type->coasts) {
+            unsigned c;
+            size_t n = arrlen(sh->type->coasts);
+            for (c = 0; c != n; ++c) {
+                if (sh->type->coasts[c] == r->terrain) {
+                    reason = SA_COAST;
+                    break;
+                }
             }
         }
-    }
-
-    if (reason == SA_NO_COAST)
-      return SA_NO_COAST;
-
-    if (sh->region && r_insectstalled(r)) {
-        /* insekten duerfen nicht hier rein. haben wir welche? */
-        unit *u = ship_owner(sh);
-
-        if (u && is_freezing(u)) {
-            return SA_NO_INSECT;
+        if (reason != SA_COAST && bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
+            unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+            if (!harbourmaster || !sh->_owner) {
+                reason = SA_HARBOUR;
+            }
+            else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                reason = SA_HARBOUR;
+            }
+            else {
+                return SA_NO_HARBOUR;
+            }
         }
-    }
+        if (reason >= 0 && sh->region && r_insectstalled(r)) {
+            /* insekten duerfen nicht hier rein. haben wir welche? */
+            unit* u = ship_owner(sh);
 
-    return reason;
+            if (u && is_freezing(u)) {
+                return SA_NO_INSECT;
+            }
+        }
+        return reason;
+    }
 }
 
 static enum direction_t set_coast(ship * sh, region * r, region * rnext)
@@ -1227,7 +1230,7 @@ static void init_movement(void)
         for (u = r->units; u; u = u->next) {
             if (getkeyword(u->thisorder) == K_DRIVE && can_move(u)
                 && !fval(u, UFL_NOTMOVING) && !LongHunger(u)) {
-                unit *ut = 0;
+                unit *ut = NULL;
 
                 init_order(u->thisorder, NULL);
                 if (getunit(r, u->faction, &ut) != GET_UNIT) {
@@ -1260,7 +1263,7 @@ static void init_movement(void)
                     if (getkeyword(ord) == K_TRANSPORT) {
                         init_order(ord, NULL);
                         for (;;) {
-                            unit *ut = 0;
+                            unit *ut = NULL;
 
                             if (getunit(r, u->faction, &ut) != GET_UNIT) {
                                 break;
@@ -1540,7 +1543,15 @@ static const region_list *travel_route(unit * u,
         /* check movement from/to oceans.
          * aquarian special, flying units, horses, the works */
         if ((u_race(u)->flags & RCF_FLY) == 0) {
-            if (!fval(next->terrain, SEA_REGION)) {
+            if (fval(next->terrain, SEA_REGION)) {
+                /* Ozeanfelder koennen nur von Einheiten mit Schwimmen und ohne
+                 * Pferde betreten werden. */
+                if (!(canswim(u) || canfly(u))) {
+                    ADDMSG(&u->faction->msgs, msg_message("detectocean",
+                        "unit region terrain", u, next, terrain_name(next)));
+                    break;
+                }
+            } else {
                 /* next region is land */
                 if (fval(current->terrain, SEA_REGION)) {
                     int moving = u_race(u)->flags & (RCF_SWIM | RCF_WALK | RCF_COASTAL);
@@ -1561,15 +1572,6 @@ static const region_list *travel_route(unit * u,
                 }
                 else if (landing) {
                     /* wir sind diese woche angelandet */
-                    ADDMSG(&u->faction->msgs, msg_message("detectocean",
-                        "unit region terrain", u, next, terrain_name(next)));
-                    break;
-                }
-            }
-            else {
-                /* Ozeanfelder koennen nur von Einheiten mit Schwimmen und ohne
-                 * Pferde betreten werden. */
-                if (!(canswim(u) || canfly(u))) {
                     ADDMSG(&u->faction->msgs, msg_message("detectocean",
                         "unit region terrain", u, next, terrain_name(next)));
                     break;
@@ -1835,7 +1837,7 @@ static void sail(unit * u, order * ord, bool drifting)
                         stormchance = 0;
                     }
                 }
-                if (rng_int() % 10000 < stormchance * sh->type->storm
+                if (stormchance && rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
                     if (!is_cursed(sh->attribs, &ct_nodrift)) {
                         region *rnext = NULL;
@@ -1911,9 +1913,12 @@ static void sail(unit * u, order * ord, bool drifting)
 
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
-                /* for some reason or another, we aren't allowed in there.. */
+                /* for some reason or another, we aren't allowed in there. */
                 if (reason == SA_NO_INSECT) {
                     ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
+                }
+                else if (reason == SA_NO_HARBOUR) {
+                    ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
                 }
                 else if (lighthouse_guarded(current_point)) {
                     ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
@@ -2105,7 +2110,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
     /* transportation */
     for (ord = u->orders; ord; ord = ord->next) {
-        unit *ut = 0;
+        unit *ut = NULL;
 
         if (getkeyword(ord) != K_TRANSPORT)
             continue;
@@ -2605,7 +2610,14 @@ void follow_cmds(unit * u)
             init_order(ord, NULL);
             p = getparam(lang);
             if (p == P_UNIT) {
-                int id = read_unitid(u->faction, r);
+                int id;
+                if (u->ship) {
+                    if (u == ship_owner(u->ship)) {
+                        cmistake(u, ord, 330, MSG_MOVE);
+                        continue;
+                    }
+                }
+                id = read_unitid(u->faction, r);
                 if (id == u->no) {
                     ADDMSG(&u->faction->msgs, msg_message("followfail", "unit follower",
                         u, u));
@@ -2623,7 +2635,12 @@ void follow_cmds(unit * u)
                 }
             }
             else if (p == P_SHIP) {
-                int id = getid();
+                int id;
+                if (!u->ship || u != ship_owner(u->ship)) {
+                    cmistake(u, ord, 146, MSG_MOVE);
+                    continue;
+                }
+                id = getid();
                 if (id <= 0) {
                     cmistake(u, ord, 20, MSG_MOVE);
                 }

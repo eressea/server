@@ -1,7 +1,6 @@
 #include "direction.h"
 #include "tests.h"
 
-#include <util/umlaut.h>
 #include <util/language.h>
 
 #include <CuTest.h>

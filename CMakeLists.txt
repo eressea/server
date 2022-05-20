@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 99)
+
 if (WIN32)
 file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
-endif(WIN32)
-
-project (eressea-server C)
-if (WIN32)
 # make subdirectories build to the same output folders (DLLs):
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif (WIN32)
+
+project (server C)
 
 if (MSVC)
   set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
@@ -69,18 +68,20 @@ if (HAVE_LIBBSD)
 endif (HAVE_LIBBSD)
 endif (MSVC)
 
-enable_testing()
+include_directories(include)
 
-if (UNIX)
-  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-  set_property(TEST runtests PROPERTY LABELS ci-only)
-endif (UNIX)
+enable_testing()
 
 add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
+
+if (UNIX)
+  add_test(NAME runtests COMMAND ${CMAKE_SOURCE_DIR}/s/runtests ${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  set_property(TEST runtests PROPERTY LABELS ci-only)
+endif (UNIX)
 
 install(DIRECTORY etc DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.txt")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.po")

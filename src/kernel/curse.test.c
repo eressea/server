@@ -12,15 +12,12 @@
 #include <util/rng.h>
 
 #include <binarystore.h>
-#include <filestream.h>
 #include <memstream.h>
 #include <storage.h>
 #include <stream.h>
 #include <tests.h>
 
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 
 #include <CuTest.h>
 
@@ -52,7 +49,7 @@ typedef struct {
 
 static void setup_curse(curse_fixture *fix, const char *name) {
     test_setup();
-    fix->r = test_create_region(0, 0, NULL);
+    fix->r = test_create_plain(0, 0);
     fix->u = test_create_unit(test_create_faction(), fix->r);
     fix->c = create_curse(fix->u, &fix->r->attribs, ct_find(name), 1.0, 1, 1.0, 0);
 }
@@ -164,7 +161,7 @@ static void test_write_flag(CuTest *tc) {
 
 static void test_curse_ids(CuTest *tc) {
     curse *c1, *c2;
-    attrib *a1 = 0, *a2 = 0;
+    attrib *a1 = NULL, *a2 = NULL;
 
     test_setup();
     rng_init(0);

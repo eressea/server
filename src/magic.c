@@ -66,6 +66,8 @@
 #include <critbit.h>
 #include <storage.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -444,7 +446,7 @@ void pick_random_spells(faction * f, int level, spellbook * book, int num_spells
         for (i = 0; i < num_spells; ++i) {
             int maxspell = numspells;
             int spellno = -1;
-            spellbook_entry *sbe = 0;
+            spellbook_entry *sbe = NULL;
             while (!sbe && maxspell > 0) {
                 spellno = rng_int() % maxspell;
                 sbe = commonspells[spellno];
@@ -783,8 +785,8 @@ int max_spell_level(unit * u, unit *caster, const spell * sp, int cast_level, in
                     else {
                         maxlevel = have / level_cost;
                     }
-                    need -= have;
                 }
+                need -= have;
             }
             if (reslist_p && need > 0) {
                 add_missing_component(reslist_p, spc, need);
@@ -1086,7 +1088,7 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
     case TYP_UNIT:
     {
         int at, pa = 0;
-        const skill *sv;
+        size_t s, len;
         const unit *u = (const unit *)obj;
 
         if (ucontact(u, magician)) {
@@ -1094,10 +1096,12 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
         }
         at = effskill(magician, SK_MAGIC, NULL);
 
-        for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
+        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+            const skill* sv = u->skills + s;
             int sk = eff_skill(u, sv, NULL);
-            if (pa < sk)
+            if (pa < sk) {
                 pa = sk;
+            }
         }
 
         /* Contest, probability = 0.05 * (10 + pa - at); */
@@ -1304,7 +1308,7 @@ static void do_fumble(castorder * co)
         if (rc_changed(&rc_cache)) {
             rc_toad = get_race(RC_TOAD);
         }
-        duration = 1 + (rng_int() % level) / 2;
+        duration = 2 + (rng_int() % level) / 2;
         trestore = change_race(mage, duration, rc_toad, NULL);
         if (trestore) {
             if (chance(0.7)) {
@@ -1498,7 +1502,7 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
 {
     /* Einheit nicht gefunden */
     char tbuf[20];
-    const char *uid = 0;
+    const char *uid = NULL;
 
     if (spobj->typ == SPP_TEMP) {
         sprintf(tbuf, "%s %s", LOC(mage->faction->locale,

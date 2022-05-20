@@ -89,7 +89,7 @@ static void upgrade_keyval(const dict_data *dd, int keyval[], int v) {
 }
 
 static void dict_upgrade(attrib **alist, attrib *abegin) {
-    int n = 0, *keys = 0;
+    int n = 0, *keys = NULL;
     int i = 0, val[8];
     attrib *a, *ak = a_find(*alist, &at_keys);
     if (ak) {

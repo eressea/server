@@ -1,6 +1,5 @@
 #include "password.h"
 #include <CuTest.h>
-#include <string.h>
 
 static void test_passwords(CuTest *tc) {
     const char *hash;

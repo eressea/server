@@ -90,6 +90,8 @@
 #include <selist.h>
 #include <iniparser.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdio.h>
@@ -173,8 +175,10 @@ static bool RemoveNMRNewbie(void)
 static void dumbeffect(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
-        skill *sv = u->skills, *sb = NULL;
-        while (sv != u->skills + u->skill_size) {
+        size_t s, n = arrlen(u->skills);
+        skill *sb = NULL;
+        for (s = 0; s != n; ++s) {
+            skill* sv = u->skills + s;
             if (sb == NULL || skill_compare(sv, sb) > 0) {
                 sb = sv;
             }
@@ -946,10 +950,9 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
     for (u = fdst->units; u != NULL; u = u->nextF) {
         if (u->skills) {
-            int i;
-            for (i = 0; i != u->skill_size; ++i) {
-                const skill *sv = u->skills + i;
-                skill_t sk = (skill_t)sv->id;
+            size_t s, len = arrlen(u->skills);
+            for (s = 0; s != len; ++s) {
+                skill_t sk = (skill_t)u->skills[s].id;
                 skill_count[sk] += u->number;
             }
         }
@@ -980,16 +983,16 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                 }
 
                 if (u->skills) {
-                    int i;
-                    for (i = 0; i != u->skill_size; ++i) {
-                        const skill *sv = u->skills + i;
+                    size_t s, len = arrlen(u->skills);
+                    for (s = 0; s != len; ++s) {
+                        const skill *sv = u->skills + s;
                         skill_t sk = (skill_t)sv->id;
 
                         if (skill_count[sk] + u->number > skill_limit[sk]) {
                             break;
                         }
                     }
-                    if (i != u->skill_size) {
+                    if (s != len) {
                         u = unext;
                         continue;
                     }
@@ -1908,7 +1911,7 @@ int name_cmd(struct unit *u, struct order *ord)
 
     case P_UNIT:
         if (foreign) {
-            unit *u2 = 0;
+            unit *u2 = NULL;
 
             getunit(r, u->faction, &u2);
             if (!u2 || !cansee(u->faction, r, u2, 0)) {
@@ -2320,7 +2323,7 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
     bool found = false;
 
     if (s) {
-        const spell *sp = 0;
+        const spell *sp = NULL;
         const item_type *itype;
         const race *rc;
         /* check if it's an item */
@@ -2522,7 +2525,7 @@ int combatspell_cmd(unit * u, struct order *ord)
     char token[128];
     const char *s;
     int level = 0;
-    spell *sp = 0;
+    spell *sp = NULL;
 
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
@@ -3164,11 +3167,11 @@ void monthly_healing(void)
     }
 }
 
-static void remove_exclusive(order ** ordp)
+static void remove_long(order ** ordp)
 {
     while (*ordp) {
         order *ord = *ordp;
-        if (is_exclusive(ord)) {
+        if (is_long(getkeyword(ord))) {
             *ordp = ord->next;
             ord->next = NULL;
             free_order(ord);
@@ -3193,26 +3196,28 @@ void defaultorders(void)
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
                     char lbuf[8192];
-                    order *new_order = 0;
+                    order *new_order = NULL;
                     const char *s;
                     init_order(ord, NULL);
                     s = gettoken(lbuf, sizeof(lbuf));
                     if (s) {
                         new_order = parse_order(s, u->faction->locale);
                     }
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
+                    else {
+                        free_orders(&u->old_orders);
+                        neworders = true;
+                    }
                     if (!neworders) {
                         /* lange Befehle aus orders und old_orders loeschen zu gunsten des neuen */
                         /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
-                        remove_exclusive(&u->orders);
-                        remove_exclusive(&u->old_orders);
+                        remove_long(&u->old_orders);
                         neworders = true;
-                        ordp = &u->orders;  /* we could have broken ordp */
                     }
                     if (new_order)
                         addlist(&u->old_orders, new_order);
+                    *ordp = ord->next;
+                    ord->next = NULL;
+                    free_order(ord);
                 }
                 else
                     ordp = &ord->next;
@@ -3368,7 +3373,9 @@ int use_cmd(unit * u, struct order *ord)
         cmistake(u, ord, 50, MSG_PRODUCE);
         break;
     default:
-        /* no error */
+        if (err < 0) {
+            cmistake(u, ord, -err, MSG_PRODUCE);
+        }
         break;
     }
     return err;
@@ -3391,7 +3398,7 @@ int pay_cmd(unit * u, struct order *ord)
             /* If the unit is not the owner of the building: error */
             if (owner->no != u->no) {
                 /* The building is not ours error */
-                cmistake(u, ord, 1222, MSG_EVENT);
+                cmistake(u, ord, 5, MSG_EVENT);
             }
             else {
                 /* If no building id is given or it is the id of our building, just set the do-not-pay flag */
@@ -3412,7 +3419,7 @@ int pay_cmd(unit * u, struct order *ord)
                         else
                         {
                             /* The building is not ours error */
-                            cmistake(u, ord, 1222, MSG_EVENT);
+                            cmistake(u, ord, 5, MSG_EVENT);
                         }
 
                     }
@@ -3428,56 +3435,12 @@ int pay_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static int reserve_i(unit * u, struct order *ord, int flags)
-{
-    if (u->number > 0) {
-        char token[128];
-        int use, count, para;
-        const item_type *itype;
-        const char *s;
-
-        init_order(ord, NULL);
-        s = gettoken(token, sizeof(token));
-        count = s ? atoip(s) : 0;
-        para = findparam(s, u->faction->locale);
-
-        if (count == 0 && para == P_EACH) {
-            count = getint() * u->number;
-        }
-        s = gettoken(token, sizeof(token));
-        itype = s ? finditemtype(s, u->faction->locale) : 0;
-        if (itype == NULL)
-            return 0;
-
-        set_resvalue(u, itype, 0);      /* make sure the pool is empty */
-
-        if (count == 0 && para == P_ANY) {
-            count = get_resource(u, itype->rtype);
-        }
-        use = use_pooled(u, itype->rtype, flags, count);
-        if (use) {
-            set_resvalue(u, itype, use);
-            change_resource(u, itype->rtype, use);
-            return use;
-        }
-    }
-    return 0;
-}
-
-int reserve_cmd(unit * u, struct order *ord) {
-    return reserve_i(u, ord, GET_DEFAULT);
-}
-
-int reserve_self(unit * u, struct order *ord) {
-    return reserve_i(u, ord, GET_RESERVE | GET_SLACK);
-}
-
 int claim_cmd(unit * u, struct order *ord)
 {
     char token[128];
     const char *t;
     int n = 1;
-    const item_type *itype = 0;
+    const item_type *itype = NULL;
 
     init_order(ord, NULL);
 

@@ -1,34 +1,32 @@
 #include "monsters.h"
 
-#include "battle.h"
-#include "guard.h"
-#include "reports.h"
 #include "study.h"
 
-#include <kernel/attrib.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/region.h>
-#include <kernel/ship.h>
+#include "kernel/attrib.h"
+#include "kernel/config.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
+#include "kernel/order.h"
+#include "kernel/race.h"
+#include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/skill.h"
 #include "kernel/skills.h"
+#include "kernel/status.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
-#include <util/language.h>
-#include <util/message.h>
-#include <util/nrmessage.h>
+#include "util/keyword.h"     // for K_MOVE
+#include "util/language.h"
+#include "util/message.h"
 
-#include <attributes/hate.h>
+#include "attributes/hate.h"
 
 #include <CuTest.h>
 #include <tests.h>
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void plan_monsters(struct faction *f);
@@ -69,7 +67,7 @@ static void create_monsters(unit **up, unit **um) {
 
     test_create_region(-1, 0, test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO));
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     *up = test_create_unit(fp, r);
     unit_setid(*up, 1);
@@ -272,7 +270,7 @@ static void test_spawn_seaserpent(CuTest *tc) {
     test_setup();
     rc = test_create_race("seaserpent");
     rc->flags &= ~RCF_PLAYABLE;
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     u = spawn_seaserpent(r, f);
     CuAssertPtrNotNull(tc, u);

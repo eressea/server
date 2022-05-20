@@ -2,8 +2,8 @@
 
 #include "battle.h"
 #include "economy.h"
-#include "give.h"
 #include "guard.h"
+#include "give.h"
 #include "laws.h"
 #include "move.h"
 #include "study.h"
@@ -50,6 +50,7 @@
 
 #include "spells/regioncurse.h"
 
+#include <stb_ds.h>
 #include <selist.h>
 
 /* libc includes */
@@ -221,8 +222,9 @@ void monsters_desert(struct faction *monsters)
                 if (fval(u, UFL_ISNEW))
                     continue;
                 if (rng_int() % 100 < 5) {
+                    faction* f = u->faction;
                     if (join_monsters(u, monsters)) {
-                        ADDMSG(&u->faction->msgs, msg_message("desertion",
+                        ADDMSG(&f->msgs, msg_message("desertion",
                             "unit region", u, r));
                     }
                 }
@@ -585,32 +587,32 @@ extern struct attrib_type at_direction;
 static order *monster_learn(unit * u)
 {
     int c = 0;
-    int n;
-    skill *sv;
     const struct locale *lang = u->faction->locale;
+    size_t s, len;
 
     /* can these monsters even study? */
     if (!check_student(u, NULL, SK_PERCEPTION)) {
         return NULL;
     }
 
+    len = arrlen(u->skills);
     /* Monster lernt ein zufaelliges Talent aus allen, in denen es schon
      * Lerntage hat. */
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        if (sv->level > 0)
+    for (s = 0; s != len; ++s) {
+        if (u->skills[s].level > 0) {
             ++c;
+        }
     }
 
-    if (c == 0)
-        return NULL;
-
-    n = rng_int() % c + 1;
-    c = 0;
-
-    for (sv = u->skills; sv != u->skills + u->skill_size; ++sv) {
-        if (sv->level > 0 && rc_can_learn(u->_race, sv->id)) {
-            if (++c == n) {
-                return create_order(K_STUDY, lang, "'%s'", skillname(sv->id, lang));
+    if (c != 0) {
+        int n = rng_int() % c + 1;
+        
+        for (c = 0, s = 0; s != len; ++s) {
+            skill* sv = u->skills + s;
+            if (sv->level > 0 && rc_can_learn(u->_race, sv->id)) {
+                if (++c == n) {
+                    return create_order(K_STUDY, lang, "'%s'", skillname(sv->id, lang));
+                }
             }
         }
     }

@@ -1,3 +1,5 @@
+#include "bind_tolua.h"
+
 #include "config.pkg.c"
 #include "eressea.pkg.c"
 #include "game.pkg.c"

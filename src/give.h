@@ -26,6 +26,8 @@ extern "C" {
     bool can_give_to(struct unit *u, struct unit *u2);
     bool can_give_men(const struct unit *u, const struct unit *dst, struct order *ord, struct message **msg);
     bool rule_transfermen(void);
+    int reserve_cmd(struct unit* u, struct order* ord);
+    int reserve_self(struct unit* u, struct order* ord);
 
 #ifdef __cplusplus
 }

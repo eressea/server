@@ -281,6 +281,9 @@ lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, st
             return result;
         }
     }
+    else {
+        log_error("use_item(%s) calling '%s': not a function.\n", unitname(u), fname);
+    }
     lua_pop(L, 1);
     return EUNUSABLE;
 }

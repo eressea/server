@@ -4,7 +4,7 @@
 
 #include "battle.h"
 
-#include "guard.h"
+#include "magic.h"
 #include "reports.h"
 
 #include "spells/buildingcurse.h"
@@ -20,20 +20,20 @@
 #include "kernel/ship.h"
 #include "kernel/skill.h"
 #include "kernel/skills.h"
+#include "kernel/status.h"
 #include "kernel/unit.h"
 
 #include "util/base36.h"
-#include "util/functions.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/rng.h"
 #include "util/strings.h"
+#include "util/variant.h"
 
 #include <CuTest.h>
 
-#include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "tests.h"
@@ -65,7 +65,7 @@ static void test_make_fighter(CuTest * tc)
 
     test_setup();
     test_create_horse();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     au = test_create_unit(f, r);
     enable_skill(SK_MAGIC, true);
@@ -201,7 +201,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
 
     test_setup();
     btype = setup_castle();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     bld = test_create_building(r, btype);
 
     du = test_create_unit(test_create_faction(), r);
@@ -252,7 +252,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
     building_type * btype;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     btype = setup_castle();
     btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
@@ -283,7 +283,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
 
     test_setup();
     btype = setup_castle();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
     bld->size = 10;
@@ -350,7 +350,7 @@ static void test_natural_armor(CuTest * tc)
 
     test_setup();
     rc = test_create_race("human");
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     set_level(u, SK_STAMINA, 2);
     CuAssertIntEquals(tc, 0, rc_armor_bonus(rc));
     CuAssertIntEquals(tc, 0, natural_armor(u));
@@ -386,7 +386,7 @@ static void test_calculate_armor(CuTest * tc)
     variant v50p = frac_make(1, 2);
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ibelt = it_get_or_create(rt_get_or_create("trollbelt"));
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
@@ -485,7 +485,7 @@ static void test_magic_resistance(CuTest *tc)
     variant v10p = frac_make(1, 10);
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
@@ -554,7 +554,7 @@ static void test_projectile_armor(CuTest * tc)
     variant v50p = frac_make(1, 2);
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ishield = it_get_or_create(rt_get_or_create("shield"));
     ashield = new_armortype(ishield, 0.0, v50p, 1, ATF_SHIELD);
     ichain = it_get_or_create(rt_get_or_create("chainmail"));
@@ -589,7 +589,7 @@ static void test_battle_skilldiff(CuTest *tc)
 
     test_setup();
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ud = test_create_unit(test_create_faction(), r);
     ua = test_create_unit(test_create_faction(), r);
     td.fighter = setup_fighter(&b, ud);
@@ -622,7 +622,7 @@ static void test_terminate(CuTest * tc)
     race *rc;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
 
     rc = test_create_race("human");
     au = test_create_unit(test_create_faction_ex(rc, NULL), r);
@@ -752,7 +752,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     test_setup();
     btype = setup_castle();
 
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     ud = test_create_unit(test_create_faction(), r);
     ud->building = test_create_building(ud->region, btype);
     ua = test_create_unit(test_create_faction(), r);
@@ -803,7 +803,7 @@ static void test_drain_exp(CuTest *tc)
 
     test_setup();
     config_set("study.random_progress", "0");
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_level(u, SK_STAMINA, 3);
 
     CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);

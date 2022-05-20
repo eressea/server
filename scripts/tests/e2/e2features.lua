@@ -262,6 +262,25 @@ function test_levitate()
   assert_equal(0, u.ship.flags)
 end
 
+function test_levitation_ring()
+  local r = region.create(0,0, "plain")
+  local f = faction.create("human")
+  local u = unit.create(f, r, 2)
+  local s = ship.create(r, "boat")
+  u.ship = s
+  u.age = 20
+  u:set_skill("sailing", 5)
+  u:add_item("ring_of_levitation", 2)
+  u:add_item("money", 100)
+  u:add_item("mallornseed", 3)
+  u:clear_orders()
+  u:add_order('BENUTZE 1 "Ring der Levitation"')
+  process_orders()
+  assert_equal(32, u.ship.flags)
+  assert_equal(1, u:get_item('ring_of_levitation'))
+  assert_equal(1, u:get_item('mallornseed'))
+end
+
 function test_terrains()
   local terrains = { "hell", "wall1", "corridor1" }
   for k,v in ipairs(terrains) do

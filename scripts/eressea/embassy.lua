@@ -1,3 +1,32 @@
+-- Ring für die Treueschwur
+
+function use_ring_of_levitation(u, amount, ord)
+    if not u.ship then
+        return -331 -- error331: Die Einheit befindet sich nicht auf einem Schiff
+    end
+    local seeds = u:get_pooled('mallornseed')
+    if seeds == 0 then
+        local msg = message.create('resource_missing')
+        msg:set_unit('unit', u)
+        msg:set_region('region', u.region)
+        msg:set_unit('command', ord)
+        msg:set_resource('missing', 'mallornseed')
+        msg:send_faction(u.faction)
+        return 0
+    end
+    if seeds > 0 then
+        if seeds > 2 then seeds = 2 end
+        u:use_pooled('mallornseed', seeds)
+        levitate_ship(u.ship, u, 1, seeds)
+        local msg = message.create('flying_ship_result')
+        msg:set_unit('mage', u)
+        msg:set_ship('ship', u.ship)
+        msg:send_region(u.region)
+        return 1
+    end
+    return 0
+end
+
 -- Muschelplateau
 
 if not config.embassy or config.embassy==0 then return nil end
@@ -12,7 +41,9 @@ function use_seashell(u, amount)
     if visit and u.region~= home then
         local turns = get_turn() - visit
         local msg = message.create('msg_event')
-        msg:set_string("string", u.name .. "(" .. itoa36(u.id) .. ") erzählt den Bewohnern von " .. u.region.name .. " von Muschelplateau, das die Partei " .. u.faction.name .. " vor " .. turns .. " Wochen besucht hat." )
+        msg:set_string("string", u.name .. " (" .. itoa36(u.id) .. ") erzählt den Bewohnern von " .. u.region.name .. " von Muschelplateau, das die Partei " .. u.faction.name .. " vor " .. turns .. " Wochen besucht hat." )
+        msg:set_unit('unit', u)
+        msg:set_region('region', u.region)
         msg:send_region(u.region)
         return 0
     end

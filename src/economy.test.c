@@ -1,14 +1,12 @@
 #include <kernel/config.h>
 #include "economy.h"
 #include "recruit.h"
-#include "guard.h"
+#include "direction.h"         // for D_EAST, directions
 
-#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
-#include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>
 #include <kernel/race.h>
@@ -18,15 +16,22 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
+#include "kernel/build.h"      // for construction, requirement
+#include "kernel/skill.h"      // for SK_ROAD_BUILDING, SK_WEAPONSMITH, SK_A...
 
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/param.h>
+#include "util/keyword.h"      // for K_BUY, K_DESTROY, K_RECRUIT, K_SELL
+#include "util/variant.h"      // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <stdbool.h>           // for false, true
+#include <stdlib.h>            // for NULL, calloc, free, malloc
 
 static void test_give_control_building(CuTest * tc)
 {
@@ -37,7 +42,7 @@ static void test_give_control_building(CuTest * tc)
 
     test_setup();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     b = test_create_building(r, NULL);
     u1 = test_create_unit(f, r);
     u_set_building(u1, b);
@@ -58,7 +63,7 @@ static void test_give_control_ship(CuTest * tc)
 
     test_setup();
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     sh = test_create_ship(r, NULL);
     u1 = test_create_unit(f, r);
     u_set_ship(u1, sh);
@@ -135,7 +140,7 @@ static struct unit *create_recruiter(void) {
     unit *u;
     const resource_type* rtype;
 
-    r=test_create_region(0, 0, NULL);
+    r=test_create_plain(0, 0);
     rsetpeasants(r, 999);
     f = test_create_faction();
     u = test_create_unit(f, r);
@@ -263,7 +268,7 @@ static void test_trade_limits(CuTest *tc) {
 }
 
 static void test_trade_needs_castle(CuTest *tc) {
-    /* Handeln ist nur in Regionen mit Burgen möglich. */
+    /* Handeln ist nur in Regionen mit Burgen mï¿½glich. */
     race *rc;
     region *r;
     unit *u;
@@ -383,7 +388,7 @@ static void test_buy_cmd(CuTest *tc) {
     b->size = 2;
     produce(r);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "error119"));
-    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "error102"));
+    CuAssertPtrNotNullMsg(tc, "traders need SK_TRADE skill", test_find_messagetype(u->faction->msgs, "skill_needed"));
     test_clear_messages(u->faction);
     freset(u, UFL_LONGACTION);
 
@@ -412,13 +417,13 @@ static void test_tax_cmd(CuTest *tc) {
     region *r;
     unit *u;
     item_type *silver;
-    econ_request *taxorders = 0;
+    econ_request *taxorders = NULL;
 
     test_setup();
     setup_production();
     config_set("taxing.perlevel", "20");
     f = test_create_faction();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r && f);
     u = test_create_unit(f, r);
 
@@ -485,7 +490,7 @@ static void test_maintain_buildings(CuTest *tc) {
     setup_economy();
     btype = test_create_buildingtype("Hort");
     btype->maxsize = 10;
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     u = test_create_unit(f, r);
     b = test_create_building(r, btype);
@@ -541,7 +546,7 @@ static void test_maintain_buildings(CuTest *tc) {
     maintain_buildings(r);
     CuAssertIntEquals(tc, BLD_UNMAINTAINED, fval(b, BLD_UNMAINTAINED));
     CuAssertPtrEquals(tc, NULL, f->msgs);
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->msgs, "maintenance_noowner"));
+    CuAssertPtrEquals(tc, NULL, r->msgs);
     test_clear_messagelist(&r->msgs);
 
     test_teardown();
@@ -554,7 +559,7 @@ static void test_recruit(CuTest *tc) {
     test_setup();
     setup_economy();
     f = test_create_faction();
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u = test_create_unit(f, test_create_plain(0, 0));
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 1, f->num_people);
     CuAssertIntEquals(tc, 1, f->num_units);
@@ -585,7 +590,7 @@ static void test_recruit_insect(CuTest *tc) {
     test_create_calendar();
     test_create_terrain("desert", -1);
     f = test_create_faction_ex(test_create_race("insect"), NULL);
-    u = test_create_unit(f, test_create_region(0, 0, NULL));
+    u = test_create_unit(f, test_create_plain(0, 0));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
     CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
@@ -613,7 +618,7 @@ static void test_income(CuTest *tc)
     unit *u;
     test_setup();
     rc = test_create_race("nerd");
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     CuAssertIntEquals(tc, 20, income(u));
     u->number = 5;
     CuAssertIntEquals(tc, 100, income(u));
@@ -629,7 +634,7 @@ static void test_modify_material(CuTest *tc) {
     test_setup();
     setup_production();
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_level(u, SK_WEAPONSMITH, 1);
 
     /* the unit's race gets 2x savings on iron used to produce goods */
@@ -678,7 +683,7 @@ static void test_modify_skill(CuTest *tc) {
     test_setup();
     setup_production();
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_level(u, SK_WEAPONSMITH, 1);
 
     itype = test_create_itemtype("iron");
@@ -742,7 +747,7 @@ static void test_modify_production(CuTest *tc) {
     rt_silver = get_resourcetype(R_SILVER);
     itype = test_create_itemtype("stone");
     rtype = itype->rtype;
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     make_item(u, itype, 1);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_cannotmake"));
     CuAssertIntEquals(tc, 0, get_item(u, itype));
@@ -840,7 +845,7 @@ static void test_loot(CuTest *tc) {
     mt_create_error(48); /* unit is unarmed */
     it_silver = test_create_silver();
     config_set("rules.enable_loot", "1");
-    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_LOOT, f->locale, NULL);
     produce(u->region);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error48")); /* unit is unarmed */
@@ -862,7 +867,7 @@ static void test_expand_production(CuTest *tc) {
     test_setup();
     orders = calloc(1, sizeof(econ_request));
     orders->qty = 2;
-    orders->unit = u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, NULL));
+    orders->unit = u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
     orders->next = NULL;
 
     u->n = 1; /* will be overwritten */
@@ -886,7 +891,7 @@ static void test_destroy_road(CuTest* tc)
     test_setup();
     mt_create_va(mt_new("destroy_road", NULL), "unit:unit", "from:region", "to:region", MT_NEW_END);
     r2 = test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(), r);
     u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
@@ -939,7 +944,7 @@ static void test_destroy_road_guard(CuTest* tc)
 
     test_setup();
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     rsetroad(r, D_EAST, 100);
     ug = test_create_guard(r, 0, 0);
     u = test_create_unit(f = test_create_faction(), r);
@@ -971,7 +976,7 @@ static void test_destroy_road_limit(CuTest* tc)
 
     test_setup();
     test_create_region(1, 0, 0);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(), r);
     u->orders = ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
@@ -995,7 +1000,7 @@ static void test_destroy_cmd(CuTest* tc) {
 
     test_setup();
     mt_create_error(138);
-    u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     u->thisorder = create_order(K_DESTROY, f->locale, NULL);
     CuAssertIntEquals(tc, 138, destroy_cmd(u, u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error138"));

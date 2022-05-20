@@ -10,8 +10,8 @@
 /* alle vierstelligen zahlen: */
 #define MAX_UNIT_NR (36*36*36*36-1)
 
-#define UFL_DEAD          (1<<0)
-#define UFL_ISNEW         (1<<1)        /* 2 */
+#define UFL_DEAD          (1<<0)        /* unit died in battle and cannot receive anything */
+#define UFL_ISNEW         (1<<1)        /* unit was created this turn */
 #define UFL_LONGACTION    (1<<2)        /* 4 */
 #define UFL_OWNER         (1<<3)        /* 8 */
 #define UFL_ANON_FACTION  (1<<4)        /* 16 */
@@ -68,15 +68,14 @@ typedef struct unit {
     int age;
 
     /* skill data */
-    int skill_size;
     struct skill* skills;
     struct item* items;
     reservation* reservations;
 
     /* orders */
-    struct order* orders;
-    struct order* thisorder;
-    struct order* old_orders;
+    struct order* orders; /* orders to be executed this turn */
+    struct order* thisorder; /* long turn to be executed this turn */
+    struct order* old_orders; /* repeatable default orders to be saved for next turn */
 
     /* race and illusionary race */
     const struct race* _race;
@@ -108,7 +107,8 @@ int max_heroes(int num_people);
 int countheroes(const struct faction* f);
 
 int ualias(const struct unit* u);
-void usetalias(unit* u, int alias);
+void usetalias(struct unit* u, int alias);
+void setguard(struct unit * u, bool enabled);
 
 int weight(const struct unit* u);
 
@@ -143,6 +143,7 @@ int effskill_study(const struct unit* u, enum skill_t sk);
 int get_modifier(const struct unit* u, enum skill_t sk, int level,
     const struct region* r, bool noitem);
 int remove_unit(struct unit** ulist, struct unit* u);
+void erase_unit(struct unit** ulist, struct unit* u);
 void leave_region(struct unit* u);
 
 /* looking up dead units' factions: */

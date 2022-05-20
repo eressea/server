@@ -51,18 +51,6 @@ void update_guards(void)
     }
 }
 
-void setguard(unit * u, bool enabled)
-{
-    if (!enabled) {
-        freset(u, UFL_GUARD);
-    } else {
-        assert(!fval(u, UFL_MOVED));
-        assert(u->status < ST_FLEE);
-        fset(u, UFL_GUARD);
-        fset(u->region, RF_GUARDED);
-    }
-}
-
 void guard(unit * u)
 {
     setguard(u, true);

@@ -3,9 +3,10 @@
 #endif
 #include "tests.h"
 
-#include "battle.h"
 #include "creport.h"
+#include "direction.h"         // for init_direction, directions, MAXDIRECTIONS
 #include "eressea.h"
+#include "magic.h"             // for spell_component, create_castorder, ...
 #include "prefix.h"
 #include "report.h"
 #include "reports.h"
@@ -16,12 +17,13 @@
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
 #include "kernel/alliance.h"
-#include "kernel/equipment.h"
 #include "kernel/messages.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
+#include "kernel/skill.h"      // for enable_skill, skillnames, MAXSKILLS
+#include "kernel/status.h"     // for ST_FLEE
 #include "kernel/terrain.h"
-#include "kernel/terrainid.h"
+#include "kernel/types.h"      // for MAXMAGIETYP
 #include "kernel/item.h"
 #include "kernel/unit.h"
 #include "kernel/order.h"
@@ -30,9 +32,6 @@
 #include "kernel/building.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
-#include "kernel/spellbook.h"
-#include "kernel/terrain.h"
-
 #include "util/aliases.h"
 #include "util/functions.h"
 #include "util/keyword.h"
@@ -44,11 +43,16 @@
 #include "util/strings.h"
 #include "util/param.h"
 #include "util/rand.h"
+#include "util/variant.h"      // for variant, VAR_VOIDPTR, VAR_INT
 
+#include <stb_ds.h>
 #include <CuTest.h>
 
 #include <assert.h>
 #include <errno.h>
+#include <stdarg.h>            // for va_list
+#include <stdbool.h>           // for true
+#include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
 #include <string.h>
 
@@ -74,6 +78,8 @@ struct race *test_create_race(const char *name)
     rc->maintenance = 10;
     rc->hitpoints = 20;
     rc->maxaura = 100;
+    rc->recruitcost = 100;
+    rc->recruit_multi = 1;
     rc->flags |= (RCF_WALK|RCF_PLAYABLE);
     rc->ec_flags |= ECF_GETITEM;
     rc->battle_flags = BF_EQUIPMENT;
@@ -195,14 +201,15 @@ struct faction* test_create_faction(void) {
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
     const struct race * rc = f ? f->race : 0;
-    assert(f && r);
     if (!rc) rc = rc_get_or_create("human");
+    if (!f) f = test_create_faction_ex(rc, NULL);
+    if (!r) r = test_create_plain(0, 0);
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
 }
 
 static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
     strlist **slp = (strlist **)udata;
-    addstrlist(slp, format);
+    addstrlist(slp, str_strdup(format));
 }
 
 struct log_t * test_log_start(int flags, strlist **slist) {
@@ -313,6 +320,13 @@ void test_create_calendar(void) {
     month_season[8] = SEASON_SUMMER;
 }
 
+void test_use_astral(void)
+{
+    config_set_int("modules.astralspace", 1);
+    test_create_terrain("fog", LAND_REGION);
+    test_create_terrain("thickfog", FORBIDDEN_REGION);
+}
+
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset_full();
@@ -387,15 +401,10 @@ ship_type * test_create_shiptype(const char * name)
         stype->construction->skill = SK_SHIPBUILDING;
     }
 
-    if (stype->coasts) {
-        free(stype->coasts);
-    }
-    stype->coasts =
-        (terrain_type **)malloc(sizeof(terrain_type *) * 3);
+    arrsetlen(stype->coasts, 1);
+    if (!stype->coasts) abort();
     stype->coasts[0] = test_create_terrain("plain",
         LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
-    stype->coasts[1] = test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
-    stype->coasts[2] = NULL;
     if (default_locale) {
         const char* str = locale_getstring(default_locale, name);
         if (!str || strcmp(name, str) != 0) {

@@ -7,11 +7,14 @@
 #include "race.h"
 #include "region.h"
 #include "skill.h"
+#include "types.h"  // for M_DRAIG
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
 #include <limits.h>
+#include <stdbool.h>       // for true
 
 void test_reservation(CuTest *tc) {
     unit *u;

@@ -1,8 +1,8 @@
 #include "gamedata.h"
 
 #include <CuTest.h>
-#include <tests.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 static void test_gamedata(CuTest * tc)
 {

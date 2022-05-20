@@ -26,7 +26,7 @@
     <familiar race="eagle"/>
     <familiar race="imp"/>
   </race>
-  <race name="kraken" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="2.0" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" getitem="yes">
+  <race name="kraken" weight="500" capacity="540" speed="2.0" hp="300" damage="2d10" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" coastal="yes" swim="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
     <skill name="perception" modifier="1"/>
     <skill name="alchemy" modifier="-99"/>
@@ -59,7 +59,7 @@
     <attack type="4" damage="1d10"/>
     <attack type="4" damage="1d10"/>
   </race>
-  <race name="giantturtle" maxaura="0.0" regaura="0.0" weight="1600" capacity="600" speed="1.0" hp="900" ac="7" damage="2d50" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="5" coastal="yes" swim="yes" walk="yes" teach="no" getitem="yes">
+  <race name="giantturtle" weight="1600" capacity="600" speed="1.0" hp="900" ac="7" damage="2d50" unarmedattack="0" unarmeddefense="0" attackmodifier="10" defensemodifier="5" coastal="yes" swim="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
     <skill name="perception" modifier="1"/>
     <skill name="alchemy" modifier="-99"/>
@@ -87,7 +87,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d50"/>
   </race>
-  <race name="dolphin" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="2.0" hp="24" damage="1d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="5" coastal="yes" swim="yes" teach="no" getitem="yes">
+  <race name="dolphin" weight="500" capacity="540" speed="2.0" hp="24" damage="1d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="5" coastal="yes" swim="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -114,7 +114,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="tiger" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="30" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" getitem="yes">
+  <race name="tiger" weight="500" capacity="540" speed="1.0" hp="30" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -143,7 +143,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="hellcat" magres="50" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="40" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" getitem="yes" resistpierce="yes">
+  <race name="hellcat" magres="50" weight="500" capacity="540" speed="1.0" hp="40" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" getitem="yes" resistpierce="yes">
     <ai splitsize="5000"/>
     <skill name="perception" modifier="1"/>
     <skill name="alchemy" modifier="-99"/>
@@ -172,7 +172,7 @@
     <attack type="4" damage="1d6"/>
     <attack type="4" damage="1d6"/>
   </race>
-  <race name="owl" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="9" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="4" fly="yes" walk="yes" teach="no" getitem="yes">
+  <race name="owl" weight="500" capacity="540" speed="1.0" hp="9" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="2" defensemodifier="4" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000"/>
     <skill name="espionage" modifier="1"/>
     <skill name="stealth" modifier="1"/>
@@ -202,7 +202,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="1d4"/>
   </race>
-  <race name="fairy" magres="80" maxaura="1.0" regaura="1.500000" weight="200" capacity="540" speed="1.0" hp="6" damage="1d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="14" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes">
+  <race name="fairy" magres="80" maxaura="1.0" regaura="1.5" weight="200" capacity="540" speed="1.0" hp="6" damage="1d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="14" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes">
     <ai splitsize="5000"/>
     <skill name="stealth" modifier="5"/>
     <skill name="espionage" modifier="2"/>
@@ -298,7 +298,7 @@
     <attack type="1" damage="1d4"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="ghost" magres="80" maxaura="0.5" regaura="0.100000" weight="500" capacity="540" speed="1.0" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes" invinciblenonmagic="yes">
+  <race name="ghost" magres="80" maxaura="0.5" regaura="0.1" weight="500" capacity="540" speed="1.0" hp="30" ac="5" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="5" defensemodifier="8" fly="yes" walk="yes" teach="no" getitem="yes" equipment="yes" invinciblenonmagic="yes">
     <ai splitsize="5000" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -328,7 +328,7 @@
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="wolf" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" getitem="yes">
+  <race name="wolf" weight="500" capacity="540" speed="1.0" hp="25" damage="2d6" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="3" walk="yes" teach="no" getitem="yes">
     <ai splitsize="5000" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -357,7 +357,7 @@
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
   </race>
-  <race name="unicorn" magres="90" maxaura="1.500000" regaura="1.500000" weight="5000" capacity="2000" speed="2.0" hp="40" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" getitem="yes">
+  <race name="unicorn" magres="90" maxaura="1.5" regaura="1.5" weight="5000" capacity="2000" speed="2.0" hp="40" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="4" walk="yes" teach="no" getitem="yes">
     <ai splitsize="9999"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -387,7 +387,7 @@
     <attack type="4" damage="3d12"/>
     <attack type="4" damage="2d4"/>
   </race>
-  <race name="nymph" magres="90" maxaura="1.0" regaura="1.500000" weight="1000" capacity="540" speed="1.0" hp="15" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" getitem="yes" equipment="yes">
+  <race name="nymph" magres="90" maxaura="1.0" regaura="1.5" weight="1000" capacity="540" speed="1.0" hp="15" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" getitem="yes" equipment="yes">
     <ai splitsize="9999"/>
     <skill name="mining" modifier="-99"/>
     <skill name="bow" modifier="2"/>
@@ -416,7 +416,7 @@
     <attack type="1" damage="1d4"/>
     <attack type="2" damage="2d20"/>
   </race>
-  <race name="songdragon" magres="99" maxaura="1.0" regaura="1.0" weight="1000" capacity="600" speed="1.500000" hp="40" ac="1" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" fly="yes" walk="yes" teach="no" getitem="yes" unarmedguard="yes">
+  <race name="songdragon" magres="99" maxaura="1.0" regaura="1.0" weight="1000" capacity="600" speed="1.5" hp="40" ac="1" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" fly="yes" walk="yes" teach="no" getitem="yes" unarmedguard="yes">
     <ai splitsize="9999"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -447,7 +447,7 @@
     <attack type="4" damage="2d4"/>
     <attack type="6" spell="fiery_dragonbreath" level="3" />
   </race>
-  <race name="rat" maxaura="0.0" regaura="0.0" weight="100" capacity="540" speed="1.0" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" getitem="yes">
+  <race name="rat" weight="100" capacity="540" speed="1.0" hp="10" damage="1d4" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" teach="no" getitem="yes">
     <ai splitsize="9999"/>
     <skill name="espionage" modifier="5"/>
     <skill name="stealth" modifier="4"/>
@@ -478,7 +478,7 @@
     <attack type="4" damage="1d4"/>
     <attack type="4" damage="1d4"/>
   </race>
-  <race name="eagle" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.500000" hp="15" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="2" fly="yes" walk="yes" teach="no" getitem="yes">
+  <race name="eagle" weight="500" capacity="540" speed="1.5" hp="15" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="2" fly="yes" walk="yes" teach="no" getitem="yes">
     <ai splitsize="9999"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -507,7 +507,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d3"/>
   </race>
-  <race name="tunnelworm" magres="80" maxaura="0.0" regaura="0.0" weight="30000" capacity="10000" speed="1.0" hp="300" ac="6" damage="3d20" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="1" walk="yes" teach="no" getitem="yes">
+  <race name="tunnelworm" magres="80" weight="30000" capacity="10000" speed="1.0" hp="300" ac="6" damage="3d20" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="1" walk="yes" teach="no" getitem="yes">
     <ai splitsize="99999" scarepeasants="yes"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -539,7 +539,7 @@
     <attack type="4" damage="3d20"/>
     <attack type="8" damage="1d10"/>
   </race>
-  <race name="lynx" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" getitem="yes">
+  <race name="lynx" weight="500" capacity="540" speed="1.0" hp="20" damage="2d3" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="5" walk="yes" teach="no" getitem="yes">
     <ai splitsize="99999"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -569,7 +569,7 @@
     <skill name="taxation" modifier="-99"/>
     <attack type="4" damage="2d3"/>
   </race>
-  <race name="direwolf" maxaura="0.0" regaura="0.0" weight="500" capacity="540" speed="1.0" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
+  <race name="direwolf" weight="500" capacity="540" speed="1.0" hp="20" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="3" defensemodifier="1" walk="yes" teach="no" giveperson="yes">
     <ai splitsize="5000"/>
     <attack type="4" damage="2d4"/>
   </race>
@@ -663,13 +663,13 @@
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="stonegolem" stonegolem="true" magres="25" maxaura="1.0" regaura="0.100000" weight="10000" capacity="2000" speed="1.0" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
+  <race name="stonegolem" stonegolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
     <ai splitsize="50"/>
     <skill name="building" modifier="14"/>
     <skill name="roadwork" modifier="14"/>
     <attack type="4" damage="2d10+4"/>
   </race>
-  <race name="irongolem" irongolem="true" magres="25" maxaura="1.0" regaura="0.100000" weight="10000" capacity="2000" speed="1.0" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
+  <race name="irongolem" irongolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
     <ai splitsize="50"/>
     <skill name="armorer" modifier="14"/>
     <skill name="weaponsmithing" modifier="14"/>
@@ -707,7 +707,7 @@
     <attack type="4" damage="5d30"/>
     <attack type="6" spell="powerful_dragonbreath" level="12" />
   </race>
-  <race name="dragon" magres="70" maxaura="1.0" regaura="2.0" weight="10000" capacity="1000000" speed="1.500000" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes" dragon="yes">
+  <race name="dragon" magres="70" maxaura="1.0" regaura="2.0" weight="10000" capacity="1000000" speed="1.5" hp="900" ac="6" damage="2d30" unarmedattack="0" unarmeddefense="0" attackmodifier="7" defensemodifier="7" fly="yes" walk="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes" dragon="yes">
     <ai splitsize="2" killpeasants="yes" scarepeasants="yes"/>
     <skill name="magic" modifier="8"/>
     <skill name="tactics" modifier="8"/>
@@ -923,7 +923,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <familiar race="rat"/>
     <familiar race="imp"/>
   </race>
-  <race name="clone" magres="90" maxaura="0.0" regaura="0.0" weight="1000" capacity="540" speed="1.0" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" learn="no" teach="no" noheal="yes">
+  <race name="clone" magres="90" weight="1000" capacity="540" speed="1.0" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" learn="no" teach="no" noheal="yes">
     <ai splitsize="10000"/>
     <skill name="alchemy" modifier="-99"/>
     <skill name="crossbow" modifier="-99"/>
@@ -960,7 +960,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="gnome" magres="100" maxaura="0.0" regaura="0.0" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
+  <race name="gnome" magres="100" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
     <ai splitsize="10000"/>
     <skill name="tactics" modifier="1"/>
     <skill name="perception" modifier="1"/>
@@ -968,7 +968,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <skill name="unarmed" modifier="1"/>
     <attack type="1" damage="1d4"/>
   </race>
-  <race name="museumghost" magres="100" maxaura="0.0" regaura="0.0" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
+  <race name="museumghost" magres="100" weight="1000" capacity="540" speed="1.0" hp="50" damage="1d4" unarmedattack="10" unarmeddefense="10" attackmodifier="10" defensemodifier="10" walk="yes" teach="no">
     <ai splitsize="10000"/>
     <skill name="tactics" modifier="1"/>
     <skill name="perception" modifier="1"/>
@@ -1070,7 +1070,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <skill name="unarmed" modifier="1"/>
     <attack type="1" damage="1d7"/>
   </race>
-  <race name="shadowknight" maxaura="0.0" regaura="0.0" weight="0" capacity="540" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" learn="no" teach="no" noblock="yes">
+  <race name="shadowknight" weight="0" capacity="540" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" learn="no" teach="no" noblock="yes">
     <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="1" damage="1d1"/>
   </race>
@@ -1173,7 +1173,7 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
   </race>
   <race name="orc" studyspeed="-5" magres="-5" maxaura="1" regaura="1" recruitcost="70" maintenance="10" weight="1000" capacity="540" speed="1" hp="24" damage="1d5" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" giveperson="yes" giveunit="yes" getitem="yes" equipment="yes">
     <ai splitsize="10000" moverandom="yes"/>
-    <param name="recruit_multi" value="0.5"/>
+    <param name="recruit_multi" value="2"/>
     <skill name="alchemy" modifier="1"/>
     <skill name="mining" modifier="1"/>
     <skill name="building" modifier="1"/>

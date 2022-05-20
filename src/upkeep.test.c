@@ -24,7 +24,7 @@ void test_upkeep_default(CuTest * tc)
     init_resources();
     i_silver = it_find("money");
     assert(i_silver);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     assert(f1 && f2);
@@ -55,7 +55,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     u1 = test_create_unit(f1, r);
     assert(r && u1);
@@ -80,7 +80,7 @@ void test_upkeep_from_pool(CuTest * tc)
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     assert(r);
     u1 = test_create_unit(test_create_faction(), r);
 	assert(u1);
@@ -114,7 +114,7 @@ void test_upkeep_from_friend(CuTest * tc)
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     assert(f1 && f2);
@@ -167,7 +167,7 @@ void test_upkeep_free(CuTest * tc)
 
     i_silver = it_find("money");
     assert(i_silver);
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     u = test_create_unit(test_create_faction(), r);
     assert(r && u);
 

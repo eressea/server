@@ -6,7 +6,6 @@
 #include <kernel/config.h>
 #include <kernel/messages.h>
 #include <kernel/version.h>
-#include <kernel/save.h>
 
 #include <util/language.h>
 #include <util/log.h>
@@ -35,7 +34,7 @@
 #include <wctype.h>
 
 static const char *logfile = "eressea.log";
-static const char *luafile = 0;
+static const char *luafile = NULL;
 static const char *inifile = "eressea.ini";
 static int memdebug = 0;
 static int verbosity = 2;
@@ -266,7 +265,7 @@ int main(int argc, char **argv)
 {
     int err = 0;
     lua_State *L;
-    dictionary *d = 0;
+    dictionary *d = NULL;
     setup_signal_handler();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
     /* parse arguments again, to override ini file */

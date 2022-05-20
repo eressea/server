@@ -1,16 +1,17 @@
 #include "lighthouse.h"
 
 #include <kernel/attrib.h>
-#include <kernel/config.h>
-#include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/region.h>
 #include <kernel/building.h>
 #include <kernel/terrain.h>
-
+#include "kernel/skill.h"     // for SK_PERCEPTION
 
 #include <CuTest.h>
 #include "tests.h"
+
+#include <stdbool.h>          // for false, true
+#include <stddef.h>           // for NULL
 
 static void test_lighthouse_range(CuTest * tc)
 {
@@ -19,7 +20,7 @@ static void test_lighthouse_range(CuTest * tc)
     building *b;
 
     test_setup();
-    r = test_create_region(0, 0, NULL);
+    r = test_create_plain(0, 0);
     test_create_region(1, 0, 0);
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);

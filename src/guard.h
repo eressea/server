@@ -16,7 +16,6 @@ extern "C" {
 
     guard_t can_start_guarding(const struct unit * u);
     void update_guards(void);
-    void setguard(struct unit * u, bool enabled);
     void guard(struct unit *u);
 
     struct unit *is_guarded(struct region *r, struct unit *u);

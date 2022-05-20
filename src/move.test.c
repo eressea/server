@@ -22,10 +22,12 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/base36.h"
+#include "util/param.h"
 #include "util/parser.h"
 
-#include <CuTest.h>
+#include <stb_ds.h>
 #include <tests.h>
+#include <CuTest.h>
 
 #include <assert.h>
 #include <stdlib.h>
@@ -41,18 +43,16 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
 {
     region *r1, *r2;
     ship * sh;
-    terrain_type *ttype, *otype;
+    terrain_type *ttype;
     ship_type *stype;
 
     test_setup();
     ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
-    otype = test_create_terrain("ocean", SEA_REGION);
     stype = test_create_shiptype("derp");
-    free(stype->coasts);
-    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
+    arrsetlen(stype->coasts, 1);
 
     r1 = test_create_region(0, 0, ttype);
-    r2 = test_create_region(1, 0, otype);
+    r2 = test_create_ocean(1, 0);
     sh = test_create_ship(0, stype);
 
     CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, r2));
@@ -63,29 +63,34 @@ static void test_ship_not_allowed_in_coast(CuTest * tc)
 }
 
 typedef struct move_fixture {
-    region *r;
-    ship *sh;
-    building * b;
-    unit *u;
+    struct region *r;
+    struct ship *sh;
+    struct terrain_type* ttype;
+    struct ship_type* stype;
+    struct building * b;
+    struct unit *u;
 } move_fixture;
 
-static void setup_harbor(move_fixture *mf) {
+static void setup_harbor(move_fixture *mf, region *r_ship) {
     region *r;
     ship * sh;
-    terrain_type * ttype;
     building_type * btype;
     building * b;
     unit *u;
 
-    ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
+    mf->ttype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     btype = test_create_buildingtype("harbour");
 
-    sh = test_create_ship(0, NULL);
-    r = test_create_region(0, 0, ttype);
-
+    r = test_create_region(0, 0, mf->ttype);
     b = test_create_building(r, btype);
 
-    u = test_create_unit(test_create_faction(), r);
+    mf->stype = test_create_shiptype("kayak");
+    if (!r_ship) {
+        r_ship = r;
+    }
+    sh = test_create_ship(r_ship, mf->stype);
+    u = test_create_unit(test_create_faction(), r_ship);
+    set_level(u, SK_SAILING, sh->type->sumskill);
     u->ship = sh;
     ship_set_owner(u);
 
@@ -95,12 +100,39 @@ static void setup_harbor(move_fixture *mf) {
     mf->b = b;
 }
 
+static void test_ship_allowed_coast_ignores_harbor(CuTest* tc)
+{
+    move_fixture mf;
+    unit* u;
+
+    test_setup();
+    setup_harbor(&mf, NULL);
+
+    /* ship cannot sail into a glacier, so the harbor gets used: */
+    CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
+
+    /* now the harbot belongs to someone who is not our ally: */
+    u = test_create_unit(test_create_faction(), mf.r);
+    u->building = mf.b;
+    building_set_owner(u);
+
+    /* ship cannot sail in becasue of the harbor: */
+    CuAssertIntEquals(tc, SA_NO_HARBOUR, check_ship_allowed(mf.sh, mf.r));
+
+    /* make it so our ship can enter glaciers: */
+    mf.stype->coasts[0] = mf.ttype;
+    /* ship cannot sail in becasue of the harbor: */
+    CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(mf.sh, mf.r));
+
+    test_teardown();
+}
+
 static void test_ship_allowed_without_harbormaster(CuTest * tc)
 {
     move_fixture mf;
 
     test_setup();
-    setup_harbor(&mf);
+    setup_harbor(&mf, NULL);
 
     CuAssertIntEquals(tc, SA_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
@@ -111,13 +143,13 @@ static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     move_fixture mf;
 
     test_setup();
-    setup_harbor(&mf);
+    setup_harbor(&mf, NULL);
 
     u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
     building_set_owner(u);
 
-    CuAssertIntEquals_Msg(tc, "harbor master must contact ship", SA_NO_COAST, check_ship_allowed(mf.sh, mf.r));
+    CuAssertIntEquals_Msg(tc, "harbor master must contact ship", SA_NO_HARBOUR, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
 }
 
@@ -126,7 +158,7 @@ static void test_ship_has_harbormaster_contact(CuTest * tc) {
     move_fixture mf;
 
     test_setup();
-    setup_harbor(&mf);
+    setup_harbor(&mf, NULL);
 
     u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
@@ -142,7 +174,7 @@ static void test_ship_has_harbormaster_same_faction(CuTest * tc) {
     move_fixture mf;
 
     test_setup();
-    setup_harbor(&mf);
+    setup_harbor(&mf, NULL);
 
     u = test_create_unit(mf.u->faction, mf.r);
     u->building = mf.b;
@@ -157,7 +189,7 @@ static void test_ship_has_harbormaster_ally(CuTest * tc) {
     move_fixture mf;
 
     test_setup();
-    setup_harbor(&mf);
+    setup_harbor(&mf, NULL);
 
     u = test_create_unit(test_create_faction(), mf.r);
     u->building = mf.b;
@@ -183,8 +215,6 @@ static void test_ship_allowed_insect(CuTest * tc)
     gtype = test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO);
     otype = test_create_terrain("ocean", SEA_REGION);
     stype = test_create_shiptype("derp");
-    free(stype->coasts);
-    stype->coasts = (struct terrain_type **)calloc(2, sizeof(struct terrain_type *));
 
     rg = test_create_region(1, 0, gtype);
     ro = test_create_region(4, 0, otype);
@@ -198,7 +228,7 @@ static void test_ship_allowed_insect(CuTest * tc)
 
     /* coast takes precedence over insect */
     CuAssertIntEquals(tc, SA_COAST, check_ship_allowed(sh, ro));
-    CuAssertIntEquals_Msg(tc, "coast trumps insect", SA_NO_COAST, check_ship_allowed(sh, rg));
+    CuAssertIntEquals_Msg(tc, "no-coast trumps insect as reason", SA_NO_COAST, check_ship_allowed(sh, rg));
     stype->coasts[0] = gtype;
     CuAssertIntEquals_Msg(tc, "insect", SA_NO_INSECT, check_ship_allowed(sh, rg));
 
@@ -213,7 +243,7 @@ static void test_ship_allowed_insect(CuTest * tc)
 
     /* insect passenger can enter */
     fh = test_create_faction_ex(test_create_race("human"), NULL);
-    uh = test_create_unit(fh, test_create_region(0, 0, NULL));
+    uh = test_create_unit(fh, test_create_plain(0, 0));
 
     uh->ship = sh;
     ship_set_owner(uh);
@@ -231,7 +261,7 @@ static void test_walkingcapacity(CuTest *tc) {
     test_setup();
     init_resources();
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     cap = u->number * (u->_race->capacity + u->_race->weight);
     CuAssertIntEquals(tc, cap, walkingcapacity(u));
     scale_number(u, 2);
@@ -269,7 +299,7 @@ static void test_ship_trails(CuTest *tc) {
     ship *sh;
     region *r1, *r2, *r3;
     terrain_type *otype;
-    region_list *route = 0;
+    region_list *route = NULL;
 
     test_setup();
     otype = test_create_terrain("ocean", SEA_REGION);
@@ -297,12 +327,12 @@ static void test_ship_trails(CuTest *tc) {
 }
 
 static void test_age_trails(CuTest *tc) {
-    region_list *route = 0;
+    region_list *route = NULL;
     region *r1, *r2;
     ship *sh;
 
     test_setup();
-    r1 = test_create_region(0, 0, NULL);
+    r1 = test_create_plain(0, 0);
     r2 = test_create_region(1, 0, NULL);
     sh = test_create_ship(r1, NULL);
     add_regionlist(&route, r1);
@@ -534,6 +564,35 @@ static void test_ship_damage_overload(CuTest *tc) {
     CuAssertDblEquals(tc, 0.0, damage_overload(5, 0.0), ASSERT_DBL_DELTA);
 }
 
+static void test_follow_bad_target(CuTest* tc) {
+    unit* u, * u2;
+    faction* f;
+
+    test_setup();
+    mt_create_va(mt_new("error330", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+    mt_create_va(mt_new("error146", NULL),
+        "unit:unit", "region:region", "command:order", MT_NEW_END);
+
+    f = test_create_faction();
+    u = test_create_unit(f, test_create_ocean(0, 0));
+    u2 = test_create_unit(f, test_create_ocean(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    unit_addorder(u, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no)));
+    unit_addorder(u2, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_SHIP]), itoa36(u->ship->no)));
+    follow_cmds(u);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error330"));
+    CuAssertIntEquals(tc, 0, fval(u, UFL_NOTMOVING | UFL_LONGACTION));
+    test_clear_messages(f);
+
+    follow_cmds(u2);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error146"));
+    CuAssertIntEquals(tc, 0, fval(u2, UFL_NOTMOVING | UFL_LONGACTION));
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
 static void test_follow_unit(CuTest *tc) {
     unit *u, *u2;
     order *ord;
@@ -706,7 +765,7 @@ static void test_movement_speed(CuTest *tc) {
     test_setup();
     it_horse = test_create_horse();
     rc = test_create_race(NULL);
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
 
     rc->speed = 1.0;
     CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
@@ -769,6 +828,42 @@ static void test_cycle_route(CuTest *tc) {
     test_teardown();
 }
 
+static void test_sail_into_harbour(CuTest* tc) {
+    unit* u, *u2;
+    region* r1, *r2;
+    faction* f;
+    move_fixture mf;
+    order* ord;
+
+    test_setup();
+    r1 = test_create_ocean(1, 0);
+    setup_harbor(&mf, r1);
+    u = mf.u;
+    r2 = mf.r;
+    f = mf.u->faction;
+    ord = create_order(K_MOVE, f->locale, "WEST");
+
+    u2 = test_create_unit(test_create_faction(), r2);
+    u2->building = mf.b;
+    building_set_owner(u2);
+    move_cmd(u, ord);
+    CuAssertPtrNotNullMsg(tc, "entry into harbor denied", test_find_messagetype(f->msgs, "harbor_denied"));
+    CuAssertIntEquals(tc, 0, u->ship->damage);
+    CuAssertPtrEquals(tc, r1, u->region);
+    test_clear_messages(f);
+
+    contact_unit(u2, u);
+    u->thisorder = create_order(K_MOVE, f->locale, "WEST");
+    move_cmd(u, ord);
+    CuAssertPtrEquals_Msg(tc, "harbor master makes contact", NULL, test_find_messagetype(f->msgs, "harbor_denied"));
+    CuAssertIntEquals(tc, 0, u->ship->damage);
+    CuAssertPtrEquals(tc, r2, u->region);
+    test_clear_messages(f);
+
+    free_order(ord);
+    test_teardown();
+}
+
 static void test_route_pause(CuTest *tc) {
     unit *u;
     region *r;
@@ -800,7 +895,7 @@ static void test_movement_speed_dragon(CuTest *tc) {
     rc = test_create_race("dragon");
     rc->flags |= RCF_DRAGON;
     rc->speed = 1.5;
-    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     CuAssertIntEquals(tc, 6, movement_speed(u));
     test_teardown();
 }
@@ -818,7 +913,7 @@ static void test_movement_speed_unicorns(CuTest *tc) {
     it_unicorn->weight = it_horse->weight;
     it_unicorn->capacity = it_horse->capacity;
 
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, NULL));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     scale_number(u, 10);
     i_change(&u->items, it_unicorn, 5);
 
@@ -907,8 +1002,10 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_movement_speed_dragon);
     SUITE_ADD_TEST(suite, test_movement_speed_unicorns);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
+    SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
+    SUITE_ADD_TEST(suite, test_ship_allowed_coast_ignores_harbor);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
@@ -929,6 +1026,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_ridiculous_overload_no_captain);
     SUITE_ADD_TEST(suite, test_ship_damage_overload);
     SUITE_ADD_TEST(suite, test_follow_unit);
+    SUITE_ADD_TEST(suite, test_follow_bad_target);
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);

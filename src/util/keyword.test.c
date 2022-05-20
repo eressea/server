@@ -1,9 +1,9 @@
-#include "kernel/config.h"
-#include "kernel/order.h"
 #include "keyword.h"
-#include "util/language.h"
-#include "tests.h"
 
+#include "kernel/order.h"
+#include "util/language.h"
+
+#include <tests.h>
 #include <critbit.h>
 #include <CuTest.h>
 

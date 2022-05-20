@@ -10,10 +10,10 @@
 #include "laws.h"
 #include "magic.h"
 #include "reports.h"
-#include "study.h"
 #include "summary.h"
 #include "teleport.h"
 
+#include "kernel/attrib.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/alliance.h"
@@ -46,16 +46,15 @@
 
 #include <modules/score.h>
 
-#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
-#include <util/message.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <dictionary.h>
 #include <tolua.h>
@@ -723,14 +722,14 @@ static int config_get_stype(lua_State * L)
             lua_pushinteger(L, stype->fishing);
             lua_settable(L, -3);
             if (stype->coasts) {
-                const terrain_type *coast = *stype->coasts;
+                unsigned c;
+                size_t n = arrlen(stype->coasts);
                 lua_pushstring(L, "coasts");
                 lua_newtable(L);
-                while (coast) {
-                    lua_pushstring(L, coast->_name);
+                for (c = 0; c != n; ++c) {
+                    lua_pushstring(L, stype->coasts[c]->_name);
                     lua_pushinteger(L, 1);
                     lua_settable(L, -3);
-                    coast = coast->next;
                 }
             }
             if (stype->construction) {

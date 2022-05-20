@@ -11,9 +11,10 @@ extern "C" {
 #define TP_RADIUS (TP_DISTANCE/2) /* Radius von Schemen */
 #define MAX_SCHEMES ((TP_RADIUS * 2 + 1) * (TP_RADIUS * 2 + 1) - 4)
 
+    struct plane;
     struct region;
     struct region_list;
-    struct plane;
+    struct terrain_type;
 
     struct region *r_standard_to_astral(const struct region *r);
     struct region *r_astral_to_standard(const struct region *r);
@@ -24,6 +25,7 @@ extern "C" {
     int regions_in_range(const struct region * r, int radius, bool(*valid) (const struct region *), struct region *result[]);
 
     void create_teleport_plane(void);
+    void update_teleport_plane(const struct region *r, struct plane* aplane, const struct terrain_type* terrain, const struct terrain_type* blocked);
     void spawn_braineaters(float chance);
 
     int real2tp(int rk);

@@ -1,7 +1,6 @@
 #include "magic.h"
 
 #include "contact.h"
-#include "give.h"
 #include "teleport.h"
 
 #include <util/language.h>
@@ -10,6 +9,7 @@
 #include <kernel/ally.h>
 #include <kernel/attrib.h>
 #include <kernel/building.h>
+#include <kernel/config.h>
 #include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
@@ -29,13 +29,12 @@
 #include <tests.h>
 
 #include <stdlib.h>
-#include <string.h>
 
 void test_updatespells(CuTest * tc)
 {
     faction * f;
     spell * sp;
-    spellbook *book = 0;
+    spellbook *book = NULL;
 
     test_setup();
     test_create_race("human");
@@ -509,6 +508,7 @@ static void test_magic_resistance(CuTest *tc) {
     building_type *btype;
 
     test_setup();
+    test_use_astral();
 
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));

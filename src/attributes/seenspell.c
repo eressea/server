@@ -62,7 +62,7 @@ write_seenspells(const variant *var, const void *owner, struct storage *store)
 static int read_seenspell(variant *var, void *owner, struct gamedata *data)
 {
     storage *store = data->store;
-    spell *sp = 0;
+    spell *sp = NULL;
     char token[32];
 
     UNUSED_ARG(owner);

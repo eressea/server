@@ -1,8 +1,6 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/config.h>
-
 #include "orderfile.h"
 
 #include "direction.h"
@@ -15,13 +13,14 @@
 #include <util/base36.h>
 #include <util/keyword.h>
 #include <util/language.h>
-#include <util/lists.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/password.h>
 
 #include <CuTest.h>
 #include <tests.h>
+
+#include <stdio.h>            // for fprintf, fclose, rewind, tmpfile, FILE
 
 static void test_unit_orders(CuTest *tc) {
     unit *u;
