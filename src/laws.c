@@ -2820,7 +2820,7 @@ static void ageing(void)
         }
 
         if (rule_region_owners()) {
-            update_owners(r);
+            update_region_owners(r);
         }
     }
 }
@@ -3984,7 +3984,7 @@ static void reset_game(void)
             faction *owner = r->land->ownership->owner;
             if (owner == get_monsters()) {
                 /* some compat-fix, i believe. */
-                owner = update_owners(r);
+                owner = update_region_owners(r);
             }
             if (owner) {
                 fset(r, RF_GUARDED);
