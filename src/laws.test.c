@@ -858,7 +858,7 @@ static void test_pay_cmd_other_building(CuTest *tc) {
     b = test_create_building(fix.u1->region, test_create_buildingtype("lighthouse"));
     config_set("rules.region_owners", "1");
     config_set("rules.region_owner_pay_building", "lighthouse");
-    update_owners(b->region);
+    update_region_owners(b->region);
 
     ord = create_order(K_PAY, f->locale, "NOT %s", itoa36(b->no));
     assert(ord);

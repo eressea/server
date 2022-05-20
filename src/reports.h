@@ -50,7 +50,6 @@ extern "C" {
     int reports(void);
     int write_reports(struct faction *f, const char *password);
     int init_reports(void);
-    void reorder_units(struct region * r);
 
     int stealth_modifier(const struct region *r, const struct faction *f, enum seen_mode mode);
 

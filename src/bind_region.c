@@ -336,6 +336,13 @@ static int tolua_region_set_flag(lua_State * L)
     return 0;
 }
 
+static int tolua_region_reorder_units(lua_State* L)
+{
+    region* r = (region*)tolua_tousertype(L, 1, NULL);
+    reorder_units(r);
+    return 0;
+}
+
 static int tolua_region_get_resourcelevel(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, NULL);
@@ -801,6 +808,8 @@ void tolua_region_open(lua_State * L)
                 tolua_region_set_terrain);
             tolua_function(L, "get_resourcelevel",
                 tolua_region_get_resourcelevel);
+            tolua_function(L, "reorder_units",
+                tolua_region_reorder_units);
             tolua_function(L, "get_resource", tolua_region_get_resource);
             tolua_function(L, "set_resource", tolua_region_set_resource);
             tolua_function(L, "get_flag", tolua_region_get_flag);

@@ -320,7 +320,7 @@ static int tolua_update_owners(lua_State * L)
     region *r;
     UNUSED_ARG(L);
     for (r = regions; r; r = r->next) {
-        update_owners(r);
+        update_region_owners(r);
     }
     return 0;
 }

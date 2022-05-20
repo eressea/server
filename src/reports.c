@@ -1012,7 +1012,7 @@ struct message *msg_curse(const struct curse *c, const void *obj, objtype_t typ,
     }
 }
 
-int stealth_modifier(const region *r, const faction *f, seen_mode mode)
+int stealth_modifier(const region *r, const faction *f, enum seen_mode mode)
 {
     switch (mode) {
     case seen_spell:
@@ -1321,104 +1321,6 @@ static void prepare_lighthouse(faction *f, region *r, int range)
         for (i = 0; i != n; ++i) {
             region *rl = result[i];
             add_seen_lighthouse(rl, f);
-        }
-    }
-}
-
-void reorder_units(region * r)
-{
-    unit **unext = &r->units;
-
-    if (r->buildings) {
-        building *b = r->buildings;
-        while (*unext && b) {
-            unit **ufirst = unext;    /* where the first unit in the building should go */
-            unit **umove = unext;     /* a unit we consider moving */
-            unit *owner = building_owner(b);
-            while (owner && *umove) {
-                unit *u = *umove;
-                if (u->building == b) {
-                    unit **uinsert = unext;
-                    if (u == owner) {
-                        uinsert = ufirst;
-                    }
-                    if (umove != uinsert) {
-                        *umove = u->next;
-                        u->next = *uinsert;
-                        *uinsert = u;
-                    }
-                    else {
-                        /* no need to move, skip ahead */
-                        umove = &u->next;
-                    }
-                    if (unext == uinsert) {
-                        /* we have a new well-placed unit. jump over it */
-                        unext = &u->next;
-                    }
-                }
-                else {
-                    umove = &u->next;
-                }
-            }
-            b = b->next;
-        }
-    }
-
-    if (r->ships) {
-        ship *sh = r->ships;
-        /* first, move all units up that are not on ships */
-        unit **umove = unext;       /* a unit we consider moving */
-        while (*umove) {
-            unit *u = *umove;
-            if (u->number && !u->ship) {
-                if (umove != unext) {
-                    *umove = u->next;
-                    u->next = *unext;
-                    *unext = u;
-                }
-                else {
-                    /* no need to move, skip ahead */
-                    umove = &u->next;
-                }
-                /* we have a new well-placed unit. jump over it */
-                unext = &u->next;
-            }
-            else {
-                umove = &u->next;
-            }
-        }
-
-        while (*unext && sh) {
-            unit **ufirst = unext;    /* where the first unit in the building should go */
-            unit *owner = ship_owner(sh);
-            umove = unext;
-            while (owner && *umove) {
-                unit *u = *umove;
-                if (u->number && u->ship == sh) {
-                    unit **uinsert = unext;
-                    if (u == owner) {
-                        uinsert = ufirst;
-                        owner = u;
-                    }
-                    if (umove != uinsert) {
-                        *umove = u->next;
-                        u->next = *uinsert;
-                        *uinsert = u;
-                    }
-                    else {
-                        /* no need to move, skip ahead */
-                        umove = &u->next;
-                    }
-                    if (unext == uinsert) {
-                        /* we have a new well-placed unit. jump over it */
-                        unext = &u->next;
-                    }
-                }
-                else {
-                    umove = &u->next;
-                }
-            }
-            sh = sh->next;
         }
     }
 }

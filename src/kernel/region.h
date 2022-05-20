@@ -266,6 +266,7 @@ bool is_mourning(const region * r, int in_turn);
 const struct item_type *r_luxury(const struct region *r);
 void get_neighbours(const struct region *r, struct region **list);
 
-struct faction *update_owners(struct region *r);
+struct faction *update_region_owners(struct region *r);
+void reorder_units(struct region* r);
 
 #endif                          /* _REGION_H */
