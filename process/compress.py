@@ -22,7 +22,7 @@ turn = argv[1]
 try:
     infile = file("reports.txt", "r")
 except:
-    print "%s: reports.txt file does not exist" % (argv[0], )
+    print("%s: reports.txt file does not exist" % (argv[0], ))
     exit(0)
 
 extras = []
