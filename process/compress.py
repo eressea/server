@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from sys import argv, exit
-from string import join
 import os
 import os.path
 
@@ -44,7 +43,7 @@ for line in infile.readlines():
             key, value = setting.split("=")
             options[key] = value
         except:
-            print "Invalid input line", line
+            print("Invalid input line", line)
     if not options.has_key("reports"):
         continue
     reports = options["reports"].split(",")
@@ -58,7 +57,7 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            os.system("zip %s -q -m -j %s" % (output, join(parameters," ")))
+            os.system("zip %s -q -m -j %s" % (output, parameters.join(" ")))
     else:
         files = []
         for extension in reports:
@@ -73,7 +72,7 @@ for line in infile.readlines():
     for extra in extras:
         if os.path.isfile(extra):
             files = files + [extra]
-    options["files"] = join(files, " ")
+    options["files"] = files.join(" ")
     batch = file("%s.sh" % options["faction"], "w")
     batch.write(template % options)
     batch.close()

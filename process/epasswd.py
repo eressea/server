@@ -1,8 +1,5 @@
 #!/usr/bin/python
 
-from string import split
-from string import strip
-from string import lower
 import bcrypt
 import sqlite3
 
@@ -34,8 +31,8 @@ class EPasswd:
             while True:
                 line = fp.readline()
                 if not line: break
-                line = strip(line)
-                [id, email, passwd] = split(line, ":")[0:3]
+                line = line.strip()
+                [id, email, passwd] = line.split(":")[0:3]
                 self.set_data(id, email, passwd)
             fp.close()
 
@@ -51,13 +48,14 @@ class EPasswd:
         return pw == passwd
 
     def get_passwd(self, id):
-        return self.data[lower(id)]["passwd"]
+        return self.data[id.lower()]["passwd"]
     
     def get_email(self, id):
-        return self.data[lower(id)]["email"]
+        return self.data[id.lower()]["email"]
     
     def get_canon_id(self, id):
-        return self.data[lower(id)]["id"]
+        return self.data[id.lower()]["id"]
 
     def fac_exists(self, id):
-        return self.data.has_key(lower(id))
+        return self.data.has_key(id.lower())
+
