@@ -22,7 +22,7 @@ elif 'HOME' in os.environ:
 else: # WTF? No HOME?
     dir = "/home/eressea/eressea"
 if not os.path.isdir(dir):
-    print "please set the ERESSEA environment variable to the install path"
+    print("please set the ERESSEA environment variable to the install path")
     sys.exit(1)
 rootdir = dir
 
@@ -34,7 +34,7 @@ sender = '%s Server <%s>' % (gamename, frommail)
 
 inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
-    print "no such file: " . inifile
+    print("no such file: " . inifile)
 else:
     config = ConfigParser.ConfigParser()
     config.read(inifile)
@@ -324,8 +324,8 @@ def accept(game, locale, stream, extend=None):
         ps.communicate(msg)
 
     if not sendmail:
-        print text_ok, fail, email
-        print filename
+        print(text_ok, fail, email)
+        print(filename)
 
     logger.info("done - accepted orders from " + email)
 
