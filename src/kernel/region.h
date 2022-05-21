@@ -142,6 +142,8 @@ extern struct attrib_type at_peasantluck;
 extern struct attrib_type at_horseluck;
 extern struct attrib_type at_woodcount;
 extern struct attrib_type at_deathcount;
+extern const int delta_x[MAXDIRECTIONS];
+extern const int delta_y[MAXDIRECTIONS];
 
 
 #define reg_hashkey(r) (r->index)
@@ -224,8 +226,6 @@ void init_region(struct region *r);
 void pnormalize(int *x, int *y, const struct plane *pl);
 void destroy_all_roads(struct region * r);
 
-const int delta_x[MAXDIRECTIONS];
-const int delta_y[MAXDIRECTIONS];
 direction_t dir_invert(direction_t dir);
 int max_production(const struct region *r);
 
