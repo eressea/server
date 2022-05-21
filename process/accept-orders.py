@@ -3,14 +3,14 @@
 
 import os
 import os.path
-import ConfigParser
+import configparser
 import string
 import logging
 import sys
 import subprocess
 import time
 import socket
-import rfc822
+from email._parseaddr import mktime_tz, parsedate_tz
 from stat import ST_MTIME
 from email.Utils import parseaddr
 from email.Parser import Parser
@@ -36,7 +36,7 @@ inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
     print("no such file: " . inifile)
 else:
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(inifile)
     if config.has_option('game', 'email'):
         frommail = config.get('game', 'email')
@@ -287,7 +287,7 @@ def accept(game, locale, stream, extend=None):
     if maildate is None:
         turndate = time.time()
     else:
-        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
+        turndate = mktime_tz(parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
     warning, msg, fail = None, "", False
