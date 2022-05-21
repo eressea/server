@@ -3,14 +3,14 @@
 
 import os
 import os.path
-import configparser
+import ConfigParser
 import string
 import logging
 import sys
 import subprocess
 import time
 import socket
-from email._parseaddr import mktime_tz, parsedate_tz
+import rfc822
 from stat import ST_MTIME
 from email.Utils import parseaddr
 from email.Parser import Parser
@@ -22,7 +22,7 @@ elif 'HOME' in os.environ:
 else: # WTF? No HOME?
     dir = "/home/eressea/eressea"
 if not os.path.isdir(dir):
-    print("please set the ERESSEA environment variable to the install path")
+    print "please set the ERESSEA environment variable to the install path"
     sys.exit(1)
 rootdir = dir
 
@@ -34,9 +34,9 @@ sender = '%s Server <%s>' % (gamename, frommail)
 
 inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
-    print("no such file: " . inifile)
+    print "no such file: " . inifile
 else:
-    config = configparser.ConfigParser()
+    config = ConfigParser.ConfigParser()
     config.read(inifile)
     if config.has_option('game', 'email'):
         frommail = config.get('game', 'email')
@@ -287,7 +287,7 @@ def accept(game, locale, stream, extend=None):
     if maildate is None:
         turndate = time.time()
     else:
-        turndate = mktime_tz(parsedate_tz(maildate))
+        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
     warning, msg, fail = None, "", False
@@ -318,14 +318,14 @@ def accept(game, locale, stream, extend=None):
         fail = True
 
     if sendmail and warning is not None:
+        logger.warning(warning)
         subject = gamename + " " + messages["subject-"+locale] + warning
-        print("mail " + subject)
         ps = subprocess.Popen(['mutt', '-s', subject, email], stdin=subprocess.PIPE)
         ps.communicate(msg)
 
     if not sendmail:
-        print(text_ok, fail, email)
-        print(filename)
+        print text_ok, fail, email
+        print filename
 
     logger.info("done - accepted orders from " + email)
 
