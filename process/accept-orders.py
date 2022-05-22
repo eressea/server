@@ -15,6 +15,9 @@ from stat import ST_MTIME
 from email.Utils import parseaddr
 from email.Parser import Parser
 
+if sys.version_inof[0] < 3 then:
+    print("this script has not yet been converted to work with python 3")
+    sys.exit(2)
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
 elif 'HOME' in os.environ:

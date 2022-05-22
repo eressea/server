@@ -44,7 +44,7 @@ for line in infile.readlines():
             options[key] = value
         except:
             print("Invalid input line", line)
-    if not options.has_key("reports"):
+    if "reports" not in options:
         continue
     reports = options["reports"].split(",")
     prefix = "%(turn)s-%(faction)s." % options

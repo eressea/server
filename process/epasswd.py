@@ -8,7 +8,7 @@ class EPasswd:
         self.data = {}
 
     def set_data(self, no, email, passwd):
-        lc_id = lower(no)
+        lc_id = no.lower()
         self.data[lc_id] = {}
         self.data[lc_id]["id"] = no
         self.data[lc_id]["email"] = email
@@ -24,12 +24,15 @@ class EPasswd:
 
     def load_file(self, file):
         try:
-            fp = open(file,"r")
+            fp = open(file,"rt")
         except:
             fp = None
-        if fp != None:
+        if fp is not None:
             while True:
-                line = fp.readline()
+                try:
+                    line = fp.readline()
+                except:
+                    break
                 if not line: break
                 line = line.strip()
                 [id, email, passwd] = line.split(":")[0:3]
@@ -57,5 +60,5 @@ class EPasswd:
         return self.data[id.lower()]["id"]
 
     def fac_exists(self, id):
-        return self.data.has_key(id.lower())
+        return id.lower() in self.data
 
