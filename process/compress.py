@@ -19,7 +19,7 @@ addr=%(email)s
 
 turn = argv[1]
 try:
-    infile = file("reports.txt", "r")
+    infile = open("reports.txt", "rt")
 except:
     print("%s: reports.txt file does not exist" % (argv[0], ))
     exit(0)
@@ -28,6 +28,7 @@ extras = []
 stats = '../parteien'
 if os.path.isfile(stats):
     extra = 'wochenbericht-%s.txt' % turn
+    os.unlink(extra)
     os.symlink(stats, extra)
     extras.append(extra)
 express='../express-%s.txt' % turn
@@ -44,7 +45,7 @@ for line in infile.readlines():
             options[key] = value
         except:
             print("Invalid input line", line)
-    if "reports" not in options:
+    if not "reports" in options:
         continue
     reports = options["reports"].split(",")
     prefix = "%(turn)s-%(faction)s." % options
@@ -57,7 +58,7 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            os.system("zip %s -q -m -j %s" % (output, parameters.join(" ")))
+            os.system("zip %s -q -m -j %s" % (output, ' '.join(parameters)))
     else:
         files = []
         for extension in reports:
@@ -72,8 +73,8 @@ for line in infile.readlines():
     for extra in extras:
         if os.path.isfile(extra):
             files = files + [extra]
-    options["files"] = files.join(" ")
-    batch = file("%s.sh" % options["faction"], "w")
+    options["files"] = ' '.join(files)
+    batch = open("%s.sh" % options["faction"], "wt")
     batch.write(template % options)
     batch.close()
 infile.close()
