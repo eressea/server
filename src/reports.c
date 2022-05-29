@@ -480,7 +480,7 @@ report_building(const struct building *b, const char **name,
 
 int
 report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
-    const faction * viewer, seen_mode mode)
+    const faction * viewer, enum seen_mode mode)
 {
     int n = 0;
 
@@ -865,7 +865,7 @@ static void bufunit_status(const unit* u, const struct locale *lang, struct sbst
 }
 
 void bufunit(const faction * f, const unit * u, const faction *fv,
-    seen_mode mode, bool getarnt, struct sbstring *sbp)
+    enum seen_mode mode, bool getarnt, struct sbstring *sbp)
 {
     bool isbattle = (mode == seen_battle);
     item *show = NULL;
@@ -924,7 +924,7 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
     bufunit_description(u, f, sbp);
 }
 
-int bufunit_depr(const faction * f, const unit * u, seen_mode mode,
+int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     char *buf, size_t size)
 {
     int getarnt = fval(u, UFL_ANON_FACTION);
@@ -2332,7 +2332,7 @@ int count_travelthru(struct region *r, const struct faction *f) {
     return data.n;
 }
 
-bool visible_unit(const unit *u, const faction *f, int stealthmod, seen_mode mode)
+bool visible_unit(const unit *u, const faction *f, int stealthmod, enum seen_mode mode)
 {
     if (u->faction == f) {
         return true;
