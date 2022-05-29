@@ -1,4 +1,5 @@
 #include "umlaut.h"
+#include "variant.h"  // for variant
 
 #include <CuTest.h>
 #include <stdio.h>

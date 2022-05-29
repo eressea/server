@@ -24,6 +24,8 @@ extern "C" {
     extern struct attrib_type at_familiar;
     extern struct attrib_type at_familiarmage;
 
+    extern const struct curse_type ct_magicresistance;
+
     /* ------------------------------------------------------------- */
     /* Spruchparameter
      * Wir suchen beim Parsen des Befehls erstmal nach lokalen Objekten,
@@ -335,6 +337,8 @@ extern "C" {
     struct spellbook * get_spellbook(const char * name);
     void free_spellbooks(void);
     void free_spellbook(struct spellbook *sb);
+
+    void register_magicresistance(void);
 #ifdef __cplusplus
 }
 #endif

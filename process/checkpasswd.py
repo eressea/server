@@ -19,12 +19,11 @@ if mypasswd[0] == '"':
     mypasswd = mypasswd.strip('"')
 
 pw_data = EPasswd()
-try:
-    pw_data.load_database(filename)
-    log("loaded from db " + filename)
-except:
-    pw_data.load_file(filename)
-    log("loaded from file " + filename)
+pw_data.load_database(filename)
+log("loaded from db " + filename)
+#except:
+#    pw_data.load_file(filename)
+#    log("loaded from file " + filename)
 
 if pw_data.fac_exists(myfaction):
     if pw_data.check(myfaction, mypasswd):

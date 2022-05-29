@@ -664,7 +664,7 @@ static order *plan_dragon(unit * u)
         rc_wyrm = get_race(RC_WYRM);
     }
 
-    if (!move && ta == NULL) {
+    if (ta == NULL) {
         move = (rpeasants(r) == 0);   /* when no peasants, move */
         move = move || (rmoney(r) == 0);      /* when no money, move */
     }

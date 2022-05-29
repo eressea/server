@@ -7,6 +7,7 @@
 #include <kernel/gamedata.h>
 
 #include <assert.h>
+#include <stdbool.h>         // for true, false
 #include <storage.h>
 
 /*

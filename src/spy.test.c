@@ -24,7 +24,6 @@
 #include <tests.h>
 #include <CuTest.h>
 
-#include <assert.h>
 #include <stdbool.h>                 // for true
 #include <stdio.h>
 

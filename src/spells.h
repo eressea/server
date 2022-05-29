@@ -11,9 +11,6 @@ extern "C" {
     struct unit;
     struct message;
 
-    extern const struct curse_type ct_magicresistance;
-
-    void register_magicresistance(void);
     void register_spells(void);
 
 #define SHOWASTRAL_MAX_RADIUS 5

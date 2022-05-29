@@ -1,15 +1,14 @@
 #include "teleport.h"
 
 #include <kernel/config.h>
-#include <kernel/plane.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
-#include <kernel/unit.h>
 
-#include "reports.h"
 #include "tests.h"
 
 #include <CuTest.h>
+
+#include <stddef.h>          // for NULL
 
 static void test_update_teleport(CuTest *tc) {
     region* r1, *r2, *ra;

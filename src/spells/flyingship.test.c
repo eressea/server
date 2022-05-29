@@ -13,6 +13,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stddef.h>          // for NULL
+
 static void test_flyingship(CuTest * tc)
 {
     castorder co;

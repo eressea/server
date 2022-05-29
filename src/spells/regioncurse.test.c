@@ -8,6 +8,9 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>        // for true
+#include <stddef.h>         // for NULL
+
 static void test_get_skill_modifier_cursed(CuTest* tc) {
     region* r;
     unit* u, * u2, * u3;

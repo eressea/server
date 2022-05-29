@@ -5,6 +5,7 @@
 #include "direction.h"
 #include "guard.h"
 #include "laws.h"
+#include "magic.h"
 #include "monsters.h"
 #include "randenc.h"
 #include "reports.h"

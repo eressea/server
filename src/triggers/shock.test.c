@@ -1,10 +1,14 @@
 #include "shock.h"
 
-#include <magic.h>
-#include <kernel/unit.h>
-#include <kernel/faction.h>
+#include "../magic.h"
 
 #include <kernel/event.h>
+#include <kernel/faction.h>
+#include <kernel/unit.h>
+#include "kernel/skill.h"    // for SK_MAGIC
+#include "kernel/types.h"    // for M_GWYRRD
+#include <kernel/unit.h>
+
 #include <util/message.h>
 
 #include <tests.h>

@@ -6,6 +6,8 @@
 #include "util/strings.h"
 
 #include <CuTest.h>
+
+#include <stdbool.h>        // for bool, false, true
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

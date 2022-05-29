@@ -8,7 +8,10 @@
 #include "order.h"
 #include "race.h"
 #include "region.h"
+#include "skill.h"  // for SK_BUILDING, SK_ARMORER
 #include "unit.h"
+
+#include <util/keyword.h>  // for K_MAKE
 
 #include <CuTest.h>
 #include <tests.h>

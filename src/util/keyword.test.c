@@ -7,6 +7,8 @@
 #include <critbit.h>
 #include <CuTest.h>
 
+#include <stddef.h>         // for NULL
+
 static void test_init_keywords(CuTest *tc) {
     struct locale *lang;
 

@@ -3,13 +3,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #endif
+#include "strings.h"
+
 #include <CuTest.h>
 
-#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include "strings.h"
 
 static void test_str_unescape(CuTest * tc)
 {

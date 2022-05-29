@@ -12,6 +12,9 @@
 
 #include <CuTest.h>
 
+#include <stdbool.h>         // for true
+#include <stddef.h>          // for NULL
+
 static void test_move_to_vortex(CuTest *tc) {
     region *r1, *r2, *r = 0;
     terrain_type *t_plain;

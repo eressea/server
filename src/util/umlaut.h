@@ -1,31 +1,23 @@
-#ifndef _UMLAUT_H
-#define _UMLAUT_H
+#pragma once
 
 #include "variant.h"
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define E_TOK_NOMATCH (-1)
 #define E_TOK_SUCCESS 0
 #define NODEHASHSIZE 8
-    struct tnode;
 
-    int findtoken(const void *tk, const char *str, variant * result);
-    void addtoken(struct tnode **root, const char *str, variant id);
-    void freetokens(struct tnode *root);
+struct tnode;
+struct locale;
 
-    char * transliterate(char * out, size_t size, const char * in);
+int findtoken(const void *tk, const char *str, variant * result);
+void addtoken(struct tnode **root, const char *str, variant id);
+void freetokens(struct tnode *root);
 
-    typedef struct local_names {
-        struct local_names *next;
-        const struct locale *lang;
-        void * names;
-    } local_names;
+char * transliterate(char * out, size_t size, const char * in);
 
-#ifdef __cplusplus
-}
-#endif
-#endif
+typedef struct local_names {
+    struct local_names *next;
+    const struct locale *lang;
+    void * names;
+} local_names;

@@ -1,17 +1,18 @@
-#include "spells.h"
 #include "magic.h"
 
-#include <spells/regioncurse.h>
+#include "spells/regioncurse.h"
 
 #include <kernel/ally.h>
 #include <kernel/attrib.h>
-#include <kernel/curse.h>
 #include <kernel/building.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
+#include "kernel/objtypes.h"     // for TYP_BUILDING, TYP_UNIT
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
-#include <util/message.h>
+#include "util/message.h"
+#include "util/variant.h"        // for frac_make, frac_sub, variant, frac_add
 
 #include <CuTest.h>
 #include <tests.h>

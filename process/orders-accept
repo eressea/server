@@ -11,7 +11,7 @@ BIN=$(dirname "$SCRIPT")
 cd "$ERESSEA/game-$game"
 mkdir -p orders.dir
 cd orders.dir
-eval "$(python "$BIN/accept-orders.py" "$@")"
+eval "$(python2.7 "$BIN/accept-orders.py" "$@")"
 if [ -e "$ACCEPT_FILE" ]
 then
 	rm -f "$LOCKFILE"
