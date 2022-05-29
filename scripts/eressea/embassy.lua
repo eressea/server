@@ -1,6 +1,6 @@
 -- Ring für die Treueschwur
 
-function use_ring_of_levitation(u, amount, ord)
+function use_ring_of_levitation(u, amount, token, ord)
     if not u.ship then
         return -331 -- error331: Die Einheit befindet sich nicht auf einem Schiff
     end
@@ -9,7 +9,7 @@ function use_ring_of_levitation(u, amount, ord)
         local msg = message.create('resource_missing')
         msg:set_unit('unit', u)
         msg:set_region('region', u.region)
-        msg:set_unit('command', ord)
+        msg:set_order('command', ord)
         msg:set_resource('missing', 'mallornseed')
         msg:send_faction(u.faction)
         return 0
