@@ -1,14 +1,10 @@
 #include "stealth.h"
 
 #include <kernel/unit.h>
-#include <kernel/region.h>
 #include <kernel/skill.h>
 
 #include <CuTest.h>
 #include <tests.h>
-
-#include <stdlib.h>
-#include <assert.h>
 
 static void test_stealth(CuTest *tc) {
     unit *u;

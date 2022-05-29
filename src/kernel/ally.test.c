@@ -4,6 +4,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stddef.h>   // for NULL
+
 static void test_allies_clone(CuTest * tc)
 {
     struct allies * al = NULL, *ac;

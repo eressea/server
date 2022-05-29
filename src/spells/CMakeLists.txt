@@ -6,7 +6,6 @@ combatspells.c
 regioncurse.c
 shipcurse.c
 unitcurse.c
-magicresistance.c
 flyingship.c
 )
 

@@ -527,7 +527,7 @@ spell * test_create_spell(void)
     return sp;
 }
 
-void test_translate_param(const struct locale *lang, param_t param, const char *text) {
+void test_translate_param(const struct locale *lang, enum param_t param, const char *text) {
     struct critbit_tree **cb;
 
     assert(lang && text);

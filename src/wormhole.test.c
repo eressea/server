@@ -9,8 +9,9 @@
 #include <util/message.h>
 
 #include <selist.h>
-
 #include <CuTest.h>
+
+#include <stddef.h>           // for NULL
 
 void sort_wormhole_regions(selist *rlist, region **match, int count);
 void make_wormholes(region **match, int count, const building_type *bt_wormhole);

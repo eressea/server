@@ -220,6 +220,7 @@ set(TESTS_SRC
   laws.test.c
   lighthouse.test.c
   magic.test.c
+  magicresistance.test.c
   market.test.c
   monsters.test.c
   move.test.c
@@ -246,7 +247,6 @@ set(TESTS_SRC
   vortex.test.c
   wormhole.test.c
   spells/flyingship.test.c
-  spells/magicresistance.test.c
   spells/regioncurse.test.c
   triggers/shock.test.c
   ${ATTRIBUTES_TESTS}

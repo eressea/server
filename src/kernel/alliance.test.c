@@ -4,13 +4,16 @@
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
+
 #include <util/base36.h>
+#include <util/keyword.h>    // for K_ALLIANCE
 
 #include <CuTest.h>
 #include <tests.h>
 #include <selist.h>
 
 #include <assert.h>
+#include <stddef.h>          // for NULL
 
 typedef struct alliance_fixture {
     struct faction *f1, *f2;

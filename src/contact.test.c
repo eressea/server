@@ -13,8 +13,6 @@
 
 #include <stddef.h>
 
-struct region;
-
 static void test_contact(CuTest *tc) {
     struct unit *u1, *u2, *u3;
     struct region *r;

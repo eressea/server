@@ -3,6 +3,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stddef.h>   // for NULL
+
 static void test_mt_new(CuTest *tc)
 {
     message_type *mt;

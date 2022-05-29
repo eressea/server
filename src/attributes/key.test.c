@@ -2,7 +2,10 @@
 #include "dict.h"
 
 #include <kernel/attrib.h>
+
 #include <util/base36.h>
+#include <util/variant.h>   // for variant
+
 #include <CuTest.h>
 #include <stdlib.h>
 

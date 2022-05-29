@@ -3,8 +3,12 @@
 #include "unit.h"
 #include "order.h"
 
+#include <util/keyword.h>  // for K_ALLIANCE
+
 #include <CuTest.h>
 #include <tests.h>
+
+#include <stddef.h>        // for NULL
 
 static void parser_two(const void *nodes, struct unit * u, struct order *ord) {
     scale_number(u, 2);

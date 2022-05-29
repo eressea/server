@@ -1,16 +1,19 @@
 #include "building.h"
 
-
+#include "build.h"  // for construction
 #include "calendar.h"
 #include "config.h"
+#include "magic.h"  // for make_icastle
 #include "race.h"
 #include "region.h"
 #include "unit.h"
 
 #include <util/strings.h>
+#include "util/variant.h"  // for variant
 
 #include <CuTest.h>
 #include <tests.h>
+#include <stdbool.h>       // for false, true
 #include <stdlib.h>
 #include <assert.h>
 

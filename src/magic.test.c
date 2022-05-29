@@ -9,7 +9,6 @@
 #include <kernel/ally.h>
 #include <kernel/attrib.h>
 #include <kernel/building.h>
-#include <kernel/config.h>
 #include <kernel/callbacks.h>
 #include <kernel/equipment.h>
 #include <kernel/faction.h>

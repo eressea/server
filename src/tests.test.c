@@ -3,6 +3,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stddef.h>       // for NULL
+
 static void test_resources(CuTest *tc) {
     resource_type *rtype;
     test_setup();
