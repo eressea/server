@@ -28,7 +28,11 @@ extras = []
 stats = '../parteien'
 if os.path.isfile(stats):
     extra = 'wochenbericht-%s.txt' % turn
-    os.unlink(extra)
+    if os.path.exists(extra):
+        try:
+            os.unlink(extra)
+        except:
+            pass
     os.symlink(stats, extra)
     extras.append(extra)
 express='../express-%s.txt' % turn
