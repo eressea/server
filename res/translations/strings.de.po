@@ -3768,7 +3768,7 @@ msgid "create_aots"
 msgstr "Der Spruch ermöglicht es einem Magier, ein Amulett des Wahren Sehens zu erschaffen. Das Amulett erlaubt es dem Träger, alle Einheiten, die durch einen Ring der Unsichtbarkeit geschützt sind, zu sehen. Einheiten allerdings, die sich mit ihrem Tarnungs-Talent verstecken, bleiben weiterhin unentdeckt."
 
 msgid "mallornseed"
-msgstr "Mallornsame"
+msgstr "Mallornsamen"
 
 msgctxt "race"
 msgid "ent"
@@ -4031,7 +4031,7 @@ msgid "summonfireelemental"
 msgstr "Hitzeelementar"
 
 msgid "seed"
-msgstr "Same"
+msgstr "Samen"
 
 msgid "nr_nb_next"
 msgstr ", im "

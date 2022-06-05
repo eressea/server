@@ -64,16 +64,18 @@ int sp_flying_ship(castorder * co)
 
     /* Duration = 1, nur diese Runde */
 
+    if (is_cursed(sh->attribs, &ct_flyingship)) {
+        /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
+        cmistake(caster, co->order, 211, MSG_MAGIC);
+        return 0;
+    }
+    else if (is_cursed(sh->attribs, &ct_shipspeedup)) {
+        /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
+        cmistake(caster, co->order, 210, MSG_MAGIC);
+        return 0;
+    }
     cno = levitate_ship(sh, caster, power, 1);
     if (cno == 0) {
-        if (is_cursed(sh->attribs, &ct_flyingship)) {
-            /* Auf dem Schiff befindet liegt bereits so ein Zauber. */
-            cmistake(caster, co->order, 211, MSG_MAGIC);
-        }
-        else if (is_cursed(sh->attribs, &ct_shipspeedup)) {
-            /* Es ist zu gefaehrlich, ein sturmgepeitschtes Schiff fliegen zu lassen. */
-            cmistake(caster, co->order, 210, MSG_MAGIC);
-        }
         return 0;
     }
     sh->coast = NODIRECTION;
@@ -148,17 +150,18 @@ bool flying_ship(const ship * sh)
 
 static curse *shipcurse_flyingship(ship * sh, unit * mage, double power, int duration)
 {
-    curse *c;
-    if (sh->attribs) {
-        if (curse_active(get_curse(sh->attribs, &ct_flyingship))) {
-            return NULL;
+    curse *c = get_curse(sh->attribs, &ct_flyingship);
+    if (c) {
+        if (c->duration > duration) {
+            c->duration = duration;
         }
-        if (is_cursed(sh->attribs, &ct_shipspeedup)) {
-            return NULL;
+        if (c->vigour < power) {
+            c->vigour = power;
         }
     }
-    /* mit C_SHIP_NODRIFT haben wir kein Problem */
-    c = create_curse(mage, &sh->attribs, &ct_flyingship, power, duration, 0.0, 0);
+    else {
+        c = create_curse(mage, &sh->attribs, &ct_flyingship, power, duration, 0.0, 0);
+    }
     if (c) {
         c->data.v = sh;
         if (c->duration > 0) {
