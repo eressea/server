@@ -277,7 +277,7 @@ function test_levitation_ring()
   u:add_order('BENUTZE 1 "Ring der Levitation"')
   process_orders()
   assert_equal(32, u.ship.flags)
-  assert_equal(1, u:get_item('ring_of_levitation'))
+  assert_equal(2, u:get_item('ring_of_levitation'))
   assert_equal(1, u:get_item('mallornseed'))
 end
 
