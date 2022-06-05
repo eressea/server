@@ -22,7 +22,7 @@ function use_ring_of_levitation(u, amount, token, ord)
         msg:set_unit('mage', u)
         msg:set_ship('ship', u.ship)
         msg:send_region(u.region)
-        return 1
+        return 0 -- the ring has unlimited charges
     end
     return 0
 end
