@@ -6,6 +6,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>    // for true, bool
+
 static unit *eq_unit;
 static const char *eq_name;
 static int eq_mask;

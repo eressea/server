@@ -5,6 +5,7 @@
 #include <kernel/order.h>
 
 #include <util/base36.h>
+#include <util/keyword.h>    // for K_GIVE, enable_keyword, K_WORK, K_ENTERTAIN
 #include <util/language.h>
 #include <util/param.h>
 
@@ -12,9 +13,10 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdlib.h>
+#include <dictionary.h>      // for dictionary_new, dictionary_set, dictionary
 
-struct critbit_tree;
+#include <stdbool.h>         // for false, true
+#include <stdlib.h>
 
 static void test_read_unitid(CuTest *tc) {
     unit *u;

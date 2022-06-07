@@ -1,19 +1,24 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-#include <kernel/ally.h>
-#include <kernel/alliance.h>
-#include <kernel/calendar.h>
-#include <kernel/callbacks.h>
-#include <kernel/faction.h>
-#include <kernel/item.h>
-#include <kernel/order.h>
-#include <kernel/plane.h>
-#include <kernel/race.h>
-#include <kernel/region.h>
-#include <kernel/unit.h>
-#include <kernel/config.h>
+#include "ally.h"
+#include "alliance.h"
+#include "calendar.h"
+#include "callbacks.h"
+#include "config.h"
+#include "faction.h"
+#include "item.h"
+#include "magic.h"                // for set_familiar
+#include "order.h"
+#include "plane.h"
+#include "race.h"
+#include "region.h"
+#include "skill.h"         // for SK_ALCHEMY, SK_MAGIC, SK_ENTERTAINMENT
+#include "types.h"         // for M_GRAY
+#include "unit.h"
+
 #include <util/goodies.h>
+#include <util/keyword.h>         // for K_ENTERTAIN, K_WORK, K_AUTOSTUDY
 #include <util/language.h>
 #include <util/password.h>
 
@@ -26,6 +31,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <limits.h>
+#include <stdbool.h>              // for false, true
 
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;

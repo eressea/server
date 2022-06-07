@@ -7,7 +7,6 @@
 #include <kernel/unit.h>
 #include "kernel/skill.h"    // for SK_MAGIC
 #include "kernel/types.h"    // for M_GWYRRD
-#include <kernel/unit.h>
 
 #include <util/message.h>
 

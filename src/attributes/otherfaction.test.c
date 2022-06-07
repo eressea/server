@@ -1,14 +1,14 @@
 #include "otherfaction.h"
 
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 
-#include <kernel/attrib.h>
-
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stdbool.h>         // for true, false
 #include <stdlib.h>
 
 static void test_rules(CuTest *tc) {

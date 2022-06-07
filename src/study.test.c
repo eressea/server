@@ -31,6 +31,8 @@
 #include <assert.h>
 #include <stddef.h>           // for NULL
 
+struct locale;
+
 #define MAXLOG 4
 typedef struct log_entry {
     unit *u;
