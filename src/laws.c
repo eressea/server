@@ -1335,7 +1335,7 @@ static void remove_idle_players(void)
     for (fp = &factions; *fp;) {
         faction *f = *fp;
 
-        if (timeout > 0 && nmr_death(f, turn, timeout)) {
+        if (timeout > 0 && nmr_death(f, turn, timeout) && !fval(f, FFL_PAUSED)) {
             destroyfaction(fp);
         } else {
             if (fval(f, FFL_NOIDLEOUT)) {
