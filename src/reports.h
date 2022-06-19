@@ -48,7 +48,7 @@ extern "C" {
     const char *hp_status(const struct unit *u);
 
     int reports(void);
-    int write_reports(struct faction *f, const char *password);
+    int write_reports(struct faction *f, int options, const char *password);
     int init_reports(void);
 
     int stealth_modifier(const struct region *r, const struct faction *f, enum seen_mode mode);

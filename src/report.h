@@ -28,6 +28,9 @@ extern "C" {
     void nr_spell_syntax(char *buf, size_t size, struct spellbook_entry * sbe, const struct locale *lang);
     void nr_spell(struct stream *out, struct spellbook_entry * sbe, const struct locale *lang);
 
+    int write_template(const char* filename, const char* bom, const struct faction* f, const char* password,
+        const struct region* regions_begin,
+        const struct region* regions_end);
 #ifdef __cplusplus
 }
 #endif

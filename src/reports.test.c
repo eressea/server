@@ -181,6 +181,7 @@ static void test_bufunit_fstealth(CuTest *tc) {
     lang = get_or_create_locale("de");
     locale_setstring(lang, "status_aggressive", "aggressive");
     locale_setstring(lang, "anonymous", "anonymous");
+    locale_setstring(lang, "disguised_as", "disguised as");
     f1 = test_create_faction();
     f1->locale = lang;
     f2 = test_create_faction();
@@ -193,7 +194,6 @@ static void test_bufunit_fstealth(CuTest *tc) {
     renumber_faction(f2, 2);
     unit_setname(u, "Hodor");
     unit_setid(u, 1);
-    key_set(&u->attribs, 42, 42);
 
     /* report to ourselves */
     bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
@@ -209,17 +209,17 @@ static void test_bufunit_fstealth(CuTest *tc) {
     set_factionstealth(u, f2);
     CuAssertPtrNotNull(tc, u->attribs);
     bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human, aggressive.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), disguised as TWW (2), 1 human, aggressive.", buf);
 
-    /* ... also when we are anonymous */
+    /* ... also see that we are anonymous */
     u->flags |= UFL_ANON_FACTION;
     bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human, aggressive.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), disguised as TWW (2), anonymous, 1 human, aggressive.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* we can see that someone is presenting as us */
     bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), disguised as TWW (2), 1 human.", buf);
 
     /* ... but not if they are anonymous */
     u->flags |= UFL_ANON_FACTION;
@@ -230,12 +230,12 @@ static void test_bufunit_fstealth(CuTest *tc) {
     /* we see the same thing as them when we are an ally */
     ally_set(&f1->allies, f2, HELP_FSTEALTH);
     bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), TWW (2) (UFO (1)), 1 human.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), disguised as TWW (2), 1 human.", buf);
 
     /* ... also when they are anonymous */
     u->flags |= UFL_ANON_FACTION;
     bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
-    CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
 
     /* fstealth has no influence when we are allies, same results again */
@@ -245,8 +245,68 @@ static void test_bufunit_fstealth(CuTest *tc) {
 
     u->flags |= UFL_ANON_FACTION;
     bufunit_depr(f2, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (1), anonymous, 1 human.", buf);
+    u->flags &= ~UFL_ANON_FACTION;
+
+    test_teardown();
+}
+
+static void test_bufunit_help_stealth(CuTest *tc) {
+    faction *f1, *f2;
+    region *r;
+    unit *u;
+    char buf[256];
+    struct locale *lang;
+
+    test_setup();
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "status_aggressive", "aggressive");
+    locale_setstring(lang, "anonymous", "anonymous");
+    locale_setstring(lang, "disguised_as", "disguised as");
+    f1 = test_create_faction();
+    f1->locale = lang;
+    f2 = test_create_faction();
+    f2->locale = lang;
+    r = test_create_plain(0, 0);
+    u = test_create_unit(f2, r);
+    faction_setname(f1, "UFO");
+    renumber_faction(f1, 1);
+    faction_setname(f2, "TWW");
+    renumber_faction(f2, 2);
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+
+    /* report non-stealthed unit */
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), TWW (2), 1 human.", buf);
+
+    /* anonymous unit */
+    u->flags |= UFL_ANON_FACTION;
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
     CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
     u->flags &= ~UFL_ANON_FACTION;
+
+    /* stealthed unit */
+    set_factionstealth(u, f1);
+    CuAssertPtrNotNull(tc, u->attribs);
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), disguised as UFO (1), 1 human.", buf);
+
+    /* allies let us see their true faction */
+    ally_set(&f2->allies, f1, HELP_FSTEALTH);
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), TWW (2), disguised as UFO (1), 1 human.", buf);
+
+    /* anonymous unit */
+    set_factionstealth(u, NULL);
+    u->flags |= UFL_ANON_FACTION;
+    /* allies let us see their true faction */
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), TWW (2), anonymous, 1 human.", buf);
+    /* non-allies do not show their faction when anonymous*/
+    ally_set(&f2->allies, f1, 0);
+    bufunit_depr(f1, u, seen_unit, buf, sizeof(buf));
+    CuAssertStrEquals(tc, "Hodor (1), anonymous, 1 human.", buf);
 
     test_teardown();
 }
@@ -992,7 +1052,7 @@ static void test_reports_genpassword(CuTest *tc) {
     CuAssertIntEquals(tc, 0, f->password_id);
     f->options = 0;
     /* writing the report does not change the password */
-    write_reports(f, NULL);
+    write_reports(f, f->options, NULL);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
     /* but the main reporting function does */
     reports();
@@ -1056,6 +1116,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
+    SUITE_ADD_TEST(suite, test_bufunit_help_stealth);
     SUITE_ADD_TEST(suite, test_arg_resources);
     SUITE_ADD_TEST(suite, test_insect_warnings);
     SUITE_ADD_TEST(suite, test_newbie_warning);

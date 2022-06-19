@@ -2,6 +2,9 @@
 
 #include <magic.h>
 
+#include <attributes/otherfaction.h>
+
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -9,7 +12,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
-#include "kernel/skill.h"            // for SK_SPY, enable_skill, SK_MAGIC
+#include <kernel/skill.h>   // for SK_SPY, enable_skill, SK_MAGIC
 #include <kernel/types.h>
 #include <kernel/unit.h>
 
@@ -18,8 +21,8 @@
 #include <util/message.h>
 #include <util/param.h>
 #include <util/rand.h>
-#include "util/variant.h"  // for frac_zero
-#include "util/keyword.h"            // for K_SETSTEALTH, K_SABOTAGE, K_SPY
+#include <util/variant.h>   // for frac_zero
+#include <util/keyword.h>   // for K_SETSTEALTH, K_SABOTAGE, K_SPY
 
 #include <tests.h>
 #include <CuTest.h>
@@ -197,6 +200,22 @@ static void test_sink_ship(CuTest *tc) {
     test_teardown();
 }
 
+static void test_set_faction_stealth(CuTest* tc) {
+    unit* u;
+    faction* f;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    f = test_create_faction();
+    CuAssertPtrEquals(tc, NULL, a_find(u->attribs, &at_otherfaction));
+    set_factionstealth(u, f);
+    CuAssertPtrEquals(tc, f, get_otherfaction(u));
+    CuAssertPtrNotNull(tc, a_find(u->attribs, &at_otherfaction));
+    set_factionstealth(u, NULL);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(u));
+    test_teardown();
+}
+
 static void test_setstealth_cmd(CuTest *tc) {
     unit *u;
     const struct locale *lang;
@@ -264,6 +283,7 @@ CuSuite *get_spy_suite(void)
     SUITE_ADD_TEST(suite, test_spy_target_not_seen);
     SUITE_ADD_TEST(suite, test_all_spy_message);
     SUITE_ADD_TEST(suite, test_sink_ship);
+    SUITE_ADD_TEST(suite, test_set_faction_stealth);
     SUITE_ADD_TEST(suite, test_setstealth_cmd);
     SUITE_ADD_TEST(suite, test_setstealth_demon);
     SUITE_ADD_TEST(suite, test_setstealth_demon_bad);

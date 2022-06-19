@@ -605,55 +605,60 @@ static void spskill(struct skill* sv, const struct unit *u, const struct locale 
     }
 }
 
-static void bufunit_info(const faction* f, const unit* u, const faction* fv,
-    bool getarnt, struct sbstring* sbp)
+static void bufunit_info(const faction* f, const unit* u, const faction* fv, 
+    bool anon, struct sbstring* sbp)
 {
     const struct locale* lang = f->locale;
+    const group *g = NULL;
+    const faction* of = get_otherfaction(u);
+    const faction* df = NULL;
+
     if (u->faction == f) {
         if (fval(u, UFL_GROUP)) {
-            group* g = get_group(u);
-            if (g) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, groupid(g, f));
+            g = get_group(u);
+        }
+    }
+    else if (anon || of) {
+        if (alliedunit(u, f, HELP_FSTEALTH)) {
+            df = u->faction;
+        }
+        else {
+            if (of != f) {
+                /* cannot see through the disguise */
+                if (anon) {
+                    df = of = NULL;
+                }
+                else {
+                    df = of;
+                    of = NULL;
+                }
             }
         }
-        if (getarnt) {
-            sbs_strcat(sbp, ", ");
-            sbs_strcat(sbp, LOC(lang, "anonymous"));
-        }
-        else if (u->attribs) {
-            faction* otherf = get_otherfaction(u);
-            if (otherf) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, factionname(otherf));
-            }
+        if (anon) {
+            of = NULL;
         }
     }
     else {
-        if (getarnt) {
-            sbs_strcat(sbp, ", ");
-            sbs_strcat(sbp, LOC(lang, "anonymous"));
-        }
-        else {
-            if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
-                faction* otherf = get_otherfaction(u);
-                if (otherf) {
-                    sbs_strcat(sbp, ", ");
-                    sbs_strcat(sbp, factionname(otherf));
-                    sbs_strcat(sbp, " (");
-                    sbs_strcat(sbp, factionname(u->faction));
-                    sbs_strcat(sbp, ")");
-                }
-                else {
-                    sbs_strcat(sbp, ", ");
-                    sbs_strcat(sbp, factionname(fv));
-                }
-            }
-            else {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, factionname(fv));
-            }
-        }
+        df = u->faction;
+    }
+    if (g) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, groupid(g, f));
+    }
+    else if (df) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, factionname(df));
+    }
+
+    if (of) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "disguised_as"));
+        sbs_strcat(sbp, " ");
+        sbs_strcat(sbp, factionname(of));
+    }
+    if (anon) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "anonymous"));
     }
 }
 
@@ -1529,7 +1534,7 @@ void finish_reports(report_context *ctx) {
     }
 }
 
-int write_reports(faction * f, const char *password)
+int write_reports(faction * f, int options, const char *password)
 {
     bool gotit = false;
     struct report_context ctx;
@@ -1544,7 +1549,7 @@ int write_reports(faction * f, const char *password)
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
-        if (f->options & rtype->flag) {
+        if (options & rtype->flag) {
             int error = 0;
             do {
                 char filename[32];
@@ -1647,7 +1652,7 @@ int reports(void)
                  * kriegen ein neues Passwort: */
                 password = faction_genpassword(f, buffer);
             }
-            int error = write_reports(f, password);
+            int error = write_reports(f, f->options, password);
             if (error)
                 retval = error;
             if (mailit)

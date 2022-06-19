@@ -4139,6 +4139,9 @@ msgstr "Mit einem düsteren Ritual und unter Opferung seines eigenen Blutes besc
 msgid "anonymous"
 msgstr "anonym"
 
+msgid "disguised_as"
+msgstr "getarnt als"
+
 msgid "FLIEHE"
 msgstr "FLIEHE"
 

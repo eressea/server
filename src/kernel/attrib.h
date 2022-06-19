@@ -48,6 +48,7 @@ extern "C" {
 
     attrib *a_select(attrib * a, const void *data, bool(*compare) (const attrib *, const void *));
     attrib *a_find(attrib * a, const attrib_type * at);
+    attrib** a_find_it(attrib** ap, const attrib_type* at);
     attrib *a_add(attrib ** pa, attrib * at);
     int a_remove(attrib ** pa, attrib * at);
     void a_removeall(attrib ** a, const attrib_type * at);

@@ -145,23 +145,6 @@ void init_options_translation(const struct locale * lang) {
     }
 }
 
-void init_races(struct locale *lang)
-{
-    const struct race *rc;
-    void **tokens;
-
-    tokens = get_translations(lang, UT_RACES);
-    for (rc = races; rc; rc = rc->next) {
-        const char *name;
-        variant var;
-        var.v = (void *)rc;
-        name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-        name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
-        if (name) addtoken((struct tnode **)tokens, name, var);
-    }
-}
-
 static void init_magic(struct locale *lang)
 {
     void **tokens;
