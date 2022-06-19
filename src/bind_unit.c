@@ -6,19 +6,20 @@
 #include "magic.h"
 
 /*  attributes includes */
+#include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 #include <attributes/key.h>
 
 /*  kernel includes */
 #include <kernel/attrib.h>
-#include "kernel/skill.h"
+#include <kernel/skill.h>
 #include <kernel/event.h>
-#include "kernel/skills.h"
-#include "kernel/status.h"
-#include "kernel/types.h"
+#include <kernel/skills.h>
+#include <kernel/status.h>
+#include <kernel/types.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
-#include "kernel/equipment.h"
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -35,8 +36,8 @@
 /*  util includes */
 #include <util/base36.h>
 #include <util/log.h>
-#include "util/strings.h"
-#include "util/variant.h"
+#include <util/strings.h>
+#include <util/variant.h>
 
 #include <selist.h>
 
@@ -60,7 +61,7 @@ static int tolua_bufunit(lua_State * L) {
             int mode = (int)tolua_tonumber(L, 3, (int)seen_unit);
             sbstring sbs;
             sbs_init(&sbs, buf, sizeof(buf));
-            bufunit(f, u, NULL, mode, u->flags & UFL_ANON_FACTION, &sbs);
+            bufunit(f, u, get_otherfaction(u), mode, (0 != (u->flags & UFL_ANON_FACTION)), &sbs);
             tolua_pushstring(L, buf);
             return 1;
         }

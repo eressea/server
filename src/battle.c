@@ -2801,9 +2801,8 @@ void
 spunit(const struct faction* f, const unit* u, unsigned int indent,
     struct sbstring *sbp)
 {
-    int getarnt = fval(u, UFL_ANON_FACTION);
-    const faction* fv = visible_faction(f, u);
-    bufunit(f, u, fv, seen_battle, !!getarnt, sbp);
+    int anon = (0 != fval(u, UFL_ANON_FACTION));
+    bufunit(f, u, get_otherfaction(u), seen_battle, anon, sbp);
 }
 
 static void battle_punit(unit * u, battle * b)

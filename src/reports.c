@@ -605,12 +605,11 @@ static void spskill(struct skill* sv, const struct unit *u, const struct locale 
     }
 }
 
-static void bufunit_info(const faction* f, const unit* u, const faction* fv, 
+static void bufunit_info(const faction* f, const unit* u, const faction* of,
     bool anon, struct sbstring* sbp)
 {
     const struct locale* lang = f->locale;
     const group *g = NULL;
-    const faction* of = get_otherfaction(u);
     const faction* df = NULL;
 
     if (u->faction == f) {
@@ -869,21 +868,18 @@ static void bufunit_status(const unit* u, const struct locale *lang, struct sbst
     }
 }
 
-void bufunit(const faction * f, const unit * u, const faction *fv,
-    enum seen_mode mode, bool getarnt, struct sbstring *sbp)
+void bufunit(const faction * f, const unit * u, const faction * of,
+    enum seen_mode mode, bool anon, struct sbstring *sbp)
 {
     bool isbattle = (mode == seen_battle);
     item *show = NULL;
     item results[MAX_INVENTORY];
     const struct locale *lang = f->locale;
 
-    if (!fv) {
-        fv = visible_faction(f, u);
-    }
     assert(f);
     sbs_strcat(sbp, unitname(u));
     if (!isbattle) {
-        bufunit_info(f, u, fv, getarnt, sbp);
+        bufunit_info(f, u, of, anon, sbp);
     }
     sbs_strcat(sbp, ", ");
     sbs_strcat(sbp, str_itoa(u->number));
@@ -932,14 +928,18 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
 int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     char *buf, size_t size)
 {
-    int getarnt = fval(u, UFL_ANON_FACTION);
-    const faction * fv = visible_faction(f, u);
+    bool anon = (0 != fval(u, UFL_ANON_FACTION));
+    const faction * of = get_otherfaction(u);
     sbstring sbs;
 
     sbs_init(&sbs, buf, size);
-    bufunit(f, u, fv, mode, !!getarnt, &sbs);
-    if (!getarnt) {
-        if (alliedfaction(f, fv, HELP_ALL)) {
+    bufunit(f, u, of, mode, anon, &sbs);
+    if (anon) {
+        const faction* vf = of;
+        if (of == NULL || !alliedunit(u, f, HELP_FSTEALTH)) {
+            vf = u->faction;
+        }
+        if (alliedfaction(f, vf, HELP_ALL)) {
             return 1;
         }
     }
