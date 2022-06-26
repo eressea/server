@@ -9,6 +9,8 @@
 
 #include <stdlib.h>
 
+struct castorder;
+
 static void test_create_a_spell(CuTest * tc)
 {
     spell * sp;

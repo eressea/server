@@ -5,7 +5,6 @@
 #include <attributes/otherfaction.h>
 
 #include <kernel/attrib.h>
-#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>

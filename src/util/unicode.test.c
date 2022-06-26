@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <wchar.h>
 
 static void test_unicode_trim(CuTest * tc)
 {

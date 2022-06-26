@@ -9,7 +9,6 @@
 #include "helpers.h"
 #include "laws.h"
 #include "magic.h"
-#include "report.h"
 #include "reports.h"
 #include "summary.h"
 #include "teleport.h"
