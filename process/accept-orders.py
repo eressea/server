@@ -204,7 +204,11 @@ def store_message(message, filename):
     outfile.close()
     return
 
-def write_part(outfile, part):
+def write_part(outfile, part, sender):
+    content_type = part.get_content_type()
+    logger.debug("found content type %s for %s" % (content_type, sender))
+    if content_type != "text/plain":
+        return False
     charset = part.get_content_charset()
     payload = part.get_payload(decode=True)
 
@@ -239,21 +243,11 @@ def copy_orders(message, filename, sender, mtime):
     outfile = open(filename, "w")
     if message.is_multipart():
         for part in message.get_payload():
-            content_type = part.get_content_type()
-            logger.debug("found content type %s for %s" % (content_type, sender))
-            if content_type=="text/plain":
-                if write_part(outfile, part):
-                    found = True
-                else:
-                    charset = part.get_content_charset()
-                    logger.error("could not write text/plain part (charset=%s) for %s" % (charset, sender))
-
+            if write_part(outfile, part, sender):
+                found = True
     else:
-        if write_part(outfile, message):
+        if write_part(outfile, message, sender):
             found = True
-        else:
-            charset = message.get_content_charset()
-            logger.error("could not write text/plain message (charset=%s) for %s" % (charset, sender))
     outfile.close()
 
     return found
@@ -293,6 +287,7 @@ def accept(game, locale, stream, extend=None):
         turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
+
     warning, msg, fail = None, "", False
     if not maildate is None:
         os.utime(filename, (turndate, turndate))
