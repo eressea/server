@@ -1444,7 +1444,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 int fno = -1;
                 unit *u = building_owner(b);
                 if (u && !fval(u, UFL_ANON_FACTION)) {
-                    const faction *sf = visible_faction(f, u);
+                    const faction *sf = visible_faction(f, u, get_otherfaction(u));
                     fno = sf->no;
                 }
                 cr_output_building_compat(F, b, u, fno, f);
@@ -1458,7 +1458,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 int fno = -1;
                 unit *u = ship_owner(sh);
                 if (u && !fval(u, UFL_ANON_FACTION)) {
-                    const faction *sf = visible_faction(f, u);
+                    const faction *sf = visible_faction(f, u, get_otherfaction(u));
                     fno = sf->no;
                 }
 

@@ -154,7 +154,7 @@ void piracy_cmd(unit * u)
                 for (sh2 = rc->ships; sh2; sh2 = sh2->next) {
                     unit *cap = ship_owner(sh2);
                     if (cap) {
-                        faction *f = visible_faction(cap->faction, cap);
+                        faction *f = visible_faction(cap->faction, cap, get_otherfaction(cap));
                         if (alliedunit(u, f, HELP_FIGHT))
                             continue;
                         if (!il || intlist_find(il, cap->faction->no)) {

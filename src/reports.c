@@ -929,16 +929,13 @@ int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     char *buf, size_t size)
 {
     bool anon = (0 != fval(u, UFL_ANON_FACTION));
-    const faction * of = get_otherfaction(u);
+    faction * of = get_otherfaction(u);
     sbstring sbs;
 
     sbs_init(&sbs, buf, size);
     bufunit(f, u, of, mode, anon, &sbs);
     if (anon) {
-        const faction* vf = of;
-        if (of == NULL || !alliedunit(u, f, HELP_FSTEALTH)) {
-            vf = u->faction;
-        }
+        const faction* vf = visible_faction(f, u, of);
         if (alliedfaction(f, vf, HELP_ALL)) {
             return 1;
         }
@@ -1067,7 +1064,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
     if (ut->faction == f) {
         unit *u;
         for (u = r->units; u; u = u->next) {
-            faction *sf = visible_faction(f, u);
+            faction *sf = visible_faction(f, u, get_otherfaction(u));
             assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
             if (data->lastf != sf && cansee_unit(ut, r, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
@@ -1117,7 +1114,7 @@ void get_addresses(report_context * ctx)
             if (r->seen.mode == seen_lighthouse) {
                 unit *u = r->units;
                 for (; u; u = u->next) {
-                    faction *sf = visible_faction(ctx->f, u);
+                    faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
                     if (lastf != sf) {
                         if (u->building || u->ship || (stealthmod > INT_MIN
                             && visible_unit(u, ctx->f, stealthmod, seen_lighthouse)))
@@ -1137,7 +1134,7 @@ void get_addresses(report_context * ctx)
                 const unit *u = r->units;
                 while (u != NULL) {
                     if (u->faction != ctx->f) {
-                        faction *sf = visible_faction(ctx->f, u);
+                        faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
                         bool ballied = sf && sf != ctx->f && sf != lastf
                             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
                         if (ballied || is_allied(ctx->f, sf)) {

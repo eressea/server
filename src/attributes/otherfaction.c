@@ -57,11 +57,10 @@ struct attrib *make_otherfaction(struct faction *f)
     return a;
 }
 
-faction *visible_faction(const faction * f, const unit * u)
+faction *visible_faction(const faction * f, const unit * u, faction* of)
 {
     if (f == NULL || !alliedunit(u, f, HELP_FSTEALTH)) {
-        faction *fv = get_otherfaction(u);
-        if (fv) return fv;
+        if (of) return of;
     }
     return u->faction;
 }

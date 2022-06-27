@@ -2797,12 +2797,18 @@ static void aftermath(battle * b)
     reorder_fleeing(r);
 }
 
-void
-spunit(const struct faction* f, const unit* u, unsigned int indent,
+static void spunit(const struct faction* f, const unit* u,
     struct sbstring *sbp)
 {
+    static char marker[] = "    ";
     int anon = (0 != fval(u, UFL_ANON_FACTION));
-    bufunit(f, u, get_otherfaction(u), seen_battle, anon, sbp);
+    struct faction* of = get_otherfaction(u);
+    const struct faction* vf = visible_faction(f, u, of);
+    int dh = alliedfaction(f, vf, HELP_ALL);
+    char mark = (char)((u->faction == f) ? '*' : (dh ? '+' : '-'));
+    marker[2] = mark;
+    sbs_strcat(sbp, marker);
+    bufunit(f, u, of, seen_battle, anon, sbp);
 }
 
 static void battle_punit(unit * u, battle * b)
@@ -2815,7 +2821,7 @@ static void battle_punit(unit * u, battle * b)
         faction* f = bf->faction;
 
         sbs_init(&sbs, buf, sizeof(buf));
-        spunit(f, u, 4, &sbs);
+        spunit(f, u, &sbs);
         if (sbs.begin != sbs.end) {
             message* m = msg_message("battle_fighter", "string unit", buf, u);
             battle_message_faction(b, f, m);

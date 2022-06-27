@@ -65,7 +65,7 @@ void spy_message(int spy, const unit * u, const unit * target)
         }
     }
     if (spy > 6) {
-        faction *fv = visible_faction(u->faction, target);
+        faction *fv = visible_faction(u->faction, target, get_otherfaction(target));
         if (fv && fv != target->faction) {
             /* true faction */
             ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
@@ -178,7 +178,7 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
             lastr = mu->region;
             while (ru != NULL) {
                 if (ru->number) {
-                    faction *fv = visible_faction(f, ru);
+                    faction *fv = visible_faction(f, ru, get_otherfaction(ru));
                     if (fv == f) {
                         if (cansee(f, lastr, ru, 0))
                             return true;

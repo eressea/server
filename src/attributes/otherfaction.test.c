@@ -38,9 +38,9 @@ static void test_otherfaction(CuTest *tc) {
     f = test_create_faction_ex(u->faction->race, u->faction->locale);
     config_set("stealth.faction.other", "1");
     CuAssertIntEquals(tc, true, rule_stealth_other());
-    CuAssertPtrEquals(tc, u->faction, visible_faction(f, u));
+    CuAssertPtrEquals(tc, u->faction, visible_faction(f, u, NULL));
     a_add(&u->attribs, make_otherfaction(f));
-    CuAssertPtrEquals(tc, f, visible_faction(f, u));
+    CuAssertPtrEquals(tc, f, visible_faction(f, u, get_otherfaction(u)));
     test_teardown();
 }
 
