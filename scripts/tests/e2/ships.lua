@@ -393,7 +393,6 @@ function test_give_ship_all_ships()
     u2.ship.number = 1
     u1:add_order("GIB " .. itoa36(u2.id) .. " 2 SCHIFF")
     process_orders()
-    write_reports()
     assert_equal(3, u2.ship.number)
     assert_equal(u2.ship, u1.ship)
 end
