@@ -1690,8 +1690,9 @@ static int read_newunitid(const faction * f, const region * r)
         return -1;
 
     u2 = findnewunit(r, f, n);
-    if (u2)
+    if (u2 && u2->region == r) {
         return u2->no;
+    }
 
     return -1;
 }
@@ -1721,7 +1722,7 @@ int getunit(const region * r, const faction * f, unit **uresult)
     }
     else if (n > 0) {
         u2 = findunit(n);
-        if (u2 != NULL && u2->region == r) {
+        if (u2 != NULL) {
             /* there used to be a 'u2->flags & UFL_ISNEW || u2->number>0' condition
             * here, but it got removed because of a bug that made units disappear:
             * http://eressea.upb.de/mantis/bug_view_page.php?bug_id=0000172

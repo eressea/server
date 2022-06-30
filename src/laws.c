@@ -1914,9 +1914,9 @@ int name_cmd(struct unit *u, struct order *ord)
             unit *u2 = NULL;
 
             getunit(r, u->faction, &u2);
-            if (!u2 || !cansee(u->faction, r, u2, 0)) {
+            if (!u2 || u2->region != r || !cansee(u->faction, r, u2, 0)) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                    "feedback_unit_not_found", ""));
+                    "feedback_unit_not_found", NULL));
                 break;
             }
             else {
@@ -2013,7 +2013,7 @@ mailunit(region * r, unit * u, int n, struct order *ord, const char *s)
         /* Immer eine Meldung - sonst koennte man so getarnte EHs enttarnen:
          * keine Meldung -> EH hier. */
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            msg_feedback(u, ord, "feedback_unit_not_found", NULL));
     }
 }
 
@@ -2090,7 +2090,7 @@ int mail_cmd(unit * u, struct order *ord)
 
             if (!u2) {
                 ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                    "feedback_unit_not_found", ""));
+                    "feedback_unit_not_found", NULL));
                 return 0;
             }
 

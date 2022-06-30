@@ -724,7 +724,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 
 bool can_give_to(unit *u, unit *u2) {
     /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden koennen */
-    if (!u2) {
+    if (!u2 || u2->region != u->region) {
         return false;
     }
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
@@ -825,7 +825,7 @@ void give_unit_cmd(unit* u, order* ord)
     err = getunit(u->region, u->faction, &u2);
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
-        msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
+        msg = msg_feedback(u, ord, "feedback_unit_not_found", NULL);
     }
     else {
         msg = check_give(u, u2, ord);
@@ -874,7 +874,7 @@ param_t give_cmd(unit * u, order * ord)
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            msg_feedback(u, ord, "feedback_unit_not_found", NULL));
         return NOPARAM;
     }
     if (u == u2) {

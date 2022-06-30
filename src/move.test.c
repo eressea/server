@@ -1014,29 +1014,33 @@ static void test_transport_unit(CuTest* tc)
 {
     unit* u1, * u2;
     region *r, *r2;
-    faction* f;
+    faction *f, *f2;
 
     test_setup();
     r = test_create_plain(0, 0);
     r2 = test_create_plain(1, 0);
-    f = test_create_faction();
-    u1 = test_create_unit(f, r);
+    u1 = test_create_unit(f = test_create_faction(), r);
     scale_number(u1, 10);
-    u2 = test_create_unit(f, r2);
+    u2 = test_create_unit(f2 = test_create_faction(), r2);
+    contact_unit(u2, u1);
     u2->thisorder = create_order(K_DRIVE, f->locale, itoa36(u1->no));
     movement();
-    CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f2->msgs, "feedback_unit_not_found"));
 
     unit_addorder(u1, create_order(K_TRANSPORT, f->locale, itoa36(u2->no)));
     test_clear_messages(f);
+    test_clear_messages(f2);
     movement();
-    CuAssertIntEquals(tc, 2, test_count_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f2->msgs, "feedback_unit_not_found"));
 
     u1->thisorder = create_order(K_MOVE, f->locale, LOC(f->locale, directions[D_EAST]));
     move_unit(u2, r, NULL);
     test_clear_messages(f);
+    test_clear_messages(f2);
     movement();
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f2->msgs, "feedback_unit_not_found"));
     CuAssertPtrEquals(tc, r2, u1->region);
     CuAssertPtrEquals(tc, r2, u2->region);
     test_teardown();

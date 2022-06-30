@@ -331,7 +331,7 @@ int teach_cmd(unit * teacher, struct order *ord)
 
             /* Falls die Unit nicht gefunden wird, Fehler melden */
 
-            if (!student) {
+            if (!student || student->region != r) {
                 char tbuf[20];
                 const char *uid;
                 const char *token;

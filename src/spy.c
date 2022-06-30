@@ -120,7 +120,7 @@ int spy_cmd(unit * u, struct order *ord)
     init_order(ord, NULL);
     getunit(r, u->faction, &target);
 
-    if (!target || !cansee(u->faction, r, target, 0)) {
+    if (!target || r != target->region || !cansee(u->faction, r, target, 0)) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "feedback_unit_not_found", NULL));
         return 0;

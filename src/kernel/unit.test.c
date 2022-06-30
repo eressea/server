@@ -818,8 +818,8 @@ static void test_getunit(CuTest* tc) {
     CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
     CuAssertPtrEquals(tc, u, u2);
     init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(r, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(r, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
     free_order(ord);
 
     ord = create_order(K_GIVE, lang, itoa36(u->no + 1));
