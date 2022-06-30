@@ -191,6 +191,7 @@ static void test_expel_building(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), u1->region);
     ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
     test_clear_messages(u2->faction);
@@ -198,21 +199,31 @@ static void test_expel_building(CuTest *tc) {
     b = u2->building = u1->building = test_create_building(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, building_owner(b));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     /* Nothing happened: */
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error5"));
     CuAssertPtrEquals(tc, u1, building_owner(b));
     CuAssertPtrEquals(tc, b, u1->building);
     CuAssertPtrEquals(tc, b, u2->building);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error5"));
-    test_clear_messages(u1->faction);
     free_order(ord);
 
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
     expel_cmd(u1, ord);
     /* owner has expelled u2: */
-    CuAssertPtrEquals(tc, NULL, u2->building);
     CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_building"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_building"));
+    CuAssertPtrEquals(tc, NULL, u2->building);
+    free_order(ord);
+
+    /* unit in another region, not found */
+    u2 = test_create_unit(u2->faction, test_create_plain(0, 1));
+    ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    expel_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "feedback_unit_not_found"));
+
     test_teardown();
 }
 
@@ -225,6 +236,7 @@ static void test_expel_ship(CuTest *tc) {
     u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), u1->region);
     ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
     test_clear_messages(u2->faction);
@@ -232,6 +244,7 @@ static void test_expel_ship(CuTest *tc) {
     sh = u2->ship = u1->ship = test_create_ship(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     /* Nothing happened: */
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
@@ -242,12 +255,24 @@ static void test_expel_ship(CuTest *tc) {
     free_order(ord);
 
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
     expel_cmd(u1, ord);
     /* owner has expelled u2: */
     CuAssertPtrEquals(tc, NULL, u2->ship);
     CuAssertPtrEquals(tc, sh, leftship(u2));
     CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_ship"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_ship"));
+    test_clear_messages(u1->faction);
+    free_order(ord);
+
+    /* unit in another region, not found */
+    u2 = test_create_unit(u2->faction, test_create_plain(0, 1));
+    ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    test_clear_messages(u1->faction);
+    expel_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "feedback_unit_not_found"));
+
     test_teardown();
 }
 
@@ -1099,6 +1124,31 @@ static unit * setup_name_cmd(void) {
     mt_create_va(mt_new("renamed_building_notseen", NULL), "region:region", "building:building", MT_NEW_END);
     f = test_create_faction();
     return test_create_unit(f, test_create_plain(0, 0));
+}
+
+static void test_name_foreign_unit(CuTest* tc) {
+    unit* u1, * u2;
+    order* ord;
+    faction* f;
+
+    u1 = setup_name_cmd();
+    f = u1->faction;
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    ord = create_order(K_NAME, f->locale, "%s %s %i Dopefish",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_UNIT]), u2->no);
+
+    name_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    test_clear_messages(f);
+    move_unit(u2, u1->region, NULL);
+    name_cmd(u1, ord);
+    CuAssertStrEquals(tc, "Dopefish", u2->_name);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "renamed_seen"));
+    test_teardown();
 }
 
 static void test_name_unit(CuTest *tc) {
@@ -2540,6 +2590,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
+    SUITE_ADD_TEST(suite, test_name_foreign_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);
     SUITE_ADD_TEST(suite, test_name_building);

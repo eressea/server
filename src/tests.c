@@ -81,7 +81,7 @@ struct race *test_create_race(const char *name)
     rc->recruitcost = 100;
     rc->recruit_multi = 1;
     rc->flags |= (RCF_WALK|RCF_PLAYABLE);
-    rc->ec_flags |= ECF_GETITEM;
+    rc->ec_flags |= ECF_GETITEM|ECF_GIVEUNIT;
     rc->battle_flags = BF_EQUIPMENT;
     return rc;
 }

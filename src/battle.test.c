@@ -872,7 +872,26 @@ static void test_tactics_chance(CuTest *tc) {
     test_teardown();
 }
 
-static void test_battle_fleeing(CuTest *tc) {
+static void test_battle_attack_invisible(CuTest* tc) {
+    region* r;
+    unit* u1, * u2;
+    faction *f;
+    test_setup();
+    setup_messages();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(f = test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    unit_addorder(u1, create_order(K_ATTACK, f->locale, itoa36(u2->no)));
+    do_battles();
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    test_clear_messages(f);
+    move_unit(u2, r, NULL);
+    do_battles();
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    test_teardown();
+}
+
+static void test_battle_fleeing(CuTest* tc) {
     region *r;
     unit *u1, *u2;
     test_setup();
@@ -909,6 +928,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_select_weapon_restricted);
     SUITE_ADD_TEST(suite, test_select_armor);
     SUITE_ADD_TEST(suite, test_battle_fleeing);
+    SUITE_ADD_TEST(suite, test_battle_attack_invisible);
     SUITE_ADD_TEST(suite, test_battle_skilldiff);
     SUITE_ADD_TEST(suite, test_battle_skilldiff_building);
     SUITE_ADD_TEST(suite, test_battle_report_one);

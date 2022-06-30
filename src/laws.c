@@ -4205,7 +4205,7 @@ int expel_cmd(unit *u, order *ord) {
     unit *u2;
     init_order(ord, f->locale);
     getunit(u->region, u->faction, &u2);
-    if (u2 == NULL) {
+    if (u2 == NULL || u2->region != u->region) {
         /* error: target unit not found */
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "feedback_unit_not_found", NULL));

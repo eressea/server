@@ -759,6 +759,19 @@ static void test_ship_leave_trail(CuTest *tc) {
     test_teardown();
 }
 
+static void test_is_transporting(CuTest* tc) {
+    unit *u1, *u2;
+    test_setup();
+    u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(u1->faction, test_create_plain(1, 1));
+    unit_addorder(u1, create_order(K_TRANSPORT, u1->faction->locale, itoa36(u2->no)));
+    CuAssertTrue(tc, !is_transporting(u1, u2));
+
+    move_unit(u2, u1->region, NULL);
+    CuAssertTrue(tc, is_transporting(u1, u2));
+    test_teardown();
+}
+
 static void test_movement_speed(CuTest *tc) {
     unit * u;
     race * rc;
@@ -997,9 +1010,42 @@ static void test_make_movement_order(CuTest *tc) {
     test_teardown();
 }
 
+static void test_transport_unit(CuTest* tc)
+{
+    unit* u1, * u2;
+    region *r, *r2;
+    faction* f;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 10);
+    u2 = test_create_unit(f, r2);
+    u2->thisorder = create_order(K_DRIVE, f->locale, itoa36(u1->no));
+    movement();
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "feedback_unit_not_found"));
+
+    unit_addorder(u1, create_order(K_TRANSPORT, f->locale, itoa36(u2->no)));
+    test_clear_messages(f);
+    movement();
+    CuAssertIntEquals(tc, 2, test_count_messagetype(f->msgs, "feedback_unit_not_found"));
+
+    u1->thisorder = create_order(K_MOVE, f->locale, LOC(f->locale, directions[D_EAST]));
+    move_unit(u2, r, NULL);
+    test_clear_messages(f);
+    movement();
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, r2, u1->region);
+    CuAssertPtrEquals(tc, r2, u2->region);
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_is_transporting);
     SUITE_ADD_TEST(suite, test_movement_speed);
     SUITE_ADD_TEST(suite, test_movement_speed_dragon);
     SUITE_ADD_TEST(suite, test_movement_speed_unicorns);
@@ -1036,5 +1082,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);
     SUITE_ADD_TEST(suite, test_make_movement_order);
+    SUITE_ADD_TEST(suite, test_transport_unit);
     return suite;
 }

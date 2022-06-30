@@ -81,6 +81,7 @@ static void setup_give(struct give *env) {
     mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("feedback_no_contact", NULL), "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END);
+    mt_create_va(mt_new("feedback_unit_not_found", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("giverestriction", NULL), "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END);
     mt_create_va(mt_new("error_unit_size", NULL), "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END);
     mt_create_va(mt_new("nogive_reserved", NULL), "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END);
@@ -550,17 +551,27 @@ static void test_give_invalid_target(CuTest *tc) {
 
     test_setup_ex(tc);
     env.f1 = test_create_faction();
-    env.f2 = NULL;
+    env.f2 = test_create_faction();
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
     ord = create_order(K_GIVE, env.f1->locale, "## KRAUT");
     assert(ord);
-
+    test_clear_messages(env.f1);
     give_cmd(env.src, ord);
-    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     free_order(ord);
+
+    /* if target unit is in another region => not found */
+    ord = create_order(K_GIVE, env.f1->locale, "%i KRAUT", env.dst->no);
+    move_unit(env.dst, test_create_plain(env.r->x, env.r->y + 1), NULL);
+    test_clear_messages(env.f1);
+    give_cmd(env.src, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    free_order(ord);
+
     test_teardown();
 }
 

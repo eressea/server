@@ -66,8 +66,57 @@ static void test_contact_cmd(CuTest *tc) {
 
     u2 = test_create_unit(test_create_faction(), r);
     usetalias(u2, 42);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
+        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
+    contact_cmd(u, ord);
+    CuAssertTrue(tc, ucontact(u, u2));
+    free_order(ord);
+
+    u2 = test_create_unit(test_create_faction(), r);
+    usetalias(u2, 47);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
         LOC(lang, parameters[P_TEMP]), ualias(u2));
+    contact_cmd(u, ord);
+    CuAssertTrue(tc, ucontact(u, u2));
+    free_order(ord);
+
+    test_teardown();
+}
+
+static void test_contact_cmd_not_local(CuTest *tc) {
+    struct unit *u, *u2;
+    struct region *r, *r2;
+    const struct locale *lang;
+    struct order *ord;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(), r);
+    lang = u->faction->locale;
+
+    /* can contact units in other regions */
+    r2 = test_create_plain(0, 1);
+    u2 = test_create_unit(test_create_faction(), r2);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
+        LOC(lang, parameters[P_UNIT]), u2->no);
+    contact_cmd(u, ord);
+    CuAssertTrue(tc, ucontact(u, u2));
+    free_order(ord);
+
+    /* two units with same TEMP id in differnt regions */
+    u2 = test_create_unit(test_create_faction(), r);
+    usetalias(u2, 42);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
+        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
+    contact_cmd(u, ord);
+    CuAssertTrue(tc, ucontact(u, u2));
+    free_order(ord);
+
+    /* cannot contact TEMP units in other regions */
+    u2 = test_create_unit(test_create_faction(), r2);
+    usetalias(u2, 47);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
+        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
     free_order(ord);
@@ -141,6 +190,7 @@ CuSuite *get_contact_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_contact);
     SUITE_ADD_TEST(suite, test_contact_cmd);
+    SUITE_ADD_TEST(suite, test_contact_cmd_not_local);
     SUITE_ADD_TEST(suite, test_contact_cmd_invalid);
 
     return suite;

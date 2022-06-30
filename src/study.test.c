@@ -123,7 +123,8 @@ static void test_study_no_teacher(CuTest *tc) {
 
     setup_teacher(&fix, SK_CROSSBOW);
     study_cmd(fix.u, fix.u->thisorder);
-    CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
+    sv = unit_skill(fix.u, SK_CROSSBOW);
+    CuAssertPtrNotNull(tc, sv);
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
     CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
@@ -567,6 +568,26 @@ static void test_teach_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_teach_not_found(CuTest *tc) {
+    unit *u, *ut;
+    
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    ut = test_create_unit(u->faction, test_create_plain(1, 1));
+    ut->thisorder = create_order(K_TEACH, u->faction->locale, itoa36(u->no));
+    teach_cmd(ut, ut->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(ut->faction->msgs, "unitnotfound_id"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(ut->faction->msgs, "teach_nolearn"));
+
+    move_unit(u, ut->region, NULL);
+    test_clear_messages(ut->faction);
+    teach_cmd(ut, ut->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(ut->faction->msgs, "unitnotfound_id"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(ut->faction->msgs, "teach_nolearn"));
+
+    test_teardown();
+}
+
 static void test_teach_two(CuTest *tc) {
     unit *u1, *u2, *ut;
     
@@ -759,6 +780,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_cost_magic);
     SUITE_ADD_TEST(suite, test_study_magic);
     SUITE_ADD_TEST(suite, test_teach_cmd);
+    SUITE_ADD_TEST(suite, test_teach_not_found);
     SUITE_ADD_TEST(suite, test_teach_magic);
     SUITE_ADD_TEST(suite, test_teach_two);
     SUITE_ADD_TEST(suite, test_teach_one_to_many);

@@ -1179,7 +1179,7 @@ order * make_movement_order(const struct locale *lang, direction_t steps[], int 
     return create_order(K_MOVE, lang, zOrder);
 }
 
-static bool transport(unit * ut, unit * u)
+bool is_transporting(const unit * ut, const unit * u)
 {
     order *ord;
 
@@ -1235,16 +1235,16 @@ static void init_movement(void)
                 init_order(u->thisorder, NULL);
                 if (getunit(r, u->faction, &ut) != GET_UNIT) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-                        "feedback_unit_not_found", ""));
+                        "feedback_unit_not_found", NULL));
                     continue;
                 }
-                if (!transport(ut, u)) {
+                if (!is_transporting(ut, u)) {
                     if (cansee(u->faction, r, ut, 0)) {
                         cmistake(u, u->thisorder, 286, MSG_MOVE);
                     }
                     else {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-                            "feedback_unit_not_found", ""));
+                            "feedback_unit_not_found", NULL));
                     }
                 }
             }
@@ -1261,13 +1261,19 @@ static void init_movement(void)
 
                 for (ord = u->orders; ord; ord = ord->next) {
                     if (getkeyword(ord) == K_TRANSPORT) {
+                        bool found = false;
                         init_order(ord, NULL);
                         for (;;) {
                             unit *ut = NULL;
 
                             if (getunit(r, u->faction, &ut) != GET_UNIT) {
+                                if (!found) {
+                                    ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                                        "feedback_unit_not_found", NULL));
+                                }
                                 break;
                             }
+                            found = true;
                             if (getkeyword(ut->thisorder) == K_DRIVE &&
                                 can_move(ut) && !fval(ut, UFL_NOTMOVING) &&
                                 !LongHunger(ut)) {
@@ -2151,15 +2157,15 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                         }
                         else {
                             ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
-                                "feedback_unit_not_found", ""));
+                                "feedback_unit_not_found", NULL));
                         }
                     }
                 }
             }
         }
         else {
-            ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-                ""));
+            ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
+                "feedback_unit_not_found", NULL));
         }
     }
     return route_end;
