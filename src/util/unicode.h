@@ -13,10 +13,10 @@ extern "C" {
         size_t * length);
     int unicode_utf8_to_cp1252(unsigned char *result, const char * utf8_string,
         size_t * length);
-    int unicode_utf8_decode(wint_t * result, const char * utf8_string,
+    int unicode_utf8_decode(wchar_t * result, const char * utf8_string,
         size_t * length);
     int unicode_utf8_encode(char * result, size_t * size,
-        wint_t ucs4_character);
+        wchar_t ucs4_character);
     int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
         size_t *length);
     int unicode_utf8_strcasecmp(const char * a, const char * b);

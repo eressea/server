@@ -5,10 +5,10 @@
 
 #include <CuTest.h>
 
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <wchar.h>
 
 static void test_unicode_trim(CuTest * tc)
 {
@@ -121,7 +121,7 @@ static void test_unicode_utf8_to_other(CuTest *tc)
 }
 
 static void test_unicode_utf8_to_ucs(CuTest *tc) {
-    wint_t wc;
+    wchar_t wc;
     size_t sz;
 
     CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, "a", &sz));
@@ -131,7 +131,7 @@ static void test_unicode_utf8_to_ucs(CuTest *tc) {
 
 static void test_unicode_bug2262(CuTest *tc) {
     char name[7];
-    wint_t wc;
+    wchar_t wc;
     size_t sz;
 
     strcpy(name, "utende");

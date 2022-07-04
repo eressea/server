@@ -23,7 +23,7 @@
 #define B00000011 0x03
 #define B00000001 0x01
 
-static bool char_trimmed(wint_t wc) {
+static bool char_trimmed(wchar_t wc) {
     if (wc == 0xa0 || wc == 0x202f || (wc >= 0x2000 && wc <= 0x200f)) {
         /* only weird stuff here */
         return true;
@@ -38,15 +38,15 @@ size_t unicode_utf8_trim(char *buf)
     assert(buf);
     while (*ip) {
         size_t size = 1;
-        wint_t wc = *(unsigned char *)ip;
+        wchar_t wc = *(unsigned char *)ip;
         if (wc & 0x80) {
-            wint_t ucs = 0;
+            wchar_t ucs = 0;
             if (ip[1]) {
                 int ret = unicode_utf8_decode(&ucs, ip, &size);
                 if (ret != 0) {
                     return ret;
                 }
-                wc = (wint_t)ucs;
+                wc = (wchar_t)ucs;
             }
             else {
                 wc = *op = '?';
@@ -82,8 +82,8 @@ size_t unicode_utf8_trim(char *buf)
 int unicode_utf8_tolower(char * op, size_t outlen, const char * ip)
 {
     while (*ip) {
-        wint_t ucs = *ip;
-        wint_t low;
+        wchar_t ucs = *ip;
+        wchar_t low;
         size_t size = 1;
 
         if (ucs & 0x80) {
@@ -95,7 +95,7 @@ int unicode_utf8_tolower(char * op, size_t outlen, const char * ip)
         if (size > outlen) {
             return ENOMEM;
         }
-        low = towlower((wint_t)ucs);
+        low = towlower((wchar_t)ucs);
         if (low == ucs) {
             memmove(op, ip, size);
             ip += size;
@@ -153,7 +153,7 @@ int unicode_utf8_strcasecmp(const char * a, const char *b)
     while (*a && *b) {
         int ret;
         size_t size;
-        wint_t ucsa = *a, ucsb = *b;
+        wchar_t ucsa = *a, ucsb = *b;
 
         if (ucsa & 0x80) {
             ret = unicode_utf8_decode(&ucsa, a, &size);
@@ -173,8 +173,8 @@ int unicode_utf8_strcasecmp(const char * a, const char *b)
             ++b;
 
         if (ucsb != ucsa) {
-            ucsb = towlower((wint_t)ucsb);
-            ucsa = towlower((wint_t)ucsa);
+            ucsb = towlower((wchar_t)ucsb);
+            ucsa = towlower((wchar_t)ucsa);
             if (ucsb < ucsa)
                 return 1;
             if (ucsb > ucsa)
@@ -191,7 +191,7 @@ int unicode_utf8_strcasecmp(const char * a, const char *b)
 /* Convert a wide character to UTF-8. */
 int
 unicode_utf8_encode(char * utf8_character, size_t * size,
-    wint_t ucs4_character)
+    wchar_t ucs4_character)
 {
     int utf8_bytes;
 
@@ -259,7 +259,7 @@ unicode_utf8_encode(char * utf8_character, size_t * size,
 
 /* Convert a UTF-8 encoded character to UCS-4. */
 int
-unicode_utf8_decode(wint_t * ucs4_character, const char * utf8_string,
+unicode_utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
     size_t * length)
 {
     char utf8_character = utf8_string[0];
@@ -366,7 +366,7 @@ int
 unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
-    wint_t ucs4_character;
+    wchar_t ucs4_character;
     int result;
 
     result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
@@ -380,7 +380,7 @@ unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
     }
     else {
         struct {
-            wint_t ucs4;
+            wchar_t ucs4;
             unsigned char cp437;
         } xref[160] = {
             { 0x00A0, 255 },
@@ -571,7 +571,7 @@ unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
 int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
     size_t *length)
 {
-    wint_t ucs4_character;
+    wchar_t ucs4_character;
     int result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
     if (result == 0) {
         if (*length > 1) {
@@ -588,7 +588,7 @@ int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
 int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
-    wint_t ucs4_character;
+    wchar_t ucs4_character;
     int result;
 
     result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
@@ -602,7 +602,7 @@ int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string
     }
     else {
         struct {
-            wint_t ucs4;
+            wchar_t ucs4;
             unsigned char cp;
         } xref[] = {
             { 0x0081, 0x81 },
