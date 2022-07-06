@@ -2402,6 +2402,7 @@ static void test_quit_transfer_no_contact(CuTest *tc) {
     quit_cmd(u1, u1->thisorder);
     CuAssertIntEquals(tc, 0, f1->flags & FFL_QUIT);
     CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertPtrEquals(tc, f2, u2->faction);
     CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "error40"));
     test_teardown();
 }
