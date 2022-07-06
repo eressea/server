@@ -2383,6 +2383,79 @@ static void test_quit_transfer(CuTest *tc) {
 }
 
 /**
+ * Gifting units requires CONTACT.
+ */ 
+static void test_quit_transfer_no_contact(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction();
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction();
+    u2 = test_create_unit(f2, r);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, 0, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "error40"));
+    test_teardown();
+}
+
+/**
+ * Gifting units requires CONTACT UNIT, not FACTION.
+ */ 
+static void test_quit_transfer_contact_faction(CuTest *tc) {
+    faction *f1, *f2;
+    unit *u1, *u2;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction();
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction();
+    u2 = test_create_unit(f2, r);
+    contact_faction(u2, u1->faction);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, FFL_QUIT, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f2, u1->faction);
+    test_teardown();
+}
+
+/**
+ * Gifting units requires CONTACT in same region.
+ */
+static void test_quit_transfer_contact_wrong_region(CuTest* tc) {
+    faction* f1, * f2;
+    unit* u1, * u2;
+    region* r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction();
+    faction_setpassword(f1, "password");
+    u1 = test_create_unit(f1, r);
+    f2 = test_create_faction();
+    u2 = test_create_unit(f2, test_create_plain(1, 1));
+    contact_unit(u2, u1);
+    u1->thisorder = create_order(K_QUIT, f1->locale, "password %s %s",
+        LOC(f1->locale, parameters[P_FACTION]), itoa36(f2->no));
+    quit_cmd(u1, u1->thisorder);
+    CuAssertIntEquals(tc, 0, f1->flags & FFL_QUIT);
+    CuAssertPtrEquals(tc, f1, u1->faction);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "error40"));
+    test_teardown();
+}
+
+/**
  * Gifting units with limited skills to another faction.
  *
  * This is allowed only up to the limit of the target faction.
@@ -2665,6 +2738,9 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_peasant_migration);
 #ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
+    SUITE_ADD_TEST(suite, test_quit_transfer_no_contact);
+    SUITE_ADD_TEST(suite, test_quit_transfer_contact_faction);
+    SUITE_ADD_TEST(suite, test_quit_transfer_contact_wrong_region);
     SUITE_ADD_TEST(suite, test_quit_transfer_limited);
     SUITE_ADD_TEST(suite, test_quit_transfer_migrants);
     SUITE_ADD_TEST(suite, test_quit_transfer_mages);
