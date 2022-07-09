@@ -2901,7 +2901,7 @@ static void print_stats(battle * b)
             for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
                 if (enemy(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
-                    rsize = slprintf(bufp, size, "%s %s %d(%s)",
+                    rsize = slprintf(bufp, size, "%s %s %d (%s)",
                         komma++ ? "," : (const char *)header, loc_army, army_index(s2),
                         abbrev);
                     if (rsize > size)
