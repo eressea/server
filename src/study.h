@@ -26,6 +26,8 @@ extern const struct attrib_type at_learning;
 int teach_cmd(struct unit *u, struct order *ord);
 int study_cmd(struct unit *u, struct order *ord);
 
+bool can_teach(const struct unit* u);
+
 enum magic_t getmagicskill(const struct locale *lang);
 enum skill_t getskill(const struct locale *lang);
 bool is_migrant(struct unit *u);

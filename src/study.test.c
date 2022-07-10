@@ -170,6 +170,7 @@ static void test_study_race_noteach(CuTest *tc) {
     rc = test_create_race("tunnelworm");
     rc->flags |= RCF_NOTEACH;
     u_setrace(fix.teachers[0], rc);
+    CuAssertTrue(tc, !can_teach(fix.teachers[0]));
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.u->faction->msgs, "error274"));
     study_cmd(fix.u, fix.u->thisorder);
