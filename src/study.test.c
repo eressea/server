@@ -72,6 +72,7 @@ static void setup_study(void) {
     mt_create_error(771);
     mt_create_error(178);
     mt_create_error(65);
+    mt_create_error(274);
     mt_create_va(mt_new("teach_asgood", NULL),
         "unit:unit", "region:region", "command:order", "student:unit", MT_NEW_END);
     mt_create_va(mt_new("studycost", NULL),
@@ -153,6 +154,24 @@ static void test_study_with_bad_teacher(CuTest *tc) {
     setup_teacher(&fix, SK_CROSSBOW);
     teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(fix.u->faction->msgs, "teach_asgood"));
+    study_cmd(fix.u, fix.u->thisorder);
+    CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+    test_teardown();
+}
+
+static void test_study_race_noteach(CuTest *tc) {
+    study_fixture fix;
+    skill *sv;
+    race* rc;
+
+    setup_teacher(&fix, SK_CROSSBOW);
+    rc = test_create_race("tunnelworm");
+    rc->flags |= RCF_NOTEACH;
+    u_setrace(fix.teachers[0], rc);
+    teach_cmd(fix.teachers[0], fix.teachers[0]->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(fix.u->faction->msgs, "error274"));
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
@@ -793,6 +812,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_no_teacher);
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
+    SUITE_ADD_TEST(suite, test_study_race_noteach);
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_academy_bonus);
