@@ -38,7 +38,11 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *
             if (kwd == K_AUTOSTUDY) {
                 if (f == u->faction) {
                     unext = u->next;
-                    if (long_order_allowed(u, false)) {
+                    if (!can_teach(u)) {
+                        cmistake(u, u->thisorder, 274, MSG_EVENT);
+                        fset(u, UFL_MARK);
+                    }
+                    else if (long_order_allowed(u, false)) {
                         scholar * st = scholars + nscholars;
                         skill_t sk = getskill(u->faction->locale);
                         if (skill == NOSKILL && sk != NOSKILL) {
@@ -104,7 +108,7 @@ void autostudy_run(scholar scholars[], int nscholars)
             }
         }
         if (mint < tt) {
-            /* die Einheit si-1 hat einen Mix aus Lehrer und Schüler */
+            /* die Einheit si-1 hat einen Mix aus Lehrer und Schï¿½ler */
             --si;
             ns = tt - mint;
         }

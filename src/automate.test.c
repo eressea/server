@@ -332,10 +332,11 @@ static void test_autostudy_run_cannot_teach(CuTest *tc)
     unit *u1, *u2, *ulist;
     faction *f;
     region *r;
-    race* rc = test_create_race("tunnelworm");
-    rc->flags |= RCF_NOTEACH;
+    race* rc;
 
     test_setup();
+    rc = test_create_race("tunnelworm");
+    rc->flags |= RCF_NOTEACH;
     r = test_create_plain(0, 0);
     f = test_create_faction();
     u1 = test_create_unit(f, r);
@@ -348,16 +349,15 @@ static void test_autostudy_run_cannot_teach(CuTest *tc)
     u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
     set_number(u2, 10);
 
-    scholars[2].u = NULL;
+    scholars[1].u = NULL;
     ulist = r->units;
-    CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertIntEquals(tc, 1, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "error274"));
     CuAssertPtrEquals(tc, NULL, ulist);
     autostudy_run(scholars, nscholars);
     CuAssertIntEquals(tc, 10, scholars[0].learn);
     CuAssertPtrEquals(tc, u2, scholars[0].u);
-    CuAssertIntEquals(tc, 1, scholars[1].learn);
-    CuAssertPtrEquals(tc, u1, scholars[1].u);
-    CuAssertPtrEquals(tc, NULL, scholars[2].u);
+    CuAssertPtrEquals(tc, NULL, scholars[1].u);
     test_teardown();
 }
 
