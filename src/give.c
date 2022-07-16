@@ -211,7 +211,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
         }
         error = 36;
     }
-    else if (itype->flags & ITF_CURSED) {
+    else if ((itype->flags & ITF_CURSED) && (dest == NULL || src->faction != dest->faction)) {
         error = 25;
     }
     else {
@@ -1061,10 +1061,6 @@ static int reserve_i(unit* u, struct order* ord, int flags)
             count = get_resource(u, itype->rtype);
         }
         if (count > 0) {
-            if (itype->flags & ITF_CURSED) {
-                flags &= ~GET_POOLED_SLACK;
-                cmistake(u, ord, 25, MSG_EVENT);
-            }
             use = use_pooled(u, itype->rtype, flags, count);
             if (use) {
                 set_resvalue(u, itype, use);

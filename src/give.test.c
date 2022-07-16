@@ -582,8 +582,9 @@ static void test_give_item_cursed(CuTest* tc)
     faction* f;
 
     test_setup_ex(tc);
-    f = test_create_faction();
-    env.f2 = env.f1 = f;
+    env.f1 = f = test_create_faction();
+    env.f2 = test_create_faction();
+
     setup_give(&env);
     env.itype->flags |= ITF_CURSED;
 
@@ -599,13 +600,41 @@ static void test_give_item_cursed(CuTest* tc)
     free_order(ord);
     test_clear_messages(f);
 
-    ord = create_order(K_RESERVE, f->locale, "10 %s", LOC(f->locale, resourcename(env.itype->rtype, 0)));
-    CuAssertIntEquals(tc, 0, reserve_cmd(env.dst, ord));
+    test_teardown();
+}
+
+static void test_give_item_cursed_self(CuTest* tc)
+{
+    struct give env = { 0 };
+    order* ord;
+    faction* f;
+
+    test_setup_ex(tc);
+    env.f1 = env.f2 = f = test_create_faction();
+
+    setup_give(&env);
+    env.itype->flags |= ITF_CURSED;
+
+    i_change(&env.src->items, env.itype, 20);
+    ord = create_order(K_GIVE, f->locale, "%s 10 %s", itoa36(env.dst->no),
+        LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    assert(ord);
+
+    give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
-    CuAssertIntEquals(tc, 0, i_get(env.dst->items, env.itype));
-    CuAssertIntEquals(tc, 0, get_reservation(env.dst, env.itype));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error25"));
+    CuAssertIntEquals(tc, 10, i_get(env.dst->items, env.itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error25"));
     free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_RESERVE, f->locale, "20 %s", LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    CuAssertIntEquals(tc, 20, reserve_cmd(env.dst, ord));
+    CuAssertIntEquals(tc, 0, i_get(env.src->items, env.itype));
+    CuAssertIntEquals(tc, 20, i_get(env.dst->items, env.itype));
+    CuAssertIntEquals(tc, 20, get_reservation(env.dst, env.itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error25"));
+    free_order(ord);
+    test_clear_messages(f);
 
     test_teardown();
 }
@@ -734,6 +763,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_new_unit);
     SUITE_ADD_TEST(suite, test_give_dead_unit);
     SUITE_ADD_TEST(suite, test_give_item_cursed);
+    SUITE_ADD_TEST(suite, test_give_item_cursed_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_all);

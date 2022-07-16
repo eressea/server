@@ -2446,7 +2446,7 @@ static void loot_items(fighter * corpse)
                     int looting = 0;
                     int maxrow = 0;
                     /* mustloot: we absolutely, positively must have somebody loot this thing */
-                    int mustloot = itm->type->flags & (ITF_CURSED | ITF_NOTLOST);
+                    bool mustloot = 0 != (itm->type->flags & (ITF_CURSED | ITF_NOTLOST));
 
                     item_add(itm, -loot);
                     maxloot -= loot;
