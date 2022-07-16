@@ -236,6 +236,61 @@ static void test_setstealth_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_setstealth_faction(CuTest *tc) {
+    unit *u, *u2;
+    faction* f;
+    const struct locale *lang;
+
+    test_setup();
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    lang = u->faction->locale;
+    u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s %s",
+        LOC(lang, parameters[P_FACTION]),
+        LOC(lang, mkname("keyword", keywords[K_NUMBER])), itoa36(f->no));
+
+    /* no unit of the desired faction visible: fail */
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(u));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
+    test_clear_messages(u->faction);
+
+    /* unit of the desired faction present in same region: success */
+    u2 = test_create_unit(f, u->region);
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, f, get_otherfaction(u));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    set_otherfaction(u, NULL);
+    test_clear_messages(u->faction);
+
+    /* unit present, but masked: fail */
+    set_otherfaction(u2, test_create_faction());
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(u));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
+    set_otherfaction(u2, NULL);
+    test_clear_messages(u->faction);
+
+    /* unit present, but anonymous: fail */
+    u2->flags |= UFL_ANON_FACTION;
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(u));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error66"));
+    u2->flags &= ~UFL_ANON_FACTION;
+    test_clear_messages(u->faction);
+
+    /* a unit masked as the desired faction is present: success */
+    u_setfaction(u2, test_create_faction());
+    set_otherfaction(u2, f);
+    setstealth_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, f, get_otherfaction(u));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    set_otherfaction(u, NULL);
+    test_clear_messages(u->faction);
+
+    test_teardown();
+}
+
 static void test_setstealth_demon(CuTest *tc) {
     unit *u;
     struct locale *lang;
@@ -284,6 +339,7 @@ CuSuite *get_spy_suite(void)
     SUITE_ADD_TEST(suite, test_sink_ship);
     SUITE_ADD_TEST(suite, test_set_faction_stealth);
     SUITE_ADD_TEST(suite, test_setstealth_cmd);
+    SUITE_ADD_TEST(suite, test_setstealth_faction);
     SUITE_ADD_TEST(suite, test_setstealth_demon);
     SUITE_ADD_TEST(suite, test_setstealth_demon_bad);
     return suite;

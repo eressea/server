@@ -177,10 +177,10 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
             unit *ru = mu->region->units;
             lastr = mu->region;
             while (ru != NULL) {
-                if (ru->number) {
-                    faction *fv = visible_faction(f, ru, get_otherfaction(ru));
+                if (ru->number && ru != u) {
+                    faction *fv = visible_faction(u->faction, ru, get_otherfaction(ru));
                     if (fv == f) {
-                        if (cansee(f, lastr, ru, 0))
+                        if (cansee(u->faction, lastr, ru, 0))
                             return true;
                     }
                 }
@@ -189,15 +189,11 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
         }
         mu = mu->nextF;
     }
-    return true;
+    return false;
 }
 
 void set_factionstealth(unit *u, faction *f) {
-    attrib *a = a_find(u->attribs, &at_otherfaction);
-    if (!a)
-        a = a_add(&u->attribs, make_otherfaction(f));
-    else
-        a->data.v = f;
+    set_otherfaction(u, f);
 }
 
 static void stealth_race(unit *u, const char *s) {

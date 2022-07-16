@@ -38,6 +38,28 @@ attrib_type at_otherfaction = {
     "otherfaction", NULL, NULL, NULL, write_of, read_of, NULL, ATF_UNIQUE
 };
 
+static struct attrib* make_otherfaction(struct faction* f)
+{
+    attrib* a = a_new(&at_otherfaction);
+    a->data.v = (void*)f;
+    return a;
+}
+
+void set_otherfaction(unit* u, faction* f)
+{
+    if (!f) {
+        a_removeall(&u->attribs, &at_otherfaction);
+    }
+    else {
+        attrib* a = a_find(u->attribs, &at_otherfaction);
+        if (!a) {
+            a = a_add(&u->attribs, make_otherfaction(f));
+        } else {
+            a->data.v = f;
+        }
+    }
+}
+
 faction *get_otherfaction(const unit * u)
 {
     attrib *a = a_find(u->attribs, &at_otherfaction);
@@ -50,17 +72,13 @@ faction *get_otherfaction(const unit * u)
     return NULL;
 }
 
-struct attrib *make_otherfaction(struct faction *f)
-{
-    attrib *a = a_new(&at_otherfaction);
-    a->data.v = (void *)f;
-    return a;
-}
-
 faction *visible_faction(const faction * f, const unit * u, faction* of)
 {
     if (f == NULL || !alliedunit(u, f, HELP_FSTEALTH)) {
         if (of) return of;
     }
-    return u->faction;
+    else {
+        return u->faction;
+    }
+    return (u->flags & UFL_ANON_FACTION) ? NULL : u->faction;
 }
