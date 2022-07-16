@@ -1374,7 +1374,7 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
         if (creator->attribs) {
             faction *otherf = get_otherfaction(creator);
             if (otherf) {
-                a_add(&u->attribs, make_otherfaction(otherf));
+                set_otherfaction(u, otherf);
             }
         }
 

@@ -2800,13 +2800,15 @@ static void aftermath(battle * b)
 static void spunit(const struct faction* f, const unit* u,
     struct sbstring *sbp)
 {
-    static char marker[] = "    ";
+    static char marker[] = "  - ";
     int anon = (0 != fval(u, UFL_ANON_FACTION));
     struct faction* of = get_otherfaction(u);
     const struct faction* vf = visible_faction(f, u, of);
-    int dh = alliedfaction(f, vf, HELP_ALL);
-    char mark = (char)((u->faction == f) ? '*' : (dh ? '+' : '-'));
-    marker[2] = mark;
+    if (vf) {
+        int dh = alliedfaction(f, vf, HELP_ALL);
+        char mark = (char)((u->faction == f) ? '*' : (dh ? '+' : '-'));
+        marker[2] = mark;
+    }
     sbs_strcat(sbp, marker);
     bufunit(f, u, of, seen_battle, anon, sbp);
 }

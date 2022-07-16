@@ -936,7 +936,7 @@ int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     bufunit(f, u, of, mode, anon, &sbs);
     if (anon) {
         const faction* vf = visible_faction(f, u, of);
-        if (alliedfaction(f, vf, HELP_ALL)) {
+        if (vf && alliedfaction(f, vf, HELP_ALL)) {
             return 1;
         }
     }
@@ -1044,7 +1044,9 @@ int cmp_faction(const void *lhs, const void *rhs) {
 }
 
 static void add_seen_faction_i(struct selist **flist, faction *f) {
-    selist_set_insert(flist, f, cmp_faction);
+    if (f) {
+        selist_set_insert(flist, f, cmp_faction);
+    }
 }
 
 void add_seen_faction(faction *self, faction *seen) {
