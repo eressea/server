@@ -268,7 +268,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 }
             }
             if (rule_stealth_other()) {
-                if (get_keyword(s, u->faction->locale) == K_NUMBER) {
+                if (findparam(s, u->faction->locale) == P_NUMBER) {
                     int nr = -1;
 
                     s = gettoken(token, sizeof(token));

@@ -5146,7 +5146,7 @@ msgctxt "keyword"
 msgid "teach"
 msgstr "TEACH"
 
-msgid "ANZAHL"
+msgid "NUMMER"
 msgstr "NUMBER"
 
 msgid "dir_se"

@@ -52,7 +52,7 @@ const char *parameters[MAXPARAMS] = {
     "AURA",
     "HINTER",
     "VOR",
-    "ANZAHL",
+    "NUMMER",
     "GEGENSTAENDE",
     "TRAENKE",
     "GRUPPE",

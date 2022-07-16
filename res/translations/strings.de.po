@@ -5796,8 +5796,8 @@ msgctxt "spell"
 msgid "cerddorfumbleshield"
 msgstr "Bannlied"
 
-msgid "ANZAHL"
-msgstr "ANZAHL"
+msgid "NUMMER"
+msgstr "NUMMER"
 
 msgid "dir_se"
 msgstr "SO"

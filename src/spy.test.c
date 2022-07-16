@@ -247,7 +247,7 @@ static void test_setstealth_faction(CuTest *tc) {
     lang = u->faction->locale;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s %s",
         LOC(lang, parameters[P_FACTION]),
-        LOC(lang, mkname("keyword", keywords[K_NUMBER])), itoa36(f->no));
+        LOC(lang, parameters[P_NUMBER]), itoa36(f->no));
 
     /* no unit of the desired faction visible: fail */
     setstealth_cmd(u, u->thisorder);
