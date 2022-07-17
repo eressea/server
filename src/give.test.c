@@ -141,12 +141,40 @@ static void test_give_unit_humans(CuTest * tc) {
 
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error128"));
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
 
     scale_number(env.dst, 57);
     CuAssertIntEquals(tc, 1, count_maxmigrants(env.f2));
     give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
+    test_teardown();
+}
+
+static void test_give_unit_cursed(CuTest * tc) {
+    struct give env = { 0 };
+    race *rc;
+    item_type* itype;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction_ex(test_create_race("elf"), NULL);
+    env.f2 = test_create_faction_ex(rc = test_create_race("human"), env.f1->locale);
+    rc->flags |= RCF_MIGRANTS;
+    setup_give(&env);
+
+    /* units with cursed items cannot be given */
+    itype = test_create_itemtype("seashell");
+    itype->flags |= ITF_CURSED;
+    i_change(&env.src->items, itype, 1);
+
+    scale_number(env.dst, 57);
+    CuAssertIntEquals(tc, 1, count_maxmigrants(env.f2));
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error78"));
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+
     test_teardown();
 }
 
@@ -344,6 +372,30 @@ static void test_give_men_other_faction(CuTest * tc) {
     env.f1 = test_create_faction();
     env.f2 = test_create_faction();
     setup_give(&env);
+    contact_unit(env.dst, env.src);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    msg_release(msg);
+    test_teardown();
+}
+
+static void test_give_men_cursed(CuTest * tc) {
+    struct give env = { 0 };
+    message * msg;
+    item_type* itype;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction();
+    env.f2 = test_create_faction();
+    setup_give(&env);
+
+    /* it should not matter that the unit has a seashell */
+    itype = test_create_itemtype("seashell");
+    itype->flags |= ITF_CURSED;
+    i_change(&env.src->items, itype, 1);
+
     contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
@@ -749,8 +801,10 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
     SUITE_ADD_TEST(suite, test_give_men_hungry);
+    SUITE_ADD_TEST(suite, test_give_men_cursed);
     SUITE_ADD_TEST(suite, test_give_unit);
     SUITE_ADD_TEST(suite, test_give_unit_humans);
+    SUITE_ADD_TEST(suite, test_give_unit_cursed);
     SUITE_ADD_TEST(suite, test_give_unit_other_race);
     SUITE_ADD_TEST(suite, test_give_unit_limits);
     SUITE_ADD_TEST(suite, test_give_unit_to_ocean);
