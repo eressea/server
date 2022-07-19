@@ -129,6 +129,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(calendar);
     ADD_SUITE(contact);
     ADD_SUITE(creport);
+    ADD_SUITE(defaults);
     ADD_SUITE(donations);
     ADD_SUITE(economy);
     ADD_SUITE(flyingship);

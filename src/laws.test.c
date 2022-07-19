@@ -28,7 +28,6 @@
 #include <kernel/unit.h>
 
 #include <util/base36.h>
-#include "util/keyword.h"            // for K_NAME, K_WORK, K_MAKETEMP, K_BUY
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
@@ -572,78 +571,6 @@ static void test_maketemp(CuTest * tc)
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->orders->next);
     CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
-    test_teardown();
-}
-
-static void test_defaultorders(CuTest* tc)
-{
-    unit* u;
-    order* ord;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-
-    ord = u->orders = create_order(K_CAST, u->faction->locale, "STUFE 9 Sturmwind");
-    ord->next = create_order(K_ENTERTAIN, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "@%s", keywords[K_GUARD]));
-    defaultorders();
-    CuAssertIntEquals(tc, K_CAST, getkeyword(ord = u->orders));
-    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(ord = ord->next));
-    CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(ord = u->defaults));
-    CuAssertIntEquals(tc, K_GUARD, getkeyword(ord = ord->next));
-    CuAssertPtrEquals(tc, NULL, ord->next);
-
-    free_orders(&u->orders);
-    ord = u->orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
-    ord->next = create_order(K_SELL, u->faction->locale, "1 Balsam");
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s 1 Weihrauch", keywords[K_BUY]));
-    defaultorders();
-    CuAssertIntEquals(tc, K_BUY, getkeyword(ord = u->defaults));
-    CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertPtrNotNull(tc, u->orders);
-
-    test_teardown();
-}
-
-static void test_defaultorders_clear(CuTest* tc)
-{
-    unit* u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-
-    /* empty DEFAULT clears all defaults: */
-    u->orders = create_order(K_ENTERTAIN, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
-    defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->defaults);
-
-    /* New repeating DEFAULT replaces long order in defaults: */
-    u->orders = create_order(K_TAX, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_ENTERTAIN, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
-    defaultorders();
-    CuAssertPtrNotNull(tc, u->defaults);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->defaults));
-    CuAssertPtrEquals(tc, NULL, u->defaults->next);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-
-    /* Bug 2843: empty DEFAULT clears repeated orders in template: */
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Sturmwind"));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Beulenpest"));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_WORK, u->faction->locale, NULL));
-    defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertPtrNotNull(tc, u->defaults);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->defaults));
-    update_defaults(u->faction);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
-    CuAssertPtrEquals(tc, NULL, u->orders->next);
-    CuAssertPtrEquals(tc, NULL, u->defaults);
-
     test_teardown();
 }
 
@@ -1292,143 +1219,6 @@ static void test_name_ship(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
 
-    test_teardown();
-}
-
-static void test_long_order_normal(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    order *ord;
-
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    fset(u, UFL_MOVED);
-    fset(u, UFL_LONGACTION);
-    unit_addorder(u, ord = create_order(K_ENTERTAIN, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertIntEquals(tc, ord->id, u->thisorder->id);
-    CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
-    CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
-    CuAssertPtrEquals(tc, ord, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertPtrEquals(tc, NULL, u->defaults);
-    test_teardown();
-}
-
-static void test_long_order_none(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_cast(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_buy_sell(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_multi_long(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrNotNull(tc, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_multi_buy(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_multi_sell(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_buy_cast(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_hungry(CuTest *tc) {
-    unit *u;
-    test_setup();
-    config_set("hunger.long", "1");
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    fset(u, UFL_HUNGER);
-    unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
-    config_set("orders.default", "work");
-    update_long_order(u);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -2653,8 +2443,6 @@ static void test_transfer_faction(CuTest *tc) {
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_defaultorders);
-    SUITE_ADD_TEST(suite, test_defaultorders_clear);
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
     SUITE_ADD_TEST(suite, test_findparam_ex);
@@ -2671,15 +2459,6 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
-    SUITE_ADD_TEST(suite, test_long_order_normal);
-    SUITE_ADD_TEST(suite, test_long_order_none);
-    SUITE_ADD_TEST(suite, test_long_order_cast);
-    SUITE_ADD_TEST(suite, test_long_order_buy_sell);
-    SUITE_ADD_TEST(suite, test_long_order_multi_long);
-    SUITE_ADD_TEST(suite, test_long_order_multi_buy);
-    SUITE_ADD_TEST(suite, test_long_order_multi_sell);
-    SUITE_ADD_TEST(suite, test_long_order_buy_cast);
-    SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
     SUITE_ADD_TEST(suite, test_password_cmd);
     SUITE_ADD_TEST(suite, test_rename_building);

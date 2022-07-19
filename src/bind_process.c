@@ -1,6 +1,7 @@
 #include "bind_process.h"
 
 #include "battle.h"
+#include "defaults.h"
 #include "economy.h"
 #include "give.h"
 #include "laws.h"
