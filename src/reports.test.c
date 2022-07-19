@@ -1074,17 +1074,46 @@ static void test_update_defaults(CuTest* tc) {
     test_setup();
     u = test_create_unit(NULL, NULL);
 
-    /* a long order gets promoted to the template, short order does not */
+    /* a long order gets promoted to storage, short order does not */
     unit_addorder(u, ord = create_order(K_ENTERTAIN, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
     CuAssertPtrEquals(tc, ord, u->orders);
     update_long_order(u);
     CuAssertIntEquals(tc, ord->id, u->thisorder->id);
     update_defaults(u->faction);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertIntEquals(tc, ord->id, u->old_orders->id);
+    CuAssertIntEquals(tc, ord->id, u->orders->id);
     CuAssertPtrEquals(tc, NULL, ord->next);
+    CuAssertPtrEquals(tc, NULL, u->defaults);
+
+    /* persistent short orders are kept */
+    unit_addorder(u, create_order(K_GIVE, u->faction->locale, NULL));
+    u->orders->command |= CMD_PERSIST;
+    CuAssertTrue(tc, is_persistent(u->orders));
+    CuAssertIntEquals(tc, K_GIVE, getkeyword(u->orders));
+    unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
+    CuAssertTrue(tc, !is_persistent(u->orders->next));
+    update_defaults(u->faction);
+    CuAssertIntEquals(tc, ord->id, u->orders->id);
+    ord = u->orders->next;
+    CuAssertIntEquals(tc, K_GIVE, getkeyword(ord));
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertPtrEquals(tc, NULL, ord->next);
+    CuAssertPtrEquals(tc, NULL, u->defaults);
+
+    /* K_SELL, K_BUY, K_CAST, K_ATTACK do not become thisorder */
+    unit_addorder(u, create_order(K_ATTACK, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+
+    /* K_SELL, K_BUY, K_CAST are stored, K_ATTACK and K_MOVE are not */
+    unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
+    update_defaults(u->faction);
+    CuAssertIntEquals(tc, K_SELL, getkeyword(u->orders));
+    CuAssertIntEquals(tc, 3, listlen(u->orders));
+    CuAssertPtrEquals(tc, NULL, u->defaults);
 
     test_teardown();
 }

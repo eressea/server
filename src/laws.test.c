@@ -582,24 +582,26 @@ static void test_defaultorders(CuTest* tc)
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
-    ord = u->old_orders = create_order(K_CAST, u->faction->locale, "STUFE 9 Sturmwind");
+    ord = u->orders = create_order(K_CAST, u->faction->locale, "STUFE 9 Sturmwind");
     ord->next = create_order(K_ENTERTAIN, u->faction->locale, NULL);
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "@%s", keywords[K_GUARD]));
     defaultorders();
-    CuAssertIntEquals(tc, K_WORK, getkeyword(ord = u->old_orders));
+    CuAssertIntEquals(tc, K_CAST, getkeyword(ord = u->orders));
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(ord = ord->next));
+    CuAssertPtrEquals(tc, NULL, ord->next);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(ord = u->defaults));
     CuAssertIntEquals(tc, K_GUARD, getkeyword(ord = ord->next));
     CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertPtrEquals(tc, NULL, u->orders);
 
-    free_orders(&u->old_orders);
-    ord = u->old_orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
+    free_orders(&u->orders);
+    ord = u->orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
     ord->next = create_order(K_SELL, u->faction->locale, "1 Balsam");
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s 1 Weihrauch", keywords[K_BUY]));
     defaultorders();
-    CuAssertIntEquals(tc, K_BUY, getkeyword(ord = u->old_orders));
+    CuAssertIntEquals(tc, K_BUY, getkeyword(ord = u->defaults));
     CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrNotNull(tc, u->orders);
 
     test_teardown();
 }
@@ -610,38 +612,37 @@ static void test_defaultorders_clear(CuTest* tc)
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
-    /* empty DEFAULT replaces long orders: */
-    u->old_orders = create_order(K_ENTERTAIN, u->faction->locale, NULL);
+    /* empty DEFAULT clears all defaults: */
+    u->orders = create_order(K_ENTERTAIN, u->faction->locale, NULL);
+    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
     defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    update_defaults(u->faction);
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
     CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->defaults);
 
     /* New repeating DEFAULT replaces long order in defaults: */
-    u->old_orders = create_order(K_TAX, u->faction->locale, NULL);
+    u->orders = create_order(K_TAX, u->faction->locale, NULL);
     unit_addorder(u, create_order(K_ENTERTAIN, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
     defaultorders();
-    CuAssertPtrNotNull(tc, u->old_orders);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
-    CuAssertPtrEquals(tc, NULL, u->old_orders->next);
-    free_orders(&u->orders);
-    free_orders(&u->old_orders);
+    CuAssertPtrNotNull(tc, u->defaults);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->defaults));
+    CuAssertPtrEquals(tc, NULL, u->defaults->next);
+    CuAssertPtrEquals(tc, NULL, u->orders);
 
     /* Bug 2843: empty DEFAULT clears repeated orders in template: */
-    u->old_orders = create_order(K_CAST, u->faction->locale, "Sturmwind");
-    u->old_orders->next = create_order(K_CAST, u->faction->locale, "Beulenpest");
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Sturmwind"));
+    unit_addorder(u, create_order(K_CAST, u->faction->locale, "Beulenpest"));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_WORK, u->faction->locale, NULL));
     defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrNotNull(tc, u->defaults);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->defaults));
     update_defaults(u->faction);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
-    CuAssertPtrEquals(tc, NULL, u->old_orders->next);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
+    CuAssertPtrEquals(tc, NULL, u->orders->next);
+    CuAssertPtrEquals(tc, NULL, u->defaults);
 
     test_teardown();
 }
@@ -1303,14 +1304,14 @@ static void test_long_order_normal(CuTest *tc) {
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     fset(u, UFL_MOVED);
     fset(u, UFL_LONGACTION);
-    unit_addorder(u, ord = create_order(K_MOVE, u->faction->locale, 0));
+    unit_addorder(u, ord = create_order(K_ENTERTAIN, u->faction->locale, NULL));
     update_long_order(u);
     CuAssertIntEquals(tc, ord->id, u->thisorder->id);
     CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
     CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
-    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, ord, u->orders);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
+    CuAssertPtrEquals(tc, NULL, u->defaults);
     test_teardown();
 }
 

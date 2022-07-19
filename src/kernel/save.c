@@ -618,7 +618,7 @@ void write_unit(gamedata *data, const unit * u)
     if (u->ship && u == ship_owner(u->ship)) flags |= UFL_OWNER;
     WRITE_INT(data->store, flags);
     WRITE_SECTION(data->store);
-    for (ord = u->old_orders; ord; ord = ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
         if (++p < MAXPERSISTENT) {
             writeorder(data, ord, u->faction->locale);
         }

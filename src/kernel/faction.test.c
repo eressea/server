@@ -162,8 +162,8 @@ static void test_change_locale(CuTest *tc) {
     u = test_create_unit(f, test_create_plain(0, 0));
     u->thisorder = create_order(K_ENTERTAIN, f->locale, NULL);
 
-    u->old_orders = create_order(K_WORK, f->locale, NULL);
-    u->old_orders->next = ord = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ALCHEMY]);
+    u->orders = create_order(K_WORK, f->locale, NULL);
+    u->orders->next = ord = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ALCHEMY]);
     CuAssertIntEquals(tc, SK_ALCHEMY - 100, ord->id);
     ord->next = create_order(K_GIVE, f->locale, "abcd 1 Schwert");
 
@@ -177,7 +177,7 @@ static void test_change_locale(CuTest *tc) {
     CuAssertPtrEquals(tc, lang, (void *)f->locale);
     CuAssertPtrNotNull(tc, u->thisorder);
 
-    CuAssertPtrNotNull(tc, ord = u->old_orders);
+    CuAssertPtrNotNull(tc, ord = u->orders);
     CuAssertIntEquals(tc, K_WORK, ord->command);
     CuAssertPtrNotNull(tc, ord = ord->next);
     CuAssertIntEquals(tc, K_AUTOSTUDY, ord->command);

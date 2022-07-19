@@ -1380,8 +1380,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
                 rps_nowrap(out, buf);
                 newline(out);
 
-                for (ord = u->old_orders; ord; ord = ord->next) {
-                    /* this new order will replace the old defaults */
+                for (ord = u->orders; ord; ord = ord->next) {
                     strcpy(buf, "   ");
                     write_order(ord, lang, buf + 2, sizeof(buf) - 2);
                     rps_nowrap(out, buf);

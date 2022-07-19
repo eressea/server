@@ -891,13 +891,10 @@ void cr_output_unit(stream *out, const faction * f,
         }
         /* default commands */
         stream_printf(out, "COMMANDS\n");
-        for (ord = u->old_orders; ord; ord = ord->next) {
-            /* this new order will replace the old defaults */
-            if (is_persistent(ord)) {
-                swrite("\"", 1, 1, out);
-                stream_order(out, ord, lang, true);
-                swrite("\"\n", 1, 2, out);
-            }
+        for (ord = u->orders; ord; ord = ord->next) {
+            swrite("\"", 1, 1, out);
+            stream_order(out, ord, lang, true);
+            swrite("\"\n", 1, 2, out);
         }
 
         /* talents */

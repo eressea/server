@@ -21,24 +21,8 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if ((u->flags & UFL_ORDERS) == 0) {
-        order **ordp;
-        /* alle wiederholbaren, langen befehle werden gesichert: */
-        u->flags |= UFL_ORDERS;
-        u->old_orders = u->orders;
-        ordp = &u->old_orders;
-        while (*ordp) {
-            order *ord = *ordp;
-            keyword_t kwd = getkeyword(ord);
-            if (!is_repeated(kwd)) {
-                *ordp = ord->next;
-                ord->next = NULL;
-                free_order(ord);
-            }
-            else {
-                ordp = &ord->next;
-            }
-        }
+    if (!u->defaults) {
+        u->defaults = u->orders;
     }
     else {
         free_orders(&u->orders);
