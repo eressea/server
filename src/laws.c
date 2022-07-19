@@ -2985,6 +2985,11 @@ void new_units(void)
     }
 }
 
+/**
+	- Die alten Befehle nicht beim Befehle laden löschen, sondern in u->defaults befördern
+	- Dann (hier) beim setzen des langen Befehls wegschmeissen, es sei denn es ist ein K_MOVE,
+	- im Falle von K_MOVE eine Variante von update_defaults machen, nur lange Befehle behalten.
+*/
 void update_long_order(unit * u)
 {
     bool hunger = LongHunger(u);
