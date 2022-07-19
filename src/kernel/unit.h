@@ -30,10 +30,9 @@
 #define UFL_STORM         (1<<19)       /* Kapitaen war in einem Sturm */
 #define UFL_FOLLOWING     (1<<20)
 #define UFL_FOLLOWED      (1<<21)
-
 #define UFL_NOAID         (1<<22)       /* Einheit hat Noaid-Status */
 #define UFL_MARK          (1<<23)       /* same as FL_MARK */
-#define UFL_ORDERS        (1<<24)       /* Einheit hat Befehle erhalten */
+
 #define UFL_TAKEALL       (1<<25)       /* Einheit nimmt alle Gegenstaende an */
 
     /* flags that speed up attribute access: */

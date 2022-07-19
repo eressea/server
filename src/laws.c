@@ -732,7 +732,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
 
-        /* Samenwachstum, wenn noch Platz für Sprößlinge ist: */
+        /* Samenwachstum, wenn noch Platz fï¿½r Sprï¿½ï¿½linge ist: */
         i = region_maxworkers(r, max_production(r));
         if (i > 0) {
             seeds = rtrees(r, 0);
@@ -2986,7 +2986,7 @@ void new_units(void)
 }
 
 /**
-	- Die alten Befehle nicht beim Befehle laden löschen, sondern in u->defaults befördern
+	- Die alten Befehle nicht beim Befehle laden lï¿½schen, sondern in u->defaults befï¿½rdern
 	- Dann (hier) beim setzen des langen Befehls wegschmeissen, es sei denn es ist ein K_MOVE,
 	- im Falle von K_MOVE eine Variante von update_defaults machen, nur lange Befehle behalten.
 */
@@ -3168,7 +3168,6 @@ void defaultorders(void)
         unit *u;
         for (u = r->units; u; u = u->next) {
             order **ordp = &u->orders;
-            assert(u->defaults == NULL);
             while (*ordp != NULL) {
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {

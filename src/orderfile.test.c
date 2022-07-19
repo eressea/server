@@ -43,7 +43,6 @@ static void test_unit_orders(CuTest *tc) {
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(u->orders));
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->defaults));
-    CuAssertIntEquals(tc, UFL_ORDERS, u->flags & UFL_ORDERS);
     fclose(F);
     test_teardown();
 }
