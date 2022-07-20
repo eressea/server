@@ -172,7 +172,6 @@ void defaultorders(void)
         unit *u;
         for (u = r->units; u; u = u->next) {
             order **ordp = &u->orders;
-            assert(u->defaults == NULL);
             while (*ordp != NULL) {
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
@@ -186,7 +185,6 @@ void defaultorders(void)
                     }
                     else {
                         free_orders(&u->defaults);
-                        free_orders(&u->orders);
                     }
                     if (new_order) {
                         addlist(&u->defaults, new_order);
@@ -208,33 +206,33 @@ void update_defaults(faction* f)
 {
     unit* u;
     for (u = f->units; u != NULL; u = u->nextF) {
+        /* u->defaults contains new orders that were added by K_DEFAULT */
         order** ordi = &u->defaults;
         while (*ordi) {
             order* ord = *ordi;
             ordi = &ord->next;
         }
-        if (u->defaults) {
-            if (u->orders) {
-                bool repeated = u->defaults != NULL;
-                order** ordp = &u->orders;
-                while (*ordp) {
-                    order* ord = *ordp;
-                    keyword_t kwd = getkeyword(ord);
-                    if (!(repeated && is_repeated(kwd))) {
-                        if (is_persistent(ord)) {
-                            *ordp = ord->next;
-                            *ordi = ord;
-                            ord->next = NULL;
-                            ordi = &ord->next;
-                            continue;
-                        }
+        /* we add persistent new orders to the end of these new defaults: */
+        if (u->orders) {
+            bool repeated = u->defaults != NULL;
+            order** ordp = &u->orders;
+            while (*ordp) {
+                order* ord = *ordp;
+                keyword_t kwd = getkeyword(ord);
+                if (!(repeated && is_repeated(kwd))) {
+                    if (is_persistent(ord)) {
+                        *ordp = ord->next;
+                        *ordi = ord;
+                        ord->next = NULL;
+                        ordi = &ord->next;
+                        continue;
                     }
-                    ordp = &ord->next;
                 }
-                free_orders(&u->orders);
+                ordp = &ord->next;
             }
-            u->orders = u->defaults;
+            free_orders(&u->orders);
         }
+        u->orders = u->defaults;
         u->defaults = NULL;
     }
 }

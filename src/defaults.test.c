@@ -64,6 +64,7 @@ static void test_defaultorders(CuTest* tc)
     CuAssertPtrEquals(tc, NULL, ord->next);
 
     free_orders(&u->orders);
+    free_orders(&u->defaults);
     ord = u->orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
     ord->next = create_order(K_SELL, u->faction->locale, "1 Balsam");
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s 1 Weihrauch", keywords[K_BUY]));
@@ -159,6 +160,23 @@ static void test_long_order_cast(CuTest* tc) {
     CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    test_teardown();
+}
+
+static void test_long_order_attack(CuTest* tc) {
+    /* TODO: write more tests */
+    unit* u;
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    unit_addorder(u, create_order(K_ATTACK, u->faction->locale, NULL));
+    update_long_order(u);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+
+    unit_addorder(u, create_order(K_ATTACK, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_AUTOSTUDY, u->faction->locale, NULL));
+    update_long_order(u);
+    CuAssertIntEquals(tc, K_AUTOSTUDY, getkeyword(u->thisorder));
+
     test_teardown();
 }
 
@@ -268,10 +286,11 @@ static void test_update_defaults(CuTest* tc) {
     CuAssertIntEquals(tc, ord->id, u->thisorder->id);
     update_defaults(u->faction);
     CuAssertIntEquals(tc, ord->id, u->orders->id);
-    CuAssertPtrEquals(tc, NULL, ord->next);
+    CuAssertPtrEquals(tc, NULL, u->orders->next);
     CuAssertPtrEquals(tc, NULL, u->defaults);
 
     /* persistent short orders are kept */
+    free_orders(&u->orders);
     unit_addorder(u, create_order(K_GIVE, u->faction->locale, NULL));
     u->orders->command |= CMD_PERSIST;
     CuAssertTrue(tc, is_persistent(u->orders));
@@ -279,26 +298,34 @@ static void test_update_defaults(CuTest* tc) {
     unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
     CuAssertTrue(tc, !is_persistent(u->orders->next));
     update_defaults(u->faction);
-    CuAssertIntEquals(tc, ord->id, u->orders->id);
-    ord = u->orders->next;
+    ord = u->orders;
     CuAssertIntEquals(tc, K_GIVE, getkeyword(ord));
     CuAssertTrue(tc, is_persistent(ord));
     CuAssertPtrEquals(tc, NULL, ord->next);
     CuAssertPtrEquals(tc, NULL, u->defaults);
 
-    /* K_SELL, K_BUY, K_CAST, K_ATTACK do not become thisorder */
+    free_orders(&u->orders);
     unit_addorder(u, create_order(K_ATTACK, u->faction->locale, NULL));
+    unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
 
     /* K_SELL, K_BUY, K_CAST are stored, K_ATTACK and K_MOVE are not */
-    unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
     update_defaults(u->faction);
     CuAssertIntEquals(tc, K_SELL, getkeyword(u->orders));
     CuAssertIntEquals(tc, 3, listlen(u->orders));
+    CuAssertPtrEquals(tc, NULL, u->defaults);
+
+    /* if the unit has one or more defaults (from K_DEFAULT) then those are kept insteaad of the new ones */
+    free_orders(&u->orders);
+    u->defaults = create_order(K_WORK, u->faction->locale, NULL);
+    u->defaults->next = create_order(K_GUARD, u->faction->locale, NULL);
+    unit_addorder(u, create_order(K_ENTERTAIN, u->faction->locale, NULL));
+    update_defaults(u->faction);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(ord = u->orders));
+    CuAssertIntEquals(tc, K_GUARD, getkeyword(ord = ord->next));
+    CuAssertPtrEquals(tc, NULL, ord->next);
     CuAssertPtrEquals(tc, NULL, u->defaults);
 
     test_teardown();
@@ -312,6 +339,7 @@ CuSuite *get_defaults_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_normal);
     SUITE_ADD_TEST(suite, test_long_order_none);
     SUITE_ADD_TEST(suite, test_long_order_cast);
+    SUITE_ADD_TEST(suite, test_long_order_attack);
     SUITE_ADD_TEST(suite, test_long_order_buy_sell);
     SUITE_ADD_TEST(suite, test_long_order_multi_long);
     SUITE_ADD_TEST(suite, test_long_order_multi_buy);
