@@ -84,7 +84,7 @@
 	- Dann (hier) beim setzen des langen Befehls wegschmeissen, es sei denn es ist ein K_MOVE,
 	- im Falle von K_MOVE eine Variante von update_defaults machen, nur lange Befehle behalten.
 */
-void update_long_order(unit * u)
+static void update_long_order(unit * u)
 {
     bool hunger = LongHunger(u);
 
@@ -126,6 +126,27 @@ void update_long_order(unit * u)
                     default:
                         if (exclusive) {
                             set_order(&u->thisorder, copy_order(ord));
+                            if (u->defaults) {
+                                if (is_persistent(ord)) {
+                                    /* this long order replaces last week's orders (not K_MOVE) */
+                                    free_orders(&u->defaults);
+                                }
+                                else {
+                                    order** ordp = &u->defaults;
+                                    while (*ordp) {
+                                        order* o = *ordp;
+                                        if (!is_long(getkeyword(o))) {
+                                            *ordp = o->next;
+                                            o->next = NULL;
+                                            free_order(o);
+                                        }
+                                        else {
+                                            ordp = &o->next;
+                                        }
+                                    }
+                                    // remove_long_orders(&u->defaults);
+                                }
+                            }
                         }
                         break;
                     }
@@ -202,39 +223,52 @@ void defaultorders(void)
     }
 }
 
-void update_defaults(faction* f)
+void update_defaults(void)
 {
-    unit* u;
-    for (u = f->units; u != NULL; u = u->nextF) {
-        /* u->defaults contains new orders that were added by K_DEFAULT */
-        order** ordi = &u->defaults;
-        while (*ordi) {
-            order* ord = *ordi;
-            ordi = &ord->next;
-        }
-        /* we add persistent new orders to the end of these new defaults: */
-        if (u->orders) {
-            bool repeated = u->defaults != NULL;
-            order** ordp = &u->orders;
-            while (*ordp) {
-                order* ord = *ordp;
-                keyword_t kwd = getkeyword(ord);
-                if (!(repeated && is_repeated(kwd))) {
-                    if (is_persistent(ord)) {
-                        *ordp = ord->next;
-                        *ordi = ord;
-                        ord->next = NULL;
-                        ordi = &ord->next;
-                        continue;
-                    }
-                }
-                ordp = &ord->next;
+    faction* f;
+    for (f = factions; f; f = f->next)
+    {
+        unit* u;
+        for (u = f->units; u != NULL; u = u->nextF) {
+            /* u->defaults contains new orders that were added by K_DEFAULT */
+            order** ordi = &u->defaults;
+            while (*ordi) {
+                order* ord = *ordi;
+                ordi = &ord->next;
             }
-            free_orders(&u->orders);
+            /* we add persistent new orders to the end of these new defaults: */
+            if (u->orders) {
+                bool repeated = u->defaults != NULL;
+                order** ordp = &u->orders;
+                while (*ordp) {
+                    order* ord = *ordp;
+                    keyword_t kwd = getkeyword(ord);
+                    if (!(repeated && is_repeated(kwd))) {
+                        if (is_persistent(ord)) {
+                            *ordp = ord->next;
+                            *ordi = ord;
+                            ord->next = NULL;
+                            ordi = &ord->next;
+                            continue;
+                        }
+                    }
+                    ordp = &ord->next;
+                }
+                free_orders(&u->orders);
+            }
+            u->orders = u->defaults;
+            u->defaults = NULL;
         }
-        u->orders = u->defaults;
-        u->defaults = NULL;
     }
 }
 
-
+void update_long_orders(void)
+{
+    region* r;
+    for (r = regions; r; r = r->next) {
+        unit* u;
+        for (u = r->units; u; u = u->next) {
+            update_long_order(u);
+        }
+    }
+}

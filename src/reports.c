@@ -1498,7 +1498,6 @@ int write_reports(faction * f, int options, const char *password)
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
 
-    update_defaults(f);
     if (noreports) {
         return false;
     }

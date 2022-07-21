@@ -853,6 +853,9 @@ void change_locale(faction *f, const struct locale *lang, bool del ) {
         if (ux->orders) {
             translate_orders(ux, lang, &ux->orders, del);
         }
+        if (ux->defaults) {
+            translate_orders(ux, lang, &ux->defaults, del);
+        }
         if (ux->thisorder) {
             translate_orders(ux, lang, &ux->thisorder, del);
         }

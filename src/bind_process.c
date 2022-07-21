@@ -78,13 +78,7 @@ void process_battle(void) {
 }
 
 void process_update_long_order(void) {
-    region * r;
-    for (r = regions; r; r = r->next) {
-        unit * u;
-        for (u = r->units; u; u = u->next) {
-            update_long_order(u);
-        }
-    }
+    update_long_orders();
 }
 
 void process_markets(void) {

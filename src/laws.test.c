@@ -567,6 +567,7 @@ static void test_maketemp(CuTest * tc)
     CuAssertPtrNotNull(tc, u2->orders);
     CuAssertPtrEquals(tc, NULL, u2->orders->next);
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u2->orders));
+    CuAssertPtrEquals(tc, NULL, u2->thisorder);
 
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->orders->next);

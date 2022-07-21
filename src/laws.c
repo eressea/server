@@ -2945,7 +2945,6 @@ static void maketemp_cmd(unit *u, order **olist)
         if (!u2->orders) {
             order *deford = default_order(u2->faction->locale);
             if (deford) {
-                set_order(&u2->thisorder, NULL);
                 unit_addorder(u2, deford);
             }
         }
@@ -3431,7 +3430,7 @@ bool long_order_allowed(const unit *u, bool flags_only)
 
     if (is_paused(u->faction)) return false;
     if (fval(u, UFL_LONGACTION)) {
-        /* this message was already given in laws.update_long_order
+        /* this message was already given in update_long_orders();
         cmistake(u, ord, 52, MSG_PRODUCE);
         */
         return false;
@@ -3638,9 +3637,9 @@ void init_processor(void)
     p = 10;
     add_proc_global(p, nmr_warnings, "NMR Warnings");
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
+    add_proc_global(p, update_long_orders, "Lange Befehle aktualisieren");
 
     p += 10;
-    add_proc_unit(p, update_long_order, "Langen Befehl aktualisieren");
     add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
     add_proc_order(p, K_EMAIL, email_cmd, 0, NULL);
     add_proc_order(p, K_PASSWORD, password_cmd, 0, NULL);
@@ -3846,6 +3845,9 @@ void turn_end(void)
     /* immer ausfuehren, wenn neue Sprueche dazugekommen sind, oder sich
      * Beschreibungen geaendert haben */
     update_spells();
+
+    /* am Ende der Auswertung die neuen Defaults zu den Befehlen dazu */
+    update_defaults();
 }
 
 typedef enum cansee_t {
