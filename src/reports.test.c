@@ -13,7 +13,6 @@
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
-#include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
@@ -21,7 +20,6 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
-#include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"

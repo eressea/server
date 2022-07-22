@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "eressea.h"
 #include "guard.h"
-#include "reports.h"
 #include "magic.h"                   // for create_mage
 
 #include <kernel/ally.h>
@@ -28,11 +27,12 @@
 #include <kernel/unit.h>
 
 #include <util/base36.h>
+#include <util/keyword.h>      // for K_NAME, K_QUIT, K_MAKETEMP, K_EXPEL
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/rand.h>
-#include "util/variant.h"  // for variant, frac_make, frac_zero
+#include <util/variant.h>  // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
