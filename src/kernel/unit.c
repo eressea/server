@@ -1864,6 +1864,7 @@ void translate_orders(unit *u, const struct locale *lang, order **list, bool del
             /* we don't know what to do with these, drop or keep them? */
             if (del) {
                 if (u->thisorder == ord) {
+                    /* FIXME: I don't think this can happen */
                     u->thisorder = NULL;
                 }
                 *po = ord->next;

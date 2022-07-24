@@ -1,0 +1,12 @@
+ERESSEA enno "ydz0we"
+EINHEIT m3vo;    Mallorngarde [50,1990$]
+; bestaetigt
+    NACH NO NW
+    // #call learn Bogenschiessen
+    @RESERVIERE JE 50 Silber
+    GIB TEMP gort 1 PERSON
+    MACHE TEMP gort Klaathu
+        LERNE Taktik
+    ENDE
+
+NAECHSTER

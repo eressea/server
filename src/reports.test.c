@@ -13,7 +13,6 @@
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
-#include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/ship.h"
@@ -21,7 +20,6 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
-#include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"
 #include "util/message.h"
@@ -1067,28 +1065,6 @@ static void test_reports_genpassword(CuTest *tc) {
     test_teardown();
 }
 
-static void test_update_defaults(CuTest* tc) {
-    unit* u;
-    order* ord;
-
-    test_setup();
-    u = test_create_unit(NULL, NULL);
-
-    /* a long order gets promoted to the template, short order does not */
-    unit_addorder(u, ord = create_order(K_ENTERTAIN, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_GUARD, u->faction->locale, NULL));
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    CuAssertPtrEquals(tc, ord, u->orders);
-    update_long_order(u);
-    CuAssertIntEquals(tc, ord->id, u->thisorder->id);
-    update_defaults(u->faction);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertIntEquals(tc, ord->id, u->old_orders->id);
-    CuAssertPtrEquals(tc, NULL, ord->next);
-
-    test_teardown();
-}
-
 CuSuite* get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1122,6 +1098,5 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_visible_unit);
     SUITE_ADD_TEST(suite, test_eval_functions);
     SUITE_ADD_TEST(suite, test_reports_genpassword);
-    SUITE_ADD_TEST(suite, test_update_defaults);
     return suite;
 }

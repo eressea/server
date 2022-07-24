@@ -4,6 +4,7 @@
 #include "reports.h"
 
 #include "battle.h"
+#include "defaults.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
@@ -746,23 +747,12 @@ static void bufunit_orders(const unit* u, struct sbstring* sbp)
     const struct locale* lang = u->faction->locale;
     int printed = 0;
     const order* ord;
-    for (ord = u->old_orders; ord; ord = ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
         keyword_t kwd = getkeyword(ord);
         if (is_repeated(kwd)) {
+            buforder(sbp, ord, lang, printed++);
             if (printed >= ORDERS_IN_NR) {
                 break;
-            }
-            buforder(sbp, ord, lang, printed++);
-        }
-    }
-    if (printed < ORDERS_IN_NR) {
-        for (ord = u->orders; ord; ord = ord->next) {
-            keyword_t kwd = getkeyword(ord);
-            if (is_repeated(kwd)) {
-                if (printed >= ORDERS_IN_NR) {
-                    break;
-                }
-                buforder(sbp, ord, lang, printed++);
             }
         }
     }
@@ -1384,38 +1374,6 @@ void report_warnings(faction *f, int now)
     }
 }
 
-void update_defaults(faction* f)
-{
-    unit* u;
-    for (u = f->units; u != NULL; u = u->nextF) {
-        order** ordi = &u->old_orders;
-        while (*ordi) {
-            order* ord = *ordi;
-            ordi = &ord->next;
-        }
-        if (u->orders) {
-            bool repeated = u->old_orders != NULL;
-            order** ordp = &u->orders;
-            while (*ordp) {
-                order* ord = *ordp;
-                keyword_t kwd = getkeyword(ord);
-                if (!(repeated && is_repeated(kwd))) {
-                    if (is_persistent(ord)) {
-                        *ordp = ord->next;
-                        *ordi = ord;
-                        ord->next = NULL;
-                        ordi = &ord->next;
-                        continue;
-                    }
-                }
-                ordp = &ord->next;
-            }
-            free_orders(&u->orders);
-        }
-    }
-}
-
-
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential
@@ -1540,7 +1498,6 @@ int write_reports(faction * f, int options, const char *password)
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
 
-    update_defaults(f);
     if (noreports) {
         return false;
     }

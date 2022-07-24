@@ -25,8 +25,9 @@ function test_trolls_with_horses()
     u1:add_item('cart', 5)
     -- trolls carry 10.8 GE, carts carry 100 GE:
     u1:add_item('money', 100 * (5 * 100 + 2 * 108))
-    u1:add_order('NACH O O O')
 
+    u1:clear_orders()
+    u1:add_order('NACH O O O')
     process_orders()
     assert_equal(r1, u1.region)
 
@@ -34,6 +35,8 @@ function test_trolls_with_horses()
     u1:add_item('horse', 20)
     u1:add_item('money', 100 * 20 * 20)
     
+    u1:clear_orders()
+    u1:add_order('NACH O O O')
     process_orders()
     assert_equal(r2, u1.region)
 
@@ -41,6 +44,8 @@ function test_trolls_with_horses()
     u1:add_item('cart', 5)
     u1:add_item('money', 100 * 5 * 100)
  
+    u1:clear_orders()
+    u1:add_order('NACH O O O')
     process_orders()
     assert_equal(r3, u1.region)
 
@@ -48,6 +53,8 @@ function test_trolls_with_horses()
     u1:add_item('cart', 5)
     u1:add_item('money', 100 * 5 * 100)
  
+    u1:clear_orders()
+    u1:add_order('NACH O O O')
     process_orders()
     assert_equal(r4, u1.region)
 

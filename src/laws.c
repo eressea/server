@@ -4,6 +4,8 @@
 #include <kernel/config.h>
 #include "laws.h"
 
+#include "defaults.h"
+
 #include <modules/gmcmd.h>
 
 #include "alchemy.h"
@@ -732,7 +734,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* zu den Baeumen hinzufuegen */
         rsettrees(r, 2, rtrees(r, 2) + grownup_trees);
 
-        /* Samenwachstum, wenn noch Platz für Sprößlinge ist: */
+        /* Samenwachstum, wenn noch Platz fï¿½r Sprï¿½ï¿½linge ist: */
         i = region_maxworkers(r, max_production(r));
         if (i > 0) {
             seeds = rtrees(r, 0);
@@ -2943,7 +2945,6 @@ static void maketemp_cmd(unit *u, order **olist)
         if (!u2->orders) {
             order *deford = default_order(u2->faction->locale);
             if (deford) {
-                set_order(&u2->thisorder, NULL);
                 unit_addorder(u2, deford);
             }
         }
@@ -2982,98 +2983,6 @@ void new_units(void)
                 }
             }
         }
-    }
-}
-
-void update_long_order(unit * u)
-{
-    order *ord;
-    bool exclusive = true;
-    keyword_t thiskwd = NOKEYWORD;
-    bool hunger = LongHunger(u);
-
-    freset(u, UFL_MOVED);
-    freset(u, UFL_LONGACTION);
-
-    /* check all orders for a potential new long order this round: */
-    for (ord = u->orders; ord; ord = ord->next) {
-        keyword_t kwd = getkeyword(ord);
-        if (kwd == NOKEYWORD) continue;
-
-        if (u->old_orders && is_repeated(kwd)) {
-            /* this new order will replace the old defaults */
-            free_orders(&u->old_orders);
-        }
-
-        /* hungry units do not get long orders: */
-        if (hunger) {
-            if (u->old_orders) {
-                /* keep looking for repeated orders that might clear the old_orders */
-                continue;
-            }
-            break;
-        }
-
-        if (is_long(kwd)) {
-            if (thiskwd == NOKEYWORD) {
-                /* we have found the (first) long order
-                 * some long orders can have multiple instances: */
-                switch (kwd) {
-                    /* Wenn gehandelt wird, darf kein langer Befehl ausgefuehrt
-                     * werden. Da Handel erst nach anderen langen Befehlen kommt,
-                     * muss das vorher abgefangen werden. Wir merken uns also
-                     * hier, ob die Einheit handelt. */
-                case K_BUY:
-                case K_SELL:
-                case K_CAST:
-                    /* non-exclusive orders can be used with others. BUY can be paired with SELL,
-                     * CAST with other CAST orders. compatibility is checked once the second
-                     * long order is analyzed (below). */
-                    exclusive = false;
-                    break;
-
-                default:
-                    set_order(&u->thisorder, copy_order(ord));
-                    break;
-                }
-                thiskwd = kwd;
-            }
-            else {
-                /* we have found a second long order. this is okay for some, but not all commands.
-                 * u->thisorder is already set, and should not have to be updated. */
-                switch (kwd) {
-                case K_CAST:
-                    if (thiskwd != K_CAST) {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
-                    break;
-                case K_SELL:
-                    if (thiskwd != K_SELL && thiskwd != K_BUY) {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
-                    break;
-                case K_BUY:
-                    if (thiskwd != K_SELL) {
-                        cmistake(u, ord, 52, MSG_EVENT);
-                    }
-                    else {
-                        thiskwd = K_BUY;
-                    }
-                    break;
-                default:
-                    cmistake(u, ord, 52, MSG_EVENT);
-                    break;
-                }
-            }
-        }
-    }
-    if (hunger) {
-        /* Hungernde Einheiten fuehren NUR den default-Befehl aus */
-        set_order(&u->thisorder, default_order(u->faction->locale));
-    }
-    else if (!exclusive) {
-        /* Wenn die Einheit handelt oder zaubert, muss der Default-Befehl geloescht werden. */
-        set_order(&u->thisorder, NULL);
     }
 }
 
@@ -3162,65 +3071,6 @@ void monthly_healing(void)
 
                 /* soll man an negativer regeneration sterben koennen? */
                 assert(u->hp > 0);
-            }
-        }
-    }
-}
-
-static void remove_long(order ** ordp)
-{
-    while (*ordp) {
-        order *ord = *ordp;
-        if (is_long(getkeyword(ord))) {
-            *ordp = ord->next;
-            ord->next = NULL;
-            free_order(ord);
-        }
-        else {
-            ordp = &ord->next;
-        }
-    }
-}
-
-void defaultorders(void)
-{
-    region *r;
-
-    assert(!keyword_disabled(K_DEFAULT));
-    for (r = regions; r; r = r->next) {
-        unit *u;
-        for (u = r->units; u; u = u->next) {
-            bool neworders = false;
-            order **ordp = &u->orders;
-            while (*ordp != NULL) {
-                order *ord = *ordp;
-                if (getkeyword(ord) == K_DEFAULT) {
-                    char lbuf[8192];
-                    order *new_order = NULL;
-                    const char *s;
-                    init_order(ord, NULL);
-                    s = gettoken(lbuf, sizeof(lbuf));
-                    if (s) {
-                        new_order = parse_order(s, u->faction->locale);
-                    }
-                    else {
-                        free_orders(&u->old_orders);
-                        neworders = true;
-                    }
-                    if (!neworders) {
-                        /* lange Befehle aus orders und old_orders loeschen zu gunsten des neuen */
-                        /* TODO: why only is_exclusive, not is_long? what about CAST, BUY, SELL? */
-                        remove_long(&u->old_orders);
-                        neworders = true;
-                    }
-                    if (new_order)
-                        addlist(&u->old_orders, new_order);
-                    *ordp = ord->next;
-                    ord->next = NULL;
-                    free_order(ord);
-                }
-                else
-                    ordp = &ord->next;
             }
         }
     }
@@ -3580,7 +3430,7 @@ bool long_order_allowed(const unit *u, bool flags_only)
 
     if (is_paused(u->faction)) return false;
     if (fval(u, UFL_LONGACTION)) {
-        /* this message was already given in laws.update_long_order
+        /* this message was already given in update_long_orders();
         cmistake(u, ord, 52, MSG_PRODUCE);
         */
         return false;
@@ -3787,9 +3637,9 @@ void init_processor(void)
     p = 10;
     add_proc_global(p, nmr_warnings, "NMR Warnings");
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
+    add_proc_global(p, update_long_orders, "Lange Befehle aktualisieren");
 
     p += 10;
-    add_proc_unit(p, update_long_order, "Langen Befehl aktualisieren");
     add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
     add_proc_order(p, K_EMAIL, email_cmd, 0, NULL);
     add_proc_order(p, K_PASSWORD, password_cmd, 0, NULL);
@@ -3995,6 +3845,9 @@ void turn_end(void)
     /* immer ausfuehren, wenn neue Sprueche dazugekommen sind, oder sich
      * Beschreibungen geaendert haben */
     update_spells();
+
+    /* am Ende der Auswertung die neuen Defaults zu den Befehlen dazu */
+    update_defaults();
 }
 
 typedef enum cansee_t {

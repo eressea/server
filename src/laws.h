@@ -41,10 +41,8 @@ extern "C" {
 
     int checkunitnumber(const struct faction * f, int add);
     void new_units(void);
-    void defaultorders(void);
     void quit(void);
     void monthly_healing(void);
-    void update_long_order(struct unit *u);
     void sinkships(struct region * r);
     void do_enter(struct region *r, bool is_final_attempt);
     bool long_order_allowed(const struct unit *u, bool flags_only);

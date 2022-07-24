@@ -1,6 +1,5 @@
 #include "otherfaction.h"
 
-#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/unit.h>
 #include <kernel/faction.h>

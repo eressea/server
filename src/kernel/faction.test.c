@@ -162,12 +162,14 @@ static void test_change_locale(CuTest *tc) {
     u = test_create_unit(f, test_create_plain(0, 0));
     u->thisorder = create_order(K_ENTERTAIN, f->locale, NULL);
 
-    u->old_orders = create_order(K_WORK, f->locale, NULL);
-    u->old_orders->next = ord = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ALCHEMY]);
+    u->defaults = create_order(K_WORK, f->locale, NULL);
+    ord = u->defaults->next = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ALCHEMY]);
     CuAssertIntEquals(tc, SK_ALCHEMY - 100, ord->id);
     ord->next = create_order(K_GIVE, f->locale, "abcd 1 Schwert");
 
+    /* NAME, GUARD not implemented: */
     unit_addorder(u, create_order(K_NAME, f->locale, "EINHEIT Hodor"));
+    unit_addorder(u, create_order(K_GUARD, f->locale, NULL));
     unit_addorder(u, create_order(K_ENTERTAIN, f->locale, NULL));
     unit_addorder(u, create_order(K_KOMMENTAR, f->locale, "ich bin kein Tintenfisch"));
     unit_addorder(u, ord = create_order(K_STUDY, f->locale, skillnames[SK_ENTERTAINMENT]));
@@ -177,7 +179,7 @@ static void test_change_locale(CuTest *tc) {
     CuAssertPtrEquals(tc, lang, (void *)f->locale);
     CuAssertPtrNotNull(tc, u->thisorder);
 
-    CuAssertPtrNotNull(tc, ord = u->old_orders);
+    CuAssertPtrNotNull(tc, ord = u->defaults);
     CuAssertIntEquals(tc, K_WORK, ord->command);
     CuAssertPtrNotNull(tc, ord = ord->next);
     CuAssertIntEquals(tc, K_AUTOSTUDY, ord->command);
@@ -185,6 +187,9 @@ static void test_change_locale(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, ord->next);
 
     CuAssertPtrNotNull(tc, ord = u->orders);
+    /* GIVE and NAME get skipped, they're not implemented */
+    CuAssertIntEquals(tc, K_GUARD, ord->command);
+    CuAssertPtrNotNull(tc, ord = ord->next);
     CuAssertIntEquals(tc, K_ENTERTAIN, ord->command);
     CuAssertPtrNotNull(tc, ord = ord->next);
     CuAssertIntEquals(tc, K_KOMMENTAR, ord->command);

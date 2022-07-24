@@ -86,6 +86,7 @@ set (ERESSEA_SRC
   contact.c
   creport.c
   direction.c
+  defaults.c
   donations.c
   recruit.c
   economy.c
@@ -211,6 +212,7 @@ set(TESTS_SRC
   contact.test.c
   creport.test.c
   direction.test.c
+  defaults.test.c
   donations.test.c
   economy.test.c
   give.test.c
