@@ -184,6 +184,21 @@ static void update_long_order(unit * u)
     }
 }
 
+static void remove_long(order** ordp)
+{
+    while (*ordp) {
+        order* ord = *ordp;
+        if (is_long(getkeyword(ord))) {
+            *ordp = ord->next;
+            ord->next = NULL;
+            free_order(ord);
+        }
+        else {
+            ordp = &ord->next;
+        }
+    }
+}
+
 void defaultorders(void)
 {
     region *r;
@@ -193,6 +208,7 @@ void defaultorders(void)
         unit *u;
         for (u = r->units; u; u = u->next) {
             order **ordp = &u->orders;
+            bool neworders = false;
             while (*ordp != NULL) {
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
@@ -204,10 +220,17 @@ void defaultorders(void)
                     if (s) {
                         new_order = parse_order(s, u->faction->locale);
                     }
+                    /* DEFAULT "", see bug 2843
                     else {
                         free_orders(&u->defaults);
                     }
+                    */
                     if (new_order) {
+                        if (!neworders && is_long(getkeyword(new_order))) 
+                        {
+                            remove_long(&u->defaults);
+                            neworders = true;
+                        }
                         addlist(&u->defaults, new_order);
                     }
                     /* The DEFAULT order itself must not be repeated */
