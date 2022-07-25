@@ -258,22 +258,24 @@ function test_defaults_make_temp()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
-    u:add_order("UNTERHALTE")
+    u:add_order("ARBEITE")
     local filename = "orders.txt"
+    -- suppress NMR check:
+    f.flags = f.flags + 16777216
     
     local file = io.open(filename, "w")
     assert_not_nil(file)
     f.password = 'Hodor'
     file:write('ERESSEA ' .. itoa36(f.id) .. ' "Hodor"\n')
     file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
-    file:write("MACHE TEMP 1\nTREIBE\nENDE\nARBEITE\n@RESERVIERE 1 Schwert")
+    file:write("MACHE TEMP 1\nTREIBE\nENDE\nLERNE Taktik\n@RESERVIERE 1 Schwert")
     file:close()
     
     eressea.read_orders(filename)
     process_orders()
     os.remove(filename)
-    assert_equal("ARBEITE", u:get_order(0))
+    assert_equal("LERNE Taktik", u:get_order(0))
     assert_equal("@RESERVIERE 1 Schwert", u:get_order(1))
-    -- should get only the nmr_warning:
-    assert_equal('nmr_warning', f.messages[1])
+    -- should get only the LERNE error:
+    assert_equal('error65', f.messages[1])
 end
