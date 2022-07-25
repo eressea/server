@@ -3637,9 +3637,9 @@ void init_processor(void)
     p = 10;
     add_proc_global(p, nmr_warnings, "NMR Warnings");
     add_proc_global(p, new_units, "Neue Einheiten erschaffen");
-    add_proc_global(p, update_long_orders, "Lange Befehle aktualisieren");
 
     p += 10;
+    add_proc_global(p, update_long_orders, "Lange Befehle aktualisieren");
     add_proc_order(p, K_BANNER, banner_cmd, 0, NULL);
     add_proc_order(p, K_EMAIL, email_cmd, 0, NULL);
     add_proc_order(p, K_PASSWORD, password_cmd, 0, NULL);

@@ -253,3 +253,27 @@ function test_promote_after_recruit()
     assert_equal(0, u1:get_item('money'))
     assert_equal(fl + 128, u1.flags) -- UFL_HERO
 end
+
+function test_defaults_make_temp()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("UNTERHALTE")
+    local filename = "orders.txt"
+    
+    local file = io.open(filename, "w")
+    assert_not_nil(file)
+    f.password = 'Hodor'
+    file:write('ERESSEA ' .. itoa36(f.id) .. ' "Hodor"\n')
+    file:write('EINHEIT ' .. itoa36(u.id) .. "\n")
+    file:write("MACHE TEMP 1\nTREIBE\nENDE\nARBEITE\n@RESERVIERE 1 Schwert")
+    file:close()
+    
+    eressea.read_orders(filename)
+    process_orders()
+    os.remove(filename)
+    assert_equal("ARBEITE", u:get_order(0))
+    assert_equal("@RESERVIERE 1 Schwert", u:get_order(1))
+    -- should get only the nmr_warning:
+    assert_equal('nmr_warning', f.messages[1])
+end
