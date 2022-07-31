@@ -71,8 +71,9 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
+    void bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
         char *buf, size_t size);
+    char bufunit_bullet(const struct faction* f, const struct unit* u, struct faction* of, bool anon);
     void bufunit(const struct faction * f, const struct unit * u,
         const struct faction *of, enum seen_mode mode, bool anon,
         struct sbstring *sbp);

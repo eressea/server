@@ -308,6 +308,19 @@ static void test_bufunit_help_stealth(CuTest *tc) {
     test_teardown();
 }
 
+static void test_bufunit_bullets(CuTest* tc) {
+    unit* u;
+    faction* f, *f2;
+
+    test_setup();
+    f = test_create_faction();
+    u = test_create_unit(f2 = test_create_faction(), test_create_plain(0, 0));
+    CuAssertIntEquals(tc, '-', bufunit_bullet(f, u, NULL, false));
+    ally_set(&f->allies, f2, HELP_GIVE);
+    CuAssertIntEquals(tc, '+', bufunit_bullet(f, u, NULL, false));
+    test_teardown();
+}
+
 static void test_bufunit(CuTest *tc) {
     unit *u;
     faction *f;
@@ -1090,6 +1103,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
+    SUITE_ADD_TEST(suite, test_bufunit_bullets);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_bufunit_help_stealth);
     SUITE_ADD_TEST(suite, test_arg_resources);

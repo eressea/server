@@ -915,7 +915,30 @@ void bufunit(const faction * f, const unit * u, const faction * of,
     bufunit_description(u, f, sbp);
 }
 
-int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
+char bufunit_bullet(const faction* f, const unit* u, faction* of, bool anon)
+{
+    char bullet = '-';
+    int dh = 0;
+    if (u->faction == f) {
+        bullet = '*';
+    }
+    else if (is_allied(u->faction, f)) {
+        bullet = 'o';
+    }
+    else if (u->attribs && f != u->faction
+        && !anon && of == f) {
+        bullet = '!';
+    }
+    else {
+        const faction* vf = visible_faction(f, u, of);
+        if (vf && !anon && alliedfaction(f, vf, HELP_ALL)) {
+            bullet = '+';
+        }
+    }
+    return bullet;
+}
+
+void bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     char *buf, size_t size)
 {
     bool anon = (0 != fval(u, UFL_ANON_FACTION));
@@ -924,13 +947,6 @@ int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
 
     sbs_init(&sbs, buf, size);
     bufunit(f, u, of, mode, anon, &sbs);
-    if (anon) {
-        const faction* vf = visible_faction(f, u, of);
-        if (vf && alliedfaction(f, vf, HELP_ALL)) {
-            return 1;
-        }
-    }
-    return 0;
 }
 
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)

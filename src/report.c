@@ -625,33 +625,17 @@ static void rps_nowrap(struct stream *out, const char *s)
 static void
 nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_mode mode)
 {
-    char marker;
-    int dh;
+    char bullet;
     bool isbattle = (mode == seen_battle);
     char buf[8192];
+    faction* of = get_otherfaction(u);
+    bool anon = fval(u, UFL_ANON_FACTION);
 
     newline(out);
-    dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
+    bufunit_depr(f, u, mode, buf, sizeof(buf));
 
-    if (u->faction == f) {
-        marker = '*';
-    }
-    else if (is_allied(u->faction, f)) {
-        marker = 'o';
-    }
-    else if (u->attribs && f != u->faction
-        && !fval(u, UFL_ANON_FACTION) && get_otherfaction(u) == f) {
-        marker = '!';
-    }
-    else {
-        if (dh && !fval(u, UFL_ANON_FACTION)) {
-            marker = '+';
-        }
-        else {
-            marker = '-';
-        }
-    }
-    paragraph(out, buf, indent, 0, marker);
+    bullet = bufunit_bullet(f, u, of, anon);
+    paragraph(out, buf, indent, 0, bullet);
 
     if (!isbattle) {
         nr_curses(out, indent, f, TYP_UNIT, u);
