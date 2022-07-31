@@ -918,7 +918,6 @@ void bufunit(const faction * f, const unit * u, const faction * of,
 char bufunit_bullet(const faction* f, const unit* u, faction* of, bool anon)
 {
     char bullet = '-';
-    int dh = 0;
     if (u->faction == f) {
         bullet = '*';
     }
