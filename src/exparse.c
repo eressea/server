@@ -1070,7 +1070,8 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
     else if (xml_strequal(el, "skill")) {
         const XML_Char *name = NULL;
         int i, speed = 0, mod = 0;
-
+        bool speed_is_set = false;
+        assert(rc);
         for (i = 0; attr[i]; i += 2) {
             const XML_Char *key = attr[i], *val = attr[i + 1];
             if (xml_strequal(key, "name")) {
@@ -1081,6 +1082,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             }
             else if (xml_strequal(key, "speed")) {
                 speed = xml_int(val);
+                speed_is_set = true;
             }
             else {
                 handle_bad_input(pi, el, key);
@@ -1090,7 +1092,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             skill_t sk = findskill(name);
             if (sk != NOSKILL) {
                 rc->bonus[sk] = (char)mod;
-                if (speed != 0) {
+                if (speed_is_set) {
                     set_study_speed(rc, sk, speed);
                 }
             }
