@@ -5,7 +5,7 @@ VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $BRANCH-$VERSION"
 cd Debug
 make clean
-../../coverity/bin/cov-build --dir cov-int make eressea
+cov-build --dir cov-int make eressea
 tar czf eressea.tgz cov-int
 curl -k --form token=IISXKH3A1ngZGfFmBz_aSA \
   --form email=enno.rehling@gmail.com \
