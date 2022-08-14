@@ -1252,7 +1252,7 @@ static void init_movement(void)
          * adds them to an internal counter which is used by travel () to
          * calculate effective weight and movement. */
 
-        if (!fval(r->terrain, SEA_REGION)) {
+        {
             for (u = r->units; u; u = u->next) {
                 order *ord;
                 int w = 0;

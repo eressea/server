@@ -1,4 +1,3 @@
--- new tests 2014-06-11
 require 'tests.laws'
 require 'tests.faction'
 require 'tests.locale'
@@ -9,3 +8,4 @@ require 'tests.settings'
 require 'tests.study'
 require 'tests.bindings'
 require 'tests.hunger'
+require 'tests.transport'
