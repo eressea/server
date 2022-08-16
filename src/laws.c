@@ -1721,12 +1721,11 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-static bool try_rename(unit *u, building *b, order *ord) {
+static bool try_rename(unit *u, building *b, order *ord, bool foreign) {
     unit *owner = b ? building_owner(b) : NULL;
-    bool foreign = !(owner && owner->faction == u->faction);
 
     if (!b) {
-        cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
+        cmistake(u, ord, foreign ? 6 : 145, MSG_EVENT);
         return false;
     }
 
@@ -1753,8 +1752,7 @@ static bool try_rename(unit *u, building *b, order *ord) {
                         "building region", b, u->region));
             }
         }
-    }
-    if (owner && owner->faction != u->faction) {
+    } else if (u != owner) {
         cmistake(u, ord, 148, MSG_PRODUCE);
         return false;
     }
@@ -1764,8 +1762,9 @@ static bool try_rename(unit *u, building *b, order *ord) {
 int
 rename_building(unit * u, order * ord, building * b, const char *name)
 {
+	/* FIXME nobody uses this! */
     assert(name);
-    if (!try_rename(u, b, ord)) {
+    if (!try_rename(u, b, ord, false)) {
         return -1;
     }
     return rename_cmd(u, ord, &b->name, name);
@@ -1806,7 +1805,7 @@ int name_cmd(struct unit *u, struct order *ord)
         if (foreign) {
             b = getbuilding(u->region);
         }
-        if (try_rename(u, b, ord)) {
+        if (try_rename(u, b, ord, foreign)) {
             s = &b->name;
         }
         break;
