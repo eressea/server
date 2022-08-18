@@ -213,25 +213,19 @@ void defaultorders(void)
                 order *ord = *ordp;
                 if (getkeyword(ord) == K_DEFAULT) {
                     char lbuf[8192];
-                    order *new_order = NULL;
                     const char *s;
                     init_order(ord, NULL);
                     s = gettoken(lbuf, sizeof(lbuf));
                     if (s) {
-                        new_order = parse_order(s, u->faction->locale);
-                    }
-                    /* DEFAULT "", see bug 2843
-                    else {
-                        free_orders(&u->defaults);
-                    }
-                    */
-                    if (new_order) {
-                        if (!neworders && is_long(getkeyword(new_order))) 
-                        {
-                            remove_long(&u->defaults);
-                            neworders = true;
+                        order* new_order = parse_order(s, u->faction->locale);
+                        if (new_order) {
+                            if (!neworders && is_long(getkeyword(new_order)))
+                            {
+                                remove_long(&u->defaults);
+                                neworders = true;
+                            }
+                            addlist(&u->defaults, new_order);
                         }
-                        addlist(&u->defaults, new_order);
                     }
                     /* The DEFAULT order itself must not be repeated */
                     *ordp = ord->next;
