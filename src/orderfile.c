@@ -30,12 +30,6 @@ static void begin_orders(unit *u) {
     u->orders = NULL;
 }
 
-typedef struct parser_state {
-    unit *u;
-    faction *f;
-    order **next_order;
-} parser_state;
-
 static void handle_faction(void *userData, int no, const char *password) {
     parser_state *state = (parser_state *)userData;
     faction * f = findfaction(no);
@@ -131,6 +125,31 @@ static void handle_order(void *userData, const char *str) {
     }
 }
 
+OP_Parser parser_create(parser_state* state)
+{
+    OP_Parser parser;
+    parser = OP_ParserCreate();
+    if (parser) {
+        OP_SetOrderHandler(parser, handle_order);
+        OP_SetUserData(parser, state);
+    }
+    return parser;
+}
+
+int parser_parse(OP_Parser parser, const char* input, size_t len, bool done)
+{
+    if (OP_Parse(parser, input, len, done) == OP_STATUS_ERROR) {
+        /* TODO: error message */
+        return (int) OP_GetErrorCode(parser);
+    }
+    return (int) OP_ERROR_NONE;
+}
+
+void parser_free(OP_Parser parser)
+{
+    OP_ParserFree(parser);
+}
+
 int parseorders(FILE *F)
 {
     char buf[4096];
@@ -138,15 +157,13 @@ int parseorders(FILE *F)
     OP_Parser parser;
     parser_state state = { NULL, NULL };
 
-    parser = OP_ParserCreate();
+    parser = parser_create(&state);
     if (!parser) {
         /* TODO: error message */
         return errno;
     }
-    OP_SetOrderHandler(parser, handle_order);
-    OP_SetUserData(parser, &state);
 
-    while (!done) {
+    while (!done && err == 0) {
         size_t len = fread(buf, 1, sizeof(buf), F);
         if (ferror(F)) {
             /* TODO: error message */
@@ -154,12 +171,8 @@ int parseorders(FILE *F)
             break;
         }
         done = feof(F);
-        if (OP_Parse(parser, buf, len, done) == OP_STATUS_ERROR) {
-            /* TODO: error message */
-            err = (int)OP_GetErrorCode(parser);
-            break;
-        }
+        err = parser_parse(parser, buf, len, done);
     }
-    OP_ParserFree(parser);
+    parser_free(parser);
     return err;
 }
