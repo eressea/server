@@ -28,8 +28,8 @@ function test_parser()
     
     eressea.read_orders(filename)
     process_orders()
-    os.remove(filename)
     assert_equal("Goldene Herde", u.name)
+    os.remove(filename)
 end
 
 local function set_order(u, str)
