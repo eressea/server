@@ -28,6 +28,7 @@ function setup()
                 "sell" : "VERKAUFE",
                 "move" : "NACH",
                 "work" : "ARBEITE",
+                "default" : "DEFAULT",
                 "entertain" : "UNTERHALTE",
                 "guard" : "BEWACHE"
             }
@@ -115,5 +116,5 @@ function test_default()
     process_orders()
     assert_equal('ARBEITE', u:get_order())
     local orders = u:get_orders()
-    -- assert_equal("UNTERHALTE", orders[1])
+    assert_equal("UNTERHALTE", orders[1])
 end
