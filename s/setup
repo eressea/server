@@ -51,7 +51,7 @@ done
 [ -d $SOURCE ] || abort "invalid source directory $SOURCE"
 [ -z $rules ] && rules=e$game
 [ -z $dir ] && dir=game-$game
-[ -z $TOOLS ] && TOOLS=$SOURCE/build-x86_64-gcc-Debug
+[ -z $TOOLS ] && TOOLS=$SOURCE/build
 [ -e $TOOLS ] || TOOLS=$SOURCE/bin
 [ -z $INIFILE ] && INIFILE=$TOOLS/inifile
 [ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile

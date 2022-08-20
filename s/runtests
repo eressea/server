@@ -4,8 +4,7 @@ set -e
 eval $(luarocks path)
 ROOT=$(git rev-parse --show-toplevel)
 export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
-BUILD="$1"
-[ -z $BUILD ] && BUILD=$ROOT/Debug ; export BUILD
+BUILD=$ROOT/build
 
 UNIT_TESTS="$BUILD/eressea/test_eressea"
 RUN_TESTS="$BUILD/eressea/eressea"
