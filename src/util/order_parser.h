@@ -26,6 +26,7 @@ void OP_ParserReset(OP_Parser parser);
 enum OP_Status OP_Parse(OP_Parser parser, const char *s, size_t len, int isFinal);
 void OP_SetOrderHandler(OP_Parser parser, OP_OrderHandler handler);
 void OP_SetUserData(OP_Parser parser, void *userData);
+void * OP_GetUserData(OP_Parser parser);
 enum OP_Error OP_GetErrorCode(OP_Parser parser);
 
 #endif

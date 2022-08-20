@@ -723,10 +723,13 @@ static int tolua_unit_set_orders(lua_State* L)
 {
     unit* u = (unit*)tolua_tousertype(L, 1, NULL);
     const char* input = tolua_tostring(L, 2, NULL);
-    parser_state state = { u, u->faction, NULL };
+    parser_state state = { NULL };
     OP_Parser parser = parser_create(&state);
     if (parser) {
-        int err = parser_parse(parser, input, strlen(input), true);
+        int err;
+        parser_set_faction(&state, u->faction);
+        parser_set_unit(&state, u);
+        err = parser_parse(parser, input, strlen(input), true);
         parser_free(parser);
         lua_pushinteger(L, err);
         return 1;

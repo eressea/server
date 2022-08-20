@@ -13,7 +13,6 @@
 #include "util/param.h"
 #include "util/parser.h"
 #include "util/password.h"
-#include "util/order_parser.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -37,15 +36,11 @@ static void handle_faction(void *userData, int no, const char *password) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
     else {
-        state->u = NULL;
-        state->next_order = NULL;
-        state->f = NULL;
         if (checkpasswd(f, password)) {
-            state->f = f;
-            f->lastorders = turn;
-            f->flags &= ~(FFL_PAUSED);
+            parser_set_faction(state, f);
         }
         else {
+            parser_set_faction(state, NULL);
             log_debug("invalid password for faction %s", itoa36(no));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
         }
@@ -56,17 +51,16 @@ static void handle_unit(void *userData, int no) {
     parser_state *state = (parser_state *)userData;
     unit * u = findunit(no);
 
-    state->u = NULL;
     if (!u) {
         /* TODO: error message */
+        parser_set_unit(state, u);
     }
     else if (u->faction != state->f) {
         /* TODO: error message */
+        parser_set_unit(state, u);
     }
     else {
-        state->u = u;
-        begin_orders(u);
-        state->next_order = &u->orders;
+        parser_set_unit(state, u);
     }
 }
 
@@ -134,6 +128,24 @@ OP_Parser parser_create(parser_state* state)
         OP_SetUserData(parser, state);
     }
     return parser;
+}
+
+void parser_set_unit(parser_state *state, struct unit *u)
+{
+    state->u = u;
+    begin_orders(u);
+    state->next_order = &u->orders;
+}
+
+void parser_set_faction(parser_state *state, struct faction *f)
+{
+    state->u = NULL;
+    state->next_order = NULL;
+    state->f = f;
+    if (f) {
+        f->lastorders = turn;
+        f->flags &= ~(FFL_PAUSED);
+    }
 }
 
 int parser_parse(OP_Parser parser, const char* input, size_t len, bool done)

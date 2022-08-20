@@ -28,6 +28,10 @@ void OP_SetUserData(OP_Parser parser, void *userData) {
     parser->m_userData = userData;
 }
 
+void * OP_GetUserData(OP_Parser parser) {
+    return parser->m_userData;
+}
+
 static void buffer_free(OP_Parser parser)
 {
     /* TODO: recycle buffers, reduce mallocs. */
