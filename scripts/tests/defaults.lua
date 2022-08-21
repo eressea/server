@@ -24,6 +24,7 @@ function setup()
         },
         "keywords" : {
             "de" : {
+                "//" : "//",
                 "buy" : "KAUFE",
                 "sell" : "VERKAUFE",
                 "move" : "NACH",
@@ -134,5 +135,32 @@ function test_default_move()
     process_orders()
     orders = u:get_orders()
     assert_equal("@GIB 0 2 Silber", orders[1])
+end
+
+function test_default_empty()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    u:add_order('// nix')
+    u:set_orders('DEFAULT\nARBEITE')
+    process_orders()
+    local orders = u:get_orders()
+    assert_equal("ARBEITE", orders[1])
+    assert_equal(1, #orders)
+end
+
+function test_default_default()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    u:set_orders('DEFAULT "DEFAULT UNTERHALTE"')
+    process_orders()
+    local orders = u:get_orders()
+    assert_equal("ARBEITE", orders[1])
+    assert_equal("DEFAULT UNTERHALTE", orders[2])
+    assert_equal(2, #orders)
+    
 end
 
