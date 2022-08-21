@@ -11,7 +11,9 @@ function setup()
     eressea.settings.set("nmr.timeout", "0")
     conf = [[{
         "races": {
-            "human" : {}
+            "human" : {
+                "flags": [ "walk" ]
+            }
         },
         "terrains" : {
             "plain": { "flags" : [ "land", "walk", "sail" ] }
@@ -46,16 +48,15 @@ function test_add_order()
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     assert_nil(u:get_order())
-    assert_nil(u:get_orders())
+    assert_nil(u.orders)
     u:add_order("ARBEITE")
     assert_nil(u:get_order())
-    local tbl = u:get_orders()
-    assert_equal(1, #tbl)
-    assert_equal("ARBEITE", tbl[1])
+    assert_equal(1, #u.orders)
+    assert_equal("ARBEITE", u.orders[1])
     process_orders()
     assert_equal("ARBEITE", u:get_order())
-    assert_equal(1, #tbl)
-    assert_equal("ARBEITE", tbl[1])
+    assert_equal(1, #u.orders)
+    assert_equal("ARBEITE", u.orders[1])
 end
 
 function test_set_orders()
@@ -64,14 +65,13 @@ function test_set_orders()
     local u = unit.create(f, r, 1)
     u:set_orders("ARBEITE\nBEWACHE")
     assert_nil(u:get_order())
-    assert_not_nil(u:get_orders())
-    local tbl = u:get_orders()
-    assert_equal(2, #tbl)
-    assert_equal("ARBEITE", tbl[1])
-    assert_equal("BEWACHE", tbl[2])
+    assert_not_nil(u.orders)
+    assert_equal(2, #u.orders)
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("BEWACHE", u.orders[2])
     process_orders()
     assert_equal("ARBEITE", u:get_order())
-    assert_not_nil(u:get_orders())
+    assert_not_nil(u.orders)
 end
 
 function test_replace_defaults()
@@ -80,22 +80,20 @@ function test_replace_defaults()
     local u = unit.create(f, r, 1)
     -- add_order sets the default orders as if they were loaded from save:
     u:add_order("UNTERHALTE")
-    local defaults = u:get_orders()
-    assert_equal(1, #defaults)
-    assert_equal("UNTERHALTE", defaults[1])
+    assert_equal(1, #u.orders)
+    assert_equal("UNTERHALTE", u.orders[1])
     -- set_orders behaves like reading from a file.
     u:set_orders("ARBEITE\nBEWACHE")
-    local orders = u:get_orders()
-    assert_equal(2, #orders)
-    assert_equal("ARBEITE", orders[1])
-    assert_equal("BEWACHE", orders[2])
+
+    assert_equal(2, #u.orders)
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("BEWACHE", u.orders[2])
     process_orders()
     -- make sure that this unit tried to work, not entertain:
     assert_equal("ARBEITE", u:get_order())
     -- short order is not kept:
-    defaults = u:get_orders()
-    assert_equal(1, #defaults)
-    assert_equal("ARBEITE", defaults[1])
+    assert_equal(1, #u.orders)
+    assert_equal("ARBEITE", u.orders[1])
 end
 
 function test_rewrite_abbrevs()
@@ -105,9 +103,8 @@ function test_rewrite_abbrevs()
 
     u:set_orders("ARB\n@BEWAC")
     process_orders()
-    local orders = u:get_orders()
-    assert_equal("ARBEITE", orders[1])
-    assert_equal("@BEWACHE", orders[2])
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("@BEWACHE", u.orders[2])
 end
 
 function test_default()
@@ -117,8 +114,7 @@ function test_default()
     u:set_orders('ARBEITE\nDEFAULT UNTERHALTE')
     process_orders()
     assert_equal('ARBEITE', u:get_order())
-    local orders = u:get_orders()
-    assert_equal("UNTERHALTE", orders[1])
+    assert_equal("UNTERHALTE", u.orders[1])
 end
 
 function test_default_move()
@@ -129,12 +125,10 @@ function test_default_move()
     u:add_order('@GIB 0 1 Silber')
     u:set_orders('DEFAULT "NACH OSTEN"\nARBEITE\n@GIB 0 2 Silber')
     process_orders()
-    local orders = u:get_orders()
-    assert_equal("NACH OSTEN", orders[1])
-    assert_equal("@GIB 0 2 Silber", orders[2])
+    assert_equal("NACH OSTEN", u.orders[1])
+    assert_equal("@GIB 0 2 Silber", u.orders[2])
     process_orders()
-    orders = u:get_orders()
-    assert_equal("@GIB 0 2 Silber", orders[1])
+    assert_equal("@GIB 0 2 Silber", u.orders[1])
 end
 
 function test_default_empty()
@@ -145,9 +139,8 @@ function test_default_empty()
     u:add_order('// nix')
     u:set_orders('DEFAULT\nARBEITE')
     process_orders()
-    local orders = u:get_orders()
-    assert_equal("ARBEITE", orders[1])
-    assert_equal(1, #orders)
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal(1, #u.orders)
 end
 
 function test_default_default()
@@ -157,10 +150,22 @@ function test_default_default()
     u:add_order('ARBEITE')
     u:set_orders('DEFAULT "DEFAULT UNTERHALTE"')
     process_orders()
-    local orders = u:get_orders()
-    assert_equal("ARBEITE", orders[1])
-    assert_equal("DEFAULT UNTERHALTE", orders[2])
-    assert_equal(2, #orders)
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("DEFAULT UNTERHALTE", u.orders[2])
+    assert_equal(2, #u.orders)
     
 end
 
+function test_movement_does_not_replace_default()
+    local r = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    u:set_orders('NACH OSTEN\n@BEWACHE')
+    process_orders()
+    assert_nil(u:get_order()) -- no long order because of movement
+    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("@BEWACHE", u.orders[2])
+    assert_equal(r2, u.region)
+end

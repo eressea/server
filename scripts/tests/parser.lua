@@ -28,7 +28,6 @@ function test_parser()
     
     eressea.read_orders(filename)
     process_orders()
-    assert_equal("Goldene Herde", u.name)
     os.remove(filename)
 end
 
@@ -175,7 +174,7 @@ function test_route()
     local u = unit.create(f, r1, 1)
     u:add_order("ROUTE O W P")
     process_orders()
-    assert_equal("ROUTE West PAUSE Ost", u:get_order(0))
+    assert_equal("ROUTE West PAUSE Ost", u:get_orders()[1])
     assert_equal(r2, u.region)
 end
 
@@ -188,7 +187,7 @@ function test_route_horse()
     u:add_item('horse', 1)
     u:set_skill('riding', 1)
     process_orders()
-    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(0))
+    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(1))
     assert_equal(r2, u.region)
 end
 
@@ -199,7 +198,7 @@ function test_route_pause()
     local u = unit.create(f, r1, 1)
     u:add_order("ROUTE P O W")
     process_orders()
-    assert_equal("ROUTE P O W", u:get_order(0))
+    assert_equal("ROUTE P O W", u:get_order(1))
     assert_equal(r1, u.region)
 end
 
@@ -274,8 +273,8 @@ function test_defaults_make_temp()
     eressea.read_orders(filename)
     process_orders()
     os.remove(filename)
-    assert_equal("LERNE Taktik", u:get_order(0))
-    assert_equal("@RESERVIERE 1 Schwert", u:get_order(1))
+    assert_equal("LERNE Taktik", u.orders[1])
+    assert_equal("@RESERVIERE 1 Schwert", u.orders[2])
     -- should get only the LERNE error:
     assert_equal('error65', f.messages[1])
 end

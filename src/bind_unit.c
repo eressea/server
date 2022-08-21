@@ -690,15 +690,15 @@ static int tolua_unit_set_region(lua_State * L)
 static int tolua_unit_get_order(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
-    int index = (int)tolua_tonumber(L, 2, -1);
+    int index = (int)tolua_tonumber(L, 2, 0);
     order *ord = NULL;
-    if (index < 0) {
+    if (index <= 0) {
         ord = u->thisorder;
     }
     else {
         int i;
         ord = u->orders;
-        for (i = 0; ord && i != index; ++i) {
+        for (i = 1; ord && i != index; ++i) {
             ord = ord->next;
         }
     }
@@ -1050,8 +1050,9 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, "familiar", tolua_unit_get_familiar,
                 tolua_unit_set_familiar);
 
-            tolua_variable(L, "weight", tolua_unit_get_weight, 0);
-            tolua_variable(L, "capacity", tolua_unit_get_capacity, 0);
+            tolua_variable(L, "weight", tolua_unit_get_weight, NULL);
+            tolua_variable(L, "capacity", tolua_unit_get_capacity, NULL);
+            tolua_variable(L, "orders", tolua_unit_get_orders, NULL);
 
             tolua_function(L, "set_orders", tolua_unit_set_orders);
             tolua_function(L, "get_orders", tolua_unit_get_orders);

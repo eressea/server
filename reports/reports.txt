@@ -1,1 +1,0 @@
-faction=h6L3:email=nobody@eressea.de:lang=test:compression=zip:reports=
