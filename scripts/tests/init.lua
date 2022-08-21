@@ -1,4 +1,3 @@
---[[
 require 'tests.laws'
 require 'tests.faction'
 require 'tests.locale'
@@ -10,5 +9,4 @@ require 'tests.study'
 require 'tests.bindings'
 require 'tests.hunger'
 require 'tests.transport'
---]]
 require 'tests.defaults'
