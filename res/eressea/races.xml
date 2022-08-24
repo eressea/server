@@ -1074,9 +1074,8 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="1" damage="1d1"/>
   </race>
-  <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
+  <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" learn="no" teach="no" getitem="yes" resistbash="yes" unarmedguard="yes">
     <ai splitsize="6" killpeasants="yes" moverandom="yes" moveattack="yes" scarepeasants="yes"/>
-    <skill name="tactics" modifier="4"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
     <attack type="4" damage="1d30"/>
