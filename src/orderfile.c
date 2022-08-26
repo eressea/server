@@ -53,7 +53,7 @@ static void handle_unit(void *userData, int no) {
 
     if (!u) {
         /* TODO: error message */
-        parser_set_unit(state, u);
+        parser_set_unit(state, NULL);
     }
     else if (u->faction != state->f) {
         /* TODO: error message */
@@ -133,8 +133,13 @@ OP_Parser parser_create(parser_state* state)
 void parser_set_unit(parser_state *state, struct unit *u)
 {
     state->u = u;
-    begin_orders(u);
-    state->next_order = &u->orders;
+    if (u) {
+        begin_orders(u);
+        state->next_order = &u->orders;
+    }
+    else {
+        state->next_order = NULL;
+    }
 }
 
 void parser_set_faction(parser_state *state, struct faction *f)
