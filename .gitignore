@@ -47,3 +47,4 @@ tests/data/185.dat
 *.mo
 /.vs
 /.idea/
+.env
