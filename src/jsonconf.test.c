@@ -498,6 +498,7 @@ static void test_configs(CuTest * tc)
     test_setup();
 
     F = fopen("test.json", "w");
+    CuAssertPtrNotNull(tc, F);
     fwrite(building_data, 1, strlen(building_data), F);
     fclose(F);
     CuAssertPtrNotNull(tc, json);

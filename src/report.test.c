@@ -35,6 +35,7 @@ static void test_write_spaces(CuTest *tc) {
     char buf[5];
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     write_spaces(&out, 4);
     out.api->rewind(out.handle);
     CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
@@ -48,6 +49,7 @@ static void test_write_many_spaces(CuTest *tc) {
     char buf[1024];
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     write_spaces(&out, 100);
     out.api->rewind(out.handle);
     CuAssertIntEquals(tc, EOF, out.api->read(out.handle, buf, sizeof(buf)));
@@ -91,6 +93,7 @@ static void test_report_region(CuTest *tc) {
     locale_setstring(lang, "see_travel", "durchgereist");
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     r = test_create_plain(0, 0);
     add_resource(r, 1, 135, 10, rt_stone);
     CuAssertIntEquals(tc, 1, r->resources->level);
@@ -180,6 +183,7 @@ static void test_report_allies(CuTest *tc) {
     lang = test_create_locale();
     locale_setstring(lang, "list_and", " und ");
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     f = test_create_faction_ex(NULL, lang);
     f1 = test_create_faction_ex(NULL, lang);
     f2 = test_create_faction_ex(NULL, lang);
@@ -232,6 +236,7 @@ static void test_report_travelthru(CuTest *tc) {
     locale_setstring(lang, "travelthru_header", "Durchreise: ");
     locale_setstring(lang, "list_and", " und ");
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     r = test_create_plain(0, 0);
     r->flags |= RF_TRAVELUNIT;
     f = test_create_faction();
@@ -249,6 +254,7 @@ static void test_report_travelthru(CuTest *tc) {
     mstream_done(&out);
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     travelthru_add(r, u);
     report_travelthru(&out, r, f);
     out.api->write(out.handle, "", 1);
@@ -259,6 +265,7 @@ static void test_report_travelthru(CuTest *tc) {
     buf[0] = '\0';
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     travelthru_add(r, u);
     travelthru_add(r, u);
     report_travelthru(&out, r, f);
@@ -270,6 +277,7 @@ static void test_report_travelthru(CuTest *tc) {
     buf[0] = '\0';
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     move_unit(u, r, NULL);
     report_travelthru(&out, r, f);
     out.api->write(out.handle, "", 1);
@@ -393,6 +401,7 @@ static void test_paragraph(CuTest *tc) {
     stream out = { 0 };
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     paragraph(&out, toolong, 0, 0, 0);
     out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
@@ -407,6 +416,7 @@ static void test_paragraph_break(CuTest *tc) {
     stream out = { 0 };
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     paragraph(&out, toolong, 0, 0, 0);
     out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
@@ -422,6 +432,7 @@ static void test_pump_paragraph_toolong(CuTest *tc) {
     stream out = { 0 };
 
     CuAssertIntEquals(tc, 0, mstream_init(&out));
+    CuAssertPtrNotNull(tc, out.api);
     sbs_init(&sbs, buf, sizeof(buf));
     sbs_strcat(&sbs, toolong);
 

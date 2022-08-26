@@ -448,8 +448,10 @@ static void test_read_password_external(CuTest *tc) {
     _test_read_password(&data, f);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     F = fopen(pwfile, "wt");
-    fprintf(F, "%s:pwfile\n", itoa36(f->no));
-    fclose(F);
+    if (F) {
+        fprintf(F, "%s:pwfile\n", itoa36(f->no));
+        fclose(F);
+    }
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     _test_read_password(&data, f);
     CuAssertTrue(tc, checkpasswd(f, "pwfile"));
