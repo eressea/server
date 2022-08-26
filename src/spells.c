@@ -112,6 +112,54 @@ static void report_failure(unit * mage, struct order *ord)
     cmistake(mage, ord, 180, MSG_MAGIC);
 }
 
+static void astral_appear(region *rt, const unit *u, const faction *caster)
+{
+    unit *u2;
+    message * m = NULL;
+
+    for (u2 = rt->units; u2; u2 = u2->next) {
+        freset(u2->faction, FFL_SELECT);
+    }
+    for (u2 = rt->units; u2; u2 = u2->next) {
+        if (!fval(u2->faction, FFL_SELECT)) {
+            if (u2->faction == caster || cansee(u2->faction, rt, u, 0)) {
+                fset(u2->faction, FFL_SELECT);
+                if (!m) {
+                    m = msg_message("astral_appear", "unit", u);
+                }
+                r_addmessage(rt, u2->faction, m);
+            }
+        }
+    }
+    if (m) {
+        msg_release(m);
+    }
+}
+
+static void astral_disappear(region *r, const unit *u)
+{
+    message *m = NULL;
+    unit * u2;
+
+    for (u2 = r->units; u2; u2 = u2->next) {
+        freset(u2->faction, FFL_SELECT);
+    }
+    for (u2 = r->units; u2; u2 = u2->next) {
+        if (!fval(u2->faction, FFL_SELECT)) {
+            if (cansee(u2->faction, r, u, 0)) {
+                fset(u2->faction, FFL_SELECT);
+                if (!m) {
+                    m = msg_message("astral_disappear", "unit", u);
+                }
+                r_addmessage(r, u2->faction, m);
+            }
+        }
+    }
+    if (m) {
+        msg_release(m);
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* Spruchanalyse - Ausgabe von curse->info und curse->name       */
 /* ------------------------------------------------------------- */
@@ -1807,9 +1855,7 @@ static int sp_treewalkenter(castorder * co)
         }
         else {
             int w;
-            message *m;
-            unit *u2;
-
+            
             if (!can_survive(u, rt)) {
                 cmistake(caster, co->order, 231, MSG_MAGIC);
                 continue;
@@ -1826,38 +1872,10 @@ static int sp_treewalkenter(castorder * co)
             erfolg = cast_level;
 
             /* Meldungen in der Ausgangsregion */
-            for (u2 = r->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, r, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_disappear", "unit", u);
-                        r_addmessage(r, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_disappear(r, u);
 
             /* Meldungen in der Zielregion */
-            for (u2 = rt->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = rt->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (u2->faction == caster->faction || cansee(u2->faction, rt, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_appear", "unit", u);
-                        r_addmessage(rt, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_appear(rt, u, caster->faction);
         }
     }
     return erfolg;
@@ -1882,7 +1900,7 @@ static int sp_treewalkenter(castorder * co)
 static int sp_treewalkexit(castorder * co)
 {
     region *rt;
-    unit *u, *u2;
+    unit *u;
     int remaining_cap;
     int n;
     int erfolg = 0;
@@ -1944,47 +1962,15 @@ static int sp_treewalkexit(castorder * co)
                     "fail_tooheavy", "target", u));
             }
             else {
-                message *m;
-
                 remaining_cap = remaining_cap - w;
                 move_unit(u, rt, NULL);
                 erfolg = cast_level;
 
                 /* Meldungen in der Ausgangsregion */
-
-                for (u2 = r->units; u2; u2 = u2->next)
-                    freset(u2->faction, FFL_SELECT);
-                m = NULL;
-                for (u2 = r->units; u2; u2 = u2->next) {
-                    if (!fval(u2->faction, FFL_SELECT)) {
-                        if (cansee(u2->faction, r, u, 0)) {
-                            fset(u2->faction, FFL_SELECT);
-                            if (!m)
-                                m = msg_message("astral_disappear", "unit", u);
-                            r_addmessage(r, u2->faction, m);
-                        }
-                    }
-                }
-                if (m)
-                    msg_release(m);
+                astral_disappear(r, u);
 
                 /* Meldungen in der Zielregion */
-
-                for (u2 = rt->units; u2; u2 = u2->next)
-                    freset(u2->faction, FFL_SELECT);
-                m = NULL;
-                for (u2 = rt->units; u2; u2 = u2->next) {
-                    if (!fval(u2->faction, FFL_SELECT)) {
-                        if (cansee(u2->faction, rt, u, 0)) {
-                            fset(u2->faction, FFL_SELECT);
-                            if (!m)
-                                m = msg_message("astral_appear", "unit", u);
-                            r_addmessage(rt, u2->faction, m);
-                        }
-                    }
-                }
-                if (m)
-                    msg_release(m);
+                astral_appear(rt, u, caster->faction);
             }
         }
     }
@@ -4987,7 +4973,7 @@ int sp_resist_magic_bonus(castorder * co)
 int sp_enterastral(castorder * co)
 {
     region *rt, *ro;
-    unit *u, *u2;
+    unit *u;
     int remaining_cap;
     int n, w;
     region *r = co_get_region(co);
@@ -5052,45 +5038,14 @@ int sp_enterastral(castorder * co)
                 "fail_tooheavy", "target", u));
         }
         else {
-            message *m;
             remaining_cap = remaining_cap - w;
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-
-            for (u2 = r->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, r, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_disappear", "unit", u);
-                        r_addmessage(r, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_disappear(r, u);
 
             /* Meldungen in der Zielregion */
-
-            for (u2 = rt->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = rt->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, rt, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_appear", "unit", u);
-                        r_addmessage(rt, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_appear(rt, u, mage->faction);
         }
     }
     return cast_level;
@@ -5101,7 +5056,7 @@ int sp_enterastral(castorder * co)
 int sp_pullastral(castorder * co)
 {
     region *rt, *ro;
-    unit *u, *u2;
+    unit *u;
     int remaining_cap;
     int n, w;
     region *r = co_get_region(co);
@@ -5181,48 +5136,16 @@ int sp_pullastral(castorder * co)
                 "fail_tooheavy", "target", u));
         }
         else {
-            message *m;
-
             ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage,
                 u));
             remaining_cap = remaining_cap - w;
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-
-            for (u2 = r->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, r, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_disappear", "unit", u);
-                        r_addmessage(r, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_disappear(ro, u);
 
             /* Meldungen in der Zielregion */
-
-            for (u2 = rt->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = rt->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, rt, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_appear", "unit", u);
-                        r_addmessage(rt, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_appear(rt, u, mage->faction);
         }
     }
     return cast_level;
@@ -5231,7 +5154,7 @@ int sp_pullastral(castorder * co)
 int sp_leaveastral(castorder * co)
 {
     region *rt, *ro;
-    unit *u, *u2;
+    unit *u;
     int remaining_cap;
     int n, w;
     region *r = co_get_region(co);
@@ -5298,46 +5221,14 @@ int sp_leaveastral(castorder * co)
                 "fail_tooheavy", "target", u));
         }
         else {
-            message *m;
-
             remaining_cap = remaining_cap - w;
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-
-            for (u2 = r->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = r->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, r, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_disappear", "unit", u);
-                        r_addmessage(r, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_disappear(r, u);
 
             /* Meldungen in der Zielregion */
-
-            for (u2 = rt->units; u2; u2 = u2->next)
-                freset(u2->faction, FFL_SELECT);
-            m = NULL;
-            for (u2 = rt->units; u2; u2 = u2->next) {
-                if (!fval(u2->faction, FFL_SELECT)) {
-                    if (cansee(u2->faction, rt, u, 0)) {
-                        fset(u2->faction, FFL_SELECT);
-                        if (!m)
-                            m = msg_message("astral_appear", "unit", u);
-                        r_addmessage(rt, u2->faction, m);
-                    }
-                }
-            }
-            if (m)
-                msg_release(m);
+            astral_appear(rt, u, mage->faction);
         }
     }
     return cast_level;
@@ -5362,9 +5253,8 @@ int sp_fetchastral(castorder * co)
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 0; n != pa->length; ++n) {
-        unit *u2, *u = pa->param[n]->data.u;
+        unit * u = pa->param[n]->data.u;
         int w;
-        message *m;
 
         if (pa->param[n]->flag)
             continue;
@@ -5427,39 +5317,10 @@ int sp_fetchastral(castorder * co)
         move_unit(u, rt, NULL);
 
         /* Meldungen in der Ausgangsregion */
-        for (u2 = ro->units; u2; u2 = u2->next)
-            freset(u2->faction, FFL_SELECT);
-        m = NULL;
-        for (u2 = ro->units; u2; u2 = u2->next) {
-            if (!fval(u2->faction, FFL_SELECT)) {
-                if (cansee(u2->faction, ro, u, 0)) {
-                    fset(u2->faction, FFL_SELECT);
-                    if (!m)
-                        m = msg_message("astral_disappear", "unit", u);
-                    r_addmessage(ro, u2->faction, m);
-                }
-            }
-        }
-        if (m)
-            msg_release(m);
+        astral_disappear(ro, u);
 
         /* Meldungen in der Zielregion */
-        for (u2 = rt->units; u2; u2 = u2->next)
-            freset(u2->faction, FFL_SELECT);
-        m = NULL;
-        for (u2 = rt->units; u2; u2 = u2->next) {
-            if (!fval(u2->faction, FFL_SELECT)) {
-                // cansee testet alle Einheiten der Partei, einmal reicht:
-                fset(u2->faction, FFL_SELECT);
-                if (cansee(u2->faction, rt, u, 0)) {
-                    if (!m)
-                        m = msg_message("astral_appear", "unit", u);
-                    r_addmessage(rt, u2->faction, m);
-                }
-            }
-        }
-        if (m)
-            msg_release(m);
+        astral_appear(rt, u, mage->faction);
     }
     return cast_level;
 }
@@ -5604,12 +5465,12 @@ static void cb_disrupt_astral(region *r2, void *cbdata) {
 }
 
 /**
- * Zauber: Störe astrale Integrität
+ * Zauber: Stï¿½re astrale Integritï¿½t
  *
- * Dieser Zauber bewirkt eine schwere Störung des Astralraums. Innerhalb eines
+ * Dieser Zauber bewirkt eine schwere Stï¿½rung des Astralraums. Innerhalb eines
  * astralen Radius von Stufe/5 Regionen werden alle Astralwesen, die dem Zauber
- * nicht wiederstehen können, aus der astralen Ebene geschleudert. Der astrale
- * Kontakt mit allen betroffenen Regionen ist für Stufe/3 Wochen gestört.
+ * nicht wiederstehen kï¿½nnen, aus der astralen Ebene geschleudert. Der astrale
+ * Kontakt mit allen betroffenen Regionen ist fï¿½r Stufe/3 Wochen gestï¿½rt.
  */
 int sp_disruptastral(castorder * co)
 {

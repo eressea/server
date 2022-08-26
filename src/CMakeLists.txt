@@ -277,12 +277,6 @@ set_property(TARGET test_eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif (IWYU_PATH)
 
 add_test(server test_eressea)
-#add_test(NAME E3
-#  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/game-e3
-#  COMMAND $<TARGET_FILE:eressea> runtests.lua )
-#add_test(NAME E2
-#	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/game-e2
-#  COMMAND $<TARGET_FILE:eressea> runtests.lua )
 
 install(TARGETS eressea DESTINATION "bin")
 

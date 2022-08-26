@@ -17,8 +17,12 @@ function setup()
 end
 
 local function file_exists(name)
-    local f=io.open(name,"r")
-    if f~=nil then io.close(f) return true else return false end
+    local f, err = io.open(name, "r")
+    if f~=nil then
+        io.close(f)
+        return true
+    end
+    return false
 end
 
 local function assert_file(filename, exists)
