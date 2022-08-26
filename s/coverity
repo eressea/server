@@ -1,12 +1,12 @@
 #!/bin/bash
-set -e
+set -ex
 test -e .env && eval $(cat .env)
 BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
 VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $BRANCH-$VERSION"
 cd build 
 make clean
-cov-build --dir cov-int make eressea
+cov-build --dir cov-int make
 tar czf eressea.tgz cov-int
 curl -k --form token=${COV_TOKEN} \
   --form email=enno.rehling@gmail.com \
