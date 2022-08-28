@@ -65,7 +65,7 @@ void spy_message(int spy, const unit * u, const unit * target)
         }
     }
     if (spy > 6) {
-        faction *fv = visible_faction(u->faction, target);
+        faction *fv = visible_faction(u->faction, target, get_otherfaction(target));
         if (fv && fv != target->faction) {
             /* true faction */
             ADDMSG(&u->faction->msgs, msg_message("spyreport_faction",
@@ -120,7 +120,7 @@ int spy_cmd(unit * u, struct order *ord)
     init_order(ord, NULL);
     getunit(r, u->faction, &target);
 
-    if (!target || !cansee(u->faction, r, target, 0)) {
+    if (!target || r != target->region || !cansee(u->faction, r, target, 0)) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "feedback_unit_not_found", NULL));
         return 0;
@@ -177,10 +177,10 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
             unit *ru = mu->region->units;
             lastr = mu->region;
             while (ru != NULL) {
-                if (ru->number) {
-                    faction *fv = visible_faction(f, ru);
+                if (ru->number && ru != u) {
+                    faction *fv = visible_faction(u->faction, ru, get_otherfaction(ru));
                     if (fv == f) {
-                        if (cansee(f, lastr, ru, 0))
+                        if (cansee(u->faction, lastr, ru, 0))
                             return true;
                     }
                 }
@@ -189,15 +189,11 @@ static bool can_set_factionstealth(const unit * u, const faction * f)
         }
         mu = mu->nextF;
     }
-    return true;
+    return false;
 }
 
 void set_factionstealth(unit *u, faction *f) {
-    attrib *a = a_find(u->attribs, &at_otherfaction);
-    if (!a)
-        a = a_add(&u->attribs, make_otherfaction(f));
-    else
-        a->data.v = f;
+    set_otherfaction(u, f);
 }
 
 static void stealth_race(unit *u, const char *s) {
@@ -272,7 +268,7 @@ int setstealth_cmd(unit * u, struct order *ord)
                 }
             }
             if (rule_stealth_other()) {
-                if (get_keyword(s, u->faction->locale) == K_NUMBER) {
+                if (findparam(s, u->faction->locale) == P_NUMBER) {
                     int nr = -1;
 
                     s = gettoken(token, sizeof(token));

@@ -45,6 +45,7 @@ local sets = {
             ['magic'] = 4,
             ['stealth'] = 1,
             ['stamina'] = 1,
+            ['tactics'] = 1,
         },
         ['callback'] = function(u)
             u:add_item('money', u.number * (math.random(500)+99))
@@ -62,6 +63,7 @@ local sets = {
             ['magic'] = 4,
             ['stamina'] = 1,
             ['perception'] = 3,
+            ['tactics'] = 1,
         }
     },
     ['rising_undead'] = {

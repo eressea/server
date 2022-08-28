@@ -13,7 +13,6 @@
 #include "util/param.h"
 #include "util/parser.h"
 #include "util/password.h"
-#include "util/order_parser.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -21,36 +20,14 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if ((u->flags & UFL_ORDERS) == 0) {
-        order **ordp;
-        /* alle wiederholbaren, langen befehle werden gesichert: */
-        u->flags |= UFL_ORDERS;
-        u->old_orders = u->orders;
-        ordp = &u->old_orders;
-        while (*ordp) {
-            order *ord = *ordp;
-            keyword_t kwd = getkeyword(ord);
-            if (!is_repeated(kwd)) {
-                *ordp = ord->next;
-                ord->next = NULL;
-                free_order(ord);
-            }
-            else {
-                ordp = &ord->next;
-            }
-        }
+    if (!u->defaults) {
+        u->defaults = u->orders;
     }
     else {
         free_orders(&u->orders);
     }
     u->orders = NULL;
 }
-
-typedef struct parser_state {
-    unit *u;
-    faction *f;
-    order **next_order;
-} parser_state;
 
 static void handle_faction(void *userData, int no, const char *password) {
     parser_state *state = (parser_state *)userData;
@@ -59,15 +36,11 @@ static void handle_faction(void *userData, int no, const char *password) {
         log_debug("orders for unknown faction %s", itoa36(no));
     }
     else {
-        state->u = NULL;
-        state->next_order = NULL;
-        state->f = NULL;
         if (checkpasswd(f, password)) {
-            state->f = f;
-            f->lastorders = turn;
-            f->flags &= ~(FFL_PAUSED);
+            parser_set_faction(state, f);
         }
         else {
+            parser_set_faction(state, NULL);
             log_debug("invalid password for faction %s", itoa36(no));
             ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
         }
@@ -78,17 +51,16 @@ static void handle_unit(void *userData, int no) {
     parser_state *state = (parser_state *)userData;
     unit * u = findunit(no);
 
-    state->u = NULL;
     if (!u) {
         /* TODO: error message */
+        parser_set_unit(state, NULL);
     }
     else if (u->faction != state->f) {
         /* TODO: error message */
+        parser_set_unit(state, u);
     }
     else {
-        state->u = u;
-        begin_orders(u);
-        state->next_order = &u->orders;
+        parser_set_unit(state, u);
     }
 }
 
@@ -147,6 +119,54 @@ static void handle_order(void *userData, const char *str) {
     }
 }
 
+OP_Parser parser_create(parser_state* state)
+{
+    OP_Parser parser;
+    parser = OP_ParserCreate();
+    if (parser) {
+        OP_SetOrderHandler(parser, handle_order);
+        OP_SetUserData(parser, state);
+    }
+    return parser;
+}
+
+void parser_set_unit(parser_state *state, struct unit *u)
+{
+    state->u = u;
+    if (u) {
+        begin_orders(u);
+        state->next_order = &u->orders;
+    }
+    else {
+        state->next_order = NULL;
+    }
+}
+
+void parser_set_faction(parser_state *state, struct faction *f)
+{
+    state->u = NULL;
+    state->next_order = NULL;
+    state->f = f;
+    if (f) {
+        f->lastorders = turn;
+        f->flags &= ~(FFL_PAUSED);
+    }
+}
+
+int parser_parse(OP_Parser parser, const char* input, size_t len, bool done)
+{
+    if (OP_Parse(parser, input, len, done) == OP_STATUS_ERROR) {
+        /* TODO: error message */
+        return (int) OP_GetErrorCode(parser);
+    }
+    return (int) OP_ERROR_NONE;
+}
+
+void parser_free(OP_Parser parser)
+{
+    OP_ParserFree(parser);
+}
+
 int parseorders(FILE *F)
 {
     char buf[4096];
@@ -154,15 +174,13 @@ int parseorders(FILE *F)
     OP_Parser parser;
     parser_state state = { NULL, NULL };
 
-    parser = OP_ParserCreate();
+    parser = parser_create(&state);
     if (!parser) {
         /* TODO: error message */
         return errno;
     }
-    OP_SetOrderHandler(parser, handle_order);
-    OP_SetUserData(parser, &state);
 
-    while (!done) {
+    while (!done && err == 0) {
         size_t len = fread(buf, 1, sizeof(buf), F);
         if (ferror(F)) {
             /* TODO: error message */
@@ -170,12 +188,8 @@ int parseorders(FILE *F)
             break;
         }
         done = feof(F);
-        if (OP_Parse(parser, buf, len, done) == OP_STATUS_ERROR) {
-            /* TODO: error message */
-            err = (int)OP_GetErrorCode(parser);
-            break;
-        }
+        err = parser_parse(parser, buf, len, done);
     }
-    OP_ParserFree(parser);
+    parser_free(parser);
     return err;
 }

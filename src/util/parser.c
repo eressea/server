@@ -27,7 +27,7 @@ static parse_state *states;
 int ltrim(const char **str_p)
 {
     int ret = 0;
-    wint_t wc;
+    wchar_t wc;
     size_t len;
     const char *str = *str_p;
 
@@ -104,7 +104,7 @@ void skip_token(void)
     ltrim(&states->current_token);
 
     while (*states->current_token) {
-        wint_t wc;
+        wchar_t wc;
         size_t len;
 
         unsigned char utf8_character = (unsigned char)states->current_token[0];
@@ -159,7 +159,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     }
     cstart = ctoken;
     while (*ctoken) {
-        wint_t wc;
+        wchar_t wc;
         size_t len;
         bool copy = false;
 

@@ -2446,7 +2446,7 @@ static void loot_items(fighter * corpse)
                     int looting = 0;
                     int maxrow = 0;
                     /* mustloot: we absolutely, positively must have somebody loot this thing */
-                    int mustloot = itm->type->flags & (ITF_CURSED | ITF_NOTLOST);
+                    bool mustloot = 0 != (itm->type->flags & (ITF_CURSED | ITF_NOTLOST));
 
                     item_add(itm, -loot);
                     maxloot -= loot;
@@ -2797,13 +2797,20 @@ static void aftermath(battle * b)
     reorder_fleeing(r);
 }
 
-void
-spunit(const struct faction* f, const unit* u, unsigned int indent,
+static void spunit(const struct faction* f, const unit* u,
     struct sbstring *sbp)
 {
-    int getarnt = fval(u, UFL_ANON_FACTION);
-    const faction* fv = visible_faction(f, u);
-    bufunit(f, u, fv, seen_battle, !!getarnt, sbp);
+    static char marker[] = "  - ";
+    int anon = (0 != fval(u, UFL_ANON_FACTION));
+    struct faction* of = get_otherfaction(u);
+    const struct faction* vf = visible_faction(f, u, of);
+    if (vf) {
+        int dh = alliedfaction(f, vf, HELP_ALL);
+        char mark = (char)((u->faction == f) ? '*' : (dh ? '+' : '-'));
+        marker[2] = mark;
+    }
+    sbs_strcat(sbp, marker);
+    bufunit(f, u, of, seen_battle, anon, sbp);
 }
 
 static void battle_punit(unit * u, battle * b)
@@ -2816,7 +2823,7 @@ static void battle_punit(unit * u, battle * b)
         faction* f = bf->faction;
 
         sbs_init(&sbs, buf, sizeof(buf));
-        spunit(f, u, 4, &sbs);
+        spunit(f, u, &sbs);
         if (sbs.begin != sbs.end) {
             message* m = msg_message("battle_fighter", "string unit", buf, u);
             battle_message_faction(b, f, m);
@@ -2896,7 +2903,7 @@ static void print_stats(battle * b)
             for (s2 = b->sides; s2 != b->sides + b->nsides; ++s2) {
                 if (enemy(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
-                    rsize = slprintf(bufp, size, "%s %s %d(%s)",
+                    rsize = slprintf(bufp, size, "%s %s %d (%s)",
                         komma++ ? "," : (const char *)header, loc_army, army_index(s2),
                         abbrev);
                     if (rsize > size)
@@ -3757,7 +3764,7 @@ static bool start_battle(region * r, battle ** bp)
 
                     /* Beginn Fehlerbehandlung */
                     /* Fehler: "Die Einheit wurde nicht gefunden" */
-                    if (!u2 || u2->number == 0 || !cansee(u->faction, u->region, u2, 0)) {
+                    if (!u2 || u2->number == 0 || u2->region != u->region || !cansee(u->faction, u->region, u2, 0)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord,
                             "feedback_unit_not_found", ""));
                         continue;

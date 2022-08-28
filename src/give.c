@@ -211,7 +211,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
         }
         error = 36;
     }
-    else if (itype->flags & ITF_CURSED) {
+    else if ((itype->flags & ITF_CURSED) && (dest == NULL || src->faction != dest->faction)) {
         error = 25;
     }
     else {
@@ -266,10 +266,7 @@ static bool unit_has_cursed_item(const unit * u)
 bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg)
 {
     UNUSED_ARG(dst);
-    if (unit_has_cursed_item(u)) {
-        if (msg) *msg = msg_error(u, ord, 78);
-    }
-    else if (has_skill(u, SK_MAGIC)) {
+    if (has_skill(u, SK_MAGIC)) {
         /* cannot give units to and from magicians */
         if (msg) *msg = msg_error(u, ord, 158);
     }
@@ -724,7 +721,7 @@ void give_unit(unit * u, unit * u2, order * ord)
 
 bool can_give_to(unit *u, unit *u2) {
     /* Damit Tarner nicht durch die Fehlermeldung enttarnt werden koennen */
-    if (!u2) {
+    if (!u2 || u2->region != u->region) {
         return false;
     }
     if (u2 && !alliedunit(u2, u->faction, HELP_GIVE)
@@ -825,7 +822,7 @@ void give_unit_cmd(unit* u, order* ord)
     err = getunit(u->region, u->faction, &u2);
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
-        msg = msg_feedback(u, ord, "feedback_unit_not_found", "");
+        msg = msg_feedback(u, ord, "feedback_unit_not_found", NULL);
     }
     else {
         msg = check_give(u, u2, ord);
@@ -874,7 +871,7 @@ param_t give_cmd(unit * u, order * ord)
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "feedback_unit_not_found", ""));
+            msg_feedback(u, ord, "feedback_unit_not_found", NULL));
         return NOPARAM;
     }
     if (u == u2) {
@@ -1061,10 +1058,6 @@ static int reserve_i(unit* u, struct order* ord, int flags)
             count = get_resource(u, itype->rtype);
         }
         if (count > 0) {
-            if (itype->flags & ITF_CURSED) {
-                flags &= ~GET_POOLED_SLACK;
-                cmistake(u, ord, 25, MSG_EVENT);
-            }
             use = use_pooled(u, itype->rtype, flags, count);
             if (use) {
                 set_resvalue(u, itype, use);

@@ -53,13 +53,10 @@ ROOT=$(git rev-parse --show-toplevel)
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
 
-MACHINE=`$CC -dumpmachine`
 [ -z $MACHINE ] && MACHINE=`uname -m`
-BIN_DIR="$ROOT/build-$MACHINE-$CC-$BUILD"
+BIN_DIR="$ROOT/build"
 rm -rf $BIN_DIR
 mkdir -p $BIN_DIR
-rm -f $BUILD
-ln -sf $BIN_DIR $BUILD
 
 # use anything installed in /opt or /usr
 LIBRARY_PATH=/opt/lib:/opt/lib/$MACHINE:/usr/lib/$MACHINE
@@ -97,7 +94,7 @@ if [ ! -e ${LUA_INCLUDE}/lua.h ]; then
   exit 1
 fi
 
-cat >| $BUILD/config.cmake <<HEREDOC
+cat >| build/config.cmake <<HEREDOC
 SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
 SET (LUA_DIR "$LUA_DIR" CACHE PATH "Lua root path")
 SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")

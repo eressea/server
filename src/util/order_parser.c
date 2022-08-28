@@ -28,6 +28,10 @@ void OP_SetUserData(OP_Parser parser, void *userData) {
     parser->m_userData = userData;
 }
 
+void * OP_GetUserData(OP_Parser parser) {
+    return parser->m_userData;
+}
+
 static void buffer_free(OP_Parser parser)
 {
     /* TODO: recycle buffers, reduce mallocs. */
@@ -114,7 +118,7 @@ static enum OP_Error buffer_append(OP_Parser parser, const char *s, size_t len)
 static char *skip_spaces(char *pos) {
     char *next;
     for (next = pos; *next && *next != '\n'; ++next) {
-        wint_t wch = *(unsigned char *)next;
+        wchar_t wch = *(unsigned char *)next;
         /* TODO: handle unicode whitespace */
         if (!iswspace(wch)) break;
     }

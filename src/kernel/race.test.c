@@ -7,6 +7,7 @@
 #include "item.h"
 
 #include <util/language.h>
+#include <util/variant.h>
 #include <attributes/raceprefix.h>
 
 #include <tests.h>

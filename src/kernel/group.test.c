@@ -16,7 +16,9 @@
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <stddef.h>           // for NULL
 
 static void test_group_readwrite_dead_faction(CuTest *tc) {
     gamedata data;

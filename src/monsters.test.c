@@ -293,12 +293,12 @@ static void test_monsters_hate(CuTest *tc) {
     CuAssertPtrNotNull(tc, mu->orders);
     for (ord = mu->orders; ord; ord = ord->next) {
         if (K_MOVE == getkeyword(ord)) {
+            CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
+            CuAssertStrEquals(tc, "move east", get_command(ord, lang, buffer, sizeof(buffer)));
             break;
         }
     }
     CuAssertPtrNotNull(tc, ord);
-    CuAssertIntEquals(tc, K_MOVE, getkeyword(ord));
-    CuAssertStrEquals(tc, "move east", get_command(ord, lang, buffer, sizeof(buffer)));
     test_teardown();
 }
 

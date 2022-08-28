@@ -78,7 +78,10 @@ static bool hunger(int number, unit * u)
     damage = hunger_damage(u_race(u));
 
     while (number--) {
-        int dam = dice_rand(damage);
+        int dam = 1;
+        if (!is_paused(u->faction)) {
+            dam = dice_rand(damage);
+        }
         if (dam >= hp) {
             ++dead;
         }

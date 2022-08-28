@@ -2,10 +2,11 @@
 
 #include "eressea.h"
 
-#include <kernel/skill.h>
-#include <kernel/unit.h>
+#include "skill.h"
+#include "unit.h"
 
-#include "util/param.h"
+#include <util/keyword.h>   // for keyword, K_STUDY, K_MOVE, init_keywords
+#include <util/param.h>
 #include <util/parser.h>
 #include <util/language.h>
 
@@ -14,8 +15,11 @@
 
 #include <tests.h>
 #include <CuTest.h>
+
+#include <stdbool.h>        // for true
 #include <stdlib.h>
 #include <string.h>
+
 
 static void test_create_order(CuTest *tc) {
     char cmd[32];

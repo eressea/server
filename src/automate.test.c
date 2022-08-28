@@ -3,6 +3,7 @@
 #include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/order.h"
+#include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/skill.h"
 #include "kernel/unit.h"
@@ -291,6 +292,75 @@ static void test_autostudy_run_noteachers(CuTest *tc) {
     test_teardown();
 }
 
+static void test_autostudy_run_can_teach(CuTest *tc)
+{
+    scholar scholars[4];
+    int nscholars;
+    unit *u1, *u2, *ulist;
+    faction *f;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u1, 1);
+    set_level(u1, SK_ENTERTAINMENT, 2);
+
+    u2 = test_create_unit(f, r);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u2, 10);
+
+    scholars[2].u = NULL;
+    ulist = r->units;
+    CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertPtrEquals(tc, NULL, ulist);
+    autostudy_run(scholars, nscholars);
+    CuAssertIntEquals(tc, 0, scholars[0].learn);
+    CuAssertPtrEquals(tc, u1, scholars[0].u);
+    CuAssertIntEquals(tc, 20, scholars[1].learn);
+    CuAssertPtrEquals(tc, u2, scholars[1].u);
+    CuAssertPtrEquals(tc, NULL, scholars[2].u);
+    test_teardown();
+}
+
+static void test_autostudy_run_cannot_teach(CuTest *tc)
+{
+    scholar scholars[4];
+    int nscholars;
+    unit *u1, *u2, *ulist;
+    faction *f;
+    region *r;
+    race* rc;
+
+    test_setup();
+    rc = test_create_race("tunnelworm");
+    rc->flags |= RCF_NOTEACH;
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u_setrace(u1, rc);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u1, 1);
+    set_level(u1, SK_ENTERTAINMENT, 2);
+
+    u2 = test_create_unit(f, r);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u2, 10);
+
+    scholars[1].u = NULL;
+    ulist = r->units;
+    CuAssertIntEquals(tc, 1, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "error274"));
+    CuAssertPtrEquals(tc, NULL, ulist);
+    autostudy_run(scholars, nscholars);
+    CuAssertIntEquals(tc, 10, scholars[0].learn);
+    CuAssertPtrEquals(tc, u2, scholars[0].u);
+    CuAssertPtrEquals(tc, NULL, scholars[1].u);
+    test_teardown();
+}
+
 /**
  * If a teacher unit doesn't have enough students, the remaining members study.
  */
@@ -428,6 +498,8 @@ CuSuite *get_automate_suite(void)
     SUITE_ADD_TEST(suite, test_do_autostudy);
     SUITE_ADD_TEST(suite, test_autostudy_batches);
     SUITE_ADD_TEST(suite, test_autostudy_run_noteachers);
+    SUITE_ADD_TEST(suite, test_autostudy_run_can_teach);
+    SUITE_ADD_TEST(suite, test_autostudy_run_cannot_teach);
     SUITE_ADD_TEST(suite, test_autostudy_run_teachers_learn);
     SUITE_ADD_TEST(suite, test_autostudy_run_twoteachers);
     SUITE_ADD_TEST(suite, test_autostudy_run_bigunit);

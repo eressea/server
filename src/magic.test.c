@@ -3,9 +3,13 @@
 #include "contact.h"
 #include "teleport.h"
 
+#include "util/keyword.h"      // for K_CAST
+#include "util/variant.h"      // for frac_make, frac_sub, frac_equal, variant
 #include <util/language.h>
 #include <util/strings.h>
 
+#include "kernel/skill.h"      // for SK_MAGIC, enable_skill, SK_STAMINA
+#include "kernel/types.h"      // for M_TYBIED, M_GWYRRD, M_CERDDOR, M_GRAY
 #include <kernel/ally.h>
 #include <kernel/attrib.h>
 #include <kernel/building.h>
@@ -27,6 +31,7 @@
 #include <selist.h>
 #include <tests.h>
 
+#include <stdbool.h>           // for true, bool
 #include <stdlib.h>
 
 void test_updatespells(CuTest * tc)

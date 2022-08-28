@@ -40,11 +40,9 @@ static void test_unit_orders(CuTest *tc) {
         LOC(f->locale, shortdirections[D_WEST]));
     rewind(F);
     CuAssertIntEquals(tc, 0, parseorders(F));
-    CuAssertPtrNotNull(tc, u->old_orders);
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(u->orders));
-    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->old_orders));
-    CuAssertIntEquals(tc, UFL_ORDERS, u->flags & UFL_ORDERS);
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->defaults));
     fclose(F);
     test_teardown();
 }

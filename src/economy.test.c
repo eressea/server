@@ -1,10 +1,13 @@
-#include <kernel/config.h>
 #include "economy.h"
+
+#include "contact.h"
+#include "give.h"
 #include "recruit.h"
 #include "direction.h"         // for D_EAST, directions
 
 #include <kernel/building.h>
 #include <kernel/calendar.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
@@ -32,6 +35,83 @@
 #include <assert.h>
 #include <stdbool.h>           // for false, true
 #include <stdlib.h>            // for NULL, calloc, free, malloc
+
+static void test_give_unit_cmd(CuTest * tc)
+{
+    unit *u1, *u2;
+    region *r;
+    faction* f;
+    order *ord;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(f = test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    contact_unit(u2, u1);
+    ord = create_order(K_GIVE, u1->faction->locale, "%i %s",
+        u2->no, LOC(u1->faction->locale, parameters[P_UNIT]));
+
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
+    give_unit_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+    CuAssertPtrEquals(tc, f, u1->faction);
+
+    move_unit(u2, u1->region, NULL);
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
+    give_unit_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "give_person"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "receive_person"));
+    CuAssertPtrEquals(tc, u2->faction, u1->faction);
+
+    test_teardown();
+}
+
+static void test_give_control_cmd(CuTest * tc)
+{
+    unit *u1, *u2;
+    building *b;
+    region *r;
+    order *ord;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    b = test_create_building(r, NULL);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    u_set_building(u1, b);
+    CuAssertPtrEquals(tc, u1, building_owner(b));
+    ord = create_order(K_GIVE, u1->faction->locale, "%i %s",
+        u2->no, LOC(u1->faction->locale, parameters[P_CONTROL]));
+
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
+    give_control_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, u1, building_owner(b));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    move_unit(u2, u1->region, NULL);
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
+    give_control_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "error33"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+    CuAssertPtrEquals(tc, u1, building_owner(b));
+
+    u_set_building(u2, b);
+    CuAssertPtrEquals(tc, u1, building_owner(b));
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
+    give_control_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "givecommand"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "givecommand"));
+    CuAssertPtrEquals(tc, u2, building_owner(b));
+
+    test_teardown();
+}
 
 static void test_give_control_building(CuTest * tc)
 {
@@ -1010,6 +1090,8 @@ static void test_destroy_cmd(CuTest* tc) {
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_give_unit_cmd);
+    SUITE_ADD_TEST(suite, test_give_control_cmd);
     SUITE_ADD_TEST(suite, test_give_control_building);
     SUITE_ADD_TEST(suite, test_give_control_ship);
     SUITE_ADD_TEST(suite, test_income);

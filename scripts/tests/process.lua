@@ -17,8 +17,12 @@ function setup()
 end
 
 local function file_exists(name)
-    local f=io.open(name,"r")
-    if f~=nil then io.close(f) return true else return false end
+    local f, err = io.open(name, "r")
+    if f~=nil then
+        io.close(f)
+        return true
+    end
+    return false
 end
 
 local function assert_file(filename, exists)
@@ -50,6 +54,9 @@ function test_write_reports()
     assert_file("reports/" .. turn .. "-777.cr")
     assert_file("reports/" .. turn .. "-777.txt")
     assert_file("reports/reports.txt")
+    os.remove("reports/" .. turn .. "-777.txt")
+    os.remove("reports/" .. turn .. "-777.nr")
+    os.remove("reports/" .. turn .. "-777.cr")
     os.remove("reports")
     assert_equal(0, eressea.write_game("test.dat"))
     assert_file("data/test.dat")

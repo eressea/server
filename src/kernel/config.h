@@ -33,8 +33,6 @@ extern "C" {
     int game_id(void);
     /* returns a value between [0..xpct_2], generated with two dice */
 
-    void init_races(struct locale *lang);
-
     bool forbiddenid(int id);
     int newcontainerid(void);
 

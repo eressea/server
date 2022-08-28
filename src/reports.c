@@ -4,6 +4,7 @@
 #include "reports.h"
 
 #include "battle.h"
+#include "defaults.h"
 #include "guard.h"
 #include "laws.h"
 #include "spells.h"
@@ -605,55 +606,59 @@ static void spskill(struct skill* sv, const struct unit *u, const struct locale 
     }
 }
 
-static void bufunit_info(const faction* f, const unit* u, const faction* fv,
-    bool getarnt, struct sbstring* sbp)
+static void bufunit_info(const faction* f, const unit* u, const faction* of,
+    bool anon, struct sbstring* sbp)
 {
     const struct locale* lang = f->locale;
+    const group *g = NULL;
+    const faction* df = NULL;
+
     if (u->faction == f) {
         if (fval(u, UFL_GROUP)) {
-            group* g = get_group(u);
-            if (g) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, groupid(g, f));
+            g = get_group(u);
+        }
+    }
+    else if (anon || of) {
+        if (alliedunit(u, f, HELP_FSTEALTH)) {
+            df = u->faction;
+        }
+        else {
+            if (of != f) {
+                /* cannot see through the disguise */
+                if (anon) {
+                    df = of = NULL;
+                }
+                else {
+                    df = of;
+                    of = NULL;
+                }
             }
         }
-        if (getarnt) {
-            sbs_strcat(sbp, ", ");
-            sbs_strcat(sbp, LOC(lang, "anonymous"));
-        }
-        else if (u->attribs) {
-            faction* otherf = get_otherfaction(u);
-            if (otherf) {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, factionname(otherf));
-            }
+        if (anon) {
+            of = NULL;
         }
     }
     else {
-        if (getarnt) {
-            sbs_strcat(sbp, ", ");
-            sbs_strcat(sbp, LOC(lang, "anonymous"));
-        }
-        else {
-            if (u->attribs && alliedunit(u, f, HELP_FSTEALTH)) {
-                faction* otherf = get_otherfaction(u);
-                if (otherf) {
-                    sbs_strcat(sbp, ", ");
-                    sbs_strcat(sbp, factionname(otherf));
-                    sbs_strcat(sbp, " (");
-                    sbs_strcat(sbp, factionname(u->faction));
-                    sbs_strcat(sbp, ")");
-                }
-                else {
-                    sbs_strcat(sbp, ", ");
-                    sbs_strcat(sbp, factionname(fv));
-                }
-            }
-            else {
-                sbs_strcat(sbp, ", ");
-                sbs_strcat(sbp, factionname(fv));
-            }
-        }
+        df = u->faction;
+    }
+    if (g) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, groupid(g, f));
+    }
+    else if (df) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, factionname(df));
+    }
+
+    if (of) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "disguised_as"));
+        sbs_strcat(sbp, " ");
+        sbs_strcat(sbp, factionname(of));
+    }
+    if (anon) {
+        sbs_strcat(sbp, ", ");
+        sbs_strcat(sbp, LOC(lang, "anonymous"));
     }
 }
 
@@ -742,23 +747,12 @@ static void bufunit_orders(const unit* u, struct sbstring* sbp)
     const struct locale* lang = u->faction->locale;
     int printed = 0;
     const order* ord;
-    for (ord = u->old_orders; ord; ord = ord->next) {
+    for (ord = u->orders; ord; ord = ord->next) {
         keyword_t kwd = getkeyword(ord);
         if (is_repeated(kwd)) {
+            buforder(sbp, ord, lang, printed++);
             if (printed >= ORDERS_IN_NR) {
                 break;
-            }
-            buforder(sbp, ord, lang, printed++);
-        }
-    }
-    if (printed < ORDERS_IN_NR) {
-        for (ord = u->orders; ord; ord = ord->next) {
-            keyword_t kwd = getkeyword(ord);
-            if (is_repeated(kwd)) {
-                if (printed >= ORDERS_IN_NR) {
-                    break;
-                }
-                buforder(sbp, ord, lang, printed++);
             }
         }
     }
@@ -864,21 +858,18 @@ static void bufunit_status(const unit* u, const struct locale *lang, struct sbst
     }
 }
 
-void bufunit(const faction * f, const unit * u, const faction *fv,
-    enum seen_mode mode, bool getarnt, struct sbstring *sbp)
+void bufunit(const faction * f, const unit * u, const faction * of,
+    enum seen_mode mode, bool anon, struct sbstring *sbp)
 {
     bool isbattle = (mode == seen_battle);
     item *show = NULL;
     item results[MAX_INVENTORY];
     const struct locale *lang = f->locale;
 
-    if (!fv) {
-        fv = visible_faction(f, u);
-    }
     assert(f);
     sbs_strcat(sbp, unitname(u));
     if (!isbattle) {
-        bufunit_info(f, u, fv, getarnt, sbp);
+        bufunit_info(f, u, of, anon, sbp);
     }
     sbs_strcat(sbp, ", ");
     sbs_strcat(sbp, str_itoa(u->number));
@@ -924,21 +915,37 @@ void bufunit(const faction * f, const unit * u, const faction *fv,
     bufunit_description(u, f, sbp);
 }
 
-int bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
+char bufunit_bullet(const faction* f, const unit* u, faction* of, bool anon)
+{
+    char bullet = '-';
+    if (u->faction == f) {
+        bullet = '*';
+    }
+    else if (is_allied(u->faction, f)) {
+        bullet = 'o';
+    }
+    else if (u->attribs && f != u->faction
+        && !anon && of == f) {
+        bullet = '!';
+    }
+    else {
+        const faction* vf = visible_faction(f, u, of);
+        if (vf && !anon && alliedfaction(f, vf, HELP_ALL)) {
+            bullet = '+';
+        }
+    }
+    return bullet;
+}
+
+void bufunit_depr(const faction * f, const unit * u, enum seen_mode mode,
     char *buf, size_t size)
 {
-    int getarnt = fval(u, UFL_ANON_FACTION);
-    const faction * fv = visible_faction(f, u);
+    bool anon = (0 != fval(u, UFL_ANON_FACTION));
+    faction * of = get_otherfaction(u);
     sbstring sbs;
 
     sbs_init(&sbs, buf, size);
-    bufunit(f, u, fv, mode, !!getarnt, &sbs);
-    if (!getarnt) {
-        if (alliedfaction(f, fv, HELP_ALL)) {
-            return 1;
-        }
-    }
-    return 0;
+    bufunit(f, u, of, mode, anon, &sbs);
 }
 
 void split_paragraph(strlist ** SP, const char *s, unsigned int indent, unsigned int width, char mark)
@@ -1042,7 +1049,9 @@ int cmp_faction(const void *lhs, const void *rhs) {
 }
 
 static void add_seen_faction_i(struct selist **flist, faction *f) {
-    selist_set_insert(flist, f, cmp_faction);
+    if (f) {
+        selist_set_insert(flist, f, cmp_faction);
+    }
 }
 
 void add_seen_faction(faction *self, faction *seen) {
@@ -1062,7 +1071,7 @@ static void cb_add_address(region *r, unit *ut, void *cbdata) {
     if (ut->faction == f) {
         unit *u;
         for (u = r->units; u; u = u->next) {
-            faction *sf = visible_faction(f, u);
+            faction *sf = visible_faction(f, u, get_otherfaction(u));
             assert(u->faction != f);   /* if this is see_travel only, then I shouldn't be here. */
             if (data->lastf != sf && cansee_unit(ut, r, u, data->stealthmod)) {
                 add_seen_faction_i(data->flist, sf);
@@ -1112,7 +1121,7 @@ void get_addresses(report_context * ctx)
             if (r->seen.mode == seen_lighthouse) {
                 unit *u = r->units;
                 for (; u; u = u->next) {
-                    faction *sf = visible_faction(ctx->f, u);
+                    faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
                     if (lastf != sf) {
                         if (u->building || u->ship || (stealthmod > INT_MIN
                             && visible_unit(u, ctx->f, stealthmod, seen_lighthouse)))
@@ -1132,7 +1141,7 @@ void get_addresses(report_context * ctx)
                 const unit *u = r->units;
                 while (u != NULL) {
                     if (u->faction != ctx->f) {
-                        faction *sf = visible_faction(ctx->f, u);
+                        faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
                         bool ballied = sf && sf != ctx->f && sf != lastf
                             && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
                         if (ballied || is_allied(ctx->f, sf)) {
@@ -1380,38 +1389,6 @@ void report_warnings(faction *f, int now)
     }
 }
 
-void update_defaults(faction* f)
-{
-    unit* u;
-    for (u = f->units; u != NULL; u = u->nextF) {
-        order** ordi = &u->old_orders;
-        while (*ordi) {
-            order* ord = *ordi;
-            ordi = &ord->next;
-        }
-        if (u->orders) {
-            bool repeated = u->old_orders != NULL;
-            order** ordp = &u->orders;
-            while (*ordp) {
-                order* ord = *ordp;
-                keyword_t kwd = getkeyword(ord);
-                if (!(repeated && is_repeated(kwd))) {
-                    if (is_persistent(ord)) {
-                        *ordp = ord->next;
-                        *ordi = ord;
-                        ord->next = NULL;
-                        ordi = &ord->next;
-                        continue;
-                    }
-                }
-                ordp = &ord->next;
-            }
-            free_orders(&u->orders);
-        }
-    }
-}
-
-
 /** set region.seen based on visibility by one faction.
  *
  * this function may also update ctx->last and ctx->first for potential
@@ -1529,14 +1506,13 @@ void finish_reports(report_context *ctx) {
     }
 }
 
-int write_reports(faction * f, const char *password)
+int write_reports(faction * f, int options, const char *password)
 {
     bool gotit = false;
     struct report_context ctx;
     const unsigned char utf8_bom[4] = { 0xef, 0xbb, 0xbf, 0 };
     report_type *rtype;
 
-    update_defaults(f);
     if (noreports) {
         return false;
     }
@@ -1544,7 +1520,7 @@ int write_reports(faction * f, const char *password)
     get_addresses(&ctx);
     log_debug("Reports for %s", factionname(f));
     for (rtype = report_types; rtype != NULL; rtype = rtype->next) {
-        if (f->options & rtype->flag) {
+        if (options & rtype->flag) {
             int error = 0;
             do {
                 char filename[32];
@@ -1647,7 +1623,7 @@ int reports(void)
                  * kriegen ein neues Passwort: */
                 password = faction_genpassword(f, buffer);
             }
-            int error = write_reports(f, password);
+            int error = write_reports(f, f->options, password);
             if (error)
                 retval = error;
             if (mailit)

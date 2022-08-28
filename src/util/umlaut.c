@@ -13,7 +13,7 @@
 
 typedef struct tref {
     struct tref *nexthash;
-    wint_t wc;
+    wchar_t wc;
     struct tnode *node;
 } tref;
 
@@ -80,7 +80,7 @@ char * transliterate(char * out, size_t size, const char * in)
                 size -= advance;
             }
             else {
-                wint_t wc;
+                wchar_t wc;
                 int ret = unicode_utf8_decode(&wc, src, &len);
                 if (ret != 0) {
                     /* encoding is broken. yikes */
@@ -108,7 +108,7 @@ void addtoken(tnode ** root, const char *str, variant id)
 {
     tnode * tk;
     static const struct replace {
-        wint_t wc;
+        wchar_t wc;
         const char str[3];
     } replace[] = {
         /* match lower-case (!) umlauts and others to transcriptions */
@@ -131,7 +131,7 @@ void addtoken(tnode ** root, const char *str, variant id)
     else {
         tref *next;
         int ret, index, i = 0;
-        wint_t ucs, lcs;
+        wchar_t ucs, lcs;
         size_t len;
 
         ret = unicode_utf8_decode(&ucs, str, &len);
@@ -154,10 +154,10 @@ void addtoken(tnode ** root, const char *str, variant id)
             tnode *node = mknode(); /* TODO: what is the reason for this empty node to exist? */
 
             if (ucs < 'a' || ucs > 'z') {
-                lcs = towlower((wint_t)ucs);
+                lcs = towlower((wchar_t)ucs);
             }
             if (ucs == lcs) {
-                ucs = towupper((wint_t)ucs);
+                ucs = towupper((wchar_t)ucs);
             }
 
             ref = (tref *)malloc(sizeof(tref));
@@ -236,7 +236,7 @@ int findtoken(const void * root, const char *key, variant * result)
     do {
         int index;
         const tref *ref;
-        wint_t wc;
+        wchar_t wc;
         size_t len;
         int ret = unicode_utf8_decode(&wc, str, &len);
 

@@ -148,6 +148,8 @@ extern "C" {
         const struct race *data;
     } race_list;
 
+    void init_races(struct locale* lang);
+
     void racelist_clear(struct race_list **rl);
     void racelist_insert(struct race_list **rl, const struct race *r);
 

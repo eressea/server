@@ -1,10 +1,10 @@
 #include <kernel/config.h>
 #include <kernel/faction.h>
-#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
 
 #include <util/base36.h>
+#include <util/keyword.h>    // for K_GIVE, enable_keyword, K_WORK, K_ENTERTAIN
 #include <util/language.h>
 #include <util/param.h>
 
@@ -12,21 +12,19 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdlib.h>
+#include <dictionary.h>      // for dictionary_new, dictionary_set, dictionary
 
-struct critbit_tree;
+#include <stdbool.h>         // for false, true
+#include <stdlib.h>
 
 static void test_read_unitid(CuTest *tc) {
     unit *u;
     order *ord;
     struct locale *lang;
-    struct terrain_type *t_plain;
 
     test_setup();
     lang = test_create_locale();
-    /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
-    t_plain = test_create_terrain("plain", LAND_REGION);
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, t_plain));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     usetalias(u, atoi36("42"));
 
     ord = create_order(K_GIVE, lang, "TEMP 42");
@@ -53,67 +51,6 @@ static void test_read_unitid(CuTest *tc) {
     ord = create_order(K_GIVE, lang, "##");
     init_order(ord, NULL);
     CuAssertIntEquals(tc, -1, read_unitid(u->faction, u->region));
-    free_order(ord);
-
-    test_teardown();
-}
-
-static void test_getunit(CuTest *tc) {
-    unit *u, *u2;
-    order *ord;
-    struct region *r;
-    struct locale *lang;
-    struct terrain_type *t_plain;
-
-    test_setup();
-    lang = test_create_locale();
-    /* note that the english order is FIGHT, not COMBAT, so this is a poor example */
-    t_plain = test_create_terrain("plain", LAND_REGION);
-    u = test_create_unit(test_create_faction(), test_create_region(0, 0, t_plain));
-    /* This unit is also TEMP 42: */
-    usetalias(u, atoi36("42"));
-
-    r = test_create_region(1, 0, t_plain);
-
-    ord = create_order(K_GIVE, lang, itoa36(u->no));
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, u, u2);
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(r, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
-    free_order(ord);
-
-    ord = create_order(K_GIVE, lang, itoa36(u->no + 1));
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
-    free_order(ord);
-
-    ord = create_order(K_GIVE, lang, "0");
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_PEASANTS, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
-    free_order(ord);
-
-    /* bug https://bugs.eressea.de/view.php?id=1685 */
-    ord = create_order(K_GIVE, lang, "TEMP ##");
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
-    free_order(ord);
-
-    /* bug https://bugs.eressea.de/view.php?id=1685 */
-    ord = create_order(K_GIVE, lang, "##");
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, NULL, u2);
-    free_order(ord);
-
-    ord = create_order(K_GIVE, lang, "TEMP 42");
-    init_order(ord, NULL);
-    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
-    CuAssertPtrEquals(tc, u, u2);
     free_order(ord);
 
     test_teardown();
@@ -301,7 +238,6 @@ CuSuite *get_config_suite(void)
     SUITE_ADD_TEST(suite, test_param_int);
     SUITE_ADD_TEST(suite, test_param_flt);
     SUITE_ADD_TEST(suite, test_forbiddenid);
-    SUITE_ADD_TEST(suite, test_getunit);
     SUITE_ADD_TEST(suite, test_read_unitid);
     SUITE_ADD_TEST(suite, test_default_order);
     SUITE_ADD_TEST(suite, test_game_mailcmd);

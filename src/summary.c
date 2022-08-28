@@ -168,7 +168,7 @@ static int count_umlaut(const char *s)
     int result = 0;
     const char *cp;
     for (cp = s; *cp; ++cp) {
-        wint_t wc = *cp;
+        wchar_t wc = *cp;
         if (wc & 0x80) {
             size_t size;
             int err;

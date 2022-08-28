@@ -600,10 +600,14 @@ function test_canoe_passes_through_land()
     u1.ship = sh
     u2.ship = sh
     u1:set_skill("sailing", 10)
+
     u1:clear_orders()
     u1:add_order("NACH O O O")
     process_orders()
     assert_equal(land, u2.region, "canoe did not stop at coast")
+
+    u1:clear_orders()
+    u1:add_order("NACH O O O")
     process_orders()
     assert_equal(dst, sh.region, "canoe could not leave coast")
     assert_equal(dst, u1.region, "canoe could not leave coast")

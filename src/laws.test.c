@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "eressea.h"
 #include "guard.h"
-#include "reports.h"
 #include "magic.h"                   // for create_mage
 
 #include <kernel/ally.h>
@@ -28,12 +27,12 @@
 #include <kernel/unit.h>
 
 #include <util/base36.h>
-#include "util/keyword.h"            // for K_NAME, K_WORK, K_MAKETEMP, K_BUY
+#include <util/keyword.h>      // for K_NAME, K_QUIT, K_MAKETEMP, K_EXPEL
 #include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/rand.h>
-#include "util/variant.h"  // for variant, frac_make, frac_zero
+#include <util/variant.h>  // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
@@ -191,6 +190,7 @@ static void test_expel_building(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), u1->region);
     ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
     test_clear_messages(u2->faction);
@@ -198,21 +198,31 @@ static void test_expel_building(CuTest *tc) {
     b = u2->building = u1->building = test_create_building(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, building_owner(b));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     /* Nothing happened: */
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error5"));
     CuAssertPtrEquals(tc, u1, building_owner(b));
     CuAssertPtrEquals(tc, b, u1->building);
     CuAssertPtrEquals(tc, b, u2->building);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error5"));
-    test_clear_messages(u1->faction);
     free_order(ord);
 
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
     expel_cmd(u1, ord);
     /* owner has expelled u2: */
-    CuAssertPtrEquals(tc, NULL, u2->building);
     CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_building"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_building"));
+    CuAssertPtrEquals(tc, NULL, u2->building);
+    free_order(ord);
+
+    /* unit in another region, not found */
+    u2 = test_create_unit(u2->faction, test_create_plain(0, 1));
+    ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    expel_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "feedback_unit_not_found"));
+
     test_teardown();
 }
 
@@ -225,6 +235,7 @@ static void test_expel_ship(CuTest *tc) {
     u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), u1->region);
     ord = create_order(K_EXPEL, u2->faction->locale, "%s", itoa36(u1->no));
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "feedback_not_inside"));
     test_clear_messages(u2->faction);
@@ -232,6 +243,7 @@ static void test_expel_ship(CuTest *tc) {
     sh = u2->ship = u1->ship = test_create_ship(u1->region, NULL);
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
 
+    test_clear_messages(u2->faction);
     expel_cmd(u2, ord);
     /* Nothing happened: */
     CuAssertPtrEquals(tc, u1, ship_owner(sh));
@@ -242,12 +254,24 @@ static void test_expel_ship(CuTest *tc) {
     free_order(ord);
 
     ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    test_clear_messages(u1->faction);
+    test_clear_messages(u2->faction);
     expel_cmd(u1, ord);
     /* owner has expelled u2: */
     CuAssertPtrEquals(tc, NULL, u2->ship);
     CuAssertPtrEquals(tc, sh, leftship(u2));
     CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "force_leave_ship"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "force_leave_ship"));
+    test_clear_messages(u1->faction);
+    free_order(ord);
+
+    /* unit in another region, not found */
+    u2 = test_create_unit(u2->faction, test_create_plain(0, 1));
+    ord = create_order(K_EXPEL, u1->faction->locale, "%s", itoa36(u2->no));
+    test_clear_messages(u1->faction);
+    expel_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "feedback_unit_not_found"));
+
     test_teardown();
 }
 
@@ -543,81 +567,11 @@ static void test_maketemp(CuTest * tc)
     CuAssertPtrNotNull(tc, u2->orders);
     CuAssertPtrEquals(tc, NULL, u2->orders->next);
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u2->orders));
+    CuAssertPtrEquals(tc, NULL, u2->thisorder);
 
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertPtrEquals(tc, NULL, u->orders->next);
     CuAssertIntEquals(tc, K_TAX, getkeyword(u->orders));
-    test_teardown();
-}
-
-static void test_defaultorders(CuTest* tc)
-{
-    unit* u;
-    order* ord;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-
-    ord = u->old_orders = create_order(K_CAST, u->faction->locale, "STUFE 9 Sturmwind");
-    ord->next = create_order(K_ENTERTAIN, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "@%s", keywords[K_GUARD]));
-    defaultorders();
-    CuAssertIntEquals(tc, K_WORK, getkeyword(ord = u->old_orders));
-    CuAssertIntEquals(tc, K_GUARD, getkeyword(ord = ord->next));
-    CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-
-    free_orders(&u->old_orders);
-    ord = u->old_orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
-    ord->next = create_order(K_SELL, u->faction->locale, "1 Balsam");
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s 1 Weihrauch", keywords[K_BUY]));
-    defaultorders();
-    CuAssertIntEquals(tc, K_BUY, getkeyword(ord = u->old_orders));
-    CuAssertPtrEquals(tc, NULL, ord->next);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-
-    test_teardown();
-}
-
-static void test_defaultorders_clear(CuTest* tc)
-{
-    unit* u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-
-    /* empty DEFAULT replaces long orders: */
-    u->old_orders = create_order(K_ENTERTAIN, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
-    defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    update_defaults(u->faction);
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-
-    /* New repeating DEFAULT replaces long order in defaults: */
-    u->old_orders = create_order(K_TAX, u->faction->locale, NULL);
-    unit_addorder(u, create_order(K_ENTERTAIN, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, keywords[K_WORK]));
-    defaultorders();
-    CuAssertPtrNotNull(tc, u->old_orders);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
-    CuAssertPtrEquals(tc, NULL, u->old_orders->next);
-    free_orders(&u->orders);
-    free_orders(&u->old_orders);
-
-    /* Bug 2843: empty DEFAULT clears repeated orders in template: */
-    u->old_orders = create_order(K_CAST, u->faction->locale, "Sturmwind");
-    u->old_orders->next = create_order(K_CAST, u->faction->locale, "Beulenpest");
-    unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_WORK, u->faction->locale, NULL));
-    defaultorders();
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->orders));
-    update_defaults(u->faction);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->old_orders));
-    CuAssertPtrEquals(tc, NULL, u->old_orders->next);
-
     test_teardown();
 }
 
@@ -1101,6 +1055,31 @@ static unit * setup_name_cmd(void) {
     return test_create_unit(f, test_create_plain(0, 0));
 }
 
+static void test_name_foreign_unit(CuTest* tc) {
+    unit* u1, * u2;
+    order* ord;
+    faction* f;
+
+    u1 = setup_name_cmd();
+    f = u1->faction;
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    ord = create_order(K_NAME, f->locale, "%s %s %i Dopefish",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_UNIT]), u2->no);
+
+    name_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    test_clear_messages(f);
+    move_unit(u2, u1->region, NULL);
+    name_cmd(u1, ord);
+    CuAssertStrEquals(tc, "Dopefish", u2->_name);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "renamed_seen"));
+    test_teardown();
+}
+
 static void test_name_unit(CuTest *tc) {
     unit *u;
     faction *f;
@@ -1241,143 +1220,6 @@ static void test_name_ship(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
 
-    test_teardown();
-}
-
-static void test_long_order_normal(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    order *ord;
-
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    fset(u, UFL_MOVED);
-    fset(u, UFL_LONGACTION);
-    unit_addorder(u, ord = create_order(K_MOVE, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertIntEquals(tc, ord->id, u->thisorder->id);
-    CuAssertIntEquals(tc, 0, fval(u, UFL_MOVED));
-    CuAssertIntEquals(tc, 0, fval(u, UFL_LONGACTION));
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    CuAssertPtrEquals(tc, NULL, u->old_orders);
-    test_teardown();
-}
-
-static void test_long_order_none(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrEquals(tc, NULL, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_cast(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_buy_sell(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_multi_long(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
-    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, NULL));
-    update_long_order(u);
-    CuAssertPtrNotNull(tc, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_multi_buy(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_multi_sell(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
-    test_teardown();
-}
-
-static void test_long_order_buy_cast(CuTest *tc) {
-    /* TODO: write more tests */
-    unit *u;
-    test_setup();
-    mt_create_error(52);
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_CAST, u->faction->locale, 0));
-    update_long_order(u);
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
-    test_teardown();
-}
-
-static void test_long_order_hungry(CuTest *tc) {
-    unit *u;
-    test_setup();
-    config_set("hunger.long", "1");
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    fset(u, UFL_HUNGER);
-    unit_addorder(u, create_order(K_MOVE, u->faction->locale, 0));
-    unit_addorder(u, create_order(K_DESTROY, u->faction->locale, 0));
-    config_set("orders.default", "work");
-    update_long_order(u);
-    CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
-    CuAssertPtrNotNull(tc, u->orders);
-    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
     test_teardown();
 }
 
@@ -2602,8 +2444,6 @@ static void test_transfer_faction(CuTest *tc) {
 CuSuite *get_laws_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_defaultorders);
-    SUITE_ADD_TEST(suite, test_defaultorders_clear);
     SUITE_ADD_TEST(suite, test_maketemp_default_order);
     SUITE_ADD_TEST(suite, test_maketemp);
     SUITE_ADD_TEST(suite, test_findparam_ex);
@@ -2614,20 +2454,12 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
+    SUITE_ADD_TEST(suite, test_name_foreign_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
-    SUITE_ADD_TEST(suite, test_long_order_normal);
-    SUITE_ADD_TEST(suite, test_long_order_none);
-    SUITE_ADD_TEST(suite, test_long_order_cast);
-    SUITE_ADD_TEST(suite, test_long_order_buy_sell);
-    SUITE_ADD_TEST(suite, test_long_order_multi_long);
-    SUITE_ADD_TEST(suite, test_long_order_multi_buy);
-    SUITE_ADD_TEST(suite, test_long_order_multi_sell);
-    SUITE_ADD_TEST(suite, test_long_order_buy_cast);
-    SUITE_ADD_TEST(suite, test_long_order_hungry);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
     SUITE_ADD_TEST(suite, test_password_cmd);
     SUITE_ADD_TEST(suite, test_rename_building);

@@ -29,7 +29,6 @@ function test_parser()
     eressea.read_orders(filename)
     process_orders()
     os.remove(filename)
-    assert_equal("Goldene Herde", u.name)
 end
 
 local function set_order(u, str)
@@ -175,7 +174,7 @@ function test_route()
     local u = unit.create(f, r1, 1)
     u:add_order("ROUTE O W P")
     process_orders()
-    assert_equal("ROUTE West PAUSE Ost", u:get_order(0))
+    assert_equal("ROUTE West PAUSE Ost", u:get_orders()[1])
     assert_equal(r2, u.region)
 end
 
@@ -188,7 +187,7 @@ function test_route_horse()
     u:add_item('horse', 1)
     u:set_skill('riding', 1)
     process_orders()
-    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(0))
+    assert_equal("ROUTE West PAUSE Ost PAUSE", u:get_order(1))
     assert_equal(r2, u.region)
 end
 
@@ -199,7 +198,7 @@ function test_route_pause()
     local u = unit.create(f, r1, 1)
     u:add_order("ROUTE P O W")
     process_orders()
-    assert_equal("ROUTE P O W", u:get_order(0))
+    assert_equal("ROUTE P O W", u:get_order(1))
     assert_equal(r1, u.region)
 end
 
@@ -252,4 +251,21 @@ function test_promote_after_recruit()
     assert_equal(fl + 128, u1.flags) -- UFL_HERO
     assert_equal(0, u1:get_item('money'))
     assert_equal(fl + 128, u1.flags) -- UFL_HERO
+end
+
+function test_defaults_make_temp()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("ARBEITE")
+    -- suppress NMR check:
+    f.flags = f.flags + 16777216
+    
+    u:set_orders("MACHE TEMP 1\nTREIBE\nENDE\nLERNE Taktik\n@RESERVIERE 1 Schwert")
+    
+    process_orders()
+    assert_equal("LERNE Taktik", u.orders[1])
+    assert_equal("@RESERVIERE 1 Schwert", u.orders[2])
+    -- should get only the LERNE error:
+    assert_equal('error65', f.messages[1])
 end

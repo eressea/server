@@ -625,33 +625,17 @@ static void rps_nowrap(struct stream *out, const char *s)
 static void
 nr_unit(struct stream *out, const faction * f, const unit * u, int indent, seen_mode mode)
 {
-    char marker;
-    int dh;
+    char bullet;
     bool isbattle = (mode == seen_battle);
     char buf[8192];
+    faction* of = get_otherfaction(u);
+    bool anon = fval(u, UFL_ANON_FACTION);
 
     newline(out);
-    dh = bufunit_depr(f, u, mode, buf, sizeof(buf));
+    bufunit_depr(f, u, mode, buf, sizeof(buf));
 
-    if (u->faction == f) {
-        marker = '*';
-    }
-    else if (is_allied(u->faction, f)) {
-        marker = 'o';
-    }
-    else if (u->attribs && f != u->faction
-        && !fval(u, UFL_ANON_FACTION) && get_otherfaction(u) == f) {
-        marker = '!';
-    }
-    else {
-        if (dh && !fval(u, UFL_ANON_FACTION)) {
-            marker = '+';
-        }
-        else {
-            marker = '-';
-        }
-    }
-    paragraph(out, buf, indent, 0, marker);
+    bullet = bufunit_bullet(f, u, of, anon);
+    paragraph(out, buf, indent, 0, bullet);
 
     if (!isbattle) {
         nr_curses(out, indent, f, TYP_UNIT, u);
@@ -1268,15 +1252,20 @@ static int buildingmaintenance(const building * b, const resource_type * rtype)
 static int
 report_template(const char *filename, report_context * ctx, const char *bom)
 {
-    const resource_type *rsilver = get_resourcetype(R_SILVER);
-    const faction *f = ctx->f;
-    const struct locale *lang = f->locale;
-    region *r;
-    FILE *F = fopen(filename, "w");
-    stream strm = { 0 }, *out = &strm;
+    return write_template(filename, TEMPLATE_BOM ? bom : NULL, ctx->f, ctx->password ? ctx->password : "password", ctx->first, ctx->last);
+}
+
+int write_template(const char* filename, const char* bom, const faction* f, const char* password,
+    const region* regions_begin,
+    const region* regions_end)
+{
+    const resource_type* rsilver = get_resourcetype(R_SILVER);
+    const struct locale* lang = f->locale;
+    const region* r;
+    FILE* F = fopen(filename, "w");
+    stream strm = { 0 }, * out = &strm;
     char buf[4096];
     sbstring sbs;
-    const char *password = "password";
 
     if (F == NULL) {
         perror(filename);
@@ -1291,10 +1280,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     sprintf(buf, "; %s\n", LOC(lang, "nr_template"));
     rps_nowrap(out, buf);
 
-    if (ctx->password) {
-        password = ctx->password;
-    }
-    else {
+    if (!password) {
         sprintf(buf, "; %s\n", LOC(lang, "template_password_notice"));
         rps_nowrap(out, buf);
     }
@@ -1307,8 +1293,8 @@ report_template(const char *filename, report_context * ctx, const char *bom)
     rps_nowrap(out, buf);
     newline(out);
 
-    for (r = ctx->first; r != ctx->last; r = r->next) {
-        unit *u;
+    for (r = regions_begin; r != regions_end; r = r->next) {
+        unit* u;
         int dh = 0;
 
         if (r->seen.mode < seen_unit)
@@ -1316,9 +1302,9 @@ report_template(const char *filename, report_context * ctx, const char *bom)
 
         for (u = r->units; u; u = u->next) {
             if (u->faction == f) {
-                order *ord;
+                const order* ord;
                 if (!dh) {
-                    plane *pl = getplane(r);
+                    plane* pl = getplane(r);
                     int nx = r->x, ny = r->y;
 
                     pnormalize(&nx, &ny, pl);
@@ -1353,7 +1339,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                 sbs_strcat(&sbs, str_itoa(get_money(u)));
                 sbs_strcat(&sbs, "$");
                 if (u->building && building_owner(u->building) == u) {
-                    building *b = u->building;
+                    building* b = u->building;
                     if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
                         int cost = buildingmaintenance(b, rsilver);
                         if (cost > 0) {
@@ -1369,7 +1355,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                     else {
                         sbs_strcat(&sbs, ",s");
                     }
-                    sbs_strcat(&sbs,itoa36(u->ship->no));
+                    sbs_strcat(&sbs, itoa36(u->ship->no));
                 }
                 if (lifestyle(u) == 0) {
                     sbs_strcat(&sbs, ",I");
@@ -1378,8 +1364,7 @@ report_template(const char *filename, report_context * ctx, const char *bom)
                 rps_nowrap(out, buf);
                 newline(out);
 
-                for (ord = u->old_orders; ord; ord = ord->next) {
-                    /* this new order will replace the old defaults */
+                for (ord = u->orders; ord; ord = ord->next) {
                     strcpy(buf, "   ");
                     write_order(ord, lang, buf + 2, sizeof(buf) - 2);
                     rps_nowrap(out, buf);
@@ -1605,20 +1590,20 @@ static void report_guards(struct stream *out, const region * r, const faction * 
     int nextguard = 0;
     unit *u;
     int i;
-    bool tarned = false;
+    bool anonymous = false;
     /* Bewachung */
 
     for (u = r->units; u; u = u->next) {
         if (is_guard(u) != 0) {
             faction *f = u->faction;
-            faction *fv = visible_faction(see, u);
+            faction *fv = visible_faction(see, u, get_otherfaction(u));
 
             if (fv != f && see != fv) {
                 f = fv;
             }
 
             if (f != see && fval(u, UFL_ANON_FACTION)) {
-                tarned = true;
+                anonymous = true;
             }
             else {
                 for (i = 0; i != nextguard; ++i)
@@ -1631,16 +1616,16 @@ static void report_guards(struct stream *out, const region * r, const faction * 
         }
     }
 
-    if (nextguard || tarned) {
+    if (nextguard || anonymous) {
         char buf[2048];
         sbstring sbs;
 
         sbs_init(&sbs, buf, sizeof(buf));
         sbs_strcat(&sbs, LOC(see->locale, "nr_guarding_prefix"));
 
-        for (i = 0; i != nextguard + (tarned ? 1 : 0); ++i) {
+        for (i = 0; i != nextguard + (anonymous ? 1 : 0); ++i) {
             if (i != 0) {
-                if (i == nextguard - (tarned ? 0 : 1)) {
+                if (i == nextguard - (anonymous ? 0 : 1)) {
                     sbs_strcat(&sbs, LOC(see->locale, "list_and"));
                 }
                 else {

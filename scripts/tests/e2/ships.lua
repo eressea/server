@@ -150,17 +150,23 @@ function test_ship_convoy_skill()
     u:set_skill('sailing', 10, true)
     u.ship = ship.create(r1, 'longboat')
     assert_equal(1, u.ship.number)
+
+    u:clear_orders()
     u:add_order('NACH O')
     process_orders()
     assert_equal(r2, u.region)
 
     u.ship.number = 2
     u:set_skill('sailing', 20, true)
+    u:clear_orders()
+    u:add_order('NACH O')
     process_orders()
     assert_equal(r2, u.region) -- not enough captains
 
     u.number = 2
     u:set_skill('sailing', 10, true)
+    u:clear_orders()
+    u:add_order('NACH O')
     process_orders()
     assert_equal(r3, u.region)
 end
@@ -282,12 +288,13 @@ function test_give_ship_compatible_coasts()
     local u2 = unit.create(f, r, 1)
     u1.ship = ship.create(r, 'longboat')
     u1.ship.number = 4
-    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     u2.ship = ship.create(r, 'longboat')
 
     -- cannot give a ship with different coast:
     u1.ship.coast = 1
     u2.ship.coast = 2
+    u1:clear_orders()
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(4, u1.ship.number)
     assert_equal(1, u2.ship.number)
@@ -295,6 +302,8 @@ function test_give_ship_compatible_coasts()
     -- can give a ship with no coast:
     u1.ship.coast = -1
     u2.ship.coast = 2
+    u1:clear_orders()
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(3, u1.ship.number)
     assert_equal(2, u2.ship.number)
@@ -303,6 +312,8 @@ function test_give_ship_compatible_coasts()
     -- can give a ship with same coast:
     u1.ship.coast = 2
     u2.ship.coast = 2
+    u1:clear_orders()
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(2, u1.ship.number)
     assert_equal(3, u2.ship.number)
@@ -311,6 +322,8 @@ function test_give_ship_compatible_coasts()
     -- giving to a ship with no coast:
     u1.ship.coast = 2
     u2.ship.coast = -1
+    u1:clear_orders()
+    u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(1, u1.ship.number)
     assert_equal(4, u2.ship.number)
@@ -393,7 +406,6 @@ function test_give_ship_all_ships()
     u2.ship.number = 1
     u1:add_order("GIB " .. itoa36(u2.id) .. " 2 SCHIFF")
     process_orders()
-    write_reports()
     assert_equal(3, u2.ship.number)
     assert_equal(u2.ship, u1.ship)
 end

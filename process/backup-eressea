@@ -8,7 +8,8 @@ GAME=$1
 upload() {
   SRC="$1"
   DST=$(basename "$SRC")
-  echo put "$SRC" "$DST" | cadaver "https://dav.box.com/dav/Eressea/game-$GAME/"
+  curl -s -n -T "$SRC" "https://dav.box.com/dav/Eressea/game-$GAME/$DST" 
+#  echo put "$SRC" "$DST" | cadaver "https://dav.box.com/dav/Eressea/game-$GAME/"
 }
 
 if [ ! -d $ERESSEA/game-$GAME ]; then

@@ -48,7 +48,7 @@ extern "C" {
     const char *hp_status(const struct unit *u);
 
     int reports(void);
-    int write_reports(struct faction *f, const char *password);
+    int write_reports(struct faction *f, int options, const char *password);
     int init_reports(void);
 
     int stealth_modifier(const struct region *r, const struct faction *f, enum seen_mode mode);
@@ -62,7 +62,6 @@ extern "C" {
         const char *password;
     } report_context;
 
-    void update_defaults(struct faction* f);
     void prepare_report(report_context *ctx, struct faction *f, const char *password);
     void finish_reports(report_context *ctx);
     void get_addresses(report_context * ctx);
@@ -72,10 +71,11 @@ extern "C" {
     void register_reporttype(const char *extension, report_fun write,
         int flag);
 
-    int bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
+    void bufunit_depr(const struct faction *f, const struct unit *u, enum seen_mode mode,
         char *buf, size_t size);
+    char bufunit_bullet(const struct faction* f, const struct unit* u, struct faction* of, bool anon);
     void bufunit(const struct faction * f, const struct unit * u,
-        const struct faction *fv, enum seen_mode mode, bool getarnt,
+        const struct faction *of, enum seen_mode mode, bool anon,
         struct sbstring *sbp);
 
     const char *trailinto(const struct region *r,

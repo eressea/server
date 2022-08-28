@@ -10,6 +10,7 @@
 #include "faction.h"
 #include "item.h"
 #include "magic.h"
+#include "order.h"
 #include "race.h"
 #include "region.h"
 #include "skill.h"
@@ -17,6 +18,7 @@
 #include "terrain.h"
 
 #include <util/base36.h>
+#include <util/keyword.h>    // for K_GIVE, enable_keyword, K_WORK, K_ENTERTAIN
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/rng.h>
@@ -797,6 +799,64 @@ static void test_max_heroes(CuTest* tc) {
 }
 
 
+static void test_getunit(CuTest* tc) {
+    unit* u, * u2;
+    struct order* ord;
+    struct region* r;
+    struct locale* lang;
+
+    test_setup();
+    lang = test_create_locale();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    /* This unit is also TEMP 42: */
+    usetalias(u, atoi36("42"));
+
+    r = test_create_plain(1, 0);
+
+    ord = create_order(K_GIVE, lang, itoa36(u->no));
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(r, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, itoa36(u->no + 1));
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "0");
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_PEASANTS, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
+    ord = create_order(K_GIVE, lang, "TEMP ##");
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    /* bug https://bugs.eressea.de/view.php?id=1685 */
+    ord = create_order(K_GIVE, lang, "##");
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_NOTFOUND, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, NULL, u2);
+    free_order(ord);
+
+    ord = create_order(K_GIVE, lang, "TEMP 42");
+    init_order(ord, NULL);
+    CuAssertIntEquals(tc, GET_UNIT, getunit(u->region, u->faction, &u2));
+    CuAssertPtrEquals(tc, u, u2);
+    free_order(ord);
+
+    test_teardown();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -831,5 +891,6 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_gift_items);
     SUITE_ADD_TEST(suite, test_maintenance_cost);
     SUITE_ADD_TEST(suite, test_max_heroes);
+    SUITE_ADD_TEST(suite, test_getunit);
     return suite;
 }

@@ -81,6 +81,7 @@ static void setup_give(struct give *env) {
     mt_create_va(mt_new("too_many_units_in_faction", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("too_many_units_in_alliance", NULL), "unit:unit", "region:region", "command:order", "allowed:int", MT_NEW_END);
     mt_create_va(mt_new("feedback_no_contact", NULL), "unit:unit", "region:region", "command:order", "target:unit", MT_NEW_END);
+    mt_create_va(mt_new("feedback_unit_not_found", NULL), "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("giverestriction", NULL), "unit:unit", "region:region", "command:order", "turns:int", MT_NEW_END);
     mt_create_va(mt_new("error_unit_size", NULL), "unit:unit", "region:region", "command:order", "maxsize:int", MT_NEW_END);
     mt_create_va(mt_new("nogive_reserved", NULL), "unit:unit", "region:region", "command:order", "resource:resource", "reservation:int", MT_NEW_END);
@@ -140,12 +141,40 @@ static void test_give_unit_humans(CuTest * tc) {
 
     give_unit(env.src, env.dst, NULL);
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error128"));
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
 
     scale_number(env.dst, 57);
     CuAssertIntEquals(tc, 1, count_maxmigrants(env.f2));
     give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertIntEquals(tc, 1, env.f2->newbies);
+    test_teardown();
+}
+
+static void test_give_unit_cursed(CuTest * tc) {
+    struct give env = { 0 };
+    race *rc;
+    item_type* itype;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction_ex(test_create_race("elf"), NULL);
+    env.f2 = test_create_faction_ex(rc = test_create_race("human"), env.f1->locale);
+    rc->flags |= RCF_MIGRANTS;
+    setup_give(&env);
+
+    /* units with cursed items cannot be given */
+    itype = test_create_itemtype("seashell");
+    itype->flags |= ITF_CURSED;
+    i_change(&env.src->items, itype, 1);
+
+    scale_number(env.dst, 57);
+    CuAssertIntEquals(tc, 1, count_maxmigrants(env.f2));
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "error78"));
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+
     test_teardown();
 }
 
@@ -343,6 +372,30 @@ static void test_give_men_other_faction(CuTest * tc) {
     env.f1 = test_create_faction();
     env.f2 = test_create_faction();
     setup_give(&env);
+    contact_unit(env.dst, env.src);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    msg_release(msg);
+    test_teardown();
+}
+
+static void test_give_men_cursed(CuTest * tc) {
+    struct give env = { 0 };
+    message * msg;
+    item_type* itype;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction();
+    env.f2 = test_create_faction();
+    setup_give(&env);
+
+    /* it should not matter that the unit has a seashell */
+    itype = test_create_itemtype("seashell");
+    itype->flags |= ITF_CURSED;
+    i_change(&env.src->items, itype, 1);
+
     contact_unit(env.dst, env.src);
     msg = give_men(1, env.src, env.dst, NULL);
     CuAssertStrEquals(tc, "give_person", test_get_messagetype(msg));
@@ -550,17 +603,27 @@ static void test_give_invalid_target(CuTest *tc) {
 
     test_setup_ex(tc);
     env.f1 = test_create_faction();
-    env.f2 = NULL;
+    env.f2 = test_create_faction();
     setup_give(&env);
 
     i_change(&env.src->items, env.itype, 10);
     ord = create_order(K_GIVE, env.f1->locale, "## KRAUT");
     assert(ord);
-
+    test_clear_messages(env.f1);
     give_cmd(env.src, ord);
-    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
     free_order(ord);
+
+    /* if target unit is in another region => not found */
+    ord = create_order(K_GIVE, env.f1->locale, "%i KRAUT", env.dst->no);
+    move_unit(env.dst, test_create_plain(env.r->x, env.r->y + 1), NULL);
+    test_clear_messages(env.f1);
+    give_cmd(env.src, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "feedback_unit_not_found"));
+    CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
+    free_order(ord);
+
     test_teardown();
 }
 
@@ -571,8 +634,9 @@ static void test_give_item_cursed(CuTest* tc)
     faction* f;
 
     test_setup_ex(tc);
-    f = test_create_faction();
-    env.f2 = env.f1 = f;
+    env.f1 = f = test_create_faction();
+    env.f2 = test_create_faction();
+
     setup_give(&env);
     env.itype->flags |= ITF_CURSED;
 
@@ -588,13 +652,41 @@ static void test_give_item_cursed(CuTest* tc)
     free_order(ord);
     test_clear_messages(f);
 
-    ord = create_order(K_RESERVE, f->locale, "10 %s", LOC(f->locale, resourcename(env.itype->rtype, 0)));
-    CuAssertIntEquals(tc, 0, reserve_cmd(env.dst, ord));
+    test_teardown();
+}
+
+static void test_give_item_cursed_self(CuTest* tc)
+{
+    struct give env = { 0 };
+    order* ord;
+    faction* f;
+
+    test_setup_ex(tc);
+    env.f1 = env.f2 = f = test_create_faction();
+
+    setup_give(&env);
+    env.itype->flags |= ITF_CURSED;
+
+    i_change(&env.src->items, env.itype, 20);
+    ord = create_order(K_GIVE, f->locale, "%s 10 %s", itoa36(env.dst->no),
+        LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    assert(ord);
+
+    give_cmd(env.src, ord);
     CuAssertIntEquals(tc, 10, i_get(env.src->items, env.itype));
-    CuAssertIntEquals(tc, 0, i_get(env.dst->items, env.itype));
-    CuAssertIntEquals(tc, 0, get_reservation(env.dst, env.itype));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error25"));
+    CuAssertIntEquals(tc, 10, i_get(env.dst->items, env.itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error25"));
     free_order(ord);
+    test_clear_messages(f);
+
+    ord = create_order(K_RESERVE, f->locale, "20 %s", LOC(f->locale, resourcename(env.itype->rtype, 0)));
+    CuAssertIntEquals(tc, 20, reserve_cmd(env.dst, ord));
+    CuAssertIntEquals(tc, 0, i_get(env.src->items, env.itype));
+    CuAssertIntEquals(tc, 20, i_get(env.dst->items, env.itype));
+    CuAssertIntEquals(tc, 20, get_reservation(env.dst, env.itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error25"));
+    free_order(ord);
+    test_clear_messages(f);
 
     test_teardown();
 }
@@ -709,8 +801,10 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
     SUITE_ADD_TEST(suite, test_give_men_not_to_self);
     SUITE_ADD_TEST(suite, test_give_men_hungry);
+    SUITE_ADD_TEST(suite, test_give_men_cursed);
     SUITE_ADD_TEST(suite, test_give_unit);
     SUITE_ADD_TEST(suite, test_give_unit_humans);
+    SUITE_ADD_TEST(suite, test_give_unit_cursed);
     SUITE_ADD_TEST(suite, test_give_unit_other_race);
     SUITE_ADD_TEST(suite, test_give_unit_limits);
     SUITE_ADD_TEST(suite, test_give_unit_to_ocean);
@@ -723,6 +817,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_new_unit);
     SUITE_ADD_TEST(suite, test_give_dead_unit);
     SUITE_ADD_TEST(suite, test_give_item_cursed);
+    SUITE_ADD_TEST(suite, test_give_item_cursed_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_all);

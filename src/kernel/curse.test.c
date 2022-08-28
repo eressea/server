@@ -2,14 +2,16 @@
 
 #include "eressea.h"
 
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
+#include <kernel/objtypes.h>  // for TYP_REGION
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/unit.h>
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
 
 #include <util/message.h>
 #include <util/rng.h>
+#include <util/variant.h>     // for variant
 
 #include <binarystore.h>
 #include <memstream.h>

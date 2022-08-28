@@ -233,7 +233,7 @@ int teach_cmd(unit * teacher, struct order *ord)
             return 0;
         }
     }
-    if ((u_race(teacher)->flags & RCF_NOTEACH) || fval(teacher, UFL_WERE)) {
+    if (!can_teach(teacher)) {
         cmistake(teacher, ord, 274, MSG_EVENT);
         return 0;
     }
@@ -331,7 +331,7 @@ int teach_cmd(unit * teacher, struct order *ord)
 
             /* Falls die Unit nicht gefunden wird, Fehler melden */
 
-            if (!student) {
+            if (!student || student->region != r) {
                 char tbuf[20];
                 const char *uid;
                 const char *token;
@@ -682,6 +682,11 @@ int study_cmd(unit * u, order * ord)
     }
     reset_order();
     return 0;
+}
+
+bool can_teach(const unit* u)
+{
+    return !(fval(u, UFL_WERE) || fval(u_race(u), RCF_NOTEACH));
 }
 
 static int produceexp_days(void) {

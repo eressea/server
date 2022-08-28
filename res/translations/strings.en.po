@@ -3692,6 +3692,9 @@ msgstr "aura"
 msgid "anonymous"
 msgstr "anonymous"
 
+msgid "disguised_as"
+msgstr "disguised as"
+
 msgid "FLIEHE"
 msgstr "FLEE"
 
@@ -5143,7 +5146,7 @@ msgctxt "keyword"
 msgid "teach"
 msgstr "TEACH"
 
-msgid "ANZAHL"
+msgid "NUMMER"
 msgstr "NUMBER"
 
 msgid "dir_se"

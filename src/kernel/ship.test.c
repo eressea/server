@@ -19,6 +19,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
+struct faction;
+
 static void test_register_ship(CuTest * tc)
 {
     ship_type *stype;

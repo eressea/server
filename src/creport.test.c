@@ -38,6 +38,7 @@ static void test_cr_unit(CuTest *tc) {
     renumber_unit(u, 1234);
 
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_unit(&strm, f, u, seen_unit);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
@@ -99,6 +100,7 @@ static void test_cr_resources(CuTest *tc) {
     region_setresource(r, get_resourcetype(R_STONE), 1);
 
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_resources(&strm, f, r, seen_unit);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
@@ -177,6 +179,7 @@ static void test_cr_lighthouse(CuTest *tc) {
     region_setresource(r, get_resourcetype(R_STONE), 1);
 
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_resources(&strm, f, r, seen_lighthouse_land);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
@@ -230,6 +233,7 @@ static void test_cr_mallorn(CuTest *tc) {
     rsettrees(r, 2, 3);
 
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_resources(&strm, f, r, seen_travel);
     strm.api->rewind(strm.handle);
     CuAssertIntEquals(tc, 0, strm.api->readln(strm.handle, line, sizeof(line)));
@@ -340,6 +344,7 @@ static void test_cr_hiderace(CuTest *tc) {
     u = test_create_unit(f1, r);
 
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     CuAssertPtrEquals(tc, default_locale, (struct locale *)f1->locale);
     CuAssertPtrEquals(tc, default_locale, (struct locale *)f2->locale);
     cr_output_unit(&strm, f1, u, seen_unit);
@@ -347,6 +352,7 @@ static void test_cr_hiderace(CuTest *tc) {
     CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));
     mstream_done(&strm);
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     CuAssertPtrEquals(tc, default_locale, (struct locale *)f1->locale);
     CuAssertPtrEquals(tc, default_locale, (struct locale *)f2->locale);
     cr_output_unit(&strm, f2, u, seen_unit);
@@ -358,11 +364,13 @@ static void test_cr_hiderace(CuTest *tc) {
     f1->locale = lang;
     u->irace = test_create_race("elf");
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_unit(&strm, f1, u, seen_unit);
     CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Elfen"));
     CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", "Menschen"));
     mstream_done(&strm);
     mstream_init(&strm);
+    CuAssertPtrNotNull(tc, strm.api);
     cr_output_unit(&strm, f2, u, seen_unit);
     CuAssertTrue(tc, cr_find_string(&strm, ";Typ", "Elfen"));
     CuAssertTrue(tc, cr_find_string(&strm, ";wahrerTyp", NULL));

@@ -1,9 +1,13 @@
 #include "region.h"
-#include "resources.h"
+
+#include "direction.h"     // for D_NORTHWEST
+#include "build.h"  // for construction
 #include "building.h"
+#include "resources.h"
 #include "unit.h"
 #include "terrain.h"
 #include "item.h"
+
 
 #include <CuTest.h>
 #include <tests.h>
