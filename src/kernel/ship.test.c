@@ -546,6 +546,9 @@ static void test_shipspeed_at_speedup(CuTest *tc) {
     CuAssertIntEquals(tc, 3, get_speedup(sh->attribs));
     CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
 
+    CuAssertTrue(tc, add_speedup(&sh->attribs, 2, 50));
+    CuAssertIntEquals(tc, 5, get_speedup(sh->attribs));
+
     test_teardown();
 }
 

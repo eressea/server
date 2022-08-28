@@ -8,3 +8,4 @@ extern struct attrib_type at_speedup;
 
 int get_speedup(struct attrib* attribs);
 bool set_speedup(struct attrib** attribs, int speed, int duration);
+bool add_speedup(struct attrib** attribs, int speed, int duration);
