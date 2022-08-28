@@ -1078,6 +1078,11 @@ static int reserve_i(unit* u, struct order* ord, int flags)
 }
 
 int reserve_cmd(unit* u, struct order* ord) {
+    if ((u_race(u)->ec_flags & ECF_GETITEM) == 0) {
+        /* race cannot be given anything, reserve would be a loophole */
+        return 0;
+    }
+
     return reserve_i(u, ord, GET_DEFAULT);
 }
 

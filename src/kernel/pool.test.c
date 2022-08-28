@@ -61,9 +61,10 @@ void test_pool_get_item(CuTest *tc) {
     rc->ec_flags &= ~ECF_GETITEM;
     u2 = test_create_unit(f, r);
     i_change(&u2->items, rtype->itype, 2);
-    CuAssertIntEquals(tc, 0, get_pooled(u1, rtype, GET_DEFAULT, 1));
+    CuAssertIntEquals(tc, 2, get_pooled(u1, rtype, GET_DEFAULT, 1));
+    CuAssertIntEquals(tc, 1, use_pooled(u1, rtype, GET_DEFAULT, 1));
     CuAssertIntEquals(tc, 0, i_get(u1->items, rtype->itype));
-    CuAssertIntEquals(tc, 2, i_get(u2->items, rtype->itype));
+    CuAssertIntEquals(tc, 1, i_get(u2->items, rtype->itype));
     test_teardown();
 }
 
