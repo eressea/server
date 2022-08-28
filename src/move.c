@@ -403,9 +403,6 @@ bool canfly(unit * u)
     if (fval(u_race(u), RCF_FLY))
         return true;
 
-    if (get_movement(&u->attribs, MV_FLY))
-        return true;
-
     return false;
 }
 
@@ -418,12 +415,6 @@ bool canswim(unit * u)
         return true;
 
     if (u_race(u)->flags & RCF_SWIM)
-        return true;
-
-    if (get_movement(&u->attribs, MV_FLY))
-        return true;
-
-    if (get_movement(&u->attribs, MV_SWIM))
         return true;
 
     return false;
@@ -1203,11 +1194,7 @@ bool is_transporting(const unit * ut, const unit * u)
 static bool can_move(const unit * u)
 {
     if (is_paused(u->faction)) return false;
-    if (u_race(u)->flags & RCF_CANNOTMOVE)
-        return false;
-    if (get_movement(&u->attribs, MV_CANNOTMOVE))
-        return false;
-    return true;
+    return (0 == (u_race(u)->flags & RCF_CANNOTMOVE));
 }
 
 static void init_movement(void)
