@@ -143,6 +143,27 @@ function test_follow_ship()
     assert_equal(2, u2.region.x)
 end
 
+function test_follow_ship_swimmer()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "ocean")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r1, 1, "giantturtle")
+    local u2 = unit.create(f, r1)
+
+    local sh = ship.create(r1, 'dragonship')
+    u2.ship = sh
+    sh.owner = u2
+    u2:set_skill('sailing', 50)
+
+    u1:add_order('@FOLGE SCHIFF ' .. itoa36(sh.id))
+    u2:add_order('NACH o')
+
+    process_orders()
+
+    assert_equal(r2, u1.region, 'turtle cannot follow ship')
+    assert_equal(r2, u2.region)
+end
+
 function assert_nomove(text, u)
     if text == nil then text = "" else text = text .. "; " end
     local r = u.region

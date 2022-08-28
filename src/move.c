@@ -2357,13 +2357,16 @@ int follow_ship(unit * u, order * ord)
     moves = 1;
 
     speed = getuint();
-    if (speed == 0) {
-        speed = shipspeed(u->ship, u);
-    }
-    else {
-        int maxspeed = shipspeed(u->ship, u);
-        if (maxspeed < speed)
-            speed = maxspeed;
+    if (u->ship && ship_owner(u->ship) == u) {
+        if (speed == 0) {
+            speed = shipspeed(u->ship, u);
+        }
+        else {
+            int maxspeed = shipspeed(u->ship, u);
+            if (maxspeed < speed) {
+                speed = maxspeed;
+            }
+        }
     }
     rc = rconnect(rc, dir);
     while (rc && (!sh || rc != sh->region) && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {
