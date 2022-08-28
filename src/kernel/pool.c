@@ -143,10 +143,6 @@ int count)
     region *r = u->region;
     int have = get_resource(u, rtype);
 
-    if ((u_race(u)->ec_flags & ECF_GETITEM) == 0) {
-        mode &= (GET_SLACK | GET_RESERVE);
-    }
-
     if ((mode & GET_SLACK) && (mode & GET_RESERVE))
         use = have;
     else if (rtype->itype && mode & (GET_SLACK | GET_RESERVE)) {
@@ -184,10 +180,6 @@ use_pooled(unit * u, const resource_type * rtype, int mode, int count)
     int use = count;
     region *r = u->region;
     int n = 0, have = get_resource(u, rtype);
-
-    if ((u_race(u)->ec_flags & ECF_GETITEM) == 0) {
-        mode &= (GET_SLACK | GET_RESERVE);
-    }
 
     if ((mode & GET_SLACK) && (mode & GET_RESERVE)) {
         n = (use < have) ? use : have;

@@ -638,6 +638,20 @@ function test_seacast()
     assert_equal(8, u2.region.x)
 end
 
+function test_irongolem_uses_pool()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local ug = unit.create(f, r, 2, "irongolem")
+    u:add_item("log", 50)
+    ug:add_order("MACHE 4 Kriegsaxt")
+    ug:set_skill("weaponsmithing", 15)
+    process_orders()
+    assert_equal(1, ug.number)
+    assert_equal(46, u:get_item("log"))
+    assert_equal(4, ug:get_item("axe"))
+end
+
 -- Solthar: long orders prevent trading
 function test_bug_2978()
     local r = region.create(0, 0, 'plain')
