@@ -172,7 +172,7 @@ msgstr "\"In $region($region) erschienen die Herren der Bäume.\""
 msgid "victory_murder_cfulfilled"
 msgstr "\"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),\"einer Woche\",\"$int($remain) Wochen\") zum Sieger erklärt werden.\""
 
-msgid "headache_effect_1"
+msgid "hangover_effect_1"
 msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing....\""
 
 msgid "feedback_no_contact"
@@ -976,7 +976,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) 
 msgid "cast_drainlife_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurde ihre Lebenskraft entzogen.\""
 
-msgid "headache_effect_0"
+msgid "hangover_effect_0"
 msgstr "\"$unit($mage) verschafft $unit($unit) einige feuchtfröhliche Stunden mit heftigen Nachwirkungen.\""
 
 msgid "unholypower_limitedeffect"

@@ -4753,14 +4753,14 @@
     </type>
   </message>
 
-  <message name="headache_effect_0" section="events">
+  <message name="hangover_effect_0" section="events">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
     </type>
   </message>
 
-  <message name="headache_effect_1" section="events">
+  <message name="hangover_effect_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
     </type>

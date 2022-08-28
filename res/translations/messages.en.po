@@ -172,7 +172,7 @@ msgstr "\"In $region($region), the Lords of the Trees have risen.\""
 msgid "victory_murder_cfulfilled"
 msgstr "\"Attention: $faction($faction) has fulfilled the victory condition and will be declared winner in $if($eq($remain,1),\"one week\",\"$int($remain) weeks\").\""
 
-msgid "headache_effect_1"
+msgid "hangover_effect_1"
 msgstr "\"$unit($unit) has a splitting headache and can hardly remember last week. Except that it all started in the tavern...\""
 
 msgid "feedback_no_contact"
@@ -976,7 +976,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) 
 msgid "cast_drainlife_effect"
 msgstr "\"$unit($mage) casts $spell($spell): $int($amount) fighters had their life energy drained.\""
 
-msgid "headache_effect_0"
+msgid "hangover_effect_0"
 msgstr "\"$unit($mage) invites $unit($unit) for a few too many drinks and a massive hangover.\""
 
 msgid "unholypower_limitedeffect"
