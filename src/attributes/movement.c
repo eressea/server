@@ -26,3 +26,13 @@ attrib_type at_speedup = {
     a_readint
 };
 
+int get_speedup(attrib* attribs)
+{
+    int k = 0;
+    attrib *a = a_find(attribs, &at_speedup);
+    while (a != NULL && a->type == &at_speedup) {
+        k += a->data.sa[0];
+        a = a->next;
+    }
+    return k;
+}

@@ -38,7 +38,7 @@ struct order *ord)
                 a->data.sa[0] = 50;     /* speed */
                 a->data.sa[1] = 50;     /* decay */
                 ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
-                /* Ticket abziehen */
+                /* Segel verbrauchen */
                 i_change(&u->items, itype, -1);
                 return 0;
             }

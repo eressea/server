@@ -333,7 +333,6 @@ int ship_captain_minskill(const ship *sh) {
 
 int shipspeed(const ship * sh, const unit * u)
 {
-    attrib *a;
     struct curse *c;
     int k, bonus;
 
@@ -377,13 +376,7 @@ int shipspeed(const ship * sh, const unit * u)
         }
     }
     k += bonus;
-
-    a = a_find(sh->attribs, &at_speedup);
-    while (a != NULL && a->type == &at_speedup) {
-        k += a->data.sa[0];
-        a = a->next;
-    }
-
+    k += get_speedup(sh->attribs);
     c = get_curse(sh->attribs, &ct_shipspeedup);
     while (c) {
         k += curse_geteffect_int(c);

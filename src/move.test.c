@@ -610,7 +610,8 @@ static void test_follow_unit(CuTest *tc) {
     ord = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
     unit_addorder(u2, ord);
     u2->thisorder = copy_order(ord);
-    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u2->no));
+    ord = create_order(K_FOLLOW, f->locale, "%s %s",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no));
     unit_addorder(u, ord);
     u->thisorder = copy_order(ord);
 
@@ -642,7 +643,8 @@ static void test_follow_unit_self(CuTest *tc) {
 
     f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
-    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u->no));
+    ord = create_order(K_FOLLOW, f->locale, "%s %s",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
     unit_addorder(u, ord);
     follow_cmds(u);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "followfail"));
