@@ -36,3 +36,15 @@ int get_speedup(attrib* attribs)
     }
     return k;
 }
+
+bool set_speedup(struct attrib** attribs, int speed, int duration)
+{
+    attrib* a = a_find(*attribs, &at_speedup);
+    if (a == NULL) {
+        a = a_add(attribs, a_new(&at_speedup));
+        a->data.sa[0] = speed;
+        a->data.sa[1] = duration;
+        return true;
+    }
+    return false;
+}

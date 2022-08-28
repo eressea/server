@@ -533,17 +533,19 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
 static void test_shipspeed_at_speedup(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
-    attrib *a;
 
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
-    a = a_new(&at_speedup);
-    a->data.i = 3;
-    a_add(&sh->attribs, a);
+    CuAssertTrue(tc, set_speedup(&sh->attribs, 3, 50));
+    CuAssertIntEquals(tc, 3, get_speedup(sh->attribs));
+    // cannot set it twice:
+    CuAssertTrue(tc, !set_speedup(&sh->attribs, 6, 50));
+    CuAssertIntEquals(tc, 3, get_speedup(sh->attribs));
     CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
+
     test_teardown();
 }
 

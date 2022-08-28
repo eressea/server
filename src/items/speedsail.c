@@ -32,18 +32,14 @@ struct order *ord)
     }
     else {
         if (u->ship) {
-            attrib *a = a_find(u->ship->attribs, &at_speedup);
-            if (a == NULL) {
-                a = a_add(&u->ship->attribs, a_new(&at_speedup));
-                a->data.sa[0] = 50;     /* speed */
-                a->data.sa[1] = 50;     /* decay */
+            if (set_speedup(&u->ship->attribs, 50, 50)) {
                 ADDMSG(&u->faction->msgs, msg_message("use_speedsail", "unit", u));
-                /* Segel verbrauchen */
-                i_change(&u->items, itype, -1);
-                return 0;
             }
             else {
                 cmistake(u, ord, 211, MSG_EVENT);
+                /* Segel verbrauchen */
+                i_change(&u->items, itype, -1);
+                return 0;
             }
         }
         else {
