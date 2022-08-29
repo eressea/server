@@ -14,11 +14,18 @@ local function ponnuki_brain(u)
     local i = math.random(#jokes)
     u:add_order("BOTSCHAFT REGION \"" .. jokes[i] .. "\"")
     eressea.log.info("Ponnuki is telling jokes in " .. tostring(u.region))
-    local d = math.random(6)
-    local r = u.region:next(d-1)
-    if r.terrain == 'glacier' then
-        u:add_order("NACH " .. directions[d])
-        eressea.log.info("Ponnuki is walking to " .. tostring(r))
+    local glaciers = {}
+    for i = 0, 5 do
+        local r = u.region:next(i)
+        if r.terrain == 'glacier' then
+            table.insert(glaciers, {r = r, d = i + 1})
+        end
+    end
+    if #glaciers > 0 then
+        local i = math.random(1, #glaciers)
+        local g = glaciers[i]
+        u:add_order("NACH " .. directions[g.d])
+        eressea.log.info("Ponnuki is walking to " .. tostring(g.r))
     end
 end
 
