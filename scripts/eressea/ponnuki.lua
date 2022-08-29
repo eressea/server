@@ -18,14 +18,16 @@ local function ponnuki_brain(u)
     for i = 0, 5 do
         local r = u.region:next(i)
         if r.terrain == 'glacier' then
-            table.insert(glaciers, {r = r, d = i + 1})
+            table.insert(glaciers, i + 1)
         end
     end
     if #glaciers > 0 then
         local i = math.random(1, #glaciers)
-        local g = glaciers[i]
-        u:add_order("NACH " .. directions[g.d])
-        eressea.log.info("Ponnuki is walking to " .. tostring(g.r))
+        local d = glaciers[i]
+        u:add_order("NACH " .. directions[d])
+        local r = u.region:next(d - 1)
+        print(tostring(u), tostring(r))
+        eressea.log.info("Ponnuki is walking to " .. tostring(r))
     end
 end
 
