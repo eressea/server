@@ -6,7 +6,10 @@ local jokes = {
     "Ein Bummerang ist, wenn man ihn wegwirft und er kommt nicht wieder, dann war's keiner.",
     "Merke: Mit Schwabenwitzen soll man ganz sparsam sein.",
     "Was bekommt man, wenn man Katzen und Elfen kreuzt? Elfen ohne Rheuma.",
-    "Was bekommt man, wenn man Insekten und Katzen kreuzt? Tiger, die Crisan benutzen."
+    "Was bekommt man, wenn man Insekten und Katzen kreuzt? Tiger, die Crisan benutzen.",
+    'Ein Skelett kommt in eine Kneipe und sagt: "Ein Bier und einen Lappen!"',
+    'Der Tod ist ein bleibender Schaden.',
+    'Was macht ein Insekt auf einer Eisscholle? - Frieren.'
 }
 
 local function ponnuki_brain(u)
