@@ -1165,6 +1165,10 @@ static void test_name_building(CuTest *tc) {
     building_setname(u->building, "Home");
     building_set_owner(ux);
     name_cmd(u, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error148"));
+    test_clear_messages(f);
+    building_set_owner(u);
+    name_cmd(u, ord);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "error148"));
     CuAssertStrEquals(tc, "Hodor", u->building->name);
     test_clear_messages(f);
@@ -1328,13 +1332,14 @@ static void test_name_cmd(CuTest *tc) {
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
     free_order(ord);
-    
+
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_BUILDING]));
     u_set_building(u, test_create_building(u->region, NULL));
+    building_set_owner(u);
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
     free_order(ord);
-    
+
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", LOC(f->locale, parameters[P_REGION]));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->region->land->name);
@@ -1357,6 +1362,28 @@ static void test_name_foreign_cmd(CuTest *tc) {
     test_setup();
     u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     b = test_create_building(u->region, NULL);
+    u->thisorder = create_order(K_NAME, f->locale, "%s %s %s Hodor",
+        LOC(f->locale, parameters[P_FOREIGN]),
+        LOC(f->locale, parameters[P_BUILDING]),
+        itoa36(b->no));
+    name_cmd(u, u->thisorder);
+    CuAssertStrEquals(tc, "Hodor", b->name);
+    test_teardown();
+}
+
+static void test_name_foreign_owned_cmd(CuTest *tc) {
+    building *b;
+    faction *f, *f2;
+    region *r;
+    unit *u, *u2;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(f2 = test_create_faction(), r);
+    b = test_create_building(u->region, NULL);
+    u2->building = b;
+    building_set_owner(u2);
+
     u->thisorder = create_order(K_NAME, f->locale, "%s %s %s Hodor",
         LOC(f->locale, parameters[P_FOREIGN]),
         LOC(f->locale, parameters[P_BUILDING]),
@@ -2451,6 +2478,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
     SUITE_ADD_TEST(suite, test_name_foreign_cmd);
+    SUITE_ADD_TEST(suite, test_name_foreign_owned_cmd);
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
