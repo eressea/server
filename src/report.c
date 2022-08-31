@@ -1623,6 +1623,7 @@ static void report_guards(struct stream *out, const region * r, const faction * 
         sbs_init(&sbs, buf, sizeof(buf));
         sbs_strcat(&sbs, LOC(see->locale, "nr_guarding_prefix"));
 
+        newline(out);
         for (i = 0; i != nextguard + (anonymous ? 1 : 0); ++i) {
             if (i != 0) {
                 if (i == nextguard - (anonymous ? 0 : 1)) {
@@ -1641,7 +1642,6 @@ static void report_guards(struct stream *out, const region * r, const faction * 
             pump_paragraph(&sbs, out, REPORTWIDTH, false);
         }
         sbs_strcat(&sbs, LOC(see->locale, "nr_guarding_postfix"));
-        newline(out);
         pump_paragraph(&sbs, out, REPORTWIDTH, true);
     }
 }
