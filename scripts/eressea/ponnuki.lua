@@ -29,7 +29,6 @@ local function ponnuki_brain(u)
         local d = glaciers[i]
         u:add_order("NACH " .. directions[d])
         local r = u.region:next(d - 1)
-        print(tostring(u), tostring(r))
         eressea.log.info("Ponnuki is walking to " .. tostring(r))
     end
 end
