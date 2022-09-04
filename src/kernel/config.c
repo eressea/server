@@ -204,12 +204,6 @@ int create_directories(void) {
     return err;
 }
 
-double get_param_flt(const struct param *p, const char *key, double def)
-{
-    const char *str = p ? get_param(p, key) : NULL;
-    return str ? atof(str) : def;
-}
-
 void kernel_done(void)
 {
     /* calling this function releases memory assigned to static variables, etc.
@@ -285,7 +279,7 @@ int rule_give(void)
     return rule;
 }
 
-static struct param *configuration;
+static struct params *configuration;
 static int config_cache_key = 1;
 
 bool config_changed(int *cache_key) {
@@ -298,7 +292,7 @@ bool config_changed(int *cache_key) {
 }
 
 #define MAXKEYS 16
-void config_set_from(const dictionary *d, const char *valid_keys[])
+void config_set_from(const struct _dictionary_ *d, const char *valid_keys[])
 {
     int s, nsec = iniparser_getnsec(d);
     for (s=0;s!=nsec;++s) {
@@ -344,33 +338,33 @@ void config_set_from(const dictionary *d, const char *valid_keys[])
 void config_set(const char *key, const char *value)
 {
     ++config_cache_key;
-    set_param(&configuration, key, value);
+    params_set(&configuration, key, value);
 }
 
 void config_set_int(const char *key, int value)
 {
     ++config_cache_key;
-    set_param(&configuration, key, itoa10(value));
+    params_set(&configuration, key, itoa10(value));
 }
 
 const char *config_get(const char *key) {
-    return get_param(configuration, key);
+    return params_get(configuration, key);
 }
 
 int config_get_int(const char *key, int def) {
-    return get_param_int(configuration, key, def);
+    return params_get_int(configuration, key, def);
 }
 
 double config_get_flt(const char *key, double def) {
-    return get_param_flt(configuration, key, def);
+    return params_get_flt(configuration, key, def);
 }
 
 bool config_token(const char *key, const char *tok) {
-    return !!check_param(configuration, key, tok);
+    return !!params_check(configuration, key, tok);
 }
 
 void free_config(void) {
-    free_params(&configuration);
+    params_free(&configuration);
     ++config_cache_key;
 }
 
@@ -408,9 +402,10 @@ void free_ids(void)
     free(forbidden_ids);
     forbidden_ids = NULL;
 }
-typedef struct param {
+
+typedef struct params {
     critbit_tree cb;
-} param;
+} params;
 
 size_t pack_keyval(const char* key, const char* value, char* data, size_t len) {
     size_t klen = strlen(key);
@@ -421,14 +416,14 @@ size_t pack_keyval(const char* key, const char* value, char* data, size_t len) {
     return klen + vlen + 2;
 }
 
-void set_param(struct param** p, const char* key, const char* value)
+void params_set(struct params** p, const char* key, const char* value)
 {
-    struct param* par;
+    struct params* par;
     assert(p);
 
     par = *p;
     if (!par && value) {
-        *p = par = calloc(1, sizeof(param));
+        *p = par = calloc(1, sizeof(struct params));
         if (!par) abort();
     }
     if (par) {
@@ -447,8 +442,8 @@ void set_param(struct param** p, const char* key, const char* value)
     }
 }
 
-void free_params(struct param** pp) {
-    param* p = *pp;
+void params_free(struct params** pp) {
+    params* p = *pp;
     if (p) {
         cb_clear(&p->cb);
         free(p);
@@ -456,7 +451,7 @@ void free_params(struct param** pp) {
     *pp = 0;
 }
 
-const char* get_param(const struct param* p, const char* key)
+const char* params_get(const struct params* p, const char* key)
 {
     void* match;
     if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
@@ -466,16 +461,16 @@ const char* get_param(const struct param* p, const char* key)
     return NULL;
 }
 
-int get_param_int(const struct param* p, const char* key, int def)
+int params_get_int(const struct params* p, const char* key, int def)
 {
-    const char* str = get_param(p, key);
+    const char* str = params_get(p, key);
     return str ? atoi(str) : def;
 }
 
-int check_param(const struct param* p, const char* key, const char* searchvalue)
+int params_check(const struct params* p, const char* key, const char* searchvalue)
 {
     int result = 0;
-    const char* value = get_param(p, key);
+    const char* value = params_get(p, key);
     char* v, * p_value;
     if (!value) {
         return 0;
@@ -492,4 +487,10 @@ int check_param(const struct param* p, const char* key, const char* searchvalue)
     }
     free(p_value);
     return result;
+}
+
+double params_get_flt(const struct params* p, const char* key, double def)
+{
+    const char* str = p ? params_get(p, key) : NULL;
+    return str ? atof(str) : def;
 }

@@ -58,44 +58,44 @@ static void test_read_unitid(CuTest *tc) {
 
 static void test_get_set_param(CuTest * tc)
 {
-    struct param *par = NULL;
+    struct params *par = NULL;
     test_setup();
-    CuAssertStrEquals(tc, NULL, get_param(par, "foo"));
-    set_param(&par, "foo", "bar");
-    set_param(&par, "bar", "foo");
-    CuAssertStrEquals(tc, "bar", get_param(par, "foo"));
-    CuAssertStrEquals(tc, "foo", get_param(par, "bar"));
-    set_param(&par, "bar", "bar");
-    CuAssertStrEquals(tc, "bar", get_param(par, "bar"));
-    set_param(&par, "bar", NULL);
-    CuAssertPtrEquals(tc, NULL, (void *)get_param(par, "bar"));
-    free_params(&par);
+    CuAssertStrEquals(tc, NULL, params_get(par, "foo"));
+    params_set(&par, "foo", "bar");
+    params_set(&par, "bar", "foo");
+    CuAssertStrEquals(tc, "bar", params_get(par, "foo"));
+    CuAssertStrEquals(tc, "foo", params_get(par, "bar"));
+    params_set(&par, "bar", "bar");
+    CuAssertStrEquals(tc, "bar", params_get(par, "bar"));
+    params_set(&par, "bar", NULL);
+    CuAssertPtrEquals(tc, NULL, (void *)params_get(par, "bar"));
+    params_free(&par);
     test_teardown();
 }
 
 static void test_param_int(CuTest * tc)
 {
-    struct param *par = NULL;
+    struct params *par = NULL;
     test_setup();
-    CuAssertIntEquals(tc, 13, get_param_int(par, "foo", 13));
-    set_param(&par, "foo", "23");
-    set_param(&par, "bar", "42");
-    CuAssertIntEquals(tc, 23, get_param_int(par, "foo", 0));
-    CuAssertIntEquals(tc, 42, get_param_int(par, "bar", 0));
-    free_params(&par);
+    CuAssertIntEquals(tc, 13, params_get_int(par, "foo", 13));
+    params_set(&par, "foo", "23");
+    params_set(&par, "bar", "42");
+    CuAssertIntEquals(tc, 23, params_get_int(par, "foo", 0));
+    CuAssertIntEquals(tc, 42, params_get_int(par, "bar", 0));
+    params_free(&par);
     test_teardown();
 }
 
 static void test_param_flt(CuTest * tc)
 {
-    struct param *par = NULL;
+    struct params *par = NULL;
     test_setup();
-    CuAssertDblEquals(tc, 13, get_param_flt(par, "foo", 13), 0.01);
-    set_param(&par, "foo", "23.0");
-    set_param(&par, "bar", "42.0");
-    CuAssertDblEquals(tc, 23.0, get_param_flt(par, "foo", 0.0), 0.01);
-    CuAssertDblEquals(tc, 42.0, get_param_flt(par, "bar", 0.0), 0.01);
-    free_params(&par);
+    CuAssertDblEquals(tc, 13, params_get_flt(par, "foo", 13), 0.01);
+    params_set(&par, "foo", "23.0");
+    params_set(&par, "bar", "42.0");
+    CuAssertDblEquals(tc, 23.0, params_get_flt(par, "foo", 0.0), 0.01);
+    CuAssertDblEquals(tc, 42.0, params_get_flt(par, "bar", 0.0), 0.01);
+    params_free(&par);
     test_teardown();
 }
 
