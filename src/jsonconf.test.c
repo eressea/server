@@ -19,6 +19,7 @@
 
 #include "util/keyword.h"
 #include "util/language.h"
+#include "util/param.h"
 #include "util/variant.h"     // for frac_equal, frac_one
 
 #include "kernel/calendar.h"
@@ -625,6 +626,30 @@ static void test_keywords(CuTest * tc)
     test_teardown();
 }
 
+static void test_parameters(CuTest * tc)
+{
+    const char * data = "{\"parameters\": { \"de\" : { \"EINHEIT\" : \"EINHEIT\", \"PARTEI\" : [ \"ERESSEA\", \"PARTEI\" ] }}}";
+    const struct locale * lang;
+
+    cJSON *json = cJSON_Parse(data);
+
+    test_setup();
+    lang = get_or_create_locale("de");
+    CuAssertPtrNotNull(tc, json);
+    CuAssertIntEquals(tc, NOPARAM, get_param("potato", lang));
+
+    json_config(json);
+    CuAssertIntEquals(tc, P_UNIT, get_param("einheit", lang));
+    CuAssertIntEquals(tc, P_FACTION, get_param("eressea", lang));
+    CuAssertIntEquals(tc, P_FACTION, get_param("partei", lang));
+
+    CuAssertStrEquals(tc, "ERESSEA", LOC(lang, "PARTEI"));
+    CuAssertStrEquals(tc, "EINHEIT", LOC(lang, "EINHEIT"));
+
+    cJSON_Delete(json);
+    test_teardown();
+}
+
 static void test_strings(CuTest * tc)
 {
     const char * data = "{\"strings\": { \"de\" : { \"move\" : \"NACH\", \"study\" : \"LERNEN\" }}}";
@@ -671,6 +696,7 @@ CuSuite *get_jsonconf_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_keywords);
+    SUITE_ADD_TEST(suite, test_parameters);
     SUITE_ADD_TEST(suite, test_skills);
     SUITE_ADD_TEST(suite, test_directions);
     SUITE_ADD_TEST(suite, test_items);

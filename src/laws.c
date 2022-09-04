@@ -120,7 +120,7 @@
 
 param_t findparam_ex(const char *s, const struct locale * lang)
 {
-    param_t result = findparam(s, lang);
+    param_t result = get_param(s, lang);
 
     if (result == NOPARAM) {
         const building_type *btype = findbuildingtype(s, lang);
@@ -1023,7 +1023,7 @@ int quit_cmd(unit * u, struct order *ord)
             param_t p;
             const char * s = gettoken(token, sizeof(token));
             if (s) {
-                p = findparam(s, f->locale);
+                p = get_param(s, f->locale);
                 if (p != P_FACTION) {
                     log_error("faction %s: QUIT FACTION syntax error.", factionname(f));
                     cmistake(u, ord, 209, MSG_EVENT);
@@ -1421,7 +1421,7 @@ int ally_cmd(unit * u, struct order *ord)
         keyword = P_ANY;
     }
     else {
-        keyword = findparam(s, u->faction->locale);
+        keyword = get_param(s, u->faction->locale);
     }
 
     sfp = &u->faction->allies;
@@ -2483,7 +2483,7 @@ int status_cmd(unit * u, struct order *ord)
 
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
-    switch (findparam(s, u->faction->locale)) {
+    switch (get_param(s, u->faction->locale)) {
     case P_NOT:
         unit_setstatus(u, ST_AVOID);
         break;
@@ -2533,13 +2533,13 @@ int combatspell_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* KAMPFZAUBER [NICHT] loescht alle gesetzten Kampfzauber */
-    if (!s || *s == 0 || findparam(s, u->faction->locale) == P_NOT) {
+    if (!s || *s == 0 || get_param(s, u->faction->locale) == P_NOT) {
         unset_combatspell(u, 0);
         return 0;
     }
 
     /* Optional: STUFE n */
-    if (findparam(s, u->faction->locale) == P_LEVEL) {
+    if (get_param(s, u->faction->locale) == P_LEVEL) {
         /* Merken, setzen kommt erst spaeter */
         level = getuint();
         s = gettoken(token, sizeof(token));
@@ -2553,7 +2553,7 @@ int combatspell_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (findparam(s, u->faction->locale) == P_NOT) {
+    if (get_param(s, u->faction->locale) == P_NOT) {
         /* KAMPFZAUBER "<Spruchname>" NICHT  loescht diesen speziellen
          * Kampfzauber */
         unset_combatspell(u, sp);

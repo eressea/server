@@ -87,7 +87,7 @@ int contact_cmd(unit * u, order * ord)
 
     init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
-    p = findparam(str, u->faction->locale);
+    p = get_param(str, u->faction->locale);
     if (p == P_FACTION) {
         /* new-style syntax, KONTAKTIERE PARTEI foo */
         faction * f = getfaction();

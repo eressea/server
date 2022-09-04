@@ -9,6 +9,7 @@
 #include "helpers.h"
 #include "laws.h"
 #include "magic.h"
+#include "orderfile.h"
 #include "reports.h"
 #include "summary.h"
 #include "teleport.h"
@@ -50,6 +51,7 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/order_parser.h>        // for OP_Parser, OrderParserStruct
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -853,6 +855,23 @@ static int lua_rng_default(lua_State *L) {
     return 0;
 }
 
+static int tolua_parse_orders(lua_State* L)
+{
+    const char* input = tolua_tostring(L, 1, NULL);
+    if (input) {
+        parser_state state = { NULL };
+        OP_Parser parser = parser_create(&state);
+        if (parser) {
+            int err;
+            err = parser_parse(parser, input, strlen(input), true);
+            parser_free(parser);
+            lua_pushinteger(L, err);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int tolua_bindings_open(lua_State * L, const dictionary *inifile)
 {
     tolua_open(L);
@@ -872,6 +891,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
     tolua_module(L, NULL, 0);
     tolua_beginmodule(L, NULL);
     {
+        tolua_function(L, "parse_orders", tolua_parse_orders);
         tolua_module(L, "rng", 1);
         tolua_beginmodule(L, "rng");
         {

@@ -40,6 +40,8 @@
 #define UFL_GUARD         (1<<27)
 #define UFL_GROUP         (1<<28)
 
+#define UFL_ORDERS        (1<<29)       /* Einheit hat Befehle bekommen */
+
     /* Flags, die gespeichert werden sollen: */
 #define UFL_SAVEMASK (UFL_MOVED|UFL_NOAID|UFL_ANON_FACTION|UFL_LOCKED|UFL_HUNGER|UFL_TAKEALL|UFL_GUARD|UFL_STEALTH|UFL_GROUP|UFL_HERO)
 

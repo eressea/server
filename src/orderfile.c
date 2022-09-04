@@ -20,11 +20,12 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if (!u->defaults) {
-        u->defaults = u->orders;
+    if (u->flags & UFL_ORDERS) {
+        free_orders(&u->orders);
     }
     else {
-        free_orders(&u->orders);
+        u->flags |= UFL_ORDERS;
+        u->defaults = u->orders;
     }
     u->orders = NULL;
 }
@@ -77,7 +78,7 @@ static void handle_order(void *userData, const char *str) {
     input = str;
     tok = parse_token(&input, buffer, sizeof(buffer));
     if (tok) {
-        param_t p = findparam(tok, lang);
+        param_t p = get_param(tok, lang);
         if (p == P_FACTION || p == P_GAMENAME) {
             tok = parse_token(&input, buffer, sizeof(buffer));
             if (tok) {

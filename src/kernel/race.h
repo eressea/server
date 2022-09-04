@@ -27,7 +27,7 @@ extern "C" {
 
 #define PERSON_WEIGHT 1000      /* weight of a "normal" human unit */
 
-    struct param;
+    struct params;
     struct spell;
     struct spellref;
     struct locale;

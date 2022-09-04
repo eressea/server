@@ -57,19 +57,13 @@ typedef enum param_t {
 extern const char* parameters[MAXPARAMS];
 
 struct locale;
-struct param;
 
-param_t findparam(const char* s, const struct locale* lang);
+param_t findparam(const char* s);
+param_t get_param(const char* s, const struct locale* lang);
 param_t findparam_block(const char* s, const struct locale* lang, bool any_locale);
 bool isparam(const char* s, const struct locale* lang, param_t param);
 param_t getparam(const struct locale* lang);
-void init_parameters(struct locale* lang);
-
-void set_param(struct param** p, const char* key, const char* value);
-const char* get_param(const struct param* p, const char* key);
-int get_param_int(const struct param* p, const char* key, int def);
-int check_param(const struct param* p, const char* key, const char* searchvalue);
-double get_param_flt(const struct param* p, const char* key, double def);
-void free_params(struct param** pp);
+void init_parameter(const struct locale* lang, param_t p, const char* str);
+void init_parameters(const struct locale* lang);
 
 #endif

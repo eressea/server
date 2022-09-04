@@ -1099,7 +1099,7 @@ int make_cmd(unit * u, struct order *ord)
             m = INT_MAX;
         }
         if (s) {
-            p = findparam(s, u->faction->locale);
+            p = get_param(s, u->faction->locale);
         }
     }
 
@@ -1696,7 +1696,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     assert(kwd == K_SELL);
     s = gettoken(token, sizeof(token));
 
-    if (findparam(s, u->faction->locale) == P_ANY) {
+    if (get_param(s, u->faction->locale) == P_ANY) {
         unlimited = false;
         n = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
@@ -1994,7 +1994,7 @@ static void breed_cmd(unit * u, struct order *ord)
         p = P_ANY;
     }
     else {
-        p = findparam(s, u->faction->locale);
+        p = get_param(s, u->faction->locale);
     }
 
     switch (p) {

@@ -62,7 +62,18 @@ const char *parameters[MAXPARAMS] = {
     "AUTO"
 };
 
-param_t findparam(const char *s, const struct locale * lang)
+param_t findparam(const char* s)
+{
+    int i;
+    for (i = 0; i != MAXPARAMS; ++i) {
+        if (parameters[i] && (strcmp(s, parameters[i]) == 0)) {
+            return (param_t)i;
+        }
+    }
+    return NOPARAM;
+}
+
+param_t get_param(const char *s, const struct locale * lang)
 {
     param_t result = NOPARAM;
     char buffer[64];
@@ -93,12 +104,12 @@ param_t findparam_block(const char *s, const struct locale *lang, bool any_local
     if (!s || s[0] == '@') {
         return NOPARAM;
     }
-    p = findparam(s, lang);
+    p = get_param(s, lang);
     if (any_locale && p == NOPARAM) {
         const struct locale *loc;
         for (loc = locales; loc; loc = nextlocale(loc)) {
             if (loc != lang) {
-                p = findparam(s, loc);
+                p = get_param(s, loc);
                 if (p == P_FACTION || p == P_GAMENAME) {
                     break;
                 }
@@ -113,7 +124,7 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
     assert(param != P_GEBAEUDE);
     assert(param != P_BUILDING);
     if (s && s[0] > '@') {
-        param_t p = findparam(s, lang);
+        param_t p = get_param(s, lang);
         return p == param;
     }
     return false;
@@ -123,7 +134,7 @@ param_t getparam(const struct locale * lang)
 {
     char token[64];
     const char *s = gettoken(token, sizeof(token));
-    return s ? findparam(s, lang) : NOPARAM;
+    return s ? get_param(s, lang) : NOPARAM;
 }
 
 static const char * parameter_key(int i)
@@ -132,92 +143,12 @@ static const char * parameter_key(int i)
     return parameters[i];
 }
 
-void init_parameters(struct locale *lang) {
+void init_parameter(const struct locale* lang, param_t p, const char* str) {
+    void** tokens = get_translations(lang, UT_PARAMS);
+    struct critbit_tree** cb = (critbit_tree**)tokens;
+    add_translation(cb, str, (int)p);
+}
+
+void init_parameters(const struct locale *lang) {
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
-}
-
-typedef struct param {
-    critbit_tree cb;
-} param;
-
-size_t pack_keyval(const char* key, const char* value, char* data, size_t len) {
-    size_t klen = strlen(key);
-    size_t vlen = strlen(value);
-    assert(klen + vlen + 2 + sizeof(vlen) <= len);
-    memcpy(data, key, klen + 1);
-    memcpy(data + klen + 1, value, vlen + 1);
-    return klen + vlen + 2;
-}
-
-void set_param(struct param** p, const char* key, const char* value)
-{
-    struct param* par;
-    assert(p);
-
-    par = *p;
-    if (!par && value) {
-        *p = par = calloc(1, sizeof(param));
-        if (!par) abort();
-    }
-    if (par) {
-        void* match;
-        size_t klen = strlen(key) + 1;
-        if (cb_find_prefix(&par->cb, key, klen, &match, 1, 0) > 0) {
-            const char* kv = (const char*)match;
-            size_t vlen = strlen(kv + klen) + 1;
-            cb_erase(&par->cb, kv, klen + vlen);
-        }
-    }
-    if (value) {
-        char data[512];
-        size_t sz = pack_keyval(key, value, data, sizeof(data));
-        cb_insert(&par->cb, data, sz);
-    }
-}
-
-void free_params(struct param** pp) {
-    param* p = *pp;
-    if (p) {
-        cb_clear(&p->cb);
-        free(p);
-    }
-    *pp = 0;
-}
-
-const char* get_param(const struct param* p, const char* key)
-{
-    void* match;
-    if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
-        cb_get_kv_ex(match, &match);
-        return (const char*)match;
-    }
-    return NULL;
-}
-
-int get_param_int(const struct param* p, const char* key, int def)
-{
-    const char* str = get_param(p, key);
-    return str ? atoi(str) : def;
-}
-
-int check_param(const struct param* p, const char* key, const char* searchvalue)
-{
-    int result = 0;
-    const char* value = get_param(p, key);
-    char* v, * p_value;
-    if (!value) {
-        return 0;
-    }
-    p_value = str_strdup(value);
-    v = strtok(p_value, " ,;");
-
-    while (v != NULL) {
-        if (strcmp(v, searchvalue) == 0) {
-            result = 1;
-            break;
-        }
-        v = strtok(NULL, " ,;");
-    }
-    free(p_value);
-    return result;
 }

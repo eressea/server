@@ -29,6 +29,7 @@
 #include "util/log.h"
 #include "util/message.h"
 #include "util/nrmessage.h"
+#include "util/param.h"
 #include "util/path.h"
 #include "util/pofile.h"
 #include "util/strings.h"
@@ -920,6 +921,38 @@ static void json_keyword(cJSON *json, struct locale *lang) {
     }
 }
 
+static void json_parameter(cJSON* json, struct locale* lang) {
+    cJSON* child;
+    if (json->type != cJSON_Object) {
+        log_error("parameters for locale `%s` not a json object: %d", locale_name(lang), json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        param_t p = findparam(child->string);
+        if (p != NOPARAM && parameters[p]) {
+            if (child->type == cJSON_String) {
+                init_parameter(lang, p, child->valuestring);
+                locale_setstring(lang, parameters[p], child->valuestring);
+            }
+            else if (child->type == cJSON_Array) {
+                cJSON* entry;
+                for (entry = child->child; entry; entry = entry->next) {
+                    init_parameter(lang, p, entry->valuestring);
+                    if (entry == child->child) {
+                        locale_setstring(lang, parameters[p], entry->valuestring);
+                    }
+                }
+            }
+            else {
+                log_error("invalid type %d for parameter `%s`", child->type, child->string);
+            }
+        }
+        else {
+            log_error("unknown parameter `%s` for locale `%s`", child->string, locale_name(lang));
+        }
+    }
+}
+
 static void json_skills(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
@@ -941,6 +974,18 @@ static void json_keywords(cJSON *json) {
     for (child = json->child; child; child = child->next) {
         struct locale * lang = get_locale(child->string);
         json_keyword(child, lang);
+    }
+}
+
+static void json_parameters(cJSON *json) {
+    cJSON *child;
+    if (json->type != cJSON_Object) {
+        log_error("parameters is not a json object: %d", json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        struct locale * lang = get_locale(child->string);
+        json_parameter(child, lang);
     }
 }
 
@@ -1170,6 +1215,9 @@ void json_config(cJSON *json) {
         }
         else if (strcmp(child->string, "keywords") == 0) {
             json_keywords(child);
+        }
+        else if (strcmp(child->string, "parameters") == 0) {
+            json_parameters(child);
         }
         else if (strcmp(child->string, "settings") == 0) {
             json_settings(child);

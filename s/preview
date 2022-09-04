@@ -76,7 +76,7 @@ rm -rf reports
 mkdir -p reports
 
 SUPP="$SOURCE/share/debian-7_8.supp"
-SERVER="$SOURCE/Debug/eressea/eressea"
+SERVER="$SOURCE/build/eressea/eressea"
 VALGRIND=$(which valgrind)
 if [ ! -z $VALGRIND ]; then
 SERVER="$VALGRIND --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
