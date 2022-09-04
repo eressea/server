@@ -24,6 +24,12 @@ function setup()
                 "west" : "WESTEN"
             }
         },
+        "parameters" : {
+            "de" : {
+                "EINHEIT": "EINHEIT",
+                "PARTEI": "PARTEI"
+            }
+        },
         "keywords" : {
             "de" : {
                 "//" : "//",
@@ -195,4 +201,19 @@ function test_no_long_order()
     process_orders()
     assert_nil(u:get_order()) -- no long order
     assert_equal('@GIB 0 10 Silber', u.orders[1]) -- no new persistent orders given
+end
+
+-- https://bugs.eressea.de/view.php?id=2888
+function test_read_orders_twice()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    f.password = "passwort"
+    local u = unit.create(f, r, 1)
+    u.id = 7
+    u:add_order('ARBEITE')
+    local cmds = 'PARTEI ' .. itoa36(f.id) .. '"passwort"\nEINHEIT 7\nNACH O\nNAECHSTER\n'
+    parse_orders(cmds .. cmds)
+    process_orders()
+    assert_nil(u:get_order()) -- no long order
+    assert_equal('ARBEITE', u.orders[1]) -- no new persistent orders given
 end

@@ -20,11 +20,12 @@
 #include <string.h>
 
 static void begin_orders(unit *u) {
-    if (!u->defaults) {
-        u->defaults = u->orders;
+    if (u->flags & UFL_ORDERS) {
+        free_orders(&u->orders);
     }
     else {
-        free_orders(&u->orders);
+        u->flags |= UFL_ORDERS;
+        u->defaults = u->orders;
     }
     u->orders = NULL;
 }
