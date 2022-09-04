@@ -42,7 +42,7 @@ void do_sort(region *r)
 
                     init_order(ord, NULL);
                     s = gettoken(token, sizeof(token));
-                    p = findparam(s, u->faction->locale);
+                    p = get_param(s, u->faction->locale);
                     id = getid();
                     v = findunit(id);
 

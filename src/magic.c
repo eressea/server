@@ -2518,12 +2518,12 @@ static castorder *cast_cmd(unit * u, order * ord)
 
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
-    param = findparam(s, u->faction->locale);
+    param = get_param(s, u->faction->locale);
     /* fuer Syntax ' STUFE x REGION y z ' */
     if (param == P_LEVEL) {
         level = getint();
         s = gettoken(token, sizeof(token));
-        param = findparam(s, u->faction->locale);
+        param = get_param(s, u->faction->locale);
     }
     if (param == P_REGION) {
         int t_x = getint();
@@ -2540,7 +2540,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             return 0;
         }
         s = gettoken(token, sizeof(token));
-        param = findparam(s, u->faction->locale);
+        param = get_param(s, u->faction->locale);
     }
     /* fuer Syntax `REGION x y STUFE z` hier nach REGION nochmal pruefen */
     if (param == P_LEVEL) {

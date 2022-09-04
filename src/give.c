@@ -770,7 +770,7 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
         }
     }
     else {
-        param_t p = findparam(s, u->faction->locale);
+        param_t p = get_param(s, u->faction->locale);
         if (p == P_PERSON) {
             if (!(u_race(u)->ec_flags & ECF_GIVEPERSON)) {
                 ADDMSG(&u->faction->msgs,
@@ -835,7 +835,7 @@ void give_unit_cmd(unit* u, order* ord)
         cmistake(u, ord, 167, MSG_COMMERCE);
     }
     else {
-        param_t p = findparam(gettoken(token, sizeof(token)), u->faction->locale);
+        param_t p = get_param(gettoken(token, sizeof(token)), u->faction->locale);
         if (p == P_UNIT) {
             give_unit(u, u2, ord);
         }
@@ -861,7 +861,7 @@ param_t give_cmd(unit * u, order * ord)
     err = getunit(r, u->faction, &u2);
     s = gettoken(token, sizeof(token));
     n = s ? atoip(s) : 0;
-    p = (n > 0) ? NOPARAM : findparam(s, u->faction->locale);
+    p = (n > 0) ? NOPARAM : get_param(s, u->faction->locale);
 
     /* quick exit before any errors are generated: */
     if (p == P_UNIT || p == P_CONTROL) {
@@ -969,7 +969,7 @@ param_t give_cmd(unit * u, order * ord)
         cmistake(u, ord, 113, MSG_COMMERCE);
     }
     else {
-        p = findparam(s, u->faction->locale);
+        p = get_param(s, u->faction->locale);
         if (p == P_SHIP) {
             if (u->ship) {
                 message* msg;
@@ -1042,7 +1042,7 @@ static int reserve_i(unit* u, struct order* ord, int flags)
         s = gettoken(token, sizeof(token));
         count = s ? atoip(s) : 0;
         if (count == 0) {
-            p = findparam(s, u->faction->locale);
+            p = get_param(s, u->faction->locale);
             if (p == P_EACH) {
                 count = getint() * u->number;
             }

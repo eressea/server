@@ -77,7 +77,7 @@ static void handle_order(void *userData, const char *str) {
     input = str;
     tok = parse_token(&input, buffer, sizeof(buffer));
     if (tok) {
-        param_t p = findparam(tok, lang);
+        param_t p = get_param(tok, lang);
         if (p == P_FACTION || p == P_GAMENAME) {
             tok = parse_token(&input, buffer, sizeof(buffer));
             if (tok) {

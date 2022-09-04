@@ -105,13 +105,13 @@ static void test_parse_parameters(CuTest* tc) {
     locale_setstring(lang, parameters[P_NEXT], "NAECHSTER");
     locale_setstring(lang, parameters[P_EACH], "JE");
     init_locale(lang);
-    CuAssertIntEquals(tc, NOPARAM, findparam("N", lang));
-    CuAssertIntEquals(tc, NOPARAM, findparam("NA", lang));
-    CuAssertIntEquals(tc, P_NEXT, findparam("NAE", lang));
-    CuAssertIntEquals(tc, P_NEXT, findparam("NAECHSTER", lang));
-    CuAssertIntEquals(tc, NOPARAM, findparam("NAECHSTERSTER", lang));
-    CuAssertIntEquals(tc, P_EACH, findparam("JE", lang));
-    CuAssertIntEquals(tc, NOPARAM, findparam("J", lang));
+    CuAssertIntEquals(tc, NOPARAM, get_param("N", lang));
+    CuAssertIntEquals(tc, NOPARAM, get_param("NA", lang));
+    CuAssertIntEquals(tc, P_NEXT, get_param("NAE", lang));
+    CuAssertIntEquals(tc, P_NEXT, get_param("NAECHSTER", lang));
+    CuAssertIntEquals(tc, NOPARAM, get_param("NAECHSTERSTER", lang));
+    CuAssertIntEquals(tc, P_EACH, get_param("JE", lang));
+    CuAssertIntEquals(tc, NOPARAM, get_param("J", lang));
     test_teardown();
 }
 

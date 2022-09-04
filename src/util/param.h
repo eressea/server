@@ -58,10 +58,12 @@ extern const char* parameters[MAXPARAMS];
 
 struct locale;
 
-param_t findparam(const char* s, const struct locale* lang);
+param_t findparam(const char* s);
+param_t get_param(const char* s, const struct locale* lang);
 param_t findparam_block(const char* s, const struct locale* lang, bool any_locale);
 bool isparam(const char* s, const struct locale* lang, param_t param);
 param_t getparam(const struct locale* lang);
-void init_parameters(struct locale* lang);
+void init_parameter(const struct locale* lang, param_t p, const char* str);
+void init_parameters(const struct locale* lang);
 
 #endif

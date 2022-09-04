@@ -62,7 +62,18 @@ const char *parameters[MAXPARAMS] = {
     "AUTO"
 };
 
-param_t findparam(const char *s, const struct locale * lang)
+param_t findparam(const char* s)
+{
+    int i;
+    for (i = 0; i != MAXPARAMS; ++i) {
+        if (parameters[i] && (strcmp(s, parameters[i]) == 0)) {
+            return (param_t)i;
+        }
+    }
+    return NOPARAM;
+}
+
+param_t get_param(const char *s, const struct locale * lang)
 {
     param_t result = NOPARAM;
     char buffer[64];
@@ -93,12 +104,12 @@ param_t findparam_block(const char *s, const struct locale *lang, bool any_local
     if (!s || s[0] == '@') {
         return NOPARAM;
     }
-    p = findparam(s, lang);
+    p = get_param(s, lang);
     if (any_locale && p == NOPARAM) {
         const struct locale *loc;
         for (loc = locales; loc; loc = nextlocale(loc)) {
             if (loc != lang) {
-                p = findparam(s, loc);
+                p = get_param(s, loc);
                 if (p == P_FACTION || p == P_GAMENAME) {
                     break;
                 }
@@ -113,7 +124,7 @@ bool isparam(const char *s, const struct locale * lang, param_t param)
     assert(param != P_GEBAEUDE);
     assert(param != P_BUILDING);
     if (s && s[0] > '@') {
-        param_t p = findparam(s, lang);
+        param_t p = get_param(s, lang);
         return p == param;
     }
     return false;
@@ -123,7 +134,7 @@ param_t getparam(const struct locale * lang)
 {
     char token[64];
     const char *s = gettoken(token, sizeof(token));
-    return s ? findparam(s, lang) : NOPARAM;
+    return s ? get_param(s, lang) : NOPARAM;
 }
 
 static const char * parameter_key(int i)
@@ -132,6 +143,12 @@ static const char * parameter_key(int i)
     return parameters[i];
 }
 
-void init_parameters(struct locale *lang) {
+void init_parameter(const struct locale* lang, param_t p, const char* str) {
+    void** tokens = get_translations(lang, UT_PARAMS);
+    struct critbit_tree** cb = (critbit_tree**)tokens;
+    add_translation(cb, str, (int)p);
+}
+
+void init_parameters(const struct locale *lang) {
     init_translations(lang, UT_PARAMS, parameter_key, MAXPARAMS);
 }

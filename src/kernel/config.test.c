@@ -197,17 +197,17 @@ static void test_findparam(CuTest *tc) {
     test_setup();
     en = get_or_create_locale("en");
     locale_setstring(en, parameters[P_FACTION], "FACTION");
-    CuAssertIntEquals(tc, NOPARAM, findparam("FACTION", en));
+    CuAssertIntEquals(tc, NOPARAM, get_param("FACTION", en));
     init_parameters(en);
-    CuAssertIntEquals(tc, P_FACTION, findparam("FACTION", en));
+    CuAssertIntEquals(tc, P_FACTION, get_param("FACTION", en));
     de = get_or_create_locale("de");
     locale_setstring(de, parameters[P_FACTION], "PARTEI");
-    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", de));
+    CuAssertIntEquals(tc, NOPARAM, get_param("PARTEI", de));
     init_parameters(de);
-    CuAssertIntEquals(tc, P_FACTION, findparam("PARTEI", de));
-    CuAssertIntEquals(tc, NOPARAM, findparam("HODOR", de));
+    CuAssertIntEquals(tc, P_FACTION, get_param("PARTEI", de));
+    CuAssertIntEquals(tc, NOPARAM, get_param("HODOR", de));
 
-    CuAssertIntEquals(tc, NOPARAM, findparam("PARTEI", en));
+    CuAssertIntEquals(tc, NOPARAM, get_param("PARTEI", en));
     CuAssertIntEquals(tc, NOPARAM, findparam_block("HODOR", de, false));
     CuAssertIntEquals(tc, P_FACTION, findparam_block("PARTEI", de, true));
     CuAssertIntEquals(tc, NOPARAM, findparam_block("PARTEI", en, false));
