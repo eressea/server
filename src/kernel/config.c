@@ -35,7 +35,6 @@
 #include <util/lists.h>
 #include <util/macros.h>
 #include <util/message.h>
-#include <util/param.h>
 #include <util/parser.h>
 #include <util/path.h>
 #include <util/rand.h>
@@ -47,8 +46,9 @@
 #include "prefix.h"
 
 /* external libraries */
-#include <strings.h>
+#include <critbit.h>
 #include <iniparser.h>
+#include <strings.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -407,4 +407,89 @@ void free_ids(void)
 {
     free(forbidden_ids);
     forbidden_ids = NULL;
+}
+typedef struct param {
+    critbit_tree cb;
+} param;
+
+size_t pack_keyval(const char* key, const char* value, char* data, size_t len) {
+    size_t klen = strlen(key);
+    size_t vlen = strlen(value);
+    assert(klen + vlen + 2 + sizeof(vlen) <= len);
+    memcpy(data, key, klen + 1);
+    memcpy(data + klen + 1, value, vlen + 1);
+    return klen + vlen + 2;
+}
+
+void set_param(struct param** p, const char* key, const char* value)
+{
+    struct param* par;
+    assert(p);
+
+    par = *p;
+    if (!par && value) {
+        *p = par = calloc(1, sizeof(param));
+        if (!par) abort();
+    }
+    if (par) {
+        void* match;
+        size_t klen = strlen(key) + 1;
+        if (cb_find_prefix(&par->cb, key, klen, &match, 1, 0) > 0) {
+            const char* kv = (const char*)match;
+            size_t vlen = strlen(kv + klen) + 1;
+            cb_erase(&par->cb, kv, klen + vlen);
+        }
+    }
+    if (value) {
+        char data[512];
+        size_t sz = pack_keyval(key, value, data, sizeof(data));
+        cb_insert(&par->cb, data, sz);
+    }
+}
+
+void free_params(struct param** pp) {
+    param* p = *pp;
+    if (p) {
+        cb_clear(&p->cb);
+        free(p);
+    }
+    *pp = 0;
+}
+
+const char* get_param(const struct param* p, const char* key)
+{
+    void* match;
+    if (p && cb_find_prefix(&p->cb, key, strlen(key) + 1, &match, 1, 0) > 0) {
+        cb_get_kv_ex(match, &match);
+        return (const char*)match;
+    }
+    return NULL;
+}
+
+int get_param_int(const struct param* p, const char* key, int def)
+{
+    const char* str = get_param(p, key);
+    return str ? atoi(str) : def;
+}
+
+int check_param(const struct param* p, const char* key, const char* searchvalue)
+{
+    int result = 0;
+    const char* value = get_param(p, key);
+    char* v, * p_value;
+    if (!value) {
+        return 0;
+    }
+    p_value = str_strdup(value);
+    v = strtok(p_value, " ,;");
+
+    while (v != NULL) {
+        if (strcmp(v, searchvalue) == 0) {
+            result = 1;
+            break;
+        }
+        v = strtok(NULL, " ,;");
+    }
+    free(p_value);
+    return result;
 }

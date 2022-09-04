@@ -101,6 +101,16 @@ extern "C" {
     void free_config(void);
     void free_ids(void);
 
+    struct param;
+
+    void set_param(struct param** p, const char* key, const char* value);
+    const char* get_param(const struct param* p, const char* key);
+    int get_param_int(const struct param* p, const char* key, int def);
+    int check_param(const struct param* p, const char* key, const char* searchvalue);
+    double get_param_flt(const struct param* p, const char* key, double def);
+    void free_params(struct param** pp);
+
+
 #ifdef __cplusplus
 }
 #endif
