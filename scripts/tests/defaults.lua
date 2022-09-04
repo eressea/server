@@ -176,11 +176,23 @@ function test_no_persistent_order()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
-    u.name = 'Fiete'
     u:add_order('ARBEITE')
     u:add_order('// #call me maybe')
     u:set_orders('GIB 0 10 Silber')
     process_orders()
     assert_nil(u:get_order()) -- no long order
     assert_nil(u.orders) -- no new persistent orders given
+end
+
+-- https://bugs.eressea.de/view.php?id=2888
+function test_no_long_order()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order('ARBEITE')
+    u:add_order('// #call me maybe')
+    u:set_orders('@GIB 0 10 Silber')
+    process_orders()
+    assert_nil(u:get_order()) -- no long order
+    assert_equal('@GIB 0 10 Silber', u.orders[1]) -- no new persistent orders given
 end
