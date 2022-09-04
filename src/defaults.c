@@ -144,7 +144,6 @@ static void update_long_order(unit * u)
                                             ordp = &o->next;
                                         }
                                     }
-                                    // remove_long_orders(&u->defaults);
                                 }
                             }
                         }
@@ -180,6 +179,9 @@ static void update_long_order(unit * u)
                     }
                 }
             }
+        }
+        if (!u->thisorder) {
+            free_orders(&u->defaults);
         }
     }
 }

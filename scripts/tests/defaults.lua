@@ -113,6 +113,7 @@ function test_default()
     local u = unit.create(f, r, 1)
     u:set_orders('ARBEITE\nDEFAULT UNTERHALTE')
     process_orders()
+    assert_equal(1, #u.orders)
     assert_equal('ARBEITE', u:get_order())
     assert_equal("UNTERHALTE", u.orders[1])
 end
@@ -125,9 +126,11 @@ function test_default_move()
     u:add_order('@GIB 0 1 Silber')
     u:set_orders('DEFAULT "NACH OSTEN"\nARBEITE\n@GIB 0 2 Silber')
     process_orders()
+    assert_equal(2, #u.orders)
     assert_equal("NACH OSTEN", u.orders[1])
     assert_equal("@GIB 0 2 Silber", u.orders[2])
     process_orders()
+    assert_equal(1, #u.orders)
     assert_equal("@GIB 0 2 Silber", u.orders[1])
 end
 
@@ -150,10 +153,8 @@ function test_default_default()
     u:add_order('ARBEITE')
     u:set_orders('DEFAULT "DEFAULT UNTERHALTE"')
     process_orders()
-    assert_equal("ARBEITE", u.orders[1])
-    assert_equal("DEFAULT UNTERHALTE", u.orders[2])
-    assert_equal(2, #u.orders)
-    
+    assert_equal("DEFAULT UNTERHALTE", u.orders[1])
+    assert_equal(1, #u.orders)
 end
 
 function test_movement_does_not_replace_default()
@@ -168,4 +169,18 @@ function test_movement_does_not_replace_default()
     assert_equal("ARBEITE", u.orders[1])
     assert_equal("@BEWACHE", u.orders[2])
     assert_equal(r2, u.region)
+end
+
+-- https://bugs.eressea.de/view.php?id=2888
+function test_no_persistent_order()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u.name = 'Fiete'
+    u:add_order('ARBEITE')
+    u:add_order('// #call me maybe')
+    u:set_orders('GIB 0 10 Silber')
+    process_orders()
+    assert_nil(u:get_order()) -- no long order
+    assert_nil(u.orders) -- no new persistent orders given
 end
