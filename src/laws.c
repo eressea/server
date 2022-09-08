@@ -1721,7 +1721,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-static bool try_rename(unit *u, building *b, order *ord) {
+static bool can_rename_building(unit *u, building *b, order *ord) {
     unit *owner = b ? building_owner(b) : NULL;
     bool foreign = !(owner && owner->faction == u->faction);
 
@@ -1761,16 +1761,6 @@ static bool try_rename(unit *u, building *b, order *ord) {
     return true;
 }
 
-int
-rename_building(unit * u, order * ord, building * b, const char *name)
-{
-    assert(name);
-    if (!try_rename(u, b, ord)) {
-        return -1;
-    }
-    return rename_cmd(u, ord, &b->name, name);
-}
-
 int name_cmd(struct unit *u, struct order *ord)
 {
     char token[128];
@@ -1780,6 +1770,7 @@ int name_cmd(struct unit *u, struct order *ord)
     param_t p;
     bool foreign = false;
     const char *str;
+    const char* name = NULL;
 
     init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
@@ -1806,7 +1797,7 @@ int name_cmd(struct unit *u, struct order *ord)
         if (foreign) {
             b = getbuilding(u->region);
         }
-        if (try_rename(u, b, ord)) {
+        if (can_rename_building(u, b, ord)) {
             s = &b->name;
         }
         break;
@@ -1956,7 +1947,17 @@ int name_cmd(struct unit *u, struct order *ord)
     {
         group *g = get_group(u);
         if (g) {
-            s = &g->name;
+            name = getstrtoken();
+            if (name == NULL) {
+                cmistake(u, ord, 84, MSG_EVENT);
+                return 0;
+            }
+            if (find_groupbyname(u->faction, name)) {
+                cmistake(u, ord, 332, MSG_EVENT);
+            }
+            else {
+                s = &g->name;
+            }
             break;
         }
         else {
@@ -1971,12 +1972,14 @@ int name_cmd(struct unit *u, struct order *ord)
     }
 
     if (s != NULL) {
-        const char *name = getstrtoken();
-        if (name) {
-            rename_cmd(u, ord, s, name);
+        if (name == NULL) {
+            name = getstrtoken();
+        }
+        if (name == NULL) {
+            cmistake(u, ord, 84, MSG_EVENT);
         }
         else {
-            cmistake(u, ord, 84, MSG_EVENT);
+            rename_cmd(u, ord, s, name);
         }
     }
 

@@ -12,6 +12,7 @@
 #include <kernel/config.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
 #include <kernel/order.h>
@@ -56,6 +57,14 @@ static void test_new_building_can_be_renamed(CuTest * tc)
     test_teardown();
 }
 
+static void rename_building(unit* u, building* b, const char* name)
+{
+    const struct locale* lang = u->faction->locale;
+    order* ord = create_order(K_NAME, lang, "%s \"%s\"", LOC(lang, parameters[P_BUILDING]), name);
+    name_cmd(u, ord);
+    free_order(ord);
+}
+
 static void test_rename_building(CuTest * tc)
 {
     region *r;
@@ -73,7 +82,7 @@ static void test_rename_building(CuTest * tc)
     u = test_create_unit(f, r);
     u_set_building(u, b);
 
-    rename_building(u, NULL, b, "Villa Nagel");
+    rename_building(u, b, "Villa Nagel");
     CuAssertStrEquals(tc, "Villa Nagel", b->name);
     CuAssertTrue(tc, renamed_building(b));
     test_teardown();
@@ -96,10 +105,10 @@ static void test_rename_building_twice(CuTest * tc)
     u = test_create_unit(f, r);
     u_set_building(u, b);
 
-    rename_building(u, NULL, b, "Villa Nagel");
+    rename_building(u, b, "Villa Nagel");
     CuAssertStrEquals(tc, "Villa Nagel", b->name);
 
-    rename_building(u, NULL, b, "Villa Kunterbunt");
+    rename_building(u, b, "Villa Kunterbunt");
     CuAssertStrEquals(tc, "Villa Kunterbunt", b->name);
     test_teardown();
 }
@@ -1048,6 +1057,7 @@ static unit * setup_name_cmd(void) {
     test_setup();
     mt_create_error(84);
     mt_create_error(148);
+    mt_create_error(332);
     mt_create_error(12);
     mt_create_va(mt_new("renamed_building_seen", NULL), "renamer:unit", "region:region", "building:building", MT_NEW_END);
     mt_create_va(mt_new("renamed_building_notseen", NULL), "region:region", "building:building", MT_NEW_END);
@@ -1219,6 +1229,34 @@ static void test_name_ship(CuTest *tc) {
     name_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error84"));
     CuAssertStrEquals(tc, "Hodor", u->ship->name);
+
+    test_teardown();
+}
+
+static void test_name_group(CuTest *tc) {
+    faction* f;
+    unit *u1, *u2;
+    group *g1, *g2;
+
+    u1 = setup_name_cmd();
+    f = u1->faction;
+    set_group(u1, g1 = create_group(f, "Penner", 1));
+    u2 = test_create_unit(u1->faction, u1->region);
+    set_group(u2, g2 = create_group(f, "Helden", 2));
+
+    u1->thisorder = create_order(K_NAME, f->locale, "%s Deppen", LOC(f->locale, parameters[P_GROUP]));
+    name_cmd(u1, u1->thisorder);
+    CuAssertPtrEquals(tc, g1, get_group(u1));
+    CuAssertStrEquals(tc, "Deppen", g1->name);
+    CuAssertPtrEquals(tc, g2, get_group(u2));
+    free_order(u1->thisorder);
+
+    u1->thisorder = create_order(K_NAME, f->locale, "%s Helden", LOC(f->locale, parameters[P_GROUP]));
+    name_cmd(u1, u1->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "error332"));
+    CuAssertPtrEquals(tc, g1, get_group(u1));
+    CuAssertStrEquals(tc, "Deppen", g1->name);
+    CuAssertPtrEquals(tc, g2, get_group(u2));
 
     test_teardown();
 }
@@ -2459,6 +2497,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_name_region);
     SUITE_ADD_TEST(suite, test_name_building);
     SUITE_ADD_TEST(suite, test_name_ship);
+    SUITE_ADD_TEST(suite, test_name_group);
     SUITE_ADD_TEST(suite, test_ally_cmd_errors);
     SUITE_ADD_TEST(suite, test_new_building_can_be_renamed);
     SUITE_ADD_TEST(suite, test_password_cmd);

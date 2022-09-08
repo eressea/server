@@ -24,6 +24,7 @@ void set_group(struct unit *u, struct group *g);
 struct group * get_group(const struct unit *u);
 void free_group(struct group *g);
 struct group *create_group(struct faction * f, const char *name, int gid);
+struct group* find_groupbyname(struct faction* f, const char* name);
 
 void write_groups(struct gamedata *data, const struct faction *f);
 void read_groups(struct gamedata *data, struct faction *f);

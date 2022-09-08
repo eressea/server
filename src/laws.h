@@ -29,7 +29,6 @@ extern "C" {
         const char *s, struct unit *receiver);
 
     bool renamed_building(const struct building * b);
-    int rename_building(struct unit * u, struct order * ord, struct building * b, const char *name);
     void get_food(struct region * r);
 
     int enter_building(struct unit *u, struct order *ord, int id, bool report);

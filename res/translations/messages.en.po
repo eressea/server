@@ -2858,6 +2858,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ships can only 
 msgid "error331"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must be on board a ship.\""
 
+msgid "error332"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is already a group by this name.\""
+
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Missign number of $localize($resource,0).\""
 
