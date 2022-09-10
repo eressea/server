@@ -47,6 +47,33 @@ static void test_unit_orders(CuTest *tc) {
     test_teardown();
 }
 
+static void test_no_foreign_unit_orders(CuTest *tc) {
+    unit *u;
+    faction *f, *f2;
+    FILE *F = tmpfile();
+
+    test_setup();
+    f2 = test_create_faction();
+    f2->locale = test_create_locale();
+    f = test_create_faction();
+    f->locale = f2->locale;
+
+    u = test_create_unit(f2, test_create_plain(0, 0));
+    u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
+    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
+    fprintf(F, "%s %s %s\n",
+        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password");
+    fprintf(F, "%s %s\n",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
+    fprintf(F, "%s\n", keyword_name(K_WORK, f->locale));
+    rewind(F);
+    CuAssertIntEquals(tc, 0, parseorders(F));
+    CuAssertPtrEquals(tc, NULL, u->defaults);
+    CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->orders));
+    fclose(F);
+    test_teardown();
+}
+
 static void test_faction_password_okay(CuTest *tc) {
     faction *f;
     FILE *F;
@@ -91,6 +118,7 @@ CuSuite *get_orderfile_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unit_orders);
+    SUITE_ADD_TEST(suite, test_no_foreign_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);
 

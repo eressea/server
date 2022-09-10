@@ -16,7 +16,6 @@ extern "C"
         K_WORK,
         K_ATTACK,
         K_STEAL,
-        K_BESIEGE_UNUSED,
         K_NAME,
         K_USE,
         K_DISPLAY,
