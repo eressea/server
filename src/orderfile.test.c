@@ -119,6 +119,7 @@ CuSuite *get_orderfile_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unit_orders);
+    SUITE_ADD_TEST(suite, test_no_foreign_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);
 
