@@ -269,3 +269,20 @@ function test_defaults_make_temp()
     -- should get only the LERNE error:
     assert_equal('error65', f.messages[1])
 end
+
+function test_read_own_units_only()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local f2 = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:add_order("ARBEITE")
+    -- suppress NMR check:
+    f.flags = f.flags + 16777216
+    
+    f2.id = 7
+    u.id = 8
+    parse_orders("PARTEI 7 password\nEINHEIT 8\nUNTERHALTE\nNAECHSTER")
+
+    process_orders()
+    assert_equal("ARBEITE", u:get_order())
+end
