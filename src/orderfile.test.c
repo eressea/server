@@ -19,40 +19,43 @@
 
 #include <CuTest.h>
 #include <tests.h>
-
-#include <stdio.h>            // for fprintf, fclose, rewind, tmpfile, FILE
+#include <strings.h>
 
 static void test_unit_orders(CuTest *tc) {
     unit *u;
     faction *f;
-    FILE *F = tmpfile();
+    sbstring sbs;
+    char orders[256];
+    parser_state state = { NULL };
+    OP_Parser parser = parser_create(&state);
 
     test_setup();
+    sbs_init(&sbs, orders, sizeof(orders));
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     f->locale = test_create_locale();
     u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
-    fprintf(F, "%s %s %s\n",
-        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password");
-    fprintf(F, "%s %s\n",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
-    fprintf(F, "%s %s\n", keyword_name(K_MOVE, f->locale),
-        LOC(f->locale, shortdirections[D_WEST]));
-    rewind(F);
-    CuAssertIntEquals(tc, 0, parseorders(F));
+    sbs_printf(&sbs, "%s %s %s\n%s %s\n%s\n",
+        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no),
+        keyword_name(K_MOVE, f->locale));
+    CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
     CuAssertPtrNotNull(tc, u->orders);
     CuAssertIntEquals(tc, K_MOVE, getkeyword(u->orders));
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->defaults));
-    fclose(F);
     test_teardown();
 }
 
 static void test_no_foreign_unit_orders(CuTest *tc) {
     unit *u;
     faction *f, *f2;
-    FILE *F = tmpfile();
+    sbstring sbs;
+    char orders[256];
+    parser_state state = { NULL };
+    OP_Parser parser = parser_create(&state);
 
     test_setup();
+    sbs_init(&sbs, orders, sizeof(orders));
     f2 = test_create_faction();
     f2->locale = test_create_locale();
     f = test_create_faction();
@@ -61,16 +64,14 @@ static void test_no_foreign_unit_orders(CuTest *tc) {
     u = test_create_unit(f2, test_create_plain(0, 0));
     u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
-    fprintf(F, "%s %s %s\n",
-        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password");
-    fprintf(F, "%s %s\n",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
-    fprintf(F, "%s\n", keyword_name(K_WORK, f->locale));
-    rewind(F);
-    CuAssertIntEquals(tc, 0, parseorders(F));
+    sbs_printf(&sbs, "%s %s %s\n%s %s\n%s\n",
+        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no),
+        keyword_name(K_WORK, f->locale));
+    CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
     CuAssertPtrEquals(tc, NULL, u->defaults);
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->orders));
-    fclose(F);
+
     test_teardown();
 }
 
