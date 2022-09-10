@@ -58,7 +58,7 @@ static void handle_unit(void *userData, int no) {
     }
     else if (u->faction != state->f) {
         /* TODO: error message */
-        parser_set_unit(state, u);
+        parser_set_unit(state, NULL);
     }
     else {
         parser_set_unit(state, u);
