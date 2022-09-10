@@ -211,9 +211,10 @@ function test_read_orders_twice()
     local u = unit.create(f, r, 1)
     u.id = 7
     u:add_order('ARBEITE')
-    local cmds = 'PARTEI ' .. itoa36(f.id) .. '"passwort"\nEINHEIT 7\nNACH O\nNAECHSTER\n'
+    local cmds = 'PARTEI ' .. itoa36(f.id) .. '"passwort"\nEINHEIT 7\nUNTERHALTE\nNAECHSTER\n'
     parse_orders(cmds .. cmds)
     process_orders()
-    assert_nil(u:get_order()) -- no long order
-    assert_equal('ARBEITE', u.orders[1]) -- no new persistent orders given
+    assert_equal('ARBEITE', u:get_order())
+    assert_equal(1, #u.orders) -- no new persistent orders given
+    assert_equal('ARBEITE', u.orders[1])
 end
