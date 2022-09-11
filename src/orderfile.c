@@ -53,7 +53,9 @@ static void handle_unit(void *userData, int no) {
     unit * u = findunit(no);
 
     if (!u || u->faction != state->f) {
-        ADDMSG(&state->f->msgs, msg_message("unit_not_found", "unit", no));
+        if (state->f) {
+            ADDMSG(&state->f->msgs, msg_message("unit_not_found", "unit", no));
+        }
         parser_set_unit(state, NULL);
     }
     else {
