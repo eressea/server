@@ -2466,6 +2466,11 @@
       <arg name="password" type="string"/>
     </type>
   </message>
+  <message name="unit_not_found" section="events">
+    <type>
+      <arg name="unit" type="int"/>
+    </type>
+  </message>
   <message name="changepasswd" section="events">
     <type>
       <arg name="value" type="string"/>

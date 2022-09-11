@@ -792,6 +792,9 @@ msgstr "\"$unit($unit) entdeckte $unit($saboteur) beim Versenken von $ship($ship
 msgid "wrongpasswd"
 msgstr "\"Deine Befehle hatten ein falsches Passwort (${password}).\""
 
+msgid "unit_not_found"
+msgstr "\"EINHEIT $int36($unit): Diese Einheit gehört uns nicht.\""
+
 msgctxt "curseinfo"
 msgid "sparkle_9"
 msgstr "\"$unit($unit) bekommt von einer Schlange einen Apfel angeboten. ($int36($id))\""
