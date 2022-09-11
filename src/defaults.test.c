@@ -6,7 +6,6 @@
 #include <kernel/unit.h>
 
 #include <util/keyword.h>            // for K_NAME, K_WORK, K_MAKETEMP, K_BUY
-#include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 

@@ -51,7 +51,6 @@
 #include "util/base36.h"
 #include "util/goodies.h"
 #include "util/language.h"
-#include "util/lists.h"
 #include "util/log.h"
 #include "util/message.h"
 #include "util/param.h"
@@ -1467,7 +1466,8 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     o->unit = u;
     o->qty = n;
     o->type = ECON_BUY;
-    addlist(buyorders, o);
+    o->next = *buyorders;
+    *buyorders = o;
 }
 
 /* ------------------------------------------------------------- */
@@ -1798,7 +1798,8 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         o->qty = n;
         o->type = ECON_SELL;
         o->data.trade.ltype = ltype;
-        addlist(sellorders, o);
+        o->next = *sellorders;
+        *sellorders = o;
 
         return unlimited;
     }
@@ -2377,7 +2378,8 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
     o->qty = u->wants / TAXFRACTION;
     o->type = ECON_TAX;
     o->unit = u;
-    addlist(taxorders, o);
+    o->next = *taxorders;
+    *taxorders = o;
     return;
 }
 
@@ -2444,8 +2446,8 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     o->qty = u->wants / TAXFRACTION;
     o->type = ECON_LOOT;
     o->unit = u;
-    addlist(lootorders, o);
-
+    o->next = *lootorders;
+    *lootorders = o;
     return;
 }
 
