@@ -68,6 +68,7 @@ extern "C" {
     void destroy(struct region *r);
     void produce(struct region *r);
     void auto_work(struct region *r);
+    int max_luxuries_sold(const struct region* r);
     
     bool trade_needs_castle(const struct terrain_type *terrain, const struct race *rc);
 

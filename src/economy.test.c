@@ -431,6 +431,123 @@ static void test_trade_insect(CuTest *tc) {
     test_teardown();
 }
 
+static void test_buy_prices(CuTest* tc) {
+    region* r;
+    unit* u;
+    building* b;
+    const resource_type* rt_silver;
+    const item_type* it_luxury;
+    int sold, costs;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    it_luxury = r_luxury(r);
+    CuAssertIntEquals(tc, 0, r_demand(r, it_luxury->rtype->ltype));
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    sold = max_luxuries_sold(r);
+    costs = sold * it_luxury->rtype->ltype->price;
+    u = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, (1 + sold) / 5); /* could buy twice what is for sale here */
+    test_set_item(u, rt_silver->itype, costs * 2);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "%d %s", sold, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+
+    produce(r);
+
+    CuAssertIntEquals(tc, sold, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, costs, get_item(u, rt_silver->itype));
+    test_teardown();
+}
+
+static void test_buy_prices_split(CuTest* tc) {
+    region* r;
+    unit* u, *u2;
+    building* b;
+    const resource_type* rt_silver;
+    const item_type* it_luxury;
+    int sold, costs;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    it_luxury = r_luxury(r);
+    CuAssertIntEquals(tc, 0, r_demand(r, it_luxury->rtype->ltype));
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    sold = max_luxuries_sold(r);
+    costs = sold * it_luxury->rtype->ltype->price;
+    u = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, (1 + sold) / 5); /* could buy twice what is for sale here */
+    test_set_item(u, rt_silver->itype, costs * 2);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "%d %s", sold, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    u2 = test_create_unit(test_create_faction(), r);
+    set_level(u2, SK_TRADE, (1 + sold) / 5); /* could buy twice what is for sale here */
+    test_set_item(u2, rt_silver->itype, costs * 2);
+    unit_addorder(u2, create_order(K_BUY, u->faction->locale, "%d %s", sold, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+
+    produce(r);
+
+    CuAssertIntEquals(tc, sold, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, sold, get_item(u2, it_luxury));
+    CuAssertIntEquals(tc, costs, get_item(u, rt_silver->itype) + get_item(u2, rt_silver->itype));
+    test_teardown();
+}
+
+static void test_buy_prices_rising(CuTest* tc) {
+    region* r;
+    unit* u;
+    building* b;
+    const resource_type* rt_silver;
+    const item_type* it_luxury;
+    int sold, costs, price;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    it_luxury = r_luxury(r);
+    CuAssertIntEquals(tc, 0, r_demand(r, it_luxury->rtype->ltype));
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    u = test_create_unit(test_create_faction(), r);
+    sold = max_luxuries_sold(r);
+    set_level(u, SK_TRADE, (1 + sold) / 5); /* could buy twice what is for sale here */
+    price = it_luxury->rtype->ltype->price;
+    costs = sold * price;
+    test_set_item(u, rt_silver->itype, costs * 2);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "%d %s", sold + 1, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+
+    produce(r);
+
+    CuAssertIntEquals(tc, sold + 1, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, costs - 2 * price, get_item(u, rt_silver->itype));
+    test_teardown();
+}
+
 static void test_buy_cmd(CuTest *tc) {
     region * r;
     unit *u;
@@ -479,6 +596,42 @@ static void test_buy_cmd(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
+    test_teardown();
+}
+
+static void test_buy_twice(CuTest *tc) {
+    region * r;
+    unit *u;
+    building *b;
+    int price, sold;
+    const resource_type *rt_silver;
+    const item_type *it_luxury;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    init_terrains();
+
+    it_luxury = r_luxury(r);
+    price = it_luxury->rtype->ltype->price;
+    sold = max_luxuries_sold(r);
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+
+    u = test_create_unit(test_create_faction(), r);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "%d %s", sold, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "%d %s", sold, LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    set_level(u, SK_TRADE, (1 + sold) / 5);
+    test_set_item(u, rt_silver->itype, 1000);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    produce(r);
+    CuAssertIntEquals(tc, 2 * sold, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, 1000 - (price * sold * 3), get_item(u, rt_silver->itype));
     test_teardown();
 }
 
@@ -1105,6 +1258,10 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
+    SUITE_ADD_TEST(suite, test_buy_twice);
+    SUITE_ADD_TEST(suite, test_buy_prices);
+    SUITE_ADD_TEST(suite, test_buy_prices_split);
+    SUITE_ADD_TEST(suite, test_buy_prices_rising);
     SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);

@@ -1222,6 +1222,11 @@ const attrib_type at_luxuries = {
     "luxuries", NULL, free_luxuries, NULL, NULL, NULL
 };
 
+int max_luxuries_sold(const region* r)
+{
+    return rpeasants(r) / TRADE_FRACTION;
+}
+
 static void expandbuying(region * r, econ_request * buyorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
@@ -1251,7 +1256,7 @@ static void expandbuying(region * r, econ_request * buyorders)
      * counter ist ein Zaehler, der die gekauften Produkte zaehlt. money
      * wird fuer die debug message gebraucht. */
 
-    max_products = rpeasants(r) / TRADE_FRACTION;
+    max_products = max_luxuries_sold(r);
 
     /* Kauf - auch so programmiert, dass er leicht erweiterbar auf mehrere
      * Gueter pro Monat ist. j sind die Befehle, i der Index des

@@ -1042,7 +1042,7 @@ void setluxuries(region * r, const luxury_type * sale)
 
     if (r->land->demands) {
         freelist(r->land->demands);
-        r->land->demands = 0;
+        r->land->demands = NULL;
     }
 
     for (ltype = luxurytypes; ltype; ltype = ltype->next) {
