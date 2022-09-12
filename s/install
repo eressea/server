@@ -18,7 +18,7 @@ fi
 [ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
 [ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
 [ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-BIN_DIR="Debug"
+BIN_DIR="build"
 
 ROOT=$(git rev-parse --show-toplevel)
 cd $ROOT/$BIN_DIR

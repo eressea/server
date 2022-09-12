@@ -133,10 +133,9 @@ struct skill* unit_skill(const struct unit* u, enum skill_t id);
 bool has_skill(const unit* u, enum skill_t sk);
 int effskill(const struct unit* u, enum skill_t sk, const struct region* r);
 
-void set_level(struct unit* u, enum skill_t id, unsigned int level);
+void set_level(struct unit* u, enum skill_t sk, unsigned int value);
 unsigned int get_level(const struct unit* u, enum skill_t id);
 void transfermen(struct unit* src, struct unit* dst, int n);
-void clone_men(const struct unit* src, struct unit* dst, int n); /* like transfer, but do not subtract from src */
 
 int eff_skill(const struct unit* u, const struct skill* sv, const struct region* r);
 int effskill_study(const struct unit* u, enum skill_t sk);
