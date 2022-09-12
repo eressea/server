@@ -1428,7 +1428,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         /* flying races ignore min- and maxrow and can attack anyone fighting
          * them */
         minrow = FIGHT_ROW;
-        maxrow = BEHIND_ROW;
+        if (maxrow < BEHIND_ROW) maxrow = BEHIND_ROW;
     }
 
     if (minrow < FIGHT_ROW) minrow = FIGHT_ROW;
@@ -2420,7 +2420,7 @@ static int loot_quota(const unit * src, const unit * dst,
     return n;
 }
 
-static void loot_items(fighter * corpse)
+void loot_items(fighter * corpse)
 {
     unit *u = corpse->unit;
     item *itm = u->items;

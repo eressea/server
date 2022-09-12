@@ -238,4 +238,6 @@ void battle_message_faction(struct battle* b, struct faction* f, struct message*
 double tactics_chance(const struct unit* u, int skilldiff);
 int meffect_apply(struct meffect* me, int damage);
 
+void loot_items(fighter* corpse);
+
 #endif
