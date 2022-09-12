@@ -1,10 +1,12 @@
 #include "recruit.h"
 
+#include "kernel/config.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
 #include "util/keyword.h"    // for K_RECRUIT
@@ -302,6 +304,36 @@ static void test_recruit_mixed_race(CuTest* tc)
     test_teardown();
 }
 
+/**
+ * Recruiting new men into a unit dilutes its skills
+ */
+static void test_recruiting_dilutes_skills(CuTest* tc) {
+    unit* u;
+    region* r;
+    faction* f;
+    skill* sv;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+
+    u = test_create_unit(f, r);
+    set_level(u, SK_ALCHEMY, 4);
+
+    add_recruits(u, 9, 9, 9);
+    CuAssertIntEquals(tc, 10, u->number);
+    sv = unit_skill(u, SK_ALCHEMY);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+
+    scale_number(u, 1);
+    add_recruits(u, 9, 9, 9);
+    CuAssertPtrEquals(tc, NULL, unit_skill(u, SK_ALCHEMY));
+
+    test_teardown();
+}
+
 CuSuite* get_recruit_suite(void)
 {
     CuSuite* suite = CuSuiteNew();
@@ -312,5 +344,6 @@ CuSuite* get_recruit_suite(void)
     SUITE_ADD_TEST(suite, test_recruit_split);
     SUITE_ADD_TEST(suite, test_recruit_split_one_peasant);
     SUITE_ADD_TEST(suite, test_recruit_orcs_split_one_peasant);
+    SUITE_ADD_TEST(suite, test_recruiting_dilutes_skills);
     return suite;
 }

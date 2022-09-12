@@ -559,6 +559,25 @@ static void test_clone_men_bug_2386(CuTest *tc) {
     test_teardown();
 }
 
+static void test_clone_men_bug_2886(CuTest *tc) {
+    unit *u1, *u2;
+    region *r;
+    faction *f;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 1);
+    set_level(u1, SK_ALCHEMY, 1);
+    u2 = test_create_unit(f, r);
+    clone_men(u1, u2, 1);
+    CuAssertIntEquals(tc, 1, u1->number);
+    CuAssertIntEquals(tc, 2, u2->number);
+    CuAssertPtrEquals(tc, NULL, unit_skill(u2, SK_ALCHEMY));
+    test_teardown();
+}
+
 static void test_clone_men(CuTest *tc) {
     unit *u1, *u2;
     region *r;
@@ -870,6 +889,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_transfer_skills);
     SUITE_ADD_TEST(suite, test_transfer_skills_merge);
     SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
+    SUITE_ADD_TEST(suite, test_clone_men_bug_2886);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);

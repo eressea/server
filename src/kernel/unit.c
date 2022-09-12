@@ -797,6 +797,9 @@ void clone_men(const unit * u, unit * dst, int n)
                 sn->level = result.level;
                 sn->weeks = result.weeks;
             }
+            else if (sn) {
+                remove_skill(dst, sk);
+            }
         }
         clone_effects(u, dst);
         sh = leftship(u);
