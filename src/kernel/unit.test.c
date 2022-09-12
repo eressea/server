@@ -540,7 +540,7 @@ static void test_unlimited_units(CuTest *tc) {
     test_teardown();
 }
 
-static void test_clone_men_bug_2386(CuTest *tc) {
+static void test_transfermen_bug_2386(CuTest *tc) {
     unit *u1, *u2;
     region *r;
     faction *f;
@@ -553,13 +553,14 @@ static void test_clone_men_bug_2386(CuTest *tc) {
     u1->hp = 39 * u1->number;
     u2 = test_create_unit(f, r);
     scale_number(u2, 0);
-    clone_men(u1, u2, 8100);
+    transfermen(u1, u2, 8100);
+    CuAssertIntEquals(tc, 137, u1->number);
     CuAssertIntEquals(tc, 8100, u2->number);
     CuAssertIntEquals(tc, u2->number * 39, u2->hp);
     test_teardown();
 }
 
-static void test_clone_men_bug_2886(CuTest *tc) {
+static void test_transfermen_bug_2886(CuTest *tc) {
     unit *u1, *u2;
     region *r;
     faction *f;
@@ -568,17 +569,17 @@ static void test_clone_men_bug_2886(CuTest *tc) {
     r = test_create_plain(0, 0);
     f = test_create_faction();
     u1 = test_create_unit(f, r);
-    scale_number(u1, 1);
+    scale_number(u1, 2);
     set_level(u1, SK_ALCHEMY, 1);
     u2 = test_create_unit(f, r);
-    clone_men(u1, u2, 1);
+    transfermen(u1, u2, 1);
     CuAssertIntEquals(tc, 1, u1->number);
     CuAssertIntEquals(tc, 2, u2->number);
     CuAssertPtrEquals(tc, NULL, unit_skill(u2, SK_ALCHEMY));
     test_teardown();
 }
 
-static void test_clone_men(CuTest *tc) {
+static void test_transfermen(CuTest *tc) {
     unit *u1, *u2;
     region *r;
     faction *f;
@@ -594,9 +595,9 @@ static void test_clone_men(CuTest *tc) {
     CuAssertIntEquals(tc, 200, u1->hp);
     CuAssertIntEquals(tc, 0, u2->number);
     CuAssertIntEquals(tc, 0, u2->hp);
-    clone_men(u1, u2, 1);
-    CuAssertIntEquals(tc, 10, u1->number);
-    CuAssertIntEquals(tc, 200, u1->hp);
+    transfermen(u1, u2, 1);
+    CuAssertIntEquals(tc, 9, u1->number);
+    CuAssertIntEquals(tc, 180, u1->hp);
     CuAssertIntEquals(tc, 1, u2->number);
     CuAssertIntEquals(tc, 20, u2->hp);
     test_teardown();
@@ -884,12 +885,12 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name);
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
-    SUITE_ADD_TEST(suite, test_clone_men);
+    SUITE_ADD_TEST(suite, test_transfermen);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
     SUITE_ADD_TEST(suite, test_transfer_skills_merge);
-    SUITE_ADD_TEST(suite, test_clone_men_bug_2386);
-    SUITE_ADD_TEST(suite, test_clone_men_bug_2886);
+    SUITE_ADD_TEST(suite, test_transfermen_bug_2386);
+    SUITE_ADD_TEST(suite, test_transfermen_bug_2886);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);

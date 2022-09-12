@@ -561,7 +561,7 @@ unsigned int get_level(const unit * u, enum skill_t id)
     return 0;
 }
 
-void set_level(unit * u, enum skill_t sk, unsigned int value)
+void set_level(struct unit * u, enum skill_t sk, unsigned int value)
 {
     size_t s, len;
 
@@ -767,7 +767,7 @@ void move_unit(unit * u, region * r, unit ** ulist)
 /* ist mist, aber wegen nicht skalierender attribute notwendig: */
 #include "alchemy.h"
 
-void clone_men(const unit * u, unit * dst, int n)
+void transfermen(unit* u, unit* dst, int n)
 {
     region *r = u->region;
 
@@ -824,11 +824,6 @@ void clone_men(const unit * u, unit * dst, int n)
             rsetpeasants(r, p);
         }
     }
-}
-
-void transfermen(unit * u, unit * dst, int n)
-{
-    clone_men(u, dst, n);
     scale_number(u, u->number - n);
 }
 
