@@ -6,6 +6,7 @@
 #include "kernel/order.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
+#include "kernel/skill.h"    // for SK_ALCHEMY
 #include "kernel/skills.h"
 #include "kernel/unit.h"
 

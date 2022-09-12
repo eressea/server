@@ -3,8 +3,6 @@
 #endif
 #include "orderfile.h"
 
-#include "direction.h"
-
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
@@ -14,12 +12,16 @@
 #include <util/keyword.h>
 #include <util/language.h>
 #include <util/message.h>
+#include <util/order_parser.h>  // for OP_Parser, OrderParserStruct
 #include <util/param.h>
 #include <util/password.h>
 
 #include <CuTest.h>
 #include <tests.h>
 #include <strings.h>
+
+#include <stdbool.h>            // for true
+#include <stdio.h>              // for NULL, fclose, fprintf, rewind, tmpfile
 
 static void test_unit_orders(CuTest *tc) {
     unit *u;
