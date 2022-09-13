@@ -667,7 +667,13 @@ static void bufunit_race(const faction* f, const unit* u, struct sbstring* sbp)
     const struct locale* lang = f->locale;
     const char *str = get_racename(u->attribs);
     if (str) {
-        const char* name = locale_string(lang, mkname("race", str), false);
+        char buffer[64];
+        const char* name;
+        if (u->number != 1) {
+            snprintf(buffer, sizeof(buffer), "%s_p", str);
+            str = buffer;
+        }
+        name = locale_string(lang, mkname("race", str), false);
         sbs_strcat(sbp, name ? name : str);
         if (u->faction == f) {
             sbs_strcat(sbp, " (");

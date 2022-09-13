@@ -363,6 +363,56 @@ static void test_bufunit(CuTest *tc) {
     test_teardown();
 }
 
+static void test_bufunit_racename_plural(CuTest *tc) {
+    unit *u;
+    faction *f;
+    race *rc, *rct;
+    struct locale *lang;
+    char buffer[256];
+
+    test_setup();
+    rc = rc_get_or_create("human");
+    rct = rc_get_or_create("orc");
+    rc->bonus[SK_ALCHEMY] = 1;
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "race::orc", "Ork");
+    locale_setstring(lang, "race::orc_p", "Orks");
+    locale_setstring(lang, "race::human", "Mensch");
+    locale_setstring(lang, "race::human_p", "Menschen");
+    locale_setstring(lang, "status_aggressive", "aggressiv");
+    init_skills(lang);
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    u->faction->locale = f->locale = lang;
+    renumber_faction(u->faction, 7);
+    faction_setname(u->faction, "UFO");
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 1 Mensch.", buffer);
+
+    scale_number(u, 2);
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 2 Menschen.", buffer);
+
+    unit_convert_race(u, rct, "human");
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 2 Menschen.", buffer);
+
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 2 Menschen (Orks), aggressiv.", buffer);
+
+    scale_number(u, 1);
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 1 Mensch.", buffer);
+
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 Mensch (Ork), aggressiv.", buffer);
+
+    test_teardown();
+}
+
 static void test_arg_resources(CuTest *tc) {
     variant v1, v2;
     arg_type *atype;
@@ -1103,6 +1153,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
+    SUITE_ADD_TEST(suite, test_bufunit_racename_plural);
     SUITE_ADD_TEST(suite, test_bufunit_bullets);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_bufunit_help_stealth);
