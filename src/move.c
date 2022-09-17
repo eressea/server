@@ -1223,11 +1223,6 @@ static void init_movement(void)
                 if (getunit(r, u->faction, &ut) != GET_UNIT || ut->region != u->region) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", NULL));
-                    continue;
-                }
-                if (!cansee(u->faction, r, ut, 0)) {
-                    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-                        "feedback_unit_not_found", NULL));
                 }
                 else if (!is_transporting(ut, u)) {
                     cmistake(u, u->thisorder, 286, MSG_MOVE);
