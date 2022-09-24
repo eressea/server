@@ -96,6 +96,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(xerewards);
     /* kernel */
     ADD_SUITE(alliance);
+    ADD_SUITE(alchemy);
     ADD_SUITE(ally);
     ADD_SUITE(building);
     ADD_SUITE(command);

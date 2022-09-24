@@ -774,11 +774,13 @@ void transfermen(unit* u, unit* dst, int n)
     if (n == 0)
         return;
     assert(n > 0);
+    assert(u != dst);
     /* "hat attackiert"-status wird uebergeben */
 
     if (dst) {
         enum skill_t sk;
         ship *sh;
+        int delta;
 
         assert(dst->number + n > 0);
 
@@ -801,7 +803,6 @@ void transfermen(unit* u, unit* dst, int n)
                 remove_skill(dst, sk);
             }
         }
-        clone_effects(u, dst);
         sh = leftship(u);
         if (sh != NULL)
             set_leftship(dst, sh);
@@ -810,21 +811,27 @@ void transfermen(unit* u, unit* dst, int n)
                 UFL_ENTER);
         if (u->attribs) {
             transfer_curse(u, dst, n);
+            transfer_effects(u, dst, n);
         }
+        delta = (long long)u->hp * n / u->number;
+        dst->hp += delta;
+        u->hp -= delta;
         set_number(dst, dst->number + n);
-        dst->hp += (long long)u->hp * n / u->number;
+        set_number(u, u->number - n);
         assert(dst->hp >= dst->number);
-        clone_effects(u, dst);
+        assert(u->hp >= u->number);
     }
-    else if (r->land) {
-        if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
-            const race *rc = u_race(u);
-            int p = rpeasants(r);
-            p += (n / rc->recruit_multi);
-            rsetpeasants(r, p);
+    else {
+        scale_number(u, u->number - n);
+        if (r->land) {
+            if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
+                const race* rc = u_race(u);
+                int p = rpeasants(r);
+                p += (n / rc->recruit_multi);
+                rsetpeasants(r, p);
+            }
         }
     }
-    scale_number(u, u->number - n);
 }
 
 struct building *inside_building(const struct unit *u)
@@ -1552,6 +1559,7 @@ void scale_number(unit * u, int n)
             scale_effects(u->attribs, n, u->number);
         }
         else {
+            a_removeall(&u->attribs, &at_effect);
             u->hp = 0;
         }
     }

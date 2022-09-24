@@ -273,13 +273,16 @@ bool display_potions(struct unit *u)
     return (c > 0);
 }
 
-void clone_effects(const unit* u, unit* dst)
+void transfer_effects(const unit* u, unit* dst, int n)
 {
     attrib * a = a_find(u->attribs, &at_effect);
     while (a && a->type == &at_effect) {
         effect_data* olde = (effect_data*)a->data.v;
-        if (olde->value)
-            change_effect(dst, olde->type, olde->value);
+        if (olde->value) {
+            int delta = (long long)olde->value * n / u->number;
+            olde->value -= delta;
+            change_effect(dst, olde->type, delta);
+        }
         a = a->next;
     }
 }
