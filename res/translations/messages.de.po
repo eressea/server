@@ -2613,7 +2613,7 @@ msgid "error84"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Name angegeben.\""
 
 msgid "spellfail_noexpensives"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat unaufkündbare Bindungen an seine alte Partei.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat unaufkündbare Bindungen an ihre alte Partei.\""
 
 msgid "error287"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin können wir die Einheit nicht transportieren.\""

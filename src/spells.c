@@ -3780,7 +3780,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     /* niemand mit teurem Talent */
-    if (has_limited_skills(target)) {
+    if (has_limited_skills(target) || is_familiar(target)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_noexpensives", "target", target));
         return 0;
