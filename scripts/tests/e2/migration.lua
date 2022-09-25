@@ -41,6 +41,26 @@ function test_migration_success()
     assert_equal(8, u.aura_max)
 end
 
+function test_migration_no_familiars()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create('human')
+    local u = setup_mage(f, r)
+    local f2 = faction.create('human')
+    local u2 = setup_mage(f2, r)
+    local u3 = unit.create(f2, r)
+    u3.race = 'goblin'
+    u2.familiar = u3
+    u.name = 'Kappa'
+    u3:add_order('KONTAKTIERE ' .. itoa36(u.id))
+    u:add_order('ZAUBERE STUFE 1 "Ritual der Aufnahme" ' .. itoa36(u3.id))
+    u.aura = 9
+    u.aura_max = 9
+    process_orders()
+    assert_not_equal(f, u3.faction)
+    assert_equal(9, u.aura)
+    assert_equal(9, u.aura_max)
+end
+
 function test_migration_no_contact()
     local r = region.create(0, 0, "plain")
     local f = faction.create('human')
