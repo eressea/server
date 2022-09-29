@@ -70,21 +70,19 @@ void terraform_resources(region * r)
 {
     int i;
     const terrain_type *terrain = r->terrain;
-    bool terraform_all = config_get_int("rules.terraform.all", 0) != 0;
 
-    if (terrain->production == NULL)
+    if (terrain->production == NULL) {
         return;
+    }
+    if (r->resources != NULL) {
+        arrfree(r->resources);
+    }
     for (i = 0; terrain->production[i].type; ++i) {
         
         const terrain_production *production = terrain->production + i;
         const resource_type *rtype = production->type;
 
-        if (rm_get(r, rtype))
-        {
-            continue;
-        }
-
-        if (terraform_all || chance(production->chance)) {
+        if (chance(production->chance)) {
             rawmaterial_type *raw;
             rawmaterial* rm = add_resource(r, dice_rand(production->startlevel),
                 dice_rand(production->base), dice_rand(production->divisor),

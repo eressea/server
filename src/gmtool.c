@@ -462,28 +462,6 @@ static void statusline(WINDOW * win, const char *str)
     wnoutrefresh(win);
 }
 
-static void reset_resources(region *r, const struct terrain_type *terrain)
-{
-    int i;
-
-    for (i = 0; terrain->production[i].type; ++i) {
-        const terrain_production *production = terrain->production + i;
-        const resource_type *rtype = production->type;
-        rawmaterial* rm = rm_get(r, rtype);
-        if (rm) {
-            struct rawmaterial_type *rmt;
-            set_resource(rm,
-                dice_rand(production->startlevel),
-                dice_rand(production->base),
-                dice_rand(production->divisor));
-            rmt = rmt_get(rtype);
-            if (rmt && rmt->terraform) {
-                rmt->terraform(rm, r);
-            }
-        }
-    }
-}
-
 static void reset_region(region *r) {
     unit **up = &r->units;
     bool players = false;
@@ -509,7 +487,7 @@ static void reset_region(region *r) {
         }
         if (r->land) {
             init_region(r);
-            reset_resources(r, r->terrain);
+            terraform_resources(r);
         }
     }
 }
