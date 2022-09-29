@@ -26,7 +26,6 @@
 #include <util/lists.h>
 #include <util/macros.h>
 #include "util/path.h"
-#include "util/rand.h"
 #include "util/rng.h"
 
 #include "gmtool_structs.h"

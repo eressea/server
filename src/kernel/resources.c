@@ -80,7 +80,6 @@ void terraform_resources(region * r)
     for (i = 0; terrain->production[i].type; ++i) {
         
         const terrain_production *production = terrain->production + i;
-        const resource_type *rtype = production->type;
 
         if (chance(production->chance)) {
             rawmaterial_type *raw;
