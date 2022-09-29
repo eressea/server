@@ -510,7 +510,7 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
         }
     }
     if (mode >= seen_travel) {
-        rawmaterial *res = r->resources;
+        ptrdiff_t i, len = arrlen(r->resources);
         int money = rmoney(r);
         int horses = rhorses(r);
         if (money) {
@@ -521,7 +521,8 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
             report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
             ++n;
         }
-        while (res) {
+        for (i = 0; i != len ; ++i) {
+            rawmaterial* res = r->resources + i;
             const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
             skill_t skill = itype->construction->skill;
@@ -554,7 +555,6 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
                     ++n;
                 }
             }
-            res = res->next;
         }
     }
     return n;

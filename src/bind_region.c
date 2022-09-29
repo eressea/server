@@ -349,12 +349,10 @@ static int tolua_region_get_resourcelevel(lua_State * L)
     const char *type = tolua_tostring(L, 2, NULL);
     const resource_type *rtype = rt_find(type);
     if (rtype != NULL) {
-        const rawmaterial *rm;
-        for (rm = r->resources; rm; rm = rm->next) {
-            if (rm->rtype == rtype) {
-                lua_pushinteger(L, rm->level);
-                return 1;
-            }
+        const rawmaterial *rm = rm_get(r, rtype);
+        if (rm != NULL) {
+            lua_pushinteger(L, rm->level);
+            return 1;
         }
     }
     return 0;

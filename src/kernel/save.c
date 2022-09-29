@@ -745,7 +745,6 @@ static region *readregion(gamedata *data, int x, int y)
     }
     if (r->land) {
         int i;
-        rawmaterial **pres = &r->resources;
 
         if (data->version >= LANDDISPLAY_VERSION) {
             read_regioninfo(data, r, info, sizeof(info));
@@ -772,22 +771,21 @@ static region *readregion(gamedata *data, int x, int y)
 
         READ_INT(data->store, &i);
         rsethorses(r, i);
-        assert(*pres == NULL);
+
         for (;;) {
             rawmaterial *res;
+            const resource_type* rtype;
             READ_STR(data->store, name, sizeof(name));
             if (strcmp(name, "end") == 0)
                 break;
-            res = malloc(sizeof(rawmaterial));
-            if (!res) abort();
-            res->rtype = rt_find(name);
-            if (!res->rtype && strncmp("rm_", name, 3) == 0) {
-                res->rtype = rt_find(name + 3);
+            rtype = rt_find(name);
+            if (!rtype && strncmp("rm_", name, 3) == 0) {
+                rtype = rt_find(name + 3);
             }
-            if (!res->rtype || !res->rtype->raw) {
+            if (!rtype || !rtype->raw) {
                 log_error("invalid resourcetype %s in data.", name);
             }
-            assert(res->rtype);
+            res = add_resource(r, 0, 0, 0, rtype);
             READ_INT(data->store, &n);
             res->level = n;
             READ_INT(data->store, &n);
@@ -800,11 +798,7 @@ static region *readregion(gamedata *data, int x, int y)
             res->base = n;
             READ_INT(data->store, &n);
             res->divisor = n;
-
-            *pres = res;
-            pres = &res->next;
         }
-        *pres = NULL;
 
         READ_STR(data->store, name, sizeof(name));
         if (strcmp(name, "noherb") != 0) {
@@ -903,7 +897,7 @@ void writeregion(gamedata *data, const region * r)
     if (r->land) {
         const item_type *rht;
         struct demand *demand;
-        rawmaterial *res = r->resources;
+        ptrdiff_t i, len = arrlen(r->resources);
 
         WRITE_STR(data->store, (const char *)r->land->name);
         WRITE_STR(data->store, region_getinfo(r));
@@ -915,14 +909,14 @@ void writeregion(gamedata *data, const region * r)
         WRITE_INT(data->store, rtrees(r, 2));
         WRITE_INT(data->store, rhorses(r));
 
-        while (res) {
+        for (i = 0; i != len; ++i) {
+            rawmaterial* res = r->resources + i;
             WRITE_TOK(data->store, res->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);
             WRITE_INT(data->store, res->base);
             WRITE_INT(data->store, res->divisor);
-            res = res->next;
         }
         WRITE_TOK(data->store, "end");
 

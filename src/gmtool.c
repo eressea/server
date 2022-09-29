@@ -35,6 +35,7 @@
 #include "teleport.h"
 
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -466,14 +467,9 @@ static void reset_resources(region *r, const struct terrain_type *terrain)
     int i;
 
     for (i = 0; terrain->production[i].type; ++i) {
-        rawmaterial *rm;
         const terrain_production *production = terrain->production + i;
         const resource_type *rtype = production->type;
-
-        for (rm = r->resources; rm; rm = rm->next) {
-            if (rm->rtype == rtype)
-                break;
-        }
+        rawmaterial* rm = rm_get(r, rtype);
         if (rm) {
             struct rawmaterial_type *rmt;
             set_resource(rm,
@@ -618,9 +614,10 @@ static void selection_walk(selection * selected, void(*callback)(region *, void 
 }
 
 static void reset_levels_cb(region *r, void *udata) {
-    struct rawmaterial *res;
+    ptrdiff_t i, len = arrlen(r->resources);
     UNUSED_ARG(udata);
-    for (res = r->resources; res; res = res->next) {
+    for (i = 0; i != len; ++i) {
+        struct rawmaterial* res = r->resources + i;
         if (res->level > 3) {
             res->level = 1;
         }
