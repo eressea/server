@@ -652,44 +652,40 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
     }
 }
 
-static void fix_resource_levels(region *r) {
-    struct terrain_production *p;
+static void fix_resource_values(region* r)
+{
+    struct terrain_production* p;
     for (p = r->terrain->production; p->type; ++p) {
-        char *end;
-        long start = (int)strtol(p->startlevel, &end, 10);
-        if (*end == '\0') {
-            rawmaterial *res;
-            for (res = r->resources; res; res = res->next) {
-                if (p->type == res->rtype) {
-                    if (start != res->startlevel) {
-                        log_debug("setting resource start level for %s in %s to %d",
-                            res->rtype->_name, regionname(r, NULL), start);
-                        res->startlevel = start;
-                    }
+        rawmaterial* res = rm_get(r, p->type);
+        if (res) {
+            char* end;
+            int val;
+
+            val = (int)strtol(p->startlevel, &end, 10);
+            if (*end == '\0') {
+                if (val != res->startlevel) {
+                    log_debug("setting resource start level for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->startlevel = val;
+                }
+            }
+            val = (int)strtol(p->base, &end, 10);
+            if (*end == '\0') {
+                if (val != res->base) {
+                    log_debug("setting resource base for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->base = val;
+                }
+            }
+            val = (int)strtol(p->divisor, &end, 10);
+            if (*end == '\0') {
+                if (val != res->divisor) {
+                    log_debug("setting resource divisor for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->divisor = val;
                 }
             }
         }
-    }
-}
-
-static void fix_resource_bases(region *r) {
-    struct terrain_production *p;
-    for (p = r->terrain->production; p->type; ++p) {
-        char *end;
-        long base = (int)strtol(p->base, &end, 10);
-        if (*end == '\0') {
-            rawmaterial *res;
-            for (res = r->resources; res; res = res->next) {
-                if (p->type == res->rtype) {
-                    if (base != res->base) {
-                        log_debug("setting resource base for %s in %s to %d",
-                            res->rtype->_name, regionname(r, NULL), base);
-                        res->base = base;
-                    }
-                }
-            }
-        }
-
     }
 }
 
@@ -868,13 +864,9 @@ static region *readregion(gamedata *data, int x, int y)
     read_attribs(data, &r->attribs, r);
 
     if (r->resources) {
-        if (data->version < FIX_STARTLEVEL_VERSION) {
+        if (data->version < FIX_RESOURCES) {
             /* we had some badly made rawmaterials before this */
-            fix_resource_levels(r);
-        }
-        if (data->version < FIX_RES_BASE_VERSION) {
-            /* we had some badly made rawmaterials before this */
-            fix_resource_bases(r);
+            fix_resource_values(r);
         }
     }
     return r;
