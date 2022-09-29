@@ -92,7 +92,7 @@ static void recruit_init(void)
 
 void free_requests(recruit_request** requests)
 {
-    size_t i, len = arrlen(requests);
+    ptrdiff_t i, len = arrlen(requests);
     for (i = 0; i != len; ++i) {
         free(requests[i]);
     }
@@ -101,7 +101,7 @@ void free_requests(recruit_request** requests)
 
 void free_recruitments(recruitment ** recruits)
 {
-    size_t i, len = arrlen(recruits);
+    ptrdiff_t i, len = arrlen(recruits);
     for (i = 0; i != len; ++i) {
         free(recruits[i]);
     }
@@ -115,7 +115,7 @@ static recruitment **select_recruitment(recruit_request ** requests,
     int(*quantify) (const struct race *, int), int *total)
 {
     recruitment **recruits = NULL;
-    size_t ui, len = arrlen(requests);
+    ptrdiff_t ui, len = arrlen(requests);
 
     for (ui = 0; ui != len; ++ui) {
         recruit_request *ro = requests[ui];
@@ -126,7 +126,7 @@ static recruitment **select_recruitment(recruit_request ** requests,
 
             if (qty > 0) {
                 recruitment* rec = NULL;
-                size_t i, len = arrlen(recruits);
+                ptrdiff_t i, len = arrlen(recruits);
                 for (i = 0; i != len; ++i) {
                     if (recruits[i]->f == u->faction) {
                         rec = recruits[i];
@@ -197,7 +197,7 @@ static int any_recruiters(const struct race *rc, int qty)
 static int do_recruiting(recruitment ** recruits, int available)
 {
     int recruited = 0, tipjar = 0;
-    size_t i, len = arrlen(recruits);
+    ptrdiff_t i, len = arrlen(recruits);
 
     /* try to assign recruits to factions fairly */
     while (available > 0) {
@@ -244,7 +244,7 @@ static int do_recruiting(recruitment ** recruits, int available)
     for (i = 0; i != len; ++i) {
         recruitment* rec = recruits[i];
         int get = rec->assigned;
-        size_t ui, len = arrlen(rec->requests);
+        ptrdiff_t ui, len = arrlen(rec->requests);
         for (ui = 0; ui != len; ++ui) {
             recruit_request* req = rec->requests[ui];
             unit *u = req->unit;

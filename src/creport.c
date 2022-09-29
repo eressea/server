@@ -849,7 +849,7 @@ void cr_output_unit(stream *out, const faction * f,
         const char *c;
         int i;
         struct sc_mage *mage;
-        size_t s, len;
+        ptrdiff_t s, len;
 
         i = ualias(u);
         if (i > 0)

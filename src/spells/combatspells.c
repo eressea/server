@@ -422,7 +422,7 @@ int sp_speed(struct castorder * co)
 static skill_t random_skill(unit * u, bool weighted)
 {
     int n = 0;
-    size_t s, len = arrlen(u->skills);
+    ptrdiff_t s, len = arrlen(u->skills);
 
     for (s = 0; s != len; ++s) {
         skill* sv = u->skills + s;

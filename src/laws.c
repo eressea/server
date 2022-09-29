@@ -177,7 +177,7 @@ static bool RemoveNMRNewbie(void)
 static void dumbeffect(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
-        size_t s, n = arrlen(u->skills);
+        ptrdiff_t s, n = arrlen(u->skills);
         skill *sb = NULL;
         for (s = 0; s != n; ++s) {
             skill* sv = u->skills + s;
@@ -952,7 +952,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
     for (u = fdst->units; u != NULL; u = u->nextF) {
         if (u->skills) {
-            size_t s, len = arrlen(u->skills);
+            ptrdiff_t s, len = arrlen(u->skills);
             for (s = 0; s != len; ++s) {
                 skill_t sk = (skill_t)u->skills[s].id;
                 skill_count[sk] += u->number;
@@ -985,7 +985,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                 }
 
                 if (u->skills) {
-                    size_t s, len = arrlen(u->skills);
+                    ptrdiff_t s, len = arrlen(u->skills);
                     for (s = 0; s != len; ++s) {
                         const skill *sv = u->skills + s;
                         skill_t sk = (skill_t)sv->id;

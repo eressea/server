@@ -925,12 +925,12 @@ void set_number(unit * u, int count)
 
 void remove_skill(unit * u, enum skill_t sk)
 {
-    size_t len = arrlen(u->skills);
+    ptrdiff_t len = arrlen(u->skills);
     if (len == 1) {
         arrfree(u->skills);
     }
     else if (len > 1) {
-        size_t s;
+        ptrdiff_t s;
         for (s = 0; s != len; ++s) {
             if (u->skills[s].id == sk) {
                 arrdel(u->skills, s);
@@ -950,7 +950,7 @@ skill *add_skill(unit * u, enum skill_t sk)
     skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
     assert(u);
     if (u->skills) {
-        size_t s, len = arrlen(u->skills);
+        ptrdiff_t s, len = arrlen(u->skills);
         for (s = 0; s != len; ++s) {
             sv = u->skills + s;
             if (sv->id >= sk) break;
@@ -974,7 +974,7 @@ skill *unit_skill(const unit * u, enum skill_t sk)
     assert(u);
 
     if (u->skills) {
-        size_t len = arrlen(u->skills);
+        ptrdiff_t len = arrlen(u->skills);
         skill* sv = u->skills;
         while (sv != u->skills + len && sv->id <= sk) {
             if (sv->id == sk) {
@@ -988,7 +988,7 @@ skill *unit_skill(const unit * u, enum skill_t sk)
 
 bool has_skill(const unit * u, enum skill_t sk)
 {
-    size_t len = arrlen(u->skills);
+    ptrdiff_t len = arrlen(u->skills);
     skill *sv = u->skills;
     while (sv != u->skills + len && sv->id <= sk) {
         if (sv->id == sk) {
@@ -1602,7 +1602,7 @@ int effskill(const unit * u, enum skill_t sk, const region *r)
     assert(u);
 
     if (skill_enabled(sk)) {
-        size_t len = arrlen(u->skills);
+        ptrdiff_t len = arrlen(u->skills);
         skill *sv = u->skills;
         while (sv != u->skills + len) {
             if (sv->id == sk) {
@@ -1774,7 +1774,7 @@ bool is_limited_skill(skill_t sk)
 
 bool has_limited_skills(const struct unit * u)
 {
-    size_t s, len = arrlen(u->skills);
+    ptrdiff_t s, len = arrlen(u->skills);
 
     for (s = 0; s != len; ++s) {
         if (is_limited_skill(u->skills[s].id)) {

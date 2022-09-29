@@ -359,9 +359,9 @@ static void read_skills(gamedata *data, unit *u)
 }
 
 static void write_skills(gamedata *data, const unit *u) {
-    int i, skill_size = (int)arrlen(u->skills);
+    ptrdiff_t i, skill_size = (int)arrlen(u->skills);
     skill_t sk = NOSKILL;
-    WRITE_INT(data->store, skill_size);
+    WRITE_INT(data->store, (int)skill_size);
     for (i = 0; i != skill_size; ++i) {
         skill *sv = u->skills + i;
 #ifndef NDEBUG
