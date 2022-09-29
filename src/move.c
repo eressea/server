@@ -676,8 +676,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         int reason = SA_NO_COAST;
         const building_type* bt_harbour = bt_find("harbour");
         if (sh->type->coasts) {
-            unsigned c;
-            size_t n = arrlen(sh->type->coasts);
+            ptrdiff_t c, n = arrlen(sh->type->coasts);
             for (c = 0; c != n; ++c) {
                 if (sh->type->coasts[c] == r->terrain) {
                     reason = SA_COAST;

@@ -36,7 +36,7 @@ struct order *ord)
     if (u->skills) {
         int n;
         for (n = 0; n != amount; ++n) {
-            size_t s, len = arrlen(u->skills);
+            ptrdiff_t s, len = arrlen(u->skills);
             for (s = 0; s != len; ++s) {
                 skill* sv = u->skills + s;
                 /* only one person learns for 3 weeks */
