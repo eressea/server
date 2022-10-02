@@ -35,7 +35,6 @@ extern "C" {
     struct item_type;
     
     typedef struct econ_request {
-        struct econ_request *next;
         struct unit *unit;
         int qty;
         enum econ_type {

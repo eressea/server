@@ -19,6 +19,8 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -208,15 +210,12 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     /* wer dank unsichtbarkeitsringen klauen kann, muss nicht unbedingt ein
      * guter dieb sein, schliesslich macht man immer noch sehr viel laerm */
 
-    o = (econ_request *)calloc(1, sizeof(econ_request));
-    if (!o) abort();
+    o = arraddnptr(*stealorders, 1);
     o->unit = u;
     o->qty = 1;                   /* Betrag steht in u->wants */
     o->type = ECON_STEAL;
     o->data.steal.no = u2->no;
     o->data.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
-    o->next = *stealorders;
-    *stealorders = o;
 
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     if (n > u->number) n = u->number;
