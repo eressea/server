@@ -32,6 +32,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <stdbool.h>           // for false, true
 #include <stdlib.h>            // for NULL, calloc, free, malloc
@@ -1092,16 +1094,15 @@ static void test_loot(CuTest *tc) {
 }
 
 static void test_expand_production(CuTest *tc) {
-    econ_request *orders;
+    econ_request *orders = NULL;
     econ_request **results = NULL;
     region *r;
     unit *u;
 
     test_setup();
-    orders = calloc(1, sizeof(econ_request));
+    (void) arraddnptr(orders, 1);
     orders->qty = 2;
     orders->unit = u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
-    orders->next = NULL;
 
     u->n = 1; /* will be overwritten */
     CuAssertIntEquals(tc, 2, expand_production(r, orders, &results));
@@ -1109,6 +1110,7 @@ static void test_expand_production(CuTest *tc) {
     CuAssertPtrEquals(tc, u, results[0]->unit);
     CuAssertPtrEquals(tc, u, results[1]->unit);
     CuAssertIntEquals(tc, 0, u->n);
+    arrfree(orders);
     free(results);
     test_teardown();
 }

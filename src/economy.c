@@ -57,6 +57,8 @@
 #include "util/parser.h"
 #include "util/rng.h"
 
+#include <stb_ds.h>
+
 /* libs includes */
 #include <assert.h>
 #include <errno.h>
@@ -74,7 +76,6 @@ static econ_request **g_requests; /* TODO: no need for this to be module-global 
 #define ENTERTAINFRACTION 20
 
 static void add_request(econ_request * req, enum econ_type type, unit *u, order *ord, int want) {
-    req->next = NULL;
     req->unit = u;
     req->qty = u->wants = want;
     req->type = type;
@@ -130,16 +131,16 @@ static void scramble(void *data, unsigned int n, size_t width)
 int expand_production(region * r, econ_request * requests, econ_request ***results)
 {
     unit *u;
-    econ_request *o;
     int norders = 0;
-
+    ptrdiff_t s, len = arrlen(requests);
     /* Alle Units ohne production haben ein -1, alle units mit orders haben ein
      * 0 hier stehen */
 
     for (u = r->units; u; u = u->next)
         u->n = -1;
 
-    for (o = requests; o; o = o->next) {
+    for (s = 0; s!= len; ++s) {
+        const econ_request *o = requests + s;
         if (o->qty > 0) {
             norders += o->qty;
         }
@@ -150,7 +151,8 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
         econ_request **split;
         split = (econ_request **)calloc(norders, sizeof(econ_request *));
         if (!split) abort();
-        for (o = requests; o; o = o->next) {
+        for (s = 0; s!= len; ++s) {
+            econ_request *o = requests + s;
             if (o->qty > 0) {
                 unsigned int j;
                 for (j = o->qty; j; j--) {
@@ -174,11 +176,7 @@ static int expandorders(region * r, econ_request * requests) {
 }
 
 static void free_requests(econ_request *requests) {
-    while (requests) {
-        econ_request *req = requests->next;
-        free(requests);
-        requests = req;
-    }
+    arrfree(requests);
 }
 
 /* ------------------------------------------------------------- */
@@ -1459,15 +1457,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", ""));
         return;
     }
-    o = (econ_request *)calloc(1, sizeof(econ_request));
-    if (!o) abort();
+    o = arraddnptr(*buyorders, 1);
     o->data.trade.ltype = ltype;        /* sollte immer gleich sein */
-
     o->unit = u;
     o->qty = n;
     o->type = ECON_BUY;
-    o->next = *buyorders;
-    *buyorders = o;
 }
 
 /* ------------------------------------------------------------- */
@@ -1745,9 +1739,10 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         return false;
     }
     else {
-        attrib *a;
         econ_request *o;
+        attrib *a;
         int available;
+        ptrdiff_t s, len = arrlen(*sellorders);
 
         if (!r->land || !r_demand(r, ltype)) {
             cmistake(u, ord, 263, MSG_COMMERCE);
@@ -1757,7 +1752,8 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
 
         /* Wenn andere Einheiten das selbe verkaufen, muss ihr Zeug abgezogen
          * werden damit es nicht zweimal verkauft wird: */
-        for (o = *sellorders; o; o = o->next) {
+        for (s = 0; s != len; ++s) {
+            o = sellorders[s];
             if (o->data.trade.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
@@ -1792,14 +1788,11 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         assert(n >= 0);
         /* die Menge der verkauften Gueter merken */
         a->data.i += n;
-        o = (econ_request *)calloc(1, sizeof(econ_request));
-        if (!o) abort();
+        o = arraddnptr(*sellorders, 1);
         o->unit = u;
         o->qty = n;
         o->type = ECON_SELL;
         o->data.trade.ltype = ltype;
-        o->next = *sellorders;
-        *sellorders = o;
 
         return unlimited;
     }
@@ -2373,13 +2366,10 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
      * fraktionen werden dann bei eintreiben unter allen eintreibenden
      * einheiten aufgeteilt. */
 
-    o = (econ_request *)calloc(1, sizeof(econ_request));
-    if (!o) abort();
+    o = arraddnptr(*taxorders, 1);
     o->qty = u->wants / TAXFRACTION;
     o->type = ECON_TAX;
     o->unit = u;
-    o->next = *taxorders;
-    *taxorders = o;
     return;
 }
 
@@ -2441,13 +2431,10 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
         if (u->wants > max) u->wants = max;
     }
 
-    o = (econ_request *)calloc(1, sizeof(econ_request));
-    if (!o) abort();
+    o = arraddnptr(*lootorders, 1);
     o->qty = u->wants / TAXFRACTION;
     o->type = ECON_LOOT;
     o->unit = u;
-    o->next = *lootorders;
-    *lootorders = o;
     return;
 }
 
