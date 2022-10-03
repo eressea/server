@@ -1753,7 +1753,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         /* Wenn andere Einheiten das selbe verkaufen, muss ihr Zeug abgezogen
          * werden damit es nicht zweimal verkauft wird: */
         for (s = 0; s != len; ++s) {
-            o = sellorders[s];
+            o = *sellorders + s;
             if (o->data.trade.ltype == ltype && o->unit->faction == u->faction) {
                 int fpool =
                     o->qty - get_pooled(o->unit, itype->rtype, GET_RESERVE, INT_MAX);
