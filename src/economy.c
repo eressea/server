@@ -1272,8 +1272,11 @@ static void expandbuying(region * r, econ_request * buyorders)
                 multi = trade->multi;
                 price = ltype->price * multi;
 
-                if (get_pooled(g_requests[j]->unit, rsilver, GET_DEFAULT,
-                    price) >= price) {
+                if (get_pooled(g_requests[j]->unit, rsilver, GET_DEFAULT, price) < price)
+                {
+                    break;
+                }
+                else {
                     item *items;
                     /* litems zaehlt die Gueter, die verkauft wurden, u->n das Geld, das
                      * verdient wurde. Dies muss gemacht werden, weil der Preis staendig sinkt,
