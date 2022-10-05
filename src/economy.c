@@ -75,6 +75,12 @@ static econ_request **g_requests; /* TODO: no need for this to be module-global 
 
 #define ENTERTAINFRACTION 20
 
+/* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
+static int max_trades(const unit *u)
+{
+    return effskill(u, SK_TRADE, u->region) * 10 * u->number;
+}
+
 static void add_request(econ_request * req, enum econ_type type, unit *u, order *ord, int want) {
     req->unit = u;
     req->qty = u->wants = want;
@@ -1208,15 +1214,28 @@ int make_cmd(unit * u, struct order *ord)
 
 /* ------------------------------------------------------------- */
 
+struct trade {
+    int trades;
+    int price;
+    item* items;
+};
+
+static void init_luxuries(variant* var)
+{
+    var->v = calloc(1, sizeof(struct trade));
+}
+
 static void free_luxuries(variant *var)
 {
-    item *itm = (item *)var->v;
-    var->v = NULL;
-    i_freeall(&itm);
+    struct trade* t = (struct trade*) var->v;
+    if (t && t->items) {
+        i_freeall(&t->items);
+    }
+    free(var->v);
 }
 
 const attrib_type at_luxuries = {
-    "luxuries", NULL, free_luxuries, NULL, NULL, NULL
+    "luxuries", init_luxuries, free_luxuries, NULL, NULL, NULL
 };
 
 int max_luxuries_sold(const region* r)
@@ -1254,36 +1273,35 @@ static void expandbuying(region * r, econ_request * buyorders)
             int multi = 1;
             unsigned int j;
             for (j = 0; j != norders; j++) {
-                u = g_requests[j]->unit;
-                int price;
-                price = ltype->price * multi;
+                int price = ltype->price * multi;
 
+                u = g_requests[j]->unit;
                 if (get_pooled(u, rsilver, GET_DEFAULT, price) < price)
                 {
                     break;
                 }
                 else {
-                    item *items;
-                    /* litems zaehlt die Gueter, die verkauft wurden, u->n das Geld, das
-                     * verdient wurde. Dies muss gemacht werden, weil der Preis staendig sinkt,
+                    /* u->n zaehlt das Geld, das verdient wurde. Dies muss gemacht werden,
+                     * weil der Preis staendig sinkt,
                      * man sich also das verdiente Geld und die verkauften Produkte separat
                      * merken muss. */
                     attrib *a;
-
-                    u = g_requests[j]->unit;
+                    struct trade* t = NULL;
+                    int buy_max = max_trades(u);
                     a = a_find(u->attribs, &at_luxuries);
                     if (a == NULL) {
                         a = a_add(&u->attribs, a_new(&at_luxuries));
                     }
-                    items = a->data.v;
+                    if (a) {
+                        t = (struct trade*)a->data.v;
+                        buy_max -= t->trades;
+                    }
 
-                    i_change(&items, ltype->itype, 1);
-                    a->data.v = items;
-                    i_change(&g_requests[j]->unit->items, ltype->itype, 1);
                     use_pooled(u, rsilver, GET_DEFAULT, price);
-                    if (u->n < 0)
-                        u->n = 0;
-                    u->n += price;
+                    if (t) {
+                        t->price += price;
+                        ++t->trades;
+                    }
 
                     rsetmoney(r, rmoney(r) + price);
 
@@ -1304,17 +1322,19 @@ static void expandbuying(region * r, econ_request * buyorders)
 
         for (u = r->units; u; u = u->next) {
             attrib *a = a_find(u->attribs, &at_luxuries);
-            item *itm;
-            if (a == NULL)
-                continue;
-            ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, u->n));
-            for (itm = (item *)a->data.v; itm; itm = itm->next) {
-                if (itm->number) {
-                    ADDMSG(&u->faction->msgs, msg_message("buyamount",
-                        "unit amount resource", u, itm->number, itm->type->rtype));
+            if (a) {
+                struct trade* t = NULL;
+                t = (struct trade*)a->data.v;
+                if (t) {
+                    ADDMSG(&u->faction->msgs, msg_message("buy", "unit money", u, t->price));
+                    if (t->trades) {
+                        ADDMSG(&u->faction->msgs, msg_message("buyamount",
+                            "unit amount resource", u, t->trades, it_sold->rtype));
+                        i_change(&u->items, it_sold, t->trades);
+                    }
+                    t->price = 0;
                 }
             }
-            a_remove(&u->attribs, a);
         }
     }
 }
@@ -1364,7 +1384,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     region *r = u->region;
     int n, k;
     econ_request *o;
-    attrib *a;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
     keyword_t kwd;
@@ -1404,22 +1423,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = effskill(u, SK_TRADE, NULL);
+    k = max_trades(u);
     if (k <= 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "skill_needed", "skill", SK_TRADE));
         return;
-    }
-    k = u->number * 10 * k;
-
-    /* hat der Haendler bereits gehandelt, muss die Menge der bereits
-     * verkauften/gekauften Gueter abgezogen werden */
-    a = a_find(u->attribs, &at_trades);
-    if (!a) {
-        a = a_add(&u->attribs, a_new(&at_trades));
-    }
-    else {
-        k -= a->data.i;
     }
 
     if (n > k) n = k;
@@ -1430,8 +1438,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     assert(n >= 0);
-    /* die Menge der verkauften Gueter merken */
-    a->data.i += n;
 
     s = gettoken(token, sizeof(token));
     itype = s ? finditemtype(s, u->faction->locale) : 0;
@@ -1475,7 +1481,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     unit *maxowner = (unit *)NULL;
     building *maxb = (building *)NULL;
     building *b;
-    unit *u;
     unit *hafenowner;
     static int counter[MAXLUXURIES];
     static int ncounter = 0;
@@ -1547,11 +1552,27 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     if (norders > 0) {
         int j;
         for (j = 0; j != norders; j++) {
+            unit *u = g_requests[j]->unit;
             const luxury_type *search = NULL;
             const luxury_type *ltype = g_requests[j]->data.trade.ltype;
             int multi = r_demand(r, ltype);
             int i, price;
             int use = 0;
+            int trade_max = max_trades(u);
+            attrib* a;
+            struct trade* t = NULL;
+            a = a_find(u->attribs, &at_luxuries);
+            if (!a) {
+                a = a_add(&u->attribs, a_new(&at_luxuries));
+            }
+            t = (struct trade*)a->data.v;
+            if (t) {
+                trade_max -= t->trades;
+            }
+            if (trade_max <= 0) {
+                /* total trade limit is reached */
+                continue;
+            }
             for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
                 /* TODO: this is slow and lame! */
                 ++i;
@@ -1563,21 +1584,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             price = ltype->price * multi;
 
             if (money >= price) {
-                item *itm;
-                attrib *a;
-                u = g_requests[j]->unit;
-                a = a_find(u->attribs, &at_luxuries);
-                if (!a) {
-                    a = a_add(&u->attribs, a_new(&at_luxuries));
-                }
-                itm = (item *)a->data.v;
-                i_change(&itm, ltype->itype, 1);
-                a->data.v = itm;
-                ++use;
-                if (u->n < 0) {
-                    u->n = 0;
-                }
-
                 if (hafenowner) {
                     if (hafenowner->faction != u->faction) {
                         int abgezogenhafen = price / 10;
@@ -1594,7 +1600,12 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                         money -= abgezogensteuer;
                     }
                 }
-                u->n += price;
+                if (t) {
+                    ++t->trades;
+                    i_change(&t->items, ltype->itype, 1);
+                    t->price += price;
+                }
+                ++use;
                 change_money(u, price);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
 
@@ -1638,20 +1649,21 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     }
     /* Berichte an die Einheiten */
 
-    for (u = r->units; u; u = u->next) {
-
+    for (unit *u = r->units; u; u = u->next) {
         attrib *a = a_find(u->attribs, &at_luxuries);
-        item *itm;
-        if (a == NULL)
-            continue;
-        for (itm = (item *)a->data.v; itm; itm = itm->next) {
-            if (itm->number) {
-                ADDMSG(&u->faction->msgs, msg_message("sellamount",
-                    "unit amount resource", u, itm->number, itm->type->rtype));
+        if (a) {
+            item* itm;
+            struct trade* t = NULL;
+            t = (struct trade*)a->data.v;
+            for (itm = t->items; itm; itm = itm->next) {
+                if (itm->number) {
+                    ADDMSG(&u->faction->msgs, msg_message("sellamount",
+                        "unit amount resource", u, itm->number, itm->type->rtype));
+                }
             }
+            add_income(u, IC_TRADE, t->price, t->price);
+            a_remove(&u->attribs, a);
         }
-        a_remove(&u->attribs, a);
-        add_income(u, IC_TRADE, u->n, u->n);
     }
 }
 
@@ -1710,10 +1722,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
             return false;
         }
     }
-    /* Ein Haendler kann nur 10 Gueter pro Talentpunkt verkaufen. */
-
-    /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = u->number * 10 * effskill(u, SK_TRADE, NULL);
+    k = max_trades(u);
     if (n > k) n = k;
 
     if (!n) {
@@ -1729,7 +1738,6 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     }
     else {
         econ_request *o;
-        attrib *a;
         int available;
         ptrdiff_t s, len = arrlen(*sellorders);
 
@@ -1763,20 +1771,9 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
          * produktion, wo fuer jedes produkt einzeln eine obere limite
          * existiert, so dass man arrays von orders machen kann. */
 
-        /* hat der Haendler bereits gehandelt, muss die Menge der bereits
-         * verkauften/gekauften Gueter abgezogen werden */
-        a = a_find(u->attribs, &at_trades);
-        if (!a) {
-            a = a_add(&u->attribs, a_new(&at_trades));
-        }
-        else {
-            k -= a->data.i;
-        }
-
         if (n > k) n = k;
         assert(n >= 0);
-        /* die Menge der verkauften Gueter merken */
-        a->data.i += n;
+
         o = arraddnptr(*sellorders, 1);
         o->unit = u;
         o->qty = n;

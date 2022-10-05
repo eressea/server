@@ -624,12 +624,13 @@ static void test_buy_before_sell(CuTest* tc) {
     CuAssertTrue(tc, it_other != it_luxury);
 
     u = test_create_unit(test_create_faction(), r);
+    set_number(u, 2);
     unit_addorder(u, create_order(K_SELL, u->faction->locale, "%s %s",
         param_name(P_ANY, u->faction->locale),
         LOC(u->faction->locale, resourcename(it_other->rtype, 0))));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "80 %s",
         LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
-    set_level(u, SK_TRADE, 8);
+    set_level(u, SK_TRADE, 4);
     test_set_item(u, rt_silver->itype, 5000);
     test_set_item(u, it_other, 1000);
     b = test_create_building(r, test_create_buildingtype("castle"));
