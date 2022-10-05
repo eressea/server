@@ -1228,23 +1228,9 @@ static void expandbuying(region * r, econ_request * buyorders)
 {
     const resource_type *rsilver = get_resourcetype(R_SILVER);
     int max_products;
-    unit *u;
-    struct trade {
-        const luxury_type *type;
-        int number;
-        int multi;
-    } trades[MAXLUXURIES], *trade;
-    int ntrades = 0;
-    const luxury_type *ltype;
+    const item_type* it_sold = r_luxury(r);
 
-    for (ntrades = 0, ltype = luxurytypes; ltype; ltype = ltype->next) {
-        assert(ntrades < MAXLUXURIES);
-        trades[ntrades].number = 0;
-        trades[ntrades].multi = 1;
-        trades[ntrades++].type = ltype;
-    }
-
-    if (!buyorders)
+    if (!buyorders || !it_sold)
         return;
 
     /* Initialisation. multiplier ist der Multiplikator auf den
@@ -1259,20 +1245,20 @@ static void expandbuying(region * r, econ_request * buyorders)
      * Gueter pro Monat ist. j sind die Befehle, i der Index des
      * gehandelten Produktes. */
     if (max_products > 0) {
+        const luxury_type* ltype = it_sold->rtype->ltype;
         unsigned int norders = expandorders(r, buyorders);
+        unit* u;
 
         if (norders) {
+            int number = 0;
+            int multi = 1;
             unsigned int j;
             for (j = 0; j != norders; j++) {
-                int price, multi;
-                ltype = g_requests[j]->data.trade.ltype;
-                trade = trades;
-                while (trade->type && trade->type != ltype)
-                    ++trade;
-                multi = trade->multi;
+                u = g_requests[j]->unit;
+                int price;
                 price = ltype->price * multi;
 
-                if (get_pooled(g_requests[j]->unit, rsilver, GET_DEFAULT, price) < price)
+                if (get_pooled(u, rsilver, GET_DEFAULT, price) < price)
                 {
                     break;
                 }
@@ -1304,9 +1290,9 @@ static void expandbuying(region * r, econ_request * buyorders)
                     /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
                      * der Preis Multiplikator fuer das Produkt um den Faktor 1. Der Zaehler
                      * wird wieder auf 0 gesetzt. */
-                    if (++trade->number == max_products) {
-                        trade->number = 0;
-                        ++trade->multi;
+                    if (++number == max_products) {
+                        number = 0;
+                        ++multi;
                     }
                     fset(u, UFL_LONGACTION | UFL_NOTMOVING);
                 }
