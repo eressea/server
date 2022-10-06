@@ -319,6 +319,70 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
     return u;
 }
 
+static void test_sell_over_demand(CuTest* tc) {
+    region* r;
+    unit* u;
+    building* b;
+    const item_type* it_luxury;
+    const luxury_type* ltype;
+    int max_products;
+
+    test_setup();
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    it_luxury = r_luxury(r);
+    ltype = it_luxury->rtype->ltype;
+    rsetpeasants(r, TRADE_FRACTION * 10);
+    max_products = rpeasants(r) / TRADE_FRACTION;
+    r_setdemand(r, ltype, 2);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    u = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, 10);
+    i_change(&u->items, it_luxury, max_products + 1);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "%d %s",
+        max_products + 1,
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 0, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 1, r_demand(r, ltype));
+    CuAssertIntEquals(tc, max_products * 2 * ltype->price + ltype->price, i_get(u->items, it_find("money")));
+}
+
+static void test_sell_all(CuTest* tc) {
+    region* r;
+    unit* u;
+    building* b;
+    const item_type* it_luxury;
+    const luxury_type* ltype;
+    int max_products;
+
+    test_setup();
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    it_luxury = r_luxury(r);
+    ltype = it_luxury->rtype->ltype;
+    rsetpeasants(r, TRADE_FRACTION * 10);
+    max_products = rpeasants(r) / TRADE_FRACTION;
+    r_setdemand(r, ltype, 2);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    u = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, 10);
+    i_change(&u->items, it_luxury, max_products);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "%s %s",
+        param_name(P_ANY, u->faction->locale),
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 0, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 2, r_demand(r, ltype));
+    CuAssertIntEquals(tc, max_products * 2 * ltype->price, i_get(u->items, it_find("money")));
+}
+
 static void test_trade_limits(CuTest *tc) {
     region *r;
     unit *u;
@@ -598,6 +662,46 @@ static void test_buy_cmd(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "buyamount"));
     CuAssertIntEquals(tc, 1, get_item(u, it_luxury));
     CuAssertIntEquals(tc, 995, get_item(u, rt_silver->itype));
+    test_teardown();
+}
+
+static void test_buy_before_sell(CuTest* tc) {
+    region* r;
+    unit* u;
+    building* b;
+    const resource_type* rt_silver;
+    const item_type* it_luxury, * it_other;
+
+    test_setup();
+    setup_production();
+    test_create_locale();
+    setup_terrains(tc);
+    r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
+    init_terrains();
+
+    it_luxury = r_luxury(r);
+    CuAssertPtrNotNull(tc, it_luxury);
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+    it_other = it_find("balm");
+    CuAssertTrue(tc, it_other != it_luxury);
+
+    u = test_create_unit(test_create_faction(), r);
+    set_number(u, 2);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "%s %s",
+        param_name(P_ANY, u->faction->locale),
+        LOC(u->faction->locale, resourcename(it_other->rtype, 0))));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "80 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    set_level(u, SK_TRADE, 4);
+    test_set_item(u, rt_silver->itype, 5000);
+    test_set_item(u, it_other, 1000);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    produce(r);
+    CuAssertIntEquals(tc, 80, get_item(u, it_luxury));
+    CuAssertIntEquals(tc, 1000, get_item(u, it_other));
     test_teardown();
 }
 
@@ -1264,6 +1368,9 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_buy_prices);
     SUITE_ADD_TEST(suite, test_buy_prices_split);
     SUITE_ADD_TEST(suite, test_buy_prices_rising);
+    SUITE_ADD_TEST(suite, test_buy_before_sell);
+    SUITE_ADD_TEST(suite, test_sell_over_demand);
+    SUITE_ADD_TEST(suite, test_sell_all);
     SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);

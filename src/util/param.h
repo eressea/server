@@ -58,6 +58,7 @@ extern const char* parameters[MAXPARAMS];
 
 struct locale;
 
+const char* param_name(param_t p, const struct locale* lang);
 param_t findparam(const char* s);
 param_t get_param(const char* s, const struct locale* lang);
 param_t findparam_block(const char* s, const struct locale* lang, bool any_locale);
