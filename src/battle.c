@@ -1788,7 +1788,7 @@ static void do_combatspell(troop at)
         return;
     }
     sp = mage_get_combatspell(mage, 1, &sl);
-    if (sp == NULL || sl <= 0 || !u_hasspell(u, sp)) {
+    if (sp == NULL || !u_hasspell(u, sp)) {
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
@@ -1797,7 +1797,7 @@ static void do_combatspell(troop at)
         fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;
     }
-    else if (sl < level) {
+    else if (sl > 0 && sl < level) {
         level = sl;
     }
     if (fumble(r, u, sp, level)) {
