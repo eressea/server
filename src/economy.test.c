@@ -5,9 +5,12 @@
 #include "recruit.h"
 #include "direction.h"         // for D_EAST, directions
 
+#include <spells/buildingcurse.h>
+
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
@@ -19,15 +22,15 @@
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
-#include "kernel/build.h"      // for construction, requirement
-#include "kernel/skill.h"      // for SK_ROAD_BUILDING, SK_WEAPONSMITH, SK_A...
+#include <kernel/build.h>      // for construction, requirement
+#include <kernel/skill.h>      // for SK_ROAD_BUILDING, SK_WEAPONSMITH, SK_A...
 
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/param.h>
-#include "util/keyword.h"      // for K_BUY, K_DESTROY, K_RECRUIT, K_SELL
-#include "util/variant.h"      // for variant, frac_make, frac_zero
+#include <util/keyword.h>      // for K_BUY, K_DESTROY, K_RECRUIT, K_SELL
+#include <util/variant.h>      // for variant, frac_make, frac_zero
 
 #include <CuTest.h>
 #include <tests.h>
@@ -816,7 +819,7 @@ static void setup_economy(void) {
 /** 
  * see https://bugs.eressea.de/view.php?id=2234
  */
-static void test_maintain_buildings(CuTest *tc) {
+static void test_maintain_buildings(CuTest* tc) {
     region *r;
     building *b;
     building_type *btype;
@@ -887,6 +890,45 @@ static void test_maintain_buildings(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, f->msgs);
     CuAssertPtrEquals(tc, NULL, r->msgs);
     test_clear_messagelist(&r->msgs);
+
+    test_teardown();
+}
+
+static void test_maintain_buildings_curse(CuTest* tc) {
+    region* r;
+    building* b;
+    building_type* btype;
+    unit* u;
+    faction* f;
+    maintenance* req;
+    item_type* itype;
+
+    test_setup();
+    setup_economy();
+    btype = test_create_buildingtype("Hort");
+    btype->maxsize = 10;
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    b = test_create_building(r, btype);
+    itype = test_create_itemtype("money");
+    b->size = btype->maxsize;
+    u_set_building(u, b);
+    req = calloc(2, sizeof(maintenance));
+    req[0].number = 100;
+    req[0].rtype = itype->rtype;
+    i_change(&u->items, itype, 100);
+    btype->maintenance = req;
+    create_curse(u, &b->attribs, &ct_nocostbuilding,
+        1, 1, .0, 0);
+
+    /* this building magically needs no upkeep: */
+    b->flags = 0;
+    maintain_buildings(r);
+    CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
+    CuAssertIntEquals(tc, 100, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrEquals(tc, NULL, r->msgs);
 
     test_teardown();
 }
@@ -1375,6 +1417,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
+    SUITE_ADD_TEST(suite, test_maintain_buildings_curse);
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_recruit_insect);
     SUITE_ADD_TEST(suite, test_loot);

@@ -371,15 +371,13 @@ static bool maintain(building * b)
 
 void maintain_buildings(region * r)
 {
-    building **bp = &r->buildings;
-    while (*bp) {
-        building *b = *bp;
+    building *b;
+    for (b = r->buildings; b; b = b->next) {
         if (!curse_active(get_curse(b->attribs, &ct_nocostbuilding))) {
             if (!maintain(b)) {
                 fset(b, BLD_UNMAINTAINED);
             }
         }
-        bp = &b->next;
     }
 }
 
