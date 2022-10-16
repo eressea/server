@@ -120,10 +120,8 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     region *r = u->region;
     faction *f = NULL;
     message * msg;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_STEAL);
+    init_order(ord, NULL);
 
     assert(skill_enabled(SK_PERCEPTION) && skill_enabled(SK_STEALTH));
 

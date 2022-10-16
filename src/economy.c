@@ -1082,10 +1082,8 @@ int make_cmd(unit * u, struct order *ord)
     int m = INT_MAX;
     const char *s;
     const struct locale *lang = u->faction->locale;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_MAKE);
+    init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
 
     if (s) {
@@ -1384,7 +1382,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     econ_request *o;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
-    keyword_t kwd;
     const char *s;
 
     if (u->ship && is_guarded(r, u)) {
@@ -1398,8 +1395,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon dafuer ausgeruestet, mehrere Produkte zu kaufen. */
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_BUY);
+    init_order(ord, NULL);
     n = getint();
     if (n <= 0) {
         cmistake(u, ord, 26, MSG_COMMERCE);
@@ -1674,7 +1670,6 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     int n, k;
     region *r = u->region;
     const char *s;
-    keyword_t kwd;
     static int bt_cache;
     static const struct building_type *castle_bt, *caravan_bt;
 
@@ -1690,8 +1685,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     /* sellorders sind KEIN array, weil fuer alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_SELL);
+    init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
 
     if (get_param(s, u->faction->locale) == P_ANY) {
@@ -2026,10 +2020,8 @@ static const char *rough_amount(int a, int m)
 static void research_cmd(unit * u, struct order *ord)
 {
     region *r = u->region;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_RESEARCH);
+    init_order(ord, NULL);
 
     if (effskill(u, SK_HERBALISM, NULL) < 7) {
         cmistake(u, ord, 227, MSG_EVENT);
@@ -2092,10 +2084,8 @@ static int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
     econ_request *req = *io_req;
     static int entertainbase = 0;
     static int entertainperlevel = 0;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_ENTERTAIN);
+    init_order(ord, NULL);
     if (!entertainbase) {
         const char *str = config_get("entertain.base");
         entertainbase = str ? atoi(str) : 0;
@@ -2293,15 +2283,13 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
     int n;
     econ_request *o;
     int max;
-    keyword_t kwd;
     static int taxperlevel = 0;
 
     if (!taxperlevel) {
         taxperlevel = config_get_int("taxing.perlevel", 0);
     }
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_TAX);
+    init_order(ord, NULL);
 
     if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
         cmistake(u, ord, 228, MSG_INCOME);
@@ -2364,10 +2352,8 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
     int n;
     int max;
     econ_request *o;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_LOOT);
+    init_order(ord, NULL);
 
     if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
         return;

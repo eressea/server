@@ -35,6 +35,7 @@ locale *locales;
 unsigned int locale_index(const locale * lang)
 {
     assert(lang);
+    assert(lang->index < MAXLOCALES);
     return lang->index;
 }
 

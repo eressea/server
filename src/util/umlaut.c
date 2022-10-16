@@ -130,12 +130,11 @@ void addtoken(tnode ** root, const char *str, variant id)
     }
     else {
         tref *next;
-        int ret, index, i = 0;
+        int index, i = 0;
         wchar_t ucs, lcs;
         size_t len;
 
-        ret = unicode_utf8_decode(&ucs, str, &len);
-        assert(ret == 0 || !"invalid utf8 string");
+        unicode_utf8_decode(&ucs, str, &len);
         lcs = ucs;
 
 #if NODEHASHSIZE == 8

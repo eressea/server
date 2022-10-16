@@ -111,14 +111,6 @@ static int flyingship_read(gamedata * data, curse * c, void *target)
     return 0;
 }
 
-static int flyingship_write(storage * store, const curse * c,
-    const void *target)
-{
-    const ship *sh = (const ship *)target;
-    assert(sh->flags & SF_FLYING);
-    return 0;
-}
-
 static int flyingship_age(curse * c)
 {
     ship *sh = (ship *)c->data.v;
@@ -131,7 +123,7 @@ static int flyingship_age(curse * c)
 
 const struct curse_type ct_flyingship = { "flyingship",
 CURSETYP_NORM, 0, NO_MERGE, cinfo_ship, NULL, flyingship_read,
-flyingship_write, NULL, flyingship_age
+NULL, NULL, flyingship_age
 };
 
 void register_flyingship(void)

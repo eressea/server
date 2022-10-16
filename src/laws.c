@@ -1012,10 +1012,8 @@ int quit_cmd(unit * u, struct order *ord)
     char token[128];
     faction *f = u->faction;
     const char *passwd;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_QUIT);
+    init_order(ord, NULL);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
         int flags = FFL_QUIT;
@@ -2429,10 +2427,7 @@ int promotion_cmd(unit * u, struct order *ord)
 
 int group_cmd(unit * u, struct order *ord)
 {
-    keyword_t kwd;
-
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_GROUP);
+    init_order(ord, NULL);
     join_group(u, getstrtoken());
     return 0;
 }
@@ -2908,8 +2903,8 @@ static void maketemp_cmd(unit *u, order **olist)
         ship *sh;
         unit *u2;
         order **ordp, **oinsert;
-        keyword_t kwd = init_order(makeord, NULL);
-        assert(kwd == K_MAKETEMP);
+        
+        init_order(makeord, NULL);
         alias = getid();
         s = gettoken(token, sizeof(token));
         if (s && s[0] == '\0') {

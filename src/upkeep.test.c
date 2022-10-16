@@ -48,13 +48,10 @@ void test_upkeep_hunger_damage(CuTest * tc)
     region *r;
     unit *u1;
     faction *f1;
-    const item_type *i_silver;
 
     test_setup();
     init_resources();
 
-    i_silver = it_find("money");
-    assert(i_silver);
     r = test_create_plain(0, 0);
     f1 = test_create_faction();
     u1 = test_create_unit(f1, r);
