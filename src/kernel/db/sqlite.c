@@ -75,6 +75,7 @@ struct order_data *db_driver_order_load(dbrow_id id)
 
 dbrow_id db_driver_order_save(const char *str) {
     sqlite3_int64 id;
+    int rc;
     
     assert(str);
    
@@ -88,7 +89,8 @@ dbrow_id db_driver_order_save(const char *str) {
     
     SQLITE_CHECK(g_swap_db, sqlite3_reset(g_stmt_insert_order));
     SQLITE_CHECK(g_swap_db, sqlite3_bind_text(g_stmt_insert_order, 1, str, -1, SQLITE_STATIC));
-    SQLITE_CHECK(g_swap_db, sqlite3_step(g_stmt_insert_order));
+    rc = sqlite3_step(g_stmt_insert_order);
+    if (rc != SQLITE_DONE) return 0;
     id = sqlite3_last_insert_rowid(g_swap_db);
     assert(id > 0 && id <= UINT_MAX);
     
@@ -281,6 +283,7 @@ void db_driver_close(database_t db)
 
 dbrow_id db_driver_string_save(const char *str) {
     sqlite3_int64 id;
+    int rc;
 
     assert(str);
 
@@ -294,7 +297,8 @@ dbrow_id db_driver_string_save(const char *str) {
 
     SQLITE_CHECK(g_game_db, sqlite3_reset(g_stmt_insert_string));
     SQLITE_CHECK(g_game_db, sqlite3_bind_text(g_stmt_insert_string, 1, str, -1, SQLITE_STATIC));
-    SQLITE_CHECK(g_game_db, sqlite3_step(g_stmt_insert_string));
+    rc = sqlite3_step(g_stmt_insert_string);
+    if (rc != SQLITE_DONE) return 0;
     id = sqlite3_last_insert_rowid(g_swap_db);
     assert(id > 0 && id <= UINT_MAX);
 
