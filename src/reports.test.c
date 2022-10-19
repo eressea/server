@@ -550,6 +550,65 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     test_teardown();
 }
 
+void test_prepare_lighthouse_range(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    unit *u1, *u2;
+    region *r1, *r2, *r3;
+    faction *f;
+    const struct terrain_type *t_ocean, *t_plain;
+    report_context ctx;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    btype = test_create_buildingtype("lighthouse");
+    btype->maxcapacity = 4;
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_plain);
+    r3 = test_create_region(2, 0, t_ocean);
+    b = test_create_building(r1, btype);
+    b->size = 10;
+    update_lighthouse(b);
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
+
+    f = test_create_faction();
+    u1 = test_create_unit(f, r1);
+    u1->building = b;
+    set_level(u1, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
+    u2 = test_create_unit(f, r1);
+    u2->building = b;
+    set_level(u2, SK_PERCEPTION, 6);
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u2));
+    CuAssertPtrEquals(tc, b, inside_building(u1));
+    CuAssertPtrEquals(tc, b, inside_building(u2));
+    prepare_report(&ctx, u1->faction, NULL);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse_land, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r3->seen.mode);
+    finish_reports(&ctx);
+
+    /* super lighthouse, huge range of 6 */
+    test_create_region(3, 0, t_ocean);
+    test_create_region(4, 0, t_ocean);
+    r2 = test_create_region(5, 0, t_ocean);
+    r3 = test_create_region(6, 0, t_ocean);
+    b->size = 100000;
+    set_level(u2, SK_PERCEPTION, 18);
+    prepare_report(&ctx, u1->faction, NULL);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r3->seen.mode);
+    finish_reports(&ctx);
+
+    test_teardown();
+}
+
 void test_prepare_lighthouse_capacity(CuTest *tc) {
     building *b;
     building_type *btype;
@@ -1091,6 +1150,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_owners);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse_range);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_get_addresses);
     SUITE_ADD_TEST(suite, test_get_addresses_fstealth);
