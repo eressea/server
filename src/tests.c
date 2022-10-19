@@ -200,7 +200,7 @@ struct faction* test_create_faction(void) {
 
 struct unit *test_create_unit(struct faction *f, struct region *r)
 {
-    const struct race * rc = f ? f->race : 0;
+    const struct race * rc = f ? f->race : NULL;
     if (!rc) rc = rc_get_or_create("human");
     if (!f) f = test_create_faction_ex(rc, NULL);
     if (!r) r = test_create_plain(0, 0);
@@ -250,7 +250,7 @@ void test_reset(void)
 static void test_reset_full(void) {
     int i;
     turn = 1;
-    default_locale = 0;
+    default_locale = NULL;
 
     if (errno) {
         int error = errno;
@@ -264,7 +264,6 @@ static void test_reset_full(void) {
     free_resources();
     free_functions();
     free_config();
-    default_locale = 0;
     calendar_cleanup();
     creport_cleanup();
     report_cleanup();

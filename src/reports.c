@@ -1429,7 +1429,7 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
         for (r = ctx->first; r != ctx->last; r = r->next) {
             unit *u;
             building *b;
-            int br = 0, c = 0, range = 0;
+            int c = 0, range = 0;
             if (fval(r, RF_OBSERVER)) {
                 int skill = get_observer(r, f);
                 if (skill >= 0) {
@@ -1463,11 +1463,10 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
                         break;
                     }
                 }
-                if (range == 0 && u->building && u->building->type == bt_lighthouse) {
+                if (u->building && u->building->type == bt_lighthouse) {
                     if (u->building && b != u->building) {
                         b = u->building;
                         c = buildingcapacity(b);
-                        br = 0;
                     }
                     if (rule_lighthouse_units) {
                         --c;
@@ -1477,12 +1476,9 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
                     }
                     if (u->faction == f && c >= 0) {
                         /* unit is one of ours, and inside the current lighthouse */
-                        if (br == 0) {
-                            /* lazy-calculate the range */
-                            br = lighthouse_view_distance(b, u);
-                            if (br > range) {
-                                range = br;
-                            }
+                        int br = lighthouse_view_distance(b, u);
+                        if (br > range) {
+                            range = br;
                         }
                     }
                 }
