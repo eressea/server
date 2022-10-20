@@ -6,6 +6,8 @@
 #include "spy.h"
 #include "travelthru.h"
 
+#include "attributes/attributes.h"
+
 #include "kernel/ally.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
@@ -26,9 +28,8 @@
 #include "util/nrmessage.h"
 #include "util/variant.h"
 
-#include "attributes/attributes.h"
-
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -888,10 +889,10 @@ static void test_region_distance_max(CuTest *tc) {
             }
         }
     }
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 64));
-    CuAssertIntEquals(tc, 7, get_regions_distance_arr(r, 1, result, 64));
-    CuAssertIntEquals(tc, 19, get_regions_distance_arr(r, 2, result, 64));
-    CuAssertIntEquals(tc, 37, get_regions_distance_arr(r, 3, result, 64));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 64));
+    CuAssertIntEquals(tc, 7, (int)get_regions_distance_arr(r, 1, result, 64));
+    CuAssertIntEquals(tc, 19, (int)get_regions_distance_arr(r, 2, result, 64));
+    CuAssertIntEquals(tc, 37, (int)get_regions_distance_arr(r, 3, result, 64));
     test_teardown();
 }
 
@@ -900,34 +901,34 @@ static void test_region_distance(CuTest *tc) {
     region *result[8];
     test_setup();
     r = test_create_plain(0, 0);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 8));
     CuAssertPtrEquals(tc, r, result[0]);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 1, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 1, result, 8));
     test_create_region(1, 0, 0);
     test_create_region(0, 1, 0);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
-    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 1, result, 8));
-    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 2, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 8));
+    CuAssertIntEquals(tc, 3, (int)get_regions_distance_arr(r, 1, result, 8));
+    CuAssertIntEquals(tc, 3, (int)get_regions_distance_arr(r, 2, result, 8));
     test_teardown();
 }
 
 static void test_region_distance_ql(CuTest *tc) {
     region *r;
-    selist *ql;
+    region **arr;
     test_setup();
     r = test_create_plain(0, 0);
-    ql = get_regions_distance(r, 0);
-    CuAssertIntEquals(tc, 1, selist_length(ql));
-    CuAssertPtrEquals(tc, r, selist_get(ql, 0));
-    selist_free(ql);
+    arr = get_regions_distance(r, 0);
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, r, arr[0]);
+    arrfree(arr);
     test_create_region(1, 0, 0);
     test_create_region(0, 1, 0);
-    ql = get_regions_distance(r, 1);
-    CuAssertIntEquals(tc, 3, selist_length(ql));
-    selist_free(ql);
-    ql = get_regions_distance(r, 2);
-    CuAssertIntEquals(tc, 3, selist_length(ql));
-    selist_free(ql);
+    arr = get_regions_distance(r, 1);
+    CuAssertIntEquals(tc, 3, (int)arrlen(arr));
+    arrfree(arr);
+    arr = get_regions_distance(r, 2);
+    CuAssertIntEquals(tc, 3, (int)arrlen(arr));
+    arrfree(arr);
     test_teardown();
 }
 

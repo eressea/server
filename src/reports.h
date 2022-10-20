@@ -41,8 +41,8 @@ extern "C" {
     void reports_done(void);
 
     bool omniscient(const struct faction *f);
-    struct selist *get_regions_distance(struct region * root, int radius);
-    int get_regions_distance_arr(struct region *r, int radius, struct region *result[], int size);
+    struct region **get_regions_distance(struct region * root, int radius);
+    size_t get_regions_distance_arr(struct region *r, int radius, struct region *result[], size_t size);
     /* funktionen zum schreiben eines reports */
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);

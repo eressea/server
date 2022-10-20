@@ -3601,12 +3601,12 @@ int armedmen(const unit * u, bool siege_weapons)
 
 static void enter_1(region * r)
 {
-    do_enter(r, 0);
+    do_enter(r, false);
 }
 
 static void enter_2(region * r)
 {
-    do_enter(r, 1);
+    do_enter(r, true);
 }
 
 bool help_enter(unit *uo, unit *u) {
