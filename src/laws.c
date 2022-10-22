@@ -1167,10 +1167,11 @@ int enter_building(unit * u, order * ord, int id, bool report)
 {
     region *r = u->region;
     building *b;
+    const struct race* rc = u_race(u);
 
     /* Schwimmer koennen keine Gebaeude betreten, ausser diese sind
      * auf dem Ozean */
-    if (!fval(u_race(u), RCF_WALK) && !fval(u_race(u), RCF_FLY)) {
+    if (fval(rc, RCF_SWIM|RCF_WALK|RCF_FLY) == RCF_SWIM) {
         if (!fval(r->terrain, SEA_REGION)) {
             if (report) {
                 cmistake(u, ord, 232, MSG_MOVE);
