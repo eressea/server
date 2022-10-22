@@ -1173,7 +1173,7 @@ int enter_building(unit * u, order * ord, int id, bool report)
 
     /* Schwimmer koennen keine Gebaeude betreten, ausser diese sind
      * auf dem Ozean */
-    if (fval(rc, RCF_SWIM) && !fval(rc, RCF_WALK|RCF_FLY)) {
+    if (fval(rc, RCF_SWIM|RCF_WALK|RCF_FLY) == RCF_SWIM) {
         if (!fval(r->terrain, SEA_REGION)) {
             if (report) {
                 cmistake(u, ord, 232, MSG_MOVE);
