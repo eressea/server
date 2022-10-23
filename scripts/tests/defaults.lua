@@ -140,6 +140,32 @@ function test_default_move()
     assert_equal("@GIB 0 2 Silber", u.orders[1])
 end
 
+function test_default_move_infinite()
+    local r = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:set_orders('DEFAULT "NACH WESTEN"\nARBEITE')
+    process_orders()
+    assert_equal(r, u.region)
+    assert_equal(1, #u.orders)
+    assert_equal("NACH WESTEN", u.orders[1])
+    u:set_orders('NACH OSTEN')
+    process_orders()
+    assert_equal(r2, u.region)
+    assert_equal(1, #u.orders)
+    assert_equal('NACH WESTEN', u.orders[1])
+    u:set_orders('NACH WESTEN') -- Vorlage neu einsenden
+    process_orders()
+    assert_equal(r, u.region)
+    assert_equal(1, #u.orders)
+    assert_equal('NACH WESTEN', u.orders[1])
+    u.region = r2
+    process_orders() -- NMR führt Default NACH WESTEN aus und löscht ihn
+    assert_equal(r, u.region)
+    assert_nil(u.orders)
+end
+
 function test_default_empty()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
