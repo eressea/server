@@ -109,6 +109,7 @@ return {
     require('eressea.wedding'),
     require('eressea.embassy'),
     require('eressea.tunnels'),
+    require('eressea.warpgate'),
     require('eressea.ponnuki'),
     require('eressea.astral'),
     require('eressea.jsreport'),
