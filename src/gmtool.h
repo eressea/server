@@ -27,4 +27,6 @@ void state_close(struct state *);
 void make_block(int x, int y, int radius, const struct terrain_type *terrain);
 void seed_players(struct newfaction **players, bool new_island);
 
+void bind_key(int keycode, const char *fname);
+
 #endif

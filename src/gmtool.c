@@ -2,6 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <curses.h>
+#include <lua.h>
 
 #include "gmtool.h"
 #include "direction.h"
@@ -1046,6 +1047,16 @@ static bool confirm(WINDOW * win, const char *q) {
     return (ch == 'y') || (ch == 'Y');
 }
 
+static int exec_key_binding(int keycode)
+{
+    struct lua_State* L = global.vm_state;
+    lua_getglobal(L, "gmtool_on_keypressed");
+    if (lua_isfunction(L, -1)) {
+        lua_pushinteger(L, keycode);
+        return lua_pcall(L, 1, 1, 0);
+    }
+    return -1;
+}
 
 static void handlekey(state * st, int c)
 {
@@ -1101,10 +1112,8 @@ static void handlekey(state * st, int c)
         break;
     case 'S':
     case KEY_SAVE:
-    case KEY_F(2):
         savedata(st);
         break;
-    case KEY_F(3):
     case KEY_OPEN:
         loaddata(st);
         break;
@@ -1444,10 +1453,12 @@ static void handlekey(state * st, int c)
         g_quit = 1;
         break;
     default:
-        for (wnd = wnd_first; wnd != NULL; wnd = wnd->next) {
-            if (wnd->handlekey) {
-                if (wnd->handlekey(wnd, st, c))
-                    break;
+        if (exec_key_binding(c) < 0) {
+            for (wnd = wnd_first; wnd != NULL; wnd = wnd->next) {
+                if (wnd->handlekey) {
+                    if (wnd->handlekey(wnd, st, c))
+                        break;
+                }
             }
         }
         break;
@@ -1463,7 +1474,7 @@ static void init_view(view * display, WINDOW * win)
     display->size.width = getmaxx(win) / TWIDTH;
     display->size.height = getmaxy(win) / THEIGHT;
     display->regions =
-        calloc(display->size.height * display->size.width, sizeof(map_region));
+        calloc(display->size.height * (size_t)display->size.width, sizeof(map_region));
 }
 
 static void update_view(view * vi)
