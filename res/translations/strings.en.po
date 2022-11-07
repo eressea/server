@@ -1034,7 +1034,7 @@ msgstr "ALLIANCE"
 
 msgctxt "spell"
 msgid "song_of_healing"
-msgstr "Blessed Harvest"
+msgstr "Song of Healing"
 
 msgid "sapling"
 msgstr "sapling"
