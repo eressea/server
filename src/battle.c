@@ -3779,7 +3779,7 @@ static bool start_battle(region * r, battle ** bp)
                         cmistake(u, ord, 47, MSG_BATTLE);
                         continue;
                     }
-                    if (IsImmune(u2->faction, u2->faction->age)) {
+                    if (IsImmune(u2->faction, faction_age(u2->faction))) {
                         add_message(&u->faction->msgs,
                             msg_feedback(u, u->thisorder, "newbie_immunity_error", "turns",
                                 NewbieImmunity()));

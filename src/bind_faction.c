@@ -146,7 +146,7 @@ static int tolua_faction_set_magic(lua_State * L)
 static int tolua_faction_get_age(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    lua_pushinteger(L, f->age);
+    lua_pushinteger(L, faction_age(f));
     return 1;
 }
 
@@ -154,7 +154,7 @@ static int tolua_faction_set_age(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int age = (int)tolua_tonumber(L, 2, 0);
-    f->age = age;
+    faction_set_age(f, age);
     return 0;
 }
 

@@ -1920,7 +1920,7 @@ int
 report_plaintext(const char *filename, report_context * ctx,
     const char *bom)
 {
-    int flag = 0;
+    int age, flag = 0;
     char ch;
     int anyunits, no_units, no_people;
     region *r;
@@ -1963,7 +1963,7 @@ report_plaintext(const char *filename, report_context * ctx,
         centre(out, alliancename(f->alliance), true);
     }
 
-    if (f->age <= 2) {
+    if (faction_age(f) <= 2) {
         const char *email;
         email = config_get("game.email");
         if (!email)
@@ -1989,10 +1989,11 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
     newline(out);
-    if (f->options & WANT_OPTION(O_SCORE) && f->age > DISPLAYSCORE) {
+    age = faction_age(f);
+    if (f->options & WANT_OPTION(O_SCORE) && age > DISPLAYSCORE) {
         char score[32], avg[32];
         write_score(score, sizeof(score), f->score);
-        write_score(avg, sizeof(avg), average_score_of_age(f->age, f->age / 24 + 1));
+        write_score(avg, sizeof(avg), average_score_of_age(age));
         RENDER(f, buf, sizeof(buf), ("nr_score", "score average", score, avg));
         centre(out, buf, true);
     }

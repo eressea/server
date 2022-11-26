@@ -28,7 +28,7 @@ guard_t can_start_guarding(const unit * u)
         return E_GUARD_OK;
     if (!armedmen(u, true))
         return E_GUARD_UNARMED;
-    if (IsImmune(u->faction, u->faction->age + 1)) {
+    if (IsImmune(u->faction, faction_age(u->faction) + 1)) {
         /* can be attacked next week, may guard now */
         return E_GUARD_NEWBIE;
     }

@@ -60,7 +60,7 @@ extern "C" {
         struct spellbook *spellbook;
         const struct locale *locale;
         int lastorders;
-        int age;
+        int _age;
         struct origin *origin;
         const struct race *race;
         int magiegebiet;
@@ -108,6 +108,8 @@ extern "C" {
     int writepasswd(void);
     void destroyfaction(faction ** f);
 
+    int faction_age(const struct faction* f);
+    void faction_set_age(struct faction* f, int age);
     bool faction_alive(const struct faction *f);
     struct faction *faction_create(int no);
 

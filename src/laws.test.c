@@ -913,9 +913,9 @@ static void test_newbie_cannot_guard(CuTest *tc) {
 
     setup_guard(&fix, true);
     config_set("NewbieImmunity", "4");
-    fix.u->faction->age = 3;
+    faction_set_age(fix.u->faction, 3);
     CuAssertIntEquals(tc, E_GUARD_OK, can_start_guarding(fix.u));
-    fix.u->faction->age = 2;
+    faction_set_age(fix.u->faction, 2);
     CuAssertIntEquals(tc, E_GUARD_NEWBIE, can_start_guarding(fix.u));
     update_guards();
     CuAssertTrue(tc, !fval(fix.u, UFL_GUARD));
@@ -1440,12 +1440,13 @@ static void test_nmr_warnings(CuTest *tc) {
     mt_create_va(mt_new("nmr_warning_final", NULL), MT_NEW_END);
     mt_create_va(mt_new("warn_dropout", NULL), "faction:faction", "turn:int", MT_NEW_END);
     config_set("nmr.timeout", "3");
-    f1 = test_create_faction();
-    f2 = test_create_faction();
-    f2->age = 2;
-    f2->lastorders = 1;
     turn = 3;
-    CuAssertIntEquals(tc, 0, f1->age);
+    f1 = test_create_faction();
+    CuAssertIntEquals(tc, 0, faction_age(f1));
+    f2 = test_create_faction();
+    faction_set_age(f2, 2);
+    CuAssertIntEquals(tc, 2, faction_age(f2));
+    f2->lastorders = 1;
     nmr_warnings();
     CuAssertPtrNotNull(tc, f1->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "nmr_warning"));

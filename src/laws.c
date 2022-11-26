@@ -1308,7 +1308,7 @@ int dropouts[2];
 
 bool nmr_death(const faction * f, int turn, int timeout)
 {
-    if (f->age >= timeout && turn - f->lastorders >= timeout) {
+    if (faction_age(f) >= timeout && turn - f->lastorders >= timeout) {
         static bool rule_destroy;
         static int config;
         
@@ -1358,12 +1358,13 @@ static void remove_idle_players(void)
             faction* f = *fp;
             if (!is_monsters(f)) {
                 if (!fval(f, FFL_PAUSED | FFL_NOIDLEOUT)) {
-                    if (f->age >= 0 && f->age < MAXNEWPLAYERS) {
-                        ++newbies[f->age];
+                    int age = faction_age(f);
+                    if (age >= 0 && age < MAXNEWPLAYERS) {
+                        ++newbies[age];
                     }
-                    if (f->age == 2 || f->age == 3) {
+                    if (age == 2 || age == 3) {
                         if (f->lastorders == turn - 2) {
-                            ++dropouts[f->age - 2];
+                            ++dropouts[age - 2];
                             destroyfaction(fp);
                             continue;
                         }
@@ -1384,7 +1385,7 @@ void quit(void)
             destroyfaction(fptr);
         }
         else {
-            ++f->age;
+            ++f->_age;
             fptr = &f->next;
         }
     }
@@ -1819,7 +1820,7 @@ int name_cmd(struct unit *u, struct order *ord)
                 cmistake(u, ord, 66, MSG_EVENT);
                 break;
             }
-            if (f->age < 10) {
+            if (faction_age(f) < 10) {
                 cmistake(u, ord, 248, MSG_EVENT);
                 break;
             }

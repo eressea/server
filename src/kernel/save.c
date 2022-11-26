@@ -1124,7 +1124,7 @@ faction *read_faction(gamedata * data)
     f->locale = get_locale(name);
     if (!f->locale) f->locale = default_locale;
     READ_INT(data->store, &f->lastorders);
-    READ_INT(data->store, &f->age);
+    READ_INT(data->store, &f->_age);
     READ_STR(data->store, name, sizeof(name));
     f->race = rc_find(name);
     if (!f->race) {
@@ -1214,7 +1214,7 @@ void write_faction(gamedata *data, const faction * f)
     write_password(data, f);
     WRITE_TOK(data->store, locale_name(f->locale));
     WRITE_INT(data->store, f->lastorders);
-    WRITE_INT(data->store, f->age);
+    WRITE_INT(data->store, faction_age(f));
     WRITE_TOK(data->store, f->race->_name);
     WRITE_SECTION(data->store);
     WRITE_INT(data->store, f->magiegebiet);

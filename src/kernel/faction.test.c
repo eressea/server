@@ -130,7 +130,7 @@ static void test_addfaction(CuTest *tc) {
     CuAssertTrue(tc, checkpasswd(f, "hurrdurr"));
     CuAssertPtrEquals(tc, (void *)lang, (void *)f->locale);
     CuAssertIntEquals(tc, FFL_ISNEW|FFL_PWMSG, f->flags);
-    CuAssertIntEquals(tc, 0, f->age);
+    CuAssertIntEquals(tc, 0, faction_age(f));
     CuAssertTrue(tc, faction_alive(f));
     CuAssertIntEquals(tc, M_GRAY, f->magiegebiet);
     CuAssertIntEquals(tc, 0, f->lastorders);

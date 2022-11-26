@@ -218,7 +218,7 @@ faction *addfaction(const char *email, const char *password,
     f->lastorders = 0;
     f->_alive = true;
     f->password_id = 0;
-    f->age = 0;
+    faction_set_age(f, 0);
     f->race = frace;
     f->magiegebiet = 0;
     f->locale = loc;
@@ -677,6 +677,16 @@ void remove_empty_factions(void)
     }
 }
 
+void faction_set_age(struct faction* f, int age)
+{
+    f->_age = age;
+}
+
+int faction_age(const struct faction* f)
+{
+    return f->_age;
+}
+
 bool faction_alive(const faction *f) {
     assert(f);
     return f->_alive || (f->flags&FFL_NPC);
@@ -824,7 +834,7 @@ void log_dead_factions(void)
             if (F) {
                 faction *f;
                 for (f = dead_factions; f; f = f->next) {
-                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, f->age, itoa36(f->no), f->email, f->name);
+                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, faction_age(f), itoa36(f->no), f->email, f->name);
                 }
                 fclose(F);
             }

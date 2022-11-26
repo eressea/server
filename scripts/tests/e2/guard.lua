@@ -13,6 +13,25 @@ function setup()
     eressea.settings.set("rules.food.flags", "4")
 end
 
+function notest_newbie_guard()
+    eressea.settings.set("NewbieImmunity", "2")
+    local r = region.create(0, 0, "plain")
+    local f1 = faction.create("human")
+    local u1 = unit.create(f1, r, 1)
+    f1.name = 'Xolgrim'
+    u1.name = 'Xolgrim'
+    u1:add_item("horse", 1)
+    u1:add_item("sword", 1)
+    u1:set_skill("melee", 2)
+    local f2 = faction.create("human")
+    local u2 = unit.create(f2, r, 1)
+    u1:add_order("BEWACHE")
+    process_orders()
+    assert_false(u1.guard)
+    process_orders()
+    assert_true(u1.guard)
+end
+
 function test_guard_unarmed()
     local r1 = region.create(0, 0, "plain")
     local f1 = faction.create("human", "hodor@eressea.de", "de")

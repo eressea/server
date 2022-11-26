@@ -195,7 +195,7 @@ give_item(int want, const item_type * itype, unit * src, unit * dest,
     if (n > want) n = want;
     delta = n;
     if (dest && src->faction != dest->faction
-        && src->faction->age < GiveRestriction()) {
+        && faction_age(src->faction) < GiveRestriction()) {
         if (ord != NULL) {
             ADDMSG(&src->faction->msgs, msg_feedback(src, ord, "giverestriction",
                 "turns", GiveRestriction()));
@@ -420,7 +420,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
         return msg;
     }
 
-    if (u->faction != u2->faction && u->faction->age < GiveRestriction()) {
+    if (u->faction != u2->faction && faction_age(u->faction) < GiveRestriction()) {
         return msg_feedback(u, ord, "giverestriction",
             "turns", GiveRestriction());
     }

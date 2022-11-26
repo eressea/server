@@ -107,7 +107,7 @@ newfaction *read_newfactions(const char *filename)
             snprintf(password, sizeof(password), "%s%s", itoa36(rng_int()), itoa36(rng_int()));
         }
         for (f = factions; f; f = f->next) {
-            if (strcmp(faction_getemail(f), email) == 0 && f->age < MINAGE_MULTI) {
+            if (strcmp(faction_getemail(f), email) == 0 && faction_age(f) < MINAGE_MULTI) {
                 log_warning("email %s already in use by %s", email, factionname(f));
                 break;
             }
@@ -258,8 +258,9 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
         if (r->units) {
             unit *u;
             for (u = r->units; u; u = u->next) {
-                if (!fval(u->faction, FFL_PAUSED | FFL_NOIDLEOUT) && u->faction->age > maxage) {
-                    maxage = u->faction->age;
+                int age = faction_age(u->faction);
+                if (!fval(u->faction, FFL_PAUSED | FFL_NOIDLEOUT) && age > maxage) {
+                    maxage = age;
                 }
             }
             ++inhabited;

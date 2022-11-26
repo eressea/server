@@ -10,7 +10,7 @@ extern "C" {
     typedef long long score_t;
 
     void score(void);
-    score_t average_score_of_age(int age, int a);
+    score_t average_score_of_age(int age);
     int default_score(const struct item_type *itype);
     void write_score(char *buffer, size_t size, score_t score);
 
