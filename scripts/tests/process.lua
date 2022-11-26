@@ -34,13 +34,12 @@ end
 function test_process_turn()
     turn_begin()
     turn = get_turn()
-    turn_process()
-    turn_end()
-    assert_equal(turn, get_turn())
     turn_begin()
-    assert_equal(turn+1, get_turn())
+    assert_equal(turn, get_turn())
     turn_process()
+    assert_equal(turn, get_turn())
     turn_end()
+    assert_equal(turn + 1, get_turn())
 end
 
 function test_write_reports()

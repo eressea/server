@@ -846,8 +846,8 @@ void demographics(void)
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
     const struct building_type *bt_harbour = bt_find("harbour");
-    season_t current_season = calendar_season(turn);
-    season_t last_weeks_season = calendar_season(turn - 1);
+    season_t current_season = calendar_season(turn + 1);
+    season_t last_weeks_season = calendar_season(turn);
 
     for (r = regions; r; r = r->next) {
         if (r->age>0 || r->units || r->attribs) {
@@ -3818,7 +3818,6 @@ void turn_begin(void)
         /* this should only happen during tests */
         turn = handle_start;
     }
-    ++turn;
     reset_game();
 }
 
@@ -3849,6 +3848,9 @@ void turn_end(void)
 
     /* am Ende der Auswertung die neuen Defaults zu den Befehlen dazu */
     update_defaults();
+
+    /* start the next week */
+    ++turn;
 }
 
 typedef enum cansee_t {

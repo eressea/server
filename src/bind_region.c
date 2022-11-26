@@ -228,7 +228,7 @@ static int tolua_region_set_morale(lua_State * L)
 static int tolua_region_get_is_mourning(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, NULL);
-    lua_pushboolean(L, is_mourning(r, turn+1));
+    lua_pushboolean(L, is_mourning(r, turn));
     return 1;
 }
 

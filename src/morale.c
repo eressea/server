@@ -20,11 +20,12 @@ static double popularity(void)
 }
 
 void morale_update(region *r) {
+    int now = turn + 1;
     int morale = region_get_morale(r);
     assert(r->land);
 
     if (r->land->ownership && r->land->ownership->owner) {
-        int stability = turn - r->land->ownership->morale_turn;
+        int stability = now - r->land->ownership->morale_turn;
         int maxmorale = MORALE_DEFAULT;
         building *b = largestbuilding(r, cmp_taxes, false);
         if (b) {
@@ -40,16 +41,16 @@ void morale_update(region *r) {
                     ch *= 1.2;            /* 20% improvement */
                 }
                 if (stability >= MORALE_AVERAGE * 2 || chance(ch)) {
-                    region_set_morale(r, morale + 1, turn);
+                    region_set_morale(r, morale + 1, now);
                 }
             }
         }
         else if (morale > maxmorale) {
-            region_set_morale(r, morale - 1, turn);
+            region_set_morale(r, morale - 1, now);
         }
     }
     else if (morale > MORALE_DEFAULT) {
-        region_set_morale(r, morale - 1, turn);
+        region_set_morale(r, morale - 1, now);
     }
 }
 
