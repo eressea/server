@@ -1,5 +1,4 @@
 if not config.autoseed or config.autoseed==0 then return nil end
-local autoseed = {}
 
 -- minimum required resources in the 7-hex neighborhood:
 local peasants = 10000
@@ -41,7 +40,6 @@ local function select_regions(regions, peasants, trees)
 end
 
 local function read_players()
---    return {{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }}
     local players =  {}
     local input = io.open("newfactions", "r")
     if input then
@@ -83,7 +81,7 @@ local function get_faction_by_email(email)
     return nil
 end
 
-function autoseed.init()
+local function autoseed()
     -- local newbs = {}
     local num_seeded = per_region
     local start = nil
@@ -123,5 +121,11 @@ function autoseed.init()
         end
     end
 end
+
+local autoseed = {
+    ["init"] = autoseed,
+    ["seed"] = seed,
+    ["read_players"] = read_players
+}
 
 return autoseed
