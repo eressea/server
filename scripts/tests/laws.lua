@@ -35,8 +35,8 @@ end
 
 function test_force_leave_on()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("human", "owner@eressea.de")
-    local f2 = faction.create("human", "guest@eressea.de")
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
     local u1 = unit.create(f1, r, 1)
     local u2 = unit.create(f2, r, 1)
     local b1 = building.create(r, "castle")
@@ -50,8 +50,8 @@ end
 
 function test_force_leave_off()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("human", "owner@eressea.de")
-    local f2 = faction.create("human", "guest@eressea.de")
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
     local u1 = unit.create(f1, r, 1)
     local u2 = unit.create(f2, r, 1)
     local b1 = building.create(r, "castle")
@@ -91,8 +91,8 @@ end
 
 function test_force_leave_postcombat()
     local r = region.create(0, 0, "plain")
-    local f1 = faction.create("human", "owner@eressea.de", "de")
-    local f2 = faction.create("human", "guest@eressea.de", "de")
+    local f1 = faction.create("human", "owner@eressea.de")
+    local f2 = faction.create("human", "guest@eressea.de")
     local u1 = unit.create(f1, r, 10)
     local u2 = unit.create(f2, r, 10)
     local u, u3
