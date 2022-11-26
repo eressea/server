@@ -17,6 +17,7 @@ end
 
 function move_all(from, to)
     -- move all units not in a ship
+    local moved = false
     local units = {}
     for u in from.units do
         if u.ship == nil and u.faction ~= 666 then
@@ -25,6 +26,7 @@ function move_all(from, to)
     end
     for _, u in ipairs(units) do
         u.region = to
+        moved = true
     end
 
     -- move all non-empty ships and units in them
@@ -38,18 +40,21 @@ function move_all(from, to)
             table.insert(units, u)
         end
         s.region = to
+        moved = true
         s.coast = nil
         for _, u in ipairs(units) do
             u.region = to
             u.ship = s
         end
     end
+    return moved
 end
 
 function warp.update()
     for _, w in ipairs(warps) do
-        print("warp from " .. tostring(w.from) .. " to " .. tostring(w.to))
-        move_all(w.from, w.to)
+        if move_all(w.from, w.to) then
+            print("warp from " .. tostring(w.from) .. " to " .. tostring(w.to))
+        end
     end
 end
 
