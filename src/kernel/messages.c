@@ -247,7 +247,7 @@ caddmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
         msg_release(m);
 }
 
-void addmessage(region * r, faction * f, const char *s, msg_t mtype, int level)
+void addmessage(struct region * r, struct faction * f, const char *s, enum msg_t mtype, int level)
 {
     caddmessage(r, f, s, mtype, level);
 }
@@ -327,4 +327,17 @@ void split_messages(message_list *mlist, struct mlist **split) {
         *split = NULL;
         mlist->end = split;
     }
+}
+
+const char* get_messagetype_name(const message* msg) {
+    const char* name;
+    assert(msg);
+    name = msg->type->name;
+    if (strcmp(name, "missing_message") == 0) {
+        name = (const char*)msg->parameters[0].v;
+    }
+    else if (strcmp(name, "missing_feedback") == 0) {
+        name = (const char*)msg->parameters[3].v;
+    }
+    return name;
 }

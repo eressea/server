@@ -630,16 +630,7 @@ message * test_get_last_message(message_list *msgs) {
 }
 
 const char * test_get_messagetype(const message *msg) {
-    const char * name;
-    assert(msg);
-    name = msg->type->name;
-    if (strcmp(name, "missing_message") == 0) {
-        name = (const char *)msg->parameters[0].v;
-    }
-    else if (strcmp(name, "missing_feedback") == 0) {
-        name = (const char *)msg->parameters[3].v;
-    }
-    return name;
+    return get_messagetype_name(msg);
 }
 
 struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev)
