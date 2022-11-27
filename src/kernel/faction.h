@@ -61,7 +61,6 @@ extern "C" {
         const struct locale *locale;
         int lastorders;
         int start_turn;
-        int _age;
         struct origin *origin;
         const struct race *race;
         int magiegebiet;

@@ -678,13 +678,11 @@ void remove_empty_factions(void)
 void faction_set_age(struct faction* f, int age)
 {
     f->start_turn = turn - age;
-    f->_age = age;
 }
 
 int faction_age(const struct faction* f)
 {
     int age = turn - f->start_turn;
-    assert(age == f->_age);
     return age;
 }
 

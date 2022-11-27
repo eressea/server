@@ -2785,7 +2785,6 @@ static void ageing(void)
     /* Factions */
     for (f = factions; f; f = f->next) {
         a_age(&f->attribs, f);
-        ++f->_age;
         handle_event(f->attribs, "timer", f);
     }
 
