@@ -403,6 +403,28 @@ static void json_building(cJSON *json, building_type *bt) {
     }
 }
 
+static void json_weapon(cJSON* json, weapon_type* wtype) {
+    cJSON* child;
+    if (json->type != cJSON_Object) {
+        log_error("weapon %s is not a json object: %d", json->string, json->type);
+        return;
+    }
+    for (child = json->child; child; child = child->next) {
+        switch (child->type) {
+        case cJSON_String:
+            if (strcmp(child->string, "skill") == 0) {
+                wtype->skill = findskill(child->valuestring);
+                break;
+            }
+            if (strcmp(child->string, "damage") == 0) {
+                wtype->damage[0] = str_strdup(child->valuestring);
+                wtype->damage[1] = str_strdup(child->valuestring);
+                break;
+            }
+        }
+    }
+}
+
 static void json_item(cJSON *json, item_type *itype) {
     cJSON *child;
     const char *flags[] = {
@@ -432,6 +454,14 @@ static void json_item(cJSON *json, item_type *itype) {
             }
             log_error("item %s contains unknown attribute %s", json->string, child->string);
         case cJSON_Object:
+            if (strcmp(child->string, "weapon") == 0) {
+                weapon_type* wtype = itype->rtype->wtype;
+                if (!wtype) {
+                    wtype = itype->rtype->wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+                }
+                json_weapon(child, wtype);
+                break;
+            }
         default:
             log_error("item %s contains unknown attribute %s", json->string, child->string);
         }

@@ -243,7 +243,7 @@ static void test_findrace(CuTest *tc) {
 static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
-        "\"axe\" : { \"weight\" : 2},"
+        "\"axe\" : { \"weight\" : 2, \"weapon\": { \"skill\": \"crossbow\", \"damage\" : \"2d4\" } },"
         "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20 }"
         "}}";
     cJSON *json = cJSON_Parse(data);
@@ -260,6 +260,9 @@ static void test_items(CuTest * tc)
 
     itype = it_find("axe");
     CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertPtrNotNull(tc, itype->rtype->wtype);
+    CuAssertIntEquals(tc, SK_CROSSBOW, itype->rtype->wtype->skill);
     CuAssertIntEquals(tc, 2, itype->weight);
     CuAssertIntEquals(tc, 0, itype->flags);
 
