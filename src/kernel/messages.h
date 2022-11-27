@@ -64,4 +64,7 @@ void split_messages(message_list *ml, struct mlist **split);
 void syntax_error(const struct unit *u, struct order *ord);
 void cmistake(const struct unit *u, struct order *ord, int mno, int mtype);
 struct message * msg_error(const struct unit * u, struct order *ord, int mno);
+
+const char* get_messagetype_name(const message* msg);
+
 #endif

@@ -60,19 +60,20 @@ function test_recruit_in_winter()
     local f = faction.create("insect")
     local u = unit.create(f, r, 1)
 
+    assert_equal('winter', get_season(1011))
+    assert_equal('spring', get_season(1012))
+
     u:add_item('money', 1000)
     u:clear_orders()
     u:add_order("REKRUTIERE 1")
-    set_turn(1010)
-    process_orders()
-    assert_equal('winter', get_season(get_turn()))
+    set_turn(1011)
+    turn_process()
     assert_equal(1, u.number)
 
     u:clear_orders()
     u:add_order("REKRUTIERE 1")
-    set_turn(1011)
-    process_orders()
-    assert_equal('spring', get_season(get_turn()))
+    set_turn(1012)
+    turn_process()
     assert_equal(2, u.number)
 end 
 

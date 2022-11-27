@@ -146,7 +146,7 @@ static int tolua_faction_set_magic(lua_State * L)
 static int tolua_faction_get_age(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
-    lua_pushinteger(L, f->age);
+    lua_pushinteger(L, faction_age(f));
     return 1;
 }
 
@@ -154,7 +154,7 @@ static int tolua_faction_set_age(lua_State * L)
 {
     faction *f = (faction *)tolua_tousertype(L, 1, NULL);
     int age = (int)tolua_tonumber(L, 2, 0);
-    f->age = age;
+    faction_set_age(f, age);
     return 0;
 }
 
@@ -260,7 +260,7 @@ static int tolua_faction_debug_messages(lua_State * L)
         for (ml = f->msgs->begin; ml; ml = ml->next, ++i) {
             char buf[120];
             nr_render(ml->msg, default_locale, buf, sizeof(buf), NULL);
-            puts(buf);
+            printf("%s:\t%s\n", get_messagetype_name(ml->msg), buf);
         }
     }
     return 0;
@@ -291,7 +291,8 @@ static int tolua_faction_count_msg_type(lua_State *L) {
     if (f->msgs) {
         mlist * ml = f->msgs->begin;
         while (ml) {
-            if (strcmp(str, ml->msg->type->name) == 0) {
+            const char* name = get_messagetype_name(ml->msg);
+            if (strcmp(str, name) == 0) {
                 ++n;
             }
             ml = ml->next;

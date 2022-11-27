@@ -202,10 +202,11 @@ char *faction_genpassword(faction *f, char *buffer) {
 faction *addfaction(const char *email, const char *password,
     const struct race * frace, const struct locale * loc)
 {
-    faction *f = calloc(1, sizeof(faction));
+    faction *f;
     const char *fname;
     char buf[128];
 
+    f = faction_create(unused_faction_id());
     if (!f) abort();
     if (check_email(email) == 0) {
         faction_setemail(f, email);
@@ -216,9 +217,8 @@ faction *addfaction(const char *email, const char *password,
 
     f->alliance_joindate = turn;
     f->lastorders = 0;
-    f->_alive = true;
     f->password_id = 0;
-    f->age = 0;
+    faction_set_age(f, 0);
     f->race = frace;
     f->magiegebiet = 0;
     f->locale = loc;
@@ -235,13 +235,11 @@ faction *addfaction(const char *email, const char *password,
         WANT_OPTION(O_COMPUTER) | WANT_OPTION(O_COMPRESS) |
         WANT_OPTION(O_ADRESSEN) | WANT_OPTION(O_STATISTICS);
 
-    f->no = unused_faction_id();
     if (rule_region_owners()) {
         alliance *al = makealliance(f->no, NULL);
         setalliance(f, al);
     }
     addlist(&factions, f);
-    fhash(f);
 
     fname = LOC(loc, "factiondefault");
     slprintf(buf, sizeof(buf), "%s %s", fname ? fname : "faction", itoa36(f->no));
@@ -677,6 +675,17 @@ void remove_empty_factions(void)
     }
 }
 
+void faction_set_age(struct faction* f, int age)
+{
+    f->start_turn = turn - age;
+}
+
+int faction_age(const struct faction* f)
+{
+    int age = turn - f->start_turn;
+    return age;
+}
+
 bool faction_alive(const faction *f) {
     assert(f);
     return f->_alive || (f->flags&FFL_NPC);
@@ -824,7 +833,7 @@ void log_dead_factions(void)
             if (F) {
                 faction *f;
                 for (f = dead_factions; f; f = f->next) {
-                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, f->age, itoa36(f->no), f->email, f->name);
+                    fprintf(F, "%d\t%d\t%d\t%s\t%s\t%s\n", turn, f->lastorders, faction_age(f), itoa36(f->no), f->email, f->name);
                 }
                 fclose(F);
             }
@@ -842,6 +851,8 @@ faction *faction_create(int no)
     faction *f = (faction *)calloc(1, sizeof(faction));
     if (!f) abort();
     f->no = no;
+    f->_alive = true;
+    faction_set_age(f, 0);
     fhash(f);
     return f;
 }

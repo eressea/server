@@ -452,12 +452,12 @@ static void test_newbie_password_message(CuTest *tc) {
     faction *f;
     test_setup();
     f = test_create_faction();
-    f->age = 5;
+    faction_set_age(f, 5);
     f->flags = 0;
     prepare_report(&ctx, f, NULL);
     CuAssertIntEquals(tc, 0, f->flags&FFL_PWMSG);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "changepasswd"));
-    f->age=2;
+    faction_set_age(f, 2);
     prepare_report(&ctx, f, NULL);
     CuAssertIntEquals(tc, FFL_PWMSG, f->flags&FFL_PWMSG);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "changepasswd"));
@@ -1007,22 +1007,22 @@ static void test_newbie_warning(CuTest *tc) {
     f = test_create_faction();
     config_set_int("NewbieImmunity", 3);
 
-    f->age = 0;
+    faction_set_age(f, 0);
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunity"));
     test_clear_messages(f);
 
-    f->age = 1;
+    faction_set_age(f, 1);
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunityending"));
     test_clear_messages(f);
 
-    f->age = 2;
+    faction_set_age(f, 2);
     report_warnings(f, 0);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "newbieimmunityended"));
     test_clear_messages(f);
 
-    f->age = 3;
+    faction_set_age(f, 3);
     report_warnings(f, 0);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunityended"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "newbieimmunityending"));
@@ -1180,7 +1180,7 @@ static void test_reports_genpassword(CuTest *tc) {
     CuAssertTrue(tc, f->password_id != 0);
     test_clear_messagelist(&f->msgs);
     f->lastorders = 1;
-    f->age = 2;
+    faction_set_age(f, 2);
     pwid = f->password_id;
     reports();
     CuAssertIntEquals(tc, pwid, f->password_id);

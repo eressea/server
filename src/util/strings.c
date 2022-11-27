@@ -250,12 +250,13 @@ void sbs_strncat(struct sbstring *sbs, const char *str, size_t size)
 
 void sbs_strcat(struct sbstring *sbs, const char *str)
 {
-    size_t len;
     assert(sbs);
-    len = sbs->size - (sbs->end - sbs->begin);
-    str_strlcpy(sbs->end, str, len);
-    sbs->end += strlen(sbs->end);
-    assert(sbs->begin + sbs->size >= sbs->end);
+    if (str) {
+        size_t len = sbs->size - (sbs->end - sbs->begin);
+        str_strlcpy(sbs->end, str, len);
+        sbs->end += strlen(sbs->end);
+        assert(sbs->begin + sbs->size >= sbs->end);
+    }
 }
 
 void sbs_substr(sbstring *sbs, ptrdiff_t pos, size_t len)

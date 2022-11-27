@@ -3,6 +3,8 @@
 #include "direction.h"     // for D_NORTHWEST
 #include "build.h"  // for construction
 #include "building.h"
+#include "calendar.h"
+#include "config.h"
 #include "resources.h"
 #include "unit.h"
 #include "terrain.h"
@@ -101,11 +103,32 @@ static void test_trees(CuTest *tc) {
     test_teardown();
 }
 
+static void test_mourning(CuTest *tc) {
+    struct region * r;
+    struct faction * f1, * f2;
+
+    test_setup();
+    config_set_int("rules.region_owners", 1);
+    r = test_create_plain(0, 0);
+    f1 = test_create_faction();
+    f2 = test_create_faction();
+    CuAssertTrue(tc, !is_mourning(r, turn));
+    region_set_owner(r, f1, turn);
+    CuAssertTrue(tc, !is_mourning(r, turn));
+    CuAssertTrue(tc, !is_mourning(r, turn + 1));
+    region_set_owner(r, f2, turn);
+    CuAssertTrue(tc, !is_mourning(r, turn));
+    CuAssertTrue(tc, is_mourning(r, turn + 1));
+    CuAssertTrue(tc, !is_mourning(r, turn + 2));
+    test_teardown();
+}
+
 CuSuite *get_region_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_terraform);
     SUITE_ADD_TEST(suite, test_trees);
+    SUITE_ADD_TEST(suite, test_mourning);
     SUITE_ADD_TEST(suite, test_region_getset_resource);
     SUITE_ADD_TEST(suite, test_region_get_owner);
     return suite;

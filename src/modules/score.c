@@ -29,16 +29,19 @@
 #include <math.h>
 #include <stdio.h>
 
-score_t average_score_of_age(int age, int a)
+score_t average_score_of_age(int age)
 {
+    int range = age / 24 + 1;
     faction *f;
     score_t sum = 0, count = 0;
 
     for (f = factions; f; f = f->next) {
-        if (!fval(f, FFL_NPC) && f->age <= age + a
-            && f->age >= age - a && f->race != get_race(RC_TEMPLATE)) {
-            sum += f->score;
-            count++;
+        if (!fval(f, FFL_NPC)) {
+            int f_age = faction_age(f);
+            if (f_age <= age + range && f_age >= age - range && f->race != get_race(RC_TEMPLATE)) {
+                sum += f->score;
+                count++;
+            }
         }
     }
 
@@ -146,15 +149,16 @@ void score(void)
         for (f = factions; f; f = f->next)
             if (!fval(f, FFL_NPC) && f->num_people != 0) {
                 char score[32];
+                int age = faction_age(f);
                 write_score(score, sizeof(score), f->score);
                 fprintf(scoreFP, "%s ", score);
-                write_score(score, sizeof(score), average_score_of_age(f->age, f->age / 24 + 1));
+                write_score(score, sizeof(score), average_score_of_age(age));
                 fprintf(scoreFP, "(%s) ", score);
                 fprintf(scoreFP, "%30.30s (%3.3s) %5s (%3d)\n",
                     f->name,
                     f->race->_name,
                     itoa36(f->no),
-                    f->age);
+                    age);
             }
         fclose(scoreFP);
     }

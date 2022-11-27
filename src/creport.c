@@ -1502,7 +1502,7 @@ static int
 report_computer(const char *filename, report_context * ctx, const char *bom)
 {
     static int era = -1;
-    int i;
+    int i, age;
     faction *f = ctx->f;
     const char *prefix, *str;
     region *r;
@@ -1554,13 +1554,14 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
         fprintf(F, "%d;alliance\n", f->alliance->id);
         fprintf(F, "%d;joined\n", f->alliance_joindate);
     }
-    fprintf(F, "%d;age\n", f->age);
+    age = faction_age(f);
+    fprintf(F, "%d;age\n", age);
     fprintf(F, "%d;Optionen\n", f->options);
-    if (f->options & WANT_OPTION(O_SCORE) && f->age > DISPLAYSCORE) {
+    if (f->options & WANT_OPTION(O_SCORE) && age > DISPLAYSCORE) {
         char score[32];
         write_score(score, sizeof(score), f->score);
         fprintf(F, "%s;Punkte\n", score);
-        write_score(score, sizeof(score), average_score_of_age(f->age, f->age / 24 + 1));
+        write_score(score, sizeof(score), average_score_of_age(age));
         fprintf(F, "%s;Punktedurchschnitt\n", score);
     }
     {
@@ -1592,7 +1593,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     if (i > 0)
         fprintf(F, "%d;max_heroes\n", i);
 
-    if (f->age > 1 && f->lastorders != turn) {
+    if (faction_age(f) > 1 && f->lastorders != turn) {
         fprintf(F, "%d;nmr\n", turn - f->lastorders);
     }
 

@@ -72,13 +72,12 @@ local function use_tree(terrain)
     u1:add_item("xmastree", 1)
     u1:clear_orders()
     u1:add_order("BENUTZEN 1 Weihnachtsbaum")
-    process_orders()
+    turn_process()
     return r
 end
 
 function test_xmastree()
-    local r
-    r = use_tree("ocean")
+    local r = use_tree("ocean")
     assert_nil(r:get_key("xm06")) 
     assert_equal(0, r:get_resource("tree"))
     eressea.free_game()

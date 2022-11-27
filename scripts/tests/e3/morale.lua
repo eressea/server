@@ -64,35 +64,28 @@ function test_morale_alliance()
   update_owners()
   r.morale = 6
 
-  local function run_a_turn()
-    process_orders()
-    f1.lastturn=get_turn()
-    f2.lastturn=get_turn()
-    f3.lastturn=get_turn()
-  end
-  
   -- just checking everything's okay after setup.
-  run_a_turn()
+  process_orders()
   assert_equal(6, r.morale)
   assert_false(r.is_mourning)
 
   
   -- change owner, new owner is in the same alliance
   u1.building = nil
-  run_a_turn()
-  assert_equal(4, r.morale)
+  process_orders()
   assert_true(r.is_mourning)
+  assert_equal(4, r.morale)
 
-  run_a_turn()
+  process_orders()
   assert_false(r.is_mourning) -- mourning recovers
 
   
   -- change owner, new owner is not in the same alliance
   u2.building = nil
-  run_a_turn()
+  process_orders()
   assert_equal(0, r.morale)
   assert_true(r.is_mourning)
-  run_a_turn()
+  process_orders()
   assert_false(r.is_mourning) -- mourning recovers
 end
 
@@ -113,20 +106,19 @@ function test_bigger_castle_empty()
     small.size = 10
     u2.building = small
 
-    local function run_a_turn()
-        process_orders()
-        f1.lastturn=get_turn()
-    end
-
+    turn_begin()
     update_owners()
+    turn_end()
     assert_equal(r.owner, u1.faction)
     u1.building = nil
+    turn_begin()
     update_owners()
+    turn_end()
     assert_equal(r.owner, u2.faction)
     assert_equal(0, r.morale)
     assert_true(r.is_mourning)
 
-    run_a_turn()
+    process_orders()
     assert_false(r.is_mourning) -- mourning recovers
 end
 
@@ -142,37 +134,32 @@ function test_morale_change()
     b.size = 10
     u1.building = b
 
-    local function run_a_turn()
-        process_orders()
-        f1.lastturn=get_turn()
-    end
-  
     -- reinhardt-regel: nach 2*AVG_STEP ist moral mindestens einmal gestiegen.
     update_owners()
-    assert_not_equal(r.owner, nil)
+    assert_not_nil(r.owner)
     assert_false(r.is_mourning)
-    for i=1,AVG_STEP*2 do
-        run_a_turn()
-        assert_not_equal(r.owner, nil)
+    for i = 1,AVG_STEP*2 do
+        process_orders()
+        assert_not_nil(r.owner)
     end
     assert_not_equal(1, r.morale)
     assert_false(r.is_mourning)
 
     -- regel: moral ist nie hoeher als 2 punkte ueber burgen-max.
-    for i=1,AVG_STEP*4 do
-        run_a_turn()
+    for i = 1,AVG_STEP*4 do
+        process_orders()
     end
     assert_equal(4, r.morale)
     assert_false(r.is_mourning)
   
     -- auch mit herrscher faellt moral um 1 pro woche, wenn moral > burgstufe
     r.morale = 6
-    run_a_turn()
+    process_orders()
     assert_equal(5, r.morale)
     assert_false(r.is_mourning)
-    run_a_turn()
+    process_orders()
     assert_equal(4, r.morale)
-    run_a_turn()
+    process_orders()
     assert_equal(4, r.morale)
     
     -- regel: ohne herrscher fällt die moral jede woche um 1 punkt, bis sie 1 erreicht
@@ -180,19 +167,19 @@ function test_morale_change()
     u1.building = nil
     update_owners()
     assert_false(r.is_mourning)
-    run_a_turn()
+    process_orders()
     assert_equal(3, r.morale)
     assert_false(r.is_mourning)
-    run_a_turn()
+    process_orders()
     assert_equal(2, r.morale)
-    run_a_turn()
+    process_orders()
     assert_equal(1, r.morale)
-    run_a_turn()
+    process_orders()
     assert_equal(1, r.morale)
     
     -- ohne herrscher ändert sich auch beschissene Moral nicht:
     r.morale = 0
-    run_a_turn()
+    process_orders()
     assert_equal(0, r.morale)
 end
 
