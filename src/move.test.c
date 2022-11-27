@@ -595,7 +595,7 @@ static void test_follow_bad_target(CuTest* tc) {
     test_teardown();
 }
 
-static void test_follow_unit(CuTest *tc) {
+static void test_follow_unit(CuTest* tc) {
     unit *u, *u2;
     order *ord;
     faction *f;
@@ -610,7 +610,8 @@ static void test_follow_unit(CuTest *tc) {
     ord = create_order(K_MOVE, f->locale, shortdirections[D_EAST] + 4);
     unit_addorder(u2, ord);
     u2->thisorder = copy_order(ord);
-    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u2->no));
+    ord = create_order(K_FOLLOW, f->locale, "%s %s",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no));
     unit_addorder(u, ord);
     u->thisorder = copy_order(ord);
 
@@ -642,7 +643,8 @@ static void test_follow_unit_self(CuTest *tc) {
 
     f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
-    ord = create_order(K_FOLLOW, f->locale, "EINHEIT %s", itoa36(u->no));
+    ord = create_order(K_FOLLOW, f->locale, "%s %s",
+        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
     unit_addorder(u, ord);
     follow_cmds(u);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "followfail"));
@@ -1046,6 +1048,33 @@ static void test_transport_unit(CuTest* tc)
     test_teardown();
 }
 
+static void test_transport_stealthed(CuTest* tc)
+{
+    unit* u1, * u2;
+    region *r, *r2;
+    faction *f, *f2;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    u1 = test_create_unit(f = test_create_faction(), r);
+    scale_number(u1, 10);
+    u2 = test_create_unit(f2 = test_create_faction(), r);
+    set_level(u1, SK_STEALTH, 1);
+    set_level(u2, SK_STEALTH, 1);
+    u2->thisorder = create_order(K_DRIVE, f->locale, itoa36(u1->no));
+    u1->thisorder = create_order(K_MOVE, f->locale, LOC(f->locale, directions[D_EAST]));
+    unit_addorder(u1, create_order(K_TRANSPORT, f->locale, itoa36(u2->no)));
+
+    movement();
+    CuAssertPtrEquals(tc, r2, u1->region);
+    CuAssertPtrEquals(tc, r2, u2->region);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f2->msgs, "feedback_unit_not_found"));
+
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1087,5 +1116,6 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_route_pause);
     SUITE_ADD_TEST(suite, test_make_movement_order);
     SUITE_ADD_TEST(suite, test_transport_unit);
+    SUITE_ADD_TEST(suite, test_transport_stealthed);
     return suite;
 }

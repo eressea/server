@@ -55,11 +55,17 @@ static void init_group(faction * f, group * g)
     g->allies = allies_clone(f->allies);
 }
 
-static group *find_groupbyname(group * g, const char *name)
+group *find_groupbyname(faction *f, const char *name)
 {
-    while (g && unicode_utf8_strcasecmp(name, g->name) != 0)
-        g = g->next;
-    return g;
+    group* g;
+    for (g = f->groups; g; g = g->next)
+    {
+        if (unicode_utf8_strcasecmp(name, g->name) == 0)
+        {
+            return g;
+        }
+    }
+    return NULL;
 }
 
 static group *find_group(int gid)
@@ -168,7 +174,7 @@ group *join_group(unit * u, const char *name)
     group *g = NULL;
 
     if (name && name[0]) {
-        g = find_groupbyname(u->faction->groups, name);
+        g = find_groupbyname(u->faction, name);
         if (g == NULL) {
             g = create_group(u->faction, name, ++maxgid);
             init_group(u->faction, g);

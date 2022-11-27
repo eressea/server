@@ -52,12 +52,10 @@ static void handle_unit(void *userData, int no) {
     parser_state *state = (parser_state *)userData;
     unit * u = findunit(no);
 
-    if (!u) {
-        /* TODO: error message */
-        parser_set_unit(state, NULL);
-    }
-    else if (u->faction != state->f) {
-        /* TODO: error message */
+    if (!u || u->faction != state->f) {
+        if (state->f) {
+            ADDMSG(&state->f->msgs, msg_message("unit_not_found", "unit", no));
+        }
         parser_set_unit(state, NULL);
     }
     else {

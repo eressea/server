@@ -1428,7 +1428,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         /* flying races ignore min- and maxrow and can attack anyone fighting
          * them */
         minrow = FIGHT_ROW;
-        maxrow = BEHIND_ROW;
+        if (maxrow < BEHIND_ROW) maxrow = BEHIND_ROW;
     }
 
     if (minrow < FIGHT_ROW) minrow = FIGHT_ROW;
@@ -1788,7 +1788,7 @@ static void do_combatspell(troop at)
         return;
     }
     sp = mage_get_combatspell(mage, 1, &sl);
-    if (sp == NULL || sl <= 0 || !u_hasspell(u, sp)) {
+    if (sp == NULL || !u_hasspell(u, sp)) {
         fi->magic = 0;              /* Hat keinen Kampfzauber, kaempft nichtmagisch weiter */
         return;
     }
@@ -1797,7 +1797,7 @@ static void do_combatspell(troop at)
         fi->magic = 0;              /* Kann nicht mehr Zaubern, kaempft nichtmagisch weiter */
         return;
     }
-    else if (sl < level) {
+    else if (sl > 0 && sl < level) {
         level = sl;
     }
     if (fumble(r, u, sp, level)) {
@@ -2420,7 +2420,7 @@ static int loot_quota(const unit * src, const unit * dst,
     return n;
 }
 
-static void loot_items(fighter * corpse)
+void loot_items(fighter * corpse)
 {
     unit *u = corpse->unit;
     item *itm = u->items;

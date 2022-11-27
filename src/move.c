@@ -403,9 +403,6 @@ bool canfly(unit * u)
     if (fval(u_race(u), RCF_FLY))
         return true;
 
-    if (get_movement(&u->attribs, MV_FLY))
-        return true;
-
     return false;
 }
 
@@ -418,12 +415,6 @@ bool canswim(unit * u)
         return true;
 
     if (u_race(u)->flags & RCF_SWIM)
-        return true;
-
-    if (get_movement(&u->attribs, MV_FLY))
-        return true;
-
-    if (get_movement(&u->attribs, MV_SWIM))
         return true;
 
     return false;
@@ -685,8 +676,7 @@ int check_ship_allowed(struct ship *sh, const region * r)
         int reason = SA_NO_COAST;
         const building_type* bt_harbour = bt_find("harbour");
         if (sh->type->coasts) {
-            unsigned c;
-            size_t n = arrlen(sh->type->coasts);
+            ptrdiff_t c, n = arrlen(sh->type->coasts);
             for (c = 0; c != n; ++c) {
                 if (sh->type->coasts[c] == r->terrain) {
                     reason = SA_COAST;
@@ -1203,11 +1193,7 @@ bool is_transporting(const unit * ut, const unit * u)
 static bool can_move(const unit * u)
 {
     if (is_paused(u->faction)) return false;
-    if (u_race(u)->flags & RCF_CANNOTMOVE)
-        return false;
-    if (get_movement(&u->attribs, MV_CANNOTMOVE))
-        return false;
-    return true;
+    return (0 == (u_race(u)->flags & RCF_CANNOTMOVE));
 }
 
 static void init_movement(void)
@@ -1234,11 +1220,6 @@ static void init_movement(void)
 
                 init_order(u->thisorder, NULL);
                 if (getunit(r, u->faction, &ut) != GET_UNIT || ut->region != u->region) {
-                    ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-                        "feedback_unit_not_found", NULL));
-                    continue;
-                }
-                if (!cansee(u->faction, r, ut, 0)) {
                     ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
                         "feedback_unit_not_found", NULL));
                 }
@@ -2357,13 +2338,16 @@ int follow_ship(unit * u, order * ord)
     moves = 1;
 
     speed = getuint();
-    if (speed == 0) {
-        speed = shipspeed(u->ship, u);
-    }
-    else {
-        int maxspeed = shipspeed(u->ship, u);
-        if (maxspeed < speed)
-            speed = maxspeed;
+    if (u->ship && ship_owner(u->ship) == u) {
+        if (speed == 0) {
+            speed = shipspeed(u->ship, u);
+        }
+        else {
+            int maxspeed = shipspeed(u->ship, u);
+            if (maxspeed < speed) {
+                speed = maxspeed;
+            }
+        }
     }
     rc = rconnect(rc, dir);
     while (rc && (!sh || rc != sh->region) && moves < speed && (dir = hunted_dir(rc->attribs, id)) != NODIRECTION) {

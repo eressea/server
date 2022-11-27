@@ -177,7 +177,7 @@ static bool RemoveNMRNewbie(void)
 static void dumbeffect(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
-        size_t s, n = arrlen(u->skills);
+        ptrdiff_t s, n = arrlen(u->skills);
         skill *sb = NULL;
         for (s = 0; s != n; ++s) {
             skill* sv = u->skills + s;
@@ -952,7 +952,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
 
     for (u = fdst->units; u != NULL; u = u->nextF) {
         if (u->skills) {
-            size_t s, len = arrlen(u->skills);
+            ptrdiff_t s, len = arrlen(u->skills);
             for (s = 0; s != len; ++s) {
                 skill_t sk = (skill_t)u->skills[s].id;
                 skill_count[sk] += u->number;
@@ -985,7 +985,7 @@ void transfer_faction(faction *fsrc, faction *fdst) {
                 }
 
                 if (u->skills) {
-                    size_t s, len = arrlen(u->skills);
+                    ptrdiff_t s, len = arrlen(u->skills);
                     for (s = 0; s != len; ++s) {
                         const skill *sv = u->skills + s;
                         skill_t sk = (skill_t)sv->id;
@@ -1012,10 +1012,8 @@ int quit_cmd(unit * u, struct order *ord)
     char token[128];
     faction *f = u->faction;
     const char *passwd;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_QUIT);
+    init_order(ord, NULL);
     passwd = gettoken(token, sizeof(token));
     if (checkpasswd(f, (const char *)passwd)) {
         int flags = FFL_QUIT;
@@ -1169,10 +1167,11 @@ int enter_building(unit * u, order * ord, int id, bool report)
 {
     region *r = u->region;
     building *b;
+    const struct race* rc = u_race(u);
 
     /* Schwimmer koennen keine Gebaeude betreten, ausser diese sind
      * auf dem Ozean */
-    if (!fval(u_race(u), RCF_WALK) && !fval(u_race(u), RCF_FLY)) {
+    if (fval(rc, RCF_SWIM|RCF_WALK|RCF_FLY) == RCF_SWIM) {
         if (!fval(r->terrain, SEA_REGION)) {
             if (report) {
                 cmistake(u, ord, 232, MSG_MOVE);
@@ -1721,7 +1720,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-static bool try_rename(unit *u, building *b, order *ord) {
+static bool can_rename_building(unit *u, building *b, order *ord) {
     unit *owner = b ? building_owner(b) : NULL;
     bool foreign = !(owner && owner->faction == u->faction);
 
@@ -1761,16 +1760,6 @@ static bool try_rename(unit *u, building *b, order *ord) {
     return true;
 }
 
-int
-rename_building(unit * u, order * ord, building * b, const char *name)
-{
-    assert(name);
-    if (!try_rename(u, b, ord)) {
-        return -1;
-    }
-    return rename_cmd(u, ord, &b->name, name);
-}
-
 int name_cmd(struct unit *u, struct order *ord)
 {
     char token[128];
@@ -1780,6 +1769,7 @@ int name_cmd(struct unit *u, struct order *ord)
     param_t p;
     bool foreign = false;
     const char *str;
+    const char* name = NULL;
 
     init_order(ord, u->faction->locale);
     str = gettoken(token, sizeof(token));
@@ -1806,7 +1796,7 @@ int name_cmd(struct unit *u, struct order *ord)
         if (foreign) {
             b = getbuilding(u->region);
         }
-        if (try_rename(u, b, ord)) {
+        if (can_rename_building(u, b, ord)) {
             s = &b->name;
         }
         break;
@@ -1956,7 +1946,17 @@ int name_cmd(struct unit *u, struct order *ord)
     {
         group *g = get_group(u);
         if (g) {
-            s = &g->name;
+            name = getstrtoken();
+            if (name == NULL) {
+                cmistake(u, ord, 84, MSG_EVENT);
+                return 0;
+            }
+            if (find_groupbyname(u->faction, name)) {
+                cmistake(u, ord, 332, MSG_EVENT);
+            }
+            else {
+                s = &g->name;
+            }
             break;
         }
         else {
@@ -1971,12 +1971,14 @@ int name_cmd(struct unit *u, struct order *ord)
     }
 
     if (s != NULL) {
-        const char *name = getstrtoken();
-        if (name) {
-            rename_cmd(u, ord, s, name);
+        if (name == NULL) {
+            name = getstrtoken();
+        }
+        if (name == NULL) {
+            cmistake(u, ord, 84, MSG_EVENT);
         }
         else {
-            cmistake(u, ord, 84, MSG_EVENT);
+            rename_cmd(u, ord, s, name);
         }
     }
 
@@ -2426,10 +2428,7 @@ int promotion_cmd(unit * u, struct order *ord)
 
 int group_cmd(unit * u, struct order *ord)
 {
-    keyword_t kwd;
-
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_GROUP);
+    init_order(ord, NULL);
     join_group(u, getstrtoken());
     return 0;
 }
@@ -2905,8 +2904,8 @@ static void maketemp_cmd(unit *u, order **olist)
         ship *sh;
         unit *u2;
         order **ordp, **oinsert;
-        keyword_t kwd = init_order(makeord, NULL);
-        assert(kwd == K_MAKETEMP);
+        
+        init_order(makeord, NULL);
         alias = getid();
         s = gettoken(token, sizeof(token));
         if (s && s[0] == '\0') {
@@ -3603,12 +3602,12 @@ int armedmen(const unit * u, bool siege_weapons)
 
 static void enter_1(region * r)
 {
-    do_enter(r, 0);
+    do_enter(r, false);
 }
 
 static void enter_2(region * r)
 {
-    do_enter(r, 1);
+    do_enter(r, true);
 }
 
 bool help_enter(unit *uo, unit *u) {

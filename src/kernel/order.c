@@ -634,11 +634,9 @@ void close_orders(void) {
 
 order *default_order(const struct locale *lang)
 {
-    int i = locale_index(lang);
     keyword_t kwd;
     const char * str;
 
-    assert(i < MAXLOCALES);
     kwd = keyword_disabled(K_WORK) ? NOKEYWORD : K_WORK;
     str = config_get("orders.default");
     if (str) {

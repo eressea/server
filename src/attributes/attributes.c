@@ -182,6 +182,7 @@ void register_attributes(void)
     register_bordertype(&bt_illusionwall);
     register_bordertype(&bt_road);
 
+    at_deprecate("movement", a_readint); /* individual units that can fly or swim, never used */
     at_deprecate("roads_override", a_readstring);
     at_deprecate("npcfaction", a_readint);
     at_deprecate("siege", a_readint);
@@ -208,5 +209,4 @@ void register_attributes(void)
     at_register(&at_otherfaction);
     at_register(&at_racename);
     at_register(&at_speedup);
-    at_register(&at_movement);
 }

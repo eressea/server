@@ -17,10 +17,8 @@ const char * password_hash(const char * passwd, cryptalgo_t algo) {
     if (algo == PASSWORD_BCRYPT && bcrypt_workfactor != 0) {
         char salt[BCRYPT_HASHSIZE];
         static char hash[BCRYPT_HASHSIZE];
-        int ret;
         bcrypt_gensalt(bcrypt_workfactor, salt);
-        ret = bcrypt_hashpw(passwd, salt, hash);
-        assert(ret == 0);
+        bcrypt_hashpw(passwd, salt, hash);
         return hash;
     }
     return passwd;

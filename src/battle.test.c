@@ -613,6 +613,49 @@ static void test_battle_skilldiff(CuTest *tc)
     test_teardown();
 }
 
+static void test_loot_items(CuTest* tc)
+{
+    troop ta, td;
+    region* r;
+    unit* ua, * ud;
+    battle* b = NULL;
+    const resource_type* rtype;
+    race* rc;
+
+    test_setup();
+    test_create_horse();
+    rc = test_create_race("ghost");
+    rc->flags |= RCF_FLY; /* bug 2887 */
+
+    r = test_create_plain(0, 0);
+    ud = test_create_unit(test_create_faction(), r);
+    ud->status = ST_FLEE; /* bug 2887 */
+    ua = test_create_unit(test_create_faction(), r);
+    u_setrace(ua, rc);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+
+    ta.fighter->alive = 0;
+    ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
+    ta.fighter->side->enemies[0] = td.fighter->side;
+    ta.fighter->side->enemies[1] = NULL;
+    td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
+    td.fighter->side->enemies[0] = ta.fighter->side;
+    td.fighter->side->enemies[1] = NULL;
+
+    rtype = get_resourcetype(R_HORSE);
+    rtype->itype->flags |= ITF_NOTLOST; /* must always be looted */
+    i_change(&ua->items, rtype->itype, 1);
+    loot_items(ta.fighter);
+    CuAssertIntEquals(tc, 1, i_get(td.fighter->loot, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(ua->items, rtype->itype));
+
+    free_battle(b);
+    test_teardown();
+}
+
 static void test_terminate(CuTest * tc)
 {
     troop at, dt;
@@ -945,6 +988,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_projectile_armor);
     SUITE_ADD_TEST(suite, test_tactics_chance);
     SUITE_ADD_TEST(suite, test_terminate);
+    SUITE_ADD_TEST(suite, test_loot_items);
     DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

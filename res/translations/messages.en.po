@@ -172,7 +172,7 @@ msgstr "\"In $region($region), the Lords of the Trees have risen.\""
 msgid "victory_murder_cfulfilled"
 msgstr "\"Attention: $faction($faction) has fulfilled the victory condition and will be declared winner in $if($eq($remain,1),\"one week\",\"$int($remain) weeks\").\""
 
-msgid "headache_effect_1"
+msgid "hangover_effect_1"
 msgstr "\"$unit($unit) has a splitting headache and can hardly remember last week. Except that it all started in the tavern...\""
 
 msgid "feedback_no_contact"
@@ -792,6 +792,9 @@ msgstr "\"$unit($unit) caught $unit($saboteur) trying to sink $ship($ship).\""
 msgid "wrongpasswd"
 msgstr "\"Your orders had the wrong password (${password}).\""
 
+msgid "unit_not_found"
+msgstr "\"UNIT $int36($unit): This is not our unit.\""
+
 msgctxt "curseinfo"
 msgid "sparkle_9"
 msgstr "\"A large green snake offers $unit($unit) a fine-looking apple. ($int36($id))\""
@@ -976,7 +979,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) 
 msgid "cast_drainlife_effect"
 msgstr "\"$unit($mage) casts $spell($spell): $int($amount) fighters had their life energy drained.\""
 
-msgid "headache_effect_0"
+msgid "hangover_effect_0"
 msgstr "\"$unit($mage) invites $unit($unit) for a few too many drinks and a massive hangover.\""
 
 msgid "unholypower_limitedeffect"
@@ -2857,6 +2860,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ships can only 
 
 msgid "error331"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit must be on board a ship.\""
+
+msgid "error332"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is already a group by this name.\""
 
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Missign number of $localize($resource,0).\""

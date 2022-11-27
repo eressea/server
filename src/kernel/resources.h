@@ -23,7 +23,6 @@ extern "C" {
         int base;
         int divisor;
         int startlevel;
-        struct rawmaterial *next;
     } rawmaterial;
 
     /* resource-limits for regions */

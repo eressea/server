@@ -533,17 +533,22 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
 static void test_shipspeed_at_speedup(CuTest *tc) {
     ship *sh;
     unit *cap, *crew;
-    attrib *a;
 
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
     assert(sh && cap && crew);
 
-    a = a_new(&at_speedup);
-    a->data.i = 3;
-    a_add(&sh->attribs, a);
+    CuAssertTrue(tc, set_speedup(&sh->attribs, 3, 50));
+    CuAssertIntEquals(tc, 3, get_speedup(sh->attribs));
+    // cannot set it twice:
+    CuAssertTrue(tc, !set_speedup(&sh->attribs, 6, 50));
+    CuAssertIntEquals(tc, 3, get_speedup(sh->attribs));
     CuAssertIntEquals_Msg(tc, "at_speedup adds value to range", sh->type->range + 3, shipspeed(sh, cap));
+
+    CuAssertTrue(tc, add_speedup(&sh->attribs, 2, 50));
+    CuAssertIntEquals(tc, 5, get_speedup(sh->attribs));
+
     test_teardown();
 }
 
@@ -723,17 +728,12 @@ static void test_shipspeed(CuTest *tc) {
 static void test_shipspeed_max_range(CuTest *tc) {
     ship *sh;
     ship_type *stype;
-    region *r;
-    struct faction *f;
     unit *cap, *crew;
 
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
     config_set("movement.shipspeed.skillbonus", "5");
-    r = sh->region;
-    f = test_create_faction();
-    assert(r && f);
     stype = st_get_or_create(sh->type->_name);
 
     set_level(cap, SK_SAILING, stype->cptskill + 4);

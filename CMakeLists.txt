@@ -78,7 +78,6 @@ add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 
-#add_test(NAME unit.tests COMMAND test_eressea)
 add_test(NAME lua-core
  COMMAND eressea -v1 ../scripts/run-tests.lua
  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)

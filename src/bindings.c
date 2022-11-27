@@ -67,6 +67,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -725,8 +726,7 @@ static int config_get_stype(lua_State * L)
             lua_pushinteger(L, stype->fishing);
             lua_settable(L, -3);
             if (stype->coasts) {
-                unsigned c;
-                size_t n = arrlen(stype->coasts);
+                ptrdiff_t c, n = arrlen(stype->coasts);
                 lua_pushstring(L, "coasts");
                 lua_newtable(L);
                 for (c = 0; c != n; ++c) {

@@ -6,6 +6,8 @@
 #include "spy.h"
 #include "travelthru.h"
 
+#include "attributes/attributes.h"
+
 #include "kernel/ally.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
@@ -26,9 +28,8 @@
 #include "util/nrmessage.h"
 #include "util/variant.h"
 
-#include "attributes/attributes.h"
-
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -363,6 +364,56 @@ static void test_bufunit(CuTest *tc) {
     test_teardown();
 }
 
+static void test_bufunit_racename_plural(CuTest *tc) {
+    unit *u;
+    faction *f;
+    race *rc, *rct;
+    struct locale *lang;
+    char buffer[256];
+
+    test_setup();
+    rc = rc_get_or_create("human");
+    rct = rc_get_or_create("orc");
+    rc->bonus[SK_ALCHEMY] = 1;
+    lang = get_or_create_locale("de");
+    locale_setstring(lang, "race::orc", "Ork");
+    locale_setstring(lang, "race::orc_p", "Orks");
+    locale_setstring(lang, "race::human", "Mensch");
+    locale_setstring(lang, "race::human_p", "Menschen");
+    locale_setstring(lang, "status_aggressive", "aggressiv");
+    init_skills(lang);
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    u->faction->locale = f->locale = lang;
+    renumber_faction(u->faction, 7);
+    faction_setname(u->faction, "UFO");
+    unit_setname(u, "Hodor");
+    unit_setid(u, 1);
+
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 1 Mensch.", buffer);
+
+    scale_number(u, 2);
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 2 Menschen.", buffer);
+
+    unit_convert_race(u, rct, "human");
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 2 Menschen.", buffer);
+
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 2 Menschen (Orks), aggressiv.", buffer);
+
+    scale_number(u, 1);
+    bufunit_depr(f, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), UFO (7), 1 Mensch.", buffer);
+
+    bufunit_depr(u->faction, u, 0, buffer, sizeof(buffer));
+    CuAssertStrEquals(tc, "Hodor (1), 1 Mensch (Ork), aggressiv.", buffer);
+
+    test_teardown();
+}
+
 static void test_arg_resources(CuTest *tc) {
     variant v1, v2;
     arg_type *atype;
@@ -547,6 +598,65 @@ static void test_get_addresses_travelthru(CuTest *tc) {
     CuAssertTrue(tc, !selist_contains(ctx.addresses, f4, NULL));
     CuAssertIntEquals(tc, 3, selist_length(ctx.addresses));
     finish_reports(&ctx);
+    test_teardown();
+}
+
+void test_prepare_lighthouse_range(CuTest *tc) {
+    building *b;
+    building_type *btype;
+    unit *u1, *u2;
+    region *r1, *r2, *r3;
+    faction *f;
+    const struct terrain_type *t_ocean, *t_plain;
+    report_context ctx;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    btype = test_create_buildingtype("lighthouse");
+    btype->maxcapacity = 4;
+    r1 = test_create_region(0, 0, t_plain);
+    r2 = test_create_region(1, 0, t_plain);
+    r3 = test_create_region(2, 0, t_ocean);
+    b = test_create_building(r1, btype);
+    b->size = 10;
+    update_lighthouse(b);
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, NULL));
+
+    f = test_create_faction();
+    u1 = test_create_unit(f, r1);
+    u1->building = b;
+    set_level(u1, SK_PERCEPTION, 3);
+    CuAssertIntEquals(tc, 1, lighthouse_view_distance(b, u1));
+    u2 = test_create_unit(f, r1);
+    u2->building = b;
+    set_level(u2, SK_PERCEPTION, 6);
+    CuAssertIntEquals(tc, 2, lighthouse_view_distance(b, u2));
+    CuAssertPtrEquals(tc, b, inside_building(u1));
+    CuAssertPtrEquals(tc, b, inside_building(u2));
+    prepare_report(&ctx, u1->faction, NULL);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse_land, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r3->seen.mode);
+    finish_reports(&ctx);
+
+    /* super lighthouse, huge range of 6 */
+    test_create_region(3, 0, t_ocean);
+    test_create_region(4, 0, t_ocean);
+    r2 = test_create_region(5, 0, t_ocean);
+    r3 = test_create_region(6, 0, t_ocean);
+    b->size = 100000;
+    set_level(u2, SK_PERCEPTION, 18);
+    prepare_report(&ctx, u1->faction, NULL);
+    CuAssertPtrEquals(tc, r1, ctx.first);
+    CuAssertPtrEquals(tc, NULL, ctx.last);
+    CuAssertIntEquals(tc, seen_unit, r1->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r2->seen.mode);
+    CuAssertIntEquals(tc, seen_lighthouse, r3->seen.mode);
+    finish_reports(&ctx);
+
     test_teardown();
 }
 
@@ -779,10 +889,10 @@ static void test_region_distance_max(CuTest *tc) {
             }
         }
     }
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 64));
-    CuAssertIntEquals(tc, 7, get_regions_distance_arr(r, 1, result, 64));
-    CuAssertIntEquals(tc, 19, get_regions_distance_arr(r, 2, result, 64));
-    CuAssertIntEquals(tc, 37, get_regions_distance_arr(r, 3, result, 64));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 64));
+    CuAssertIntEquals(tc, 7, (int)get_regions_distance_arr(r, 1, result, 64));
+    CuAssertIntEquals(tc, 19, (int)get_regions_distance_arr(r, 2, result, 64));
+    CuAssertIntEquals(tc, 37, (int)get_regions_distance_arr(r, 3, result, 64));
     test_teardown();
 }
 
@@ -791,34 +901,34 @@ static void test_region_distance(CuTest *tc) {
     region *result[8];
     test_setup();
     r = test_create_plain(0, 0);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 8));
     CuAssertPtrEquals(tc, r, result[0]);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 1, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 1, result, 8));
     test_create_region(1, 0, 0);
     test_create_region(0, 1, 0);
-    CuAssertIntEquals(tc, 1, get_regions_distance_arr(r, 0, result, 8));
-    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 1, result, 8));
-    CuAssertIntEquals(tc, 3, get_regions_distance_arr(r, 2, result, 8));
+    CuAssertIntEquals(tc, 1, (int)get_regions_distance_arr(r, 0, result, 8));
+    CuAssertIntEquals(tc, 3, (int)get_regions_distance_arr(r, 1, result, 8));
+    CuAssertIntEquals(tc, 3, (int)get_regions_distance_arr(r, 2, result, 8));
     test_teardown();
 }
 
 static void test_region_distance_ql(CuTest *tc) {
     region *r;
-    selist *ql;
+    region **arr;
     test_setup();
     r = test_create_plain(0, 0);
-    ql = get_regions_distance(r, 0);
-    CuAssertIntEquals(tc, 1, selist_length(ql));
-    CuAssertPtrEquals(tc, r, selist_get(ql, 0));
-    selist_free(ql);
+    arr = get_regions_distance(r, 0);
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, r, arr[0]);
+    arrfree(arr);
     test_create_region(1, 0, 0);
     test_create_region(0, 1, 0);
-    ql = get_regions_distance(r, 1);
-    CuAssertIntEquals(tc, 3, selist_length(ql));
-    selist_free(ql);
-    ql = get_regions_distance(r, 2);
-    CuAssertIntEquals(tc, 3, selist_length(ql));
-    selist_free(ql);
+    arr = get_regions_distance(r, 1);
+    CuAssertIntEquals(tc, 3, (int)arrlen(arr));
+    arrfree(arr);
+    arr = get_regions_distance(r, 2);
+    CuAssertIntEquals(tc, 3, (int)arrlen(arr));
+    arrfree(arr);
     test_teardown();
 }
 
@@ -1091,6 +1201,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_prepare_lighthouse);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_owners);
     SUITE_ADD_TEST(suite, test_prepare_lighthouse_capacity);
+    SUITE_ADD_TEST(suite, test_prepare_lighthouse_range);
     SUITE_ADD_TEST(suite, test_prepare_travelthru);
     SUITE_ADD_TEST(suite, test_get_addresses);
     SUITE_ADD_TEST(suite, test_get_addresses_fstealth);
@@ -1103,6 +1214,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_sparagraph);
     SUITE_ADD_TEST(suite, test_sparagraph_long);
     SUITE_ADD_TEST(suite, test_bufunit);
+    SUITE_ADD_TEST(suite, test_bufunit_racename_plural);
     SUITE_ADD_TEST(suite, test_bufunit_bullets);
     SUITE_ADD_TEST(suite, test_bufunit_fstealth);
     SUITE_ADD_TEST(suite, test_bufunit_help_stealth);

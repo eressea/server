@@ -172,7 +172,7 @@ msgstr "\"In $region($region) erschienen die Herren der Bäume.\""
 msgid "victory_murder_cfulfilled"
 msgstr "\"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),\"einer Woche\",\"$int($remain) Wochen\") zum Sieger erklärt werden.\""
 
-msgid "headache_effect_1"
+msgid "hangover_effect_1"
 msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing....\""
 
 msgid "feedback_no_contact"
@@ -792,6 +792,9 @@ msgstr "\"$unit($unit) entdeckte $unit($saboteur) beim Versenken von $ship($ship
 msgid "wrongpasswd"
 msgstr "\"Deine Befehle hatten ein falsches Passwort (${password}).\""
 
+msgid "unit_not_found"
+msgstr "\"EINHEIT $int36($unit): Diese Einheit gehört uns nicht.\""
+
 msgctxt "curseinfo"
 msgid "sparkle_9"
 msgstr "\"$unit($unit) bekommt von einer Schlange einen Apfel angeboten. ($int36($id))\""
@@ -976,7 +979,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $race($race,0) 
 msgid "cast_drainlife_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Kriegern wurde ihre Lebenskraft entzogen.\""
 
-msgid "headache_effect_0"
+msgid "hangover_effect_0"
 msgstr "\"$unit($mage) verschafft $unit($unit) einige feuchtfröhliche Stunden mit heftigen Nachwirkungen.\""
 
 msgid "unholypower_limitedeffect"
@@ -2610,7 +2613,7 @@ msgid "error84"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Name angegeben.\""
 
 msgid "spellfail_noexpensives"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat unaufkündbare Bindungen an seine alte Partei.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat unaufkündbare Bindungen an ihre alte Partei.\""
 
 msgid "error287"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dorthin können wir die Einheit nicht transportieren.\""
@@ -2854,6 +2857,9 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Schiffe können
 
 msgid "error331"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht auf einem Schiff.\""
+
+msgid "error332"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es gibt bereits eine Gruppe mit diesem Namen.\""
 
 msgid "give_number_missing"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Anzahl der $localize($resource) fehlt.\""

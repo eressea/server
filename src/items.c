@@ -133,10 +133,8 @@ struct order *ord)
     for (i = 0; i != amount; ++i) {
         int effect;
         double force;
-        spell *sp = find_spell("antimagiczone");
         attrib **ap = &r->attribs;
         UNUSED_ARG(ord);
-        assert(sp);
 
         /* Reduziert die Staerke jedes Spruchs um effect */
         effect = 5;

@@ -12,6 +12,8 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
+#include <stb_ds.h>
+
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
@@ -23,13 +25,13 @@ static double ResourceFactor(void)
 
 void update_resources(region * r)
 {
-    struct rawmaterial *res = r->resources;
-    while (res) {
+    ptrdiff_t len = arrlen(r->resources);
+    for (ptrdiff_t i = 0; i != len; ++i) {
+        rawmaterial* res = r->resources + i;
         struct rawmaterial_type *raw = rmt_get(res->rtype);
         if (raw && raw->update) {
             raw->update(res, r);
         }
-        res = res->next;
     }
 }
 
@@ -56,12 +58,8 @@ void set_resource(struct rawmaterial *rm, int level, int base, int divisor)
 struct rawmaterial *
 add_resource(region * r, int level, int base, int divisor,
 const resource_type * rtype)
-{
-    struct rawmaterial *rm = calloc(1, sizeof(struct rawmaterial));
-
-    if (!rm) abort();
-    rm->next = r->resources;
-    r->resources = rm;
+{    
+    struct rawmaterial *rm = arraddnptr(r->resources, 1);
     rm->flags = 0;
     rm->rtype = rtype;
     set_resource(rm, level, base, divisor);
@@ -72,27 +70,20 @@ void terraform_resources(region * r)
 {
     int i;
     const terrain_type *terrain = r->terrain;
-    bool terraform_all = config_get_int("rules.terraform.all", 0) != 0;
 
-    if (terrain->production == NULL)
+    if (terrain->production == NULL) {
         return;
+    }
+    if (r->resources != NULL) {
+        arrfree(r->resources);
+    }
     for (i = 0; terrain->production[i].type; ++i) {
-        rawmaterial *rm;
+        
         const terrain_production *production = terrain->production + i;
-        const resource_type *rtype = production->type;
 
-        for (rm = r->resources; rm; rm = rm->next) {
-            if (rm->rtype == rtype)
-                break;
-        }
-        if (rm) {
-            continue;
-        }
-
-        if (terraform_all || chance(production->chance)) {
-            rawmaterial *rm;
+        if (chance(production->chance)) {
             rawmaterial_type *raw;
-            rm = add_resource(r, dice_rand(production->startlevel),
+            rawmaterial* rm = add_resource(r, dice_rand(production->startlevel),
                 dice_rand(production->base), dice_rand(production->divisor),
                 production->type);
             update_resource(rm, 1.0);
@@ -166,11 +157,14 @@ static void use_default(rawmaterial * res, const region * r, int amount)
 
 struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
 {
-    struct rawmaterial *rm = r->resources;
-    while (rm && rm->rtype != rtype) {
-        rm = rm->next;
+    ptrdiff_t i, len = arrlen(r->resources);
+    for (i = 0; i != len; ++i) {
+        rawmaterial *rm = r->resources + i;
+        if (rm->rtype == rtype) {
+            return rm;
+        }
     }
-    return rm;
+    return NULL;
 }
 
 struct rawmaterial_type *rmt_get(const struct resource_type *rtype)

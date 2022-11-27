@@ -34,7 +34,7 @@ struct unit;
 struct order;
 struct attrib;
 
-void clone_effects(const struct unit* src, struct unit* dst);
+void transfer_effects(const struct unit* src, struct unit* dst, int n);
 void scale_effects(struct attrib* alist, int n, int size);
 
 void new_potiontype(struct item_type* itype, int level);

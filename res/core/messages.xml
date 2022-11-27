@@ -2466,6 +2466,11 @@
       <arg name="password" type="string"/>
     </type>
   </message>
+  <message name="unit_not_found" section="events">
+    <type>
+      <arg name="unit" type="int"/>
+    </type>
+  </message>
   <message name="changepasswd" section="events">
     <type>
       <arg name="value" type="string"/>
@@ -2775,6 +2780,14 @@
   </message>
 
   <message name="error331" section="errors">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+      <arg name="command" type="order"/>
+    </type>
+  </message>
+
+  <message name="error332" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -4753,14 +4766,14 @@
     </type>
   </message>
 
-  <message name="headache_effect_0" section="events">
+  <message name="hangover_effect_0" section="events">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
     </type>
   </message>
 
-  <message name="headache_effect_1" section="events">
+  <message name="hangover_effect_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
     </type>

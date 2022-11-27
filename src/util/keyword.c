@@ -80,15 +80,15 @@ keyword_t get_keyword(const char *s, const struct locale *lang) {
 static bool disabled_kwd[MAXKEYWORDS];
 
 void enable_keyword(keyword_t kwd, bool enabled) {
-    assert(kwd < MAXKEYWORDS);
-    if (kwd < MAXKEYWORDS) {
+    assert(kwd < MAXKEYWORDS && (int)kwd >= 0);
+    if (kwd < MAXKEYWORDS && (int)kwd >= 0) {
         disabled_kwd[kwd] = !enabled;
     }
 }
 
 bool keyword_disabled(keyword_t kwd) {
-    assert(kwd < MAXKEYWORDS);
-    if (kwd < MAXKEYWORDS) {
+    assert(kwd < MAXKEYWORDS && (int)kwd >= 0);
+    if (kwd < MAXKEYWORDS && (int)kwd >= 0) {
         return disabled_kwd[kwd];
     }
     return true;
@@ -96,7 +96,11 @@ bool keyword_disabled(keyword_t kwd) {
 
 const char *keyword_name(keyword_t kwd, const struct locale *lang)
 {
-    return LOC(lang, mkname("keyword", keywords[kwd]));
+    assert(kwd < MAXKEYWORDS && (int)kwd >= 0);
+    if (kwd < MAXKEYWORDS && (int)kwd >= 0) {
+        return LOC(lang, mkname("keyword", keywords[kwd]));
+    }
+    return NULL;
 }
 
 const char *keywords[MAXKEYWORDS] = {
@@ -105,7 +109,6 @@ const char *keywords[MAXKEYWORDS] = {
     "work",
     "attack",
     "steal",
-    NULL,
     "name",
     "use",
     "describe",

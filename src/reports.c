@@ -510,7 +510,7 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
         }
     }
     if (mode >= seen_travel) {
-        rawmaterial *res = r->resources;
+        ptrdiff_t i, len = arrlen(r->resources);
         int money = rmoney(r);
         int horses = rhorses(r);
         if (money) {
@@ -521,7 +521,8 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
             report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
             ++n;
         }
-        while (res) {
+        for (i = 0; i != len ; ++i) {
+            rawmaterial* res = r->resources + i;
             const item_type *itype = resource2item(res->rtype);
             int minskill = itype->construction->minskill;
             skill_t skill = itype->construction->skill;
@@ -554,7 +555,6 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
                     ++n;
                 }
             }
-            res = res->next;
         }
     }
     return n;
@@ -667,7 +667,13 @@ static void bufunit_race(const faction* f, const unit* u, struct sbstring* sbp)
     const struct locale* lang = f->locale;
     const char *str = get_racename(u->attribs);
     if (str) {
-        const char* name = locale_string(lang, mkname("race", str), false);
+        char buffer[64];
+        const char* name;
+        if (u->number != 1) {
+            snprintf(buffer, sizeof(buffer), "%s_p", str);
+            str = buffer;
+        }
+        name = locale_string(lang, mkname("race", str), false);
         sbs_strcat(sbp, name ? name : str);
         if (u->faction == f) {
             sbs_strcat(sbp, " (");
@@ -1195,12 +1201,12 @@ void reports_done(void) {
     }
 }
 
-int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
+size_t get_regions_distance_arr(region *rc, int radius, region *result[], size_t size)
 {
-    int n = 0, i;
+    size_t n = 1, i;
 
-    if (size > n) {
-        result[n++] = rc;
+    if (size > 0) {
+        result[0] = rc;
         fset(rc, RF_MARK);
     }
     for (i = 0; i != n; ++i) {
@@ -1236,34 +1242,33 @@ int get_regions_distance_arr(region *rc, int radius, region *result[], int size)
     return n;
 }
 
-selist *get_regions_distance(region * root, int radius)
+region **get_regions_distance(region * root, int radius)
 {
-    selist *ql, *rlist = NULL;
-    int qi = 0;
+    region** arr = NULL;
+    ptrdiff_t qi;
 
-    selist_push(&rlist, root);
+    arrpush(arr, root);
     fset(root, RF_MARK);
-    ql = rlist;
 
-    while (ql) {
-        region *r = (region *)selist_get(ql, qi);
-        region * next[MAXDIRECTIONS];
+    for (qi = 0; qi != arrlen(arr); ++qi) {
+        region *r = arr[qi];
+        region *next[MAXDIRECTIONS];
         int d;
         get_neighbours(r, next);
 
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (next[d] && !fval(next[d], RF_MARK) && distance(next[d], root) <= radius) {
-                selist_push(&rlist, next[d]);
-                fset(next[d], RF_MARK);
+                r = next[d];
+                arrpush(arr, r);
+                fset(r, RF_MARK);
             }
         }
-        selist_advance(&ql, &qi, 1);
     }
-    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-        region *r = (region *)selist_get(ql, qi);
+    for (qi = arrlen(arr); qi > 0; --qi) {
+        region *r = arr[qi - 1];
         freset(r, RF_MARK);
     }
-    return rlist;
+    return arr;
 }
 
 static void add_seen(region *r, seen_mode mode) {
@@ -1302,35 +1307,28 @@ static void add_seen_lighthouse(region *r, faction *f)
     }
 }
 
-/** mark all regions seen by the lighthouse.
- */
-static void prepare_lighthouse_ql(faction *f, selist *rlist) {
-    selist *ql;
-    int qi;
-
-    for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-        region *rl = (region *)selist_get(ql, qi);
-        add_seen_lighthouse(rl, f);
+static void add_seen_from_lighthouses(faction* f, region** arr, size_t len)
+{
+    size_t i;
+    for (i = 0; i != len; ++i) {
+        add_seen_lighthouse(arr[i], f);
     }
 }
 
 static void prepare_lighthouse(faction *f, region *r, int range)
 {
     if (range > 3) {
-        selist *rlist = get_regions_distance(r, range);
-        prepare_lighthouse_ql(f, rlist);
-        selist_free(rlist);
+        region ** arr = get_regions_distance(r, range);
+        add_seen_from_lighthouses(f, arr, arrlenu(arr));
+        arrfree(arr);
     }
     else {
         region *result[64];
-        int n, i;
+        size_t n;
 
         n = get_regions_distance_arr(r, range, result, 64);
         assert(n > 0 && n <= 64);
-        for (i = 0; i != n; ++i) {
-            region *rl = result[i];
-            add_seen_lighthouse(rl, f);
-        }
+        add_seen_from_lighthouses(f, result, n);
     }
 }
 
@@ -1424,7 +1422,7 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
         for (r = ctx->first; r != ctx->last; r = r->next) {
             unit *u;
             building *b;
-            int br = 0, c = 0, range = 0;
+            int c = 0, range = 0;
             if (fval(r, RF_OBSERVER)) {
                 int skill = get_observer(r, f);
                 if (skill >= 0) {
@@ -1458,11 +1456,10 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
                         break;
                     }
                 }
-                if (range == 0 && u->building && u->building->type == bt_lighthouse) {
+                if (u->building && u->building->type == bt_lighthouse) {
                     if (u->building && b != u->building) {
                         b = u->building;
                         c = buildingcapacity(b);
-                        br = 0;
                     }
                     if (rule_lighthouse_units) {
                         --c;
@@ -1472,12 +1469,9 @@ void prepare_report(report_context *ctx, faction *f, const char *password)
                     }
                     if (u->faction == f && c >= 0) {
                         /* unit is one of ours, and inside the current lighthouse */
-                        if (br == 0) {
-                            /* lazy-calculate the range */
-                            br = lighthouse_view_distance(b, u);
-                            if (br > range) {
-                                range = br;
-                            }
+                        int br = lighthouse_view_distance(b, u);
+                        if (br > range) {
+                            range = br;
                         }
                     }
                 }

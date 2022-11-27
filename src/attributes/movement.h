@@ -1,15 +1,11 @@
 #pragma once
-#ifndef H_ATTRIBUTE_MOVEMENT
-#define H_ATTRIBUTE_MOVEMENT
 
 #include <stdbool.h>
 
-extern struct attrib_type at_movement;
-extern struct attrib_type at_speedup;
-
 struct attrib;
 
-bool get_movement(struct attrib *const *alist, int type);
-void set_movement(struct attrib **alist, int type);
+extern struct attrib_type at_speedup;
 
-#endif
+int get_speedup(struct attrib* attribs);
+bool set_speedup(struct attrib** attribs, int speed, int duration);
+bool add_speedup(struct attrib** attribs, int speed, int duration);

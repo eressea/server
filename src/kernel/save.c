@@ -359,9 +359,11 @@ static void read_skills(gamedata *data, unit *u)
 }
 
 static void write_skills(gamedata *data, const unit *u) {
-    int i, skill_size = (int)arrlen(u->skills);
+    ptrdiff_t i, skill_size = (int)arrlen(u->skills);
+#ifndef NDEBUG
     skill_t sk = NOSKILL;
-    WRITE_INT(data->store, skill_size);
+#endif
+    WRITE_INT(data->store, (int)skill_size);
     for (i = 0; i != skill_size; ++i) {
         skill *sv = u->skills + i;
 #ifndef NDEBUG
@@ -652,44 +654,40 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
     }
 }
 
-static void fix_resource_levels(region *r) {
-    struct terrain_production *p;
+static void fix_resource_values(region* r)
+{
+    struct terrain_production* p;
     for (p = r->terrain->production; p->type; ++p) {
-        char *end;
-        long start = (int)strtol(p->startlevel, &end, 10);
-        if (*end == '\0') {
-            rawmaterial *res;
-            for (res = r->resources; res; res = res->next) {
-                if (p->type == res->rtype) {
-                    if (start != res->startlevel) {
-                        log_debug("setting resource start level for %s in %s to %d",
-                            res->rtype->_name, regionname(r, NULL), start);
-                        res->startlevel = start;
-                    }
+        rawmaterial* res = rm_get(r, p->type);
+        if (res) {
+            char* end;
+            int val;
+
+            val = (int)strtol(p->startlevel, &end, 10);
+            if (*end == '\0') {
+                if (val != res->startlevel) {
+                    log_debug("setting resource start level for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->startlevel = val;
+                }
+            }
+            val = (int)strtol(p->base, &end, 10);
+            if (*end == '\0') {
+                if (val != res->base) {
+                    log_debug("setting resource base for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->base = val;
+                }
+            }
+            val = (int)strtol(p->divisor, &end, 10);
+            if (*end == '\0') {
+                if (val != res->divisor) {
+                    log_debug("setting resource divisor for %s in %s to %d",
+                        res->rtype->_name, regionname(r, NULL), val);
+                    res->divisor = val;
                 }
             }
         }
-    }
-}
-
-static void fix_resource_bases(region *r) {
-    struct terrain_production *p;
-    for (p = r->terrain->production; p->type; ++p) {
-        char *end;
-        long base = (int)strtol(p->base, &end, 10);
-        if (*end == '\0') {
-            rawmaterial *res;
-            for (res = r->resources; res; res = res->next) {
-                if (p->type == res->rtype) {
-                    if (base != res->base) {
-                        log_debug("setting resource base for %s in %s to %d",
-                            res->rtype->_name, regionname(r, NULL), base);
-                        res->base = base;
-                    }
-                }
-            }
-        }
-
     }
 }
 
@@ -749,7 +747,6 @@ static region *readregion(gamedata *data, int x, int y)
     }
     if (r->land) {
         int i;
-        rawmaterial **pres = &r->resources;
 
         if (data->version >= LANDDISPLAY_VERSION) {
             read_regioninfo(data, r, info, sizeof(info));
@@ -776,22 +773,21 @@ static region *readregion(gamedata *data, int x, int y)
 
         READ_INT(data->store, &i);
         rsethorses(r, i);
-        assert(*pres == NULL);
+
         for (;;) {
             rawmaterial *res;
+            const resource_type* rtype;
             READ_STR(data->store, name, sizeof(name));
             if (strcmp(name, "end") == 0)
                 break;
-            res = malloc(sizeof(rawmaterial));
-            if (!res) abort();
-            res->rtype = rt_find(name);
-            if (!res->rtype && strncmp("rm_", name, 3) == 0) {
-                res->rtype = rt_find(name + 3);
+            rtype = rt_find(name);
+            if (!rtype && strncmp("rm_", name, 3) == 0) {
+                rtype = rt_find(name + 3);
             }
-            if (!res->rtype || !res->rtype->raw) {
+            if (!rtype || !rtype->raw) {
                 log_error("invalid resourcetype %s in data.", name);
             }
-            assert(res->rtype);
+            res = add_resource(r, 0, 0, 0, rtype);
             READ_INT(data->store, &n);
             res->level = n;
             READ_INT(data->store, &n);
@@ -804,11 +800,7 @@ static region *readregion(gamedata *data, int x, int y)
             res->base = n;
             READ_INT(data->store, &n);
             res->divisor = n;
-
-            *pres = res;
-            pres = &res->next;
         }
-        *pres = NULL;
 
         READ_STR(data->store, name, sizeof(name));
         if (strcmp(name, "noherb") != 0) {
@@ -868,13 +860,9 @@ static region *readregion(gamedata *data, int x, int y)
     read_attribs(data, &r->attribs, r);
 
     if (r->resources) {
-        if (data->version < FIX_STARTLEVEL_VERSION) {
+        if (data->version < FIX_RESOURCES_VERSION) {
             /* we had some badly made rawmaterials before this */
-            fix_resource_levels(r);
-        }
-        if (data->version < FIX_RES_BASE_VERSION) {
-            /* we had some badly made rawmaterials before this */
-            fix_resource_bases(r);
+            fix_resource_values(r);
         }
     }
     return r;
@@ -911,7 +899,7 @@ void writeregion(gamedata *data, const region * r)
     if (r->land) {
         const item_type *rht;
         struct demand *demand;
-        rawmaterial *res = r->resources;
+        ptrdiff_t i, len = arrlen(r->resources);
 
         WRITE_STR(data->store, (const char *)r->land->name);
         WRITE_STR(data->store, region_getinfo(r));
@@ -923,14 +911,14 @@ void writeregion(gamedata *data, const region * r)
         WRITE_INT(data->store, rtrees(r, 2));
         WRITE_INT(data->store, rhorses(r));
 
-        while (res) {
+        for (i = 0; i != len; ++i) {
+            rawmaterial* res = r->resources + i;
             WRITE_TOK(data->store, res->rtype->_name);
             WRITE_INT(data->store, res->level);
             WRITE_INT(data->store, res->amount);
             WRITE_INT(data->store, res->startlevel);
             WRITE_INT(data->store, res->base);
             WRITE_INT(data->store, res->divisor);
-            res = res->next;
         }
         WRITE_TOK(data->store, "end");
 

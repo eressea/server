@@ -12,7 +12,7 @@
 #include <util/keyword.h>
 #include <util/language.h>
 #include <util/message.h>
-#include <util/order_parser.h>  // for OP_Parser, OrderParserStruct
+#include <util/order_parser.h>
 #include <util/param.h>
 #include <util/password.h>
 
@@ -20,8 +20,8 @@
 #include <tests.h>
 #include <strings.h>
 
-#include <stdbool.h>            // for true
-#include <stdio.h>              // for NULL, fclose, fprintf, rewind, tmpfile
+#include <stdbool.h> 
+#include <stdio.h>
 
 static void test_unit_orders(CuTest *tc) {
     unit *u;
@@ -57,6 +57,7 @@ static void test_no_foreign_unit_orders(CuTest *tc) {
     OP_Parser parser = parser_create(&state);
 
     test_setup();
+    mt_create_va(mt_new("unit_not_found", "events"), "unit:int", MT_NEW_END);
     sbs_init(&sbs, orders, sizeof(orders));
     f2 = test_create_faction();
     f2->locale = test_create_locale();
@@ -71,8 +72,33 @@ static void test_no_foreign_unit_orders(CuTest *tc) {
         LOC(f->locale, parameters[P_UNIT]), itoa36(u->no),
         keyword_name(K_WORK, f->locale));
     CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unit_not_found"));
     CuAssertPtrEquals(tc, NULL, u->defaults);
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(u->orders));
+
+    test_teardown();
+}
+
+static void test_unit_not_found(CuTest *tc) {
+    faction *f;
+    sbstring sbs;
+    char orders[256];
+    parser_state state = { NULL };
+    OP_Parser parser = parser_create(&state);
+
+    test_setup();
+    mt_create_va(mt_new("unit_not_found", "events"), "unit:int", MT_NEW_END);
+    sbs_init(&sbs, orders, sizeof(orders));
+    f = test_create_faction();
+    f->locale = test_create_locale();
+
+    faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
+    sbs_printf(&sbs, "%s %s %s\n%s 42\n",
+        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
+        LOC(f->locale, parameters[P_UNIT]));
+    CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unit_not_found"));
+    CuAssertIntEquals(tc, turn, f->lastorders);
 
     test_teardown();
 }
@@ -112,6 +138,7 @@ static void test_faction_password_bad(CuTest *tc) {
     fprintf(F, "ERESSEA 1 password\n");
     rewind(F);
     CuAssertIntEquals(tc, 0, parseorders(F));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "wrongpasswd"));
     CuAssertIntEquals(tc, turn - 1, f->lastorders);
     fclose(F);
     test_teardown();
@@ -121,6 +148,7 @@ CuSuite *get_orderfile_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unit_orders);
+    SUITE_ADD_TEST(suite, test_unit_not_found);
     SUITE_ADD_TEST(suite, test_no_foreign_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);

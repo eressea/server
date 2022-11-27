@@ -27,7 +27,6 @@
 #include <util/lists.h>
 #include <util/macros.h>
 #include "util/path.h"
-#include "util/rand.h"
 #include "util/rng.h"
 
 #include "gmtool_structs.h"
@@ -36,6 +35,7 @@
 #include "teleport.h"
 
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -462,33 +462,6 @@ static void statusline(WINDOW * win, const char *str)
     wnoutrefresh(win);
 }
 
-static void reset_resources(region *r, const struct terrain_type *terrain)
-{
-    int i;
-
-    for (i = 0; terrain->production[i].type; ++i) {
-        rawmaterial *rm;
-        const terrain_production *production = terrain->production + i;
-        const resource_type *rtype = production->type;
-
-        for (rm = r->resources; rm; rm = rm->next) {
-            if (rm->rtype == rtype)
-                break;
-        }
-        if (rm) {
-            struct rawmaterial_type *rmt;
-            set_resource(rm,
-                dice_rand(production->startlevel),
-                dice_rand(production->base),
-                dice_rand(production->divisor));
-            rmt = rmt_get(rtype);
-            if (rmt && rmt->terraform) {
-                rmt->terraform(rm, r);
-            }
-        }
-    }
-}
-
 static void reset_region(region *r) {
     unit **up = &r->units;
     bool players = false;
@@ -514,7 +487,7 @@ static void reset_region(region *r) {
         }
         if (r->land) {
             init_region(r);
-            reset_resources(r, r->terrain);
+            terraform_resources(r);
         }
     }
 }
@@ -619,9 +592,10 @@ static void selection_walk(selection * selected, void(*callback)(region *, void 
 }
 
 static void reset_levels_cb(region *r, void *udata) {
-    struct rawmaterial *res;
+    ptrdiff_t i, len = arrlen(r->resources);
     UNUSED_ARG(udata);
-    for (res = r->resources; res; res = res->next) {
+    for (i = 0; i != len; ++i) {
+        struct rawmaterial* res = r->resources + i;
         if (res->level > 3) {
             res->level = 1;
         }
@@ -1431,7 +1405,7 @@ static void handlekey(state * st, int c)
             region *first = (mr && mr->r && mr->r->next) ? mr->r->next : regions;
 
             if (findmode == 'f') {
-                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %s", loc);
+                snprintf(sbuffer, sizeof(sbuffer), "find-faction: %.40s", loc);
                 statusline(st->wnd_status->handle, sbuffer);
                 f = findfaction(atoi36(loc));
                 if (f == NULL) {

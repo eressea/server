@@ -1286,8 +1286,9 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
             parse_construction(&stage->construction, pi, el, attr);
         }
         else if (xml_strequal(el, "maintenance")) {
-            assert(!btype->maintenance);
-            handle_maintenance(pi, el, attr);
+            if (!btype->maintenance) {
+                handle_maintenance(pi, el, attr);
+            }
         }
         else {
             handle_bad_input(pi, el, NULL);

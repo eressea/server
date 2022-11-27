@@ -6,7 +6,6 @@
 #include <kernel/unit.h>
 
 #include <util/keyword.h>            // for K_NAME, K_WORK, K_MAKETEMP, K_BUY
-#include <util/language.h>
 #include <util/lists.h>
 #include <util/message.h>
 
@@ -25,9 +24,9 @@ static void test_defaultorders(CuTest* tc)
     ord = u->orders = create_order(K_CAST, u->faction->locale, "STUFE 9 Sturmwind");
     ord->next = create_order(K_ENTERTAIN, u->faction->locale, NULL);
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale,
-        LOC(u->faction->locale, mkname("keyword", keywords[K_WORK]))));
+        keyword_name(K_WORK, u->faction->locale)));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "@%s", 
-        LOC(u->faction->locale, mkname("keyword", keywords[K_GUARD]))));
+        keyword_name(K_GUARD, u->faction->locale)));
     defaultorders();
     CuAssertIntEquals(tc, K_CAST, getkeyword(ord = u->orders));
     CuAssertIntEquals(tc, K_ENTERTAIN, getkeyword(ord = ord->next));
@@ -41,7 +40,7 @@ static void test_defaultorders(CuTest* tc)
     ord = u->orders = create_order(K_SELL, u->faction->locale, "1 Juwel");
     ord->next = create_order(K_SELL, u->faction->locale, "1 Balsam");
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s 1 Weihrauch",
-        LOC(u->faction->locale, mkname("keyword", keywords[K_BUY]))));
+        keyword_name(K_BUY, u->faction->locale)));
     defaultorders();
     CuAssertIntEquals(tc, K_BUY, getkeyword(ord = u->defaults));
     CuAssertPtrEquals(tc, NULL, ord->next);
@@ -58,7 +57,7 @@ static void test_defaultorders(CuTest* tc)
     unit_addorder(u, create_order(K_KOMMENTAR, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_DEFAULT, u->faction->locale, "%s",
-        LOC(u->faction->locale, mkname("keyword", keywords[K_WORK]))));
+        keyword_name(K_WORK, u->faction->locale)));
     defaultorders();
     CuAssertPtrNotNull(tc, ord = u->orders);
     CuAssertIntEquals(tc, K_KOMMENTAR, getkeyword(ord));

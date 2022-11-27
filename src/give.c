@@ -814,11 +814,9 @@ void give_unit_cmd(unit* u, order* ord)
     char token[64];
     unit* u2;
     message* msg = NULL;
-    keyword_t kwd;
     int err;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_GIVE);
+    init_order(ord, NULL);
     err = getunit(u->region, u->faction, &u2);
 
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
@@ -853,10 +851,8 @@ param_t give_cmd(unit * u, order * ord)
     param_t p;
     plane *pl;
     message *msg;
-    keyword_t kwd;
 
-    kwd = init_order(ord, NULL);
-    assert(kwd == K_GIVE);
+    init_order(ord, NULL);
 
     err = getunit(r, u->faction, &u2);
     s = gettoken(token, sizeof(token));

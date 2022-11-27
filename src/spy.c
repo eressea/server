@@ -59,7 +59,7 @@ void spy_message(int spy, const unit * u, const unit * target)
     if (spy > 20) {
         magic_t mtype = unit_get_magic(target);
         /* for mages, spells and magic school */
-        if (mtype != M_GRAY && mtype < MAXMAGIETYP && mtype != M_NONE) {
+        if (mtype != M_GRAY && mtype < MAXMAGIETYP && mtype >= 0) {
             ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target type", u,
                 target, magic_school[mtype]));
         }
@@ -77,7 +77,7 @@ void spy_message(int spy, const unit * u, const unit * target)
         int first = 1;
         int found = 0;
         char buf[4096];
-        size_t s, n = arrlen(target->skills);
+        ptrdiff_t s, n = arrlen(target->skills);
 
         buf[0] = 0;
         for (s = 0; s != n; ++s) {

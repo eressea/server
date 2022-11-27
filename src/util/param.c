@@ -62,6 +62,11 @@ const char *parameters[MAXPARAMS] = {
     "AUTO"
 };
 
+const char* param_name(param_t p, const struct locale* lang)
+{
+    return LOC(lang, parameters[p]);
+}
+
 param_t findparam(const char* s)
 {
     int i;

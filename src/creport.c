@@ -744,7 +744,6 @@ void cr_output_unit(stream *out, const faction * f,
     /* Race attributes are always plural and item attributes always
      * singular */
     const char *str;
-    const item_type *lasttype;
     int pr;
     item *itm, *show = NULL;
     const char *pzTmp;
@@ -849,7 +848,7 @@ void cr_output_unit(stream *out, const faction * f,
         const char *c;
         int i;
         struct sc_mage *mage;
-        size_t s, len;
+        ptrdiff_t s, len;
 
         i = ualias(u);
         if (i > 0)
@@ -949,12 +948,9 @@ void cr_output_unit(stream *out, const faction * f,
             }
         }
     }
-    lasttype = NULL;
     for (itm = show; itm; itm = itm->next) {
         const char *ic;
         int in;
-        assert(itm->type != lasttype
-            || !"error: list contains two objects of the same item");
         report_item(u, itm, f, NULL, &ic, &in, true);
         if (in == 0)
             continue;

@@ -29,28 +29,37 @@ static sqlite3_stmt * g_stmt_insert_faction;
 static int g_insert_batchsize;
 static int g_insert_tx_size;
 
+static int SQLITE_CHECK(sqlite3 *db, int err)
+{
+    if (err != SQLITE_OK) {
+        log_error(sqlite3_errmsg(db));
+    }
+    return err;
+}
+
+static int SQLITE_EXEC(sqlite3 *db, const char *sql)
+{
+    return SQLITE_CHECK(db, sqlite3_exec(db, sql, NULL, NULL, NULL));
+}
+
 static void end_transaction(void) {
     if (g_insert_tx_size > 0) {
-        int err;
         g_insert_tx_size = 0;
-        err = sqlite3_exec(g_swap_db, "COMMIT", NULL, NULL, NULL);
-        assert(err == SQLITE_OK);
+        SQLITE_EXEC(g_swap_db, "COMMIT");
     }
 }
 
 struct order_data *db_driver_order_load(dbrow_id id)
 {
     struct order_data * od = NULL;
-    int err;
+    int rc;
 
     ERRNO_CHECK();
     end_transaction();
-    err = sqlite3_reset(g_stmt_select_order);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_int(g_stmt_select_order, 1, id);
-    assert(err == SQLITE_OK);
-    err = sqlite3_step(g_stmt_select_order);
-    if (err == SQLITE_ROW) {
+    SQLITE_CHECK(g_swap_db, sqlite3_reset(g_stmt_select_order));
+    SQLITE_CHECK(g_swap_db, sqlite3_bind_int(g_stmt_select_order, 1, id));
+    rc = sqlite3_step(g_stmt_select_order);
+    if (rc == SQLITE_ROW) {
         const unsigned char *text;
         int bytes;
         text = sqlite3_column_text(g_stmt_select_order, 0);
@@ -65,8 +74,8 @@ struct order_data *db_driver_order_load(dbrow_id id)
 }
 
 dbrow_id db_driver_order_save(const char *str) {
-    int err;
     sqlite3_int64 id;
+    int rc;
     
     assert(str);
    
@@ -74,17 +83,14 @@ dbrow_id db_driver_order_save(const char *str) {
 
     if (g_insert_batchsize > 0) {
         if (g_insert_tx_size == 0) {
-            err = sqlite3_exec(g_swap_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-            assert(err == SQLITE_OK);
+            SQLITE_EXEC(g_swap_db, "BEGIN TRANSACTION");
         }
     }
     
-    err = sqlite3_reset(g_stmt_insert_order);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_order, 1, str, -1, SQLITE_STATIC);
-    assert(err == SQLITE_OK);
-    err = sqlite3_step(g_stmt_insert_order);
-    assert(err == SQLITE_DONE);
+    SQLITE_CHECK(g_swap_db, sqlite3_reset(g_stmt_insert_order));
+    SQLITE_CHECK(g_swap_db, sqlite3_bind_text(g_stmt_insert_order, 1, str, -1, SQLITE_STATIC));
+    rc = sqlite3_step(g_stmt_insert_order);
+    if (rc != SQLITE_DONE) return 0;
     id = sqlite3_last_insert_rowid(g_swap_db);
     assert(id > 0 && id <= UINT_MAX);
     
@@ -108,21 +114,21 @@ int db_driver_faction_save(dbrow_id * p_id, int no, const char *email, const cha
 
     assert(g_game_db);
 
-    err = sqlite3_reset(stmt);
+    err = SQLITE_CHECK(g_game_db, sqlite3_reset(stmt));
     if (err != SQLITE_OK) return err;
     str = itoa36(no);
     len = (int)strlen(str);
     assert(len > 0 && len <= 4);
     memcpy(dbno, str, len);
-    err = sqlite3_bind_text(stmt, 1, dbno, len, SQLITE_STATIC);
+    err = SQLITE_CHECK(g_game_db, sqlite3_bind_text(stmt, 1, dbno, len, SQLITE_STATIC));
     if (err != SQLITE_OK) return err;
-    err = sqlite3_bind_text(stmt, 2, email, -1, SQLITE_STATIC);
+    err = SQLITE_CHECK(g_game_db, sqlite3_bind_text(stmt, 2, email, -1, SQLITE_STATIC));
     if (err != SQLITE_OK) return err;
-    err = sqlite3_bind_text(stmt, 3, password, -1, SQLITE_STATIC);
+    err = SQLITE_CHECK(g_game_db, sqlite3_bind_text(stmt, 3, password, -1, SQLITE_STATIC));
     if (err != SQLITE_OK) return err;
 
     if (id > 0) {
-        err = sqlite3_bind_int(stmt, 4, id);
+        err = SQLITE_CHECK(g_game_db, sqlite3_bind_int(stmt, 4, id));
         if (err != SQLITE_OK) return err;
     }
     err = sqlite3_step(stmt);
@@ -143,11 +149,11 @@ int db_driver_update_factions(db_faction_generator gen, void *data)
     db_faction results[32];
     int num, err;
 
-    err = sqlite3_exec(g_game_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
+    err = SQLITE_EXEC(g_game_db, "BEGIN TRANSACTION");
     assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_game_db, "DELETE FROM `faction`", NULL, NULL, NULL);
+    err = SQLITE_EXEC(g_game_db, "DELETE FROM `faction`");
     if (err != SQLITE_OK) {
-        sqlite3_exec(g_game_db, "ROLLBACK", NULL, NULL, NULL);
+        SQLITE_EXEC(g_game_db, "ROLLBACK");
         return err;
     }
     num = gen(data, results, 32);
@@ -158,7 +164,7 @@ int db_driver_update_factions(db_faction_generator gen, void *data)
             dbrow_id id = (dbrow_id)*dbf->p_uid;
             err = db_driver_faction_save(&id, dbf->no, dbf->email, dbf->pwhash);
             if (err != SQLITE_OK) {
-                sqlite3_exec(g_game_db, "ROLLBACK", NULL, NULL, NULL);
+                SQLITE_EXEC(g_game_db, "ROLLBACK");
                 return err;
             }
             assert(id > 0 && id <= INT_MAX);
@@ -166,7 +172,7 @@ int db_driver_update_factions(db_faction_generator gen, void *data)
         }
         num = gen(data, results, 32);
     }
-    err = sqlite3_exec(g_game_db, "COMMIT", NULL, NULL, NULL);
+    err = SQLITE_EXEC(g_game_db, "COMMIT");
     return err;
 }
 
@@ -180,14 +186,13 @@ static int db_open_game(const char *dbname) {
     int err, version = 0;
 
     err = sqlite3_open(dbname, &g_game_db);
-    assert(err == SQLITE_OK);
+    if (err != SQLITE_OK) return err;
 
-    err = sqlite3_exec(g_game_db, "PRAGMA user_version", cb_int_col, &version, NULL);
-    assert(err == SQLITE_OK);
+    err = SQLITE_CHECK(g_game_db, sqlite3_exec(g_game_db, "PRAGMA user_version", cb_int_col, &version, NULL));
+    if (err != SQLITE_OK) return err;
     if (version < 1) {
-        /* drop deprecated table */
-        err = sqlite3_exec(g_game_db, "DROP TABLE IF EXISTS `factions`", NULL, NULL, NULL);
-        assert(err == SQLITE_OK);
+        /* drop deprecated table if it exists */
+        SQLITE_EXEC(g_game_db, "DROP TABLE IF EXISTS `factions`");
     }
     if (version < 2) {
         /* install schema version 2: */
@@ -212,23 +217,15 @@ static int db_open_swap(const char *dbname) {
     g_insert_batchsize = config_get_int("game.dbbatch", 100);
 
     err = sqlite3_open(dbname, &g_swap_db);
-    assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_swap_db, "PRAGMA journal_mode=OFF", NULL, NULL, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_swap_db, "PRAGMA synchronous=OFF", NULL, NULL, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_swap_db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, data TEXT NOT NULL)", NULL, NULL, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_exec(g_swap_db, "CREATE TABLE IF NOT EXISTS strings (id INTEGER PRIMARY KEY, data TEXT NOT NULL)", NULL, NULL, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_swap_db, "INSERT INTO strings (data) VALUES (?)", -1, &g_stmt_insert_string, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_swap_db, "SELECT data FROM strings WHERE id=?", -1, &g_stmt_select_string, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_swap_db, "INSERT INTO orders (data) VALUES (?)", -1, &g_stmt_insert_order, NULL);
-    assert(err == SQLITE_OK);
-    err = sqlite3_prepare_v2(g_swap_db, "SELECT data FROM orders WHERE id=?", -1, &g_stmt_select_order, NULL);
-    assert(err == SQLITE_OK);
+    if (err != SQLITE_OK) return err;
+    SQLITE_EXEC(g_swap_db, "PRAGMA journal_mode=OFF");
+    SQLITE_EXEC(g_swap_db, "PRAGMA synchronous=OFF");
+    SQLITE_EXEC(g_swap_db, "CREATE TABLE IF NOT EXISTS orders (id INTEGER PRIMARY KEY, data TEXT NOT NULL)");
+    SQLITE_EXEC(g_swap_db, "CREATE TABLE IF NOT EXISTS strings (id INTEGER PRIMARY KEY, data TEXT NOT NULL)");
+    SQLITE_CHECK(g_swap_db, sqlite3_prepare_v2(g_swap_db, "INSERT INTO strings (data) VALUES (?)", -1, &g_stmt_insert_string, NULL));
+    SQLITE_CHECK(g_swap_db, sqlite3_prepare_v2(g_swap_db, "SELECT data FROM strings WHERE id=?", -1, &g_stmt_select_string, NULL));
+    SQLITE_CHECK(g_swap_db, sqlite3_prepare_v2(g_swap_db, "INSERT INTO orders (data) VALUES (?)", -1, &g_stmt_insert_order, NULL));
+    SQLITE_CHECK(g_swap_db, sqlite3_prepare_v2(g_swap_db, "SELECT data FROM orders WHERE id=?", -1, &g_stmt_select_order, NULL));
     ERRNO_CHECK();
     return 0;
 }
@@ -255,21 +252,14 @@ int db_driver_open(database_t db, const char *dbname)
 
 void db_driver_close(database_t db)
 {
-    int err;
-
     ERRNO_CHECK();
     if (db == DB_SWAP) {
         assert(g_swap_db);
-        err = sqlite3_finalize(g_stmt_select_string);
-        assert(err == SQLITE_OK);
-        err = sqlite3_finalize(g_stmt_insert_string);
-        assert(err == SQLITE_OK);
-        err = sqlite3_finalize(g_stmt_select_order);
-        assert(err == SQLITE_OK);
-        err = sqlite3_finalize(g_stmt_insert_order);
-        assert(err == SQLITE_OK);
-        err = sqlite3_close(g_swap_db);
-        assert(err == SQLITE_OK);
+        SQLITE_CHECK(g_swap_db, sqlite3_finalize(g_stmt_select_string));
+        SQLITE_CHECK(g_swap_db, sqlite3_finalize(g_stmt_insert_string));
+        SQLITE_CHECK(g_swap_db, sqlite3_finalize(g_stmt_select_order));
+        SQLITE_CHECK(g_swap_db, sqlite3_finalize(g_stmt_insert_order));
+        SQLITE_CHECK(g_swap_db, sqlite3_close(g_swap_db));
         if (g_swapname) {
             FILE * F = fopen(g_swapname, "r");
             if (F) {
@@ -284,19 +274,16 @@ void db_driver_close(database_t db)
     }
     else if (db == DB_GAME) {
         assert(g_game_db);
-        err = sqlite3_finalize(g_stmt_update_faction);
-        assert(err == SQLITE_OK);
-        err = sqlite3_finalize(g_stmt_insert_faction);
-        assert(err == SQLITE_OK);
-        err = sqlite3_close(g_game_db);
-        assert(err == SQLITE_OK);
+        SQLITE_CHECK(g_game_db, sqlite3_finalize(g_stmt_update_faction));
+        SQLITE_CHECK(g_game_db, sqlite3_finalize(g_stmt_insert_faction));
+        SQLITE_CHECK(g_game_db, sqlite3_close(g_game_db));
     }
     ERRNO_CHECK();
 }
 
 dbrow_id db_driver_string_save(const char *str) {
-    int err;
     sqlite3_int64 id;
+    int rc;
 
     assert(str);
 
@@ -304,17 +291,14 @@ dbrow_id db_driver_string_save(const char *str) {
 
     if (g_insert_batchsize > 0) {
         if (g_insert_tx_size == 0) {
-            err = sqlite3_exec(g_swap_db, "BEGIN TRANSACTION", NULL, NULL, NULL);
-            assert(err == SQLITE_OK);
+            SQLITE_EXEC(g_swap_db, "BEGIN TRANSACTION");
         }
     }
 
-    err = sqlite3_reset(g_stmt_insert_string);
-    assert(err == SQLITE_OK);
-    err = sqlite3_bind_text(g_stmt_insert_string, 1, str, -1, SQLITE_STATIC);
-    assert(err == SQLITE_OK);
-    err = sqlite3_step(g_stmt_insert_string);
-    assert(err == SQLITE_DONE);
+    SQLITE_CHECK(g_game_db, sqlite3_reset(g_stmt_insert_string));
+    SQLITE_CHECK(g_game_db, sqlite3_bind_text(g_stmt_insert_string, 1, str, -1, SQLITE_STATIC));
+    rc = sqlite3_step(g_stmt_insert_string);
+    if (rc != SQLITE_DONE) return 0;
     id = sqlite3_last_insert_rowid(g_swap_db);
     assert(id > 0 && id <= UINT_MAX);
 
@@ -353,10 +337,7 @@ const char *db_driver_string_load(dbrow_id id, size_t *size) {
 
 void db_driver_compact(int turn)
 {
-    int err;
-
     /* repack database: */
-    err = sqlite3_exec(g_game_db, "VACUUM", 0, 0, 0);
-    assert(err == SQLITE_OK);
+    SQLITE_EXEC(g_game_db, "VACUUM");
 }
 
