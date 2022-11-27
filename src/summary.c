@@ -73,13 +73,9 @@ int update_nmrs(void)
     int timeout = NMRTimeout();
 
     if (timeout>0) {
-        int i;
         if (nmrs == NULL) {
-            nmrs = malloc(sizeof(int) * (timeout + 1));
+            nmrs = calloc((1 + (size_t)timeout), sizeof(int));
             if (!nmrs) abort();
-        }
-        for (i = 0; i <= timeout; ++i) {
-            nmrs[i] = 0;
         }
     }
     

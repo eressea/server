@@ -1112,6 +1112,10 @@ faction *read_faction(gamedata * data)
     f->locale = get_locale(name);
     if (!f->locale) f->locale = default_locale;
     READ_INT(data->store, &f->lastorders);
+    if (data->version < REMOVE_FACTION_AGE_VERSION)
+    {
+        --f->lastorders;
+    }
     READ_INT(data->store, &n);
     if (data->version < REMOVE_FACTION_AGE_VERSION)
     {
