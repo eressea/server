@@ -51,8 +51,9 @@
 #define FIX_SHAPESHIFT_SPELL_VERSION 373 /* shapeshift spell, bug 2719 */
 #define FIX_SHIP_DAMAGE_VERSION 374 /* ship damage for fleets */
 #define FIX_TELEPORT_PLANE_VERSION 375 /* astral space not created, bug 2856 */
+#define REMOVE_FACTION_AGE_VERSION 376 /* faction age saved, not start_turn */
 
-#define RELEASE_VERSION FIX_TELEPORT_PLANE_VERSION /* current datafile */
+#define RELEASE_VERSION REMOVE_FACTION_AGE_VERSION /* current datafile */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

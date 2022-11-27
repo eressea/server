@@ -103,7 +103,7 @@ static void test_trees(CuTest *tc) {
     test_teardown();
 }
 
-static void test_morale(CuTest *tc) {
+static void test_mourning(CuTest *tc) {
     struct region * r;
     struct faction * f1, * f2;
 
@@ -128,7 +128,7 @@ CuSuite *get_region_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_terraform);
     SUITE_ADD_TEST(suite, test_trees);
-    SUITE_ADD_TEST(suite, test_morale);
+    SUITE_ADD_TEST(suite, test_mourning);
     SUITE_ADD_TEST(suite, test_region_getset_resource);
     SUITE_ADD_TEST(suite, test_region_get_owner);
     return suite;

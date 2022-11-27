@@ -60,6 +60,7 @@ extern "C" {
         struct spellbook *spellbook;
         const struct locale *locale;
         int lastorders;
+        int start_turn;
         int _age;
         struct origin *origin;
         const struct race *race;
