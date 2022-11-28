@@ -42,6 +42,9 @@ char * read_multiline(FILE *F, char *line, char *buffer, size_t size) {
             if (read[len - 1] == '"') {
                 --len;
             }
+            else {
+                log_error("read_multiline: unexpected newline in line %d (expeted \")", po_lineno);
+            }
             if (size > len) {
                 /* copy into buffer */
                 memcpy(output, read, len);

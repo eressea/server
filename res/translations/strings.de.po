@@ -6199,18 +6199,18 @@ msgstr "Wolf"
 
 msgctxt "iteminfo"
 msgid "elfspoil"
-msgstr "Die Ohren sind spitz und beinahe trapezförmig. Wie kann
-damit hören?"
+msgstr "Die Ohren sind spitz und beinahe trapezförmig. Wie kann man"
+" damit hören?"
 
 msgctxt "iteminfo"
 msgid "goblinspoil"
-msgstr "Die Fratze des kleinen Kopfs wirkt beinahe etwas kindlich
-zierlich, aber dennoch liegt etwas Listiges darin."
+msgstr "Die Fratze des kleinen Kopfs wirkt beinahe etwas kindlich"
+" zierlich, aber dennoch liegt etwas Listiges darin."
 
 msgctxt "iteminfo"
 msgid "halflingspoil"
-msgstr "Die Sohle des behaarten Fußes ist deutlich dicker, beinahe
-wie ein Huf."
+msgstr "Die Sohle des behaarten Fußes ist deutlich dicker, beinahe"
+" wie ein Huf."
 
 msgctxt "iteminfo"
 msgid "aquarianspoil"
@@ -6226,9 +6226,9 @@ msgstr "Wie ein kleines Seil aus weichem Fell."
 
 msgctxt "iteminfo"
 msgid "insectspoil"
-msgstr "Das am Kopf der meisten Gliederfüßer auftretende,
-gegliederte Extremitätenpaar, das mit Sensillen (Tastsinn, Geruchssinn)
-ausgestattet ist."
+msgstr "Das am Kopf der meisten Gliederfüßer auftretende,"
+" gegliederte Extremitätenpaar, das mit Sensillen (Tastsinn, Geruchssinn)"
+" ausgestattet ist."
 
 msgctxt "iteminfo"
 msgid "orcspoil"
@@ -6236,5 +6236,5 @@ msgstr "Große, spitze Zähne. Ob sie früher einem Ork oder doch einem Wildschw
 
 msgctxt "iteminfo"
 msgid "demonspoil"
-msgstr "Eine giftige und grüne Flüssigkeit in einer kleinen Phiole,
-keine humanoide Rasse außer Dämonen wagt damit in Kontakt zu kommen."
+msgstr "Eine giftige und grüne Flüssigkeit in einer kleinen Phiole,"
+" keine humanoide Rasse außer Dämonen wagt damit in Kontakt zu kommen."
