@@ -604,6 +604,52 @@ static void test_transfermen(CuTest *tc) {
     test_teardown();
 }
 
+static void test_transfermen_peasants(CuTest *tc) {
+    unit *u;
+    region *r;
+    faction *f;
+    race* rc;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    rsetpeasants(r, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    scale_number(u, 10);
+    transfermen(u, NULL, 1);
+    CuAssertIntEquals(tc, 9, u->number);
+    CuAssertIntEquals(tc, 1, rpeasants(r));
+
+    /* undead don't transfer to peasants */
+    rc = test_create_race("undead");
+    rc->flags -= RCF_PLAYABLE;
+    u_setrace(u, rc);
+    transfermen(u, NULL, 1);
+    CuAssertIntEquals(tc, 8, u->number);
+    CuAssertIntEquals(tc, 1, rpeasants(r));
+
+    /* demons don't transfer to peasants */
+    rc = test_create_race("undead");
+    rc->ec_flags |= ECF_REC_ETHEREAL;
+    u_setrace(u, rc);
+    transfermen(u, NULL, 1);
+    CuAssertIntEquals(tc, 7, u->number);
+    CuAssertIntEquals(tc, 1, rpeasants(r));
+
+    /* orcs transfer max 50% to peasants */
+    rc = test_create_race("orc");
+    rc->recruit_multi = 2;
+    u_setrace(u, rc);
+    transfermen(u, NULL, 1);
+    CuAssertIntEquals(tc, 6, u->number);
+    CuAssertIntEquals(tc, 1, rpeasants(r));
+    transfermen(u, NULL, 2);
+    CuAssertIntEquals(tc, 4, u->number);
+    CuAssertIntEquals(tc, 2, rpeasants(r));
+
+    test_teardown();
+}
+
 static void test_transfer_effects(CuTest* tc) {
     unit* u1, * u2;
     region* r;
@@ -957,6 +1003,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_unit_name_from_race);
     SUITE_ADD_TEST(suite, test_update_monster_name);
     SUITE_ADD_TEST(suite, test_transfermen);
+    SUITE_ADD_TEST(suite, test_transfermen_peasants);
     SUITE_ADD_TEST(suite, test_transfer_effects);
     SUITE_ADD_TEST(suite, test_transfer_effects_rounding);
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);

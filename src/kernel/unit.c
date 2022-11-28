@@ -824,8 +824,8 @@ void transfermen(unit* u, unit* dst, int n)
     else {
         scale_number(u, u->number - n);
         if (r->land) {
-            if ((u_race(u)->ec_flags & ECF_REC_ETHEREAL) == 0) {
-                const race* rc = u_race(u);
+            const race* rc = u_race(u);
+            if (playerrace(rc) && (rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                 int p = rpeasants(r);
                 p += (n / rc->recruit_multi);
                 rsetpeasants(r, p);
