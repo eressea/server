@@ -78,27 +78,6 @@ add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 
-add_test(NAME lua-core
- COMMAND eressea -v1 ../scripts/run-tests.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-add_test(NAME lua-e2
- COMMAND eressea -v1 ../scripts/run-tests-e2.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-add_test(NAME lua-e3
- COMMAND eressea -v1 ../scripts/run-tests-e3.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-
-find_program(LUAROCKS_EXECUTABLE luarocks)
-if(LUAROCKS_EXECUTABLE)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-path OUTPUT_VARIABLE LR_PATH)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-cpath OUTPUT_VARIABLE LR_CPATH)
-string(REPLACE ";" "\;" LUA_PATH "${CMAKE_SOURCE_DIR}/scripts/?.lua;${LR_PATH}")
-string(REPLACE ";" "\;" LUA_CPATH "${LR_CPATH}")
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}")
-endif(LUAROCKS_EXECUTABLE)
-
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
-
 install(DIRECTORY etc DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.txt")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.po")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.xml")
