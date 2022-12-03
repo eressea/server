@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CLIBS_INCLUDE_DIR})
-include_directories (${STORAGE_INCLUDE_DIR})
-include_directories (${TOLUA_INCLUDE_DIR})
-include_directories (${LUA_INCLUDE_DIR})
-include_directories (${INIPARSER_INCLUDE_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
@@ -177,6 +172,9 @@ if(DEFINED ERESSEA_BUILDNO)
 endif()
 add_library(parser ${PARSER_SRC})
 
+target_include_directories (parser PUBLIC ${CLIBS_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${STORAGE_INCLUDE_DIR})
+
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
@@ -193,9 +191,12 @@ if (HAVE_LIBM)
 endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
+target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
+target_include_directories (eressea PRIVATE ${TOLUA_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARY}
@@ -330,7 +331,7 @@ target_link_libraries(test_eressea ${SQLITE3_LIBRARY})
 target_compile_definitions(game PRIVATE USE_SQLITE)
 
 if (READLINE_FOUND)
-#include_directories (${READLINE_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${READLINE_INCLUDE_DIR})
 target_link_libraries(eressea ${READLINE_LIBRARY})
 target_compile_definitions(eressea PRIVATE DUSE_READLINE)
 endif (READLINE_FOUND)
