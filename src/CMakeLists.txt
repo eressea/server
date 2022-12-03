@@ -192,6 +192,7 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
@@ -204,6 +205,7 @@ target_link_libraries(eressea
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
+  ${UTF8PROC_LIBRARY}
 )
 
 add_test(NAME lua-core
@@ -288,6 +290,7 @@ target_link_libraries(test_eressea
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
+  ${UTF8PROC_LIBRARY}
   )
 
 set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
@@ -324,6 +327,7 @@ endif (HAVE_LIBBSD)
 
 target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIR})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
 target_include_directories (game PRIVATE ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARY})

@@ -30,6 +30,7 @@ endif (NOT CURSES_FOUND)
 
 find_package (EXPAT REQUIRED)
 find_package (Lua 5.2 REQUIRED)
+find_package (Utf8Proc REQUIRED)
 
 find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
 find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h REQUIRED)
