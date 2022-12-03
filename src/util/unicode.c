@@ -1,5 +1,7 @@
 #include "unicode.h"
 
+#include <utf8proc.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>

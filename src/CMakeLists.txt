@@ -174,6 +174,7 @@ add_library(parser ${PARSER_SRC})
 
 target_include_directories (parser PUBLIC ${CLIBS_INCLUDE_DIR})
 target_include_directories (parser PUBLIC ${STORAGE_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
@@ -192,7 +193,6 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
-target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
