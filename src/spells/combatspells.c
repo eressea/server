@@ -1399,7 +1399,7 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
             continue;
 
         /* wir heilen erstmal keine Monster */
-        if (heal_monsters || !undeadrace(u_race(df->unit))) {
+        if (heal_monsters || playerrace(u_race(df->unit))) {
             int n, hp = df->unit->hp / df->unit->number;
             int rest = df->unit->hp % df->unit->number;
 
