@@ -9,11 +9,12 @@ extern "C" {
 
     struct summary;
 
+    extern int* nmrs;
+
     void report_summary(const struct summary *sum, bool full);
     struct summary *make_summary(void);
     void free_summary(struct summary *sum);
-    int update_nmrs(void);
-    extern int* nmrs;
+    int update_nmrs(int since);
 
 
 #ifdef __cplusplus
