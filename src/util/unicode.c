@@ -33,8 +33,98 @@ static bool char_trimmed(wchar_t wc) {
     return iswspace(wc) || iswcntrl(wc);
 }
 
-size_t unicode_utf8_trim(char *buf)
+static bool unicode_trimmed(const utf8proc_property_t* property)
 {
+    return
+        property->category == UTF8PROC_CATEGORY_CF ||
+        property->category == UTF8PROC_CATEGORY_CC ||
+        property->category == UTF8PROC_CATEGORY_ZS ||
+        property->category == UTF8PROC_CATEGORY_ZL ||
+        property->category == UTF8PROC_CATEGORY_ZP ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_WS ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_B ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_S ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_BN;
+}
+
+static void commit_bytes(char* out, char* begin, size_t bytes)
+{
+    if (out != begin) {
+        memmove(out, begin, bytes);
+    }
+}
+
+size_t unicode_utf8_trim(char* buf)
+{
+    char* str = buf;
+    char* out = buf;
+    const size_t len = strlen(buf);
+    size_t spaces = 0;
+    utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+    // @var begin: first byte in current printable sequence
+    // @var end: one-after last byte in current sequence
+    // @var rtrim: potential first byte of right-trim space
+    char* begin = NULL, * end = NULL, * ltrim = str, *rtrim = NULL;
+    while (ulen > 0 && *str) {
+        utf8proc_uint32_t codepoint;
+        utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+        if (size > 0) {
+            const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+            if (str == ltrim) {
+                // we are still trimming on the left
+                if (unicode_trimmed(property)) {
+                    ltrim += size;
+                }
+                else {
+                    // we are finished trimming, start the first sequence here:
+                    ltrim = NULL;
+                    begin = str;
+                    end = str + size;
+                }
+            }
+            else {
+                // we are still trying to extend the sequence:
+                if (property->bidi_class != UTF8PROC_BIDI_CLASS_WS) {
+                    // include in sequence:
+                    end = str + size;
+                    if (unicode_trimmed(property)) {
+                        // could be trailing junk, set rtrim lower bound
+                        if (!rtrim) {
+                            rtrim = str;
+                        }
+                    }
+                    else {
+                        rtrim = NULL;
+                    }
+                }
+                else {
+                    // whitespace, might start right-trim or end of sequence
+                    if (!rtrim) {
+                        rtrim = str;
+                    }
+                }
+            }
+        }
+        else {
+            *str = 0;
+            return EILSEQ;
+        }
+        str += size;
+    }
+    if (begin && end) {
+        ptrdiff_t plen;
+        if (rtrim && rtrim < end) {
+            end = rtrim;
+        }
+        plen = end - begin;
+        commit_bytes(out, begin, plen);
+        out[plen] = 0;
+        return len - plen;
+    }
+    return 0;
+}
+
+size_t unicode_utf8_trim_old(char* buf) {
     size_t result = 0, ts = 0;
     char *op = buf, *ip = buf, *lc = buf;
     assert(buf);

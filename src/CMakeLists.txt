@@ -179,6 +179,7 @@ target_include_directories (parser PUBLIC ${UTF8PROC_INCLUDE_DIR})
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
+  ${UTF8PROC_LIBRARY}
   )
 
 add_executable(checker ${CHECK_SRC})
@@ -205,7 +206,6 @@ target_link_libraries(eressea
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
-  ${UTF8PROC_LIBRARY}
 )
 
 add_test(NAME lua-core
@@ -290,7 +290,6 @@ target_link_libraries(test_eressea
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
-  ${UTF8PROC_LIBRARY}
   )
 
 set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)

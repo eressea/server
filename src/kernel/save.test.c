@@ -69,9 +69,7 @@ static void test_readwrite_unit(CuTest * tc)
     f = test_create_faction();
     fno = f->no;
     u = test_create_unit(f, r);
-    unit_setname(u, "  Hodor  ");
-    CuAssertStrEquals(tc, "  Hodor  ", u->_name);
-    enable_skill(SK_STEALTH, false);
+    unit_setname(u, "Hodor");
     irace = test_create_race("halfling");
     CuAssertTrue(tc, playerrace(irace));
     u->irace = irace;
@@ -109,8 +107,8 @@ static void test_readwrite_faction(CuTest * tc)
     test_setup();
     f = test_create_faction();
     free(f->name);
-    f->name = str_strdup("  Hodor  ");
-    CuAssertStrEquals(tc, "  Hodor  ", f->name);
+    f->name = str_strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", f->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_faction(&data, f);
@@ -139,8 +137,8 @@ static void test_readwrite_region(CuTest * tc)
     test_setup();
     r = test_create_plain(0, 0);
     free(r->land->name);
-    r->land->name = str_strdup("  Hodor  ");
-    CuAssertStrEquals(tc, "  Hodor  ", r->land->name);
+    r->land->name = str_strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", r->land->name);
     region_setinfo(r, lipsum);
     CuAssertStrEquals(tc, lipsum, r->land->display);
     mstream_init(&data.strm);
@@ -172,8 +170,8 @@ static void test_readwrite_building(CuTest * tc)
     r = test_create_plain(0, 0);
     b = test_create_building(r, NULL);
     free(b->name);
-    b->name = str_strdup("  Hodor  ");
-    CuAssertStrEquals(tc, "  Hodor  ", b->name);
+    b->name = str_strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", b->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_building(&data, b);
@@ -205,8 +203,8 @@ static void test_readwrite_ship(CuTest * tc)
     r = test_create_plain(0, 0);
     sh = test_create_ship(r, NULL);
     free(sh->name);
-    sh->name = str_strdup("  Hodor  ");
-    CuAssertStrEquals(tc, "  Hodor  ", sh->name);
+    sh->name = str_strdup("Hodor");
+    CuAssertStrEquals(tc, "Hodor", sh->name);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
     write_ship(&data, sh);

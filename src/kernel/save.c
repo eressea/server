@@ -426,13 +426,17 @@ unit *read_unit(gamedata *data)
     }
 
     READ_STR(data->store, obuf, sizeof(obuf));
-    if (unicode_utf8_trim(obuf)!=0) {
-		log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
-	}
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(obuf) != 0) {
+            log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
+        }
+    }
     unit_setname(u, obuf[0] ? obuf : NULL);
     READ_STR(data->store, obuf, sizeof(obuf));
-    if (unicode_utf8_trim(obuf)!=0) {
-        log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(obuf) != 0) {
+            log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
+        }
     }
     unit_setinfo(u, obuf[0] ? obuf : NULL);
     READ_INT(data->store, &number);
@@ -649,8 +653,10 @@ void write_unit(gamedata *data, const unit * u)
 
 static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
     READ_STR(data->store, info, len);
-    if (unicode_utf8_trim(info) != 0) {
-        log_warning("trim region %d info to '%s'", r->uid, info);
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(info) != 0) {
+            log_warning("trim region %d info to '%s'", r->uid, info);
+        }
     }
 }
 
@@ -740,9 +746,11 @@ static region *readregion(gamedata *data, int x, int y)
     if (fval(r->terrain, LAND_REGION)) {
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
-        if (unicode_utf8_trim(name) != 0) {
-            log_warning("trim region %d name to '%s'", uid, name);
-        };
+        if (data->version <= NOWATCH_VERSION) {
+            if (unicode_utf8_trim(name) != 0) {
+                log_warning("trim region %d name to '%s'", uid, name);
+            }
+        }
         r->land->name = str_strdup(name);
     }
     if (r->land) {
@@ -1083,14 +1091,18 @@ faction *read_faction(gamedata * data)
     }
 
     READ_STR(data->store, name, sizeof(name));
-	if (unicode_utf8_trim(name)!=0) {
-		log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
-	};
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
+        }
+    }
     f->name = str_strdup(name);
     READ_STR(data->store, name, sizeof(name));
-	if (unicode_utf8_trim(name)!=0) {
-		log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
-	};
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
+        }
+    }
     faction_setbanner(f, name);
 
     log_debug("   - Lese Partei %s (%s)", f->name, itoa36(f->no));
@@ -1316,13 +1328,17 @@ struct building *read_building(gamedata *data) {
     READ_INT(store, &b->no);
     bhash(b);
     READ_STR(store, name, sizeof(name));
-    if (unicode_utf8_trim(name)!=0) {
-		log_warning("trim building %s name to '%s'", itoa36(b->no), name);
-	}
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim building %s name to '%s'", itoa36(b->no), name);
+        }
+    }
     b->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
-    if (unicode_utf8_trim(name)!=0) {
-        log_warning("trim building %s info to '%s'", itoa36(b->no), name);
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim building %s info to '%s'", itoa36(b->no), name);
+        }
     }
     b->display = str_strdup(name);
     READ_INT(store, &b->size);
@@ -1377,13 +1393,17 @@ ship *read_ship(gamedata *data)
     READ_INT(store, &sh->no);
     shash(sh);
     READ_STR(store, name, sizeof(name));
-    if (unicode_utf8_trim(name)!=0) {
-		log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
-	}
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
+        }
+    }
     sh->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
-    if (unicode_utf8_trim(name)!=0) {
-        log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
+    if (data->version <= NOWATCH_VERSION) {
+        if (unicode_utf8_trim(name) != 0) {
+            log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
+        }
     }
     sh->display = str_strdup(name);
     READ_STR(store, name, sizeof(name));
