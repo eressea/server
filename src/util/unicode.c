@@ -25,14 +25,6 @@
 #define B00000011 0x03
 #define B00000001 0x01
 
-static bool char_trimmed(wchar_t wc) {
-    if (wc == 0xa0 || wc == 0x202f || (wc >= 0x2000 && wc <= 0x200f)) {
-        /* only weird stuff here */
-        return true;
-    }
-    return iswspace(wc) || iswcntrl(wc);
-}
-
 static bool unicode_trimmed(const utf8proc_property_t* property)
 {
     return
@@ -47,10 +39,10 @@ static bool unicode_trimmed(const utf8proc_property_t* property)
         property->bidi_class == UTF8PROC_BIDI_CLASS_BN;
 }
 
-static void commit_bytes(char* out, const char* begin, const char *end)
+static void move_bytes(char* out, const char* begin, size_t bytes)
 {
-    if (out != begin && end > begin) {
-        memmove(out, begin, end - begin);
+    if (out != begin && bytes > 0) {
+        memmove(out, begin, bytes);
     }
 }
 
@@ -69,7 +61,7 @@ void unicode_utf8_clean(char* buf)
         }
         else if (size == 1) {
             if (iscntrl(*str)) {
-                commit_bytes(out, begin, str);
+                move_bytes(out, begin, str - begin);
                 out += (str - begin);
                 begin = str + size;
             }
@@ -77,14 +69,14 @@ void unicode_utf8_clean(char* buf)
         else {
             const utf8proc_property_t* property = utf8proc_get_property(codepoint);
             if (property->bidi_class == UTF8PROC_BIDI_CLASS_S || property->bidi_class == UTF8PROC_BIDI_CLASS_B) {
-                commit_bytes(out, begin, str);
+                move_bytes(out, begin, str - begin);
                 out += (str - begin);
                 begin = str + size;
             }
         }
         str += size;
     }
-    commit_bytes(out, begin, str);
+    move_bytes(out, begin, str - begin);
     out[str - begin] = 0;
 }
 
@@ -150,59 +142,12 @@ size_t unicode_utf8_trim(char* buf)
         if (rtrim && rtrim < end) {
             end = rtrim;
         }
-        commit_bytes(out, begin, end);
         plen = end - begin;
+        move_bytes(out, begin, plen);
         out[plen] = 0;
         return len - plen;
     }
     return 0;
-}
-
-size_t unicode_utf8_trim_old(char* buf) {
-    size_t result = 0, ts = 0;
-    char *op = buf, *ip = buf, *lc = buf;
-    assert(buf);
-    while (*ip) {
-        size_t size = 1;
-        wchar_t wc = *(unsigned char *)ip;
-        if (wc & 0x80) {
-            wchar_t ucs = 0;
-            if (ip[1]) {
-                int ret = unicode_utf8_decode(&ucs, ip, &size);
-                if (ret != 0) {
-                    return ret;
-                }
-                wc = (wchar_t)ucs;
-            }
-            else {
-                wc = *op = '?';
-                size = 1;
-                ++result;
-            }
-        }
-        if (op == buf && char_trimmed(wc)) {
-            result += size;
-        }
-        else if (wc>255 || !iswcntrl(wc)) {
-            if (op != ip) {
-                memmove(op, ip, size);
-            }
-            op += size;
-            if (char_trimmed(wc)) {
-                ts += size;
-            }
-            else {
-                lc = op;
-                ts = 0;
-            }
-        }
-        else {
-            result += size;
-        }
-        ip += size;
-    }
-    *lc = '\0';
-    return result + ts;
 }
 
 int unicode_utf8_tolower(char * op, size_t outlen, const char * ip)
