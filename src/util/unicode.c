@@ -149,40 +149,6 @@ size_t unicode_utf8_trim(char* buf)
     return 0;
 }
 
-int unicode_utf8_tolower(char * op, size_t outlen, const char * ip)
-{
-    while (*ip) {
-        wchar_t ucs = *ip;
-        wchar_t low;
-        size_t size = 1;
-
-        if (ucs & 0x80) {
-            int ret = unicode_utf8_decode(&ucs, ip, &size);
-            if (ret != 0) {
-                return ret;
-            }
-        }
-        if (size > outlen) {
-            return ENOMEM;
-        }
-        low = towlower((wchar_t)ucs);
-        if (low == ucs) {
-            memmove(op, ip, size);
-            ip += size;
-            op += size;
-            outlen -= size;
-        }
-        else {
-            ip += size;
-            unicode_utf8_encode(op, &size, low);
-            op += size;
-            outlen -= size;
-        }
-    }
-    *op = 0;
-    return 0;
-}
-
 int
 unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
     size_t * inlen)
@@ -247,8 +213,8 @@ int unicode_utf8_strcasecmp(const char * a, const char *b)
         len_a -= size_a;
         len_b -= size_b;
     }
-    if (*a) return 1;
-    if (*b) return -1;
+    if (*ap) return 1;
+    if (*bp) return -1;
     return 0;
 }
 

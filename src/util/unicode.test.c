@@ -85,17 +85,6 @@ static void test_unicode_trim(CuTest* tc)
     CuAssertStrEquals(tc, "Hello Wor", buffer);
 }
 
-static void test_unicode_tolower(CuTest * tc)
-{
-    char buffer[32];
-    CuAssertIntEquals(tc, 0, unicode_utf8_tolower(buffer, sizeof(buffer), "HeLlO W0Rld"));
-    CuAssertStrEquals(tc, "hello w0rld", buffer);
-    memset(buffer, 0, sizeof(buffer));
-    buffer[5] = 'X';
-    CuAssertIntEquals(tc, ENOMEM, unicode_utf8_tolower(buffer, 5, "HeLlO W0Rld"));
-    CuAssertStrEquals(tc, "helloX", buffer);
-}
-
 static void test_unicode_utf8_to_other(CuTest *tc)
 {
     const unsigned char uchar_str[] = { 0xc3, 0x98, 0xc5, 0xb8, 0xc2, 0x9d, 'l', 0 }; /* &Oslash;&Yuml;&#157;l */
@@ -244,6 +233,5 @@ CuSuite *get_unicode_suite(void)
     SUITE_ADD_TEST(suite, test_unicode_utf8_to_ucs);
     SUITE_ADD_TEST(suite, test_unicode_compare);
     SUITE_ADD_TEST(suite, test_unicode_bug2262);
-    SUITE_ADD_TEST(suite, test_unicode_tolower);
     return suite;
 }
