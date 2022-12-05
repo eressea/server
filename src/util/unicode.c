@@ -54,7 +54,7 @@ void unicode_utf8_clean(char* buf)
     const size_t len = strlen(buf);
     utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
     while (ulen > 0 && *str) {
-        utf8proc_uint32_t codepoint;
+        utf8proc_int32_t codepoint;
         utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
         if (size <= 0) {
             break;
@@ -85,14 +85,13 @@ size_t unicode_utf8_trim(char* buf)
     char* str = buf;
     char* out = buf;
     const size_t len = strlen(buf);
-    size_t spaces = 0;
     utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
     // @var begin: first byte in current printable sequence
     // @var end: one-after last byte in current sequence
     // @var rtrim: potential first byte of right-trim space
     char* begin = NULL, * end = NULL, * ltrim = str, *rtrim = NULL;
     while (ulen > 0 && *str) {
-        utf8proc_uint32_t codepoint;
+        utf8proc_int32_t codepoint;
         utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
         if (size > 0) {
             const utf8proc_property_t* property = utf8proc_get_property(codepoint);
