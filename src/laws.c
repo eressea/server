@@ -1636,6 +1636,7 @@ int display_cmd(unit * u, struct order *ord)
         str = getstrtoken();
         if (str) {
             unicode_utf8_trim(str);
+            unicode_utf8_clean(str);
         }
         unit_setinfo(u, str);
         break;
@@ -1644,6 +1645,7 @@ int display_cmd(unit * u, struct order *ord)
         str = getstrtoken();
         if (str) {
             unicode_utf8_trim(str);
+            unicode_utf8_clean(str);
         }
         usetprivate(u, str);
         break;
@@ -1670,6 +1672,7 @@ int display_cmd(unit * u, struct order *ord)
             if (unicode_utf8_trim(sdup) != 0) {
                 log_info("trimming info: %s", s2);
             }
+            unicode_utf8_clean(str);
             if (strlen(sdup) >= DISPLAYSIZE) {
                 sdup[DISPLAYSIZE-1] = 0;
             }
@@ -1714,6 +1717,7 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     if (unicode_utf8_trim(name) != 0) {
         log_info("trimming name: %s", s2);
     }
+    unicode_utf8_clean(name);
 
     free(*s);
     *s = str_strdup(name);

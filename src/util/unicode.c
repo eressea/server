@@ -47,11 +47,45 @@ static bool unicode_trimmed(const utf8proc_property_t* property)
         property->bidi_class == UTF8PROC_BIDI_CLASS_BN;
 }
 
-static void commit_bytes(char* out, char* begin, size_t bytes)
+static void commit_bytes(char* out, const char* begin, const char *end)
 {
-    if (out != begin) {
-        memmove(out, begin, bytes);
+    if (out != begin && end > begin) {
+        memmove(out, begin, end - begin);
     }
+}
+
+void unicode_utf8_clean(char* buf)
+{
+    char* str = buf;
+    char* out = buf;
+    char* begin = str;
+    const size_t len = strlen(buf);
+    utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+    while (ulen > 0 && *str) {
+        utf8proc_uint32_t codepoint;
+        utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+        if (size <= 0) {
+            break;
+        }
+        else if (size == 1) {
+            if (iscntrl(*str)) {
+                commit_bytes(out, begin, str);
+                out += (str - begin);
+                begin = str + size;
+            }
+        }
+        else {
+            const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+            if (property->bidi_class == UTF8PROC_BIDI_CLASS_S || property->bidi_class == UTF8PROC_BIDI_CLASS_B) {
+                commit_bytes(out, begin, str);
+                out += (str - begin);
+                begin = str + size;
+            }
+        }
+        str += size;
+    }
+    commit_bytes(out, begin, str);
+    out[str - begin] = 0;
 }
 
 size_t unicode_utf8_trim(char* buf)
@@ -116,8 +150,8 @@ size_t unicode_utf8_trim(char* buf)
         if (rtrim && rtrim < end) {
             end = rtrim;
         }
+        commit_bytes(out, begin, end);
         plen = end - begin;
-        commit_bytes(out, begin, plen);
         out[plen] = 0;
         return len - plen;
     }
