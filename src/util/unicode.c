@@ -227,7 +227,7 @@ int unicode_utf8_strcasecmp(const char * a, const char *b)
     utf8proc_ssize_t len_b = (utf8proc_ssize_t)strlen(b);
     utf8proc_uint8_t * ap = (utf8proc_uint8_t *)a;
     utf8proc_uint8_t * bp = (utf8proc_uint8_t *)b;
-    while (*a && *b) {
+    while (*ap && *bp) {
         utf8proc_int32_t ca, cb;
         utf8proc_ssize_t size_a, size_b;
         size_a = utf8proc_iterate(ap, len_a, &ca);
