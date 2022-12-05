@@ -220,41 +220,35 @@ unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
 
 int unicode_utf8_strcasecmp(const char * a, const char *b)
 {
-    while (*a && *b) {
-        int ret;
-        size_t size;
-        wchar_t ucsa = *a, ucsb = *b;
-
-        if (ucsa & 0x80) {
-            ret = unicode_utf8_decode(&ucsa, a, &size);
-            if (ret != 0)
-                return -1;
-            a += size;
-        }
-        else
-            ++a;
-        if (ucsb & 0x80) {
-            ret = unicode_utf8_decode(&ucsb, b, &size);
-            if (ret != 0)
-                return -1;
-            b += size;
-        }
-        else
-            ++b;
-
-        if (ucsb != ucsa) {
-            ucsb = towlower((wchar_t)ucsb);
-            ucsa = towlower((wchar_t)ucsa);
-            if (ucsb < ucsa)
-                return 1;
-            if (ucsb > ucsa)
-                return -1;
-        }
+    if (strcmp(a, b) == 0) {
+        return 0;
     }
-    if (*b)
-        return -1;
-    if (*a)
-        return 1;
+    utf8proc_ssize_t len_a = (utf8proc_ssize_t)strlen(a);
+    utf8proc_ssize_t len_b = (utf8proc_ssize_t)strlen(b);
+    utf8proc_uint8_t * ap = (utf8proc_uint8_t *)a;
+    utf8proc_uint8_t * bp = (utf8proc_uint8_t *)b;
+    while (*a && *b) {
+        utf8proc_int32_t ca, cb;
+        utf8proc_ssize_t size_a, size_b;
+        size_a = utf8proc_iterate(ap, len_a, &ca);
+        size_b = utf8proc_iterate(bp, len_b, &cb);
+        if (size_a < 0) {
+            return -1;
+        }
+        if (size_b < 0) {
+            return 1;
+        }
+        ca = utf8proc_tolower(ca);
+        cb = utf8proc_tolower(cb);
+        if (ca < cb) return -1;
+        if (ca > cb) return 1;
+        ap += size_a;
+        bp += size_b;
+        len_a -= size_a;
+        len_b -= size_b;
+    }
+    if (*a) return 1;
+    if (*b) return -1;
     return 0;
 }
 

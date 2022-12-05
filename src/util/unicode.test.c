@@ -172,6 +172,7 @@ static void test_unicode_compare(CuTest *tc)
     CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("ABCDEFG", "abcdefg"));
     CuAssertIntEquals(tc, 0, unicode_utf8_strcasecmp("abcdefg123", "ABCDEFG123"));
     CuAssertIntEquals(tc, 1, unicode_utf8_strcasecmp("bacdefg123", "ABCDEFG123"));
+    CuAssertIntEquals(tc, -1, unicode_utf8_strcasecmp("abc", "abcD"));
 }
 
 static void test_unicode_trim_zwnj(CuTest *tc) {
