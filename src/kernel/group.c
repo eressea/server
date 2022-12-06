@@ -60,7 +60,7 @@ group *find_groupbyname(faction *f, const char *name)
     group* g;
     for (g = f->groups; g; g = g->next)
     {
-        if (unicode_utf8_strcasecmp(name, g->name) == 0)
+        if (utf8_strcasecmp(name, g->name) == 0)
         {
             return g;
         }

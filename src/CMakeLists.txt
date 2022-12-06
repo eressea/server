@@ -174,10 +174,12 @@ add_library(parser ${PARSER_SRC})
 
 target_include_directories (parser PUBLIC ${CLIBS_INCLUDE_DIR})
 target_include_directories (parser PUBLIC ${STORAGE_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
+  ${UTF8PROC_LIBRARY}
   )
 
 add_executable(checker ${CHECK_SRC})
@@ -207,14 +209,17 @@ target_link_libraries(eressea
 )
 
 add_test(NAME lua-core
- COMMAND eressea -v1 ../scripts/run-tests.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-core PROPERTY RUN_SERIAL)
 add_test(NAME lua-e2
- COMMAND eressea -v1 ../scripts/run-tests-e2.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests-e2.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e2 PROPERTY RUN_SERIAL)
 add_test(NAME lua-e3
- COMMAND eressea -v1 ../scripts/run-tests-e3.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests-e3.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
 
 find_program(LUAROCKS_EXECUTABLE luarocks)
 if(LUAROCKS_EXECUTABLE)
@@ -324,6 +329,7 @@ endif (HAVE_LIBBSD)
 
 target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIR})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
 target_include_directories (game PRIVATE ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARY})

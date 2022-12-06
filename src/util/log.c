@@ -85,10 +85,10 @@ cp_convert(const char *format, unsigned char *buffer, size_t length, int codepag
         size_t size = 0;
         int result = 0;
         if (codepage == 437) {
-            result = unicode_utf8_to_cp437(pos, input, &size);
+            result = utf8_to_cp437(pos, input, &size);
         }
         else if (codepage == 1252) {
-            result = unicode_utf8_to_cp1252(pos, input, &size);
+            result = utf8_to_cp1252(pos, input, &size);
         }
         if (result != 0) {
             *pos = 0;                 /* just in case caller ignores our return value */

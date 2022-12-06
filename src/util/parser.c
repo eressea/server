@@ -22,36 +22,6 @@ typedef struct parse_state {
 
 static parse_state *states;
 
-#define TRIMMED(wc) (iswspace(wc) || iswcntrl(wc) || (wc) == 160 || (wc) == 8199 || (wc) == 8239)
-
-int ltrim(const char **str_p)
-{
-    int ret = 0;
-    wchar_t wc;
-    size_t len;
-    const char *str = *str_p;
-
-    /* skip over potential whitespace */
-    while (*str) {
-        wc = *(unsigned char *)str;
-        if (~wc & 0x80) {
-            if (!TRIMMED(wc)) break;
-            ++str;
-        }
-        else {
-            ret = unicode_utf8_decode(&wc, str, &len);
-            if (ret != 0) {
-                log_warning("illegal character sequence in UTF8 string: %s\n", str);
-                break;
-            }
-            if (!TRIMMED(wc)) break;
-            str += len;
-        }
-    }
-    *str_p = str;
-    return ret;
-}
-
 void init_tokens_ex(const char *initstr, void *data, void (*dtor)(void *))
 {
     if (states == NULL) {
@@ -92,8 +62,9 @@ void parser_popstate(void)
 bool parser_end(void)
 {
     if (states->current_token) {
-        ltrim(&states->current_token);
-        return *states->current_token == 0;
+        if (NULL != (states->current_token = utf8_ltrim(states->current_token))) {
+            return 0 == *states->current_token;
+        }
     }
     return true;
 }
@@ -101,40 +72,43 @@ bool parser_end(void)
 void skip_token(void)
 {
     char quotechar = 0;
-    ltrim(&states->current_token);
 
-    while (*states->current_token) {
-        wchar_t wc;
-        size_t len;
+    if (NULL != (states->current_token = utf8_ltrim(states->current_token)))
+    {
+        while (*states->current_token)
+        {
+            wchar_t wc;
+            size_t len;
 
-        unsigned char utf8_character = (unsigned char)states->current_token[0];
-        if (~utf8_character & 0x80) {
-            wc = utf8_character;
-            ++states->current_token;
-        }
-        else {
-            int ret = unicode_utf8_decode(&wc, states->current_token, &len);
-            if (ret == 0) {
-                states->current_token += len;
+            unsigned char utf8_character = (unsigned char)states->current_token[0];
+            if (~utf8_character & 0x80) {
+                wc = utf8_character;
+                ++states->current_token;
             }
             else {
-                log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
+                int ret = utf8_decode(&wc, states->current_token, &len);
+                if (ret == 0) {
+                    states->current_token += len;
+                }
+                else {
+                    log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
+                }
             }
-        }
-        if (iswspace(wc) && quotechar == 0) {
-            return;
-        }
-        else {
-            switch (utf8_character) {
-            case '"':
-            case '\'':
-                if (utf8_character == quotechar)
-                    return;
-                quotechar = utf8_character;
-                break;
-            case ESCAPE_CHAR:
-                ++states->current_token;
-                break;
+            if (iswspace(wc) && quotechar == 0) {
+                return;
+            }
+            else {
+                switch (utf8_character) {
+                case '"':
+                case '\'':
+                    if (utf8_character == quotechar)
+                        return;
+                    quotechar = utf8_character;
+                    break;
+                case ESCAPE_CHAR:
+                    ++states->current_token;
+                    break;
+                }
             }
         }
     }
@@ -145,12 +119,11 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     char *cursor = lbuf;
     char quotechar = 0;
     bool escape = false;
-    const char *ctoken = *str, *cstart;
+    const char *ctoken = utf8_ltrim(*str), *cstart;
 
     if (!ctoken) {
         return 0;
     }
-    ltrim(&ctoken);
     if (!*ctoken) {
         if (buflen > 0) {
             *cursor = 0;
@@ -169,13 +142,13 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             len = 1;
         }
         else {
-            int ret = unicode_utf8_decode(&wc, ctoken, &len);
+            int ret = utf8_decode(&wc, ctoken, &len);
             if (ret != 0) {
                 log_info("falling back to ISO-8859-1: %s\n", cstart);
                 if (cursor - buflen < lbuf - 2) {
                     size_t inlen = 1;
                     len = 2;
-                    unicode_latin1_to_utf8(cursor, &len, ctoken, &inlen);
+                    utf8_from_latin1(cursor, &len, ctoken, &inlen);
                     cursor += len;
                     ctoken += inlen;
                     continue;
@@ -230,7 +203,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     }
 
     *cursor = '\0';
-    unicode_utf8_trim(lbuf);
+    utf8_trim(lbuf);
     *str = ctoken;
     return lbuf;
 }

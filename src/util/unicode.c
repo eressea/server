@@ -1,5 +1,7 @@
 #include "unicode.h"
 
+#include <utf8proc.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -7,114 +9,152 @@
 #include <wctype.h>
 #include <ctype.h>
 
-#define B00000000 0x00
-#define B10000000 0x80
-#define B11000000 0xC0
-#define B11100000 0xE0
-#define B11110000 0xF0
-#define B11111000 0xF8
-#define B11111100 0xFC
-#define B11111110 0xFE
-
-#define B00111111 0x3F
-#define B00011111 0x1F
-#define B00001111 0x0F
-#define B00000111 0x07
-#define B00000011 0x03
-#define B00000001 0x01
-
-static bool char_trimmed(wchar_t wc) {
-    if (wc == 0xa0 || wc == 0x202f || (wc >= 0x2000 && wc <= 0x200f)) {
-        /* only weird stuff here */
-        return true;
-    }
-    return iswspace(wc) || iswcntrl(wc);
+static bool unicode_trimmed(const utf8proc_property_t* property)
+{
+    return
+        property->category == UTF8PROC_CATEGORY_CF ||
+        property->category == UTF8PROC_CATEGORY_CC ||
+        property->category == UTF8PROC_CATEGORY_ZS ||
+        property->category == UTF8PROC_CATEGORY_ZL ||
+        property->category == UTF8PROC_CATEGORY_ZP ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_WS ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_B ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_S ||
+        property->bidi_class == UTF8PROC_BIDI_CLASS_BN;
 }
 
-size_t unicode_utf8_trim(char *buf)
+static void move_bytes(char* out, const char* begin, size_t bytes)
 {
-    size_t result = 0, ts = 0;
-    char *op = buf, *ip = buf, *lc = buf;
-    assert(buf);
-    while (*ip) {
-        size_t size = 1;
-        wchar_t wc = *(unsigned char *)ip;
-        if (wc & 0x80) {
-            wchar_t ucs = 0;
-            if (ip[1]) {
-                int ret = unicode_utf8_decode(&ucs, ip, &size);
-                if (ret != 0) {
-                    return ret;
+    if (out != begin && bytes > 0) {
+        memmove(out, begin, bytes);
+    }
+}
+
+void utf8_clean(char* buf)
+{
+    char* str = buf;
+    char* out = buf;
+    char* begin = str;
+    const size_t len = strlen(buf);
+    utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+    while (ulen > 0 && *str) {
+        utf8proc_int32_t codepoint;
+        utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+        if (size <= 0) {
+            break;
+        }
+        else if (size == 1) {
+            if (iscntrl(*str)) {
+                move_bytes(out, begin, str - begin);
+                out += (str - begin);
+                begin = str + size;
+            }
+        }
+        else {
+            const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+            if (property->bidi_class == UTF8PROC_BIDI_CLASS_S || property->bidi_class == UTF8PROC_BIDI_CLASS_B) {
+                move_bytes(out, begin, str - begin);
+                out += (str - begin);
+                begin = str + size;
+            }
+        }
+        str += size;
+    }
+    move_bytes(out, begin, str - begin);
+    out[str - begin] = 0;
+}
+
+int
+utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
+    size_t * length)
+{
+    const char * str = utf8_string;
+    const size_t len = strlen(str);
+    utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+    utf8proc_int32_t codepoint;
+    utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+    if (size <= 0) {
+        return EILSEQ;
+    }
+    *length = (size_t)size;
+    if (codepoint < WCHAR_MIN || codepoint > WCHAR_MAX) {
+        return ENOMEM;
+    }
+    *ucs4_character = (wchar_t)codepoint;
+    return 0;
+}
+
+size_t utf8_trim(char* buf)
+{
+    char* str = buf;
+    char* out = buf;
+    const size_t len = strlen(buf);
+    utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+    // @var begin: first byte in current printable sequence
+    // @var end: one-after last byte in current sequence
+    // @var rtrim: potential first byte of right-trim space
+    char* begin = NULL, * end = NULL, * ltrim = str, *rtrim = NULL;
+    while (ulen > 0 && *str) {
+        utf8proc_int32_t codepoint;
+        utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+        if (size > 0) {
+            const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+            if (str == ltrim) {
+                // we are still trimming on the left
+                if (unicode_trimmed(property)) {
+                    ltrim += size;
                 }
-                wc = (wchar_t)ucs;
+                else {
+                    // we are finished trimming, start the first sequence here:
+                    ltrim = NULL;
+                    begin = str;
+                    end = str + size;
+                }
             }
             else {
-                wc = *op = '?';
-                size = 1;
-                ++result;
-            }
-        }
-        if (op == buf && char_trimmed(wc)) {
-            result += size;
-        }
-        else if (wc>255 || !iswcntrl(wc)) {
-            if (op != ip) {
-                memmove(op, ip, size);
-            }
-            op += size;
-            if (char_trimmed(wc)) {
-                ts += size;
-            }
-            else {
-                lc = op;
-                ts = 0;
+                // we are still trying to extend the sequence:
+                if (property->bidi_class != UTF8PROC_BIDI_CLASS_WS) {
+                    // include in sequence:
+                    end = str + size;
+                    if (unicode_trimmed(property)) {
+                        // could be trailing junk, set rtrim lower bound
+                        if (!rtrim) {
+                            rtrim = str;
+                        }
+                    }
+                    else {
+                        rtrim = NULL;
+                    }
+                }
+                else {
+                    // whitespace, might start right-trim or end of sequence
+                    if (!rtrim) {
+                        rtrim = str;
+                    }
+                }
             }
         }
         else {
-            result += size;
+            *str = 0;
+            return EILSEQ;
         }
-        ip += size;
+        str += size;
     }
-    *lc = '\0';
-    return result + ts;
-}
-
-int unicode_utf8_tolower(char * op, size_t outlen, const char * ip)
-{
-    while (*ip) {
-        wchar_t ucs = *ip;
-        wchar_t low;
-        size_t size = 1;
-
-        if (ucs & 0x80) {
-            int ret = unicode_utf8_decode(&ucs, ip, &size);
-            if (ret != 0) {
-                return ret;
-            }
+    if (begin && end) {
+        ptrdiff_t plen;
+        if (rtrim && rtrim < end) {
+            end = rtrim;
         }
-        if (size > outlen) {
-            return ENOMEM;
-        }
-        low = towlower((wchar_t)ucs);
-        if (low == ucs) {
-            memmove(op, ip, size);
-            ip += size;
-            op += size;
-            outlen -= size;
-        }
-        else {
-            ip += size;
-            unicode_utf8_encode(op, &size, low);
-            op += size;
-            outlen -= size;
-        }
+        plen = end - begin;
+        move_bytes(out, begin, plen);
+        out[plen] = 0;
+        return len - plen;
     }
-    *op = 0;
     return 0;
 }
 
 int
-unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
+utf8_from_latin1(char * dst, size_t * outlen, const char *in,
     size_t * inlen)
 {
     int is = (int)*inlen;
@@ -148,228 +188,50 @@ unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
     return (int)*outlen;
 }
 
-int unicode_utf8_strcasecmp(const char * a, const char *b)
+int utf8_strcasecmp(const char * a, const char *b)
 {
-    while (*a && *b) {
-        int ret;
-        size_t size;
-        wchar_t ucsa = *a, ucsb = *b;
-
-        if (ucsa & 0x80) {
-            ret = unicode_utf8_decode(&ucsa, a, &size);
-            if (ret != 0)
-                return -1;
-            a += size;
-        }
-        else
-            ++a;
-        if (ucsb & 0x80) {
-            ret = unicode_utf8_decode(&ucsb, b, &size);
-            if (ret != 0)
-                return -1;
-            b += size;
-        }
-        else
-            ++b;
-
-        if (ucsb != ucsa) {
-            ucsb = towlower((wchar_t)ucsb);
-            ucsa = towlower((wchar_t)ucsa);
-            if (ucsb < ucsa)
-                return 1;
-            if (ucsb > ucsa)
-                return -1;
-        }
+    if (strcmp(a, b) == 0) {
+        return 0;
     }
-    if (*b)
-        return -1;
-    if (*a)
-        return 1;
+    utf8proc_ssize_t len_a = (utf8proc_ssize_t)strlen(a);
+    utf8proc_ssize_t len_b = (utf8proc_ssize_t)strlen(b);
+    utf8proc_uint8_t * ap = (utf8proc_uint8_t *)a;
+    utf8proc_uint8_t * bp = (utf8proc_uint8_t *)b;
+    while (*ap && *bp) {
+        utf8proc_int32_t ca, cb;
+        utf8proc_ssize_t size_a, size_b;
+        size_a = utf8proc_iterate(ap, len_a, &ca);
+        size_b = utf8proc_iterate(bp, len_b, &cb);
+        if (size_a < 0) {
+            return -1;
+        }
+        if (size_b < 0) {
+            return 1;
+        }
+        ca = utf8proc_tolower(ca);
+        cb = utf8proc_tolower(cb);
+        if (ca < cb) return -1;
+        if (ca > cb) return 1;
+        ap += size_a;
+        bp += size_b;
+        len_a -= size_a;
+        len_b -= size_b;
+    }
+    if (*ap) return 1;
+    if (*bp) return -1;
     return 0;
 }
 
-/* Convert a wide character to UTF-8. */
-int
-unicode_utf8_encode(char * utf8_character, size_t * size,
-    wchar_t ucs4_character)
-{
-    int utf8_bytes;
-
-    if (ucs4_character <= 0x0000007F) {
-        /* 0xxxxxxx */
-        utf8_bytes = 1;
-        utf8_character[0] = (char)ucs4_character;
-    }
-    else if (ucs4_character <= 0x000007FF) {
-        /* 110xxxxx 10xxxxxx */
-        utf8_bytes = 2;
-        utf8_character[0] = (char)((ucs4_character >> 6) | B11000000);
-        utf8_character[1] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x0000FFFF) {
-        /* 1110xxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 3;
-        utf8_character[0] = (char)((ucs4_character >> 12) | B11100000);
-        utf8_character[1] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[2] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-#if 0
-    else if (ucs4_character <= 0x001FFFFF) {
-        /* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 4;
-        utf8_character[0] = (char)((ucs4_character >> 18) | B11110000);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[2] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[3] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x03FFFFFF) {
-        /* 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 5;
-        utf8_character[0] = (char)((ucs4_character >> 24) | B11111000);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 18) & B00111111) | B10000000);
-        utf8_character[2] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[3] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[4] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x7FFFFFFF) {
-        /* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 6;
-        utf8_character[0] = (char)((ucs4_character >> 30) | B11111100);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 24) & B00111111) | B10000000);
-        utf8_character[2] =
-            (char)(((ucs4_character >> 18) & B00111111) | B10000000);
-        utf8_character[3] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[4] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[5] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-#endif
-    else {
-        return EILSEQ;
-    }
-
-    *size = utf8_bytes;
-
-    return 0;
-}
-
-/* Convert a UTF-8 encoded character to UCS-4. */
-int
-unicode_utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
-    size_t * length)
-{
-    char utf8_character = utf8_string[0];
-
-    /* Is the character in the ASCII range? If so, just copy it to the
-       output. */
-    if (~utf8_character & 0x80) {
-        *ucs4_character = utf8_character;
-        *length = 1;
-    }
-    else if ((utf8_character & 0xE0) == 0xC0) {
-        /* A two-byte UTF-8 sequence. Make sure the other byte is good. */
-        if (utf8_string[1] != '\0' && (utf8_string[1] & 0xC0) != 0x80) {
-            return EILSEQ;
-        }
-
-        *ucs4_character =
-            ((utf8_string[1] & 0x3F) << 0) + ((utf8_character & 0x1F) << 6);
-        *length = 2;
-    }
-    else if ((utf8_character & 0xF0) == 0xE0) {
-        /* A three-byte UTF-8 sequence. Make sure the other bytes are
-           good. */
-        if ((utf8_string[1] != '\0') &&
-            (utf8_string[1] & 0xC0) != 0x80 &&
-            (utf8_string[2] != '\0') && (utf8_string[2] & 0xC0) != 0x80) {
-            return EILSEQ;
-        }
-
-        *ucs4_character =
-            ((utf8_string[2] & 0x3F) << 0) +
-            ((utf8_string[1] & 0x3F) << 6) + ((utf8_character & 0x0F) << 12);
-        *length = 3;
-    }
-    else if ((utf8_character & 0xF8) == 0xF0) {
-        /* A four-byte UTF-8 sequence. Make sure the other bytes are
-           good. */
-        if ((utf8_string[1] != '\0') &&
-            (utf8_string[1] & 0xC0) != 0x80 &&
-            (utf8_string[2] != '\0') &&
-            (utf8_string[2] & 0xC0) != 0x80 &&
-            (utf8_string[3] != '\0') && (utf8_string[3] & 0xC0) != 0x80) {
-            return EILSEQ;
-        }
-
-        *ucs4_character =
-            ((utf8_string[3] & 0x3F) << 0) +
-            ((utf8_string[2] & 0x3F) << 6) +
-            ((utf8_string[1] & 0x3F) << 12) + ((utf8_character & 0x07) << 18);
-        *length = 4;
-    }
-    else if ((utf8_character & 0xFC) == 0xF8) {
-        /* A five-byte UTF-8 sequence. Make sure the other bytes are
-           good. */
-        if ((utf8_string[1] != '\0') &&
-            (utf8_string[1] & 0xC0) != 0x80 &&
-            (utf8_string[2] != '\0') &&
-            (utf8_string[2] & 0xC0) != 0x80 &&
-            (utf8_string[3] != '\0') &&
-            (utf8_string[3] & 0xC0) != 0x80 &&
-            (utf8_string[4] != '\0') && (utf8_string[4] & 0xC0) != 0x80) {
-            return EILSEQ;
-        }
-
-        *ucs4_character =
-            ((utf8_string[4] & 0x3F) << 0) +
-            ((utf8_string[3] & 0x3F) << 6) +
-            ((utf8_string[2] & 0x3F) << 12) +
-            ((utf8_string[1] & 0x3F) << 18) + ((utf8_character & 0x03) << 24);
-        *length = 5;
-    }
-    else if ((utf8_character & 0xFE) == 0xFC) {
-        /* A six-byte UTF-8 sequence. Make sure the other bytes are
-           good. */
-        if ((utf8_string[1] != '\0') &&
-            (utf8_string[1] & 0xC0) != 0x80 &&
-            (utf8_string[2] != '\0') &&
-            (utf8_string[2] & 0xC0) != 0x80 &&
-            (utf8_string[3] != '\0') &&
-            (utf8_string[3] & 0xC0) != 0x80 &&
-            (utf8_string[4] != '\0') &&
-            (utf8_string[4] & 0xC0) != 0x80 &&
-            (utf8_string[5] != '\0') && (utf8_string[5] & 0xC0) != 0x80) {
-            return EILSEQ;
-        }
-
-        *ucs4_character =
-            ((utf8_string[5] & 0x3F) << 0) +
-            ((utf8_string[4] & 0x3F) << 6) +
-            ((utf8_string[3] & 0x3F) << 12) +
-            ((utf8_string[2] & 0x3F) << 18) +
-            ((utf8_string[1] & 0x3F) << 24) + ((utf8_character & 0x01) << 30);
-        *length = 6;
-    }
-    else {
-        return EILSEQ;
-    }
-
-    return 0;
-}
 
 /** Convert a UTF-8 encoded character to CP437. */
 int
-unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
+utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
     wchar_t ucs4_character;
     int result;
 
-    result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result != 0) {
         /* pass decoding characters upstream */
         return result;
@@ -568,11 +430,11 @@ unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
 }
 
 /** Convert a UTF-8 encoded character to ASCII, with '?' replacements. */
-int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
+int utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
     size_t *length)
 {
     wchar_t ucs4_character;
-    int result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    int result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result == 0) {
         if (*length > 1) {
             *cp_character = '?';
@@ -585,13 +447,13 @@ int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
 }
 
 /** Convert a UTF-8 encoded character to CP1252. */
-int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string,
+int utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
     wchar_t ucs4_character;
     int result;
 
-    result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result != 0) {
         /* pass decoding characters upstream */
         return result;
@@ -655,4 +517,32 @@ int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string
         }
     }
     return 0;
+}
+
+const char* utf8_ltrim(const char* str)
+{
+    if (str == NULL) {
+        return NULL;
+    }
+    else {
+        const size_t len = strlen(str);
+        utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+        while (ulen > 0 && *str) {
+            utf8proc_int32_t codepoint;
+            utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+
+            if (size < 1) {
+                return NULL;
+            }
+            else {
+                const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+                if (!unicode_trimmed(property)) {
+                    break;
+                }
+                str += size;
+            }
+        }
+        return str;
+
+    }
 }
