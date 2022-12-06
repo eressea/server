@@ -120,42 +120,42 @@ static void test_utf8_to_other(CuTest *tc)
     char *utf8_str = (char *)uchar_str;
     unsigned char ch;
     size_t sz;
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp437(&ch, utf8_str, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str+2, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp437(&ch, utf8_str+2, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str+4, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp437(&ch, utf8_str+4, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp437(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp437(&ch, utf8_str + 6, &sz));
     CuAssertIntEquals(tc, 1, (int)sz);
     CuAssertIntEquals(tc, 'l', ch);
 
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp1252(&ch, utf8_str, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, 216, ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str+2, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp1252(&ch, utf8_str+2, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, 120, ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str + 4, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp1252(&ch, utf8_str + 4, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, 0x9d, ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_cp1252(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_cp1252(&ch, utf8_str + 6, &sz));
     CuAssertIntEquals(tc, 1, (int)sz);
     CuAssertIntEquals(tc, 'l', ch);
 
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_ascii(&ch, utf8_str, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 2, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_ascii(&ch, utf8_str + 2, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 4, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_ascii(&ch, utf8_str + 4, &sz));
     CuAssertIntEquals(tc, 2, (int)sz);
     CuAssertIntEquals(tc, '?', ch);
-    CuAssertIntEquals(tc, 0, unicode_utf8_to_ascii(&ch, utf8_str + 6, &sz));
+    CuAssertIntEquals(tc, 0, utf8_to_ascii(&ch, utf8_str + 6, &sz));
     CuAssertIntEquals(tc, 1, (int)sz);
     CuAssertIntEquals(tc, 'l', ch);
 }
@@ -164,7 +164,7 @@ static void test_utf8_to_ucs(CuTest *tc) {
     wchar_t wc;
     size_t sz;
 
-    CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, "a", &sz));
+    CuAssertIntEquals(tc, 0, utf8_decode(&wc, "a", &sz));
     CuAssertIntEquals(tc, 'a', wc);
     CuAssertIntEquals(tc, 1, (int)sz);
 }
@@ -175,13 +175,13 @@ static void test_bug2262(CuTest *tc) {
     size_t sz;
 
     strcpy(name, "utende");
-    CuAssertIntEquals(tc, 0, unicode_utf8_decode(&wc, name, &sz));
+    CuAssertIntEquals(tc, 0, utf8_decode(&wc, name, &sz));
     CuAssertIntEquals(tc, 1, (int)sz);
     CuAssertIntEquals(tc, 'u', wc);
     CuAssertIntEquals(tc, 0, (int)utf8_trim(name));
 
     name[0] = -4; /* latin1: &uuml; should fail to decode */
-    CuAssertIntEquals(tc, EILSEQ, unicode_utf8_decode(&wc, name, &sz));
+    CuAssertIntEquals(tc, EILSEQ, utf8_decode(&wc, name, &sz));
     CuAssertIntEquals(tc, EILSEQ, (int)utf8_trim(name));
 }
 

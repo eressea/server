@@ -65,7 +65,7 @@ void utf8_clean(char* buf)
 }
 
 int
-unicode_utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
+utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
     size_t * length)
 {
     const char * str = utf8_string;
@@ -154,7 +154,7 @@ size_t utf8_trim(char* buf)
 }
 
 int
-unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
+utf8_from_latin1(char * dst, size_t * outlen, const char *in,
     size_t * inlen)
 {
     int is = (int)*inlen;
@@ -225,13 +225,13 @@ int utf8_strcasecmp(const char * a, const char *b)
 
 /** Convert a UTF-8 encoded character to CP437. */
 int
-unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
+utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
     wchar_t ucs4_character;
     int result;
 
-    result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result != 0) {
         /* pass decoding characters upstream */
         return result;
@@ -430,11 +430,11 @@ unicode_utf8_to_cp437(unsigned char *cp_character, const char * utf8_string,
 }
 
 /** Convert a UTF-8 encoded character to ASCII, with '?' replacements. */
-int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
+int utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
     size_t *length)
 {
     wchar_t ucs4_character;
-    int result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    int result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result == 0) {
         if (*length > 1) {
             *cp_character = '?';
@@ -447,13 +447,13 @@ int unicode_utf8_to_ascii(unsigned char *cp_character, const char * utf8_string,
 }
 
 /** Convert a UTF-8 encoded character to CP1252. */
-int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string,
+int utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string,
     size_t * length)
 {
     wchar_t ucs4_character;
     int result;
 
-    result = unicode_utf8_decode(&ucs4_character, utf8_string, length);
+    result = utf8_decode(&ucs4_character, utf8_string, length);
     if (result != 0) {
         /* pass decoding characters upstream */
         return result;

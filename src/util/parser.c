@@ -86,7 +86,7 @@ void skip_token(void)
                 ++states->current_token;
             }
             else {
-                int ret = unicode_utf8_decode(&wc, states->current_token, &len);
+                int ret = utf8_decode(&wc, states->current_token, &len);
                 if (ret == 0) {
                     states->current_token += len;
                 }
@@ -142,13 +142,13 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
             len = 1;
         }
         else {
-            int ret = unicode_utf8_decode(&wc, ctoken, &len);
+            int ret = utf8_decode(&wc, ctoken, &len);
             if (ret != 0) {
                 log_info("falling back to ISO-8859-1: %s\n", cstart);
                 if (cursor - buflen < lbuf - 2) {
                     size_t inlen = 1;
                     len = 2;
-                    unicode_latin1_to_utf8(cursor, &len, ctoken, &inlen);
+                    utf8_from_latin1(cursor, &len, ctoken, &inlen);
                     cursor += len;
                     ctoken += inlen;
                     continue;

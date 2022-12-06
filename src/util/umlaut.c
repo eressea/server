@@ -81,7 +81,7 @@ char * transliterate(char * out, size_t size, const char * in)
             }
             else {
                 wchar_t wc;
-                int ret = unicode_utf8_decode(&wc, src, &len);
+                int ret = utf8_decode(&wc, src, &len);
                 if (ret != 0) {
                     /* encoding is broken. yikes */
                     log_error("transliterate | encoding error in '%s'\n", src);
@@ -134,7 +134,7 @@ void addtoken(tnode ** root, const char *str, variant id)
         wchar_t ucs, lcs;
         size_t len;
 
-        unicode_utf8_decode(&ucs, str, &len);
+        utf8_decode(&ucs, str, &len);
         lcs = ucs;
 
 #if NODEHASHSIZE == 8
@@ -237,7 +237,7 @@ int findtoken(const void * root, const char *key, variant * result)
         const tref *ref;
         wchar_t wc;
         size_t len;
-        int ret = unicode_utf8_decode(&wc, str, &len);
+        int ret = utf8_decode(&wc, str, &len);
 
         if (ret != 0) {
             /* encoding is broken. youch */
