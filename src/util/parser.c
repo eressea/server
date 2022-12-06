@@ -62,8 +62,9 @@ void parser_popstate(void)
 bool parser_end(void)
 {
     if (states->current_token) {
-        states->current_token = utf8_ltrim(states->current_token);
-        return 0 == *states->current_token;
+        if (NULL != (states->current_token = utf8_ltrim(states->current_token))) {
+            return 0 == *states->current_token;
+        }
     }
     return true;
 }
@@ -71,40 +72,43 @@ bool parser_end(void)
 void skip_token(void)
 {
     char quotechar = 0;
-    states->current_token = utf8_ltrim(states->current_token);
 
-    while (*states->current_token) {
-        wchar_t wc;
-        size_t len;
+    if (NULL != (states->current_token = utf8_ltrim(states->current_token)))
+    {
+        while (*states->current_token)
+        {
+            wchar_t wc;
+            size_t len;
 
-        unsigned char utf8_character = (unsigned char)states->current_token[0];
-        if (~utf8_character & 0x80) {
-            wc = utf8_character;
-            ++states->current_token;
-        }
-        else {
-            int ret = unicode_utf8_decode(&wc, states->current_token, &len);
-            if (ret == 0) {
-                states->current_token += len;
+            unsigned char utf8_character = (unsigned char)states->current_token[0];
+            if (~utf8_character & 0x80) {
+                wc = utf8_character;
+                ++states->current_token;
             }
             else {
-                log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
+                int ret = unicode_utf8_decode(&wc, states->current_token, &len);
+                if (ret == 0) {
+                    states->current_token += len;
+                }
+                else {
+                    log_warning("illegal character sequence in UTF8 string: %s\n", states->current_token);
+                }
             }
-        }
-        if (iswspace(wc) && quotechar == 0) {
-            return;
-        }
-        else {
-            switch (utf8_character) {
-            case '"':
-            case '\'':
-                if (utf8_character == quotechar)
-                    return;
-                quotechar = utf8_character;
-                break;
-            case ESCAPE_CHAR:
-                ++states->current_token;
-                break;
+            if (iswspace(wc) && quotechar == 0) {
+                return;
+            }
+            else {
+                switch (utf8_character) {
+                case '"':
+                case '\'':
+                    if (utf8_character == quotechar)
+                        return;
+                    quotechar = utf8_character;
+                    break;
+                case ESCAPE_CHAR:
+                    ++states->current_token;
+                    break;
+                }
             }
         }
     }
@@ -115,12 +119,11 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     char *cursor = lbuf;
     char quotechar = 0;
     bool escape = false;
-    const char *ctoken = *str, *cstart;
+    const char *ctoken = utf8_ltrim(*str), *cstart;
 
     if (!ctoken) {
         return 0;
     }
-    ctoken = utf8_ltrim(ctoken);
     if (!*ctoken) {
         if (buflen > 0) {
             *cursor = 0;
@@ -200,7 +203,7 @@ char *parse_token(const char **str, char *lbuf, size_t buflen)
     }
 
     *cursor = '\0';
-    unicode_utf8_trim(lbuf);
+    utf8_trim(lbuf);
     *str = ctoken;
     return lbuf;
 }

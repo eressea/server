@@ -46,7 +46,7 @@ static void move_bytes(char* out, const char* begin, size_t bytes)
     }
 }
 
-void unicode_utf8_clean(char* buf)
+void utf8_clean(char* buf)
 {
     char* str = buf;
     char* out = buf;
@@ -100,7 +100,7 @@ unicode_utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
     return 0;
 }
 
-size_t unicode_utf8_trim(char* buf)
+size_t utf8_trim(char* buf)
 {
     char* str = buf;
     char* out = buf;
@@ -204,7 +204,7 @@ unicode_latin1_to_utf8(char * dst, size_t * outlen, const char *in,
     return (int)*outlen;
 }
 
-int unicode_utf8_strcasecmp(const char * a, const char *b)
+int utf8_strcasecmp(const char * a, const char *b)
 {
     if (strcmp(a, b) == 0) {
         return 0;
@@ -603,30 +603,30 @@ int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string
     return 0;
 }
 
-#define TRIMMED(wc) (iswspace(wc) || iswcntrl(wc) || (wc) == 160 || (wc) == 8199 || (wc) == 8239)
-
-const char * utf8_ltrim(const char *input)
+const char* utf8_ltrim(const char* str)
 {
-    wchar_t wc;
-    size_t len;
-    const char *str = input;
-
-    /* skip over potential whitespace */
-    while (*str) {
-        wc = *(unsigned char *)str;
-        if (~wc & 0x80) {
-            if (!TRIMMED(wc)) break;
-            ++str;
-        }
-        else {
-            int ret = unicode_utf8_decode(&wc, str, &len);
-            if (ret != 0) {
-//                log_warning("illegal character sequence in UTF8 string: %s\n", str);
-                break;
-            }
-            if (!TRIMMED(wc)) break;
-            str += len;
-        }
+    if (str == NULL) {
+        return NULL;
     }
-    return str;
+    else {
+        const size_t len = strlen(str);
+        utf8proc_ssize_t ulen = (utf8proc_ssize_t)len;
+        while (ulen > 0 && *str) {
+            utf8proc_int32_t codepoint;
+            utf8proc_ssize_t size = utf8proc_iterate((const utf8proc_uint8_t*)str, ulen, &codepoint);
+
+            if (size < 1) {
+                return NULL;
+            }
+            else {
+                const utf8proc_property_t* property = utf8proc_get_property(codepoint);
+                if (!unicode_trimmed(property)) {
+                    break;
+                }
+                str += size;
+            }
+        }
+        return str;
+
+    }
 }

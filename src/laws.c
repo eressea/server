@@ -1635,8 +1635,8 @@ int display_cmd(unit * u, struct order *ord)
     case P_UNIT:
         str = getstrtoken();
         if (str) {
-            unicode_utf8_trim(str);
-            unicode_utf8_clean(str);
+            utf8_trim(str);
+            utf8_clean(str);
         }
         unit_setinfo(u, str);
         break;
@@ -1644,8 +1644,8 @@ int display_cmd(unit * u, struct order *ord)
     case P_PRIVAT:
         str = getstrtoken();
         if (str) {
-            unicode_utf8_trim(str);
-            unicode_utf8_clean(str);
+            utf8_trim(str);
+            utf8_clean(str);
         }
         usetprivate(u, str);
         break;
@@ -1669,10 +1669,10 @@ int display_cmd(unit * u, struct order *ord)
         free(*s);
         if (s2) {
             char * sdup = str_strdup(s2);
-            if (unicode_utf8_trim(sdup) != 0) {
+            if (utf8_trim(sdup) != 0) {
                 log_info("trimming info: %s", s2);
             }
-            unicode_utf8_clean(str);
+            utf8_clean(str);
             if (strlen(sdup) >= DISPLAYSIZE) {
                 sdup[DISPLAYSIZE-1] = 0;
             }
@@ -1714,10 +1714,10 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     /* TODO: Validate to make sure people don't have illegal characters in
      * names, phishing-style? () come to mind. */
     str_strlcpy(name, s2, sizeof(name));
-    if (unicode_utf8_trim(name) != 0) {
+    if (utf8_trim(name) != 0) {
         log_info("trimming name: %s", s2);
     }
-    unicode_utf8_clean(name);
+    utf8_clean(name);
 
     free(*s);
     *s = str_strdup(name);

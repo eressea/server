@@ -427,14 +427,14 @@ unit *read_unit(gamedata *data)
 
     READ_STR(data->store, obuf, sizeof(obuf));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(obuf) != 0) {
+        if (utf8_trim(obuf) != 0) {
             log_warning("trim unit %s name to '%s'", itoa36(u->no), obuf);
         }
     }
     unit_setname(u, obuf[0] ? obuf : NULL);
     READ_STR(data->store, obuf, sizeof(obuf));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(obuf) != 0) {
+        if (utf8_trim(obuf) != 0) {
             log_warning("trim unit %s info to '%s'", itoa36(u->no), obuf);
         }
     }
@@ -654,7 +654,7 @@ void write_unit(gamedata *data, const unit * u)
 static void read_regioninfo(gamedata *data, const region *r, char *info, size_t len) {
     READ_STR(data->store, info, len);
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(info) != 0) {
+        if (utf8_trim(info) != 0) {
             log_warning("trim region %d info to '%s'", r->uid, info);
         }
     }
@@ -747,7 +747,7 @@ static region *readregion(gamedata *data, int x, int y)
         r->land = calloc(1, sizeof(land_region));
         READ_STR(data->store, name, sizeof(name));
         if (data->version <= NOWATCH_VERSION) {
-            if (unicode_utf8_trim(name) != 0) {
+            if (utf8_trim(name) != 0) {
                 log_warning("trim region %d name to '%s'", uid, name);
             }
         }
@@ -1092,14 +1092,14 @@ faction *read_faction(gamedata * data)
 
     READ_STR(data->store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim faction %s name to '%s'", itoa36(f->no), name);
         }
     }
     f->name = str_strdup(name);
     READ_STR(data->store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim faction %s banner to '%s'", itoa36(f->no), name);
         }
     }
@@ -1329,14 +1329,14 @@ struct building *read_building(gamedata *data) {
     bhash(b);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim building %s name to '%s'", itoa36(b->no), name);
         }
     }
     b->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim building %s info to '%s'", itoa36(b->no), name);
         }
     }
@@ -1394,14 +1394,14 @@ ship *read_ship(gamedata *data)
     shash(sh);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim ship %s name to '%s'", itoa36(sh->no), name);
         }
     }
     sh->name = str_strdup(name);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
-        if (unicode_utf8_trim(name) != 0) {
+        if (utf8_trim(name) != 0) {
             log_warning("trim ship %s info to '%s'", itoa36(sh->no), name);
         }
     }
