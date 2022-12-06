@@ -9,22 +9,6 @@
 #include <wctype.h>
 #include <ctype.h>
 
-#define B00000000 0x00
-#define B10000000 0x80
-#define B11000000 0xC0
-#define B11100000 0xE0
-#define B11110000 0xF0
-#define B11111000 0xF8
-#define B11111100 0xFC
-#define B11111110 0xFE
-
-#define B00111111 0x3F
-#define B00011111 0x1F
-#define B00001111 0x0F
-#define B00000111 0x07
-#define B00000011 0x03
-#define B00000001 0x01
-
 static bool unicode_trimmed(const utf8proc_property_t* property)
 {
     return
@@ -238,74 +222,6 @@ int utf8_strcasecmp(const char * a, const char *b)
     return 0;
 }
 
-/* Convert a wide character to UTF-8. */
-int
-unicode_utf8_encode(char * utf8_character, size_t * size,
-    wchar_t ucs4_character)
-{
-    int utf8_bytes;
-
-    if (ucs4_character <= 0x0000007F) {
-        /* 0xxxxxxx */
-        utf8_bytes = 1;
-        utf8_character[0] = (char)ucs4_character;
-    }
-    else if (ucs4_character <= 0x000007FF) {
-        /* 110xxxxx 10xxxxxx */
-        utf8_bytes = 2;
-        utf8_character[0] = (char)((ucs4_character >> 6) | B11000000);
-        utf8_character[1] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x0000FFFF) {
-        /* 1110xxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 3;
-        utf8_character[0] = (char)((ucs4_character >> 12) | B11100000);
-        utf8_character[1] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[2] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-#if 0
-    else if (ucs4_character <= 0x001FFFFF) {
-        /* 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 4;
-        utf8_character[0] = (char)((ucs4_character >> 18) | B11110000);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[2] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[3] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x03FFFFFF) {
-        /* 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 5;
-        utf8_character[0] = (char)((ucs4_character >> 24) | B11111000);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 18) & B00111111) | B10000000);
-        utf8_character[2] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[3] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[4] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-    else if (ucs4_character <= 0x7FFFFFFF) {
-        /* 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx */
-        utf8_bytes = 6;
-        utf8_character[0] = (char)((ucs4_character >> 30) | B11111100);
-        utf8_character[1] =
-            (char)(((ucs4_character >> 24) & B00111111) | B10000000);
-        utf8_character[2] =
-            (char)(((ucs4_character >> 18) & B00111111) | B10000000);
-        utf8_character[3] =
-            (char)(((ucs4_character >> 12) & B00111111) | B10000000);
-        utf8_character[4] = (char)(((ucs4_character >> 6) & B00111111) | B10000000);
-        utf8_character[5] = (char)((ucs4_character & B00111111) | B10000000);
-    }
-#endif
-    else {
-        return EILSEQ;
-    }
-
-    *size = utf8_bytes;
-
-    return 0;
-}
 
 /** Convert a UTF-8 encoded character to CP437. */
 int
