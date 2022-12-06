@@ -24,6 +24,7 @@ extern "C" {
         const char *in, size_t * inlen);
     size_t unicode_utf8_trim(char * str);
     void unicode_utf8_clean(char* str);
+    const char * utf8_ltrim(const char *str);
 
 #ifdef __cplusplus
 }

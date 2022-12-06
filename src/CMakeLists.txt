@@ -209,14 +209,17 @@ target_link_libraries(eressea
 )
 
 add_test(NAME lua-core
- COMMAND eressea -v1 ../scripts/run-tests.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-core PROPERTY RUN_SERIAL)
 add_test(NAME lua-e2
- COMMAND eressea -v1 ../scripts/run-tests-e2.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests-e2.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e2 PROPERTY RUN_SERIAL)
 add_test(NAME lua-e3
- COMMAND eressea -v1 ../scripts/run-tests-e3.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+  COMMAND eressea -v1 ../scripts/run-tests-e3.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
 
 find_program(LUAROCKS_EXECUTABLE luarocks)
 if(LUAROCKS_EXECUTABLE)

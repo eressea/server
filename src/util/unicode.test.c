@@ -31,6 +31,29 @@ static void test_unicode_clean(CuTest* tc)
     CuAssertStrEquals(tc, "Heo", buffer);
 }
 
+static void test_ltrim(CuTest* tc)
+{
+    char buffer[32];
+    const char * str, * seq = utf8_nbsp;
+
+    strcpy(buffer, "Hello");
+    CuAssertPtrEquals(tc, buffer, (void *)utf8_ltrim(buffer));
+    CuAssertStrEquals(tc, "Hello", buffer);
+
+    strcpy(buffer, "Hello ");
+    CuAssertStrEquals(tc, "Hello ", str = utf8_ltrim(buffer));
+    CuAssertPtrEquals(tc, buffer, (void *)str);
+
+    strcpy(buffer, " Hello");
+    CuAssertStrEquals(tc, "Hello", str = utf8_ltrim(buffer));
+    CuAssertPtrEquals(tc, buffer + 1, (void *)str);
+
+    strcpy(buffer, seq);
+    strcpy(buffer + strlen(seq), " Hello");
+    CuAssertStrEquals(tc, "Hello", str = utf8_ltrim(buffer));
+    CuAssertPtrEquals(tc, buffer + 1 + strlen(seq), (void *)str);
+}
+
 static void test_unicode_trim(CuTest* tc)
 {
     char buffer[32];
@@ -56,10 +79,7 @@ static void test_unicode_trim(CuTest* tc)
     CuAssertStrEquals(tc, "Hello  World", buffer);
 
     strcpy(buffer, "LRM");
-    buffer[3] = -30;
-    buffer[4] = -128;
-    buffer[5] = -114;
-    buffer[6] = 0;
+    strcpy(buffer + 3, utf8_lrm);
     CuAssertIntEquals(tc, 3, (int)unicode_utf8_trim(buffer));
     CuAssertStrEquals(tc, "LRM", buffer);
 
@@ -223,6 +243,7 @@ CuSuite *get_unicode_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_unicode_clean);
     SUITE_ADD_TEST(suite, test_unicode_trim);
+    SUITE_ADD_TEST(suite, test_ltrim);
     SUITE_ADD_TEST(suite, test_unicode_trim_zwnj);
     SUITE_ADD_TEST(suite, test_unicode_trim_nbsp);
     SUITE_ADD_TEST(suite, test_unicode_trim_nnbsp);

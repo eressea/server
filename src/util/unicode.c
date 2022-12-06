@@ -686,3 +686,32 @@ int unicode_utf8_to_cp1252(unsigned char *cp_character, const char * utf8_string
     }
     return 0;
 }
+
+#define TRIMMED(wc) (iswspace(wc) || iswcntrl(wc) || (wc) == 160 || (wc) == 8199 || (wc) == 8239)
+
+const char * utf8_ltrim(const char *input)
+{
+    wchar_t wc;
+    size_t len;
+    const char *str = input;
+
+    /* skip over potential whitespace */
+    while (*str) {
+        wc = *(unsigned char *)str;
+        if (~wc & 0x80) {
+            if (!TRIMMED(wc)) break;
+            ++str;
+        }
+        else {
+            int ret = unicode_utf8_decode(&wc, str, &len);
+            if (ret != 0) {
+//                log_warning("illegal character sequence in UTF8 string: %s\n", str);
+                break;
+            }
+            if (!TRIMMED(wc)) break;
+            str += len;
+        }
+    }
+    return str;
+}
+
