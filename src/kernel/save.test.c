@@ -8,7 +8,6 @@
 #include "version.h"
 #include "building.h"
 #include "ship.h"
-#include "skill.h"
 #include "unit.h"
 #include "group.h"
 #include "ally.h"
@@ -36,7 +35,6 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
