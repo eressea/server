@@ -1117,13 +1117,7 @@ faction *read_faction(gamedata * data)
         --f->lastorders;
     }
     READ_INT(data->store, &n);
-    if (data->version < REMOVE_FACTION_AGE_VERSION)
-    {
-        faction_set_age(f, n);
-    }
-    else {
-        f->start_turn = n;
-    }
+    faction_set_age(f, n);
     READ_STR(data->store, name, sizeof(name));
     f->race = rc_find(name);
     if (!f->race) {
