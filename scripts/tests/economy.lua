@@ -88,6 +88,35 @@ function test_mine_bonus()
     assert_equal(80, r:get_resource("iron"))
 end
 
+function test_make_nothing()
+    local r = region.create(0, 0, "mountain")
+    r:set_resource("iron", 100)
+    local level = r:get_resourcelevel("iron")
+    assert_equal(1, level)
+    local u = unit.create(faction.create("human"), r)
+    u.number = 10
+    u:set_skill("mining", 1)
+    u:add_order("MACHE 0 EISEN")
+    process_orders()
+    assert_equal(1, u.faction:count_msg_type("error_cannotmake"))
+    assert_equal(0, u:get_item("iron"))
+    assert_equal(100, r:get_resource("iron"))
+end
+
+function test_make_limited()
+    local r = region.create(0, 0, "mountain")
+    r:set_resource("iron", 100)
+    local level = r:get_resourcelevel("iron")
+    assert_equal(1, level)
+    local u = unit.create(faction.create("human"), r)
+    u.number = 10
+    u:set_skill("mining", 1)
+    u:add_order("MACHE 5 EISEN")
+    process_orders()
+    assert_equal(5, u:get_item("iron"))
+    assert_equal(95, r:get_resource("iron"))
+end
+
 function test_smithy_bonus()
     local r = region.create(0, 0, "mountain")
     local u = unit.create(faction.create("human"), r)

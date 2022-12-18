@@ -66,7 +66,7 @@ typedef struct summary {
 
 int *nmrs = NULL;
 
-int update_nmrs(void)
+int update_nmrs(int since)
 {
     int newplayers = 0;
     faction *f;
@@ -77,6 +77,9 @@ int update_nmrs(void)
             nmrs = calloc((1 + (size_t)timeout), sizeof(int));
             if (!nmrs) abort();
         }
+        else {
+            memset(nmrs, 0, sizeof(int) * timeout);
+        }
     }
     
     for (f = factions; f; f = f->next) {
@@ -84,7 +87,7 @@ int update_nmrs(void)
             ++newplayers;
         }
         else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED)) {
-            int nmr = turn - f->lastorders;
+            int nmr = since - f->lastorders;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
                     log_error("faction %s has %d NMR", itoa36(f->no), nmr);
@@ -302,7 +305,7 @@ void report_summary(const summary * s, bool full)
 
     fprintf(F, "\n");
 
-    newplayers = update_nmrs();
+    newplayers = update_nmrs(turn - 1);
 
     if (nmrs) {
         int i;
