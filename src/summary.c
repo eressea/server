@@ -110,13 +110,13 @@ static void out_faction(FILE * file, const struct faction *f)
         fprintf(file, "%s (%s/%d) (%.3s/%.3s), %d Einh., %d Pers., %d NMR\n",
             f->name, itoa36(f->no), f_get_alliance(f) ? f->alliance->id : 0,
             LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)), magic_school[f->magiegebiet],
-            f->num_units, f->num_people, turn - f->lastorders);
+            f->num_units, f->num_people, turn - f->lastorders - 1);
     }
     else {
         fprintf(file, "%s (%.3s/%.3s), %d Einh., %d Pers., %d NMR\n",
             factionname(f), LOC(default_locale, rc_name_s(f->race, NAME_SINGULAR)),
             magic_school[f->magiegebiet], f->num_units, f->num_people,
-            turn - f->lastorders);
+            turn - f->lastorders - 1);
     }
 }
 
@@ -334,7 +334,7 @@ void report_summary(const summary * s, bool full)
             }
         }
 
-        if (timeout>0 && full) {
+        if (timeout > 0) {
             int i;
             fprintf(F, "\n\nFactions with NMRs:\n");
             for (i = timeout; i > 0; --i) {
