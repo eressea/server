@@ -278,7 +278,7 @@ void transfer_effects(const unit* u, unit* dst, int n)
     attrib * a = a_find(u->attribs, &at_effect);
     while (a && a->type == &at_effect) {
         effect_data* olde = (effect_data*)a->data.v;
-        if (olde->value) {
+        if (olde->value >= u->number) {
             int delta = (long long)olde->value * n / u->number;
             olde->value -= delta;
             change_effect(dst, olde->type, delta);
