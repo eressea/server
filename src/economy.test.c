@@ -1388,6 +1388,18 @@ static void test_destroy_cmd(CuTest* tc) {
     test_teardown();
 }
 
+static void test_make_zero(CuTest* tc) {
+    unit* u;
+    faction* f;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    u->thisorder = create_order(K_MAKE, f->locale, "0 BURG");
+    CuAssertIntEquals(tc, 0, make_cmd(u, u->thisorder));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error_cannotmake"));
+    test_teardown();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1426,5 +1438,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_road);
     SUITE_ADD_TEST(suite, test_destroy_road_limit);
     SUITE_ADD_TEST(suite, test_destroy_road_guard);
+    SUITE_ADD_TEST(suite, test_make_zero);
     return suite;
 }

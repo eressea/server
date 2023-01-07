@@ -231,7 +231,7 @@ int give_control_cmd(unit * u, order * ord)
         bool okay = false;
         if (!can_give_to(u, u2)) {
             ADDMSG(&u->faction->msgs,
-                msg_feedback(u, ord, "feedback_unit_not_found", ""));
+                msg_feedback(u, ord, "feedback_unit_not_found", NULL));
         }
         else if (!u->building && !u->ship) {
             cmistake(u, ord, 140, MSG_EVENT);
@@ -1066,7 +1066,7 @@ void make_item(unit * u, const item_type * itype, int want)
         }
         else {
             ADDMSG(&u->faction->msgs, msg_feedback(u, u->thisorder,
-                "error_cannotmake", ""));
+                "error_cannotmake", NULL));
         }
     }
 }
@@ -1090,7 +1090,7 @@ int make_cmd(unit * u, struct order *ord)
         char ibuf[16];
         m = atoip(s);
         sprintf(ibuf, "%d", m);
-        if (!strcmp(ibuf, (const char *)s)) {
+        if (strcmp(ibuf, (const char *)s) == 0) {
             /* a quantity was given */
             s = gettoken(token, sizeof(token));
         }
@@ -1100,6 +1100,11 @@ int make_cmd(unit * u, struct order *ord)
         if (s) {
             p = get_param(s, u->faction->locale);
         }
+    }
+
+    if (m <= 0) {
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", NULL));
+        return 0;
     }
 
     if (p == P_ROAD) {
@@ -1202,7 +1207,7 @@ int make_cmd(unit * u, struct order *ord)
         make_item(u, itype, m);
     }
     else {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", NULL));
     }
 
     return 0;
@@ -1443,7 +1448,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         }
     }
     if (!r->land || r_demand(r, ltype)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", NULL));
         return;
     }
     o = arraddnptr(*buyorders, 1);
@@ -1950,7 +1955,7 @@ static void breed_cmd(unit * u, struct order *ord)
     region *r = u->region;
 
     if (r->land == NULL) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_onlandonly", NULL));
         return;
     }
 
@@ -1989,7 +1994,7 @@ static void breed_cmd(unit * u, struct order *ord)
                 break;
             }
             else if (rtype != get_resourcetype(R_HORSE)) {
-                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", ""));
+                ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", NULL));
                 break;
             }
         }
@@ -2310,7 +2315,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
 
     if (effskill(u, SK_TAXING, NULL) <= 0) {
         ADDMSG(&u->faction->msgs,
-            msg_feedback(u, ord, "error_no_tax_skill", ""));
+            msg_feedback(u, ord, "error_no_tax_skill", NULL));
         return;
     }
 
