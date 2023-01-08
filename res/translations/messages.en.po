@@ -1053,7 +1053,7 @@ msgid "iceberg_create"
 msgstr "\"The glacier in $region($region) breaks up and drifts away.\""
 
 msgid "chaos_disease"
-msgstr "\"$unit($unit) is stricken by a strange disease.\""
+msgstr "\"$unit($unit) in $region($region) came down with a strange disease.\""
 
 msgid "error1"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There are not enough experienced sailors on board the ship.\""
