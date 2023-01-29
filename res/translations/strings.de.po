@@ -5244,7 +5244,7 @@ msgstr "NO"
 
 msgctxt "spell"
 msgid "create_bagofholding"
-msgstr "Erschaffe einen Beutel des Negativen Gewichts"
+msgstr "Erschaffe einen Beutel des negativen Gewichts"
 
 msgctxt "spellinfo"
 msgid "orkdream"
