@@ -6,6 +6,8 @@
 		"orders.default": "work",
 		"NewbieImmunity": 8,
 		"modules.astralspace": true,
+		"modules.iceberg": true,
+		"modules.volcano": true,
 		"monsters.spawn.chance": 50,
 		"entertain.base": 0,
 		"entertain.perlevel": 20,
