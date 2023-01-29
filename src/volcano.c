@@ -283,7 +283,7 @@ bool volcano_module(void)
     static int cache;
     static bool active;
     if (config_changed(&cache)) {
-        active = config_get_int("modules.volcano", 0) != 0;
+        active = config_get_int("modules.volcano", 1) != 0;
     }
     return active;
 }
