@@ -170,7 +170,7 @@ void autostudy_run(scholar scholars[], int nscholars)
                 }
             }
             if (i > 0) {
-                int remain = (STUDENTS_PER_TEACHER * scholars[t].u->number - i + STUDENTS_PER_TEACHER - 1) / STUDENTS_PER_TEACHER;
+                int remain = i / STUDENTS_PER_TEACHER;
                 /* teacher has remaining time */
                 learning(scholars + t, remain);
             }
