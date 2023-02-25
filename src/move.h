@@ -67,11 +67,11 @@ extern "C" {
     void move_cmd_ex(struct unit * u, struct order * ord, const char *directions);
     int follow_ship(struct unit * u, struct order * ord);
 
-#define SA_HARBOUR 1
-#define SA_COAST 0
-#define SA_NO_INSECT -1
-#define SA_NO_COAST -2
-#define SA_NO_HARBOUR -3
+#define SA_HARBOUR_ALLOWED 1
+#define SA_ALLOWED 0
+#define SA_INSECT_DENIED -1
+#define SA_DENIED -2
+#define SA_HARBOUR_DENIED -3
 #define SA_HARBOUR_DISABLED -4
 
     int check_ship_allowed(struct ship *sh, const struct region * r);
