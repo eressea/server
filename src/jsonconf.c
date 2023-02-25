@@ -394,6 +394,20 @@ static void json_building(cJSON *json, building_type *bt) {
                 json_maintenance(child, &bt->maintenance);
             }
             break;
+        case cJSON_Number:
+            if (strcmp(child->string, "capacity") == 0) {
+                bt->capacity = child->valueint;
+            }
+            else if (strcmp(child->string, "maxcapacity") == 0) {
+                bt->maxcapacity = child->valueint;
+            }
+            else if (strcmp(child->string, "maxsize") == 0) {
+                bt->maxsize = child->valueint;
+            }
+            else {
+                log_error("building %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_String:
             log_error("building %s contains unknown attribute %s", json->string, child->string);
             break;

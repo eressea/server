@@ -387,6 +387,9 @@ static const char * building_data = "{\"buildings\": { "
 "\"maintenance\" : "
 "{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"variable\" ] }"
 ","
+"\"maxsize\" : 10,"
+"\"capacity\" : 2,"
+"\"maxcapacity\" : 20,"
 "\"construction\" : {"
 "\"maxsize\" : 20,"
 "\"reqsize\" : 10,"
@@ -423,10 +426,16 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertIntEquals(tc, 2, bt->maintenance[1].number);
     CuAssertIntEquals(tc, 0, bt->maintenance[2].number);
+    CuAssertIntEquals(tc, 1, bt->capacity);
+    CuAssertIntEquals(tc, -1, bt->maxcapacity);
+    CuAssertIntEquals(tc, -1, bt->maxsize);
 
     bt = bt_find("house");
     CuAssertPtrNotNull(tc, bt);
 
+    CuAssertIntEquals(tc, 2, bt->capacity);
+    CuAssertIntEquals(tc, 20, bt->maxcapacity);
+    CuAssertIntEquals(tc, 10, bt->maxsize);
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);
