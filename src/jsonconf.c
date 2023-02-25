@@ -520,6 +520,12 @@ static void json_ship(cJSON *json, ship_type *st) {
             if (strcmp(child->string, "range") == 0) {
                 st->range = child->valueint;
             }
+            else if (strcmp(child->string, "cargo") == 0) {
+                st->cargo = child->valueint;
+            }
+            else if (strcmp(child->string, "cabins") == 0) {
+                st->cabins = child->valueint;
+            }
             else if (strcmp(child->string, "maxrange") == 0) {
                 st->range_max = child->valueint;
             }

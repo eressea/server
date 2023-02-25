@@ -284,6 +284,8 @@ static void test_ships(CuTest * tc)
         "\"coasts\" : [ \"plain\" ],"
         "\"range\" : 8,"
         "\"maxrange\" : 16,"
+        "\"cargo\" : 5000,"
+        "\"cabins\" : 5,"
         "\"minskill\" : 2,"
         "\"captain\" : 3,"
         "\"skills\" : 6"
@@ -311,6 +313,8 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 2, st->minskill);
     CuAssertIntEquals(tc, 3, st->cptskill);
     CuAssertIntEquals(tc, 6, st->sumskill);
+    CuAssertIntEquals(tc, 5000, st->cargo);
+    CuAssertIntEquals(tc, 5, st->cabins);
 
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
