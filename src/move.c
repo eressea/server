@@ -667,6 +667,28 @@ static bool is_freezing(const unit * u)
     return true;
 }
 
+void deny_ship_entry(unit *u, struct region* current_point, struct region* next_point, int reason)
+{
+    ship* sh = u->ship;
+    faction* f = u->faction;
+    if (reason == SA_NO_INSECT) {
+        ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
+    }
+    else if (reason == SA_NO_HARBOUR) {
+        ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
+    }
+    else if (lighthouse_guarded(current_point)) {
+        ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
+    }
+    else {
+        double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
+        ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
+            next_point));
+        damage_ship(sh, dmg);
+        /* we handle destruction at the end */
+    }
+}
+
 int check_ship_allowed(struct ship *sh, const region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
@@ -1902,22 +1924,7 @@ static void sail(unit * u, order * ord, bool drifting)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there. */
-                if (reason == SA_NO_INSECT) {
-                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
-                }
-                else if (reason == SA_NO_HARBOUR) {
-                    ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
-                }
-                else if (lighthouse_guarded(current_point)) {
-                    ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
-                }
-                else {
-                    double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
-                    ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
-                        next_point));
-                    damage_ship(sh, dmg);
-                    /* we handle destruction at the end */
-                }
+                deny_ship_entry(u, current_point, next_point, reason);
                 break;
             }
 

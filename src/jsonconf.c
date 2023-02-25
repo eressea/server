@@ -489,12 +489,14 @@ static void json_ship(cJSON *json, ship_type *st) {
         case cJSON_Array:
             n = cJSON_GetArraySize(child);
             if (n) {
-                arrsetlen(st->coasts, n);
-                for (i = 0, iter = child->child; iter; iter = iter->next) {
-                    if (iter->type == cJSON_String) {
-                        terrain_type* ter = get_or_create_terrain(iter->valuestring);
-                        if (ter) {
-                            st->coasts[i++] = ter;
+                if (strcmp(child->string, "coasts") == 0) {
+                    arrsetlen(st->coasts, n);
+                    for (i = 0, iter = child->child; iter; iter = iter->next) {
+                        if (iter->type == cJSON_String) {
+                            terrain_type* ter = get_or_create_terrain(iter->valuestring);
+                            if (ter) {
+                                st->coasts[i++] = ter;
+                            }
                         }
                     }
                 }
@@ -506,6 +508,15 @@ static void json_ship(cJSON *json, ship_type *st) {
             }
             else if (strcmp(child->string, "maxrange") == 0) {
                 st->range_max = child->valueint;
+            }
+            else if (strcmp(child->string, "minskill") == 0) {
+                st->minskill = child->valueint;
+            }
+            else if (strcmp(child->string, "captain") == 0) {
+                st->cptskill = child->valueint;
+            }
+            else if (strcmp(child->string, "skills") == 0) {
+                st->sumskill = child->valueint;
             }
             else {
                 log_error("ship %s contains unknown attribute %s", json->string, child->string);

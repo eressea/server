@@ -155,6 +155,23 @@ static void test_ship_blocked_by_harbormaster(CuTest * tc) {
     test_teardown();
 }
 
+static void test_ship_blocked_by_unpaid_harbor(CuTest * tc) {
+    unit *u;
+    move_fixture mf;
+
+    test_setup();
+    setup_harbor(&mf, NULL);
+
+    u = test_create_unit(test_create_faction(), mf.r);
+    u->building = mf.b;
+    u->building->flags |= BLD_UNMAINTAINED;
+    building_set_owner(u);
+
+    // FIXME: bug 2943, needs a special case
+    CuAssertIntEquals_Msg(tc, "unmaintained harbor", SA_NO_COAST, check_ship_allowed(mf.sh, mf.r));
+    test_teardown();
+}
+
 static void test_ship_has_harbormaster_contact(CuTest * tc) {
     unit *u;
     move_fixture mf;
@@ -1089,6 +1106,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_ship_allowed_coast_ignores_harbor);
     SUITE_ADD_TEST(suite, test_ship_allowed_without_harbormaster);
     SUITE_ADD_TEST(suite, test_ship_blocked_by_harbormaster);
+    SUITE_ADD_TEST(suite, test_ship_blocked_by_unpaid_harbor);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_contact);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_ally);
     SUITE_ADD_TEST(suite, test_ship_has_harbormaster_same_faction);

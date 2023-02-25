@@ -283,7 +283,10 @@ static void test_ships(CuTest * tc)
         "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 },"
         "\"coasts\" : [ \"plain\" ],"
         "\"range\" : 8,"
-        "\"maxrange\" : 16"
+        "\"maxrange\" : 16,"
+        "\"minskill\" : 2,"
+        "\"captain\" : 3,"
+        "\"skills\" : 6"
         "}}}";
 
     cJSON *json = cJSON_Parse(data);
@@ -305,6 +308,9 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 1, st->construction->minskill);
     CuAssertIntEquals(tc, 8, st->range);
     CuAssertIntEquals(tc, 16, st->range_max);
+    CuAssertIntEquals(tc, 2, st->minskill);
+    CuAssertIntEquals(tc, 3, st->cptskill);
+    CuAssertIntEquals(tc, 6, st->sumskill);
 
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
