@@ -892,6 +892,16 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
     tolua_beginmodule(L, NULL);
     {
         tolua_function(L, "parse_orders", tolua_parse_orders);
+        tolua_module(L, "directions", 1);
+        tolua_beginmodule(L, "directions");
+        {
+            tolua_constant(L, "WEST", D_WEST);
+            tolua_constant(L, "EAST", D_EAST);
+            tolua_constant(L, "SOUTHWEST", D_SOUTHWEST);
+            tolua_constant(L, "SOUTHEAST", D_SOUTHEAST);
+            tolua_constant(L, "NORTHWEST", D_NORTHWEST);
+            tolua_constant(L, "NORTHEAST", D_NORTHEAST);
+        } tolua_endmodule(L);
         tolua_module(L, "rng", 1);
         tolua_beginmodule(L, "rng");
         {

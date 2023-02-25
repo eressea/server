@@ -161,7 +161,9 @@ extern "C" {
     void building_set_owner(struct unit * u);
     void building_update_owner(struct building * bld);
 
-    bool buildingtype_exists(const struct region *r,
+    bool buildingtype_exists(const struct region* r,
+        const struct building_type* bt, bool working);
+    building *get_building_of_type(const struct region *r,
         const struct building_type *bt, bool working);
     bool building_is_active(const struct building *b);
     bool is_building_type(const struct building_type *btype, const char *name);

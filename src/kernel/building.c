@@ -639,18 +639,25 @@ region *building_getregion(const building * b)
     return b->region;
 }
 
-bool
-buildingtype_exists(const region * r, const building_type * bt, bool working)
+building *
+get_building_of_type(const region * r, const building_type * bt, bool working)
 {
     building *b;
 
     for (b = rbuildings(r); b; b = b->next) {
         if (b->type == bt && !(working && fval(b, BLD_UNMAINTAINED)) && building_finished(b)) {
-            return true;
+            return b;
         }
     }
 
-    return false;
+    return NULL;
+}
+
+bool
+buildingtype_exists(const region* r, const building_type* bt, bool working)
+{
+    building* b = get_building_of_type(r, bt, working);
+    return b != NULL;
 }
 
 bool building_finished(const struct building *b) {
