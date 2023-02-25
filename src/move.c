@@ -684,16 +684,19 @@ int check_ship_allowed(struct ship *sh, const region * r)
                 }
             }
         }
-        if (reason != SA_COAST && bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-            unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-            if (!harbourmaster || !sh->_owner) {
-                reason = SA_HARBOUR;
-            }
-            else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-                reason = SA_HARBOUR;
-            }
-            else {
-                return SA_NO_HARBOUR;
+        if (reason != SA_COAST && bt_harbour) {
+            building* b = get_building_of_type(r, bt_harbour, true);
+            if (b) {
+                unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+                if (!harbourmaster || !sh->_owner) {
+                    reason = SA_HARBOUR;
+                }
+                else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                    reason = SA_HARBOUR;
+                }
+                else {
+                    return SA_NO_HARBOUR;
+                }
             }
         }
         if (reason >= 0 && sh->region && r_insectstalled(r)) {

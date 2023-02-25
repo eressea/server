@@ -86,8 +86,7 @@ end
 function test_landing_harbour_unpaid()
   local ocean = region.create(1, 0, "ocean")
   local r = region.create(0, 0, "glacier")
-  local harbour = building.create(r, "harbour")
-  harbour.size = 25
+  local harbour = building.create(r, "harbour", 25)
   local f = faction.create("human", "noreply@eressea.de", "de")
   local s = ship.create(ocean, "longboat")
   local u1 = unit.create(f, ocean, 1)
