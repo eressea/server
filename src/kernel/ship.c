@@ -118,6 +118,7 @@ ship_type *st_get_or_create(const char * name) {
         if (!st) abort();
         st->_name = str_strdup(name);
         st->storm = 1.0;
+        st->damage = 1.0;
         st->tac_bonus = 1.0;
         st_register(st);
     }
