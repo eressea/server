@@ -684,7 +684,9 @@ void deny_ship_entry(unit *u, struct region* current_point, struct region* next_
         double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
         ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
             next_point));
-        damage_ship(sh, dmg);
+        if (reason != SA_HARBOUR_DISABLED) {
+            damage_ship(sh, dmg);
+        }
         /* we handle destruction at the end */
     }
 }
@@ -707,17 +709,22 @@ int check_ship_allowed(struct ship *sh, const region * r)
             }
         }
         if (reason != SA_COAST && bt_harbour) {
-            building* b = get_building_of_type(r, bt_harbour, true);
+            building* b = get_building_of_type(r, bt_harbour, false);
             if (b) {
-                unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-                if (!harbourmaster || !sh->_owner) {
-                    reason = SA_HARBOUR;
-                }
-                else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-                    reason = SA_HARBOUR;
+                if (fval(b, BLD_UNMAINTAINED)) {
+                    reason = SA_HARBOUR_DISABLED;
                 }
                 else {
-                    return SA_NO_HARBOUR;
+                    unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+                    if (!harbourmaster || !sh->_owner) {
+                        reason = SA_HARBOUR;
+                    }
+                    else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                        reason = SA_HARBOUR;
+                    }
+                    else {
+                        reason = SA_NO_HARBOUR;
+                    }
                 }
             }
         }
@@ -726,8 +733,11 @@ int check_ship_allowed(struct ship *sh, const region * r)
             unit* u = ship_owner(sh);
 
             if (u && is_freezing(u)) {
-                return SA_NO_INSECT;
+                reason = SA_NO_INSECT;
             }
+        }
+        if (reason < 0 && sh->name[0]=='H') {
+            printf("!ship_allowed %s: %d\n", sh->name, reason);
         }
         return reason;
     }

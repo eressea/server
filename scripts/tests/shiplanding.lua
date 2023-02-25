@@ -12,6 +12,16 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.config.parse([[
 {
+    "keywords": {
+        "de" : {
+            "move" : "NACH"
+         }
+    },
+    "directions" : {
+        "de" : {
+            "west" : "WESTEN"
+        }
+    },
     "terrains": {
         "ocean" : {
             "flags": [ "sea", "sail" ]
@@ -78,7 +88,6 @@ function test_crash_on_shore_damage()
     u.ship = ship.create(r2, "longboat")
     u:add_order('NACH W')
 
-    u.ship.name = 'hodor'
     process_orders()
     assert_equal(r2, u.region)
     assert_equal(500, u.ship.damage)

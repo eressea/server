@@ -168,7 +168,7 @@ static void test_ship_blocked_by_unpaid_harbor(CuTest * tc) {
     building_set_owner(u);
 
     // FIXME: bug 2943, needs a special case
-    CuAssertIntEquals_Msg(tc, "unmaintained harbor", SA_NO_COAST, check_ship_allowed(mf.sh, mf.r));
+    CuAssertIntEquals_Msg(tc, "unmaintained harbor", SA_HARBOUR_DISABLED, check_ship_allowed(mf.sh, mf.r));
     test_teardown();
 }
 

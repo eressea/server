@@ -17,6 +17,25 @@ function setup()
     eressea.settings.set("NewbieImmunity", "0")
     eressea.config.parse([[
 {
+    "keywords": {
+        "de" : {
+            "move" : "NACH",
+            "help" : "HELFEN",
+            "contact" : "KONTAKTIEREN"
+         }
+    },
+    "directions" : {
+        "de" : {
+            "east" : "OSTEN",
+            "west" : "WESTEN"
+        }
+    },
+    "parameters" : {
+        "de" : {
+            "EINHEIT": "EINHEIT",
+            "PARTEI": "PARTEI"
+        }
+    },
     "terrains": {
         "ocean" : {
             "flags": [ "sea", "sail" ]
@@ -69,28 +88,29 @@ function setup()
 end
 
 function test_landing_harbour_with_help()
-  local ocean = region.create(1, 0, "ocean")
-  local r = region.create(0, 0, "glacier")
-  local harbour = building.create(r, "harbour", 25)
-  local f = faction.create("human")
-  local f2 = faction.create("human")
-  local s = ship.create(ocean, "longboat")
-  local u1 = unit.create(f, ocean, 1)
-  local u2 = unit.create(f2, r, 1)
-  assert_not_nil(u2)
-  u1:add_item("money", 1000)
-  u2:add_item("money", 1000)
-  u2.building = harbour
-  u2:clear_orders()
-  u2:add_order("KONTAKTIERE " .. itoa36(u1.id))
+    local ocean = region.create(1, 0, "ocean")
+    local r = region.create(0, 0, "glacier")
+    local harbour = building.create(r, "harbour", 25)
+    local f = faction.create("human")
+    local f2 = faction.create("human")
+    local s = ship.create(ocean, "longboat")
+    local u1 = unit.create(f, ocean, 1)
+    local u2 = unit.create(f2, r, 1)
+    assert_not_nil(u2)
+    u1:add_item("money", 1000)
+    u2:add_item("money", 1000)
+    u2.building = harbour
+    u2:clear_orders()
+    u2:add_order("KONTAKTIERE EINHEIT " .. itoa36(u1.id))
   
-  u1.ship = s
-  u1:set_skill("sailing", 10)
-  u1:clear_orders()
-  u1:add_order("NACH w")
-  process_orders()
-  
-  assert_equal(r, u1.region) -- glacier with harbour and help-- okay
+    u1.ship = s
+    u1:set_skill("sailing", 10)
+    u1:clear_orders()
+    u1:add_order("NACH w")
+
+    process_orders()
+    assert_equal(0, s.damage)
+    assert_equal(r, u1.region) -- glacier with harbour and help-- okay
 end
 
 function test_landing_harbour_without_help()
@@ -114,6 +134,7 @@ function test_landing_harbour_without_help()
   process_orders()
   
   assert_equal(ocean, u1.region) -- glacier with harbour and no help-- cannot land
+  assert_equal(0, s.damage)
 end
 
 function test_landing_harbour_unpaid()
@@ -135,6 +156,7 @@ function test_landing_harbour_unpaid()
   process_orders()
   
   assert_equal(ocean, u1.region) -- did not pay 
+  assert_equal(0, s.damage)
 end
 
 function test_no_damage_with_harbor()
@@ -148,7 +170,6 @@ function test_no_damage_with_harbor()
 
     -- no owner, not maintained:
     local b = building.create(r, 'harbour', 25)
-    u.ship.name = "hoho"
     process_orders()
     assert_false(b.working)
     assert_equal(r2, u.region)
@@ -196,4 +217,5 @@ function test_landing_insects()
     process_orders()
   
     assert_equal(ocean, u1.region) -- even with a harbor, insects cannot land in glaciers
+    assert_equal(0, s.damage)
 end
