@@ -1,6 +1,6 @@
 #include "bind_locale.h"
 #include "util/language.h"
-#include "direction.h"
+#include "kernel/direction.h"
 
 void locale_create(const char *lang) {
     get_or_create_locale(lang);

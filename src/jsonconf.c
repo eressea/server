@@ -3,12 +3,18 @@
 #endif
 #include "jsonconf.h"
 
+/* game modules */
+#include "move.h"
+#include "prefix.h"
+#include "exparse.h"
+
 /* kernel includes */
 #include "kernel/attrib.h"
 #include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/equipment.h"
+#include "kernel/direction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/race.h"
@@ -34,11 +40,6 @@
 #include "util/pofile.h"
 #include "util/strings.h"
 
-/* game modules */
-#include "direction.h"
-#include "move.h"
-#include "prefix.h"
-#include "exparse.h"
 
 /* external libraries */
 #include <stb_ds.h>

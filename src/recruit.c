@@ -1,7 +1,6 @@
 #include "recruit.h"
 
 #include "alchemy.h"
-#include "direction.h"
 #include "donations.h"
 #include "guard.h"
 #include "give.h"
@@ -28,6 +27,7 @@
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
+#include "kernel/direction.h"
 #include "kernel/event.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"

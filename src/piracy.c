@@ -1,11 +1,13 @@
 #include "piracy.h"
 
-#include "direction.h"
 #include "move.h"
+
+#include <attributes/otherfaction.h>
 
 #include <kernel/ally.h>
 #include <kernel/attrib.h>
 #include <kernel/faction.h>
+#include "kernel/direction.h"
 #include <kernel/messages.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -18,11 +20,9 @@
 #include <util/goodies.h>
 #include "util/keyword.h"
 #include <util/language.h>
+#include <util/message.h>
 #include <util/parser.h>
 #include <util/rng.h>
-#include <util/message.h>
-
-#include <attributes/otherfaction.h>
 
 #include <assert.h>
 #include <stdlib.h>

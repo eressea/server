@@ -5,10 +5,14 @@
 #include "jsonconf.h"
 
 #include "eressea.h"
+#include "move.h"
+#include "prefix.h"
 
 #include "kernel/build.h"     // for construction, requirement
 #include "kernel/building.h"
+#include "kernel/calendar.h"
 #include "kernel/config.h"
+#include "kernel/direction.h"
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
@@ -21,11 +25,6 @@
 #include "util/language.h"
 #include "util/param.h"
 #include "util/variant.h"     // for frac_equal, frac_one
-
-#include "kernel/calendar.h"
-#include "direction.h"
-#include "move.h"
-#include "prefix.h"
 
 #include <tests.h>
 

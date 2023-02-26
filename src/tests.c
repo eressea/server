@@ -4,7 +4,6 @@
 #include "tests.h"
 
 #include "creport.h"
-#include "direction.h"         // for init_direction, directions, MAXDIRECTIONS
 #include "eressea.h"
 #include "magic.h"             // for spell_component, create_castorder, ...
 #include "prefix.h"
@@ -12,37 +11,39 @@
 #include "reports.h"
 #include "vortex.h"
 
+#include "kernel/alliance.h"
 #include "kernel/build.h"
+#include "kernel/building.h"
 #include "kernel/config.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
-#include "kernel/alliance.h"
+#include "kernel/direction.h" 
+#include "kernel/faction.h"
+#include "kernel/item.h"
 #include "kernel/messages.h"
+#include "kernel/order.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
 #include "kernel/skill.h"      // for enable_skill, skillnames, MAXSKILLS
 #include "kernel/status.h"     // for ST_FLEE
 #include "kernel/terrain.h"
 #include "kernel/types.h"      // for MAXMAGIETYP
-#include "kernel/item.h"
 #include "kernel/unit.h"
-#include "kernel/order.h"
 #include "kernel/race.h"
-#include "kernel/faction.h"
-#include "kernel/building.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
+
 #include "util/aliases.h"
 #include "util/functions.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"
-#include "util/message.h"
 #include "util/log.h"
-#include "util/stats.h"
-#include "util/strings.h"
+#include "util/message.h"
 #include "util/param.h"
 #include "util/rand.h"
+#include "util/stats.h"
+#include "util/strings.h"
 #include "util/variant.h"      // for variant, VAR_VOIDPTR, VAR_INT
 
 #include <stb_ds.h>

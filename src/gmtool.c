@@ -5,13 +5,13 @@
 #include <lua.h>
 
 #include "gmtool.h"
-#include "direction.h"
 
 #include <modules/autoseed.h>
 
 #include "kernel/building.h"
 #include "kernel/config.h"
 #include "kernel/faction.h"
+#include "kernel/direction.h"
 #include "kernel/item.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"

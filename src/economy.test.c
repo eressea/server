@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "give.h"
 #include "recruit.h"
-#include "direction.h"         // for D_EAST, directions
 
 #include <spells/buildingcurse.h>
 
@@ -12,6 +11,7 @@
 #include <kernel/config.h>
 #include <kernel/curse.h>
 #include <kernel/faction.h>
+#include "kernel/direction.h"         // for D_EAST, directions
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/pool.h>

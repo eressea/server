@@ -4,12 +4,12 @@
 #include "bind_building.h"
 
 #include "teleport.h"
-#include "direction.h"
 
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/region.h>
+#include "kernel/direction.h"
 #include <kernel/resources.h>
 #include <kernel/unit.h>
 #include <kernel/item.h>

@@ -1,16 +1,16 @@
 #include "bind_ship.h"
 #include "bind_unit.h"
 
-#include "direction.h"
 #include "move.h"
 
-#include <kernel/curse.h>
+#include "kernel/attrib.h"
+#include "kernel/curse.h"
+#include "kernel/direction.h"
 #include <kernel/region.h>
 #include <kernel/unit.h>
 #include <kernel/ship.h>
 #include <kernel/build.h>
 
-#include <kernel/attrib.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/strings.h>

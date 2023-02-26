@@ -2,7 +2,6 @@
 
 #include "contact.h"
 #include "lighthouse.h"
-#include "direction.h"          // for D_WEST, shortdirections, D_EAST, dire...
 #include "attributes/follow.h"
 
 #include "kernel/attrib.h"
@@ -10,6 +9,7 @@
 #include "kernel/building.h"
 #include "kernel/config.h"
 #include "kernel/faction.h"
+#include "kernel/direction.h"          // for D_WEST, shortdirections, D_EAST, dire...
 #include "kernel/region.h"
 #include "kernel/ship.h"
 #include "kernel/skill.h"       // for SK_SAILING, SK_RIDING

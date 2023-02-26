@@ -1,4 +1,4 @@
-#include "direction.h"
+#include "kernel/direction.h"
 #include <stdbool.h>
 
 #ifndef H_KRNL_MOVEMENT

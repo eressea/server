@@ -13,6 +13,7 @@ config.test.c
 # connection.test.c
 curse.test.c
 database.test.c
+direction.test.c
 equipment.test.c
 # event.test.c
 faction.test.c
@@ -51,6 +52,7 @@ config.c
 connection.c
 curse.c
 database.c
+direction.c
 equipment.c
 event.c
 faction.c
