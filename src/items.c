@@ -1,7 +1,6 @@
 #include "items.h"
 
 #include "alchemy.h"
-#include "direction.h"
 #include "study.h"
 #include "economy.h"
 #include "magic.h"
@@ -12,6 +11,7 @@
 
 #include "kernel/curse.h"
 #include "kernel/config.h"
+#include "kernel/direction.h"
 #include "kernel/faction.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"

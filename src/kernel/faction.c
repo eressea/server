@@ -431,28 +431,14 @@ void destroyfaction(faction ** fp)
             if (result != 0) {
                 save_special_items(u);
             }
-            if (r->land && !!playerrace(u_race(u))) {
+            if (r->land && playerrace(u_race(u))) {
                 const race *rc = u_race(u);
-                int m = rmoney(r);
-
-                /* Personen gehen nur an die Bauern, wenn sie auch von dort
-                    * stammen */
+                /* Personen gehen nur an die Bauern, wenn sie auch von dort stammen */
                 if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
                     int p = rpeasants(u->region);
-                    int h = rhorses(u->region);
-                    item *itm;
-
                     p += (int)(u->number / rc->recruit_multi);
-                    for (itm = u->items; itm; itm = itm->next) {
-                        if (itm->type->flags & ITF_ANIMAL) {
-                            h += itm->number;
-                        }
-                    }
                     rsetpeasants(r, p);
-                    rsethorses(r, h);
                 }
-                m += get_money(u);
-                rsetmoney(r, m);
             }
         }
         set_number(u, 0);

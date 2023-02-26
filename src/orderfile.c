@@ -13,6 +13,7 @@
 #include "util/param.h"
 #include "util/parser.h"
 #include "util/password.h"
+#include "util/unicode.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -71,7 +72,7 @@ static void handle_order(void *userData, const char *str) {
     faction * f = state->f;
 
     lang = f ? f->locale : default_locale;
-    ltrim(&str);
+    str = utf8_ltrim(str);
     if (*str == 0) return;
     input = str;
     tok = parse_token(&input, buffer, sizeof(buffer));

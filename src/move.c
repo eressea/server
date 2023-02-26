@@ -1,6 +1,5 @@
 #include "alchemy.h"
 #include "contact.h"
-#include "direction.h"
 #include "guard.h"
 #include "laws.h"
 #include "lighthouse.h"
@@ -23,6 +22,7 @@
 #include "kernel/config.h"
 #include "kernel/connection.h"
 #include "kernel/curse.h"
+#include "kernel/direction.h"
 #include "kernel/faction.h"
 #include "kernel/gamedata.h"
 #include "kernel/item.h"
@@ -667,33 +667,65 @@ static bool is_freezing(const unit * u)
     return true;
 }
 
+void deny_ship_entry(unit *u, struct region* current_point, struct region* next_point, int reason)
+{
+    ship* sh = u->ship;
+    faction* f = u->faction;
+    if (reason == SA_INSECT_DENIED) {
+        ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
+    }
+    else if (reason == SA_HARBOUR_DENIED) {
+        ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
+    }
+    else if (lighthouse_guarded(current_point)) {
+        ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
+    }
+    else {
+        double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
+        ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
+            next_point));
+        if (reason != SA_HARBOUR_DISABLED) {
+            damage_ship(sh, dmg);
+        }
+        /* we handle destruction at the end */
+    }
+}
+
 int check_ship_allowed(struct ship *sh, const region * r)
 {
     if (fval(r->terrain, SEA_REGION)) {
-        return SA_COAST;
+        return SA_ALLOWED;
     }
     else {
-        int reason = SA_NO_COAST;
+        int reason = SA_DENIED;
         const building_type* bt_harbour = bt_find("harbour");
         if (sh->type->coasts) {
             ptrdiff_t c, n = arrlen(sh->type->coasts);
             for (c = 0; c != n; ++c) {
                 if (sh->type->coasts[c] == r->terrain) {
-                    reason = SA_COAST;
+                    reason = SA_ALLOWED;
                     break;
                 }
             }
         }
-        if (reason != SA_COAST && bt_harbour && buildingtype_exists(r, bt_harbour, true)) {
-            unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
-            if (!harbourmaster || !sh->_owner) {
-                reason = SA_HARBOUR;
-            }
-            else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
-                reason = SA_HARBOUR;
-            }
-            else {
-                return SA_NO_HARBOUR;
+        if (reason != SA_ALLOWED && bt_harbour) {
+            building* b = get_building_of_type(r, bt_harbour, false);
+            if (b) {
+                if (fval(b, BLD_UNMAINTAINED)) {
+                    reason = SA_HARBOUR_DISABLED;
+                }
+                else {
+                    unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+                    if (!harbourmaster || !sh->_owner) {
+                        reason = SA_HARBOUR_ALLOWED;
+                    }
+                    else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                        reason = SA_HARBOUR_ALLOWED;
+                    }
+                    else {
+                        reason = SA_HARBOUR_DENIED;
+                    }
+                }
             }
         }
         if (reason >= 0 && sh->region && r_insectstalled(r)) {
@@ -701,8 +733,11 @@ int check_ship_allowed(struct ship *sh, const region * r)
             unit* u = ship_owner(sh);
 
             if (u && is_freezing(u)) {
-                return SA_NO_INSECT;
+                reason = SA_INSECT_DENIED;
             }
+        }
+        if (reason < 0 && sh->name[0]=='H') {
+            printf("!ship_allowed %s: %d\n", sh->name, reason);
         }
         return reason;
     }
@@ -1899,22 +1934,7 @@ static void sail(unit * u, order * ord, bool drifting)
             reason = check_ship_allowed(sh, next_point);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there. */
-                if (reason == SA_NO_INSECT) {
-                    ADDMSG(&f->msgs, msg_message("detectforbidden", "unit region", u, next_point));
-                }
-                else if (reason == SA_NO_HARBOUR) {
-                    ADDMSG(&f->msgs, msg_message("harbor_denied", "ship region", sh, next_point));
-                }
-                else if (lighthouse_guarded(current_point)) {
-                    ADDMSG(&f->msgs, msg_message("sailnolandingstorm", "ship region", sh, next_point));
-                }
-                else {
-                    double dmg = config_get_flt("rules.ship.damage.nolanding", 0.1);
-                    ADDMSG(&f->msgs, msg_message("sailnolanding", "ship region", sh,
-                        next_point));
-                    damage_ship(sh, dmg);
-                    /* we handle destruction at the end */
-                }
+                deny_ship_entry(u, current_point, next_point, reason);
                 break;
             }
 

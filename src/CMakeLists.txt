@@ -2,11 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 project (server C)
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${CLIBS_INCLUDE_DIR})
-include_directories (${STORAGE_INCLUDE_DIR})
-include_directories (${TOLUA_INCLUDE_DIR})
-include_directories (${LUA_INCLUDE_DIR})
-include_directories (${INIPARSER_INCLUDE_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
@@ -85,7 +80,6 @@ set (ERESSEA_SRC
   chaos.c
   contact.c
   creport.c
-  direction.c
   defaults.c
   donations.c
   recruit.c
@@ -177,9 +171,14 @@ if(DEFINED ERESSEA_BUILDNO)
 endif()
 add_library(parser ${PARSER_SRC})
 
+target_include_directories (parser PUBLIC ${CLIBS_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${STORAGE_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${UTF8PROC_INCLUDE_DIR})
+
 target_link_libraries(parser
   ${CLIBS_LIBRARIES}
   ${CRYPTO_LIBRARIES}
+  ${UTF8PROC_LIBRARY}
   )
 
 add_executable(checker ${CHECK_SRC})
@@ -193,9 +192,12 @@ if (HAVE_LIBM)
 endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
+target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
+target_include_directories (eressea PRIVATE ${TOLUA_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARY}
@@ -205,13 +207,36 @@ target_link_libraries(eressea
   ${INIPARSER_LIBRARY}
 )
 
+add_test(NAME lua-core
+  COMMAND eressea -v1 ../scripts/run-tests.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-core PROPERTY RUN_SERIAL)
+add_test(NAME lua-e2
+  COMMAND eressea -v1 ../scripts/run-tests-e2.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e2 PROPERTY RUN_SERIAL)
+add_test(NAME lua-e3
+  COMMAND eressea -v1 ../scripts/run-tests-e3.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
+
+find_program(LUAROCKS_EXECUTABLE luarocks)
+if(LUAROCKS_EXECUTABLE)
+execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-path OUTPUT_VARIABLE LR_PATH)
+execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-cpath OUTPUT_VARIABLE LR_CPATH)
+string(REPLACE ";" "\;" LUA_PATH "${CMAKE_SOURCE_DIR}/scripts/?.lua;${LR_PATH}")
+string(REPLACE ";" "\;" LUA_CPATH "${LR_CPATH}")
+set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}")
+endif(LUAROCKS_EXECUTABLE)
+
+set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
+
 set(TESTS_SRC
   alchemy.test.c
   automate.test.c
   battle.test.c
   contact.test.c
   creport.test.c
-  direction.test.c
   defaults.test.c
   donations.test.c
   economy.test.c
@@ -276,7 +301,7 @@ set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 set_property(TARGET test_eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif (IWYU_PATH)
 
-add_test(server test_eressea)
+add_test(NAME unit-tests COMMAND test_eressea)
 
 install(TARGETS eressea DESTINATION "bin")
 
@@ -302,6 +327,7 @@ endif (HAVE_LIBBSD)
 
 target_include_directories (game PUBLIC ${CJSON_INCLUDE_DIR})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
 target_include_directories (game PRIVATE ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARY})
@@ -309,7 +335,7 @@ target_link_libraries(test_eressea ${SQLITE3_LIBRARY})
 target_compile_definitions(game PRIVATE USE_SQLITE)
 
 if (READLINE_FOUND)
-#include_directories (${READLINE_INCLUDE_DIR})
+target_include_directories (eressea PRIVATE ${READLINE_INCLUDE_DIR})
 target_link_libraries(eressea ${READLINE_LIBRARY})
 target_compile_definitions(eressea PRIVATE DUSE_READLINE)
 endif (READLINE_FOUND)

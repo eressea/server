@@ -1,7 +1,7 @@
 #ifndef H_ATTRIBUTE_ICEBERG
 #define H_ATTRIBUTE_ICEBERG
 
-#include "direction.h"
+#include <kernel/direction.h>
 
 #ifdef __cplusplus
 extern "C" {

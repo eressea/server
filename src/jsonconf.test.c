@@ -5,10 +5,14 @@
 #include "jsonconf.h"
 
 #include "eressea.h"
+#include "move.h"
+#include "prefix.h"
 
 #include "kernel/build.h"     // for construction, requirement
 #include "kernel/building.h"
+#include "kernel/calendar.h"
 #include "kernel/config.h"
+#include "kernel/direction.h"
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
@@ -21,11 +25,6 @@
 #include "util/language.h"
 #include "util/param.h"
 #include "util/variant.h"     // for frac_equal, frac_one
-
-#include "kernel/calendar.h"
-#include "direction.h"
-#include "move.h"
-#include "prefix.h"
 
 #include <tests.h>
 
@@ -283,7 +282,12 @@ static void test_ships(CuTest * tc)
         "\"construction\" : { \"maxsize\" : 20, \"reqsize\" : 10, \"minskill\" : 1 },"
         "\"coasts\" : [ \"plain\" ],"
         "\"range\" : 8,"
-        "\"maxrange\" : 16"
+        "\"maxrange\" : 16,"
+        "\"cargo\" : 5000,"
+        "\"cabins\" : 5,"
+        "\"minskill\" : 2,"
+        "\"captain\" : 3,"
+        "\"skills\" : 6"
         "}}}";
 
     cJSON *json = cJSON_Parse(data);
@@ -305,6 +309,11 @@ static void test_ships(CuTest * tc)
     CuAssertIntEquals(tc, 1, st->construction->minskill);
     CuAssertIntEquals(tc, 8, st->range);
     CuAssertIntEquals(tc, 16, st->range_max);
+    CuAssertIntEquals(tc, 2, st->minskill);
+    CuAssertIntEquals(tc, 3, st->cptskill);
+    CuAssertIntEquals(tc, 6, st->sumskill);
+    CuAssertIntEquals(tc, 5000, st->cargo);
+    CuAssertIntEquals(tc, 5, st->cabins);
 
     ter = get_terrain("plain");
     CuAssertPtrNotNull(tc, ter);
@@ -381,6 +390,9 @@ static const char * building_data = "{\"buildings\": { "
 "\"maintenance\" : "
 "{ \"type\" : \"iron\", \"amount\" : 1, \"flags\" : [ \"variable\" ] }"
 ","
+"\"maxsize\" : 10,"
+"\"capacity\" : 2,"
+"\"maxcapacity\" : 20,"
 "\"construction\" : {"
 "\"maxsize\" : 20,"
 "\"reqsize\" : 10,"
@@ -417,10 +429,16 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertIntEquals(tc, 2, bt->maintenance[1].number);
     CuAssertIntEquals(tc, 0, bt->maintenance[2].number);
+    CuAssertIntEquals(tc, 1, bt->capacity);
+    CuAssertIntEquals(tc, -1, bt->maxcapacity);
+    CuAssertIntEquals(tc, -1, bt->maxsize);
 
     bt = bt_find("house");
     CuAssertPtrNotNull(tc, bt);
 
+    CuAssertIntEquals(tc, 2, bt->capacity);
+    CuAssertIntEquals(tc, 20, bt->maxcapacity);
+    CuAssertIntEquals(tc, 10, bt->maxsize);
     CuAssertPtrNotNull(tc, bt->maintenance);
     CuAssertIntEquals(tc, 1, bt->maintenance[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_IRON), (void *)bt->maintenance[0].rtype);

@@ -86,7 +86,7 @@ static void chaos(region * r, faction *monsters)
                 if (u && !undeadrace(u_race(u))) {
                     faction * f = u->faction;
                     if (join_monsters(u, monsters)) {
-                        ADDMSG(&f->msgs, msg_message("chaos_disease", "unit", u));
+                        ADDMSG(&f->msgs, msg_message("chaos_disease", "unit region", u, r));
                         u_setrace(u, get_race(RC_GHOUL));
                     }
                 }

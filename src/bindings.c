@@ -14,15 +14,16 @@
 #include "summary.h"
 #include "teleport.h"
 
-#include "kernel/attrib.h"
-#include "kernel/calendar.h"
-#include "kernel/config.h"
 #include "kernel/alliance.h"
+#include "kernel/attrib.h"
 #include "kernel/building.h"
 #include "kernel/build.h"
+#include "kernel/calendar.h"
+#include "kernel/config.h"
 #include "kernel/curse.h"
-#include "kernel/unit.h"
-#include "kernel/terrain.h"
+#include "kernel/direction.h"
+#include "kernel/faction.h"
+#include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/plane.h"
 #include "kernel/region.h"
@@ -30,9 +31,9 @@
 #include "kernel/ship.h"
 #include "kernel/skill.h"
 #include "kernel/spell.h"
-#include "kernel/item.h"
-#include "kernel/faction.h"
 #include "kernel/spellbook.h"
+#include "kernel/terrain.h"
+#include "kernel/unit.h"
 #include "races/races.h"
 
 #include "bind_unit.h"
@@ -892,6 +893,16 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
     tolua_beginmodule(L, NULL);
     {
         tolua_function(L, "parse_orders", tolua_parse_orders);
+        tolua_module(L, "directions", 1);
+        tolua_beginmodule(L, "directions");
+        {
+            tolua_constant(L, "WEST", D_WEST);
+            tolua_constant(L, "EAST", D_EAST);
+            tolua_constant(L, "SOUTHWEST", D_SOUTHWEST);
+            tolua_constant(L, "SOUTHEAST", D_SOUTHEAST);
+            tolua_constant(L, "NORTHWEST", D_NORTHWEST);
+            tolua_constant(L, "NORTHEAST", D_NORTHEAST);
+        } tolua_endmodule(L);
         tolua_module(L, "rng", 1);
         tolua_beginmodule(L, "rng");
         {

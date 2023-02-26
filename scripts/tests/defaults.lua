@@ -178,6 +178,20 @@ function test_default_empty()
     assert_equal(1, #u.orders)
 end
 
+function test_default_short()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    region.create(1, 0, "plain")
+    u.name = 'Xolgrim'
+    u:add_order('UNTERHALTE')
+    u:set_orders('ARBEITE\nDEFAULT "GIB 1 2 Silber"')
+    process_orders()
+    assert_equal(2, #u.orders)
+    assert_equal("GIB 1 2 Silber", u.orders[1])
+    assert_equal("ARBEITE", u.orders[2])
+end
+
 function test_default_default()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")

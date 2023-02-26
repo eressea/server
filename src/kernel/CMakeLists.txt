@@ -13,6 +13,7 @@ config.test.c
 # connection.test.c
 curse.test.c
 database.test.c
+direction.test.c
 equipment.test.c
 # event.test.c
 faction.test.c
@@ -51,6 +52,7 @@ config.c
 connection.c
 curse.c
 database.c
+direction.c
 equipment.c
 event.c
 faction.c
@@ -82,6 +84,6 @@ FOREACH(_FILE ${_FILES})
 ENDFOREACH(_FILE)
 SET(KERNEL_SRC ${_SOURCES} PARENT_SCOPE)
 FOREACH(_FILE ${_TEST_FILES})
-    LIST(APPEND _TESTS ${PROJECT_NAME}/${_FILE})
+LIST(APPEND _TESTS ${PROJECT_NAME}/${_FILE})
 ENDFOREACH(_FILE)
 SET(KERNEL_TESTS ${_TESTS} PARENT_SCOPE)

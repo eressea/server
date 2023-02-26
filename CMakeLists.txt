@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 99)
-
 if (WIN32)
 file(TO_CMAKE_PATH "${CMAKE_MODULE_PATH}" CMAKE_MODULE_PATH )
 file(TO_CMAKE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH )
@@ -10,9 +9,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 endif (WIN32)
 
 project (server C)
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if (MSVC)
-  set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
   find_package (PDCurses)
   set (CURSES_FOUND ${PDCURSES_FOUND})
   set (CURSES_LIBRARIES ${PDCURSES_LIBRARY})
@@ -31,6 +30,7 @@ endif (NOT CURSES_FOUND)
 
 find_package (EXPAT REQUIRED)
 find_package (Lua 5.2 REQUIRED)
+find_package (Utf8Proc REQUIRED)
 
 find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
 find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h REQUIRED)
@@ -77,27 +77,6 @@ add_subdirectory (storage)
 add_subdirectory (clibs)
 add_subdirectory (process)
 add_subdirectory (src eressea)
-
-add_test(NAME lua-core
- COMMAND eressea -v1 ../scripts/run-tests.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-add_test(NAME lua-e2
- COMMAND eressea -v1 ../scripts/run-tests-e2.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-add_test(NAME lua-e3
- COMMAND eressea -v1 ../scripts/run-tests-e3.lua
- WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-
-find_program(LUAROCKS_EXECUTABLE luarocks)
-if(LUAROCKS_EXECUTABLE)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-path OUTPUT_VARIABLE LR_PATH)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-cpath OUTPUT_VARIABLE LR_CPATH)
-string(REPLACE ";" "\;" LUA_PATH "${CMAKE_SOURCE_DIR}/scripts/?.lua;${LR_PATH}")
-string(REPLACE ";" "\;" LUA_CPATH "${LR_CPATH}")
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}")
-endif(LUAROCKS_EXECUTABLE)
-
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
 
 install(DIRECTORY etc DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.txt")
 install(DIRECTORY res conf DESTINATION ${CMAKE_INSTALL_PREFIX} FILES_MATCHING PATTERN "*.po")

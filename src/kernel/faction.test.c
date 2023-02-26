@@ -33,6 +33,123 @@
 #include <limits.h>
 #include <stdbool.h>              // for false, true
 
+static void test_destroyfaction(CuTest *tc) {
+    faction *f;
+    region *r;
+    unit* u;
+
+    test_setup();
+    init_resources();
+
+    r = test_create_plain(0, 0);
+    rsethorses(r, 10);
+    rsetpeasants(r, 100);
+    rsetmoney(r, 1000);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    i_change(&u->items, it_find("horse"), 10);
+    i_change(&u->items, it_find("money"), 1000);
+    scale_number(u, 100);
+    CuAssertPtrEquals(tc, f, factions);
+    CuAssertPtrEquals(tc, NULL, f->next);
+    destroyfaction(&factions);
+    CuAssertPtrEquals(tc, NULL, factions);
+    CuAssertIntEquals(tc, 20, rhorses(r));
+    CuAssertIntEquals(tc, 200, rpeasants(r));
+    CuAssertIntEquals(tc, 2000, rmoney(r));
+    test_teardown();
+}
+
+static void test_destroyfaction_undead(CuTest *tc) {
+    faction *f;
+    region *r;
+    unit* u;
+    race* rc;
+
+    test_setup();
+    init_resources();
+
+    r = test_create_plain(0, 0);
+    rsethorses(r, 10);
+    rsetpeasants(r, 100);
+    rsetmoney(r, 1000);
+    rc = test_create_race("undead");
+    rc->flags -= RCF_PLAYABLE;
+    f = test_create_faction_ex(rc, NULL);
+    u = test_create_unit(f, r);
+    i_change(&u->items, it_find("horse"), 10);
+    i_change(&u->items, it_find("money"), 1000);
+    scale_number(u, 100);
+    CuAssertPtrEquals(tc, f, factions);
+    CuAssertPtrEquals(tc, NULL, f->next);
+    destroyfaction(&factions);
+    CuAssertPtrEquals(tc, NULL, factions);
+    CuAssertIntEquals(tc, 20, rhorses(r));
+    CuAssertIntEquals(tc, 100, rpeasants(r));
+    CuAssertIntEquals(tc, 2000, rmoney(r));
+    test_teardown();
+}
+
+static void test_destroyfaction_demon(CuTest *tc) {
+    faction *f;
+    region *r;
+    unit* u;
+    race* rc;
+
+    test_setup();
+    init_resources();
+
+    r = test_create_plain(0, 0);
+    rsethorses(r, 10);
+    rsetpeasants(r, 100);
+    rsetmoney(r, 1000);
+    rc = test_create_race("demon");
+    rc->ec_flags -= ECF_REC_ETHEREAL;
+    f = test_create_faction_ex(rc, NULL);
+    u = test_create_unit(f, r);
+    i_change(&u->items, it_find("horse"), 10);
+    i_change(&u->items, it_find("money"), 1000);
+    scale_number(u, 100);
+    CuAssertPtrEquals(tc, f, factions);
+    CuAssertPtrEquals(tc, NULL, f->next);
+    destroyfaction(&factions);
+    CuAssertPtrEquals(tc, NULL, factions);
+    CuAssertIntEquals(tc, 20, rhorses(r));
+    CuAssertIntEquals(tc, 100, rpeasants(r));
+    CuAssertIntEquals(tc, 2000, rmoney(r));
+    test_teardown();
+}
+
+static void test_destroyfaction_orc(CuTest *tc) {
+    faction *f;
+    region *r;
+    unit* u;
+    race* rc;
+
+    test_setup();
+    init_resources();
+
+    r = test_create_plain(0, 0);
+    rsethorses(r, 10);
+    rsetpeasants(r, 100);
+    rsetmoney(r, 1000);
+    rc = test_create_race("orc");
+    rc->recruit_multi = 2;
+    f = test_create_faction_ex(rc, NULL);
+    u = test_create_unit(f, r);
+    i_change(&u->items, it_find("horse"), 10);
+    i_change(&u->items, it_find("money"), 1000);
+    scale_number(u, 100);
+    CuAssertPtrEquals(tc, f, factions);
+    CuAssertPtrEquals(tc, NULL, f->next);
+    destroyfaction(&factions);
+    CuAssertPtrEquals(tc, NULL, factions);
+    CuAssertIntEquals(tc, 20, rhorses(r));
+    CuAssertIntEquals(tc, 150, rpeasants(r));
+    CuAssertIntEquals(tc, 2000, rmoney(r));
+    test_teardown();
+}
+
 static void test_destroyfaction_allies(CuTest *tc) {
     faction *f1, *f2;
     region *r;
@@ -445,6 +562,10 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_count_skill);
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
+    SUITE_ADD_TEST(suite, test_destroyfaction);
+    SUITE_ADD_TEST(suite, test_destroyfaction_undead);
+    SUITE_ADD_TEST(suite, test_destroyfaction_demon);
+    SUITE_ADD_TEST(suite, test_destroyfaction_orc);
     SUITE_ADD_TEST(suite, test_destroyfaction_allies);
     SUITE_ADD_TEST(suite, test_remove_empty_factions_alliance);
     SUITE_ADD_TEST(suite, test_remove_dead_factions);

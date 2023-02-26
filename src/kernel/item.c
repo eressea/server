@@ -221,7 +221,7 @@ item_type *it_find(const char *zname)
             result = rt_find(name);
         }
     }
-    return result ? result->itype : 0;
+    return result ? result->itype : NULL;
 }
 
 item_type *it_get_or_create(resource_type *rtype) {

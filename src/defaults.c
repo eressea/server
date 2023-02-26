@@ -251,8 +251,12 @@ void update_defaults(void)
         for (u = f->units; u != NULL; u = u->nextF) {
             /* u->defaults contains new orders that were added by K_DEFAULT */
             order** ordi = &u->defaults;
+            bool new_long = false;
             while (*ordi) {
                 order* ord = *ordi;
+                if (is_long(getkeyword(ord))) {
+                    new_long = true;
+                }
                 ordi = &ord->next;
             }
             /* we add persistent new orders to the end of these new defaults: */
@@ -262,7 +266,11 @@ void update_defaults(void)
                 while (*ordp) {
                     order* ord = *ordp;
                     keyword_t kwd = getkeyword(ord);
-                    if (!(repeated && is_repeated(kwd))) {
+                    bool keep = !(repeated && is_repeated(kwd));
+                    if (!keep && !new_long && is_long(kwd)) {
+                        keep = true;
+                    }
+                    if (keep) {
                         if (is_persistent(ord)) {
                             *ordp = ord->next;
                             *ordi = ord;
@@ -270,6 +278,13 @@ void update_defaults(void)
                             ordi = &ord->next;
                             continue;
                         }
+                    }
+                    else {
+                        /* replace any old long orders */
+                        *ordp = ord->next;
+                        ord->next = NULL;
+                        free_order(ord);
+                        continue;
                     }
                     ordp = &ord->next;
                 }
