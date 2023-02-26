@@ -5,6 +5,7 @@
 #include "bind_tolua.h"
 
 #include "console.h"
+#include "direction.h"
 #include "gamedb.h"
 #include "helpers.h"
 #include "laws.h"
