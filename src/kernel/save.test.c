@@ -72,6 +72,7 @@ static void test_readwrite_unit(CuTest * tc)
     CuAssertTrue(tc, playerrace(irace));
     u->irace = irace;
     CuAssertTrue(tc, irace == u_irace(u));
+    fset(u, UFL_MOVED);
     
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -84,6 +85,8 @@ static void test_readwrite_unit(CuTest * tc)
     renumber_faction(f, fno);
     gamedata_init(&data, &store, RELEASE_VERSION);
     u = read_unit(&data);
+    // The UFL_MOVED flag must be saved, monsters use it for planning:
+    CuAssertIntEquals(tc, UFL_MOVED, fval(u, UFL_MOVED));
     CuAssertPtrNotNull(tc, u);
     CuAssertPtrEquals(tc, f, u->faction);
     CuAssertStrEquals(tc, "Hodor", u->_name);
