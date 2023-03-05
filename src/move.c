@@ -736,9 +736,6 @@ int check_ship_allowed(struct ship *sh, const region * r)
                 reason = SA_INSECT_DENIED;
             }
         }
-        if (reason < 0 && sh->name[0]=='H') {
-            printf("!ship_allowed %s: %d\n", sh->name, reason);
-        }
         return reason;
     }
 }
