@@ -20,9 +20,10 @@
 
 /* util includes */
 #include "util/log.h"
-#include "util/rand.h"
 #include "util/message.h"
+#include "util/rand.h"
 #include "util/rng.h"
+#include "util/stats.h"
 
 /* libc includes */
 #include <assert.h>
@@ -214,7 +215,7 @@ void volcano_outbreak(region * r, region *rn)
             freset(f, FFL_SELECT);
         }
     }
-
+    stats_count("volcano.outbreak", 1);
     volcano_destruction(r, r, "4d10");
     if (rn) {
         volcano_destruction(r, rn, "3d10");
