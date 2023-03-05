@@ -132,14 +132,55 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     test_teardown();
 }
 
-static void test_renumber_ship(CuTest *tc) {
-    unit *u;
+static void test_renumber_ship(CuTest* tc) {
+    unit* u;
+    int uno, no;
+    const struct locale* lang;
+
+    setup_renumber(tc);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    no = u->ship->no;
+    uno = (no > 1) ? no - 1 : no + 1;
+    lang = u->faction->locale;
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    renumber_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, uno, u->ship->no);
+    test_teardown();
+}
+
+static void test_renumber_ship_not_owner(CuTest *tc) {
+    unit *u, *u2;
     int uno, no;
     const struct locale *lang;
 
     setup_renumber(tc);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->ship = test_create_ship(u->region, NULL);
+    no = u->ship->no;
+    uno = (no > 1) ? no - 1 : no + 1;
+    lang = u->faction->locale;
+    u2->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    renumber_cmd(u2, u2->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error144"));
+    CuAssertIntEquals(tc, no, u->ship->no);
+    u2->ship = u->ship;
+    renumber_cmd(u2, u2->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error146"));
+    CuAssertIntEquals(tc, no, u->ship->no);
+    test_teardown();
+}
+
+static void test_renumber_moved_ship(CuTest* tc) {
+    unit* u;
+    int uno, no;
+    const struct locale* lang;
+
+    setup_renumber(tc);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    u->ship->coast = D_EAST;
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
@@ -272,6 +313,8 @@ CuSuite *get_renumber_suite(void)
     SUITE_ADD_TEST(suite, test_renumber_building);
     SUITE_ADD_TEST(suite, test_renumber_building_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_ship);
+    SUITE_ADD_TEST(suite, test_renumber_ship_not_owner);
+    SUITE_ADD_TEST(suite, test_renumber_moved_ship);
     SUITE_ADD_TEST(suite, test_renumber_ship_twice);
     SUITE_ADD_TEST(suite, test_renumber_ship_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_faction);

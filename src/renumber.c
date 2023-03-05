@@ -137,10 +137,6 @@ int renumber_cmd(unit * u, order * ord)
             cmistake(u, ord, 146, MSG_EVENT);
             break;
         }
-        if (u->ship->coast != NODIRECTION) {
-            cmistake(u, ord, 116, MSG_EVENT);
-            break;
-        }
         s = gettoken(token, sizeof(token));
         if (s == NULL || *s == 0) {
             i = newcontainerid();
