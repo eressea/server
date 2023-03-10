@@ -212,6 +212,7 @@ int unit_getcapacity(const unit* u);
 void unit_addorder(unit* u, struct order* ord);
 int unit_max_hp(const struct unit* u);
 void scale_number(struct unit* u, int n);
+void remove_skills(unit* u);
 
 void remove_empty_units_in_region(struct region* r);
 void remove_empty_units(void);

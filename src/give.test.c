@@ -364,6 +364,23 @@ static void test_give_men_none(CuTest * tc) {
     test_teardown();
 }
 
+static void test_give_men_all(CuTest* tc) {
+    struct give env = { 0 };
+    message* msg;
+
+    test_setup_ex(tc);
+    env.f2 = env.f1 = test_create_faction();
+    setup_give(&env);
+    set_level(env.src, SK_ALCHEMY, 5);
+    msg = give_men(1, env.src, env.dst, NULL);
+    CuAssertIntEquals(tc, 2, env.dst->number);
+    CuAssertIntEquals(tc, 0, env.src->number);
+    CuAssertPtrNotNull(tc, unit_skill(env.dst, SK_ALCHEMY));
+    CuAssertPtrEquals(tc, NULL, unit_skill(env.src, SK_ALCHEMY));
+    CuAssertPtrEquals(tc, NULL, msg);
+    test_teardown();
+}
+
 static void test_give_men_other_faction(CuTest * tc) {
     struct give env = { 0 };
     message * msg;
@@ -796,6 +813,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_limit);
     SUITE_ADD_TEST(suite, test_give_men_in_ocean);
     SUITE_ADD_TEST(suite, test_give_men_none);
+    SUITE_ADD_TEST(suite, test_give_men_all);
     SUITE_ADD_TEST(suite, test_give_men_too_many);
     SUITE_ADD_TEST(suite, test_give_men_other_faction);
     SUITE_ADD_TEST(suite, test_give_men_requires_contact);
