@@ -816,8 +816,12 @@ void transfermen(unit* u, unit* dst, int n)
         delta = (long long)u->hp * n / u->number;
         dst->hp += delta;
         u->hp -= delta;
+        /* cannot use scale_number here, because it changes hp+effects: */
         set_number(dst, dst->number + n);
         set_number(u, u->number - n);
+        if (u->number == 0) {
+            remove_skills(u);
+        }
         assert(dst->hp >= dst->number);
         assert(u->hp >= u->number);
     }
@@ -947,7 +951,7 @@ void remove_skill(unit * u, enum skill_t sk)
     }
 }
 
-static void remove_skills(unit * u) {
+void remove_skills(unit * u) {
     arrfree(u->skills);
 }
 
