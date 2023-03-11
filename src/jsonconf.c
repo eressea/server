@@ -172,6 +172,11 @@ static void json_construction(cJSON *json, construction *cons) {
                 json_requirements(child, &cons->materials);
             }
             break;
+        case cJSON_String:
+            if (strcmp(child->string, "skill") == 0) {
+                cons->skill = findskill(child->valuestring);
+            }
+            break;
         case cJSON_Number:
             if (strcmp(child->string, "maxsize") == 0) {
                 cons->maxsize = child->valueint;
@@ -343,6 +348,7 @@ static void json_stages(cJSON *json, building_type *bt) {
         case cJSON_Object:
             stage = calloc(1, sizeof(building_stage));
             if (!stage) abort();
+            stage->construction.skill = SK_BUILDING;
             json_stage(child, stage);
             if (stage->construction.maxsize > 0) {
                 stage->construction.maxsize -= size;
@@ -387,6 +393,7 @@ static void json_building(cJSON *json, building_type *bt) {
                 if (!bt->stages) {
                     building_stage *stage = calloc(1, sizeof(building_stage));
                     if (!stage) abort();
+                    stage->construction.skill = SK_BUILDING;
                     json_construction(child, &stage->construction);
                     bt->stages = stage;
                 }
@@ -495,7 +502,10 @@ static void json_ship(cJSON *json, ship_type *st) {
         case cJSON_Object:
             if (strcmp(child->string, "construction") == 0) {
                 st->construction = calloc(1, sizeof(construction));
-                json_construction(child, st->construction);
+                if (st->construction) {
+                    st->construction->skill = SK_SHIPBUILDING;
+                    json_construction(child, st->construction);
+                }
             }
             else {
                 log_error("ship %s contains unknown attribute %s", json->string, child->string);

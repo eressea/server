@@ -304,6 +304,7 @@ static void test_ships(CuTest * tc)
     st = st_find("boat");
     CuAssertPtrNotNull(tc, st);
     CuAssertPtrNotNull(tc, st->construction);
+    CuAssertIntEquals(tc, SK_SHIPBUILDING, st->construction->skill);
     CuAssertIntEquals(tc, 10, st->construction->reqsize);
     CuAssertIntEquals(tc, 20, st->construction->maxsize);
     CuAssertIntEquals(tc, 1, st->construction->minskill);
@@ -330,8 +331,8 @@ static void test_castles(CuTest *tc) {
     const char * data = "{\"buildings\": { \"castle\" : { "
         "\"stages\" : ["
         "{ \"construction\": { \"maxsize\" : 2 }, \"name\": \"site\" },"
-        "{ \"construction\": { \"maxsize\" : 8 } },"
-        "{ \"construction\": { \"maxsize\" : -1 } }"
+        "{ \"construction\": { \"maxsize\" : 8, \"skill\" : \"building\" } },"
+        "{ \"construction\": { \"maxsize\" : -1, \"skill\" : \"shipcraft\" } }"
         "]}}}";
 
     cJSON *json = cJSON_Parse(data);
@@ -350,13 +351,16 @@ static void test_castles(CuTest *tc) {
     CuAssertPtrNotNull(tc, stage = bt->stages);
     CuAssertStrEquals(tc, "site", stage->name);
     CuAssertIntEquals(tc, 2, stage->construction.maxsize);
+    CuAssertIntEquals(tc, SK_BUILDING, stage->construction.skill);
 
     CuAssertPtrNotNull(tc, stage = stage->next);
     CuAssertPtrEquals(tc, NULL, stage->name);
     CuAssertIntEquals(tc, 6, stage->construction.maxsize);
+    CuAssertIntEquals(tc, SK_BUILDING, stage->construction.skill);
 
     CuAssertPtrNotNull(tc, stage = stage->next);
     CuAssertIntEquals(tc, -1, stage->construction.maxsize);
+    CuAssertIntEquals(tc, SK_SHIPBUILDING, stage->construction.skill);
 
     CuAssertPtrEquals(tc, NULL, stage->next);
 
