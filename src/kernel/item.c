@@ -821,7 +821,7 @@ const item_type *finditemtype(const char *name, const struct locale *lang)
     else {
         log_debug("finditemtype: transliterate failed for '%s'\n", name);
     }
-    return 0;
+    return NULL;
 }
 
 item *item_spoil(const struct race *rc, int size)
