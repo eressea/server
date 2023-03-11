@@ -450,7 +450,7 @@ static void json_weapon(cJSON* json, weapon_type* wtype) {
     }
 }
 
-static void set_flag(int* flags, int bit, bool enabled)
+static void set_flag(unsigned int* flags, int bit, bool enabled)
 {
     if (enabled) {
         *flags |= bit;
