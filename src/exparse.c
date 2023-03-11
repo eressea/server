@@ -998,9 +998,9 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
     const char *flag_names[] = {
         "playerrace", "killpeasants", "scarepeasants", "!cansteal",
         "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
-        "!learn", "!teach","horse", "desert", "illusionary",
+        "nolearn", "!teach", "horse", "desert", "illusionary",
         "absorbpeasants", "noheal", "noweapons", "shapeshift",
-        "shapeshiftany", "undead", "dragon", "coastal", "unarmedguard",
+        "undead", "dragon", "coastal", "unarmedguard",
         "cansail", "familiar", "shipspeed", "migrants", "moveattack", NULL};
     const char *bflag_names[] = {
         "equipment", "noblock", "resistpierce", "resistcut", "resistbash",
