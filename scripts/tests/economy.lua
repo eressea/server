@@ -122,13 +122,13 @@ function test_make_limited_ship()
     local u = unit.create(faction.create("human"), r)
     u.number = 10
     u.name = 'Xolgrim'
-    u:set_skill("shipcraft", 3)
+    u:set_skill("shipcraft", 6)
     u:add_item("log", 5)
-    u:add_order("MACHE 1 Boot")
+    u:add_order("MACHE 1 Karavelle")
     process_orders()
     assert_equal(4, u:get_item("log"))
     assert_equal(1, u.ship.size)
-    assert_equal("MACHE 1 Boot", u:get_order())
+    assert_equal("MACHE 1 Karavelle", u:get_order())
 end
 
 function test_smithy_bonus()
