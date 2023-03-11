@@ -48,7 +48,7 @@ static critbit_tree cb_shiptypes; /* use this trie instead */
 
 static local_names *snames;
 
-void free_snames()
+void free_snames(void)
 {
     while (snames) {
         local_names* sn = snames;
