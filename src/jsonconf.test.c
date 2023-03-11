@@ -55,10 +55,10 @@ static void check_ec_flag(CuTest *tc, const char *name, int flag) {
     CuAssertIntEquals(tc, flag, rc->ec_flags);
 }
 
-static void check_flag(CuTest *tc, const char *name, int flag) {
-    const struct race *rc = race_with_flag(name);
+static void check_flag(CuTest* tc, const char* name, int flag) {
+    const struct race* rc = race_with_flag(name);
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, flag, rc->flags);
+    CuAssertIntEquals(tc, RCF_DEFAULT | flag, rc->flags);
 }
 
 static void test_flags(CuTest *tc) {
@@ -189,6 +189,10 @@ static void test_races(CuTest * tc)
         "\"hp\" : 5,"
         "\"ac\" : 6,"
         "\"flags\" : [ \"player\", \"walk\", \"undead\" ]"
+        "},"
+        "\"human\" : {"
+        " \"player\": true,"
+        " \"cansail\": false"
         "}}}";
     cJSON *json = cJSON_Parse(data);
     const struct race *rc;
@@ -200,9 +204,13 @@ static void test_races(CuTest * tc)
     json_config(json);
 
     CuAssertPtrNotNull(tc, races);
+    rc = rc_find("human");
+    CuAssertPtrNotNull(tc, rc);
+    CuAssertIntEquals(tc, (RCF_DEFAULT-RCF_CANSAIL) | RCF_PLAYABLE, rc->flags);
+
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, RCF_PLAYABLE | RCF_WALK | RCF_UNDEAD, rc->flags);
+    CuAssertIntEquals(tc, RCF_DEFAULT | RCF_PLAYABLE | RCF_WALK | RCF_UNDEAD, rc->flags);
     CuAssertStrEquals(tc, "1d4", rc->def_damage);
     CuAssertTrue(tc, frac_equal(frac_one, rc->magres));
     CuAssertIntEquals(tc, 200, rc->maxaura);
@@ -243,9 +251,10 @@ static void test_findrace(CuTest *tc) {
 static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
-        "\"axe\" : { \"weight\" : 2, \"weapon\": { \"skill\": \"crossbow\", \"damage\" : \"2d4\" } },"
+        "\"crossbow\" : { \"weight\" : 2, \"weapon\": { \"skill\": \"crossbow\", \"damage\" : \"2d4\", \"pierce\" : true } },"
         "\"iron\" : { \"weight\" : 50, \"construction\": { \"skill\": \"mining\", \"minskill\" : 1 }, \"limited\" : true },"
-        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20, \"pooled\" : false }"
+        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20, \"pooled\" : true },"
+        "\"unicorn\" : { \"animal\" : true, \"big\" : true, \"capacity\" : 20, \"pooled\" : false }"
         "}}";
     cJSON *json = cJSON_Parse(data);
     const item_type * itype;
@@ -253,17 +262,18 @@ static void test_items(CuTest * tc)
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, NULL, it_find("axe"));
-    CuAssertPtrEquals(tc, NULL, rt_find("axe"));
+    CuAssertPtrEquals(tc, NULL, it_find("crossbow"));
+    CuAssertPtrEquals(tc, NULL, rt_find("crossbow"));
     CuAssertPtrEquals(tc, NULL, (void *)get_resourcetype(R_HORSE));
 
     json_config(json);
 
-    itype = it_find("axe");
+    itype = it_find("crossbow");
     CuAssertPtrNotNull(tc, itype);
     CuAssertPtrNotNull(tc, itype->rtype);
     CuAssertIntEquals(tc, RTF_POOLED | RTF_ITEM, itype->rtype->flags);
     CuAssertPtrNotNull(tc, itype->rtype->wtype);
+    CuAssertIntEquals(tc, WTF_PIERCE, itype->rtype->wtype->flags);
     CuAssertIntEquals(tc, SK_CROSSBOW, itype->rtype->wtype->skill);
     CuAssertIntEquals(tc, 2, itype->weight);
     CuAssertIntEquals(tc, 0, itype->flags);
@@ -284,11 +294,19 @@ static void test_items(CuTest * tc)
     itype = it_find("horse");
     CuAssertPtrNotNull(tc, itype);
     CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertIntEquals(tc, RTF_ITEM | RTF_POOLED, itype->rtype->flags);
+    CuAssertIntEquals(tc, 20, itype->capacity);
+    CuAssertIntEquals(tc, ITF_ANIMAL | ITF_BIG, itype->flags);
+
+    itype = it_find("unicorn");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrNotNull(tc, itype->rtype);
     CuAssertIntEquals(tc, RTF_ITEM, itype->rtype->flags);
     CuAssertIntEquals(tc, 20, itype->capacity);
     CuAssertIntEquals(tc, ITF_ANIMAL | ITF_BIG, itype->flags);
 
-    CuAssertPtrNotNull(tc, rt_find("axe"));
+    CuAssertPtrNotNull(tc, rt_find("crossbow"));
+    CuAssertPtrNotNull(tc, it_find("crossbow"));
     CuAssertPtrNotNull(tc, (void *)get_resourcetype(R_HORSE));
     cJSON_Delete(json);
     test_teardown();
