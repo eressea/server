@@ -150,7 +150,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     u_setrace(m, rc = test_create_race("seaserpent"));
     assert(!m->region->land);
     fset(m, UFL_MOVED);
-    fset(rc, RCF_SWIM);
+    fset(rc, RCF_SWIM| RCF_ATTACK_MOVED);
 
     config_set("rules.monsters.attack_chance", "1");
 
@@ -309,7 +309,7 @@ CuSuite *get_monsters_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_hate);
     SUITE_ADD_TEST(suite, test_spawn_seaserpent);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
-    DISABLE_TEST(suite, test_seaserpent_piracy);
+    SUITE_ADD_TEST(suite, test_seaserpent_piracy);
     SUITE_ADD_TEST(suite, test_monsters_waiting);
     SUITE_ADD_TEST(suite, test_monsters_attack_not);
     SUITE_ADD_TEST(suite, test_dragon_attacks_the_rich);

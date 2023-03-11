@@ -192,6 +192,7 @@ static void test_races(CuTest * tc)
         "},"
         "\"human\" : {"
         " \"player\": true,"
+        " \"migrants\": true,"
         " \"cansail\": false"
         "}}}";
     cJSON *json = cJSON_Parse(data);
@@ -206,7 +207,7 @@ static void test_races(CuTest * tc)
     CuAssertPtrNotNull(tc, races);
     rc = rc_find("human");
     CuAssertPtrNotNull(tc, rc);
-    CuAssertIntEquals(tc, (RCF_DEFAULT-RCF_CANSAIL) | RCF_PLAYABLE, rc->flags);
+    CuAssertIntEquals(tc, (RCF_DEFAULT - RCF_CANSAIL) | RCF_PLAYABLE | RCF_MIGRANTS, rc->flags);
 
     rc = rc_find("orc");
     CuAssertPtrNotNull(tc, rc);

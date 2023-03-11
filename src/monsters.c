@@ -147,7 +147,8 @@ static void reduce_weight(unit * u)
 
 static bool monster_is_waiting(const unit * u)
 {
-    return fval(u, UFL_ISNEW | UFL_MOVED) != 0;
+    int test = fval(u_race(u), RCF_ATTACK_MOVED) ? UFL_ISNEW : (UFL_ISNEW | UFL_MOVED);
+    return fval(u, test) != 0;
 }
 
 static bool monster_can_attack(const unit * u)

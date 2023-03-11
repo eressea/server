@@ -213,15 +213,15 @@ extern "C" {
 #define RCF_NOHEAL         (1<<16)      /* Einheit kann nicht geheilt werden */
 #define RCF_NOWEAPONS      (1<<17)      /* Einheit kann keine Waffen benutzen */
 #define RCF_SHAPESHIFT     (1<<18)      /* Kann TARNE RASSE benutzen. */
-#define RCF_UNDEAD         (1<<20)      /* Undead. */
-#define RCF_DRAGON         (1<<21)      /* Drachenart (fuer Zauber) */
-#define RCF_COASTAL        (1<<22)      /* kann in Landregionen an der Kueste sein */
-#define RCF_UNARMEDGUARD   (1<<23)      /* kann ohne Waffen bewachen */
-#define RCF_CANSAIL        (1<<24)      /* Einheit darf Schiffe betreten */
-#define RCF_FAMILIAR       (1<<25)      /* may be a familiar */
-#define RCF_SHIPSPEED      (1<<26)      /* race gets +1 on shipspeed */
+#define RCF_UNDEAD         (1<<19)      /* Undead. */
+#define RCF_DRAGON         (1<<20)      /* Drachenart (fuer Zauber) */
+#define RCF_COASTAL        (1<<21)      /* kann in Landregionen an der Kueste sein */
+#define RCF_UNARMEDGUARD   (1<<22)      /* kann ohne Waffen bewachen */
+#define RCF_CANSAIL        (1<<23)      /* Einheit darf Schiffe betreten */
+#define RCF_FAMILIAR       (1<<24)      /* may be a familiar */
+#define RCF_SHIPSPEED      (1<<25)      /* race gets +1 on shipspeed */
+#define RCF_MIGRANTS       (1<<26)      /* may have migrant units (human bonus) */
 #define RCF_ATTACK_MOVED   (1<<27)      /* may attack if it has moved */
-#define RCF_MIGRANTS       (1<<28)      /* may have migrant units (human bonus) */
 
 #define RCF_DEFAULT (RCF_CANSAIL|RCF_AI_LEARN)
 

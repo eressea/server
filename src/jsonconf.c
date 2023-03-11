@@ -650,7 +650,8 @@ static void json_race(cJSON *json, race *rc) {
         "noteach", "horse", "desert",
         "illusionary", "absorbpeasants", "noheal",
         "noweapons", "shapeshift", "undead", "dragon",
-        "coastal", "invisible", "shipspeed", "migrants", NULL
+        "coastal", "unarmedguard", "cansail", "familiar",
+        "shipspeed", "migrants", "moveattack", NULL
     };
     const char *ecflags[] = {
         "giveperson", "giveunit", "getitem", NULL
