@@ -4,6 +4,7 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
+#include <kernel/direction.h>
 #include <kernel/ship.h>
 #include <kernel/order.h>
 #include <util/base36.h>
