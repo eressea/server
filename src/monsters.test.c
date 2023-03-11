@@ -150,7 +150,7 @@ static void test_seaserpent_piracy(CuTest * tc)
     u_setrace(m, rc = test_create_race("seaserpent"));
     assert(!m->region->land);
     fset(m, UFL_MOVED);
-    fset(rc, RCF_ATTACK_MOVED|RCF_SWIM);
+    fset(rc, RCF_SWIM);
 
     config_set("rules.monsters.attack_chance", "1");
 
