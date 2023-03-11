@@ -132,7 +132,7 @@ static void handle_bad_input(parseinfo *pi, const XML_Char *el, const XML_Char *
     ++pi->errors;
 }
 
-static bool handle_flag(int *flags, const XML_Char **pair, const char *names[]) {
+static bool handle_flag(unsigned int *flags, const XML_Char **pair, const char *names[]) {
     int i;
     for (i = 0; names[i]; ++i) {
         const char * name = names[i];
