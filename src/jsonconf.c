@@ -161,6 +161,9 @@ static void json_maintenance(cJSON *json, maintenance **mtp) {
 static void json_construction(cJSON *json, construction *cons) {
     cJSON *child;
     
+    cons->maxsize = -1;
+    cons->minskill = -1;
+    cons->reqsize = 1;
     if (json->type != cJSON_Object) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
@@ -447,6 +450,16 @@ static void json_weapon(cJSON* json, weapon_type* wtype) {
     }
 }
 
+static void set_flag(int* flags, int bit, bool enabled)
+{
+    if (enabled) {
+        *flags |= bit;
+    }
+    else {
+        *flags &= ~bit;
+    }
+}
+
 static void json_item(cJSON *json, item_type *itype) {
     cJSON *child;
     const char *flags[] = {
@@ -458,35 +471,61 @@ static void json_item(cJSON *json, item_type *itype) {
     }
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
+        case cJSON_True:
+        case cJSON_False:
+            if (strcmp(child->string, "limited") == 0) {
+                set_flag(&itype->rtype->flags, RTF_LIMITED, child->type == cJSON_True);
+            }
+            else if (strcmp(child->string, "pooled") == 0) {
+                set_flag(&itype->rtype->flags, RTF_POOLED, child->type == cJSON_True);
+            }
+            else {
+                log_error("item %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_Number:
             if (strcmp(child->string, "weight") == 0) {
                 itype->weight = child->valueint;
-                break;
             }
-            if (strcmp(child->string, "capacity") == 0) {
+            else if (strcmp(child->string, "capacity") == 0) {
                 itype->capacity = child->valueint;
-                break;
             }
-            log_error("item %s contains unknown attribute %s", json->string, child->string);
+            else {
+                log_error("item %s contains unknown attribute %s", json->string, child->string);
+            }
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
                 itype->flags = json_flags(child, flags);
                 break;
             }
-            log_error("item %s contains unknown attribute %s", json->string, child->string);
+            else {
+                log_error("item %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_Object:
-            if (strcmp(child->string, "weapon") == 0) {
+            if (strcmp(child->string, "construction") == 0) {
+                itype->construction = calloc(1, sizeof(construction));
+                if (!itype->construction) abort();
+                json_construction(child, itype->construction);
+            }
+            else if (strcmp(child->string, "weapon") == 0) {
                 weapon_type* wtype = itype->rtype->wtype;
                 if (!wtype) {
                     wtype = itype->rtype->wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
                 }
                 json_weapon(child, wtype);
-                break;
             }
+            else {
+                log_error("item %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         default:
             log_error("item %s contains unknown attribute %s", json->string, child->string);
         }
+    }
+    if (itype->construction) {
+        rmt_create(itype->rtype);
     }
 }
 

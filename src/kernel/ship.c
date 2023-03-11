@@ -48,14 +48,33 @@ static critbit_tree cb_shiptypes; /* use this trie instead */
 
 static local_names *snames;
 
-const ship_type *findshiptype(const char *name, const struct locale *lang)
+void free_snames()
 {
-    local_names *sn = snames;
-    variant var;
+    while (snames) {
+        local_names* sn = snames;
+        snames = snames->next;
+        if (sn->names) {
+            freetokens(sn->names);
+        }
+        free(sn);
+    }
+}
+
+static local_names* get_snames(const struct locale* lang)
+{
+    local_names* sn = snames;
 
     while (sn && sn->lang != lang) {
         sn = sn->next;
     }
+    return sn;
+}
+
+const ship_type *findshiptype(const char *name, const struct locale *lang)
+{
+    local_names *sn = get_snames(lang);
+    variant var;
+
     if (!sn) {
         selist *ql;
         int qi;
@@ -67,10 +86,12 @@ const ship_type *findshiptype(const char *name, const struct locale *lang)
 
         for (qi = 0, ql = shiptypes; ql; selist_advance(&ql, &qi, 1)) {
             ship_type *stype = (ship_type *)selist_get(ql, qi);
-            variant var2;
             const char *n = LOC(lang, stype->_name);
-            var2.v = (void *)stype;
-            addtoken((struct tnode **)&sn->names, n, var2);
+            if (n) {
+                variant var2;
+                var2.v = (void*)stype;
+                addtoken((struct tnode**)&sn->names, n, var2);
+            }
         }
         snames = sn;
     }
@@ -112,7 +133,6 @@ static void st_register(ship_type *stype) {
 
 ship_type *st_get_or_create(const char * name) {
     ship_type * st = st_find_i(name);
-    assert(!snames);
     if (!st) {
         st = (ship_type *)calloc(1, sizeof(ship_type));
         if (!st) abort();
@@ -280,6 +300,7 @@ static void free_shiptype(void *ptr) {
 }
 
 void free_shiptypes(void) {
+    free_snames();
     cb_clear(&cb_shiptypes);
     selist_foreach(shiptypes, free_shiptype);
     selist_free(shiptypes);

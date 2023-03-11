@@ -233,7 +233,7 @@ item_type *it_get_or_create(resource_type *rtype) {
         itype->rtype = rtype;
         rtype->uchange = res_changeitem;
         rtype->itype = itype;
-        rtype->flags |= RTF_ITEM;
+        rtype->flags |= RTF_ITEM|RTF_POOLED;
     }
     return rtype->itype;
 }

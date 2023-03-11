@@ -241,7 +241,9 @@ static void free_bnames(void) {
     while (bnames) {
         local_names *bn = bnames;
         bnames = bnames->next;
-        freetokens(bn->names);
+        if (bn->names) {
+            freetokens(bn->names);
+        }
         free(bn);
     }
 }

@@ -16,6 +16,7 @@
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
+#include "kernel/resources.h"
 #include "kernel/ship.h"
 #include "kernel/spell.h"
 #include "kernel/skill.h"     // for get_skill, skill_enabled, SK_ALCHEMY
@@ -243,7 +244,8 @@ static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
         "\"axe\" : { \"weight\" : 2, \"weapon\": { \"skill\": \"crossbow\", \"damage\" : \"2d4\" } },"
-        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20 }"
+        "\"iron\" : { \"weight\" : 50, \"construction\": { \"skill\": \"mining\", \"minskill\" : 1 }, \"limited\" : true },"
+        "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20, \"pooled\" : false }"
         "}}";
     cJSON *json = cJSON_Parse(data);
     const item_type * itype;
@@ -260,13 +262,29 @@ static void test_items(CuTest * tc)
     itype = it_find("axe");
     CuAssertPtrNotNull(tc, itype);
     CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertIntEquals(tc, RTF_POOLED | RTF_ITEM, itype->rtype->flags);
     CuAssertPtrNotNull(tc, itype->rtype->wtype);
     CuAssertIntEquals(tc, SK_CROSSBOW, itype->rtype->wtype->skill);
     CuAssertIntEquals(tc, 2, itype->weight);
     CuAssertIntEquals(tc, 0, itype->flags);
 
+    itype = it_find("iron");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertIntEquals(tc, RTF_LIMITED | RTF_POOLED | RTF_ITEM, itype->rtype->flags);
+    CuAssertPtrNotNull(tc, itype->rtype->raw);
+    CuAssertPtrEquals(tc, itype->rtype, (void *)itype->rtype->raw->rtype);
+    CuAssertPtrEquals(tc, NULL, itype->rtype->wtype);
+    CuAssertPtrNotNull(tc, itype->construction);
+    CuAssertIntEquals(tc, SK_MINING, itype->construction->skill);
+    CuAssertIntEquals(tc, 1, itype->construction->minskill);
+    CuAssertIntEquals(tc, 50, itype->weight);
+    CuAssertIntEquals(tc, 0, itype->flags);
+
     itype = it_find("horse");
     CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertIntEquals(tc, RTF_ITEM, itype->rtype->flags);
     CuAssertIntEquals(tc, 20, itype->capacity);
     CuAssertIntEquals(tc, ITF_ANIMAL | ITF_BIG, itype->flags);
 
