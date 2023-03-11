@@ -1079,7 +1079,7 @@ int make_cmd(unit * u, struct order *ord)
     const ship_type *stype = NULL;
     const item_type *itype = NULL;
     param_t p = NOPARAM;
-    int m = INT_MAX;
+    int want = INT_MAX;
     const char *s;
     const struct locale *lang = u->faction->locale;
 
@@ -1088,21 +1088,21 @@ int make_cmd(unit * u, struct order *ord)
 
     if (s) {
         char ibuf[16];
-        m = atoip(s);
-        sprintf(ibuf, "%d", m);
+        want = atoip(s);
+        sprintf(ibuf, "%d", want);
         if (strcmp(ibuf, (const char *)s) == 0) {
             /* a quantity was given */
             s = gettoken(token, sizeof(token));
         }
         else {
-            m = INT_MAX;
+            want = INT_MAX;
         }
         if (s) {
             p = get_param(s, u->faction->locale);
         }
     }
 
-    if (m <= 0) {
+    if (want <= 0) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", NULL));
         return 0;
     }
@@ -1116,7 +1116,7 @@ int make_cmd(unit * u, struct order *ord)
             s = gettoken(token, sizeof(token));
             direction_t d = s ? get_direction(s, u->faction->locale) : NODIRECTION;
             if (d != NODIRECTION) {
-                build_road(u, m, d);
+                build_road(u, want, d);
             }
             else {
                 /* Die Richtung wurde nicht erkannt */
@@ -1131,12 +1131,12 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            continue_ship(u, m);
+            continue_ship(u, want);
         }
         return 0;
     }
     else if (p == P_HERBS) {
-        herbsearch(u, m);
+        herbsearch(u, want);
         return 0;
     }
 
@@ -1187,7 +1187,7 @@ int make_cmd(unit * u, struct order *ord)
             cmistake(u, ord, 276, MSG_PRODUCE);
         }
         else {
-            create_ship(u, stype, m, ord);
+            create_ship(u, stype, want, ord);
         }
     }
     else if (btype != NOBUILDING) {
@@ -1197,14 +1197,14 @@ int make_cmd(unit * u, struct order *ord)
         }
         else if (btype->stages) {
             int id = getid();
-            build_building(u, btype, id, m, ord);
+            build_building(u, btype, id, want, ord);
         }
         else {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
     }
     else if (itype != NULL) {
-        make_item(u, itype, m);
+        make_item(u, itype, want);
     }
     else {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_cannotmake", NULL));
