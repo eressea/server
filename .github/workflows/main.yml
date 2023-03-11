@@ -32,11 +32,11 @@ jobs:
           luarocks install lunitx --local
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
       - name: Build and Test
-        uses: ashutoshvarma/action-cmake-build@master
+        uses: ashutoshvarma/action-cmake-build@v1
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
