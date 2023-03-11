@@ -127,9 +127,9 @@ extern "C" {
         int at_bonus;               /* Veraendert den Angriffsskill (default: 0) */
         int df_bonus;               /* Veraendert den Verteidigungskill (default: 0) */
         signed char *study_speed;   /* study-speed-bonus in points/turn (0=30 Tage) */
-        int flags;
-        int battle_flags;
-        int ec_flags;
+        unsigned int flags;
+        unsigned int battle_flags;
+        unsigned int ec_flags;
         int mask_item;
         struct att attack[RACE_ATTACKS];
         signed char bonus[MAXSKILLS];
