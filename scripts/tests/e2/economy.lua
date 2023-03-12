@@ -151,3 +151,39 @@ function test_sawmill()
     assert_equal(6, u:get_item("log"))
     assert_equal(97, r:get_resource("tree"))
 end
+
+function test_bug_2361_forget_magic()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local uf = unit.create(f, r, 1)
+    u:clear_orders()
+    u:add_order("VERGESSE Magie")
+    u:set_skill('magic', 5)
+    uf.race = 'lynx'
+    u.familiar = uf
+    process_orders()
+    assert_equal(0, u:get_skill('magic'))
+    assert_nil(u.familiar)
+    -- without a mage, familiars become ghosts:
+    assert_equal('ghost', uf.race_name)
+    assert_equal(0, uf:get_skill('magic'))
+end
+
+function test_bug_2361_familiar_cannot_forget_magic_()
+    -- https://bugs.eressea.de/view.php?id=2361
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    local uf = unit.create(f, r, 1)
+    u:clear_orders()
+    u:set_skill('magic', 5)
+    uf.race = 'lynx'
+    uf:clear_orders()
+    uf:add_order("VERGESSE Magie")
+    uf:set_skill('magic', 5)
+    u.familiar = uf
+    process_orders()
+    -- familiars cannot forget magic:
+    assert_equal(5, uf:get_skill('magic'))
+end
