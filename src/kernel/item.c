@@ -775,6 +775,17 @@ attrib_type at_showitem = {
     "showitem"
 };
 
+static void add_itemname(critbit_tree* cb, const char *name, const resource_type* rtype)
+{
+    char buffer[128];
+    if (transliterate(buffer, sizeof(buffer), name)) {
+        size_t len = strlen(buffer);
+        assert(len + sizeof(rtype->itype) < sizeof(buffer));
+        len = cb_new_kv(buffer, len, &rtype->itype, sizeof(rtype->itype), buffer);
+        cb_insert(cb, buffer, len);
+    }
+}
+
 static int add_itemname_cb(void * match, const void * key,
     size_t keylen, void *data)
 {
@@ -783,17 +794,11 @@ static int add_itemname_cb(void * match, const void * key,
     resource_type *rtype = ((rt_entry *)match)->value;
 
     if (rtype->itype) {
-        int i;
-        for (i = 0; i != 2; ++i) {
-            char buffer[128];
-            const char * name = LOC(lang, resourcename(rtype, (i == 0) ? 0 : NMF_PLURAL));
-
-            if (name && transliterate(buffer, sizeof(buffer), name)) {
-                size_t len = strlen(buffer);
-                assert(len + sizeof(rtype->itype) < sizeof(buffer));
-                len = cb_new_kv(buffer, len, &rtype->itype, sizeof(rtype->itype), buffer);
-                cb_insert(cb, buffer, len);
-            }
+        const char* singular = LOC(lang, resourcename(rtype, 0));
+        if (singular) {
+            const char* plural = LOC(lang, resourcename(rtype, NMF_PLURAL));
+            add_itemname(cb, singular, rtype);
+            add_itemname(cb, plural ? plural : singular, rtype);
         }
     }
     return 0;
