@@ -496,6 +496,7 @@ static void json_weapon(cJSON* json, weapon_type* wtype) {
 
 static void json_item(cJSON *json, item_type *itype) {
     cJSON *child;
+    bool is_material = false;
     const char *flags[] = {
         "herb", "cursed", "nodrop", "big", "animal", "vehicle", NULL
     };
@@ -508,6 +509,10 @@ static void json_item(cJSON *json, item_type *itype) {
         switch (child->type) {
         case cJSON_True:
         case cJSON_False:
+            if (strcmp(child->string, "material") == 0) {
+                is_material = (child->type == cJSON_True);
+                break;
+            }
             for (f = 0; flags[f]; ++f) {
                 if (strcmp(child->string, flags[f]) == 0) {
                     set_flag(&itype->flags, 1 << f, child->type == cJSON_True);
@@ -567,7 +572,7 @@ static void json_item(cJSON *json, item_type *itype) {
             log_error("item %s contains unknown attribute %s", json->string, child->string);
         }
     }
-    if (itype->construction) {
+    if (is_material) {
         rmt_create(itype->rtype);
     }
 }

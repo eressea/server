@@ -253,7 +253,8 @@ static void test_items(CuTest * tc)
 {
     const char * data = "{\"items\": { "
         "\"crossbow\" : { \"weight\" : 2, \"weapon\": { \"skill\": \"crossbow\", \"damage\" : \"2d4\", \"pierce\" : true } },"
-        "\"iron\" : { \"weight\" : 50, \"construction\": { \"skill\": \"mining\", \"minskill\" : 1 }, \"limited\" : true },"
+        "\"iron\" : { \"weight\" : 50, \"construction\": { \"skill\": \"mining\", \"minskill\" : 1 }, \"limited\" : true, \"material\" : true },"
+        "\"log\" : { \"weight\" : 50, \"construction\": { \"skill\": \"forestry\", \"minskill\" : 1 }, \"limited\" : true },"
         "\"horse\" : { \"flags\" : [ \"animal\", \"big\" ], \"capacity\" : 20, \"pooled\" : true },"
         "\"unicorn\" : { \"animal\" : true, \"big\" : true, \"capacity\" : 20, \"pooled\" : false }"
         "}}";
@@ -291,6 +292,12 @@ static void test_items(CuTest * tc)
     CuAssertIntEquals(tc, 1, itype->construction->minskill);
     CuAssertIntEquals(tc, 50, itype->weight);
     CuAssertIntEquals(tc, 0, itype->flags);
+
+    itype = it_find("log");
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrNotNull(tc, itype->rtype);
+    CuAssertPtrNotNull(tc, itype);
+    CuAssertPtrEquals(tc, NULL, itype->rtype->raw);
 
     itype = it_find("horse");
     CuAssertPtrNotNull(tc, itype);
