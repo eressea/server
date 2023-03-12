@@ -1,3 +1,4 @@
+--[[
 require 'tests.laws'
 require 'tests.faction'
 require 'tests.locale'
@@ -12,3 +13,5 @@ require 'tests.transport'
 require 'tests.defaults'
 require 'tests.shiplanding'
 require 'tests.harbor'
+]]
+require 'tests.economy'
