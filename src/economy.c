@@ -1693,7 +1693,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
 
-    if (get_param(s, u->faction->locale) == P_ANY) {
+    if (isparam(s, u->faction->locale, P_ANY)) {
         unlimited = false;
         n = rpeasants(r) / TRADE_FRACTION;
         if (r->terrain == newterrain(T_DESERT)
