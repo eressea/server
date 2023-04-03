@@ -980,10 +980,10 @@ static void test_cycle_route(CuTest *tc) {
     test_teardown();
 }
 
-static void test_sailing_sets_coast(CuTest *tc) {
-    unit *u;
-    region *r1, *r2;
-    ship_type *stype;
+static void test_sailing_sets_coast(CuTest* tc) {
+    unit* u;
+    region* r1, * r2;
+    ship_type * stype;
 
     test_setup();
     r2 = test_create_plain(0, 0);
@@ -1103,6 +1103,7 @@ static void test_sail_into_harbour(CuTest* tc) {
     building_set_owner(u2);
     move_cmd(u, ord);
     CuAssertPtrNotNullMsg(tc, "entry into harbor denied", test_find_messagetype(f->msgs, "harbor_denied"));
+    CuAssertIntEquals(tc, NODIRECTION, u->ship->coast);
     CuAssertIntEquals(tc, 0, u->ship->damage);
     CuAssertPtrEquals(tc, r1, u->region);
     test_clear_messages(f);
@@ -1111,6 +1112,7 @@ static void test_sail_into_harbour(CuTest* tc) {
     u->thisorder = create_order(K_MOVE, f->locale, "WEST");
     move_cmd(u, ord);
     CuAssertPtrEquals_Msg(tc, "harbor master makes contact", NULL, test_find_messagetype(f->msgs, "harbor_denied"));
+    CuAssertIntEquals(tc, NODIRECTION, u->ship->coast);
     CuAssertIntEquals(tc, 0, u->ship->damage);
     CuAssertPtrEquals(tc, r2, u->region);
     test_clear_messages(f);
@@ -1337,6 +1339,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_trolls_pull_carts);
     SUITE_ADD_TEST(suite, test_sailing_sets_coast);
     SUITE_ADD_TEST(suite, test_leave_coast_direction);
+    SUITE_ADD_TEST(suite, test_sailing_sets_coast);
     SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
