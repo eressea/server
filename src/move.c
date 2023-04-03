@@ -1839,6 +1839,7 @@ static void sail(unit * u, order * ord, bool drifting)
     faction *f = u->faction;
     region *next_point = NULL;
     int error;
+    int reason = SA_DENIED;
     bool storms_enabled = drifting && (config_get_int("rules.ship.storms", 1) != 0);
     double damage_storm = storms_enabled ? config_get_flt("rules.ship.damage_storm", 0.02) : 0.0;
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
@@ -1886,7 +1887,6 @@ static void sail(unit * u, order * ord, bool drifting)
         }
 
         if (!flying_ship(sh)) {
-            int reason;
             if (storms_enabled) {
                 int stormchance = 0;
                 int stormyness;
@@ -2053,7 +2053,12 @@ static void sail(unit * u, order * ord, bool drifting)
             free_order(norder);
         }
         if (route) {
-            set_coast(sh, last_point, current_point);
+	        if (reason != SA_HARBOUR_ALLOWED) {
+	            set_coast(sh, last_point, current_point);
+	        }
+	        else {
+	            sh->coast = NODIRECTION;
+	        }
             if (is_cursed(sh->attribs, &ct_flyingship)) {
                 ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
                     starting_point, current_point));
