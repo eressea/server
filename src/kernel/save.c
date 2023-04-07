@@ -447,6 +447,11 @@ unit *read_unit(gamedata *data)
 
     READ_TOK(data->store, rname, sizeof(rname));
     rc = rc_find(rname);
+    if (!rc) {
+        log_error("%s is a unit of unknown race %s", unitname(u), rname);
+        rc = rc_find("template");
+        set_racename(&u->attribs, rname);
+    }
     assert(rc);
     u_setrace(u, rc);
 
