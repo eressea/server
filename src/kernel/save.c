@@ -447,6 +447,11 @@ unit *read_unit(gamedata *data)
 
     READ_TOK(data->store, rname, sizeof(rname));
     rc = rc_find(rname);
+    if (!rc) {
+        log_error("%s is a unit of unknown race %s", unitname(u), rname);
+        rc = rc_find("template");
+        set_racename(&u->attribs, rname);
+    }
     assert(rc);
     u_setrace(u, rc);
 
@@ -535,10 +540,12 @@ unit *read_unit(gamedata *data)
     read_attribs(data, &u->attribs, u);
     if (rc_demon) {
         if (rc == rc_smurf) {
-            assert(u->faction->race);
-            rc = u->faction->race;
-            log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, rc->_name);
-            restore_race(u, rc);
+            if (!is_familiar(u)) {
+                assert(u->faction->race);
+                rc = u->faction->race;
+                log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, rc->_name);
+                restore_race(u, rc);
+            }
         }
         else if (rc == rc_demon) {
             if (data->version < FIX_SHAPESHIFT_VERSION) {
