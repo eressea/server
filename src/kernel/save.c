@@ -548,9 +548,6 @@ unit *read_unit(gamedata *data)
             }
         }
         else if (rc == rc_demon) {
-            if (is_familiar(u)) {
-                log_error("%s was a %s familiar in %s faction %s", unitname(u), u->_race->_name, rc->_name, factionname(u->faction));
-            }
             if (data->version < FIX_SHAPESHIFT_VERSION) {
                 const char* zRace = get_racename(u->attribs);
                 if (zRace) {
