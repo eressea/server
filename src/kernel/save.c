@@ -535,12 +535,17 @@ unit *read_unit(gamedata *data)
     read_attribs(data, &u->attribs, u);
     if (rc_demon) {
         if (rc == rc_smurf) {
-            assert(u->faction->race);
-            rc = u->faction->race;
-            log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, rc->_name);
-            restore_race(u, rc);
+            if (!is_familiar(u)) {
+                assert(u->faction->race);
+                rc = u->faction->race;
+                log_error("%s was a %s in a %s faction", unitname(u), u->_race->_name, rc->_name);
+                restore_race(u, rc);
+            }
         }
         else if (rc == rc_demon) {
+            if (is_familiar(u)) {
+                log_error("%s was a %s familiar in %s faction %s", unitname(u), u->_race->_name, rc->_name, factionname(u->faction));
+            }
             if (data->version < FIX_SHAPESHIFT_VERSION) {
                 const char* zRace = get_racename(u->attribs);
                 if (zRace) {
