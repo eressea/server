@@ -24,7 +24,6 @@
 #include <attributes/targetregion.h>
 #include <attributes/hate.h>
 #include <attributes/attributes.h>
-#include <races/races.h>
 #include <spells/borders.h>
 #include <spells/buildingcurse.h>
 #include <spells/regioncurse.h>
@@ -3256,7 +3255,7 @@ static int sp_summonundead(castorder * co)
     int force = (int)(co->force * 10);
     const race *race = get_race(RC_SKELETON);
 
-    if (!r->land || deathcount(r) == 0) {
+    if (!r->land) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order, "error_nograves",
             "target", r));
         return 0;
@@ -3264,7 +3263,8 @@ static int sp_summonundead(castorder * co)
 
     undead = 2 + lovar(force);
     dc = deathcount(r);
-    if (undead > dc) undead = dc;
+    if (dc <= 0) undead = 1;
+    else if (undead > dc) undead = dc;
 
     if (cast_level <= 8) {
         race = get_race(RC_SKELETON);
@@ -3277,7 +3277,7 @@ static int sp_summonundead(castorder * co)
     }
 
     u = create_unit(r, mage->faction, undead, race, 0, NULL, mage);
-    make_undead_unit(u);
+    u->flags |= UFL_ISNEW;
     skill_summoned(u, cast_level / 2);
 
     ADDMSG(&mage->faction->msgs, msg_message("summonundead_effect_1",

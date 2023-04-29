@@ -349,3 +349,50 @@ function test_astral_disruption_default_level()
     assert_nil(r5:get_curse("astralblock"))
     assert_equal(r, uh.region)
 end
+
+function test_summonundead()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("demon")
+    local u = unit.create(f, r)
+    u.magic = "draig"
+    u.aura = 200
+    u:set_skill("magic", 20)
+    u:add_spell("summonundead")
+    u:add_order('TARNE Goblin')
+    u:add_order('ZAUBERE "Maechte des Todes"')
+    process_orders()
+    local u3 = nil
+    for u2 in f.units do
+        if u2 ~= u then 
+            u3 = u2
+            break
+        end
+    end
+    assert_not_nil(string.find(u:show(), "Goblin"))
+    assert_not_nil(u3)
+    assert_nil(string.find(u3:show(), "Goblin"))
+end
+
+function test_courting()
+    local r = region.create(0, 0, "plain")
+    r:set_resource("peasant", 100)
+    local f = faction.create("demon")
+    local u = unit.create(f, r)
+    u.magic = "cerddor"
+    u.aura = 200
+    u:set_skill("magic", 20)
+    u:add_spell("courting")
+    u:add_order('TARNE Goblin')
+    u:add_order('ZAUBERE "Gesang des Werbens"')
+    process_orders()
+    local u3 = nil
+    for u2 in f.units do
+        if u2 ~= u then 
+            u3 = u2
+            break
+        end
+    end
+    assert_not_nil(string.find(u:show(), "Goblin"))
+    assert_not_nil(u3)
+    assert_not_nil(string.find(u3:show(), "Goblin"))
+end
