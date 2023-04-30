@@ -43,6 +43,8 @@
 
 #include <selist.h>
 
+#include <stb_ds.h>
+
 #include <lauxlib.h>
 #include <lua.h>
 #include <tolua.h>
@@ -557,6 +559,24 @@ static int tolua_unit_setskill(lua_State * L)
         if (rcmod) level -= u_race(u)->bonus[sk];
         set_level(u, sk, level);
         lua_pushinteger(L, level);
+        return 1;
+    }
+    return 0;
+}
+
+static int tolua_unit_get_skills(lua_State* L)
+{
+    unit* u = (unit*)tolua_tousertype(L, 1, NULL);
+    size_t len = arrlen(u->skills);
+    if (len > 0) {
+        unsigned int i;
+        lua_newtable(L);
+        for (i = 0; i != len; ++i) {
+            const skill* sv = u->skills + i;
+            lua_pushstring(L, skillnames[sv->id]);
+            lua_pushinteger(L, sv->level);
+            lua_rawset(L, -3);
+        }
         return 1;
     }
     return 0;
@@ -1089,6 +1109,7 @@ void tolua_unit_open(lua_State * L)
             tolua_function(L, "get_skill", tolua_unit_getskill);
             tolua_function(L, "eff_skill", tolua_unit_effskill);
             tolua_function(L, "set_skill", tolua_unit_setskill);
+            tolua_variable(L, "skills", tolua_unit_get_skills, NULL);
 
             tolua_function(L, "add_notice", tolua_unit_addnotice);
 
