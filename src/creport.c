@@ -333,13 +333,6 @@ cr_output_curses(struct stream *out, const faction * viewer, const void *obj, ob
     }
 }
 
-static void cr_output_curses_compat(FILE *F, const faction * viewer, const void *obj, objtype_t typ) {
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_output_curses(&strm, viewer, obj, typ);
-}
-
 static int cr_unit(variant var, const char *name, char *buffer, const void *userdata)
 {
     unit *u = (unit *)var.v;
@@ -1218,16 +1211,6 @@ void cr_output_resources(struct stream *out, const struct faction * f, const str
     }
 }
 
-static void cr_output_resources_compat(FILE *F, report_context * ctx,
-    region *r)
-{
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_output_resources(&strm, ctx->f, r, r->seen.mode);
-}
-
-
 static void
 cr_region_header(struct stream *out, int plid, int nx, int ny, int uid)
 {
@@ -1243,14 +1226,6 @@ cr_region_header(struct stream *out, int plid, int nx, int ny, int uid)
         snprintf(buf, sizeof(buf), "%d;id", uid);
         sputs(buf, out);
     }
-}
-
-static void cr_region_header_compat(FILE* F, int plid, int nx, int ny, int uid)
-{
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_region_header(&strm, plid, nx, ny, uid);
 }
 
 typedef struct travel_data {

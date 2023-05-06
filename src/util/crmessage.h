@@ -2,6 +2,8 @@
 #define H_UTIL_CRMESSAGE
 
 #include "variant.h"
+
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
