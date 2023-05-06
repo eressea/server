@@ -1,5 +1,5 @@
 $#undef tolua_reg_types
-$#define tolua_reg_types tolua_reg_types_config
+$#define tolua_reg_types tolua_reg_types_settings
 $#include <kernel/config.h>
 
 module eressea {

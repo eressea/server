@@ -1,6 +1,5 @@
 require 'tests.laws'
 require 'tests.faction'
-require 'tests.locale'
 require 'tests.movement'
 require 'tests.pool'
 require 'tests.regions'

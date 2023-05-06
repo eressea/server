@@ -7,6 +7,11 @@
 #ifndef __cplusplus
 #include <stdlib.h>
 #endif
+#ifdef __cplusplus
+ extern "C" int tolua_bnd_takeownership (lua_State* L); // from tolua_map.c
+#else
+ int tolua_bnd_takeownership (lua_State* L); /* from tolua_map.c */
+#endif
 #include <string.h>
 
 /* Exported function */
