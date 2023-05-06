@@ -1259,7 +1259,7 @@ typedef struct travel_data {
     int n;
 } travel_data;
 
-static void cb_cr_travelthru_ship(region *r, unit *u, void *cbdata) {
+static void cb_cr_travelthru_ship(const region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
     stream *out = data->out;
@@ -1272,7 +1272,7 @@ static void cb_cr_travelthru_ship(region *r, unit *u, void *cbdata) {
     }
 }
 
-static void cb_cr_travelthru_unit(region *r, unit *u, void *cbdata) {
+static void cb_cr_travelthru_unit(const region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
     stream *out = data->out;
@@ -1285,7 +1285,7 @@ static void cb_cr_travelthru_unit(region *r, unit *u, void *cbdata) {
     }
 }
 
-static void cr_output_travelthru(stream *out, const region *r, const faction *f) {
+static void cr_output_travelthru(stream *out, region *r, const faction *f) {
     /* describe both passed and inhabited regions */
     travel_data cbdata = { 0 };
     cbdata.f = f;
@@ -1305,7 +1305,7 @@ static void cr_output_region_compat(FILE* F, report_context* ctx, region* r)
 }
 
 void cr_output_region(struct stream* out, const struct faction* f,
-    const struct region* r, enum seen_mode mode)
+    struct region* r, enum seen_mode mode)
 {
     plane *pl = rplane(r);
     int plid = plane_id(pl), nx, ny;

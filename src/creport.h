@@ -15,7 +15,7 @@ void register_cr(void);
 
 int crwritemap(const char *filename);
 void cr_output_region(struct stream* out, const struct faction* f,
-    const struct region* r, enum seen_mode mode);
+    struct region* r, enum seen_mode mode);
 void cr_output_unit(struct stream *out, const struct faction *f,
     const struct unit * u, enum seen_mode mode);
 void cr_output_resources(struct stream *out, const struct faction *f,
