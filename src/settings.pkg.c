@@ -15,8 +15,8 @@
 #include <string.h>
 
 /* Exported function */
-int tolua_settings_open (lua_State* tolua_S);
-int luaopen_settings (lua_State* tolua_S);
+TOLUA_API int tolua_settings_open (lua_State* tolua_S);
+LUALIB_API int luaopen_settings (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_settings
@@ -27,7 +27,7 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
 }
 
-/* function: settings_set */
+/* function: config_set */
 static int tolua_settings_eressea_settings_set00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
@@ -55,7 +55,7 @@ static int tolua_settings_eressea_settings_set00(lua_State* tolua_S)
 #endif
 }
 
-/* function: settings_get */
+/* function: config_get */
 static int tolua_settings_eressea_settings_get00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
@@ -83,7 +83,7 @@ static int tolua_settings_eressea_settings_get00(lua_State* tolua_S)
 }
 
 /* Open lib function */
-int luaopen_settings (lua_State* tolua_S)
+LUALIB_API int luaopen_settings (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
@@ -101,7 +101,7 @@ int luaopen_settings (lua_State* tolua_S)
  return 1;
 }
 /* Open tolua function */
-int tolua_settings_open (lua_State* tolua_S)
+TOLUA_API int tolua_settings_open (lua_State* tolua_S)
 {
  lua_pushcfunction(tolua_S, luaopen_settings);
  lua_pushstring(tolua_S, "settings");

@@ -65,7 +65,7 @@ TOLUA_BINDING(config.pkg bind_config.h)
 TOLUA_BINDING(process.pkg bind_process.h)
 TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
-TOLUA_BINDING(settings.pkg kenel/config.h)
+TOLUA_BINDING(settings.pkg kernel/config.h)
 
 set (PARSER_SRC
   ${DB_SRC}
@@ -73,6 +73,13 @@ set (PARSER_SRC
   )
 
 set (ERESSEA_SRC
+  log.pkg.c
+  locale.pkg.c
+  config.pkg.c
+  process.pkg.c
+  game.pkg.c
+  eressea.pkg.c
+  settings.pkg.c
   vortex.c
   alchemy.c
   automate.c
@@ -193,11 +200,11 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${TOLUA_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${LUA_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
-target_include_directories (eressea PRIVATE ${TOLUA_INCLUDE_DIR})
-target_include_directories (eressea PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARY}

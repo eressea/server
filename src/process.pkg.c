@@ -7,11 +7,16 @@
 #ifndef __cplusplus
 #include <stdlib.h>
 #endif
+#ifdef __cplusplus
+ extern "C" int tolua_bnd_takeownership (lua_State* L); // from tolua_map.c
+#else
+ int tolua_bnd_takeownership (lua_State* L); /* from tolua_map.c */
+#endif
 #include <string.h>
 
 /* Exported function */
-int tolua_process_open (lua_State* tolua_S);
-int luaopen_process (lua_State* tolua_S);
+TOLUA_API int tolua_process_open (lua_State* tolua_S);
+LUALIB_API int luaopen_process (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_process
@@ -937,7 +942,7 @@ static int tolua_process_eressea_process_set_default00(lua_State* tolua_S)
 }
 
 /* Open lib function */
-int luaopen_process (lua_State* tolua_S)
+LUALIB_API int luaopen_process (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
@@ -991,7 +996,7 @@ int luaopen_process (lua_State* tolua_S)
  return 1;
 }
 /* Open tolua function */
-int tolua_process_open (lua_State* tolua_S)
+TOLUA_API int tolua_process_open (lua_State* tolua_S)
 {
  lua_pushcfunction(tolua_S, luaopen_process);
  lua_pushstring(tolua_S, "process");

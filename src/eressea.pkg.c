@@ -2,7 +2,7 @@
 ** Lua binding: eressea
 */
 
-#include <tolua.h>
+#include "tolua.h"
 
 #ifndef __cplusplus
 #include <stdlib.h>
@@ -15,12 +15,11 @@
 #include <string.h>
 
 /* Exported function */
-int tolua_eressea_open (lua_State* tolua_S);
-int luaopen_eressea (lua_State* tolua_S);
+TOLUA_API int tolua_eressea_open (lua_State* tolua_S);
+LUALIB_API int luaopen_eressea (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_eressea
-#include "bind_tolua.h"
 #include "bind_eressea.h"
 
 /* function to register type */
@@ -190,7 +189,7 @@ static int tolua_eressea_eressea_import00(lua_State* tolua_S)
 }
 
 /* Open lib function */
-int luaopen_eressea (lua_State* tolua_S)
+LUALIB_API int luaopen_eressea (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
@@ -209,7 +208,7 @@ int luaopen_eressea (lua_State* tolua_S)
  return 1;
 }
 /* Open tolua function */
-int tolua_eressea_open (lua_State* tolua_S)
+TOLUA_API int tolua_eressea_open (lua_State* tolua_S)
 {
  lua_pushcfunction(tolua_S, luaopen_eressea);
  lua_pushstring(tolua_S, "eressea");

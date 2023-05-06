@@ -15,8 +15,8 @@
 #include <string.h>
 
 /* Exported function */
-int tolua_game_open (lua_State* tolua_S);
-int luaopen_game (lua_State* tolua_S);
+TOLUA_API int tolua_game_open (lua_State* tolua_S);
+LUALIB_API int luaopen_game (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_game
@@ -162,7 +162,7 @@ static int tolua_game_eressea_game_import00(lua_State* tolua_S)
 }
 
 /* Open lib function */
-int luaopen_game (lua_State* tolua_S)
+LUALIB_API int luaopen_game (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
@@ -183,7 +183,7 @@ int luaopen_game (lua_State* tolua_S)
  return 1;
 }
 /* Open tolua function */
-int tolua_game_open (lua_State* tolua_S)
+TOLUA_API int tolua_game_open (lua_State* tolua_S)
 {
  lua_pushcfunction(tolua_S, luaopen_game);
  lua_pushstring(tolua_S, "game");
