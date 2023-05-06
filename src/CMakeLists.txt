@@ -49,12 +49,23 @@ macro(ADD_LUA_MODULE MODULE_NAME FILES)
   )
 endmacro(ADD_LUA_MODULE)
 
+set (_TOLUA_FILES
+  log.pkg.c
+  locale.pkg.c
+  config.pkg.c
+  process.pkg.c
+  game.pkg.c
+  eressea.pkg.c
+  settings.pkg.c
+)
+
+if (TOLUA_EXECUTABLE)
 macro(TOLUA_BINDING PKGFILE FILES)
   add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c
     DEPENDS ${FILES} ${PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
-    ARGS -o ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c ${PKGFILE}
+    ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c ${PKGFILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
   )
 endmacro(TOLUA_BINDING)
@@ -67,19 +78,21 @@ TOLUA_BINDING(game.pkg bind_eressea.h config.h)
 TOLUA_BINDING(eressea.pkg bind_eressea.h)
 TOLUA_BINDING(settings.pkg kernel/config.h)
 
+FOREACH(_FILE ${_TOLUA_FILES})
+    LIST(APPEND _SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${_FILE})
+ENDFOREACH(_FILE)
+SET(TOLUA_SRC ${_SOURCES})
+else(TOLUA_EXECUTABLE)
+SET(TOLUA_SRC ${_TOLUA_FILES})
+endif(TOLUA_EXECUTABLE)
+
 set (PARSER_SRC
   ${DB_SRC}
   ${UTIL_SRC}
-  )
+)
 
 set (ERESSEA_SRC
-  log.pkg.c
-  locale.pkg.c
-  config.pkg.c
-  process.pkg.c
-  game.pkg.c
-  eressea.pkg.c
-  settings.pkg.c
+  ${TOLUA_SRC}
   vortex.c
   alchemy.c
   automate.c
