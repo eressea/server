@@ -299,6 +299,21 @@ static int cr_get_int(stream *strm, const char *match, int def)
     return def;
 }
 
+static bool cr_find_text(stream* strm, const char* match)
+{
+    char line[1024];
+    size_t len = strlen(match);
+
+    strm->api->rewind(strm->handle);
+    while (strm->api->readln(strm->handle, line, sizeof(line)) == 0) {
+        const char* pos = strstr(line, match);
+        if (pos) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static bool cr_find_string(stream *strm, const char *match, const char *value)
 {
     char line[1024];
@@ -503,7 +518,31 @@ static void test_cr_factionstealth(CuTest *tc) {
     test_teardown();
 }
 
-CuSuite *get_creport_suite(void)
+static void test_cr_borders(CuTest* tc) {
+    stream strm;
+    faction* f;
+    region* r;
+
+    test_setup();
+    test_create_plain(0, 0);
+    f = test_create_faction();
+    r = test_create_plain(1, 0);
+    rsetroad(r, D_WEST, 100);
+    
+    mstream_init(&strm);
+    cr_output_region(&strm, f, r, seen_unit);
+    CuAssertTrue(tc, cr_find_text(&strm, "GRENZE"));
+    mstream_done(&strm);
+
+    mstream_init(&strm);
+    cr_output_region(&strm, f, r, seen_lighthouse_land);
+    CuAssertTrue(tc, cr_find_text(&strm, "GRENZE"));
+    mstream_done(&strm);
+
+    test_teardown();
+}
+
+CuSuite* get_creport_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_cr_unit);
@@ -512,5 +551,6 @@ CuSuite *get_creport_suite(void)
     SUITE_ADD_TEST(suite, test_cr_mallorn);
     SUITE_ADD_TEST(suite, test_cr_hiderace);
     SUITE_ADD_TEST(suite, test_cr_factionstealth);
+    SUITE_ADD_TEST(suite, test_cr_borders);
     return suite;
 }

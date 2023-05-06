@@ -1101,7 +1101,7 @@ void report_region(struct stream *out, const region * r, faction * f)
             int e;
             struct edge *match = NULL;
             bool transparent = b->type->transparent(b, f);
-            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
+            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE, NULL);
 
             if (!transparent) {
                 see[d] = false;

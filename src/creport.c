@@ -190,6 +190,41 @@ static void print_items(FILE * F, item * items, const struct locale *lang)
     }
 }
 
+static void creport_block(struct stream* out, const char* name)
+{
+    assert(name);
+    sputs(name, out);
+}
+
+static void creport_block_1(struct stream* out, const char* name, long i)
+{
+    assert(name);
+    stream_printf(out, "%s %ld\n", name, i);
+}
+
+static void creport_block_2(struct stream* out, const char* name, long i, long j)
+{
+    assert(name);
+    stream_printf(out, "%s %ld\n", name, i, j);
+}
+
+static void creport_tag(struct stream* out, const char* key, const char* value)
+{
+    assert(value);
+    if (key) {
+        stream_printf(out, "\"%s\";%s\n", value, key);
+    }
+    else {
+        stream_printf(out, "\"%s\"\n", value);
+    }
+}
+
+static void creport_tag_int(struct stream* out, const char* key, long value)
+{
+    assert(key);
+    stream_printf(out, "%ld;%s\n", value, key);
+}
+
 static void
 cr_output_curses(struct stream *out, const faction * viewer, const void *obj, objtype_t typ)
 {
@@ -514,72 +549,79 @@ static int message_id(const struct message *msg)
 /** writes a quoted string to the file
 * no trailing space, since this is used to make the creport.
 */
-static int fwritestr(FILE * F, const char *str)
+static int write_quoted(stream* out, const char* str)
 {
     int nwrite = 0;
-    fputc('\"', F);
-    if (str)
+    swrite("\"", 1, 1, out);
+    if (str) {
         while (*str) {
-            int c = (int)(unsigned char)*str++;
+            char c = (char)*str++;
             switch (c) {
             case '"':
             case '\\':
-                fputc('\\', F);
-                fputc(c, F);
+                swrite("\\", 1, 1, out);
+                swrite(&c, 1, 1, out);
                 nwrite += 2;
                 break;
             case '\n':
-                fputc('\\', F);
-                fputc('n', F);
+                swrite("\\n", 1, 2, out);
                 nwrite += 2;
                 break;
             default:
-                fputc(c, F);
+                swrite(&c, 1, 1, out);
                 ++nwrite;
             }
         }
-    fputc('\"', F);
+    }
+    swrite("\"", 1, 1, out);
     return nwrite + 2;
 }
 
-static void render_messages(FILE * F, faction * f, message_list * msgs)
+static void render_messages(stream *out, const faction * f, message_list * msgs)
 {
-    struct mlist *m = msgs->begin;
-    while (m) {
-        bool printed = false;
-        const struct message_type *mtype = m->msg->type;
-        unsigned int hash = mtype->key;
-        g_bigbuf[0] = '\0';
-        if (nr_render(m->msg, f->locale, g_bigbuf, sizeof(g_bigbuf), f) > 0) {
-            fprintf(F, "MESSAGE %d\n", message_id(m->msg));
-            fprintf(F, "%u;type\n", hash);
-            if (m->msg->type->section) {
-                fprintf(F, "\"%s\";section\n", m->msg->type->section);
-            }
-            fwritestr(F, g_bigbuf);
-            fputs(";rendered\n", F);
-            printed = true;
-        }
-        g_bigbuf[0] = '\0';
-        if (cr_render(m->msg, g_bigbuf, (const void *)f) == 0) {
-            if (g_bigbuf[0]) {
-                if (!printed) {
-                    fprintf(F, "MESSAGE %d\n", message_id(m->msg));
+    if (msgs) {
+        struct mlist* m = msgs->begin;
+        while (m) {
+            bool printed = false;
+            const struct message_type* mtype = m->msg->type;
+            unsigned int hash = mtype->key;
+            size_t bytes;
+            g_bigbuf[0] = '\0';
+            if (nr_render(m->msg, f->locale, g_bigbuf, sizeof(g_bigbuf), f) > 0) {
+                creport_block_1(out, "MESSAGE", message_id(m->msg));
+                creport_tag_int(out, "type", hash);
+                if (m->msg->type->section) {
+                    creport_tag(out, "section", m->msg->type->section);
                 }
-                fputs(g_bigbuf, F);
+                write_quoted(out, g_bigbuf);
+                sputs(";rendered", out);
+                printed = true;
             }
+            g_bigbuf[0] = '\0';
+            bytes = cr_render(m->msg, g_bigbuf, (const void*)f);
+            if (bytes > 0) {
+                if (g_bigbuf[0]) {
+                    if (!printed) {
+                        creport_block_1(out, "MESSAGE", message_id(m->msg));
+                    }
+                    swrite(g_bigbuf, 1, bytes, out);
+                }
+            }
+            else {
+                log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
+            }
+            m = m->next;
         }
-        else {
-            log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
-        }
-        m = m->next;
     }
 }
 
-static void cr_output_messages(FILE * F, message_list * msgs, faction * f)
+static void render_messages_compat(FILE* F, message_list * msgs, faction * f)
 {
-    if (msgs)
-        render_messages(F, f, msgs);
+    if (msgs) {
+        stream strm;
+        fstream_init(&strm, F);
+        render_messages(&strm, f, msgs);
+    }
 }
 
 static void cr_output_battles(FILE * F, faction * f)
@@ -598,13 +640,13 @@ static void cr_output_battles(FILE * F, faction * f)
         else {
             fprintf(F, "BATTLE %d %d %d\n", nx, ny, plid);
         }
-        cr_output_messages(F, bm->msgs, f);
+        render_messages_compat(F, bm->msgs, f);
     }
 }
 
 /* prints a building */
-static void cr_output_building(struct stream *out, building *b, 
-    const unit *owner, int fno, faction *f)
+static void cr_output_building(struct stream *out, const building *b, 
+    const unit *owner, int fno, const faction *f)
 {
     const char *bname, *billusion;
 
@@ -637,15 +679,6 @@ static void cr_output_building(struct stream *out, building *b,
     }
 
     cr_output_curses(out, f, b, TYP_BUILDING);
-}
-
-static void cr_output_building_compat(FILE *F, building *b,
-    const unit *owner, int fno, faction *f)
-{
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_output_building(&strm, b, owner, fno, f);
 }
 
 /* = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  */
@@ -694,15 +727,6 @@ static void cr_output_ship(struct stream *out, const ship *sh, const unit *u,
     cr_output_curses(out, f, sh, TYP_SHIP);
 }
 
-static void cr_output_ship_compat(FILE *F, const ship *sh, const unit *u,
-    int fcaptain, const faction *f, const region *r)
-{
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_output_ship(&strm, sh, u, fcaptain, f, r);
-}
-
 static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 {
     spellbook * book = unit_get_spellbook(u);
@@ -738,8 +762,8 @@ int level_days(unsigned int level)
 * @param f observers faction
 * @param u unit to report
 */
-void cr_output_unit(stream *out, const faction * f,
-    const unit * u, seen_mode mode)
+void cr_output_unit(struct stream *out, const struct faction * f,
+    const struct unit * u, enum seen_mode mode)
 {
     /* Race attributes are always plural and item attributes always
      * singular */
@@ -964,15 +988,6 @@ void cr_output_unit(stream *out, const faction * f,
     cr_output_curses(out, f, u, TYP_UNIT);
 }
 
-static void cr_output_unit_compat(FILE * F, const faction * f,
-    const unit * u, int mode)
-{
-    /* TODO: eliminate this function */
-    stream strm;
-    fstream_init(&strm, F);
-    cr_output_unit(&strm, f, u, mode);
-}
-
 static void print_ally(const faction *f, faction *af, int status, FILE *F) {
     if (af && status > 0) {
         fprintf(F, "ALLIANZ %d\n", af->no);
@@ -1119,7 +1134,7 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
 }
 
 static void
-cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
+cr_borders(stream *out, const region * r, const faction * f)
 {
     direction_t d;
     int g = 0;
@@ -1147,17 +1162,15 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
                 }
             }
             if (cs) {
-                const char *bname = border_name(b, r, f, GF_PURE);
-                bname = mkname("border", bname);
-                fprintf(F, "GRENZE %d\n", ++g);
-                fprintf(F, "\"%s\";typ\n", LOC(f->locale, bname));
-                fprintf(F, "%d;richtung\n", d);
+                creport_block_1(out, "GRENZE", ++g);
+                creport_tag(out, "typ", border_name(b, r, f, GF_PURE, f->locale));
+                creport_tag_int(out, "richtung", d);
                 if (!b->type->transparent(b, f))
-                    fputs("1;opaque\n", F);
+                    sputs("1;opaque", out);
                 /* hack: */
                 if (b->type == &bt_road && r->terrain->max_road) {
                     int p = rroad(r, d) * 100 / r->terrain->max_road;
-                    fprintf(F, "%d;prozent\n", p);
+                    creport_tag_int(out, "prozent", p);
                 }
             }
             b = b->next;
@@ -1165,7 +1178,7 @@ cr_borders(const region * r, const faction * f, seen_mode mode, FILE * F)
     }
 }
 
-void cr_output_resources(stream *out, const faction * f, const region *r, seen_mode mode)
+void cr_output_resources(struct stream *out, const struct faction * f, const struct region *r, enum seen_mode mode)
 {
     char *pos = g_bigbuf;
     resource_report result[MAX_RAWMATERIALS];
@@ -1216,64 +1229,84 @@ static void cr_output_resources_compat(FILE *F, report_context * ctx,
 
 
 static void
-cr_region_header(FILE * F, int plid, int nx, int ny, int uid)
+cr_region_header(struct stream *out, int plid, int nx, int ny, int uid)
 {
+    char buf[64];
     if (plid == 0) {
-        fprintf(F, "REGION %d %d\n", nx, ny);
+        snprintf(buf, sizeof(buf), "REGION %d %d", nx, ny);
     }
     else {
-        fprintf(F, "REGION %d %d %d\n", nx, ny, plid);
+        snprintf(buf, sizeof(buf), "REGION %d %d %d", nx, ny, plid);
     }
-    if (uid)
-        fprintf(F, "%d;id\n", uid);
+    sputs(buf, out);
+    if (uid) {
+        snprintf(buf, sizeof(buf), "%d;id", uid);
+        sputs(buf, out);
+    }
+}
+
+static void cr_region_header_compat(FILE* F, int plid, int nx, int ny, int uid)
+{
+    /* TODO: eliminate this function */
+    stream strm;
+    fstream_init(&strm, F);
+    cr_region_header(&strm, plid, nx, ny, uid);
 }
 
 typedef struct travel_data {
     const faction *f;
-    FILE *file;
+    struct stream *out;
     int n;
 } travel_data;
 
 static void cb_cr_travelthru_ship(region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
-    FILE *F = data->file;
+    stream *out = data->out;
 
     if (u->ship && travelthru_cansee(r, f, u)) {
         if (data->n++ == 0) {
-            fprintf(F, "DURCHSCHIFFUNG\n");
+            creport_block(out, "DURCHSCHIFFUNG");
         }
-        fprintf(F, "\"%s\"\n", shipname(u->ship));
+        creport_tag(out, shipname(u->ship), NULL);
     }
 }
 
 static void cb_cr_travelthru_unit(region *r, unit *u, void *cbdata) {
     travel_data *data = (travel_data *)cbdata;
     const faction *f = data->f;
-    FILE *F = data->file;
+    stream *out = data->out;
 
     if (!u->ship && travelthru_cansee(r, f, u)) {
         if (data->n++ == 0) {
-            fprintf(F, "DURCHREISE\n");
+            creport_block(out, "DURCHREISE");
         }
-        fprintf(F, "\"%s\"\n", unitname(u));
+        creport_tag(out, unitname(u), NULL);
     }
 }
 
-static void cr_output_travelthru(FILE *F, region *r, const faction *f) {
+static void cr_output_travelthru(stream *out, const region *r, const faction *f) {
     /* describe both passed and inhabited regions */
     travel_data cbdata = { 0 };
     cbdata.f = f;
-    cbdata.file = F;
+    cbdata.out = out;
     cbdata.n = 0;
     travelthru_map(r, cb_cr_travelthru_ship, &cbdata);
     cbdata.n = 0;
     travelthru_map(r, cb_cr_travelthru_unit, &cbdata);
 }
 
-static void cr_output_region(FILE * F, report_context * ctx, region * r)
+static void cr_output_region_compat(FILE* F, report_context* ctx, region* r)
 {
-    faction *f = ctx->f;
+    /* TODO: eliminate this function */
+    stream strm;
+    fstream_init(&strm, F);
+    cr_output_region(&strm, ctx->f, r, r->seen.mode);
+}
+
+void cr_output_region(struct stream* out, const struct faction* f,
+    const struct region* r, enum seen_mode mode)
+{
     plane *pl = rplane(r);
     int plid = plane_id(pl), nx, ny;
     const char *tname;
@@ -1309,97 +1342,98 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
         }
     }
     while (o--) {
-        cr_region_header(F, plid, oc[o][0], oc[o][1], uid);
-        fputs("\"wrap\";visibility\n", F);
+        cr_region_header(out, plid, oc[o][0], oc[o][1], uid);
+        sputs("\"wrap\";visibility", out);
     }
 
-    cr_region_header(F, plid, nx, ny, uid);
+    cr_region_header(out, plid, nx, ny, uid);
 
     if (r->land) {
         const char *str = rname(r, f->locale);
         if (str && str[0]) {
-            fprintf(F, "\"%s\";Name\n", str);
+            creport_tag(out, "Name", str);
         }
     }
     tname = terrain_name(r);
 
-    fprintf(F, "\"%s\";Terrain\n", translate(tname, LOC(f->locale, tname)));
-    if (r->seen.mode != seen_unit)
-        fprintf(F, "\"%s\";visibility\n", visibility[r->seen.mode]);
-    if (r->seen.mode > seen_neighbour) {
-        if (r->land && r->land->display && r->land->display[0])
-            fprintf(F, "\"%s\";Beschr\n", r->land->display);
+    creport_tag(out, "Terrain", translate(tname, LOC(f->locale, tname)));
+    if (mode != seen_unit) {
+        creport_tag(out, "visibility", visibility[mode]);
+    }
+    if (mode > seen_neighbour) {
+        if (r->land && r->land->display && r->land->display[0]) {
+            creport_tag(out, "Beschr", r->land->display);
+        }
         if (fval(r->terrain, LAND_REGION)) {
             assert(r->land);
-            fprintf(F, "%d;Bauern\n", rpeasants(r));
+            creport_tag_int(out, "Bauern", rpeasants(r));
 
-            if (r->seen.mode >= seen_travel) {
-                fprintf(F, "%d;Pferde\n", rhorses(r));
-                fprintf(F, "%d;Silber\n", rmoney(r));
+            if (mode >= seen_travel) {
+                creport_tag_int(out, "Pferde", rhorses(r));
+                creport_tag_int(out, "Silber", rmoney(r));
                 if (skill_enabled(SK_ENTERTAINMENT)) {
-                    fprintf(F, "%d;Unterh\n", entertainmoney(r));
+                    creport_tag_int(out, "Unterh", entertainmoney(r));
                 }
-                fprintf(F, "%d;Rekruten\n", max_recruits(r));
+                creport_tag_int(out, "Rekruten", max_recruits(r));
                 if (max_production(r)) {
                     /* Im CR steht der Bauernlohn, der bei Trauer nur 10 ist */
                     bool mourn = is_mourning(r, turn);
                     int p_wage = peasant_wage(r, mourn);
-                    fprintf(F, "%d;Lohn\n", p_wage);
+                    creport_tag_int(out, "Lohn", p_wage);
                     if (mourn) {
-                        fputs("1;mourning\n", F);
+                        sputs("1;mourning", out);
                     }
                 }
                 if (rule_region_owners()) {
                     faction *owner = region_get_owner(r);
                     if (owner) {
-                        fprintf(F, "%d;owner\n", owner->no);
+                        creport_tag_int(out, "owner", owner->no);
                     }
                 }
                 if (r->land && r->land->ownership) {
-                    fprintf(F, "%d;morale\n", region_get_morale(r));
+                    creport_tag_int(out, "morale", region_get_morale(r));
                 }
             }
 
             /* this writes both some tags (RESOURCECOMPAT) and a block.
              * must not write any blocks before it */
-            cr_output_resources_compat(F, ctx, r);
+            cr_output_resources(out, f, r, mode);
 
-            if (r->seen.mode >= seen_unit) {
+            if (mode >= seen_unit) {
                 /* trade */
                 if (markets_module() && r->land) {
                     const item_type *lux = r_luxury(r);
                     const item_type *herb = r->land->herbtype;
                     if (lux || herb) {
-                        fputs("PREISE\n", F);
+                        creport_block(out, "PREISE");
                         if (lux) {
                             const char *ch = resourcename(lux->rtype, 0);
-                            fprintf(F, "%d;%s\n", 1, translate(ch,
-                                LOC(f->locale, ch)));
+                            creport_tag_int(out, translate(ch, LOC(f->locale, ch)), 1);
                         }
                         if (herb) {
                             const char *ch = resourcename(herb->rtype, 0);
-                            fprintf(F, "%d;%s\n", 1, translate(ch,
-                                LOC(f->locale, ch)));
+                            creport_tag_int(out, translate(ch, LOC(f->locale, ch)), 1);
                         }
                     }
                 }
                 else if (rpeasants(r) / TRADE_FRACTION > 0) {
                     struct demand *dmd = r->land->demands;
-                    fputs("PREISE\n", F);
-                    while (dmd) {
-                        const char *ch = resourcename(dmd->type->itype->rtype, 0);
-                        fprintf(F, "%d;%s\n", (dmd->value
-                            ? dmd->value * dmd->type->price
-                            : -dmd->type->price),
-                            translate(ch, LOC(f->locale, ch)));
-                        dmd = dmd->next;
+                    if (dmd) {
+                        creport_block(out, "PREISE");
+                        while (dmd) {
+                            const char* ch = resourcename(dmd->type->itype->rtype, 0);
+                            creport_tag_int(out, translate(ch, LOC(f->locale, ch)), (dmd->value
+                                ? dmd->value * dmd->type->price
+                                : -dmd->type->price));
+                            dmd = dmd->next;
+                        }
                     }
                 }
             }
         }
-        cr_output_curses_compat(F, f, r, TYP_REGION);
+        cr_output_curses(out, f, r, TYP_REGION);
     }
-    cr_borders(r, f, r->seen.mode, F);
+    cr_borders(out, r, f);
     if (see_schemes(r)) {
         /* Sonderbehandlung Teleport-Ebene */
         region *rl[MAX_SCHEMES];
@@ -1415,20 +1449,20 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                 ny = r2->y;
                 pnormalize(&nx, &ny, plx);
                 adjust_coordinates(f, &nx, &ny, plx);
-                fprintf(F, "SCHEMEN %d %d\n", nx, ny);
-                fprintf(F, "\"%s\";Name\n", rname(r2, f->locale));
+                creport_block_2(out, "SCHEMEN", nx, ny);
+                creport_tag(out, "Name", rname(r2, f->locale));
             }
         }
     }
-    if (r->seen.mode >= seen_travel) {
+    if (mode >= seen_travel) {
         message_list *mlist = r_getmessages(r, f);
-        cr_output_messages(F, r->msgs, f);
+        render_messages(out, f, r->msgs);
         if (mlist) {
-            cr_output_messages(F, mlist, f);
+            render_messages(out, f, mlist);
         }
     }
-    if (r->seen.mode >= seen_lighthouse) {
-        cr_output_travelthru(F, r, f);
+    if (mode >= seen_lighthouse) {
+        cr_output_travelthru(out, r, f);
 
         /* buildings */
         if (r->buildings) {
@@ -1440,7 +1474,7 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                     const faction *sf = visible_faction(f, u, get_otherfaction(u));
                     fno = sf->no;
                 }
-                cr_output_building_compat(F, b, u, fno, f);
+                cr_output_building(out, b, u, fno, f);
             }
         }
 
@@ -1455,17 +1489,17 @@ static void cr_output_region(FILE * F, report_context * ctx, region * r)
                     fno = sf->no;
                 }
 
-                cr_output_ship_compat(F, sh, u, fno, f, r);
+                cr_output_ship(out, sh, u, fno, f, r);
             }
         }
 
         /* visible units */
         if (r->units) {
             unit *u;
-            int stealthmod = stealth_modifier(r, f, r->seen.mode);
+            int stealthmod = stealth_modifier(r, f, mode);
             for (u = r->units; u; u = u->next) {
-                if (visible_unit(u, f, stealthmod, r->seen.mode)) {
-                    cr_output_unit_compat(F, f, u, r->seen.mode);
+                if (visible_unit(u, f, stealthmod, mode)) {
+                    cr_output_unit(out, f, u, mode);
                 }
             }
         }
@@ -1631,7 +1665,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
         }
     }
 
-    cr_output_messages(F, f->msgs, f);
+    render_messages_compat(F, f->msgs, f);
     cr_output_battles(F, f);
 
     cr_find_address(F, f, ctx->addresses);
@@ -1654,7 +1688,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     /* traverse all regions */
     for (r = ctx->first; r != ctx->last; r = r->next) {
         if (r->seen.mode > seen_none) {
-            cr_output_region(F, ctx, r);
+            cr_output_region_compat(F, ctx, r);
         }
     }
     if (f->locale != crtag_locale()) {

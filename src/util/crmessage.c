@@ -111,14 +111,14 @@ void crt_register(const struct message_type *mtype)
     }
 }
 
-int cr_render(const message * msg, char *buffer, const void *userdata)
+size_t cr_render(const message * msg, char *buffer, const void *userdata)
 {
     int i;
     char *c = buffer;
     struct crmessage_type *crt = crt_find(msg->type);
 
     if (crt == NULL)
-        return -1;
+        return 0;
     for (i = 0; i != msg->type->nparameters; ++i) {
         if (crt->renderers[i] == NULL) {
             log_error("No renderer for argument %s:%s of \"%s\"\n", msg->type->pnames[i], msg->type->types[i]->name, msg->type->name);
@@ -130,7 +130,7 @@ int cr_render(const message * msg, char *buffer, const void *userdata)
         }
         c += strlen(c);
     }
-    return 0;
+    return c - buffer;
 }
 
 int cr_string(variant var, const char *name, char *buffer, const void *userdata)
