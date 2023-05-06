@@ -539,6 +539,11 @@ static void test_cr_borders(CuTest* tc) {
     CuAssertTrue(tc, cr_find_text(&strm, "GRENZE"));
     mstream_done(&strm);
 
+    mstream_init(&strm);
+    cr_output_region(&strm, f, r, seen_neighbour);
+    CuAssertTrue(tc, !cr_find_text(&strm, "GRENZE"));
+    mstream_done(&strm);
+
     test_teardown();
 }
 

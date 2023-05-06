@@ -1432,8 +1432,8 @@ void cr_output_region(struct stream* out, const struct faction* f,
             }
         }
         cr_output_curses(out, f, r, TYP_REGION);
+        cr_borders(out, r, f);
     }
-    cr_borders(out, r, f);
     if (see_schemes(r)) {
         /* Sonderbehandlung Teleport-Ebene */
         region *rl[MAX_SCHEMES];
