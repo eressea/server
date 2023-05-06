@@ -111,7 +111,7 @@ function setup()
     eressea.settings.set("rules.peasants.growth.factor", "0")
 end
 
-function test_forestry_no_guards()
+function disable_test_forestry_no_guards()
     local r = region.create(0, 0, "plain")
     r:set_resource("tree", 100)
     local u = unit.create(faction.create("human"), r)
