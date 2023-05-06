@@ -1816,7 +1816,7 @@ static void init_cb(travelthru_data *data, struct stream *out, char *buffer, siz
     data->counter = 0;
 }
 
-static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
+static void cb_write_travelthru(region *r, const unit *u, void *cbdata) {
     travelthru_data *data = (travelthru_data *)cbdata;
     const faction *f = data->f;
 

@@ -6,6 +6,7 @@
 #include <util/language.h>
 
 #include "kernel/build.h"         // for construction
+#include "kernel/direction.h"
 #include "kernel/skill.h"         // for SK_QUARRYING
 #include <kernel/ally.h>
 #include <kernel/faction.h>
@@ -302,8 +303,7 @@ static int cr_get_int(stream *strm, const char *match, int def)
 static bool cr_find_text(stream* strm, const char* match)
 {
     char line[1024];
-    size_t len = strlen(match);
-
+    
     strm->api->rewind(strm->handle);
     while (strm->api->readln(strm->handle, line, sizeof(line)) == 0) {
         const char* pos = strstr(line, match);
