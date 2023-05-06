@@ -60,23 +60,26 @@ set (_TOLUA_FILES
 )
 
 if (TOLUA_EXECUTABLE)
-macro(TOLUA_BINDING PKGFILE FILES)
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c
-    DEPENDS ${FILES} ${PKGFILE}
+  macro(TOLUA_BINDING _NAME _FILES)
+    set(_PKGFILE ${_NAME}.pkg)
+    set(_SRCFILE ${_PKGFILE}.c)
+    add_custom_command(
+      OUTPUT ${_SRCFILE}
+    DEPENDS ${_FILES}
+    MAIN_DEPENDENCY ${_PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
-    ARGS -o ${CMAKE_CURRENT_BINARY_DIR}/${PKGFILE}.c ${PKGFILE}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    ARGS -n ${_NAME} -o ${_SRCFILE} ${CMAKE_CURRENT_SOURCE_DIR}/${_PKGFILE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
 endmacro(TOLUA_BINDING)
 
-TOLUA_BINDING(log.pkg util/log.h)
-TOLUA_BINDING(locale.pkg bind_locale.h)
-TOLUA_BINDING(config.pkg bind_config.h)
-TOLUA_BINDING(process.pkg bind_process.h)
-TOLUA_BINDING(game.pkg bind_eressea.h config.h)
-TOLUA_BINDING(eressea.pkg bind_eressea.h)
-TOLUA_BINDING(settings.pkg kernel/config.h)
+TOLUA_BINDING(log util/log.h)
+TOLUA_BINDING(locale bind_locale.h)
+TOLUA_BINDING(config bind_config.h)
+TOLUA_BINDING(process bind_process.h)
+TOLUA_BINDING(game bind_eressea.h config.h)
+TOLUA_BINDING(eressea bind_eressea.h)
+TOLUA_BINDING(settings kernel/config.h)
 
 FOREACH(_FILE ${_TOLUA_FILES})
     LIST(APPEND _SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${_FILE})
