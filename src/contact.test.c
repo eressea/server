@@ -46,16 +46,15 @@ static void test_contact_cmd(CuTest *tc) {
     lang = u->faction->locale;
 
     u2 = test_create_unit(test_create_faction(), r);
-    ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
-        LOC(lang, parameters[P_UNIT]), u2->no);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %i", param_name(P_UNIT, lang), u2->no);
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
     free_order(ord);
 
     u2 = test_create_unit(test_create_faction(), r);
-    ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
-        LOC(lang, parameters[P_FACTION]), u2->faction->no);
+    ord = create_order(K_CONTACT, u->faction->locale, "%s %i", param_name(P_FACTION, lang),
+        u2->faction->no);
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
@@ -71,7 +70,7 @@ static void test_contact_cmd(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), r);
     usetalias(u2, 42);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
-        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
+        param_name(P_UNIT, lang), param_name(P_TEMP, lang), ualias(u2));
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
@@ -80,7 +79,7 @@ static void test_contact_cmd(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), r);
     usetalias(u2, 47);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
-        LOC(lang, parameters[P_TEMP]), ualias(u2));
+        param_name(P_TEMP, lang), ualias(u2));
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
@@ -104,7 +103,7 @@ static void test_contact_cmd_not_local(CuTest *tc) {
     r2 = test_create_plain(0, 1);
     u2 = test_create_unit(test_create_faction(), r2);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
-        LOC(lang, parameters[P_UNIT]), u2->no);
+        param_name(P_UNIT, lang), u2->no);
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
@@ -114,7 +113,7 @@ static void test_contact_cmd_not_local(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), r);
     usetalias(u2, 42);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
-        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
+        param_name(P_UNIT, lang), param_name(P_TEMP, lang), ualias(u2));
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
     CuAssertTrue(tc, ucontact(u, u2));
@@ -124,7 +123,7 @@ static void test_contact_cmd_not_local(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), r2);
     usetalias(u2, 47);
     ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
-        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), ualias(u2));
+        param_name(P_UNIT, lang), param_name(P_TEMP, lang), ualias(u2));
     test_clear_messages(u->faction);
     a_removeall(&u->attribs, NULL);
     contact_cmd(u, ord);
@@ -148,7 +147,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     /* KONTAKTIERE EINHEIT <not-found> */
     ord = create_order(K_CONTACT, u->faction->locale, "%s %i",
-        LOC(lang, parameters[P_UNIT]), u->no + 1);
+        param_name(P_UNIT, lang), u->no + 1);
     contact_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
     free_order(ord);
@@ -156,7 +155,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     /* KONTAKTIERE EINHEIT TEMP <not-found> */
     ord = create_order(K_CONTACT, u->faction->locale, "%s %s %i",
-        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]), u->no + 1);
+        param_name(P_UNIT, lang), param_name(P_TEMP, lang), u->no + 1);
     contact_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
     free_order(ord);
@@ -164,7 +163,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     /* KONTAKTIERE EINHEIT TEMP */
     ord = create_order(K_CONTACT, u->faction->locale, "%s %s",
-        LOC(lang, parameters[P_UNIT]), LOC(lang, parameters[P_TEMP]));
+        param_name(P_UNIT, lang), param_name(P_TEMP, lang));
     contact_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
     free_order(ord);
@@ -172,7 +171,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     /* KONTAKTIERE EINHEIT */
     ord = create_order(K_CONTACT, u->faction->locale,
-        LOC(lang, parameters[P_UNIT]));
+        param_name(P_UNIT, lang));
     contact_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
     free_order(ord);
@@ -180,7 +179,7 @@ static void test_contact_cmd_invalid(CuTest *tc) {
 
     /* KONTAKTIERE TEMP */
     ord = create_order(K_CONTACT, u->faction->locale,
-        LOC(lang, parameters[P_TEMP]));
+        param_name(P_TEMP, lang));
     contact_cmd(u, ord);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_unit_not_found"));
     free_order(ord);

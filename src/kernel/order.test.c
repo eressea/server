@@ -102,8 +102,8 @@ static void test_parse_parameters(CuTest* tc) {
     test_setup();
     lang = get_or_create_locale("en");
 
-    locale_setstring(lang, parameters[P_NEXT], "NAECHSTER");
-    locale_setstring(lang, parameters[P_EACH], "JE");
+    locale_setstring(lang, param_name(P_NEXT, NULL), "NAECHSTER");
+    locale_setstring(lang, param_name(P_EACH, NULL), "JE");
     init_locale(lang);
     CuAssertIntEquals(tc, NOPARAM, get_param("N", lang));
     CuAssertIntEquals(tc, NOPARAM, get_param("NA", lang));
@@ -150,7 +150,7 @@ static void test_parse_autostudy(CuTest *tc) {
     locale_setstring(lang, mkname("skill", skillnames[SK_TACTICS]), "Tactics");
     locale_setstring(lang, keyword(K_STUDY), "STUDY");
     locale_setstring(lang, keyword(K_AUTOSTUDY), "AUTOSTUDY");
-    locale_setstring(lang, parameters[P_AUTO], "AUTO");
+    locale_setstring(lang, param_name(P_AUTO, NULL), "AUTO");
     init_locale(lang);
 
     ord = parse_order("STUDY AUTO Entertainment", lang);
@@ -184,7 +184,7 @@ static void test_parse_make_temp(CuTest *tc) {
     lang = get_or_create_locale("en");
     locale_setstring(lang, keyword(K_MAKE), "MAKE");
     locale_setstring(lang, keyword(K_MAKETEMP), "MAKETEMP");
-    locale_setstring(lang, parameters[P_TEMP], "TEMP");
+    locale_setstring(lang, param_name(P_TEMP, NULL), "TEMP");
     init_locale(lang);
 
     CuAssertPtrEquals(tc, NULL, parse_order("M T herp", lang));

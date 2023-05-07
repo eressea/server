@@ -54,7 +54,7 @@ static void test_give_unit_cmd(CuTest * tc)
     u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
     contact_unit(u2, u1);
     ord = create_order(K_GIVE, u1->faction->locale, "%i %s",
-        u2->no, LOC(u1->faction->locale, parameters[P_UNIT]));
+        u2->no, param_name(P_UNIT, u1->faction->locale));
 
     test_clear_messages(u1->faction);
     test_clear_messages(u2->faction);
@@ -89,7 +89,7 @@ static void test_give_control_cmd(CuTest * tc)
     u_set_building(u1, b);
     CuAssertPtrEquals(tc, u1, building_owner(b));
     ord = create_order(K_GIVE, u1->faction->locale, "%i %s",
-        u2->no, LOC(u1->faction->locale, parameters[P_CONTROL]));
+        u2->no, param_name(P_CONTROL, u1->faction->locale));
 
     test_clear_messages(u1->faction);
     test_clear_messages(u2->faction);
@@ -1275,7 +1275,7 @@ static void test_destroy_road(CuTest* tc)
     r = test_create_plain(0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(), r);
-    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", param_name(P_ROAD, f->locale), LOC(f->locale, directions[D_EAST]));
 
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
@@ -1329,7 +1329,7 @@ static void test_destroy_road_guard(CuTest* tc)
     rsetroad(r, D_EAST, 100);
     ug = test_create_guard(r, 0, 0);
     u = test_create_unit(f = test_create_faction(), r);
-    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "%s %s", param_name(P_ROAD, f->locale), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));
@@ -1360,7 +1360,8 @@ static void test_destroy_road_limit(CuTest* tc)
     r = test_create_plain(0, 0);
     rsetroad(r, D_EAST, 100);
     u = test_create_unit(f = test_create_faction(), r);
-    u->orders = ord = create_order(K_DESTROY, f->locale, "1 %s %s", LOC(f->locale, parameters[P_ROAD]), LOC(f->locale, directions[D_EAST]));
+    u->orders = ord = create_order(K_DESTROY, f->locale, "1 %s %s",
+        param_name(P_ROAD, f->locale), LOC(f->locale, directions[D_EAST]));
 
     set_level(u, SK_ROAD_BUILDING, 1);
     CuAssertIntEquals(tc, 0, destroy_cmd(u, ord));

@@ -124,8 +124,8 @@ struct locale * test_create_locale(void) {
     if (!loc) {
         int i;
         loc = get_or_create_locale("test");
-        locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
-        locale_setstring(loc, "unitdefault", parameters[P_UNIT]);
+        locale_setstring(loc, "factiondefault", param_name(P_FACTION, NULL));
+        locale_setstring(loc, "unitdefault", param_name(P_UNIT, NULL));
         locale_setstring(loc, "money", "Silber");
         locale_setstring(loc, "money_p", "Silber");
         locale_setstring(loc, "cart", "Wagen");
@@ -173,8 +173,9 @@ struct locale * test_create_locale(void) {
             }
         }
         for (i = 0; i != MAXPARAMS; ++i) {
-            locale_setstring(loc, parameters[i], parameters[i]);
-            test_translate_param(loc, i, parameters[i]);
+            const char* p = param_name(i, NULL);
+            locale_setstring(loc, p, p);
+            test_translate_param(loc, i, p);
         }
         for (i = 0; i != MAXMAGIETYP; ++i) {
             locale_setstring(loc, mkname("school", magic_school[i]), magic_school[i]);

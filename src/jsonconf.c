@@ -1114,17 +1114,17 @@ static void json_parameter(cJSON* json, struct locale* lang) {
     }
     for (child = json->child; child; child = child->next) {
         param_t p = findparam(child->string);
-        if (p != NOPARAM && parameters[p]) {
+        if (p != NOPARAM) {
             if (child->type == cJSON_String) {
                 init_parameter(lang, p, child->valuestring);
-                locale_setstring(lang, parameters[p], child->valuestring);
+                locale_setstring(lang, param_name(p, NULL), child->valuestring);
             }
             else if (child->type == cJSON_Array) {
                 cJSON* entry;
                 for (entry = child->child; entry; entry = entry->next) {
                     init_parameter(lang, p, entry->valuestring);
                     if (entry == child->child) {
-                        locale_setstring(lang, parameters[p], entry->valuestring);
+                        locale_setstring(lang, param_name(p, NULL), entry->valuestring);
                     }
                 }
             }

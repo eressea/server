@@ -38,8 +38,8 @@ static void test_unit_orders(CuTest *tc) {
     u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     sbs_printf(&sbs, "%s %s %s\n%s %s\n%s\n",
-        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no),
+        param_name(P_FACTION, f->locale), itoa36(f->no), "password",
+        param_name(P_UNIT, f->locale), itoa36(u->no),
         keyword_name(K_MOVE, f->locale));
     CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
     CuAssertPtrNotNull(tc, u->orders);
@@ -68,8 +68,8 @@ static void test_no_foreign_unit_orders(CuTest *tc) {
     u->orders = create_order(K_ENTERTAIN, f->locale, NULL);
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     sbs_printf(&sbs, "%s %s %s\n%s %s\n%s\n",
-        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no),
+        param_name(P_FACTION, f->locale), itoa36(f->no), "password",
+        param_name(P_UNIT, f->locale), itoa36(u->no),
         keyword_name(K_WORK, f->locale));
     CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unit_not_found"));
@@ -94,8 +94,8 @@ static void test_unit_not_found(CuTest *tc) {
 
     faction_setpassword(f, password_hash("password", PASSWORD_DEFAULT));
     sbs_printf(&sbs, "%s %s %s\n%s 42\n",
-        LOC(f->locale, parameters[P_FACTION]), itoa36(f->no), "password",
-        LOC(f->locale, parameters[P_UNIT]));
+        param_name(P_FACTION, f->locale), itoa36(f->no), "password",
+        param_name(P_UNIT, f->locale));
     CuAssertIntEquals(tc, 0, parser_parse(parser, orders, sbs_length(&sbs), true));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "unit_not_found"));
     CuAssertIntEquals(tc, turn, f->lastorders);

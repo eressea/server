@@ -548,7 +548,7 @@ static void test_give_herbs(CuTest * tc) {
     setup_give(&env);
     i_change(&env.src->items, env.itype, 10);
 
-    ord = create_order(K_GIVE, env.f1->locale, "%s %s", itoa36(env.dst->no), LOC(env.f1->locale, parameters[P_HERBS]));
+    ord = create_order(K_GIVE, env.f1->locale, "%s %s", itoa36(env.dst->no), param_name(P_HERBS, env.f1->locale));
     assert(ord);
 
     give_cmd(env.src, ord);
@@ -748,7 +748,7 @@ static void test_reserve_all(CuTest* tc) {
     test_setup();
     init_resources();
     loc = test_create_locale();
-    locale_setstring(loc, parameters[P_ANY], "ALLES");
+    locale_setstring(loc, param_name(P_ANY, NULL), "ALLES");
     init_parameters(loc);
 
     rtype = get_resourcetype(R_SILVER);

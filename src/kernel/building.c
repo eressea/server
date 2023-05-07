@@ -410,10 +410,7 @@ building *new_building(const struct building_type * btype, region * r,
 
     bname = LOC(lang, btype->_name);
     if (!bname) {
-        bname = LOC(lang, parameters[P_GEBAEUDE]);
-        if (!bname) {
-            bname = parameters[P_GEBAEUDE];
-        }
+        bname = param_name(P_GEBAEUDE, lang);
     }
     assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));

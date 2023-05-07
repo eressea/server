@@ -190,7 +190,7 @@ static void test_report_allies(CuTest *tc) {
     f3 = test_create_faction_ex(NULL, lang);
     snprintf(exp, sizeof(exp), "Wir helfen %s (%s).\n\n",
         factionname(f1),
-        LOC(lang, parameters[P_GUARD]));
+        param_name(P_GUARD, lang));
     ally_set(&f->allies, f1, HELP_GUARD);
     report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
     out.api->write(out.handle, "", 1);
@@ -203,17 +203,17 @@ static void test_report_allies(CuTest *tc) {
     ally_set(&f->allies, f3, HELP_ALL);
     snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)",
         factionname(f1),
-        LOC(lang, parameters[P_GUARD]),
+        param_name(P_GUARD, lang),
         factionname(f2),
-        LOC(lang, parameters[P_GIVE]));
+        param_name(P_GIVE, lang));
     linebreak = strlen(exp);
     snprintf(exp, sizeof(exp), "Wir helfen %s (%s), %s (%s)\nund %s (%s).\n\n",
         factionname(f1),
-        LOC(lang, parameters[P_GUARD]),
+        param_name(P_GUARD, lang),
         factionname(f2),
-        LOC(lang, parameters[P_GIVE]),
+        param_name(P_GIVE, lang),
         factionname(f3),
-        LOC(lang, parameters[P_ANY]));
+        param_name(P_ANY, lang));
     report_allies(&out, linebreak, f, f->allies, "Wir helfen ");
     out.api->write(out.handle, "", 1);
     out.api->rewind(out.handle);
@@ -304,8 +304,8 @@ static void setup_spell_fixture(spell_fixture * spf) {
     locale_setstring(spf->lang, "nr_spell_modifiers", "Modifier:");
     locale_setstring(spf->lang, "smod_none", "Keine");
     locale_setstring(spf->lang, keyword(K_CAST), "ZAUBERE");
-    locale_setstring(spf->lang, parameters[P_REGION], "REGION");
-    locale_setstring(spf->lang, parameters[P_LEVEL], "STUFE");
+    locale_setstring(spf->lang, param_name(P_REGION, NULL), "REGION");
+    locale_setstring(spf->lang, param_name(P_LEVEL, NULL), "STUFE");
     locale_setstring(spf->lang, "par_unit", "enr");
     locale_setstring(spf->lang, "par_ship", "snr");
     locale_setstring(spf->lang, "par_building", "bnr");

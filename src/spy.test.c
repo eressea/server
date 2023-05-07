@@ -224,13 +224,13 @@ static void test_setstealth_cmd(CuTest *tc) {
     lang = u->faction->locale;
     u->flags = UFL_ANON_FACTION | UFL_MOVED;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s",
-        LOC(lang, parameters[P_FACTION]),
-        LOC(lang, parameters[P_NOT]));
+        param_name(P_FACTION, lang),
+        param_name(P_NOT, lang));
     setstealth_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, UFL_MOVED, u->flags);
     free_order(u->thisorder);
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s",
-        LOC(lang, parameters[P_FACTION]));
+        param_name(P_FACTION, lang));
     setstealth_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, UFL_MOVED | UFL_ANON_FACTION, u->flags);
     test_teardown();
@@ -246,8 +246,8 @@ static void test_setstealth_faction(CuTest *tc) {
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     lang = u->faction->locale;
     u->thisorder = create_order(K_SETSTEALTH, lang, "%s %s %s",
-        LOC(lang, parameters[P_FACTION]),
-        LOC(lang, parameters[P_NUMBER]), itoa36(f->no));
+        param_name(P_FACTION, lang),
+        param_name(P_NUMBER, lang), itoa36(f->no));
 
     /* no unit of the desired faction visible: fail */
     setstealth_cmd(u, u->thisorder);

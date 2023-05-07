@@ -1266,12 +1266,12 @@ void default_name(const unit *u, char name[], int len) {
         const char * prefix;
         prefix = LOC(lang, "unitdefault");
         if (!prefix) {
-            prefix = parameters[P_UNIT];
+            prefix = param_name(P_UNIT, lang);
         }
         result = prefix;
     }
     else {
-        result = parameters[P_UNIT];
+        result = param_name(P_UNIT, lang);
     }
     snprintf(name, len, "%s %s", result, itoa36(u->no));
 }

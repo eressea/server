@@ -1865,7 +1865,7 @@ int name_cmd(struct unit *u, struct order *ord)
                         break;
                     }
 
-                    sdname = LOC(lang, parameters[P_SHIP]);
+                    sdname = param_name(P_SHIP, lang);
                     sdlen = strlen(sdname);
                     if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
