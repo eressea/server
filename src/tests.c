@@ -262,25 +262,14 @@ static void test_reset_full(void) {
     memset(&callbacks, 0, sizeof(callbacks));
 
     test_reset();
-    free_terrains();
-    free_resources();
-    free_functions();
-    free_config();
+    free_configuration();
     calendar_cleanup();
     creport_cleanup();
     report_cleanup();
     close_orders();
     log_close();
     stats_close();
-    free_special_directions();
     free_locales();
-    free_spells();
-    free_buildingtypes();
-    free_shiptypes();
-    free_races();
-    free_spellbooks();
-    free_aliases();
-    free_prefixes();
     mt_clear();
 
     for (i = 0; i != MAXSKILLS; ++i) {
