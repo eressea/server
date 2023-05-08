@@ -8,10 +8,8 @@ end
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.food.flags", "4") -- food is free
     eressea.settings.set("rules.treeseeds.chance", "0.0") -- trees make no seeds
     eressea.settings.set("rules.grow.formula", "0") -- no tree or seed growth
-    eressea.settings.set("NewbieImmunity", "0")
 end
 
 function test_no_growth()

@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.xmas'
+local tcname = 'tests.e2.xmas'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -8,7 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
     eressea.settings.set("volcano.active.percent", "0")

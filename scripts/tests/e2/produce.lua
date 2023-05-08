@@ -1,4 +1,4 @@
-local tcname = 'tests.e2.manufacture'
+local tcname = 'tests.e2.produce'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -16,12 +16,7 @@ function setup()
     u = unit.create(f, r, 1)
     u:set_skill('forestry', 2)
     u:add_order('MACHE Holz')
-    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.grow.formula", "0")
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_produce_logs()

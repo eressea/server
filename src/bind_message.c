@@ -213,7 +213,9 @@ static int msg_send_faction(lua_message * msg, faction * f)
 
 static int msg_send_region(lua_message * lmsg, region * r)
 {
+    assert(lmsg);
     if (lmsg->mtype) {
+        assert(r);
         if (lmsg->msg == NULL) {
             lmsg->msg = msg_create(lmsg->mtype, lmsg->args);
         }

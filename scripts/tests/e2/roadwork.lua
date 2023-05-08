@@ -17,11 +17,6 @@ function setup()
     u:add_item('stone', 300) -- no shortage of materials
     u:set_skill('roadwork', 1)
     u:add_order('MACHE Strasse OST')
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_build_road()

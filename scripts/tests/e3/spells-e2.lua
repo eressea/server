@@ -12,7 +12,6 @@ function setup()
     eressea.free_game()
     eressea.settings.set("magic.regeneration.enable", "0")
     eressea.settings.set("magic.fumble.enable", "0")
-    eressea.settings.set("rules.food.flags", "4")
 
     r = region.create(0, 0, "plain")
     f = faction.create("elf", "spell_payment@eressea.de", "de")

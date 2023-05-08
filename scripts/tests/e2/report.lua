@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.report'
+local tcname = 'tests.e2.report'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -8,8 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4")
 end
 
 local function find_in_report(f, pattern, extension)
@@ -33,8 +31,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4")
 end
 
 function test_coordinates_unnamed_plane()

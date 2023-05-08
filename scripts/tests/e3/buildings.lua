@@ -8,11 +8,6 @@ end
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_castle_names()

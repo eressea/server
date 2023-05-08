@@ -18,6 +18,8 @@
 #include "kernel/plane.h"
 #include "kernel/race.h"
 #include "kernel/region.h"
+#include "kernel/ship.h"
+#include "kernel/spell.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
@@ -212,4 +214,21 @@ void free_gamedata(void)
         planes = planes->next;
         free_plane(pl);
     }
+}
+
+void free_configuration(void)
+{
+    free_terrains();
+    free_resources();
+    free_functions();
+    free_config();
+    free_special_directions();
+    free_spells();
+    free_buildingtypes();
+    free_shiptypes();
+    free_races();
+    free_spellbooks();
+    free_aliases();
+    free_prefixes();
+    free_spells();
 }

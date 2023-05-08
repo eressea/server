@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.economy'
+local tcname = 'tests.economy'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -103,10 +103,7 @@ function setup()
     eressea.free_game()
     eressea.config.reset()
     eressea.config.parse(conf)
-    eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("study.produceexp", "0")
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
 end

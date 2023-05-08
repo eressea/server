@@ -15,11 +15,6 @@ function setup()
     u = unit.create(f, r, 1)
     u:set_skill('weaponsmithing', 6)
     u:add_order('MACHE Schwert')
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_make_items()

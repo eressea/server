@@ -8,8 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
     eressea.config.parse([[
 {
     "keywords": {

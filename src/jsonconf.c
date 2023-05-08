@@ -1372,7 +1372,6 @@ void json_config(cJSON *json) {
         log_error("config is not a json object: %d", json->type);
         return;
     }
-    reset_locales();
     for (child = json->child; child; child = child->next) {
         if (strcmp(child->string, "races") == 0) {
             json_races(child);

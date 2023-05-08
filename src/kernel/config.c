@@ -167,7 +167,7 @@ void set_datapath(const char *path)
     g_datadir = path;
 }
 
-static const char *g_reportdir;
+static char *g_reportdir;
 const char *reportpath(void)
 {
     static char zText[4096];
@@ -178,7 +178,9 @@ const char *reportpath(void)
 
 void set_reportpath(const char *path)
 {
-    g_reportdir = path;
+    // FIXME: memory leak
+    if (g_reportdir) free(g_reportdir);
+    g_reportdir = str_strdup(path);
 }
 
 static int sys_mkdir(const char *path, int mode) {
