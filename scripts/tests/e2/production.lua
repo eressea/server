@@ -8,198 +8,211 @@ end
 
 function setup()
     eressea.game.reset()
+    eressea.settings.set("study.random_progress", "0")
 end
 
-local function create_faction(race)
-    return faction.create(race, race .. '@example.com', "de")
-end
-
-function test_produce_multi()
-    local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
+function test_laen_needs_mine()
+    -- some resources require a building
+    -- i.e. you cannot create laen without a mine
+    local r = region.create(0, 0, "mountain")
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
-    -- sword needs skill=3, iron=1
-    u:set_skill('weaponsmithing', 15)
-    u:add_item('iron', 5)
 
     turn_begin()
-    u:add_order("MACHE 6 Schwert")
-    
+    r:set_resource('laen', 100)
+    u:add_order("MACHE Laen")
+    u:set_skill('mining', 7)
     turn_process()
-    assert_equal(5, u:get_item('sword'))
-    assert_equal(0, u:get_item('iron'))
+    assert_equal(0, u:get_item('laen'))
+    assert_equal(100, r:get_resource('laen'))
+    assert_equal(1, f:count_msg_type("building_needed")) -- requires building
+
+    u.building = building.create(u.region, "mine")
+    u.building.size = 10
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
+    turn_process()
+    assert_equal(1, u:get_item('laen'))
+    assert_equal(99, r:get_resource('laen'))
+
+    turn_end()
 end
 
-function test_greatbow_needs_elf()
--- only elves can build a greatbow
+function test_mine_laen_bonus()
+    -- some buildings grant a bonus on the production skill
+    -- i.e. a mine adds +1 to mining
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
-    u:set_skill('weaponsmithing', 5)
-    u:add_item('mallorn', 2)
-    u:add_order("MACHE Elfenbogen")
-    turn_process() -- humans cannot do it
-    assert_equal(1, f:count_msg_type("error117"))
-    assert_equal(0, u:get_item('greatbow'))
-    assert_equal(2, u:get_item('mallorn'))
+    r:set_resource('laen', 100)
+    assert_equal(100, r:get_resource('laen'))
+    u:add_order("MACHE Laen")
+    u:set_skill('mining', 6)
+    u.building = building.create(u.region, "mine")
 
-    u.race = 'elf'
-    turn_process() -- but elves can
-    assert_equal(1, u:get_item('greatbow'))
-    assert_equal(0, u:get_item('mallorn'))
+    u.building.size = 10
+    u.number = 2
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
+    turn_process() -- T6 is not enough for laen
+    assert_equal(0, u:get_item('laen'))
+    assert_equal(100, r:get_resource('laen'))
+    assert_equal(1, f:count_msg_type("manufacture_skills"))
+
+    u:set_skill('mining', 13)
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
+    turn_process() -- T13 is enough, the +1 produces one extra Laen
+    assert_equal(4, u:get_item('laen')) -- FAIL (3)
+    assert_equal(96, r:get_resource('laen'))
+
+    turn_end()
 end
 
-function test_troll_quarrying_bonus()
--- Von Trollen abgebaute Steine werden nur zu 75% vom "Regionsvorrat" abgezogen. 
--- Dieser Effekt ist kumulativ zu einem Steinbruch.
+function test_mine_iron_bonus()
+    -- some buildings grant a bonus on the production skill
+    -- i.e. a mine adds +1 to mining iron
+    --
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
-    local u = unit.create(f, r, 1)
-
-    turn_begin()
-    r:set_resource("stone", 100)
-    u:set_skill('quarrying', 4)
-    u:add_order("MACHE Steine")
-    turn_process() -- humans get no bonus
-    assert_equal(4, u:get_item('stone'))
-    assert_equal(96, r:get_resource('stone'))
-
-    u.race = 'troll'
-    u:set_skill('quarrying', 2)
-    turn_process() -- trolls have +2 to quarrying, and save 25%
-    assert_equal(8, u:get_item('stone'))
-    assert_equal(93, r:get_resource('stone'))
-end
-
-function test_dwarf_mining_bonus()
--- Von Zwergen abgebautes Eisen wird nur zu 60% vom "Regionsvorrat" abgezogen. 
--- Dieser Effekt ist kumulativ zu einem Bergwerk (siehe hier und hier).
-    local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
     r:set_resource('iron', 100)
-    u:set_skill('mining', 10)
-    u:add_order('MACHE Eisen')
-    turn_process() -- humans get no bonus
-    assert_equal(10, u:get_item('iron'))
-    assert_equal(90, r:get_resource('iron'))
+    assert_equal(100, r:get_resource('iron'))
+    u:add_order("MACHE Eisen")
+    u:set_skill('mining', 1)
+    u.building = building.create(u.region, "mine")
 
-    u.race = 'dwarf'
-    u:set_skill('mining', 8)
-    turn_process() -- dwarves have +2 to mining, and save 40%
-    assert_equal(20, u:get_item('iron'))
-    assert_equal(84, r:get_resource('iron'))
+    u.building.size = 10
+    u.number = 2
+    turn_process() -- iron can be made without a working mine
+    assert_equal(2, u:get_item('iron'))
+    assert_equal(98, r:get_resource('iron'))
+
+    u:add_item('money', 500) -- Unterhalt Bergwerk
+    u.building.working = true
+    turn_process()
+    assert_equal(6, u:get_item('iron'))
+    assert_equal(96, r:get_resource('iron'))
+
+    turn_end()
 end
 
-function test_build_boat_low_skill()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human", "build@example.com")
+function test_quarry_bonus()
+    -- a quarry grants +1 to quarrying, and saves 50% stone
+    --
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
-    u:set_skill("shipcraft", 3) -- humans get +1
-    u:add_item("log", 10)
-    u:add_order("MACHE BOOT")
-    process_orders()
-    assert_not_nil(u.ship)
-    assert_equal(4, u.ship.size)
-    assert_equal(6, u:get_item('log'))
+
+    turn_begin()
+    r:set_resource('stone', 100)
+    assert_equal(100, r:get_resource('stone'))
+    u:add_order("MACHE Stein")
+    u:set_skill('quarrying', 1)
+    u.number = 2
+    u.building = building.create(u.region, 'quarry')
+
+    u.building.size = 10
+    turn_process()
+    assert_equal(2, u:get_item('stone'))
+    assert_equal(98, r:get_resource('stone'))
+
+    u:add_item('money', 250) -- Unterhalt Steinbruch
+    u.building.working = true
+    turn_process()
+    assert_equal(6, u:get_item('stone'))
+    assert_equal(96, r:get_resource('stone'))
+
+    turn_end()
 end
 
-function test_build_boat_high_skill()
-    local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
+function test_smithy_no_bonus()
+-- a smithy does not give a bonus to other skills
+-- five cartmakers make 5 carts, no matter what
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
-    u:set_skill("shipcraft", 5) -- humans get +1
-    u:add_item("log", 10)
-    u:add_order("MACHE BOOT")
-    process_orders()
-    assert_not_equal(nil, u.ship)
-    assert_equal(5, u.ship.size)
-    assert_equal(5, u:get_item('log'))
+
+    turn_begin()
+    u.building = building.create(u.region, 'smithy')
+
+    u.building.size = 10
+    u.number = 5
+    u:set_skill('cartmaking', 1) -- needs 1 min
+    u:add_item('log', 100)
+    u:add_order("MACHE Wagen")
+    turn_process() -- building disabled, money is missing 
+    assert_equal(5, u:get_item('cart'))
+    assert_equal(75, u:get_item('log'))
+
+    u:add_item('money', 300) -- Unterhalt Schmiede
+    u:add_item('log', 1)
+    u.building.working = true
+    turn_process() -- building active
+    assert_equal(10, u:get_item('cart'))
+    assert_equal(50, u:get_item('log'))
+
+    turn_end()
 end
 
-function test_work()
-    eressea.settings.set("rules.peasants.growth.factor", "0")
-    local r = region.create(0, 0, "plain")
-    r:set_resource('peasant', 1)
-    r:set_resource('tree', 0)
-    local f = faction.create("human")
+function test_smithy_bonus_iron()
+-- a smithy adds +1 to weaponsmithing, and saves 50% iron
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
-    u:add_order('ARBEITE')
-    r:set_resource('money', 0)
 
-    process_orders()
-    assert_equal(10, u:get_item('money'))
-    assert_equal(1, r:get_resource('money'))
-    b = building.create(r, 'castle')
+    turn_begin()
+    u.building = building.create(u.region, 'smithy')
 
-    b.size = 2
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    process_orders()
-    assert_equal(10, u:get_item('money'))
-    assert_equal(1, r:get_resource('money'))
+    u.building.size = 10
+    u:set_skill('weaponsmithing', 5) -- needs 3
+    u:add_item('iron', 100)
+    u:add_order("MACHE Schwert")
+    turn_process() -- building disabled
+    assert_equal(1, u:get_item('sword'))
+    assert_equal(99, u:get_item('iron'))
 
-    b.size = 10
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    process_orders()
-    assert_equal(11, u:get_item('money'))
-    assert_equal(2, r:get_resource('money'))
+    u:add_item('log', 1) -- Unterhalt Schmiede
+    u:add_item('money', 300) -- Unterhalt Schmiede
+    u.building.working = true
+    turn_process() -- building active
+    assert_equal(3, u:get_item('sword'))
+    assert_equal(98, u:get_item('iron'))
 
-    b.size = 50
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    process_orders()
-    assert_equal(12, u:get_item('money'))
-    assert_equal(3, r:get_resource('money'))
-
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    b.size = 250
-    process_orders()
-    assert_equal(13, u:get_item('money'))
-    assert_equal(4, r:get_resource('money'))
-
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    b.size = 1250
-    process_orders()
-    assert_equal(14, u:get_item('money'))
-    assert_equal(5, r:get_resource('money'))
-
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    b.size = 6250
-    process_orders()
-    assert_equal(15, u:get_item('money'))
-    assert_equal(6, r:get_resource('money'))
+    turn_end()
 end
 
-function test_blessed_harvest()
-    eressea.settings.set("rules.peasants.growth.factor", "0")
-    local r = region.create(0, 0, "plain")
-    r:set_resource('peasant', 1)
-    r:set_resource('tree', 0)
-    local f = faction.create("human")
+function test_smithy_bonus_mixed()
+-- a smithy adds +1 to weaponsmithing, and saves 50% iron
+-- it does not save any other resource, though.
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
-    u:add_order('ARBEITE')
-    r:set_resource('money', 0)
-    r:add_curse('blessedharvest', nil, 2, 1, 1) -- duration, force, effect
 
-    process_orders()
-    assert_equal(10, u:get_item('money')) -- only peasants benefit
-    assert_equal(2, r:get_resource('money')) -- peasants work +1
+    turn_begin()
+    u.building = building.create(u.region, 'smithy')
 
-    b = building.create(r, 'castle')
-    b.size = 6250
-    r:set_resource('money', 0)
-    u:add_item('money', -u:get_item('money'))
-    assert_equal(1, r:get_curse('blessedharvest'))
-    process_orders()
-    assert_equal(15, u:get_item('money')) -- only peasants get +1
-    assert_equal(7, r:get_resource('money')) -- peasants get +1
+    u.building.size = 10
+    u:set_skill('weaponsmithing', 5) -- needs 3
+    u:add_item('iron', 100)
+    u:add_item('log', 100)
+    u:add_order("MACHE Kriegsaxt")
+    turn_process() -- building disabled
+    assert_equal(1, u:get_item('axe'))
+    assert_equal(99, u:get_item('iron'))
+    assert_equal(99, u:get_item('log'))
+
+    u:add_item('money', 300) -- Unterhalt Schmiede
+    u:add_item('log', 1) -- Unterhalt Schmiede
+    u.building.working = true
+    turn_process() -- building active
+    assert_equal(3, u:get_item('axe'))
+    assert_equal(98, u:get_item('iron'))
+    assert_equal(97, u:get_item('log'))
+
+    turn_end()
 end

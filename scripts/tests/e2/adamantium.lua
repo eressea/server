@@ -10,14 +10,10 @@ function setup()
     eressea.free_game()
 end
 
-local function create_faction(race)
-    return faction.create(race, race .. '@eressea.de', "de")
-end
-
 local function _test_create_adamantium()
     eressea.settings.set("rules.terraform.all", "1")
     local r = region.create(0,0, "mountain")
-    local f1 = create_faction('human')
+    local f1 = faction.create('human')
     local u1 = unit.create(f1, r, 1)
     r:set_resource("adamantium", 50)
     assert_equal(50, r:get_resource("adamantium"))
