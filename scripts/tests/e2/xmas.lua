@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.xmas'
+local tcname = 'tests.e2.xmas'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')

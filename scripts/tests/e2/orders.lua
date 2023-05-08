@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.orders'
+local tcname = 'tests.e2.orders'
 local lunit = require("lunit")
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname , 'seeall')
