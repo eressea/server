@@ -378,7 +378,7 @@ struct drift_fixture {
 
 void setup_drift (struct drift_fixture *fix) {
     test_create_locale();
-    config_set("rules.ship.storms", "0");
+    config_set_int("rules.ship.storms", 0);
 
     fix->st_boat = test_create_shiptype("boat");
     fix->st_boat->cabins = 20000;

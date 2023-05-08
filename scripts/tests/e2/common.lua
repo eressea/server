@@ -34,9 +34,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth", "1")
     eressea.settings.set("study.random_progress", "0")
 end
@@ -121,9 +118,10 @@ function test_demon_food()
     local u = unit.create(f, r, 1)
     local p = r:get_resource("peasant")
     r:set_resource("peasant", 2000)
-    eressea.settings.set("rules.food.flags", "0")
     eressea.settings.set("rules.peasants.growth", "0")
+    eressea.settings.set("rules.food.flags", "0")
     process_orders()
+    eressea.settings.set("rules.food.flags", "4")
     assert_not_nil(u)
     assert_equal(1, u.number)
     assert_equal(1999, r:get_resource("peasant"))
@@ -456,14 +454,15 @@ function test_work()
 end
 
 function test_upkeep()
-    eressea.settings.set("rules.food.flags", "0")
     local r = region.create(0, 0, "plain")
     local f = create_faction('human')
     local u = unit.create(f, r, 5)
     u:add_item("money", u.number * 11)
     u:clear_orders()
     u:add_order("LERNE Waffenbau")
+    eressea.settings.set("rules.food.flags", "0")
     process_orders()
+    eressea.settings.set("rules.food.flags", "4")
     assert_equal(u:get_item("money"), u.number)
 end
 
@@ -764,7 +763,6 @@ function test_food_is_consumed()
   u:add_item("money", 100)
   u:clear_orders()
   u:add_order("LERNEN Reiten") -- don't work
-  eressea.settings.set("rules.food.flags", "4")
   process_orders()
   assert_equal(100, u:get_item("money"))
 end
@@ -778,6 +776,7 @@ function test_food_can_override()
   u:add_order("LERNEN Reiten") -- don't work
   eressea.settings.set("rules.food.flags", "0")
   process_orders()
+  eressea.settings.set("rules.food.flags", "4")
   assert_equal(90, u:get_item("money"))
 end
 

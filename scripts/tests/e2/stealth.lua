@@ -9,30 +9,14 @@ end
 local f
 local u
 
-local settings = {}
-
-local function set_rule(key, value)
-    if value==nil then
-        eressea.settings.set(key, settings[key])
-    else
-        settings[key] = settings[key] or eressea.settings.get(key)
-        eressea.settings.set(key, value)
-    end
-end
-
 function setup()
     eressea.game.reset()
-    set_rule('rules.food.flags', '4')
 
     local r = region.create(0,0, "plain")
     f = faction.create("human", "stealthy@eressea.de", "de")
     u = unit.create(f, r, 1)
     f = faction.create("human", "stealth@eressea.de", "de")
     unit.create(f, r, 1) -- TARNE PARTEI NUMMER <no> must have a unit in the region
-end
-
-function teardown()
-    set_rule('rules.food.flags')
 end
 
 function test_stealth_faction_on()

@@ -8,7 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("rules.peasants.growth", "0")
 end
 

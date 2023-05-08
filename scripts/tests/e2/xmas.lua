@@ -8,7 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.grow.formula", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
     eressea.settings.set("volcano.active.percent", "0")

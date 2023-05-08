@@ -8,10 +8,7 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("NewbieImmunity", "0")
     eressea.settings.set("study.produceexp", "0")
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.encounters", "0")
     eressea.settings.set("rules.peasants.growth.factor", "0")
 end

@@ -19,9 +19,6 @@ function setup()
     eressea.game.reset()
     settings = {}
     eressea.settings.set("rules.move.owner_leave", "1")
-    eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("rules.ship.drifting", "0")
-    eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("magic.resist.enable", "0")
 end
 
@@ -215,6 +212,7 @@ function test_fishing()
     process_orders()
     assert_equal(r, u1.region)
     assert_equal(60, u1:get_item("money"))
+    eressea.settings.set("rules.food.flags", "4")
 end
 
 function test_ship_capacity()
@@ -991,9 +989,6 @@ function test_bug2187()
   hp = u.hp
   process_orders()
   assert_equal(hp, u.hp)
---  init_reports()
---  write_report(f)
-      
   eressea.settings.set("rules.food.flags", "4")
 end
 
@@ -1016,8 +1011,6 @@ end
 
 function test_demons_using_mallornlance()
     -- bug 2392
-    eressea.settings.set("skillchange.demon.up", "0")
-    eressea.settings.set("NewbieImmunity", "0")
     local r = region.create(0, 0, "plain")
     local f = faction.create('goblin')
     local u = unit.create(f, r, 1, 'demon')

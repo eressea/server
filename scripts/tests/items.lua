@@ -8,10 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 

@@ -9,8 +9,6 @@ end
 function setup()
     eressea.game.reset()
     eressea.config.reset()
-    eressea.settings.set("rules.food.flags", "0")
-    eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.magic.playerschools", "")
     conf = [[{
         "races": {

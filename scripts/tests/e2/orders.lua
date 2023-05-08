@@ -17,9 +17,6 @@ function setup()
     f = _G.faction.create("human", "noreply@eressea.de", "de")
     u = _G.unit.create(f, r, 1)
     u:clear_orders()
-    eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
 end
 
 function test_no_errors()

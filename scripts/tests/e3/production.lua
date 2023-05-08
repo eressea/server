@@ -8,8 +8,6 @@ end
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.food.flags", "4") -- food is free
-    eressea.settings.set("NewbieImmunity", "0")
 end
 
 local function create_faction(race)
