@@ -210,12 +210,12 @@ static void creport_block_2(struct stream* out, const char* name, long i, long j
 
 static void creport_tag(struct stream* out, const char* key, const char* value)
 {
-    assert(value);
-    if (key) {
+    assert(key);
+    if (value) {
         stream_printf(out, "\"%s\";%s\n", value, key);
     }
     else {
-        stream_printf(out, "\"%s\"\n", value);
+        stream_printf(out, "\"%s\"\n", key);
     }
 }
 
@@ -578,7 +578,6 @@ static void render_messages(stream *out, const faction * f, message_list * msgs)
             bool printed = false;
             const struct message_type* mtype = m->msg->type;
             unsigned int hash = mtype->key;
-            size_t bytes;
             g_bigbuf[0] = '\0';
             if (nr_render(m->msg, f->locale, g_bigbuf, sizeof(g_bigbuf), f) > 0) {
                 creport_block_1(out, "MESSAGE", message_id(m->msg));
@@ -591,17 +590,19 @@ static void render_messages(stream *out, const faction * f, message_list * msgs)
                 printed = true;
             }
             g_bigbuf[0] = '\0';
-            bytes = cr_render(m->msg, g_bigbuf, (const void*)f);
-            if (bytes > 0) {
-                if (g_bigbuf[0]) {
-                    if (!printed) {
-                        creport_block_1(out, "MESSAGE", message_id(m->msg));
+            if (m->msg->type->nparameters) {
+                size_t bytes = cr_render(m->msg, g_bigbuf, (const void*)f);
+                if (bytes > 0) {
+                    if (g_bigbuf[0]) {
+                        if (!printed) {
+                            creport_block_1(out, "MESSAGE", message_id(m->msg));
+                        }
+                        swrite(g_bigbuf, 1, bytes, out);
                     }
-                    swrite(g_bigbuf, 1, bytes, out);
                 }
-            }
-            else {
-                log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
+                else {
+                    log_error("could not render cr-message %p: %s\n", m->msg, m->msg->type->name);
+                }
             }
             m = m->next;
         }
