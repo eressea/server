@@ -6,10 +6,8 @@
 #include "creport.h"
 #include "eressea.h"
 #include "magic.h"             // for spell_component, create_castorder, ...
-#include "prefix.h"
 #include "report.h"
 #include "reports.h"
-#include "vortex.h"
 
 #include "kernel/alliance.h"
 #include "kernel/build.h"
@@ -33,8 +31,6 @@
 #include "kernel/ship.h"
 #include "kernel/spell.h"
 
-#include "util/aliases.h"
-#include "util/functions.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"

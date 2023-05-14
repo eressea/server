@@ -9,7 +9,6 @@
 #include <kernel/order.h>
 #include <util/base36.h>
 #include "util/keyword.h"     // for K_NUMBER
-#include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 

@@ -6,7 +6,6 @@
 #include "kernel/unit.h"
 
 #include "util/keyword.h"
-#include "util/language.h"
 #include "util/param.h"
 
 #include "tests.h"
