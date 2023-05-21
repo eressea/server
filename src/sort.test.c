@@ -9,7 +9,6 @@
 
 #include "util/base36.h"
 #include "util/keyword.h"
-#include "util/language.h"
 #include "util/param.h"
 
 #include "tests.h"
