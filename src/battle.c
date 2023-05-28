@@ -71,8 +71,6 @@
 #define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
 #define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
-#define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
-
 #define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
 #define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
@@ -1939,36 +1937,37 @@ int getreload(troop at)
     return at.fighter->person[at.index].reload;
 }
 
-int hits(troop at, troop dt, weapon * awp)
+bool hits(troop at, troop dt, weapon * awp)
 {
     fighter *af = at.fighter, *df = dt.fighter;
     const armor_type *armor, *shield = NULL;
     int skdiff = 0;
-    int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
-    weapon *dwp = select_weapon(dt, false, dist > 1);
+    const int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
+    const bool missiles_only = dist > 1;
+    weapon *dwp = select_weapon(dt, false, missiles_only);
 
     if (!df->alive)
-        return 0;
+        return false;
     if (getreload(at))
-        return 0;
-    if (dist > 1 && (awp == NULL || !fval(awp->type, WTF_MISSILE)))
-        return 0;
+        return false;
+    if (missiles_only && (awp == NULL || !fval(awp->type, WTF_MISSILE)))
+        return false;
 
     /* mark this person as hit. */
     df->person[dt.index].flags |= FL_HIT;
 
     if (af->person[at.index].flags & FL_STUNNED) {
         af->person[at.index].flags &= ~FL_STUNNED;
-        return 0;
+        return false;
     }
     if ((af->person[at.index].flags & FL_TIRED && rng_int() % 100 < 50)
         || (af->person[at.index].flags & FL_SLEEPING))
-        return 0;
+        return false;
 
     /* effect of sp_reeling_arrows combatspell */
     if (af->side->battle->reelarrow && awp && fval(awp->type, WTF_MISSILE)
         && rng_double() < 0.5) {
-        return 0;
+        return false;
     }
 
     skdiff = skilldiff(at, dt, dist);
@@ -1977,10 +1976,10 @@ int hits(troop at, troop dt, weapon * awp)
     if (dwp == NULL || (dwp->type->flags & WTF_USESHIELD)) {
         shield = select_armor(dt, false);
     }
-    if (contest(skdiff, dt, armor, shield)) {
-        return 1;
+    if (!contest(skdiff, dt, armor, shield)) {
+        return false;
     }
-    return 0;
+    return true;
 }
 
 void dazzle(battle * b, troop * td)
@@ -2045,6 +2044,37 @@ static void make_heroes(battle * b)
             }
         }
     }
+}
+
+void structural_damage(troop td, int damage_abs, int chance_pct)
+{
+    unit* du = td.fighter->unit;
+    if (du->ship) {
+        if (chance_pct >= 100 || rng_int() % 100 < chance_pct) {
+            double damage = .0f;
+            ship* sh = du->ship;
+            if (damage_abs > 0) {
+                damage = (double)damage_abs / sh->type->damage / sh->size;
+            }
+            else {
+                damage = config_get_flt("rules.catapult.damage.ship", 0.01);
+            }
+            damage_ship(du->ship, damage);
+        }
+    }
+    else if (du->building) {
+        if (chance_pct >= 100 || rng_int() % 100 < chance_pct) {
+            battle* b = td.fighter->side->battle;
+            if (damage_abs > 0) {
+                damage_building(b, du->building, damage_abs);
+            }
+            else {
+                damage_abs = config_get_int("rules.catapult.damage.building", 1);
+                damage_building(b, du->building, damage_abs);
+            }
+        }
+    }
+
 }
 
 static void attack(battle * b, troop ta, const att * a, int numattack)
@@ -2193,18 +2223,11 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         if (ta.fighter->person[ta.index].last_action < b->turn) {
             ta.fighter->person[ta.index].last_action = b->turn;
         }
-        if (td.fighter->unit->ship) {
-            int dice = dice_rand(a->data.dice);
-            ship * sh = td.fighter->unit->ship;
-            damage_ship(sh, dice / sh->type->damage / sh->size);
-        }
-        else if (td.fighter->unit->building) {
-            damage_building(b, td.fighter->unit->building, dice_rand(a->data.dice));
-        }
+        structural_damage(td, dice_rand(a->data.dice), 100);
     }
 }
 
-void do_attack(fighter * af)
+static void do_attack(fighter * af)
 {
     troop ta;
     unit *au = af->unit;
