@@ -3,6 +3,7 @@
 
 #include <kernel/unit.h>
 #include <kernel/build.h>
+#include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/messages.h>
@@ -125,17 +126,9 @@ int *casualties)
 
         /* If battle succeeds */
         if (hits(*at, dt, wp)) {
+            int chance_pct = config_get_int("rules.catapult.damage.chance_percent", 5);
             d += terminate(dt, *at, AT_STANDARD, wp->type->damage[0], true);
-/* CATAPULT_STRUCTURAL_DAMAGE
-            if (dt.fighter->unit->building && rng_int() % 100 < 5) {
-                double dmg = config_get_flt("rules.building.damage.catapult", 1);
-                damage_building(b, dt.fighter->unit->building, dmg);
-            }
-            else if (dt.fighter->unit->ship && rng_int() % 100 < 5) {
-                double dmg = config_get_flt("rules.ship.damage.catapult", 0.01);
-                damage_ship(dt.fighter->unit->ship, dmg);
-            }
-*/
+            structural_damage(dt, 0, chance_pct);
         }
     }
 

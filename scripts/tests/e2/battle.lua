@@ -52,6 +52,8 @@ function test_complex_battle()
 end
 
 function test_ship_damage_catapult()
+    -- eressea.settings.set("rules.catapult.damage.ship", 1.0)
+    eressea.settings.set("rules.catapult.damage.chance_percent", 100)
     local r = region.create(0, 0, 'plain')
     local sh = ship.create(r, "caravel")
     local f1 = faction.create('human')
@@ -60,9 +62,11 @@ function test_ship_damage_catapult()
     u1.ship = sh
     local f2 = faction.create('human')
     local u2 = unit.create(f2, r)
+    u2.name = 'Xolgrim'
     u2:add_order('ATTACKIERE ' .. itoa36(u1.id))
     u2:set_skill('catapult', 10)
     u2:add_item('catapult', 1)
+    u2:add_item('catapultammo', 10)
     assert_equal(0, sh.damage)
     process_orders()
     assert_not_equal(0, sh.damage)
@@ -77,7 +81,6 @@ function test_ship_damage_seaserpent()
     u1.ship = sh
     local f2 = faction.create('seaserpent')
     local u2 = unit.create(f2, r)
-    u2.name = 'Xolgrim'
     u2:add_order('ATTACKIERE ' .. itoa36(u1.id))
     u2:set_skill('unarmed', 10)
     assert_equal(0, sh.damage)

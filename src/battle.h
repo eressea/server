@@ -201,7 +201,7 @@ int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwty
 bool terminate(troop dt, troop at, int type, const char* damage,
     bool missile);
 void message_all(battle* b, struct message* m);
-int hits(troop at, troop dt, weapon* awp);
+bool hits(troop at, troop dt, weapon* awp);
 void damage_building(struct battle* b, struct building* bldg,
     int damage_abs);
 
@@ -239,5 +239,6 @@ double tactics_chance(const struct unit* u, int skilldiff);
 int meffect_apply(struct meffect* me, int damage);
 
 void loot_items(fighter* corpse);
+void structural_damage(troop td, int damage_abs, int changce_pct);
 
 #endif
