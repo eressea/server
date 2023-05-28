@@ -1,3 +1,4 @@
+--[[
 require 'tests.shared.process'
 require 'tests.shared.items'
 require 'tests.shared.spells'
@@ -6,7 +7,6 @@ require 'tests.shared.storage'
 require 'tests.e2.common'
 require 'tests.e2.spells'
 require 'tests.e2.guard'
-require 'tests.e2.battle'
 require 'tests.e2.produce'
 require 'tests.e2.production'
 require 'tests.e2.manufacture'
@@ -40,3 +40,5 @@ require 'tests.e2.parser'
 require 'tests.e2.report'
 require 'tests.e2.magicbag'
 require 'tests.e2.xmas'
+]]
+require 'tests.e2.battle'

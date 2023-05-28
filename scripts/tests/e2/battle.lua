@@ -13,7 +13,6 @@ end
 
 function test_complex_battle()
     local r = region.create(0, 0, 'plain')
-    r.name = 'Hyboria'
     local f1 = faction.create('goblin')
     local f2 = faction.create('human')
     local f3 = faction.create('cat')
@@ -50,4 +49,38 @@ function test_complex_battle()
     u3:add_order('ATTACKIERE ' .. itoa36(u1.id))
     u2:add_order('ATTACKIERE ' .. itoa36(u5.id))
     process_orders()
+end
+
+function test_ship_damage_catapult()
+    local r = region.create(0, 0, 'plain')
+    local sh = ship.create(r, "caravel")
+    local f1 = faction.create('human')
+    local u1 = unit.create(f1, r, 10)
+    u1.hp = u1.hp * 100
+    u1.ship = sh
+    local f2 = faction.create('human')
+    local u2 = unit.create(f2, r)
+    u2:add_order('ATTACKIERE ' .. itoa36(u1.id))
+    u2:set_skill('catapult', 10)
+    u2:add_item('catapult', 1)
+    assert_equal(0, sh.damage)
+    process_orders()
+    assert_not_equal(0, sh.damage)
+end
+
+function test_ship_damage_seaserpent()
+    local r = region.create(0, 0, 'plain')
+    local sh = ship.create(r, "caravel")
+    local f1 = faction.create('human')
+    local u1 = unit.create(f1, r, 10)
+    u1.hp = u1.hp * 100
+    u1.ship = sh
+    local f2 = faction.create('seaserpent')
+    local u2 = unit.create(f2, r)
+    u2.name = 'Xolgrim'
+    u2:add_order('ATTACKIERE ' .. itoa36(u1.id))
+    u2:set_skill('unarmed', 10)
+    assert_equal(0, sh.damage)
+    process_orders()
+    assert_not_equal(0, sh.damage)
 end

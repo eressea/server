@@ -71,8 +71,6 @@
 #define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
 #define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
-#define CATAPULT_INITIAL_RELOAD 4       /* erster schuss in runde 1 + rng_int() % INITIAL */
-
 #define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
 #define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
@@ -2204,7 +2202,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
     }
 }
 
-void do_attack(fighter * af)
+static void do_attack(fighter * af)
 {
     troop ta;
     unit *au = af->unit;
