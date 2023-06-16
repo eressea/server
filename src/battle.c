@@ -3094,8 +3094,7 @@ static void equip_weapons(fighter* fig)
     int dwp[WMAX];
     int wcount[WMAX];
     int wused[WMAX];
-    int oi = 0, di = 0, w = 0;
-    int i;
+    int i, oi = 0, di = 0, w = 0;
 
     for (itm = u->items; itm && w != WMAX; itm = itm->next) {
         const weapon_type* wtype = resource2weapon(itm->type->rtype);
@@ -3112,29 +3111,30 @@ static void equip_weapons(fighter* fig)
         assert(w != WMAX);
     }
     fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
-    memcpy(fig->weapons, weapons, w * sizeof(weapon));
-    fig->weapons[w].type = NULL;
-
-    for (i = 0; i != w; ++i) {
-        int j, o = 0, d = 0;
-        for (j = 0; j != i; ++j) {
-            if (weapon_weight(fig->weapons + j,
-                true) >= weapon_weight(fig->weapons + i, true))
-                ++d;
-            if (weapon_weight(fig->weapons + j,
-                false) >= weapon_weight(fig->weapons + i, false))
-                ++o;
+    if (fig->weapons) {
+        memcpy(fig->weapons, weapons, w * sizeof(weapon));
+        fig->weapons[w].type = NULL;
+        for (i = 0; i != w; ++i) {
+            int j, o = 0, d = 0;
+            for (j = 0; j != i; ++j) {
+                if (weapon_weight(fig->weapons + j,
+                    true) >= weapon_weight(fig->weapons + i, true))
+                    ++d;
+                if (weapon_weight(fig->weapons + j,
+                    false) >= weapon_weight(fig->weapons + i, false))
+                    ++o;
+            }
+            for (j = i + 1; j != w; ++j) {
+                if (weapon_weight(fig->weapons + j,
+                    true) > weapon_weight(fig->weapons + i, true))
+                    ++d;
+                if (weapon_weight(fig->weapons + j,
+                    false) > weapon_weight(fig->weapons + i, false))
+                    ++o;
+            }
+            owp[o] = i;
+            dwp[d] = i;
         }
-        for (j = i + 1; j != w; ++j) {
-            if (weapon_weight(fig->weapons + j,
-                true) > weapon_weight(fig->weapons + i, true))
-                ++d;
-            if (weapon_weight(fig->weapons + j,
-                false) > weapon_weight(fig->weapons + i, false))
-                ++o;
-        }
-        owp[o] = i;
-        dwp[d] = i;
     }
     /* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
      * oi and di are the current index to the sorted owp/dwp arrays
