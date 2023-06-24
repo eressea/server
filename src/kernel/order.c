@@ -179,7 +179,6 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
     if (ord->id < 0) {
         skill_t sk = (skill_t)(100 + ord->id);
 
-        assert(kwd == K_AUTOSTUDY || kwd == K_STUDY);
         assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
