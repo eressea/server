@@ -15,6 +15,7 @@ if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
   exit 1
 fi
 REPORTS="$ERESSEA/game-$GAME/reports"
+DATA="$ERESSEA/game-$GAME/data"
 if [ -d "$REPORTS" ]; then
   rm -rf "$REPORTS"
 fi
@@ -42,7 +43,7 @@ rm -f execute.lock
 touch execute.lock
 
 let NEXTTURN=$TURN+1
-if [ ! -e "$ERESSEA/data/$NEXTTURN.dat" ]; then
+if [ ! -e "$DATA/$NEXTTURN.dat" ]; then
   echo "server did not create data file $NEXTTURN.dat"
   exit 5
 fi
