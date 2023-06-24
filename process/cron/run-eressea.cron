@@ -15,6 +15,7 @@ if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
   exit 1
 fi
 REPORTS="$ERESSEA/game-$GAME/reports"
+DATA="$ERESSEA/game-$GAME/data"
 if [ -d "$REPORTS" ]; then
   rm -rf "$REPORTS"
 fi
@@ -41,12 +42,17 @@ rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
 touch execute.lock
 
+let NEXTTURN=$TURN+1
+if [ ! -e "$DATA/$NEXTTURN.dat" ]; then
+  echo "server did not create data file $NEXTTURN.dat"
+  exit 5
+fi
 if [ ! -s "$REPORTS/reports.txt" ]; then
   echo "server did not create reports.txt in game $GAME"
   exit 4
 fi
 "$BIN/backup-eressea" "$GAME" "$TURN"
-let TURN=$TURN+1
+TURN=$NEXTTURN
 if [ ! -s "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
   echo "server did not create data for turn $TURN in game $GAME"
   exit 3

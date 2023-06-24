@@ -123,7 +123,6 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         sbs_strcat(&sbs, str);
         if (ord->id < 0) {
             skill_t sk = (skill_t)(100+ord->id);
-            assert((kwd == K_STUDY || kwd == K_AUTOSTUDY) && sk != SK_MAGIC && sk < MAXSKILLS);
             str = skillname(sk, lang);
             if (str) {
                 if (strchr(str, ' ') == NULL) {
@@ -179,7 +178,6 @@ int stream_order(struct stream *out, const struct order *ord, const struct local
     if (ord->id < 0) {
         skill_t sk = (skill_t)(100 + ord->id);
 
-        assert(kwd == K_AUTOSTUDY || kwd == K_STUDY);
         assert(sk != SK_MAGIC && sk < MAXSKILLS);
         text = skillname(sk, lang);
         if (strchr(text, ' ') != NULL) {
@@ -591,7 +589,6 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
 
             assert(sk < MAXSKILLS);
             assert(lang);
-            assert(kwd == K_STUDY || kwd == K_AUTOSTUDY || kwd == K_FORGET);
             str = skillname(sk, lang);
             if (strchr(str, ' ') == NULL) {
                 init_tokens_str(str);
