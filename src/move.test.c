@@ -378,7 +378,7 @@ struct drift_fixture {
 
 void setup_drift (struct drift_fixture *fix) {
     test_create_locale();
-    config_set("rules.ship.storms", "0");
+    config_set_int("rules.ship.storms", 0);
 
     fix->st_boat = test_create_shiptype("boat");
     fix->st_boat->cabins = 20000;
@@ -596,8 +596,8 @@ static void test_follow_bad_target(CuTest* tc) {
     u = test_create_unit(f, test_create_ocean(0, 0));
     u2 = test_create_unit(f, test_create_ocean(0, 0));
     u->ship = test_create_ship(u->region, NULL);
-    unit_addorder(u, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no)));
-    unit_addorder(u2, create_order(K_FOLLOW, f->locale, "%s %s", LOC(f->locale, parameters[P_SHIP]), itoa36(u->ship->no)));
+    unit_addorder(u, create_order(K_FOLLOW, f->locale, "%s %s", param_name(P_UNIT, f->locale), itoa36(u2->no)));
+    unit_addorder(u2, create_order(K_FOLLOW, f->locale, "%s %s", param_name(P_SHIP, f->locale), itoa36(u->ship->no)));
     follow_cmds(u);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error330"));
     CuAssertIntEquals(tc, 0, fval(u, UFL_NOTMOVING | UFL_LONGACTION));
@@ -627,7 +627,7 @@ static void test_follow_unit(CuTest* tc) {
     unit_addorder(u2, ord);
     u2->thisorder = copy_order(ord);
     ord = create_order(K_FOLLOW, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u2->no));
+        param_name(P_UNIT, f->locale), itoa36(u2->no));
     unit_addorder(u, ord);
     u->thisorder = copy_order(ord);
 
@@ -660,7 +660,7 @@ static void test_follow_unit_self(CuTest *tc) {
     f = test_create_faction();
     u = test_create_unit(f, test_create_plain(0, 0));
     ord = create_order(K_FOLLOW, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_UNIT]), itoa36(u->no));
+        param_name(P_UNIT, f->locale), itoa36(u->no));
     unit_addorder(u, ord);
     follow_cmds(u);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "followfail"));

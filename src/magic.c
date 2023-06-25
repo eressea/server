@@ -1505,8 +1505,7 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
     const char *uid = NULL;
 
     if (spobj->typ == SPP_TEMP) {
-        sprintf(tbuf, "%s %s", LOC(mage->faction->locale,
-            parameters[P_TEMP]), itoa36(spobj->data.i));
+        sprintf(tbuf, "%s %s", param_name(P_TEMP, mage->faction->locale), itoa36(spobj->data.i));
         uid = tbuf;
     }
     else if (spobj->typ == SPP_UNIT) {

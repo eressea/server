@@ -1,14 +1,23 @@
 #include "bind_tolua.h"
 
-#include "config.pkg.c"
-#include "eressea.pkg.c"
-#include "game.pkg.c"
-#include "locale.pkg.c"
-#include "log.pkg.c"
-#include "process.pkg.c"
-#include "settings.pkg.c"
-
+#include <tolua.h>
 #include <lua.h>
+#include <luaconf.h>
+
+TOLUA_API int tolua_config_open (lua_State* tolua_S);
+LUALIB_API int luaopen_config (lua_State* tolua_S);
+TOLUA_API int tolua_eressea_open (lua_State* tolua_S);
+LUALIB_API int luaopen_eressea (lua_State* tolua_S);
+TOLUA_API int tolua_game_open (lua_State* tolua_S);
+LUALIB_API int luaopen_game (lua_State* tolua_S);
+TOLUA_API int tolua_log_open (lua_State* tolua_S);
+LUALIB_API int luaopen_log (lua_State* tolua_S);
+TOLUA_API int tolua_process_open (lua_State* tolua_S);
+LUALIB_API int luaopen_process (lua_State* tolua_S);
+TOLUA_API int tolua_settings_open (lua_State* tolua_S);
+LUALIB_API int luaopen_settings (lua_State* tolua_S);
+TOLUA_API int tolua_locale_open (lua_State* tolua_S);
+LUALIB_API int luaopen_locale (lua_State* tolua_S);
 
 void tolua_bind_open(lua_State * L)
 {

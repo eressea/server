@@ -62,6 +62,7 @@ typedef struct window {
     void (*paint) (struct window* win, const struct state* st);
 
     WINDOW* handle;
+    void* data;
     struct window* next;
     struct window* prev;
     bool initialized;

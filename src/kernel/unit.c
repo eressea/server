@@ -816,8 +816,12 @@ void transfermen(unit* u, unit* dst, int n)
         delta = (long long)u->hp * n / u->number;
         dst->hp += delta;
         u->hp -= delta;
+        /* cannot use scale_number here, because it changes hp+effects: */
         set_number(dst, dst->number + n);
         set_number(u, u->number - n);
+        if (u->number == 0) {
+            remove_skills(u);
+        }
         assert(dst->hp >= dst->number);
         assert(u->hp >= u->number);
     }
@@ -947,7 +951,7 @@ void remove_skill(unit * u, enum skill_t sk)
     }
 }
 
-static void remove_skills(unit * u) {
+void remove_skills(unit * u) {
     arrfree(u->skills);
 }
 
@@ -1262,12 +1266,12 @@ void default_name(const unit *u, char name[], int len) {
         const char * prefix;
         prefix = LOC(lang, "unitdefault");
         if (!prefix) {
-            prefix = parameters[P_UNIT];
+            prefix = param_name(P_UNIT, lang);
         }
         result = prefix;
     }
     else {
-        result = parameters[P_UNIT];
+        result = param_name(P_UNIT, lang);
     }
     snprintf(name, len, "%s %s", result, itoa36(u->no));
 }
@@ -1337,7 +1341,9 @@ unit *create_unit(region * r, faction * f, int number, const struct race *urace,
 
         /* erbt Kampfstatus und Tarnung */
         unit_setstatus(u, creator->status);
-        u->irace = creator->irace;
+        if (u->_race == creator->_race) {
+            u->irace = creator->irace;
+        }
 
         /* erbt Gebaeude/Schiff */
         if (creator->region == r) {

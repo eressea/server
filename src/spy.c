@@ -262,13 +262,13 @@ int setstealth_cmd(unit * u, struct order *ord)
                     u->flags |= UFL_ANON_FACTION;
                     break;
                 }
-                else if (get_param(s, u->faction->locale) == P_NOT) {
+                else if (isparam(s, u->faction->locale, P_NOT)) {
                     u->flags &= ~UFL_ANON_FACTION;
                     break;
                 }
             }
             if (rule_stealth_other()) {
-                if (get_param(s, u->faction->locale) == P_NUMBER) {
+                if (isparam(s, u->faction->locale, P_NUMBER)) {
                     int nr = -1;
 
                     s = gettoken(token, sizeof(token));

@@ -16,11 +16,6 @@ function setup()
     u:add_item('log', 300) -- no shortage of materials
     u:set_skill('shipcraft', 4) -- humans get + 1
     u:add_order('MACHE Karavelle')
-    eressea.settings.set("rules.food.flags", "4")
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_build_ship()

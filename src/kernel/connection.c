@@ -622,6 +622,14 @@ int read_borders(gamedata *data)
     return 0;
 }
 
-const char * border_name(const connection *co, const struct region * r, const struct faction * f, int flags) {
-    return (co->type->name) ? co->type->name(co, r, f, flags) : co->type->_name;
+const char * border_name(const connection *co, const struct region * r, const struct faction * f, int flags, const struct locale *lang) {
+    const char * bname = (co->type->name) ? co->type->name(co, r, f, flags) : co->type->_name;
+    if (lang) {
+        const char *result = mkname("border", bname);
+        result = LOC(f->locale, result);
+        if (result) {
+            return result;
+        }
+    }
+    return bname;
 }

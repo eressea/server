@@ -249,12 +249,12 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
     /* Reihenfolge beachten: Erst REGION, dann STUFE! */
     if (sp->sptyp & FARCASTING) {
         sbs_strcat(&sbs, " [");
-        sbs_strcat(&sbs, LOC(lang, parameters[P_REGION]));
+        sbs_strcat(&sbs, param_name(P_REGION, lang));
         sbs_strcat(&sbs, " x y]");
     }
     if (sp->sptyp & SPELLLEVEL) {
         sbs_strcat(&sbs, " [");
-        sbs_strcat(&sbs, LOC(lang, parameters[P_LEVEL]));
+        sbs_strcat(&sbs, param_name(P_LEVEL, lang));
         sbs_strcat(&sbs, " n]");
     }
 
@@ -361,7 +361,7 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
                     if (targetp->param && targetp->vars) {
                         locp = LOC(lang, targetp->vars);
                         sbs_strcat(&sbs, " ");
-                        sbs_strcat(&sbs, parameters[targetp->param]);
+                        sbs_strcat(&sbs, param_name(targetp->param, lang));
                         sbs_strcat(&sbs, " <");
                         sbs_strcat(&sbs, locp);
                         sbs_strcat(&sbs, ">");
@@ -373,7 +373,7 @@ void nr_spell_syntax(char *buf, size_t size, spellbook_entry * sbe, const struct
                     }
                     else {
                         sbs_strcat(&sbs, " ");
-                        sbs_strcat(&sbs, parameters[targetp->param]);
+                        sbs_strcat(&sbs, param_name(targetp->param, NULL));
                     }
                 }
             }
@@ -1101,7 +1101,7 @@ void report_region(struct stream *out, const region * r, faction * f)
             int e;
             struct edge *match = NULL;
             bool transparent = b->type->transparent(b, f);
-            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE);
+            const char *name = border_name(b, r, f, GF_DETAILED | GF_ARTICLE, NULL);
 
             if (!transparent) {
                 see[d] = false;
@@ -1284,7 +1284,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
         sprintf(buf, "; %s\n", LOC(lang, "template_password_notice"));
         rps_nowrap(out, buf);
     }
-    sprintf(buf, "%s %s \"%s\"", LOC(lang, parameters[P_FACTION]), itoa36(f->no), password);
+    sprintf(buf, "%s %s \"%s\"", param_name(P_FACTION, lang), itoa36(f->no), password);
     rps_nowrap(out, buf);
     newline(out);
     newline(out);
@@ -1311,11 +1311,11 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
                     adjust_coordinates(f, &nx, &ny, pl);
                     newline(out);
                     if (pl && pl->id != 0) {
-                        sprintf(buf, "%s %d,%d,%d ; %s", LOC(lang,
-                            parameters[P_REGION]), nx, ny, pl->id, rname(r, lang));
+                        sprintf(buf, "%s %d,%d,%d ; %s", param_name(P_REGION, lang),
+                            nx, ny, pl->id, rname(r, lang));
                     }
                     else {
-                        sprintf(buf, "%s %d,%d ; %s", LOC(lang, parameters[P_REGION]),
+                        sprintf(buf, "%s %d,%d ; %s", param_name(P_REGION, lang),
                             nx, ny, rname(r, lang));
                     }
                     rps_nowrap(out, buf);
@@ -1328,7 +1328,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
                 dh = 1;
 
                 sbs_init(&sbs, buf, sizeof(buf));
-                sbs_strcat(&sbs, LOC(u->faction->locale, parameters[P_UNIT]));
+                sbs_strcat(&sbs, param_name(P_UNIT, u->faction->locale));
                 sbs_strcat(&sbs, " ");
                 sbs_strcat(&sbs, itoa36(u->no)),
                 sbs_strcat(&sbs, ";    ");
@@ -1377,7 +1377,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
         }
     }
     newline(out);
-    str_strlcpy(buf, LOC(lang, parameters[P_NEXT]), sizeof(buf));
+    str_strlcpy(buf, param_name(P_NEXT, lang), sizeof(buf));
     rps_nowrap(out, buf);
     newline(out);
     fstream_done(&strm);
@@ -1478,7 +1478,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
     pump_paragraph(sbp, show->out, show->maxlen, false);
     sbs_strcat(sbp, " (");
     if ((mode & HELP_ALL) == HELP_ALL) {
-        sbs_strcat(sbp, LOC(f->locale, parameters[P_ANY]));
+        sbs_strcat(sbp, param_name(P_ANY, f->locale));
     }
     else if (mode > 0) {
         int h, hh = 0;
@@ -1510,7 +1510,7 @@ static int show_allies_cb(struct allies *all, faction *af, int status, void *uda
                 if (hh) {
                     sbs_strcat(sbp, ", ");
                 }
-                sbs_strcat(sbp, LOC(f->locale, parameters[p]));
+                sbs_strcat(sbp, param_name(p, f->locale));
                 hh = 1;
             }
         }
@@ -1816,7 +1816,7 @@ static void init_cb(travelthru_data *data, struct stream *out, char *buffer, siz
     data->counter = 0;
 }
 
-static void cb_write_travelthru(region *r, unit *u, void *cbdata) {
+static void cb_write_travelthru(region *r, const unit *u, void *cbdata) {
     travelthru_data *data = (travelthru_data *)cbdata;
     const faction *f = data->f;
 

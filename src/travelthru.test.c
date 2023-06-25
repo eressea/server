@@ -12,7 +12,7 @@
 
 #include <stddef.h>          // for NULL
 
-static void count_travelers(region *r, unit *u, void *cbdata) {
+static void count_travelers(region *r, const unit *u, void *cbdata) {
     int *n = (int *)cbdata;
     (void)r;
     *n += u->number;

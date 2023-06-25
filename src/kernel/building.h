@@ -22,7 +22,7 @@ extern "C" {
     typedef struct maintenance {
         const struct resource_type *rtype;  /* type of resource required */
         int number;                 /* amount of resources */
-        int flags;         /* misc. flags */
+        unsigned int flags;         /* misc. flags */
     } maintenance;
 
     /* building_type::flags */

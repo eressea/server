@@ -8,18 +8,12 @@ end
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.food.flags", "4") -- food is free
-    eressea.settings.set("NewbieImmunity", "0")
-end
-
-local function create_faction(race)
-    return faction.create(race, race .. '@example.com', "de")
 end
 
 function test_greatbow_needs_elf()
 -- only elves can build a greatbow
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -40,7 +34,7 @@ end
 function test_troll_no_quarrying_bonus()
 -- Trolle kriegen keinen Rohstoffbonus wie in E2
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('troll')
+    local f = faction.create('troll')
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -55,7 +49,7 @@ end
 function test_dwarf_no_mining_bonus()
 -- E3: Zwerge verlieren den Eisenabbaubonus
     local r = region.create(0, 0, 'mountain')
-    local f = create_faction('dwarf')
+    local f = faction.create('dwarf')
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -71,7 +65,7 @@ function test_dwarf_towershield()
 -- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
 -- und Repetierarmbrüste bauen.
     local r = region.create(0, 0, 'plain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -95,7 +89,7 @@ function test_dwarf_scale()
 -- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
 -- und Repetierarmbrüste bauen.
     local r = region.create(0, 0, 'plain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()
@@ -118,7 +112,7 @@ function test_dwarf_rep_xbow()
 -- Zwerge können als einzige Rasse Turmschilde, Schuppenpanzer 
 -- und Repetierarmbrüste bauen.
     local r = region.create(0, 0, 'plain')
-    local f = create_faction('human')
+    local f = faction.create('human')
     local u = unit.create(f, r, 1)
 
     turn_begin()

@@ -20,8 +20,8 @@ static void test_resourcename_no_appearance(CuTest *tc) {
     init_resources(); /* creates R_SILVER */
     rtype = get_resourcetype(R_SILVER);
     assert(rtype && rtype->itype);
-    assert(rtype->itype->_appearance[0] == 0);
-    assert(rtype->itype->_appearance[1] == 0);
+    assert(rtype->itype->_appearance[0] == NULL);
+    assert(rtype->itype->_appearance[1] == NULL);
     CuAssertStrEquals(tc, "money", resourcename(rtype, 0));
     CuAssertStrEquals(tc, "money_p", resourcename(rtype, NMF_PLURAL));
     CuAssertStrEquals(tc, "money", resourcename(rtype, NMF_APPEARANCE));
@@ -31,9 +31,14 @@ static void test_resourcename_no_appearance(CuTest *tc) {
 
 static void test_resourcename_with_appearance(CuTest *tc) {
     item_type *itype;
+    resource_type *rtype;
 
     test_setup();
-    itype = it_get_or_create(rt_get_or_create("foo"));
+    rtype = rt_get_or_create("foo");
+    CuAssertIntEquals(tc, 0, rtype->flags);
+    itype = it_get_or_create(rtype);
+    CuAssertPtrEquals(tc, rtype, itype->rtype);
+    CuAssertIntEquals(tc, RTF_ITEM | RTF_POOLED, rtype->flags);
     assert(itype && itype->rtype);
     it_set_appearance(itype, "bar");
     CuAssertStrEquals(tc, "foo", resourcename(itype->rtype, 0));
@@ -172,10 +177,8 @@ static void test_fix_demand(CuTest *tc) {
 
     test_setup();
     ltype = test_create_itemtype("balm");
-    ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
     new_luxurytype(ltype, 0);
     ltype = test_create_itemtype("oint");
-    ltype->rtype->flags |= (RTF_ITEM | RTF_POOLED);
     new_luxurytype(ltype, 0);
     tplain = test_create_terrain("plain", LAND_REGION);
     r = new_region(0, 0, NULL, 0);

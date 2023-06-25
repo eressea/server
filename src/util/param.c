@@ -64,7 +64,13 @@ const char *parameters[MAXPARAMS] = {
 
 const char* param_name(param_t p, const struct locale* lang)
 {
-    return LOC(lang, parameters[p]);
+    if (lang) {
+        const char* pname = LOC(lang, parameters[p]);
+        if (pname) {
+            return pname;
+        }
+    }
+    return parameters[p];
 }
 
 param_t findparam(const char* s)

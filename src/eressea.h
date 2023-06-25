@@ -7,6 +7,7 @@ void game_init(void);
 void game_done(void);
 
 void free_gamedata(void);
+void free_configuration(void);
 void init_locale(struct locale *lang);
 
 #endif

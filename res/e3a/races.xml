@@ -603,7 +603,7 @@
     <attack type="3" damage="1d1"/>
     <attack type="4" damage="1d1"/>
   </race>
-  <race name="toad" magres="20" maxaura="1" regaura="1" maintenance="10" weight="100" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" learn="no">
+  <race name="toad" magres="20" maxaura="1" regaura="1" maintenance="10" weight="100" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" nolearn="yes">
     <ai splitsize="1"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
@@ -627,7 +627,7 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="smurf" weight="1000" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" learn="no">
+  <race name="smurf" weight="1000" capacity="540" speed="1.0" hp="10" damage="1d2" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" giveperson="yes" giveunit="yes" getitem="yes" walk="yes" nolearn="yes">
     <ai splitsize="1"/>
     <skill name="crossbow" modifier="-10"/>
     <skill name="mining" modifier="-10"/>
@@ -651,28 +651,28 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="mountainguard" unarmedguard="yes" magres="50" weight="10000" capacity="2000" speed="0.0" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" learn="no" teach="no" noweapons="yes">
+  <race name="mountainguard" unarmedguard="yes" magres="50" weight="10000" capacity="2000" speed="0.0" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
-  <race name="shadowmaster" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.0" regaura="2.0" weight="500" capacity="540" speed="1.0" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" walk="yes" teach="no" desert="yes">
+  <race name="shadowmaster" cansail="no" cansteal="no" nolearn="yes" magres="75" maxaura="1.0" regaura="2.0" weight="500" capacity="540" speed="1.0" hp="150" ac="4" damage="2d5" unarmedattack="0" unarmeddefense="0" attackmodifier="11" defensemodifier="13" walk="yes" teach="no" desert="yes">
     <ai splitsize="50" scarepeasants="yes" killpeasants="yes" moverandom="yes"/>
     <attack type="4" damage="2d4"/>
     <attack type="2" damage="2d30"/>
     <attack type="3" damage="1d2"/>
   </race>
-  <race name="shadowdemon" cansail="no" cansteal="no" learn="no" magres="75" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" walk="yes" teach="no" desert="yes" recruitethereal="yes">
+  <race name="shadowdemon" cansail="no" cansteal="no" nolearn="yes" magres="75" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="50" ac="3" damage="2d4" unarmedattack="0" unarmeddefense="0" attackmodifier="8" defensemodifier="11" walk="yes" teach="no" desert="yes" recruitethereal="yes">
     <ai splitsize="1000" scarepeasants="yes" killpeasants="yes" moverandom="yes"/>
     <attack type="4" damage="2d3"/>
     <attack type="3" damage="1d1"/>
   </race>
-  <race name="stonegolem" stonegolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
+  <race name="stonegolem" stonegolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="60" ac="4" damage="2d12+6" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" nolearn="yes" teach="no">
     <ai splitsize="50"/>
     <skill name="building" modifier="14"/>
     <skill name="roadwork" modifier="14"/>
     <attack type="4" damage="2d10+4"/>
   </race>
-  <race name="irongolem" irongolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" learn="no" teach="no">
+  <race name="irongolem" irongolem="true" magres="25" weight="10000" capacity="2000" speed="1.0" hp="50" ac="2" damage="2d10+4" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="2" walk="yes" nolearn="yes" teach="no">
     <ai splitsize="50"/>
     <skill name="armorer" modifier="14"/>
     <skill name="weaponsmithing" modifier="14"/>
@@ -699,14 +699,14 @@
   <race name="undead" maxaura="1" regaura="1" weight="1000"
   capacity="540" speed="1.0" hp="20" damage="1d7" unarmedattack="0"
   unarmeddefense="0" attackmodifier="1" defensemodifier="1"
-  walk="yes" learn="no" teach="no" noheal="yes" desert="yes"
+  walk="yes" nolearn="yes" teach="no" noheal="yes" desert="yes"
   undead="yes" equipment="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="20000" moverandom="yes" scarepeasants="yes"/>
     <attack type="4" damage="1d7"/>
     <attack type="5"/>
   </race>
 
-  <race name="clone" magres="90" weight="1000" capacity="540" speed="1.0" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" learn="no" teach="no" noheal="yes">
+  <race name="clone" magres="90" weight="1000" capacity="540" speed="1.0" hp="40" damage="0d0" unarmedattack="-2" unarmeddefense="-2" playerrace="yes" walk="yes" nolearn="yes" teach="no" noheal="yes">
     <ai splitsize="10000"/>
     <skill name="crossbow" modifier="-99"/>
     <skill name="mining" modifier="-99"/>
@@ -732,7 +732,7 @@
     <attack type="1" damage="0d0"/>
   </race>
 
-  <race name="ghast" magres="60" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
+  <race name="ghast" magres="60" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="6" defensemodifier="6" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
     <ai splitsize="2000" killpeasants="yes" moverandom="yes" scarepeasants="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -750,7 +750,7 @@
     <attack type="2" damage="1d30"/>
   </race>
 
-  <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
+  <race name="ghoul" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="30" ac="1" damage="1d7" unarmedattack="3" unarmeddefense="3" attackmodifier="3" defensemodifier="3" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" giveperson="yes" desert="yes">
     <ai splitsize="10000" killpeasants="yes" scarepeasants="yes" moverandom="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -767,7 +767,7 @@
     <attack type="2" damage="1d30"/>
   </race>
 
-  <race name="juju" magres="50" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
+  <race name="juju" magres="50" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="80" ac="2" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" resistbash="yes" resistcut="yes" resistpierce="yes" giveperson="yes">
     <ai splitsize="2000" killpeasants="yes" scarepeasants="yes" moverandom="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -783,7 +783,7 @@
     <attack type="3" damage="1d1"/>
   </race>
 
-  <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" desert="yes">
+  <race name="zombie" magres="20" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="40" ac="1" damage="1d7" unarmedattack="2" unarmeddefense="2" attackmodifier="5" defensemodifier="5" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" desert="yes">
     <ai splitsize="10000" killpeasants="yes" scarepeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -797,7 +797,7 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <race name="skeletonlord" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" learn="no" teach="no" noheal="yes" desert="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
+  <race name="skeletonlord" magres="30" maxaura="1.0" regaura="1.0" weight="1000" capacity="540" speed="1.0" hp="60" ac="4" damage="1d7" unarmedattack="6" unarmeddefense="6" attackmodifier="8" defensemodifier="8" walk="yes" nolearn="yes" teach="no" noheal="yes" desert="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="2000" killpeasants="yes" scarepeasants="yes" moverandom="yes" absorbpeasants="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -812,7 +812,7 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" walk="yes" learn="no" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
+  <race name="skeleton" magres="10" maxaura="1.0" regaura="1.0" weight="500" capacity="540" speed="1.0" hp="20" ac="1" damage="1d7" unarmedattack="1" unarmeddefense="1" attackmodifier="6" defensemodifier="6" walk="yes" nolearn="yes" teach="no" noheal="yes" undead="yes" equipment="yes" resistcut="yes" resistpierce="yes" giveperson="yes" unarmedguard="yes">
     <ai splitsize="10000" killpeasants="yes" scarepeasants="yes" moverandom="yes"/>
     <skill name="crossbow" modifier="1"/>
     <skill name="bow" modifier="1"/>
@@ -826,12 +826,12 @@
     <attack type="1" damage="1d7"/>
   </race>
 
-  <race name="shadowknight" weight="0" capacity="540" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" learn="no" teach="no" noblock="yes">
+  <race name="shadowknight" weight="0" capacity="540" speed="1.0" hp="1" damage="1d1" unarmedattack="0" unarmeddefense="0" attackmodifier="1" defensemodifier="1" walk="yes" nolearn="yes" teach="no" noblock="yes">
     <ai splitsize="20000" scarepeasants="yes" moverandom="yes"/>
     <attack type="1" damage="1d1"/>
   </race>
 
-  <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" learn="no" teach="no" getitem="yes" resistbash="yes">
+  <race name="seaserpent" magres="50" maxaura="1.0" regaura="1.0" weight="20000" capacity="5000" speed="1.0" hp="600" ac="3" damage="2d15" unarmedattack="0" unarmeddefense="0" attackmodifier="4" defensemodifier="4" swim="yes" nolearn="yes" teach="no" getitem="yes" resistbash="yes">
     <ai splitsize="6" scarepeasants="yes" killpeasants="yes" moverandom="yes" moveattack="yes"/>
     <skill name="stealth" modifier="-99"/>
     <attack type="4" damage="1d30"/>

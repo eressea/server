@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.config'
+local tcname = 'tests.e2.config'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -8,14 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-end
-
-function test_read_race()
-    local f
-    assert_not_nil(eressea.config)
-    eressea.config.parse('{ "races": { "orc" : {}}}')
-    f = faction.create("orc", "orc@example.com", "en")
-    assert_not_nil(f)
 end
 
 function test_first_insect()

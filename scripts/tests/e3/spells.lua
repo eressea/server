@@ -9,7 +9,6 @@ end
 function setup()
     eressea.game.reset()
     eressea.settings.set("magic.fumble.enable", "0")
-    eressea.settings.set("nmr.timeout", "0")
     eressea.settings.set("rules.peasants.growth", "0")
 end
 
@@ -68,7 +67,6 @@ function test_earn_silver()
     local f = faction.create("human")
     local u = unit.create(f, r)
 
-    eressea.settings.set("rules.food.flags", "4")
     eressea.settings.set("magic.fumble.enable", "0")
     eressea.settings.set("rules.peasants.growth", "0")
     eressea.settings.set("rules.economy.repopulate_maximum", "0")

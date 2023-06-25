@@ -1865,7 +1865,7 @@ int name_cmd(struct unit *u, struct order *ord)
                         break;
                     }
 
-                    sdname = LOC(lang, parameters[P_SHIP]);
+                    sdname = param_name(P_SHIP, lang);
                     sdlen = strlen(sdname);
                     if (sh_len >= sdlen && strncmp(sh->name, sdname, sdlen) == 0) {
                         break;
@@ -2536,13 +2536,13 @@ int combatspell_cmd(unit * u, struct order *ord)
     s = gettoken(token, sizeof(token));
 
     /* KAMPFZAUBER [NICHT] loescht alle gesetzten Kampfzauber */
-    if (!s || *s == 0 || get_param(s, u->faction->locale) == P_NOT) {
+    if (!s || *s == 0 || isparam(s, u->faction->locale, P_NOT)) {
         unset_combatspell(u, 0);
         return 0;
     }
 
     /* Optional: STUFE n */
-    if (get_param(s, u->faction->locale) == P_LEVEL) {
+    if (isparam(s, u->faction->locale, P_LEVEL)) {
         /* Merken, setzen kommt erst spaeter */
         level = getuint();
         s = gettoken(token, sizeof(token));
@@ -2556,7 +2556,7 @@ int combatspell_cmd(unit * u, struct order *ord)
 
     s = gettoken(token, sizeof(token));
 
-    if (get_param(s, u->faction->locale) == P_NOT) {
+    if (isparam(s, u->faction->locale, P_NOT)) {
         /* KAMPFZAUBER "<Spruchname>" NICHT  loescht diesen speziellen
          * Kampfzauber */
         unset_combatspell(u, sp);

@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.parser'
+local tcname = 'tests.e2.parser'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -8,7 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("rules.food.flags", "4") -- FOOD_IS_FREE
     eressea.settings.set("rules.move.owner_leave", "0")
 end
 

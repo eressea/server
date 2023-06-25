@@ -132,7 +132,7 @@ static void handle_bad_input(parseinfo *pi, const XML_Char *el, const XML_Char *
     ++pi->errors;
 }
 
-static bool handle_flag(int *flags, const XML_Char **pair, const char *names[]) {
+static bool handle_flag(unsigned int *flags, const XML_Char **pair, const char *names[]) {
     int i;
     for (i = 0; names[i]; ++i) {
         const char * name = names[i];
@@ -164,7 +164,7 @@ static void handle_resource(parseinfo *pi, const XML_Char *el, const XML_Char **
     const char *flag_names[] = { "item", "limited", "pooled", NULL };
     int i;
     const char *name = NULL, *appear = NULL;
-    int flags = RTF_POOLED;
+    unsigned int flags = RTF_POOLED;
     bool material = false;
     (void)el;
     for (i = 0; attr[i]; i += 2) {
@@ -200,7 +200,8 @@ static void handle_resource(parseinfo *pi, const XML_Char *el, const XML_Char **
 
 static void handle_item(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     const char *flag_names[] = { "herb", "cursed", "notlost", "big", "animal", "vehicle", "use", NULL };
-    int i, flags = ITF_NONE;
+    int i;
+    unsigned int flags = ITF_NONE;
     resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     assert(rtype);
@@ -245,7 +246,7 @@ static void handle_armor(parseinfo *pi, const XML_Char *el, const XML_Char **att
     resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     armor_type *atype = new_armortype(itype, 0.0, frac_zero, 0, 0);
-    int i, flags = 0;
+    unsigned int i, flags = 0;
     for (i = 0; attr[i]; i += 2) {
         if (xml_strequal(attr[i], "penalty")) {
             atype->penalty = xml_float(attr[i + 1]);
@@ -271,7 +272,7 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
     resource_type *rtype = (resource_type *)pi->object;
     item_type * itype = rtype->itype;
     weapon_type *wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, NOSKILL);
-    int i, flags = 0;
+    unsigned int i, flags = 0;
     for (i = 0; attr[i]; i += 2) {
         if (xml_strequal(attr[i], "offmod")) {
             wtype->offmod = xml_int(attr[i + 1]);
@@ -417,7 +418,8 @@ static void start_spells(parseinfo *pi, const XML_Char *el, const XML_Char **att
     else if (xml_strequal(el, "spell")) {
         spell *sp;
         const XML_Char *name = NULL, *syntax = NULL, *parameter = NULL;
-        int i, rank = 0, flags = 0;
+        int rank = 0;
+        unsigned int i, flags = 0;
         for (i = 0; attr[i]; i += 2) {
             const XML_Char *key = attr[i], *val = attr[i + 1];
             if (xml_strequal(key, "name")) {
@@ -881,7 +883,7 @@ static void start_ships(parseinfo *pi, const XML_Char *el, const XML_Char **attr
         name = attr_get(attr, "name");
         if (name) {
             ship_type *stype = st_get_or_create(name);
-            int i, flags = SFL_DEFAULT;
+            unsigned int i, flags = SFL_DEFAULT;
 
             for (i = 0; attr[i]; i += 2) {
                 if (xml_strequal(attr[i], "range")) {
@@ -994,19 +996,12 @@ static int nfamiliars;
 static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr) {
     race *rc = (race *)pi->object;
     const char *flag_names[] = {
-        "playerrace", "", "", "!cansteal",
-        "", "cannotmove", "", "fly", "swim", "walk",
-        "!learn", "!teach","horse", "desert", "illusionary",
-        "", "noheal", "noweapons", "shapeshift",
-        "shapeshiftany", "undead", "dragon", "coastal", "unarmedguard",
-        "cansail", "invisible", "shipspeed", "", "migrants", NULL };
-    const char *ai_flag_names[] = {
-        "", "killpeasants", "scarepeasants", "",
-        "moverandom", "", "learn", "", "", "",
-        "", "", "", "", "",
-        "absorbpeasants", "", "", "",
-        "", "", "", "", "",
-        "", "", "", "moveattack", "", NULL };
+        "playerrace", "killpeasants", "scarepeasants", "!cansteal",
+        "moverandom", "cannotmove", "learn", "fly", "swim", "walk",
+        "nolearn", "!teach", "horse", "desert", "illusionary",
+        "absorbpeasants", "noheal", "noweapons", "shapeshift",
+        "undead", "dragon", "coastal", "unarmedguard",
+        "cansail", "familiar", "shipspeed", "migrants", "moveattack", NULL};
     const char *bflag_names[] = {
         "equipment", "noblock", "resistpierce", "resistcut", "resistbash",
         "invinciblenonmagic", "noattack", NULL };
@@ -1104,7 +1099,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
     }
     else if (xml_strequal(el, "ai")) {
         /* AI flags are cumulative to race flags. XML format is dumb */
-        int i, flags = 0;
+        unsigned int i, flags = 0;
         assert(rc);
         for (i = 0; attr[i]; i += 2) {
             const XML_Char *key = attr[i], *val = attr[i + 1];
@@ -1114,7 +1109,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             else if (xml_strequal(key, "scare")) {
                 rc_set_param(rc, "scare", val);
             }
-            else if (!handle_flag(&flags, attr + i, ai_flag_names)) {
+            else if (!handle_flag(&flags, attr + i, flag_names)) {
                 handle_bad_input(pi, el, key);
             }
         }
@@ -1227,7 +1222,7 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
         name = attr_get(attr, "name");
         if (name) {
             building_type *btype = bt_get_or_create(name);
-            int i, flags = BTF_DEFAULT;
+            unsigned int i, flags = BTF_DEFAULT;
 
             for (i = 0; attr[i]; i += 2) {
                 if (xml_strequal(attr[i], "maxsize")) {

@@ -484,28 +484,35 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
     const faction * viewer, enum seen_mode mode)
 {
     int n = 0;
+    const resource_type* rtype;
 
     if (r->land) {
         int peasants = rpeasants(r);
         if (peasants) {
-            report_resource(result + n, get_resourcetype(R_PEASANT), peasants, -1);
-            ++n;
+            rtype = get_resourcetype(R_PEASANT);
+            if (rtype) {
+                report_resource(result + n, rtype, peasants, -1);
+                ++n;
+            }
         }
 
         if (mode >= seen_lighthouse_land) {
-            const resource_type *rtype;
             int trees = rtrees(r, 2);
             int saplings = rtrees(r, 1);
             bool mallorn = fval(r, RF_MALLORN) != 0;
             if (trees) {
                 rtype = get_resourcetype(mallorn ? R_MALLORN_TREE : R_TREE);
-                report_resource(result + n, rtype, trees, -1);
-                ++n;
+                if (rtype) {
+                    report_resource(result + n, rtype, trees, -1);
+                    ++n;
+                }
             }
             if (saplings) {
                 rtype = get_resourcetype(mallorn ? R_MALLORN_SAPLING : R_SAPLING);
-                report_resource(result + n, rtype, saplings, -1);
-                ++n;
+                if (rtype) {
+                    report_resource(result + n, rtype, saplings, -1);
+                    ++n;
+                }
             }
         }
     }
@@ -514,12 +521,18 @@ report_resources(const region * r, resource_report result[MAX_RAWMATERIALS],
         int money = rmoney(r);
         int horses = rhorses(r);
         if (money) {
-            report_resource(result + n, get_resourcetype(R_SILVER), money, -1);
-            ++n;
+            rtype = get_resourcetype(R_SILVER);
+            if (rtype) {
+                report_resource(result + n, rtype, money, -1);
+                ++n;
+            }
         }
         if (horses) {
-            report_resource(result + n, get_resourcetype(R_HORSE), horses, -1);
-            ++n;
+            rtype = get_resourcetype(R_HORSE);
+            if (rtype) {
+                report_resource(result + n, rtype, horses, -1);
+                ++n;
+            }
         }
         for (i = 0; i != len ; ++i) {
             rawmaterial* res = r->resources + i;
@@ -1070,7 +1083,7 @@ typedef struct address_data {
     int stealthmod;
 } address_data;
 
-static void cb_add_address(region *r, unit *ut, void *cbdata) {
+static void cb_add_address(region *r, const unit *ut, void *cbdata) {
     address_data *data = (address_data *)cbdata;
     faction *f = data->f;
 
@@ -1352,7 +1365,7 @@ static region *firstregion(faction * f)
     return f->first = regions;
 }
 
-static void cb_add_seen(region *r, unit *u, void *cbdata) {
+static void cb_add_seen(region *r, const unit *u, void *cbdata) {
     faction *f = (faction *)cbdata;
     if (u->faction == f) {
         add_seen_nb(f, r, seen_travel);
@@ -2286,7 +2299,7 @@ typedef struct count_data {
     const struct faction *f;
 } count_data;
 
-static void count_cb(region *r, unit *u, void *cbdata) {
+static void count_cb(region *r, const unit *u, void *cbdata) {
     count_data *data = (count_data *)cbdata;
     const struct faction *f = data->f;
     if (r != u->region && (!u->ship || ship_owner(u->ship) == u)) {

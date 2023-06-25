@@ -448,18 +448,20 @@ message *msg_materials_required(unit * u, order * ord,
 int maxbuild(const unit * u, const construction * cons)
 /* calculate maximum size that can be built from available material */
 {
-    int c;
     int maximum = INT_MAX;
-    for (c = 0; cons->materials[c].number; c++) {
-        const resource_type *rtype = cons->materials[c].rtype;
-        int have = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
-        int need = required(1, cons->reqsize, cons->materials[c].number);
-        if (have < need) {
-            return 0;
-        }
-        else {
-            int b = have / need;
-            if (maximum > b) maximum = b;
+    if (cons->materials) {
+        int c;
+        for (c = 0; cons->materials[c].number; c++) {
+            const resource_type* rtype = cons->materials[c].rtype;
+            int have = get_pooled(u, rtype, GET_DEFAULT, INT_MAX);
+            int need = required(1, cons->reqsize, cons->materials[c].number);
+            if (have < need) {
+                return 0;
+            }
+            else {
+                int b = have / need;
+                if (maximum > b) maximum = b;
+            }
         }
     }
     return maximum;

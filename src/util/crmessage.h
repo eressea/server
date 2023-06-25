@@ -2,6 +2,8 @@
 #define H_UTIL_CRMESSAGE
 
 #include "variant.h"
+
+#include <stddef.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -21,7 +23,7 @@ extern "C" {
     int cr_ignore(variant v, const char *name, char *buffer, const void *userdata);
 
     void crt_register(const struct message_type *mtype);
-    int cr_render(const struct message *msg, char *buffer,
+    size_t cr_render(const struct message *msg, char *buffer,
         const void *userdata);
 
 #ifdef __cplusplus

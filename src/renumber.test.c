@@ -4,11 +4,11 @@
 #include <kernel/unit.h>
 #include <kernel/faction.h>
 #include <kernel/building.h>
+#include <kernel/direction.h>
 #include <kernel/ship.h>
 #include <kernel/order.h>
 #include <util/base36.h>
 #include "util/keyword.h"     // for K_NUMBER
-#include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 
@@ -32,7 +32,7 @@ static void test_renumber_faction(CuTest *tc) {
     no = u->faction->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_FACTION]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_FACTION, lang), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     renumber_factions();
     CuAssertIntEquals(tc, uno, u->faction->no);
@@ -51,7 +51,7 @@ static void test_renumber_faction_duplicate(CuTest *tc) {
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     no = f->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_FACTION]), itoa36(f2->no));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_FACTION, lang), itoa36(f2->no));
     renumber_cmd(u, u->thisorder);
     renumber_factions();
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "renumber_inuse"));
@@ -69,7 +69,7 @@ static void test_renumber_faction_invalid(CuTest *tc) {
     u = test_create_unit(f = test_create_faction(), test_create_region(0, 0, 0));
     no = f->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s [halima]", LOC(lang, parameters[P_FACTION]));
+    u->thisorder = create_order(K_NUMBER, lang, "%s [halima]", param_name(P_FACTION, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
     renumber_factions();
@@ -77,13 +77,13 @@ static void test_renumber_faction_invalid(CuTest *tc) {
 
     test_clear_messages(f);
     free_order(u->thisorder);
-    u->thisorder = create_order(K_NUMBER, lang, "%s 10000", LOC(lang, parameters[P_FACTION]));
+    u->thisorder = create_order(K_NUMBER, lang, "%s 10000", param_name(P_FACTION, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
 
     test_clear_messages(f);
     free_order(u->thisorder);
-    u->thisorder = create_order(K_NUMBER, lang, "%s 0", LOC(lang, parameters[P_FACTION]));
+    u->thisorder = create_order(K_NUMBER, lang, "%s 0", param_name(P_FACTION, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
 
@@ -101,12 +101,12 @@ static void test_renumber_building(CuTest *tc) {
     no = u->building->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, LOC(lang, parameters[P_BUILDING]));
+    u->thisorder = create_order(K_NUMBER, lang, param_name(P_BUILDING, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertTrue(tc, no != u->building->no);
     free_order(u->thisorder);
 
-    u->thisorder = create_order(K_NUMBER, lang, "%s %i", LOC(lang, parameters[P_BUILDING]), uno);
+    u->thisorder = create_order(K_NUMBER, lang, "%s %i", param_name(P_BUILDING, lang), uno);
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->building->no);
     test_teardown();
@@ -125,17 +125,17 @@ static void test_renumber_building_duplicate(CuTest *tc) {
     u->building = test_create_building(u->region, NULL);
     no = u->building->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %i", LOC(lang, parameters[P_BUILDING]), uno);
+    u->thisorder = create_order(K_NUMBER, lang, "%s %i", param_name(P_BUILDING, lang), uno);
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->building->no);
     test_teardown();
 }
 
-static void test_renumber_ship(CuTest *tc) {
-    unit *u;
+static void test_renumber_ship(CuTest* tc) {
+    unit* u;
     int uno, no;
-    const struct locale *lang;
+    const struct locale* lang;
 
     setup_renumber(tc);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
@@ -143,7 +143,48 @@ static void test_renumber_ship(CuTest *tc) {
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(uno));
+    renumber_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, uno, u->ship->no);
+    test_teardown();
+}
+
+static void test_renumber_ship_not_owner(CuTest *tc) {
+    unit *u, *u2;
+    int uno, no;
+    const struct locale *lang;
+
+    setup_renumber(tc);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    no = u->ship->no;
+    uno = (no > 1) ? no - 1 : no + 1;
+    lang = u->faction->locale;
+    u2->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(uno));
+    renumber_cmd(u2, u2->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error144"));
+    CuAssertIntEquals(tc, no, u->ship->no);
+    u2->ship = u->ship;
+    renumber_cmd(u2, u2->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "error146"));
+    CuAssertIntEquals(tc, no, u->ship->no);
+    test_teardown();
+}
+
+static void test_renumber_moved_ship(CuTest* tc) {
+    unit* u;
+    int uno, no;
+    const struct locale* lang;
+
+    setup_renumber(tc);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u->ship = test_create_ship(u->region, NULL);
+    u->ship->coast = D_EAST;
+    no = u->ship->no;
+    uno = (no > 1) ? no - 1 : no + 1;
+    lang = u->faction->locale;
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->ship->no);
     test_teardown();
@@ -160,11 +201,11 @@ static void test_renumber_ship_twice(CuTest *tc) {
     no = u->ship->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->ship->no);
     free_order(u->thisorder);
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(no));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(no));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->ship->no);
     test_teardown();
@@ -183,7 +224,7 @@ static void test_renumber_ship_duplicate(CuTest *tc) {
     u->ship = test_create_ship(u->region, NULL);
     no = u->ship->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_SHIP]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_SHIP, lang), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
     CuAssertIntEquals(tc, no, u->ship->no);
@@ -200,7 +241,7 @@ static void test_renumber_unit(CuTest *tc) {
     no = u->no;
     uno = (no > 1) ? no - 1 : no + 1;
     lang = u->faction->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_UNIT]), itoa36(uno));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_UNIT, lang), itoa36(uno));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, uno, u->no);
     CuAssertIntEquals(tc, -no, ualias(u));
@@ -218,7 +259,7 @@ static void test_renumber_unit_duplicate(CuTest *tc) {
     no = u->no;
     u2 = test_create_unit(f, u->region);
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s %s", LOC(lang, parameters[P_UNIT]), itoa36(u2->no));
+    u->thisorder = create_order(K_NUMBER, lang, "%s %s", param_name(P_UNIT, lang), itoa36(u2->no));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error115"));
@@ -236,7 +277,7 @@ static void test_renumber_unit_limit(CuTest *tc) {
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     no = u->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s 10000", LOC(lang, parameters[P_UNIT]));
+    u->thisorder = create_order(K_NUMBER, lang, "%s 10000", param_name(P_UNIT, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error114"));
@@ -254,7 +295,7 @@ static void test_renumber_unit_invalid(CuTest *tc) {
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     no = u->no;
     lang = f->locale;
-    u->thisorder = create_order(K_NUMBER, lang, "%s TEMP", LOC(lang, parameters[P_UNIT]));
+    u->thisorder = create_order(K_NUMBER, lang, "%s TEMP", param_name(P_UNIT, lang));
     renumber_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, no, u->no);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error116"));
@@ -272,6 +313,8 @@ CuSuite *get_renumber_suite(void)
     SUITE_ADD_TEST(suite, test_renumber_building);
     SUITE_ADD_TEST(suite, test_renumber_building_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_ship);
+    SUITE_ADD_TEST(suite, test_renumber_ship_not_owner);
+    SUITE_ADD_TEST(suite, test_renumber_moved_ship);
     SUITE_ADD_TEST(suite, test_renumber_ship_twice);
     SUITE_ADD_TEST(suite, test_renumber_ship_duplicate);
     SUITE_ADD_TEST(suite, test_renumber_faction);

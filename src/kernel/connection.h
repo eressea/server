@@ -128,8 +128,8 @@ extern "C" {
     /* game-specific callbacks */
     extern void(*border_convert_cb) (struct connection * con, struct attrib * attr);
 
-    const char * border_name(const struct connection *co,
-        const struct region * r, const struct faction * f, int flags);
+    const char * border_name(const struct connection *co, const struct region * r,
+        const struct faction * f, int flags, const struct locale* lang);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,7 @@ local u, r, f
 function setup()
     eressea.free_game()
     r = region.create(0, 0, "plain")
-    f = faction.create("human", "bernd@eressea.de", "de")
+    f = faction.create("human", 'process@example.com', 'de')
     u = unit.create(f, r, 1)
     u:add_item("money", 10)
 end

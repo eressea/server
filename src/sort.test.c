@@ -9,7 +9,6 @@
 
 #include "util/base36.h"
 #include "util/keyword.h"
-#include "util/language.h"
 #include "util/param.h"
 
 #include "tests.h"
@@ -26,7 +25,7 @@ static void test_sort_after(CuTest *tc) {
     u1 = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     u2 = test_create_unit(f, r);
     unit_addorder(u1, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_AFTER]), itoa36(u2->no)));
+        param_name(P_AFTER, f->locale), itoa36(u2->no)));
     CuAssertPtrEquals(tc, u1, r->units);
     CuAssertPtrEquals(tc, u2, u1->next);
     CuAssertPtrEquals(tc, NULL, u2->next);
@@ -48,7 +47,7 @@ static void test_sort_before(CuTest *tc) {
     u1 = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     u2 = test_create_unit(f, r);
     unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+        param_name(P_BEFORE, f->locale), itoa36(u1->no)));
     CuAssertPtrEquals(tc, u1, r->units);
     CuAssertPtrEquals(tc, u2, u1->next);
     CuAssertPtrEquals(tc, NULL, u2->next);
@@ -75,7 +74,7 @@ static void test_sort_before_owner(CuTest *tc) {
 
     u2 = test_create_unit(f, r);
     unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+        param_name(P_BEFORE, f->locale), itoa36(u1->no)));
     u1->building = b;
     building_update_owner(b);
     CuAssertPtrEquals(tc, u1, r->units);
@@ -138,7 +137,7 @@ static void test_sort_before_paused_building_owner(CuTest *tc) {
 
     u2 = test_create_unit(f = test_create_faction(), r);
     unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+        param_name(P_BEFORE, f->locale), itoa36(u1->no)));
     u1->building = b;
     building_update_owner(b);
     CuAssertPtrEquals(tc, u1, r->units);
@@ -177,7 +176,7 @@ static void test_sort_before_paused_ship_owner(CuTest *tc) {
 
     u2 = test_create_unit(f = test_create_faction(), r);
     unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+        param_name(P_BEFORE, f->locale), itoa36(u1->no)));
     u1->ship = sh;
     ship_update_owner(sh);
     CuAssertPtrEquals(tc, u1, r->units);
@@ -212,7 +211,7 @@ static void test_sort_paused(CuTest *tc) {
     u1 = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     u2 = test_create_unit(f, r);
     unit_addorder(u2, create_order(K_SORT, f->locale, "%s %s",
-        LOC(f->locale, parameters[P_BEFORE]), itoa36(u1->no)));
+        param_name(P_BEFORE, f->locale), itoa36(u1->no)));
     CuAssertPtrEquals(tc, u1, r->units);
     CuAssertPtrEquals(tc, u2, u1->next);
     CuAssertPtrEquals(tc, NULL, u2->next);

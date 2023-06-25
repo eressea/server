@@ -1153,7 +1153,7 @@ order * cycle_route(order * ord, const struct locale *lang, int gereist)
         else if (strlen(neworder) > sizeof(neworder) / 2)
             break;
         else if (cm == gereist && !paused && (d == D_PAUSE)) {
-            const char *loc = LOC(lang, parameters[P_PAUSE]);
+            const char *loc = param_name(P_PAUSE, lang);
             sbs_strcat(&sbtail, " ");
             sbs_strcat(&sbtail, loc);
             paused = true;
@@ -1166,7 +1166,7 @@ order * cycle_route(order * ord, const struct locale *lang, int gereist)
                 /* da PAUSE nicht in ein shortdirections[d] umgesetzt wird (ist
                  * hier keine normale direction), muss jede PAUSE einzeln
                  * herausgefiltert und explizit gesetzt werden */
-                sbs_strcat(&sborder, LOC(lang, parameters[P_PAUSE]));
+                sbs_strcat(&sborder, param_name(P_PAUSE, lang));
             }
             else {
                 sbs_strcat(&sborder, LOC(lang, shortdirections[d]));
@@ -2229,7 +2229,7 @@ static void travel(unit * u, order *ord)
             if (uf->region == r) {
                 order *follow_order;
                 const struct locale *lang = u->faction->locale;
-                const char *s = LOC(uf->faction->locale, parameters[P_UNIT]);
+                const char *s = param_name(P_UNIT, uf->faction->locale);
                 /* construct an order */
                 assert(s || !"missing translation for UNIT keyword");
                 follow_order = create_order(K_FOLLOW, lang, "%s %i",

@@ -8,7 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("NewbieImmunity", "0")
 end
 
 function disabled_test_dont_move_after_destroy()

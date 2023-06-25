@@ -6,10 +6,8 @@
 #include "creport.h"
 #include "eressea.h"
 #include "magic.h"             // for spell_component, create_castorder, ...
-#include "prefix.h"
 #include "report.h"
 #include "reports.h"
-#include "vortex.h"
 
 #include "kernel/alliance.h"
 #include "kernel/build.h"
@@ -33,8 +31,6 @@
 #include "kernel/ship.h"
 #include "kernel/spell.h"
 
-#include "util/aliases.h"
-#include "util/functions.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/lists.h"
@@ -51,7 +47,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdarg.h>            // for va_list
+#include <stdarg.h>
 #include <stdbool.h>           // for true
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
@@ -124,8 +120,8 @@ struct locale * test_create_locale(void) {
     if (!loc) {
         int i;
         loc = get_or_create_locale("test");
-        locale_setstring(loc, "factiondefault", parameters[P_FACTION]);
-        locale_setstring(loc, "unitdefault", parameters[P_UNIT]);
+        locale_setstring(loc, "factiondefault", param_name(P_FACTION, NULL));
+        locale_setstring(loc, "unitdefault", param_name(P_UNIT, NULL));
         locale_setstring(loc, "money", "Silber");
         locale_setstring(loc, "money_p", "Silber");
         locale_setstring(loc, "cart", "Wagen");
@@ -173,8 +169,9 @@ struct locale * test_create_locale(void) {
             }
         }
         for (i = 0; i != MAXPARAMS; ++i) {
-            locale_setstring(loc, parameters[i], parameters[i]);
-            test_translate_param(loc, i, parameters[i]);
+            const char* p = param_name(i, NULL);
+            locale_setstring(loc, p, p);
+            test_translate_param(loc, i, p);
         }
         for (i = 0; i != MAXMAGIETYP; ++i) {
             locale_setstring(loc, mkname("school", magic_school[i]), magic_school[i]);
@@ -261,25 +258,14 @@ static void test_reset_full(void) {
     memset(&callbacks, 0, sizeof(callbacks));
 
     test_reset();
-    free_terrains();
-    free_resources();
-    free_functions();
-    free_config();
+    free_configuration();
     calendar_cleanup();
     creport_cleanup();
     report_cleanup();
     close_orders();
     log_close();
     stats_close();
-    free_special_directions();
     free_locales();
-    free_spells();
-    free_buildingtypes();
-    free_shiptypes();
-    free_races();
-    free_spellbooks();
-    free_aliases();
-    free_prefixes();
     mt_clear();
 
     for (i = 0; i != MAXSKILLS; ++i) {

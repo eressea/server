@@ -8,11 +8,6 @@ end
 
 function setup()
     eressea.game.reset()
-    eressea.settings.set("rules.food.flags", "4") -- food is free
-end
-
-function teardown()
-    eressea.settings.set("rules.food.flags", "0")
 end
 
 function test_when_owner_returns_morale_stays()

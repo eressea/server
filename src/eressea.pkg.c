@@ -2,7 +2,7 @@
 ** Lua binding: eressea
 */
 
-#include <tolua.h>
+#include "tolua.h"
 
 #ifndef __cplusplus
 #include <stdlib.h>
@@ -20,7 +20,6 @@ int luaopen_eressea (lua_State* tolua_S);
 
 #undef tolua_reg_types
 #define tolua_reg_types tolua_reg_types_eressea
-#include "bind_tolua.h"
 #include "bind_eressea.h"
 
 /* function to register type */

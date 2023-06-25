@@ -53,8 +53,9 @@
 #define FIX_TELEPORT_PLANE_VERSION 375 /* astral space not created, bug 2856 */
 #define FIX_RESOURCES_VERSION 376 /* badly made rawmaterials, bug 2898 */
 #define REMOVE_FACTION_AGE_VERSION 377 /* save start_turn, not age, bug 2878 */
+#define FORBIDDEN_LAND_VERSION 378 /* forbidden regions (walls) do not store land info */
 
-#define RELEASE_VERSION REMOVE_FACTION_AGE_VERSION /* current datafile */
+#define RELEASE_VERSION FORBIDDEN_LAND_VERSION /* use for new datafiles */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

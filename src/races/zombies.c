@@ -22,13 +22,6 @@ static int age_chance(int a, int b, int p) {
     return (r < 0) ? 0 : r;
 }
 
-void make_undead_unit(unit * u)
-{
-    free_orders(&u->orders);
-    name_unit(u);
-    u->flags |= UFL_ISNEW;
-}
-
 void age_skeleton(unit * u)
 {
     if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {

@@ -27,7 +27,7 @@ static void tolua_reg_types (lua_State* tolua_S)
 {
 }
 
-/* function: settings_set */
+/* function: config_set */
 static int tolua_settings_eressea_settings_set00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE
@@ -55,7 +55,7 @@ static int tolua_settings_eressea_settings_set00(lua_State* tolua_S)
 #endif
 }
 
-/* function: settings_get */
+/* function: config_get */
 static int tolua_settings_eressea_settings_get00(lua_State* tolua_S)
 {
 #ifndef TOLUA_RELEASE

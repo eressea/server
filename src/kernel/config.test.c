@@ -196,12 +196,12 @@ static void test_findparam(CuTest *tc) {
     struct locale *en, *de;
     test_setup();
     en = get_or_create_locale("en");
-    locale_setstring(en, parameters[P_FACTION], "FACTION");
+    locale_setstring(en, param_name(P_FACTION, NULL), "FACTION");
     CuAssertIntEquals(tc, NOPARAM, get_param("FACTION", en));
     init_parameters(en);
     CuAssertIntEquals(tc, P_FACTION, get_param("FACTION", en));
     de = get_or_create_locale("de");
-    locale_setstring(de, parameters[P_FACTION], "PARTEI");
+    locale_setstring(de, param_name(P_FACTION, NULL), "PARTEI");
     CuAssertIntEquals(tc, NOPARAM, get_param("PARTEI", de));
     init_parameters(de);
     CuAssertIntEquals(tc, P_FACTION, get_param("PARTEI", de));

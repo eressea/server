@@ -1,4 +1,4 @@
-local tcname = 'tests.shared.items'
+local tcname = 'tests.items'
 local lunit = require("lunit")
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -8,10 +8,6 @@ end
 
 function setup()
     eressea.free_game()
-    eressea.settings.set("nmr.timeout", "0")
-    eressea.settings.set("NewbieImmunity", "0")
-    eressea.settings.set("rules.food.flags", "4")
-    eressea.settings.set("rules.ship.storms", "0")
     eressea.settings.set("magic.regeneration.enable", "0")
 end
 

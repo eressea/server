@@ -54,8 +54,6 @@ typedef enum param_t {
     NOPARAM
 } param_t;
 
-extern const char* parameters[MAXPARAMS];
-
 struct locale;
 
 const char* param_name(param_t p, const struct locale* lang);

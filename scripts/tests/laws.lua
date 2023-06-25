@@ -130,7 +130,6 @@ function test_force_leave_postcombat()
     u1.building = b1
     u2.building = b1
     eressea.settings.set("rules.owners.force_leave", "1")
-    eressea.settings.set("NewbieImmunity", "0")
     u1:clear_orders()
     u1:add_order("ATTACKIERE " .. itoa36(u2.id))
     u2:clear_orders()

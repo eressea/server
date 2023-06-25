@@ -49,30 +49,53 @@ macro(ADD_LUA_MODULE MODULE_NAME FILES)
   )
 endmacro(ADD_LUA_MODULE)
 
-macro(TOLUA_BINDING PKGFILE FILES)
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c
-    DEPENDS ${FILES} ${PKGFILE}
+set (_TOLUA_FILES
+  log.pkg.c
+  locale.pkg.c
+  config.pkg.c
+  process.pkg.c
+  game.pkg.c
+  eressea.pkg.c
+  settings.pkg.c
+)
+
+if (TOLUA_EXECUTABLE)
+  macro(TOLUA_BINDING _NAME _FILES)
+    set(_PKGFILE ${_NAME}.pkg)
+    set(_SRCFILE ${_PKGFILE}.c)
+    add_custom_command(
+      OUTPUT ${_SRCFILE}
+    DEPENDS ${_FILES}
+    MAIN_DEPENDENCY ${_PKGFILE}
     COMMAND ${TOLUA_EXECUTABLE}
-    ARGS -o ${CMAKE_CURRENT_SOURCE_DIR}/${PKGFILE}.c ${PKGFILE}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    ARGS -n ${_NAME} -o ${_SRCFILE} ${CMAKE_CURRENT_SOURCE_DIR}/${_PKGFILE}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   )
 endmacro(TOLUA_BINDING)
 
-TOLUA_BINDING(log.pkg util/log.h)
-TOLUA_BINDING(locale.pkg bind_locale.h)
-TOLUA_BINDING(config.pkg bind_config.h)
-TOLUA_BINDING(process.pkg bind_process.h)
-TOLUA_BINDING(game.pkg bind_eressea.h config.h)
-TOLUA_BINDING(eressea.pkg bind_eressea.h)
-TOLUA_BINDING(settings.pkg kenel/config.h)
+TOLUA_BINDING(log util/log.h)
+TOLUA_BINDING(locale bind_locale.h)
+TOLUA_BINDING(config bind_config.h)
+TOLUA_BINDING(process bind_process.h)
+TOLUA_BINDING(game bind_eressea.h config.h)
+TOLUA_BINDING(eressea bind_eressea.h)
+TOLUA_BINDING(settings kernel/config.h)
+
+FOREACH(_FILE ${_TOLUA_FILES})
+    LIST(APPEND _SOURCES ${CMAKE_CURRENT_BINARY_DIR}/${_FILE})
+ENDFOREACH(_FILE)
+SET(TOLUA_SRC ${_SOURCES})
+else(TOLUA_EXECUTABLE)
+SET(TOLUA_SRC ${_TOLUA_FILES})
+endif(TOLUA_EXECUTABLE)
 
 set (PARSER_SRC
   ${DB_SRC}
   ${UTIL_SRC}
-  )
+)
 
 set (ERESSEA_SRC
+  ${TOLUA_SRC}
   vortex.c
   alchemy.c
   automate.c
@@ -193,11 +216,11 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${TOLUA_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${LUA_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
-target_include_directories (eressea PRIVATE ${TOLUA_INCLUDE_DIR})
-target_include_directories (eressea PRIVATE ${LUA_INCLUDE_DIR})
 target_link_libraries(eressea
   game
   ${TOLUA_LIBRARY}

@@ -238,6 +238,34 @@ static chtype mr_tile(const map_region * mr, int highlight)
     return ' ' | COLOR_PAIR(hl + COLOR_WHITE);
 }
 
+typedef chtype (*draw_fun)(const map_region*, int);
+
+static chtype draw_terrain(const map_region* mr, int highlight)
+{
+    return mr_tile(mr, highlight);
+}
+
+static chtype draw_luxury(const map_region* mr, int highlight)
+{
+    int hl = 8 * highlight;
+    if (mr && mr->r) {
+        const item_type* it_lux = r_luxury(mr->r);
+        if (it_lux) {
+            return it_lux->rtype->_name[0] | COLOR_PAIR(hl + COLOR_WHITE);
+        }
+    }
+    return mr_tile(mr, hl);
+}
+
+static chtype draw_tile(window *win, const map_region* mr, int highlight)
+{
+    if (win->data) {
+        draw_fun foo = (draw_fun)win->data;
+        return foo(mr, highlight);
+    }
+    return mr_tile(mr, highlight);
+}
+
 static void paint_map(window * wnd, const state * st)
 {
     WINDOW *win = wnd->handle;
@@ -258,13 +286,15 @@ static void paint_map(window * wnd, const state * st)
             if (mr) {
                 int attr = 0;
                 int hl = 0;
+                chtype tile;
                 cnormalize(&mr->coord, &nx, &ny);
                 if (tagged_region(st->selected, nx, ny)) {
                     attr |= A_REVERSE;
                 }
                 if (mr->r && (mr->r->flags & RF_MAPPER_HIGHLIGHT))
                     hl = 1;
-                mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
+                tile = draw_tile(wnd, mr, hl);
+                mvwaddch(win, yp, xp, tile | attr);
             }
         }
     }
@@ -286,9 +316,10 @@ map_region *cursor_region(const view * v, const coordinate * c)
 }
 
 static void
-draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
+draw_cursor(window * wnd, selection * s, const view * v, const coordinate * c,
     int show)
 {
+    WINDOW* win = wnd->handle;
     int lines = getmaxy(win) / THEIGHT;
     int xp, yp, nx, ny;
     int attr = 0;
@@ -313,7 +344,7 @@ draw_cursor(WINDOW * win, selection * s, const view * v, const coordinate * c,
         int hl = 0;
         if (mr->r->flags & RF_MAPPER_HIGHLIGHT)
             hl = 1;
-        mvwaddch(win, yp, xp, mr_tile(mr, hl) | attr);
+        mvwaddch(win, yp, xp, draw_tile(wnd, mr, hl) | attr);
     }
     else
         mvwaddch(win, yp, xp, ' ' | attr | COLOR_PAIR(COLOR_YELLOW));
@@ -1394,6 +1425,7 @@ static void handlekey(state * st, int c)
         if (!strlen(loc)) {
             break;
         }
+        /* intentional fallthrough */
     case 'n':
         if (findmode == 'u') {
             unit *u = findunit(atoi36(locate));
@@ -1416,7 +1448,7 @@ static void handlekey(state * st, int c)
             }
             for (r = first;;) {
                 if (findmode == 'r' && r->land && r->land->name
-                    && strstr((const char *)r->land->name, locate)) {
+                    && strstr((const char *)r->land->name, loc)) {
                     break;
                 }
                 else if (findmode == 'f') {
@@ -1447,6 +1479,21 @@ static void handlekey(state * st, int c)
             region2coord(r, &st->cursor);
             st->wnd_info->update |= 1;
             st->wnd_status->update |= 1;
+        }
+        break;
+    case 'd':
+        statusline(st->wnd_status->handle, "draw-");
+        doupdate();
+        findmode = getch();
+        if (findmode == 't') {
+            statusline(st->wnd_status->handle, "draw-terrain");
+            st->wnd_map->data = (void*)draw_terrain;
+            st->wnd_map->update |= 1;
+        }
+        else if (findmode == 'l') {
+            statusline(st->wnd_status->handle, "draw-luxury");
+            st->wnd_map->data = (void*)draw_luxury;
+            st->wnd_map->update |= 1;
         }
         break;
     case 'Q':
@@ -1610,10 +1657,10 @@ void run_mapper(void)
                 wnd->update = 0;
             }
         }
-        draw_cursor(st->wnd_map->handle, st->selected, vi, &st->cursor, 1);
+        draw_cursor(st->wnd_map, st->selected, vi, &st->cursor, 1);
         doupdate();
         c = getch();
-        draw_cursor(st->wnd_map->handle, st->selected, vi, &st->cursor, 0);
+        draw_cursor(st->wnd_map, st->selected, vi, &st->cursor, 0);
         handlekey(st, c);
     }
     g_quit = 0;
