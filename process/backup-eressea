@@ -8,7 +8,7 @@ GAME=$1
 upload() {
   SRC="$1"
   DST=$(basename "$SRC")
-  curl -s -n -T "$SRC" "https://dav.box.com/dav/Eressea/game-$GAME/$DST" 
+  curl -n -T "$SRC" "https://dav.box.com/dav/Eressea/game-$GAME/$DST" 
 #  echo put "$SRC" "$DST" | cadaver "https://dav.box.com/dav/Eressea/game-$GAME/"
 }
 
