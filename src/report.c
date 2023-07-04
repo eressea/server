@@ -1152,8 +1152,7 @@ static void report_statistics(struct stream *out, const region * r, const factio
     newline(out);
 
     /* Region */
-    if (skill_enabled(SK_ENTERTAINMENT) && fval(r->terrain, LAND_REGION)
-        && rmoney(r)) {
+    if (skill_enabled(SK_ENTERTAINMENT) && r->land && rmoney(r)) {
         m = msg_message("nr_stat_maxentertainment", "max", entertainmoney(r));
         nr_render(m, f->locale, buf, sizeof(buf), f);
         paragraph(out, buf, 2, 2, 0);

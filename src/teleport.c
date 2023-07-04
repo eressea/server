@@ -231,5 +231,5 @@ void update_teleport_plane(const region* r, plane* aplane, const terrain_type* t
 
 bool inhabitable(const region * r)
 {
-    return fval(r->terrain, LAND_REGION);
+    return r->land != NULL;
 }

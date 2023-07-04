@@ -595,7 +595,7 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         cmistake(u, ord, 221, MSG_PRODUCE);
         return 0;
     }
-    if ((r->terrain->flags & LAND_REGION) == 0) {
+    if (!r->land) {
         /* special terrain, cannot build */
         cmistake(u, ord, 221, MSG_PRODUCE);
         return 0;

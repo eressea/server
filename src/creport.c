@@ -1340,8 +1340,7 @@ void cr_output_region(struct stream* out, const struct faction* f,
         if (r->land && r->land->display && r->land->display[0]) {
             creport_tag(out, "Beschr", r->land->display);
         }
-        if (fval(r->terrain, LAND_REGION)) {
-            assert(r->land);
+        if (r->land) {
             creport_tag_int(out, "Bauern", rpeasants(r));
 
             if (mode >= seen_travel) {
