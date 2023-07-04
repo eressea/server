@@ -737,6 +737,36 @@ static void test_reserve_cmd(CuTest* tc) {
     test_teardown();
 }
 
+static void test_reserve_twice(CuTest* tc) {
+    unit* u1, * u2;
+    faction* f;
+    region* r;
+    order* ord;
+    const resource_type* rtype;
+
+    test_setup();
+    init_resources();
+
+    rtype = get_resourcetype(R_SILVER);
+    assert(rtype && rtype->itype);
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    assert(r && f);
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    assert(u1 && u2);
+    i_change(&u2->items, rtype->itype, 100);
+    ord = create_order(K_RESERVE, f->locale, "30 SILBER");
+    CuAssertIntEquals(tc, 30, reserve_cmd(u1, ord));
+    free_order(ord);
+    ord = create_order(K_RESERVE, f->locale, "20 SILBER");
+    CuAssertIntEquals(tc, 20, reserve_cmd(u1, ord));
+    free_order(ord);
+    CuAssertIntEquals(tc, 30, i_get(u1->items, rtype->itype));
+    CuAssertIntEquals(tc, 30, get_reservation(u1, rtype->itype));
+    test_teardown();
+}
+
 static void test_reserve_all(CuTest* tc) {
     unit* u1, * u2;
     faction* f;
@@ -837,6 +867,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_item_cursed);
     SUITE_ADD_TEST(suite, test_give_item_cursed_self);
     SUITE_ADD_TEST(suite, test_reserve_cmd);
+    SUITE_ADD_TEST(suite, test_reserve_twice);
     SUITE_ADD_TEST(suite, test_reserve_self);
     SUITE_ADD_TEST(suite, test_reserve_all);
     return suite;

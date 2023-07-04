@@ -2384,7 +2384,7 @@ int follow_ship(unit * u, order * ord)
 
 /* Bewegung, Verfolgung, Piraterie */
 
-/** ships that folow other ships
+/** ships that follow other ships
  * Dann generieren die jagenden Einheiten ihre Befehle und
  * bewegen sich.
  * Following the trails of other ships.
