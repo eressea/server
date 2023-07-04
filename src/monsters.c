@@ -1150,7 +1150,7 @@ static int scareaway(region * r, int anzahl)
         direction_t dir = (direction_t)(rng_int() % MAXDIRECTIONS);
         region *rc = rconnect(r, dir);
 
-        if (rc && fval(rc->terrain, LAND_REGION)) {
+        if (rc && rc->land) {
             ++diff;
             rc->land->newpeasants++;
             emigrants[dir]++;

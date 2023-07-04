@@ -913,7 +913,7 @@ static int sp_magicstreet(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
 
-    if (!fval(r->terrain, LAND_REGION)) {
+    if (!r->land) {
         cmistake(caster, co->order, 186, MSG_MAGIC);
         return 0;
     }
@@ -1107,7 +1107,7 @@ static int sp_mallorn(castorder * co)
     int cast_level = co->level;
     unit *caster = co_get_caster(co);
 
-    if (!fval(r->terrain, LAND_REGION)) {
+    if (!r->land) {
         cmistake(caster, co->order, 186, MSG_MAGIC);
         return 0;
     }
@@ -5668,7 +5668,7 @@ int sp_movecastle(castorder * co)
 
     target_region = rconnect(r, dir);
 
-    if (!target_region || !(target_region->terrain->flags & LAND_REGION)) {
+    if (!target_region || !target_region->land) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_movecastle_fail_1", "direction", dir));
         return cast_level;

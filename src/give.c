@@ -337,7 +337,7 @@ message * give_ship(unit *u1, unit *u2, int n, order *ord)
         return msg_error(u1, ord, 146);
     }
     if (u2 == NULL) {
-        if (fval(u1->region->terrain, LAND_REGION) || n < u1->ship->number) {
+        if (u1->region->land || n < u1->ship->number) {
             ship * sh = new_ship(u1->ship->type, u1->region, u1->faction->locale);
             scale_ship(sh, 0);
             transfer_ships(u1->ship, sh, n);

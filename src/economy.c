@@ -1786,7 +1786,7 @@ static void plant(unit * u, int raw)
     region *r = u->region;
 
     assert(rt_water != NULL);
-    if (!fval(r->terrain, LAND_REGION)) {
+    if (!r->land) {
         return;
     }
     itype = rherbtype(r);
@@ -1852,7 +1852,7 @@ static void breedtrees(unit * u, int raw)
     region *r = u->region;
     int minskill = 6;
 
-    if (!fval(r->terrain, LAND_REGION)) {
+    if (!r->land) {
         return;
     }
 

@@ -297,7 +297,7 @@ void peasant_migration(region * r)
         int dir = (turn + 1 + i) % MAXDIRECTIONS;
         region *rc = rconnect(r, (direction_t)dir);
 
-        if (rc != NULL && fval(rc->terrain, LAND_REGION)) {
+        if (rc != NULL && rc->land) {
             int rp2 = rpeasants(rc);
             int maxp2 = region_production(rc);
             int max_emigration = MAX_EMIGRATION(rp2 - maxp2);
@@ -693,7 +693,7 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
             seeds = (rtrees(r, 2) * FORESTGROWTH * 3) / 1000000;
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 region *r2 = rconnect(r, d);
-                if (r2 && fval(r2->terrain, LAND_REGION) && r2->terrain->size) {
+                if (r2 && r2->land && r2->terrain->size) {
                     /* Eine Landregion, wir versuchen Samen zu verteilen:
                      * Die Chance, das Samen ein Stueck Boden finden, in dem sie
                      * keimen koennen, haengt von der Bewuchsdichte und der
