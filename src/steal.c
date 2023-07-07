@@ -44,10 +44,10 @@ void expandstealing(region * r, econ_request * stealorders)
      */
 
     for (j = 0; j != norders; j++) {
-        unit *u;
+        unit *u = requests[j]->unit;
         int n = 0;
 
-        if (requests[j]->unit->n > requests[j]->unit->wants) {
+        if (u->n > u->wants) {
             break;
         }
 
@@ -194,15 +194,17 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
         }
     }
 
-    i = i_get(u->items, rring->itype);
-    if (i > u->number) i = u->number;
-    if (i > 0) {
-        n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
+    if (rring) {
+        i = i_get(u->items, rring->itype);
+        if (i > u->number) i = u->number;
+        if (i > 0) {
+            n *= (u->number + i * (roqf_factor() - 1));
+        }
+        else {
+            n *= u->number;
+        }
     }
-    else {
-        n *= u->number * STEALINCOME;
-    }
-
+    n *= STEALINCOME;
     u->wants = n;
 
     /* wer dank unsichtbarkeitsringen klauen kann, muss nicht unbedingt ein

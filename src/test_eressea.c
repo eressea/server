@@ -153,6 +153,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(shock);
     ADD_SUITE(sort);
     ADD_SUITE(spy);
+    ADD_SUITE(steal);
     ADD_SUITE(stealth);
     ADD_SUITE(study);
     ADD_SUITE(summary);

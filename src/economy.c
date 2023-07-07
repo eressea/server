@@ -181,10 +181,6 @@ static int expandorders(region * r, econ_request * requests) {
     return expand_production(r, requests, &g_requests);
 }
 
-static void free_requests(econ_request *requests) {
-    arrfree(requests);
-}
-
 /* ------------------------------------------------------------- */
 
 static void friendly_takeover(region * r, faction * f)
@@ -1463,10 +1459,8 @@ void add_income(unit * u, income_t type, int want, int qty)
 {
     if (want == INT_MAX)
         want = qty;
-    if (qty > 0) {
-        ADDMSG(&u->faction->msgs, msg_message("income",
-            "unit region mode wanted amount", u, u->region, (int)type, want, qty));
-    }
+    ADDMSG(&u->faction->msgs, msg_message("income",
+        "unit region mode wanted amount", u, u->region, (int)type, want, qty));
 }
 
 /* Steuersaetze in % bei Burggroesse */
@@ -2628,12 +2622,12 @@ void produce(struct region *r)
 
     if (taxorders) {
         expandtax(r, taxorders);
-        free_requests(taxorders);
+        arrfree(taxorders);
     }
 
     if (lootorders) {
         expandloot(r, lootorders);
-        free_requests(lootorders);
+        arrfree(lootorders);
     }
     /* An erster Stelle Kaufen (expandbuying), die Bauern so Geld bekommen, um
      * nachher zu beim Verkaufen (expandselling) den Spielern abkaufen zu
@@ -2641,7 +2635,7 @@ void produce(struct region *r)
 
     if (buyorders) {
         expandbuying(r, buyorders);
-        free_requests(buyorders);
+        arrfree(buyorders);
     }
 
     if (sellorders) {
@@ -2650,7 +2644,7 @@ void produce(struct region *r)
             && buildingtype_exists(r, caravan_bt, true))
             limit *= 2;
         expandselling(r, sellorders, limited ? limit : INT_MAX);
-        free_requests(sellorders);
+        arrfree(sellorders);
     }
 
     /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
@@ -2658,7 +2652,7 @@ void produce(struct region *r)
 
     if (stealorders) {
         expandstealing(r, stealorders);
-        free_requests(stealorders);
+        arrfree(stealorders);
     }
 
     assert(rmoney(r) >= 0);
