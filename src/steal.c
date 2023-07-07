@@ -173,7 +173,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     if (n <= 0) {
         /* Wenn Goblins mit einem Tarnungstalent von mindestens 4 klauen, bekommen 
          * sie mindestens 50 Silber, selbst dann, wenn sie erwischt werden. */
-        if (u_race(u) == get_race(RC_GOBLIN) && effsk >= 4) {
+        if (effsk >= 4 && u_race(u) == get_race(RC_GOBLIN)) {
             ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
                 u2));
             ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
