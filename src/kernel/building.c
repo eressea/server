@@ -414,7 +414,7 @@ building *new_building(const struct building_type * btype, region * r,
     }
     assert(bname);
     snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = str_strdup(bname);
+    b->name = str_strdup(buffer);
     b->size = size;
     return b;
 }
