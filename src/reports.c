@@ -197,8 +197,8 @@ const char *hp_status(const unit * u)
     return NULL;
 }
 
-bool see_schemes(const region *r) {
-    return r->seen.mode >= seen_unit && is_astral(r) && !is_cursed(r->attribs, &ct_astralblock);
+bool see_schemes(const region *r, seen_mode mode) {
+    return mode >= seen_unit && is_astral(r) && !is_cursed(r->attribs, &ct_astralblock);
 }
 
 void

@@ -205,7 +205,7 @@ static void creport_block_1(struct stream* out, const char* name, long i)
 static void creport_block_2(struct stream* out, const char* name, long i, long j)
 {
     assert(name);
-    stream_printf(out, "%s %ld\n", name, i, j);
+    stream_printf(out, "%s %ld %ld\n", name, i, j);
 }
 
 static void creport_tag(struct stream* out, const char* key, const char* value)
@@ -1409,7 +1409,7 @@ void cr_output_region(struct stream* out, const struct faction* f,
         cr_output_curses(out, f, r, TYP_REGION);
         cr_borders(out, r, f);
     }
-    if (see_schemes(r)) {
+    if (see_schemes(r, mode)) {
         /* Sonderbehandlung Teleport-Ebene */
         region *rl[MAX_SCHEMES];
         int num = get_astralregions(r, inhabitable, rl);
