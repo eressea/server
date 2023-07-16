@@ -22,8 +22,9 @@
 #include <CuTest.h>
 #include <tests.h>
 
-#include <stdbool.h>              // for bool, false
-#include <stdlib.h>               // for atoi, calloc
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void test_cr_unit(CuTest *tc) {
@@ -551,7 +552,7 @@ static void test_cr_borders(CuTest* tc) {
 static void test_cr_schemes(CuTest* tc) {
     stream strm;
     faction* f;
-    region* ra, *r;
+    region* ra;
     char buffer[32];
 
     test_setup();
@@ -559,7 +560,7 @@ static void test_cr_schemes(CuTest* tc) {
     test_create_plain(0, 0);
     test_create_plain(TP_RADIUS, 0);
     test_create_plain(TP_RADIUS+1, 0);
-    r = test_create_plain(0, 0);
+    test_create_plain(0, 0);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
     ra->_plane = get_astralplane();
     f = test_create_faction();
