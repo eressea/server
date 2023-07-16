@@ -1131,7 +1131,7 @@ void report_region(struct stream *out, const region * r, faction * f)
     }
 
     report_region_description(out, r, f, see);
-    if (see_schemes(r)) {
+    if (see_schemes(r, r->seen.mode)) {
         report_region_schemes(out, r, f);
     }
     report_region_edges(out, r, f, edges, ne);
