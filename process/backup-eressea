@@ -1,6 +1,6 @@
 #!/bin/bash
-if [ -z $ERESSEA ] ; then
-  ERESSEA=$HOME/eressea
+if [ -z "$ERESSEA" ] ; then
+  ERESSEA="$HOME/eressea"
   echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
 fi
 GAME=$1
@@ -8,39 +8,44 @@ GAME=$1
 upload() {
   SRC="$1"
   DST=$(basename "$SRC")
-  curl -n -T "$SRC" "https://dav.box.com/dav/Eressea/game-$GAME/$DST" 
-#  echo put "$SRC" "$DST" | cadaver "https://dav.box.com/dav/Eressea/game-$GAME/"
+  SELECT=".name=\"$DST\""
+  FILE_ID=$(box folders:get --json 2654558997 |  jq ".item_collection.entries[] | select($SELECT) | .id" | tr -d \")
+  if [ -n "$FILE_ID" ]; then
+    box files:upload -p 2654558997 "$SRC"
+  else
+    box files:versions:upload "$FILE_ID" "$SRC"
+  fi
 }
 
-if [ ! -d $ERESSEA/game-$GAME ]; then
+if [ ! -d "$ERESSEA/game-$GAME" ]; then
   echo "No such game: game-$GAME."
   exit 1
 fi
-cd $ERESSEA/game-$GAME
+cd "$ERESSEA/game-$GAME" || exit
 TURN=$2
-if [ -z $TURN ]; then
+if [ -z "$TURN" ]; then
   TURN=$(cat turn)
 fi
-if [ ! -e data/$TURN.dat ]; then
+if [ ! -e "data/$TURN.dat" ]; then
   echo "No data for turn $TURN in game $GAME."
   exit 2
 fi
 if [ ! -d backup ] ; then
   echo "creating missing backup directory for game $GAME."
-  mkdir -p ~/backup/eressea/game-$GAME
-  ln -sf ~/backup/eressea/game-$GAME backup
+  mkdir -p "$HOME/backup/eressea/game-$GAME"
+  ln -sf "$HOME/backup/eressea/game-$GAME" backup
 fi
 
 if [ -e reports/reports.txt ] ; then
   echo "backup reports $TURN, game $GAME"
-  tar cjf backup/$TURN-reports.tar.bz2 reports eressea.db
-  upload backup/$TURN-reports.tar.bz2
+  tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+  upload "backup/$TURN-reports.tar.bz2"
 fi
-files="data/$TURN.dat parteien.full parteien"
-if [ -e orders.$TURN ]; then
-files="$files orders.$TURN"
+files=("data/$TURN.dat" parteien.full parteien)
+if [ -e "orders.$TURN" ]; then
+  files+=("orders.$TURN")
 fi
-echo "backup turn $TURN, game $GAME, files: $files"
-tar cjf backup/$TURN.tar.bz2 $files
-upload backup/$TURN.tar.bz2
+echo "backup turn $TURN, game $GAME, files: ${files[*]}"
+tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+upload "backup/$TURN.tar.bz2"
 
