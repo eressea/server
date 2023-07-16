@@ -123,7 +123,7 @@ extern "C" {
 
     bool visible_unit(const struct unit *u, const struct faction *f, int stealthmod, enum seen_mode mode);
 
-    bool see_schemes(const struct region *r);
+    bool see_schemes(const struct region *r, enum seen_mode mode);
 
 #ifdef __cplusplus
 }
