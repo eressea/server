@@ -399,7 +399,6 @@ building *new_building(const struct building_type * btype, region * r,
     int id = newbuildingid();
     building *b = building_create(id);
     const char *bname;
-    char buffer[32];
 
     assert(size > 0);
     b->type = btype;
@@ -413,8 +412,7 @@ building *new_building(const struct building_type * btype, region * r,
         bname = param_name(P_GEBAEUDE, lang);
     }
     assert(bname);
-    snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
-    b->name = str_strdup(buffer);
+    b->name = str_strdup(bname);
     b->size = size;
     return b;
 }

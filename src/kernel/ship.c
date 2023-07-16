@@ -226,7 +226,6 @@ static int newshipid(void) {
 
 ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
-    static char buffer[32];
     ship *sh = (ship *)calloc(1, sizeof(ship));
     const char* sname;
 
@@ -248,8 +247,7 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
         sname = param_name(P_SHIP, NULL);
     }
     assert(sname);
-    snprintf(buffer, sizeof(buffer), "%s %s", sname, itoa36(sh->no));
-    sh->name = str_strdup(buffer);
+    sh->name = str_strdup(sname);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);

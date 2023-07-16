@@ -474,7 +474,7 @@ function test_build_new_ship()
     process_orders()
     local sh = u.ship
     assert_not_nil(sh)
-    assert_equal("Langboot " .. itoa36(sh.id), sh.name)
+    assert_equal("Langboot", sh.name)
     assert_equal(25, sh.size)
     assert_equal(25, u:get_item('log'))
 end
