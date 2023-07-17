@@ -2100,61 +2100,53 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         break;
     case AT_STANDARD:          /* Waffen, mag. Gegenstaende, Kampfzauber */
         if (numattack > 0 || af->magic <= 0) {
-            weapon *wp = ta.fighter->person[ta.index].missile;
-            int melee =
-                count_enemies(b, af, melee_range[0], melee_range[1],
-                    SELECT_ADVANCE | SELECT_DISTANCE | SELECT_FIND);
-            if (melee)
-                wp = preferred_weapon(ta, true);
-            /* Sonderbehandlungen */
-
             if (getreload(ta)) {
                 ta.fighter->person[ta.index].reload--;
             }
             else {
-                bool standard_attack = true;
-                bool reload = false;
+                weapon* wp = ta.fighter->person[ta.index].missile;
+                bool missile = false;
+                if (count_enemies(b, af, melee_range[0], melee_range[1],
+                    SELECT_ADVANCE | SELECT_DISTANCE | SELECT_FIND) > 0) {
+                    wp = preferred_weapon(ta, true);
+                }
+
+                if (wp && fval(wp->type, WTF_MISSILE))
+                    missile = true;
+                if (missile) {
+                    td = select_opponent(b, ta, missile_range[0], missile_range[1]);
+                }
+                else {
+                    td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+                }
+                if (!td.fighter)
+                    return;
+                if (ta.fighter->person[ta.index].last_action < b->turn) {
+                    ta.fighter->person[ta.index].last_action = b->turn;
+                }
+                if (hits(ta, td, wp)) {
+                    const char* d;
+                    if (wp == NULL)
+                        d = u_race(au)->def_damage;
+                    else if (is_riding(ta))
+                        d = wp->type->damage[1];
+                    else
+                        d = wp->type->damage[0];
+                    terminate(td, ta, a->type, d, missile);
+                }
+
                 /* spezialattacken der waffe nur, wenn erste attacke in der runde.
                  * sonst helden mit feuerschwertern zu maechtig */
                 if (numattack == 0 && wp && wp->type->attack) {
                     int dead = 0;
-                    standard_attack = false;
                     if (wp->type->attack(&ta, wp->type, &dead)) {
-                        reload = true;
                         af->catmsg += dead;
                         if (af->person[ta.index].last_action < b->turn) {
                             af->person[ta.index].last_action = b->turn;
                         }
                     }
                 }
-                if (standard_attack) {
-                    bool missile = false;
-                    if (wp && fval(wp->type, WTF_MISSILE))
-                        missile = true;
-                    if (missile) {
-                        td = select_opponent(b, ta, missile_range[0], missile_range[1]);
-                    }
-                    else {
-                        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
-                    }
-                    if (!td.fighter)
-                        return;
-                    if (ta.fighter->person[ta.index].last_action < b->turn) {
-                        ta.fighter->person[ta.index].last_action = b->turn;
-                    }
-                    reload = true;
-                    if (hits(ta, td, wp)) {
-                        const char *d;
-                        if (wp == NULL)
-                            d = u_race(au)->def_damage;
-                        else if (is_riding(ta))
-                            d = wp->type->damage[1];
-                        else
-                            d = wp->type->damage[0];
-                        terminate(td, ta, a->type, d, missile);
-                    }
-                }
-                if (reload && wp && wp->type->reload && !getreload(ta)) {
+                if (wp && wp->type->reload && !getreload(ta)) {
                     setreload(ta);
                 }
             }
