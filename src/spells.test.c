@@ -1,6 +1,6 @@
 #include "spells.h"
 
-#include "magic.h"                   // for free_castorder, castorder
+#include "magic.h"
 #include "teleport.h"
 
 #include <kernel/curse.h>
@@ -15,6 +15,7 @@
 #include "util/variant.h"  // for variant
 
 #include <spells/regioncurse.h>
+#include <spells/unitcurse.h>
 #include <attributes/attributes.h>
 
 #include <triggers/changerace.h>
@@ -53,7 +54,6 @@ static void test_good_dreams(CuTest *tc) {
     a_age(&r->attribs, r);
     CuAssertIntEquals_Msg(tc, "good dreams give +1 to allies", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "good dreams have no effect on non-allies", 0, get_modifier(u2, SK_MELEE, 11, r, false));
-    free_castorder(&co);
     test_teardown();
 }
 
@@ -78,7 +78,50 @@ static void test_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "good dreams in same region as bad dreams", 1, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams in same region as good dreams", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
-    free_castorder(&co);
+    test_teardown();
+}
+
+static void test_speed2(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u1, *u2;
+    castorder co;
+    curse* c;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 30);
+
+    args.length = 1;
+    args.param = &params;
+    param.flag = 0;
+    param.typ = SPP_UNIT;
+    param.data.u = u2;
+    
+    /* force 4, kann bis zu 32 Personen verzaubern */
+    test_create_castorder(&co, u1, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_speed2(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_speed));
+    CuAssertDblEquals(tc, 2.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, (1 + co.level) / 2, c->duration);
+    CuAssertIntEquals(tc, u2->number, c->data.i);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    a_removeall(&u2->attribs, NULL);
+
+    /* force 3, kann nur bis zu 18 Personen verzaubern */
+    test_create_castorder(&co, u1, 1, 3., 0, &args);
+    CuAssertIntEquals(tc, 1, sp_speed2(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_speed));
+    CuAssertDblEquals(tc, 2.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertIntEquals(tc, 18, c->data.i);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     test_teardown();
 }
 
@@ -110,7 +153,6 @@ static void test_bad_dreams(CuTest *tc) {
     CuAssertIntEquals_Msg(tc, "bad dreams have no effect on allies", 0, get_modifier(u1, SK_MELEE, 11, r, false));
     CuAssertIntEquals_Msg(tc, "bad dreams give -1 to non-allies", -1, get_modifier(u2, SK_MELEE, 11, r, false));
 
-    free_castorder(&co);
     test_teardown();
 }
 
@@ -137,7 +179,6 @@ static void test_view_reality(CuTest *tc) {
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_only"));
-    free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
@@ -149,7 +190,6 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
-    free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
     r = test_create_plain(0, 0);
@@ -162,7 +202,6 @@ static void test_view_reality(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "viewreality_effect"));
     CuAssertIntEquals(tc, 5, get_observer(r, f));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
-    free_castorder(&co);
 
     set_observer(r, f, -1, 0);
     CuAssertIntEquals(tc, -1, get_observer(r, f));
@@ -173,7 +212,6 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
-    free_castorder(&co);
     remove_curse(&ra->attribs, c);
 
     /* target region r exists, but astral interference is blocked */
@@ -182,7 +220,6 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
-    free_castorder(&co);
 
     test_teardown();
 }
@@ -212,7 +249,6 @@ static void test_show_astral(CuTest *tc) {
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_forbidden"));
-    free_castorder(&co);
 
     test_clear_messagelist(&f->msgs);
     move_unit(u, r, NULL);
@@ -222,7 +258,6 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
-    free_castorder(&co);
 
     rx = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
     rx->_plane = ra->_plane;
@@ -234,7 +269,6 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "showastral_effect"));
-    free_castorder(&co);
 
     test_create_unit(f, ra);
     test_create_unit(f, rx);
@@ -244,14 +278,12 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, 5, get_observer(rx, f));
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "showastral_effect"));
-    free_castorder(&co);
 
     /* astral block on r */
     c = create_curse(u, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
-    free_castorder(&co);
     remove_curse(&r->attribs, c);
 
     /* astral block on rx */
@@ -259,7 +291,6 @@ static void test_show_astral(CuTest *tc) {
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
-    free_castorder(&co);
     remove_curse(&rx->attribs, c);
 
     test_teardown();
@@ -342,6 +373,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);
+    SUITE_ADD_TEST(suite, test_speed2);
     SUITE_ADD_TEST(suite, test_change_race);
     return suite;
 }

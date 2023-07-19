@@ -47,7 +47,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdarg.h>
 #include <stdbool.h>           // for true
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
@@ -484,12 +483,7 @@ item_type * test_create_itemtype(const char * name) {
 }
 
 void test_create_castorder(castorder *co, unit *u, int level, float force, int range, spellparameter *par) {
-    struct locale * lang;
-    order *ord;
-
-    lang = test_create_locale();
-    create_castorder(co, u, NULL, NULL, u->region, level, force, range, ord = create_order(K_CAST, lang, ""), par);
-    free_order(ord);
+    create_castorder(co, u, NULL, NULL, u->region, level, force, range, NULL, par);
 }
 
 spell * test_create_spell(void)
