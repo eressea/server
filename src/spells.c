@@ -5916,13 +5916,11 @@ int sp_speed2(castorder * co)
     int n, maxmen, used = 0, dur, men;
     unit *u;
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
 
-    maxmen = 2 * cast_level * cast_level;
-    dur = cast_level / 2;
-    if (dur < 1) dur = 1;
+    maxmen = 2 * (int)(force * force);
+    dur = (1 + co->level) / 2;
 
     for (n = 0; n < pa->length; n++) {
         double effect;
@@ -5944,10 +5942,7 @@ int sp_speed2(castorder * co)
 
     ADDMSG(&mage->faction->msgs, msg_message("speed_time_effect",
         "unit region amount", mage, mage->region, used));
-    /* Effektiv benoetigten cast_level (mindestens 1) zurueckgeben */
-    used = (int)sqrt(used / 2);
-    if (used < 1) used = 1;
-    return used;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
