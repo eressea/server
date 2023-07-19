@@ -6,11 +6,13 @@
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/region.h>
+#include "kernel/skill.h"    // for SK_STEALTH, SK_PERCEPTION
 #include <kernel/unit.h>
 
 #include <util/base36.h>
 #include <util/keyword.h>
 #include <util/message.h>
+#include "util/variant.h"    // for variant
 
 #include <stb_ds.h>
 
