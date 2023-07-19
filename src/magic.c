@@ -1850,9 +1850,7 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
     int i = 0;
     sppobj_t otype = SPP_UNIT;
 
-    if (spobjp) {
-        *spobjp = NULL;
-    }
+    *spobjp = NULL;
     if (isparam(param[0], u->faction->locale, P_TEMP)) {
         if (param[1] == NULL) {
             /* Fehler: Ziel vergessen */
