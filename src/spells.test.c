@@ -423,17 +423,44 @@ static void test_watch_region(CuTest *tc) {
 
 static void test_summonent(CuTest *tc) {
     unit *u;
+    region* r;
     castorder co;
+    struct race* rc;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
+    rc = test_create_race("ent");
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    test_create_castorder(&co, u, 5, 4.0, 0, NULL);
 
     /* keine Bäume, keine Kosten */
-    rsettrees(u->region, 2, 0);
+    rsettrees(r, 2, 0);
     CuAssertIntEquals(tc, 0, sp_summonent(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error204"));
+    CuAssertPtrEquals(tc, NULL, u->next);
     test_clear_messages(u->faction);
+
+    /* create 10 ents */
+    rsettrees(r, 2, 10);
+    CuAssertIntEquals(tc, co.level, sp_summonent(&co));
+    CuAssertIntEquals(tc, 0, rtrees(r, 2));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "ent_effect"));
+
+    CuAssertPtrNotNull(tc, u = u->next);
+    CuAssertIntEquals(tc, 10, u->number);
+    CuAssertPtrEquals(tc, rc, (void*)u_race(u));
+    CuAssertPtrNotNull(tc, a_find(u->attribs, &at_unitdissolve));
+    CuAssertPtrNotNull(tc, a_find(u->attribs, &at_creator));
+    CuAssertIntEquals(tc, UFL_LOCKED, u->flags & UFL_LOCKED);
+    test_clear_messagelist(&r->individual_messages->msgs);
+
+    /* create 16 ents (force limited) */
+    rsettrees(r, 2, 32);
+    CuAssertIntEquals(tc, co.level, sp_summonent(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "ent_effect"));
+    CuAssertIntEquals(tc, 16, rtrees(r, 2));
+    CuAssertPtrNotNull(tc, u = u->next);
+    CuAssertIntEquals(tc, 16, u->number);
+    test_clear_messagelist(&r->individual_messages->msgs);
 
     test_teardown();
 }

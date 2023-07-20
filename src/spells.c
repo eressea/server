@@ -950,7 +950,6 @@ int sp_summonent(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     unit *u;
     attrib *a;
     int ents, p2;
@@ -983,7 +982,7 @@ int sp_summonent(castorder * co)
         msg_release(unseen);
         msg_release(seen);
     }
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */

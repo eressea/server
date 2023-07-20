@@ -131,7 +131,7 @@ void set_observer(region *r, faction *f, int skill, int turns)
     a_add(&r->attribs, make_observer(f, skill, turns));
 }
 
-attrib_type at_unitdissolve = {
+struct attrib_type at_unitdissolve = {
     "unitdissolve", NULL, NULL, NULL, a_writechars, a_readchars
 };
 
