@@ -8,6 +8,7 @@
 #include <kernel/faction.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include "kernel/ship.h"            // for SK_MELEE
 #include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/unit.h>
 #include <kernel/attrib.h>
@@ -16,6 +17,7 @@
 
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
+#include <spells/shipcurse.h>
 #include <attributes/attributes.h>
 
 #include <triggers/changerace.h>
@@ -81,6 +83,58 @@ static void test_dreams(CuTest *tc) {
     test_teardown();
 }
 
+static void test_change_race(CuTest* tc) {
+    unit* u;
+    race* rctoad, * rcsmurf;
+    trigger** tp, * tr;
+    timeout_data* td;
+    changerace_data* crd;
+
+    test_setup();
+    rctoad = test_create_race("toad");
+    rcsmurf = test_create_race("smurf");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertPtrEquals(tc, (void*)u->faction->race, (void*)u->_race);
+    CuAssertPtrNotNull(tc, tr = change_race(u, 2, rctoad, NULL));
+    CuAssertPtrEquals(tc, (void*)rctoad, (void*)u->_race);
+    CuAssertPtrEquals(tc, NULL, (void*)u->irace);
+    CuAssertPtrEquals(tc, &tt_timeout, tr->type);
+    CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertPtrEquals(tc, NULL, u->attribs->next);
+    tp = get_triggers(u->attribs, "timer");
+    CuAssertPtrNotNull(tc, tp);
+    CuAssertPtrEquals(tc, tr, *tp);
+    CuAssertPtrEquals(tc, NULL, tr->next);
+    td = (timeout_data*)tr->data.v;
+    CuAssertPtrNotNull(tc, td);
+    CuAssertIntEquals(tc, 2, td->timer);
+    CuAssertPtrNotNull(tc, td->triggers);
+    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
+    CuAssertPtrEquals(tc, NULL, td->triggers->next);
+    crd = (changerace_data*)td->triggers->data.v;
+    CuAssertPtrEquals(tc, (void*)u->faction->race, (void*)crd->race);
+    CuAssertPtrEquals(tc, NULL, (void*)crd->irace);
+
+    /* change race, but do not add a second change_race trigger */
+    CuAssertPtrEquals(tc, tr, change_race(u, 2, rcsmurf, NULL));
+    CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertPtrEquals(tc, NULL, u->attribs->next);
+    CuAssertPtrEquals(tc, NULL, tr->next);
+    CuAssertPtrEquals(tc, (void*)rcsmurf, (void*)u->_race);
+    CuAssertPtrEquals(tc, NULL, (void*)u->irace);
+    td = (timeout_data*)tr->data.v;
+    CuAssertPtrNotNull(tc, td);
+    CuAssertIntEquals(tc, 2, td->timer);
+    CuAssertPtrNotNull(tc, td->triggers);
+    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
+    CuAssertPtrEquals(tc, NULL, td->triggers->next);
+    crd = (changerace_data*)td->triggers->data.v;
+    CuAssertPtrEquals(tc, (void*)u->faction->race, (void*)crd->race);
+    CuAssertPtrEquals(tc, NULL, (void*)crd->irace);
+
+    test_teardown();
+}
+
 static void test_speed2(CuTest *tc) {
     struct region *r;
     struct faction *f;
@@ -116,12 +170,67 @@ static void test_speed2(CuTest *tc) {
 
     /* force 3, kann nur bis zu 18 Personen verzaubern */
     test_create_castorder(&co, u1, 1, 3., 0, &args);
-    CuAssertIntEquals(tc, 1, sp_speed2(&co));
+    CuAssertIntEquals(tc, co.level, sp_speed2(&co));
     CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_speed));
     CuAssertDblEquals(tc, 2.0, c->effect, 0.01);
-    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertIntEquals(tc, (1 + co.level) / 2, c->duration);
     CuAssertIntEquals(tc, 18, c->data.i);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    a_removeall(&u2->attribs, NULL);
+
+    /* if target not found, no costs, no effect */
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_speed2(&co));
+    CuAssertPtrEquals(tc, NULL, u2->attribs);
+
+    /* if target resists, pay in full, no effect */
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_speed2(&co));
+    CuAssertPtrEquals(tc, NULL, u2->attribs);
+
+    test_teardown();
+}
+
+static void test_goodwinds(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    ship* sh;
+    castorder co;
+    curse* c;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    sh = test_create_ship(r, NULL);
+
+    args.length = 1;
+    args.param = &params;
+    param.flag = 0;
+    param.typ = SPP_SHIP;
+    param.data.sh = sh;
+    
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(sh->attribs, &ct_nodrift));
+    CuAssertIntEquals(tc, 1 + co.level, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    a_removeall(&sh->attribs, NULL);
+
+    /* if target not found, no costs, no effect */
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
+    CuAssertPtrEquals(tc, NULL, sh->attribs);
+
+    /* if target resists, pay in full, no effect */
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
+    CuAssertPtrEquals(tc, NULL, sh->attribs);
+
     test_teardown();
 }
 
@@ -312,55 +421,108 @@ static void test_watch_region(CuTest *tc) {
     test_teardown();
 }
 
-static void test_change_race(CuTest *tc) {
+static void test_summonent(CuTest *tc) {
     unit *u;
-    race *rctoad, *rcsmurf;
-    trigger **tp, *tr;
-    timeout_data *td;
-    changerace_data *crd;
+    castorder co;
 
     test_setup();
-    rctoad = test_create_race("toad");
-    rcsmurf = test_create_race("smurf");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)u->_race);
-    CuAssertPtrNotNull(tc, tr = change_race(u, 2, rctoad, NULL));
-    CuAssertPtrEquals(tc, (void *)rctoad, (void *)u->_race);
-    CuAssertPtrEquals(tc, NULL, (void *)u->irace);
-    CuAssertPtrEquals(tc, &tt_timeout, tr->type);
-    CuAssertPtrNotNull(tc, u->attribs);
-    CuAssertPtrEquals(tc, NULL, u->attribs->next);
-    tp = get_triggers(u->attribs, "timer");
-    CuAssertPtrNotNull(tc, tp);
-    CuAssertPtrEquals(tc, tr, *tp);
-    CuAssertPtrEquals(tc, NULL, tr->next);
-    td = (timeout_data *)tr->data.v;
-    CuAssertPtrNotNull(tc, td);
-    CuAssertIntEquals(tc, 2, td->timer);
-    CuAssertPtrNotNull(tc, td->triggers);
-    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
-    CuAssertPtrEquals(tc, NULL, td->triggers->next);
-    crd = (changerace_data *)td->triggers->data.v;
-    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)crd->race);
-    CuAssertPtrEquals(tc, NULL, (void *)crd->irace);
+    test_create_castorder(&co, u, 10, 10.0, 0, NULL);
 
-    /* change race, but do not add a second change_race trigger */
-    CuAssertPtrEquals(tc, tr, change_race(u, 2, rcsmurf, NULL));
-    CuAssertPtrNotNull(tc, u->attribs);
-    CuAssertPtrEquals(tc, NULL, u->attribs->next);
-    CuAssertPtrEquals(tc, NULL, tr->next);
-    CuAssertPtrEquals(tc, (void *)rcsmurf, (void *)u->_race);
-    CuAssertPtrEquals(tc, NULL, (void *)u->irace);
-    td = (timeout_data *)tr->data.v;
-    CuAssertPtrNotNull(tc, td);
-    CuAssertIntEquals(tc, 2, td->timer);
-    CuAssertPtrNotNull(tc, td->triggers);
-    CuAssertPtrEquals(tc, &tt_changerace, td->triggers->type);
-    CuAssertPtrEquals(tc, NULL, td->triggers->next);
-    crd = (changerace_data *)td->triggers->data.v;
-    CuAssertPtrEquals(tc, (void *)u->faction->race, (void *)crd->race);
-    CuAssertPtrEquals(tc, NULL, (void *)crd->irace);
+    /* keine Bäume, keine Kosten */
+    rsettrees(u->region, 2, 0);
+    CuAssertIntEquals(tc, 0, sp_summonent(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error204"));
+    test_clear_messages(u->faction);
 
+    test_teardown();
+}
+
+static void test_maelstrom(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_blessedharvest(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_kaelteschutz(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_treewalkenter(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_treewalkexit(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_holyground(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_drought(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_stormwinds(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_fumblecurse(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_deathcloud(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_teardown();
+}
+
+static void test_magicboost(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     test_teardown();
 }
 
@@ -374,6 +536,20 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_bad_dreams);
     SUITE_ADD_TEST(suite, test_dreams);
     SUITE_ADD_TEST(suite, test_speed2);
+    SUITE_ADD_TEST(suite, test_goodwinds);
     SUITE_ADD_TEST(suite, test_change_race);
+    SUITE_ADD_TEST(suite, test_summonent);
+    SUITE_ADD_TEST(suite, test_maelstrom);
+    SUITE_ADD_TEST(suite, test_blessedharvest);
+    SUITE_ADD_TEST(suite, test_kaelteschutz);
+    SUITE_ADD_TEST(suite, test_treewalkenter);
+    SUITE_ADD_TEST(suite, test_treewalkexit);
+    SUITE_ADD_TEST(suite, test_holyground);
+    SUITE_ADD_TEST(suite, test_drought);
+    SUITE_ADD_TEST(suite, test_stormwinds);
+    SUITE_ADD_TEST(suite, test_fumblecurse);
+    SUITE_ADD_TEST(suite, test_deathcloud);
+    SUITE_ADD_TEST(suite, test_magicboost);
+
     return suite;
 }
