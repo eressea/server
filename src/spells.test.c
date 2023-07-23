@@ -707,6 +707,7 @@ static void test_stormwinds(CuTest *tc) {
 
 static void test_fumblecurse(CuTest *tc) {
     unit *u, *u2;
+    curse *c;
     castorder co;
     spellparameter args;
     spllprm param;
@@ -716,11 +717,25 @@ static void test_fumblecurse(CuTest *tc) {
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     args.length = 1;
     args.param = &params;
-    param.flag = TARGET_RESISTS;
+    param.flag = TARGET_NOTFOUND;
     param.typ = SPP_UNIT;
     param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    set_level(u2, SK_MAGIC, 1);
     test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, 0, sp_fumblecurse(&co));
+
+    param.flag = TARGET_RESISTS;
     CuAssertIntEquals(tc, co.level, sp_fumblecurse(&co));
+    CuAssertPtrEquals(tc, NULL, get_curse(u2->attribs, &ct_fumble));
+
+    param.flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_fumblecurse(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_fumble));
+    CuAssertIntEquals(tc, co.level, c->duration);
+    CuAssertDblEquals(tc, co.force * .5, c->effect, 0.01);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "fumblecurse"));
+
     test_teardown();
 }
 
