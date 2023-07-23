@@ -32,6 +32,7 @@ extern "C" {
     int sp_fumblecurse(struct castorder* co);
     int sp_deathcloud(struct castorder* co);
     int sp_magicboost(struct castorder* co);
+    int sp_migranten(struct castorder* co);
 
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */

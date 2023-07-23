@@ -2498,6 +2498,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     unit * mage = NULL;
     param_t param;
 
+    assert(u);
     if (LongHunger(u)) {
         cmistake(u, ord, 224, MSG_MAGIC);
         return 0;
@@ -2856,7 +2857,7 @@ void magic(void)
             }
             /* erst bezahlen, dann Kostenzaehler erhoehen */
             if (co->level > 0) {
-                pay_spell(mage, caster, sp, cast_level, co->distance);
+                pay_spell(mage, caster, sp, co->level, co->distance);
             }
             if (fumbled) {
                 do_fumble(co);

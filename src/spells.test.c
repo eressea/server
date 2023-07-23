@@ -1,5 +1,6 @@
 #include "spells.h"
 
+#include "contact.h"
 #include "magic.h"
 #include "teleport.h"
 
@@ -10,6 +11,7 @@
 #include <kernel/region.h>
 #include "kernel/ship.h"            // for SK_MELEE
 #include "kernel/skill.h"            // for SK_MELEE
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 #include <kernel/attrib.h>
 #include <util/message.h>
@@ -430,7 +432,7 @@ static void test_summonent(CuTest *tc) {
     test_setup();
     rc = test_create_race("ent");
     u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
-    test_create_castorder(&co, u, 5, 4.0, 0, NULL);
+    test_create_castorder(&co, u, 3, 4.0, 0, NULL);
 
     /* keine Bäume, keine Kosten */
     rsettrees(r, 2, 0);
@@ -443,7 +445,7 @@ static void test_summonent(CuTest *tc) {
     rsettrees(r, 2, 10);
     CuAssertIntEquals(tc, co.level, sp_summonent(&co));
     CuAssertIntEquals(tc, 0, rtrees(r, 2));
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "ent_effect"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "ent_effect", u->faction));
 
     CuAssertPtrNotNull(tc, u = u->next);
     CuAssertIntEquals(tc, 10, u->number);
@@ -451,105 +453,271 @@ static void test_summonent(CuTest *tc) {
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_unitdissolve));
     CuAssertPtrNotNull(tc, a_find(u->attribs, &at_creator));
     CuAssertIntEquals(tc, UFL_LOCKED, u->flags & UFL_LOCKED);
-    test_clear_messagelist(&r->individual_messages->msgs);
+    test_clear_region_messages(r);
 
     /* create 16 ents (force limited) */
     rsettrees(r, 2, 32);
     CuAssertIntEquals(tc, co.level, sp_summonent(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "ent_effect"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "ent_effect", u->faction));
     CuAssertIntEquals(tc, 16, rtrees(r, 2));
     CuAssertPtrNotNull(tc, u = u->next);
     CuAssertIntEquals(tc, 16, u->number);
-    test_clear_messagelist(&r->individual_messages->msgs);
+    test_clear_region_messages(r);
 
     test_teardown();
 }
 
 static void test_maelstrom(CuTest *tc) {
     unit *u;
+    region *r;
+    castorder co;
+    curse *c;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_ocean(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_maelstrom(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_maelstrom));
+    CuAssertDblEquals(tc, co.force, c->effect, 0.01);
+    CuAssertIntEquals(tc, co.level + 1, c->duration);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "maelstrom_effect", u->faction));
     test_teardown();
 }
 
 static void test_blessedharvest(CuTest *tc) {
     unit *u;
+    castorder co;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_blessedharvest(&co));
     test_teardown();
 }
 
 static void test_kaelteschutz(CuTest *tc) {
-    unit *u;
+    unit *u, *u2;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm* params = &param;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_kaelteschutz(&co));
     test_teardown();
 }
 
 static void test_treewalkenter(CuTest *tc) {
-    unit *u;
+    unit *u, *u2;
+    region *r, *ra;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_use_astral();
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    rsettrees(r, 2, r->terrain->size / 2);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    ra->_plane = get_astralplane();
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
+    CuAssertPtrEquals(tc, r, u2->region);
+
+    param.flag = 0;
+    CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_no_contact"));
+    test_clear_messages(u->faction);
+
+    contact_unit(u2, u);
+    CuAssertIntEquals(tc, co.level, sp_treewalkenter(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "astral_disappear", u->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_appear", u2->faction));
     test_teardown();
 }
 
 static void test_treewalkexit(CuTest *tc) {
-    unit *u;
+    unit *u, *u2;
+    region *r, *ra;
+    castorder co;
+    spellparameter args;
+    spllprm param[2];
+    spllprm *params[2] = { param, param + 1 };
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_use_astral();
+    r = test_create_plain(0, 0);
+    rsettrees(r, 2, r->terrain->size / 2);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    ra->_plane = get_astralplane();
+    u = test_create_unit(test_create_faction(), ra);
+    args.length = 2;
+    args.param = params;
+    param[0].flag = TARGET_RESISTS;
+    param[0].typ = SPP_REGION;
+    param[0].data.r = r;
+    param[1].flag = 0;
+    param[1].typ = SPP_UNIT;
+    param[1].data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
+
+    param[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+
+    param[0].flag = 0;
+    param[1].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
+
+    param[0].flag = 0;
+    param[1].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+
     test_teardown();
 }
 
 static void test_holyground(CuTest *tc) {
     unit *u;
+    castorder co;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_holyground(&co));
     test_teardown();
 }
 
 static void test_drought(CuTest *tc) {
     unit *u;
+    castorder co;
+    curse *c;
+    region *r;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    rsettrees(r, 2, 200);
+    rsettrees(r, 1, 200);
+    rsettrees(r, 0, 200);
+    rsethorses(r, 200);
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_drought(&co));
+    /* Meldung nur bei Fernzaubern: */
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "sp_drought_effect"));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, co.level, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+
+    co.level++;
+    co.force += 1.0;
+    CuAssertIntEquals(tc, co.level, sp_drought(&co));
+    CuAssertPtrEquals(tc, c, get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, co.level, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+
     test_teardown();
 }
 
 static void test_stormwinds(CuTest *tc) {
     unit *u;
+    ship *sh;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm* params = &param;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_SHIP;
+    param.data.sh = sh = test_create_ship(u->region, NULL);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
     test_teardown();
 }
 
 static void test_fumblecurse(CuTest *tc) {
-    unit *u;
+    unit *u, *u2;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm* params = &param;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_fumblecurse(&co));
     test_teardown();
 }
 
 static void test_deathcloud(CuTest *tc) {
     unit *u;
+    castorder co;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_deathcloud(&co));
     test_teardown();
 }
 
 static void test_magicboost(CuTest *tc) {
     unit *u;
+    castorder co;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_magicboost(&co));
+    test_teardown();
+}
+
+static void test_migrants(CuTest *tc) {
+    unit *u, *u2;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_migranten(&co));
     test_teardown();
 }
 
@@ -577,6 +745,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_fumblecurse);
     SUITE_ADD_TEST(suite, test_deathcloud);
     SUITE_ADD_TEST(suite, test_magicboost);
+    SUITE_ADD_TEST(suite, test_migrants);
 
     return suite;
 }

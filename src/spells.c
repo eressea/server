@@ -1150,7 +1150,11 @@ int sp_blessedharvest(castorder * co)
 
     if (create_curse(caster, &r->attribs, &ct_blessedharvest, co->force,
         co->level + 1, 1.0, 0)) {
-        const char * effect = co->sp->sname[0] == 'b' ? "harvest_effect" : "raindance_effect";
+        const char* effect = "harvest_effect";
+        // HACK: same function for harvest and raindance, different message:
+        if (co->sp && co->sp->sname && co->sp->sname[0] != 'b') {
+            effect = "raindance_effect";
+        }
         message *seen = msg_message(effect, "mage", caster);
         message *unseen = msg_message(effect, "mage", (unit *)NULL);
         report_effect(r, caster, seen, unseen);
@@ -1433,27 +1437,30 @@ int sp_kaelteschutz(castorder * co)
         if (force < 1)
             break;
 
-        if (pa->param[n]->flag)
+        if (pa->param[n]->flag == TARGET_NOTFOUND)
             continue;
 
-        u = pa->param[n]->data.u;
+        if (pa->param[n]->flag == 0)
+        {
+            u = pa->param[n]->data.u;
 
-        if (force < u->number) {
-            men = (int)force;
+            if (force < u->number) {
+                men = (int)force;
+            }
+            else {
+                men = u->number;
+            }
+
+            create_curse(caster, &u->attribs, &ct_insectfur, co->force,
+                co->level + 1, zero_effect, men);
+
+            force -= u->number;
+            ADDMSG(&caster->faction->msgs, msg_message("heat_effect", "mage target", caster,
+                u));
+            if (u->faction != caster->faction)
+                ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
+                    cansee(u->faction, r, caster, 0) ? caster : NULL, u));
         }
-        else {
-            men = u->number;
-        }
-
-        create_curse(caster, &u->attribs, &ct_insectfur, co->force,
-            co->level + 1, zero_effect, men);
-
-        force -= u->number;
-        ADDMSG(&caster->faction->msgs, msg_message("heat_effect", "mage target", caster,
-            u));
-        if (u->faction != caster->faction)
-            ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
-                cansee(u->faction, r, caster, 0) ? caster : NULL, u));
         cost = co->level;
     }
     /* Erstattung? */
@@ -1886,7 +1893,7 @@ int sp_treewalkexit(castorder * co)
     unit *u;
     int remaining_cap;
     int n;
-    int erfolg = 0;
+    int cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     spellparameter *pa = co->par;
@@ -1923,21 +1930,30 @@ int sp_treewalkexit(castorder * co)
         return 0;
     }
 
+    if (pa->param[0]->flag == TARGET_RESISTS) {
+        /* target region resists the magical invasion */
+        return co->level;
+    }
+
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
-        if (pa->param[n]->flag)
+        if (pa->param[n]->flag == TARGET_NOTFOUND) {
             continue;
-
+        }
         u = pa->param[n]->data.u;
 
-        if (!ucontact(u, caster)) {
-            ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
-                "feedback_no_contact", "target", u));
+        if (!can_survive(u, rt)) {
+            cmistake(caster, co->order, 231, MSG_MAGIC);
         }
         else {
             int w = weight(u);
-            if (!can_survive(u, rt)) {
-                cmistake(caster, co->order, 231, MSG_MAGIC);
+
+            if (pa->param[n]->flag == TARGET_RESISTS) {
+                cost = cast_level;
+            }
+            else if (!ucontact(u, caster)) {
+                ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
+                    "feedback_no_contact", "target", u));
             }
             else if (remaining_cap - w < 0) {
                 ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
@@ -1946,7 +1962,7 @@ int sp_treewalkexit(castorder * co)
             else {
                 remaining_cap = remaining_cap - w;
                 move_unit(u, rt, NULL);
-                erfolg = cast_level;
+                cost = cast_level;
 
                 /* Meldungen in der Ausgangsregion */
                 astral_disappear(r, u);
@@ -1956,7 +1972,7 @@ int sp_treewalkexit(castorder * co)
             }
         }
     }
-    return erfolg;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
@@ -2073,7 +2089,6 @@ int sp_drought(castorder * co)
         return 0;
     }
 
-    /* melden, 1x pro Partei */
     msg = msg_message("sp_drought_effect", "mage region", caster, r);
     report_spell(caster, r, msg);
     msg_release(msg);
@@ -2188,7 +2203,7 @@ int sp_stormwinds(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     spellparameter *pa = co->par;
-    int n, force = (int)co->force;
+    int n, max_targets = (int)co->force;
     message *m = NULL;
 
     /* melden vorbereiten */
@@ -2196,9 +2211,10 @@ int sp_stormwinds(castorder * co)
     for (u = r->units; u; u = u->next)
         freset(u->faction, FFL_SELECT);
 
-    for (n = 0; n < pa->length && force > 0; n++) {
-        if (pa->param[n]->flag)
+    for (n = 0; n < pa->length && max_targets > 0; n++) {
+        if (pa->param[n]->flag == TARGET_NOTFOUND) {
             continue;
+        }
 
         sh = pa->param[n]->data.sh;
 
@@ -2223,7 +2239,7 @@ int sp_stormwinds(castorder * co)
         /* Da der Spruch nur diese Runde wirkt wird er nie im Report
          * erscheinen */
         erfolg++;
-        force--;
+        max_targets--;
 
         /* melden vorbereiten: */
         for (u = r->units; u; u = u->next) {
@@ -2252,7 +2268,7 @@ int sp_stormwinds(castorder * co)
     }
     if (m)
         msg_release(m);
-    return erfolg;
+    return erfolg ? co->level : 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -3705,7 +3721,7 @@ static int sp_raisepeasantmob(castorder * co)
  * Flag:
  *  (UNITSPELL | SPELLLEVEL | TESTCANSEE)
  */
-static int sp_migranten(castorder * co)
+int sp_migranten(castorder * co)
 {
     unit *target;
     region *r = co_get_region(co);

@@ -101,8 +101,9 @@ function test_migration_with_ring()
     u.aura_max = 9
     process_orders()
     assert_equal(f, u2.faction)
-    assert_equal(6, u.aura)
-    assert_equal(8, u.aura_max)
+     -- cost scales with result:
+    assert_equal(3, u.aura)
+    assert_equal(7, u.aura_max)
 end
 
 function test_migration_insufficient_aura()
@@ -137,7 +138,7 @@ function test_migration_reduced_cost()
     -- spell is cast at level 1:
     assert_equal(f, u2.faction)
     assert_equal(0, u.aura)
-    assert_equal(7, u.aura_max)
+    assert_equal(8, u.aura_max)
 end
 
 --[[

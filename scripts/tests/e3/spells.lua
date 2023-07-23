@@ -14,7 +14,7 @@ end
 
 function test_raindance()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("halfling", "noreply@eressea.de", "de")
+    local f = faction.create("halfling")
     local u = unit.create(f, r)
     r:set_resource("peasant", 100)
     r:set_resource("money", 0)
@@ -26,7 +26,7 @@ function test_raindance()
     assert_equal(0, err)
     
     u:clear_orders()
-    u:add_order("ZAUBERE STUFE 3 Regentanz")
+    u:add_order("ZAUBERE STUFE 1 Regentanz")
     assert_equal(0, r:get_resource("money"), 0)
     
     process_orders()
@@ -42,7 +42,7 @@ end
 
 function test_magic()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("halfling", "noreply@eressea.de", "de")
+    local f = faction.create("halfling")
     local u = unit.create(f, r)
     local b = building.create(r, "castle")
 
