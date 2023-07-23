@@ -13,6 +13,7 @@
 #include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
+#include <kernel/order.h>
 #include <kernel/attrib.h>
 #include <util/message.h>
 #include "util/variant.h"  // for variant
@@ -759,31 +760,65 @@ static void test_deathcloud(CuTest *tc) {
 
 static void test_magicboost(CuTest *tc) {
     unit *u;
+    curse *c;
     castorder co;
+    attrib *a;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_magicboost(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(u->attribs, &ct_magicboost));
+    CuAssertIntEquals(tc, 10, c->duration);
+    CuAssertDblEquals(tc, 6.0, c->effect, 0.01);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+
+    CuAssertPtrNotNull(tc, a = a_find(u->attribs, &at_eventhandler));
+    /*
+    CuAssertPtrNotNull(tc, c = get_curse(u->attribs, &ct_auraboost));
+    CuAssertIntEquals(tc, 4, c->duration);
+    CuAssertDblEquals(tc, 200.0, c->effect, 0.01);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    */
     test_teardown();
 }
 
 static void test_migrants(CuTest *tc) {
     unit *u, *u2;
+    faction *f;
     castorder co;
     spellparameter args;
     spllprm param;
     spllprm *params = &param;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     args.length = 1;
     args.param = &params;
     param.flag = TARGET_RESISTS;
     param.typ = SPP_UNIT;
-    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    param.data.u = u2 = test_create_unit(f = test_create_faction(), u->region);
+    u2->orders = create_order(K_WORK, u2->faction->locale, NULL);
+    u_setrace(u2, test_create_race("hobgoblin"));
     test_create_castorder(&co, u, 4, 5.0, 0, &args);
-    CuAssertIntEquals(tc, co.level, sp_migranten(&co));
+    CuAssertIntEquals(tc, u2->number, sp_migranten(&co));
+    CuAssertPtrEquals(tc, f, u2->faction);
+
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_migranten(&co));
+    CuAssertPtrEquals(tc, f, u2->faction);
+
+    /* no contact, no cost: */
+    param.flag = 0;
+    CuAssertIntEquals(tc, 0, sp_migranten(&co));
+    CuAssertPtrEquals(tc, f, u2->faction);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "spellfail::contact"));
+    test_clear_messages(u->faction);
+
+    contact_unit(u2, u);
+    CuAssertIntEquals(tc, u2->number, sp_migranten(&co));
+    CuAssertPtrEquals(tc, u->faction, u2->faction);
+    CuAssertPtrEquals(tc, NULL, u2->orders);
     test_teardown();
 }
 

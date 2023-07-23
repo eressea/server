@@ -124,6 +124,24 @@ function test_migration_insufficient_aura()
     assert_equal(9, u.aura_max)
 end
 
+function test_migration_insufficient_max_aura()
+    -- if unit cannot pay full costs, it casts at a lower level.
+    local r = region.create(0, 0, "plain")
+    local f = faction.create('human')
+    local u = setup_mage(f, r)
+    local u2 = unit.create(faction.create('human'), r)
+    u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
+    u2.number = 2
+    u:add_order('ZAUBERE STUFE 2 "Ritual der Aufnahme" ' .. itoa36(u2.id))
+    u.aura = 6
+    u.aura_max = 1
+    process_orders()
+    -- spell fails, costs nothing:
+    assert_not_equal(f, u2.faction)
+    assert_equal(6, u.aura)
+    assert_equal(1, u.aura_max)
+end
+
 function test_migration_reduced_cost()
     -- if unit cannot pay full costs, it casts at a lower level.
     local r = region.create(0, 0, "plain")

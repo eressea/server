@@ -3732,16 +3732,16 @@ int sp_migranten(castorder * co)
     int max_force = (int) co->force;
     spellparameter *pa = co->par;
 
+    target = pa->param[0]->data.u;        /* Zieleinheit */
+
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return co->level;
+        return target->number;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
         return 0;
-
-    target = pa->param[0]->data.u;        /* Zieleinheit */
 
     /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
     if (u_race(target) == mage->faction->race) {
@@ -3767,7 +3767,7 @@ int sp_migranten(castorder * co)
         return 0;
     }
     /* maximal Stufe Personen */
-    if (target->number > max_force || target->number > max_spellpoints(mage, r)) {
+    if (target->number > max_force) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_toomanytargets", ""));
         return 0;
