@@ -593,11 +593,18 @@ static void test_treewalkexit(CuTest *tc) {
 static void test_holyground(CuTest *tc) {
     unit *u;
     castorder co;
+    curse *c;
+    region *r;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    deathcounts(r, 100);
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_holyground(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_holyground));
+    CuAssertDblEquals(tc, co.force * co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 0.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 0, deathcount(r));
     test_teardown();
 }
 
