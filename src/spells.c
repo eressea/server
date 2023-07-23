@@ -2080,7 +2080,6 @@ int sp_drought(castorder * co)
     curse *c;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     message *msg;
 
     if (fval(r->terrain, SEA_REGION)) {
@@ -3727,7 +3726,6 @@ static int sp_raisepeasantmob(castorder * co)
 int sp_migranten(castorder * co)
 {
     unit *target;
-    region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int max_force = (int) co->force;
     spellparameter *pa = co->par;

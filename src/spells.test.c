@@ -15,7 +15,8 @@
 #include <kernel/unit.h>
 #include <kernel/order.h>
 #include <kernel/attrib.h>
-#include <util/message.h>
+#include "util/keyword.h"
+#include "util/message.h"
 #include "util/variant.h"  // for variant
 
 #include <spells/regioncurse.h>
