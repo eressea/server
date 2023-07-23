@@ -1992,7 +1992,7 @@ int sp_holyground(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    message *msg = msg_message("sp_holyground_effect", "mage region", caster, r);
+    message *msg = msg_message("holyground_effect", "mage region", caster, r);
     report_spell(caster, r, msg);
     msg_release(msg);
 
@@ -2089,7 +2089,7 @@ int sp_drought(castorder * co)
         return 0;
     }
 
-    msg = msg_message("sp_drought_effect", "mage region", caster, r);
+    msg = msg_message("drought_effect", "mage region", caster, r);
     report_spell(caster, r, msg);
     msg_release(msg);
 
@@ -3188,7 +3188,7 @@ static int sp_bloodsacrifice(castorder * co)
     caster->hp++;
     change_spellpoints(caster, aura);
     ADDMSG(&caster->faction->msgs,
-        msg_message("sp_bloodsacrifice_effect",
+        msg_message("bloodsacrifice_effect",
             "unit region command amount", caster, caster->region, co->order, aura));
     return cast_level;
 }
@@ -3703,7 +3703,7 @@ static int sp_raisepeasantmob(castorder * co)
     create_curse(mage, &r->attribs, &ct_riotzone, (float)cast_level, duration,
         (float)anteil, 0);
 
-    msg = msg_message("sp_raisepeasantmob_effect", "mage region", mage, r);
+    msg = msg_message("raisepeasantmob_effect", "mage region", mage, r);
     report_spell(mage, r, msg);
     msg_release(msg);
 
@@ -4325,7 +4325,7 @@ static int sp_raisepeasants(castorder * co)
     a_add(&u2->attribs, a);
 
     msg =
-        msg_message("sp_raisepeasants_effect", "mage region amount", caster, r,
+        msg_message("raisepeasants_effect", "mage region amount", caster, r,
             u2->number);
     r_addmessage(r, NULL, msg);
     if (caster->region != r) {
@@ -4359,7 +4359,7 @@ static int sp_depression(castorder * co)
     create_curse(mage, &r->attribs, &ct_depression, force, duration,
         zero_effect, 0);
 
-    msg = msg_message("sp_depression_effect", "mage region", mage, r);
+    msg = msg_message("depression_effect", "mage region", mage, r);
     r_addmessage(r, NULL, msg);
     if (mage->region != r) {
         add_message(&mage->faction->msgs, msg);
@@ -4460,7 +4460,7 @@ int sp_icastle(castorder * co)
     ADDMSG(&mage->faction->msgs, msg_message("icastle_create",
         "unit region command", mage, mage->region, co->order));
 
-    msg = msg_message("sp_icastle_effect", "region", r);
+    msg = msg_message("icastle_effect", "region", r);
     report_spell(mage, r, msg);
     msg_release(msg);
 
@@ -4657,7 +4657,7 @@ int sp_clonecopy(castorder * co)
 
     create_newclone(mage, clone);
 
-    msg = msg_message("sp_clone_effect", "mage", mage);
+    msg = msg_message("clone_effect", "mage", mage);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
 
@@ -4703,7 +4703,7 @@ int sp_dreamreading(castorder * co)
     set_observer(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region), 2);
 
     msg =
-        msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
+        msg_message("dreamreading_effect", "mage unit region", mage, u,
             u->region);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
@@ -4751,7 +4751,7 @@ int sp_sweetdreams(castorder * co)
         effect = 0.05f;
         create_curse(mage, &u->attribs, &ct_orcish, power, duration, effect, men);
 
-        msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
+        msg = msg_message("sweetdreams_effect", "mage unit region", mage, u, r);
         r_addmessage(r, mage->faction, msg);
         if (u->faction != mage->faction) {
             r_addmessage(r, u->faction, msg);
@@ -4774,7 +4774,7 @@ int sp_disturbingdreams(castorder * co)
     effect = 10;
     create_curse(mage, &r->attribs, &ct_badlearn, power, duration, effect, 0);
 
-    ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect",
+    ADDMSG(&mage->faction->msgs, msg_message("disturbingdreams_effect",
         "mage region", mage, r));
     return cast_level;
 }
@@ -5519,7 +5519,7 @@ static int sp_eternizewall(castorder * co)
     for (u = r->units; u; u = u->next)
         freset(u->faction, FFL_SELECT);
     msg =
-        msg_message("sp_eternizewall_effect", "mage building region", mage, b, r);
+        msg_message("eternizewall_effect", "mage building region", mage, b, r);
     for (u = r->units; u; u = u->next) {
         if (!fval(u->faction, FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
@@ -5600,7 +5600,7 @@ int sp_permtransfer(castorder * co)
         change_maxspellpoints(tu, aura / 3);
     }
 
-    msg = msg_message("sp_permtransfer_effect", "mage target amount", mage, tu, aura);
+    msg = msg_message("permtransfer_effect", "mage target amount", mage, tu, aura);
     add_message(&caster->faction->msgs, msg);
     if (tu->faction != caster->faction) {
         add_message(&tu->faction->msgs, msg);
@@ -5678,7 +5678,7 @@ int sp_movecastle(castorder * co)
         }
     }
 
-    msg = msg_message("sp_movecastle_effect", "building direction", b, dir);
+    msg = msg_message("movecastle_effect", "building direction", b, dir);
     r_addmessage(r, NULL, msg);
     msg_release(msg);
 

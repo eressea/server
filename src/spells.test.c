@@ -623,7 +623,7 @@ static void test_drought(CuTest *tc) {
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_drought(&co));
     /* Meldung nur bei Fernzaubern: */
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "sp_drought_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "drought_effect"));
     CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
     CuAssertIntEquals(tc, co.level, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
@@ -651,20 +651,26 @@ static void test_drought(CuTest *tc) {
 static void test_stormwinds(CuTest *tc) {
     unit *u;
     ship *sh;
+    region *r;
+    curse *c;
     castorder co;
     spellparameter args;
     spllprm param;
     spllprm* params = &param;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
     args.length = 1;
     args.param = &params;
     param.flag = TARGET_RESISTS;
     param.typ = SPP_SHIP;
-    param.data.sh = sh = test_create_ship(u->region, NULL);
+    param.data.sh = sh = test_create_ship(r, NULL);
     test_create_castorder(&co, u, 4, 5.0, 0, &args);
     CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(sh->attribs, &ct_stormwind));
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "stormwinds_effect"));
     test_teardown();
 }
 
