@@ -1111,19 +1111,12 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
     }
 
     case TYP_REGION:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
         a = ((const region *)obj)->attribs;
         break;
 
     case TYP_BUILDING:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
         a = ((const building *)obj)->attribs;
-        /* Bonus durch Typ
-        probability += 0.01 * ((building *)obj)->type->magres; */
+        /* Bonus durch Typ */
         prob = frac_add(prob, ((const building *)obj)->type->magres);
         break;
 
