@@ -480,6 +480,7 @@ static void test_maelstrom(CuTest *tc) {
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_maelstrom(&co));
     CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_maelstrom));
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     CuAssertDblEquals(tc, co.force, c->effect, 0.01);
     CuAssertIntEquals(tc, co.level + 1, c->duration);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "maelstrom_effect", u->faction));
@@ -488,12 +489,19 @@ static void test_maelstrom(CuTest *tc) {
 
 static void test_blessedharvest(CuTest *tc) {
     unit *u;
+    region *r;
+    curse *c;
     castorder co;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_blessedharvest(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_blessedharvest));
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertIntEquals(tc, 1, curse_geteffect_int(c));
+    CuAssertIntEquals(tc, co.level + 1, c->duration);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "harvest_effect", u->faction));
     test_teardown();
 }
 
