@@ -741,12 +741,19 @@ static void test_fumblecurse(CuTest *tc) {
 
 static void test_deathcloud(CuTest *tc) {
     unit *u;
+    curse *c;
+    region *r;
     castorder co;
 
     test_setup();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_deathcloud(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_deathcloud));
+    CuAssertIntEquals(tc, co.level, c->duration);
+    CuAssertDblEquals(tc, co.force * .5, c->effect, 0.01);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "deathcloud_effect"));
     test_teardown();
 }
 

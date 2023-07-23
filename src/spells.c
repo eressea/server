@@ -2827,7 +2827,7 @@ static int dc_age(struct curse *c)
     return AT_AGE_KEEP;
 }
 
-static struct curse_type ct_deathcloud = {
+const struct curse_type ct_deathcloud = {
     "deathcloud", CURSETYP_REGION, 0, NO_MERGE, cinfo_simple, NULL, NULL, NULL,
     NULL, dc_age
 };
