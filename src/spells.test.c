@@ -20,6 +20,7 @@
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
 #include <spells/shipcurse.h>
+#include <spells/flyingship.h>
 #include <attributes/attributes.h>
 
 #include <triggers/changerace.h>
@@ -665,12 +666,42 @@ static void test_stormwinds(CuTest *tc) {
     param.flag = TARGET_RESISTS;
     param.typ = SPP_SHIP;
     param.data.sh = sh = test_create_ship(r, NULL);
-    test_create_castorder(&co, u, 4, 5.0, 0, &args);
+    test_create_castorder(&co, u, 2, 1.0, 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
+    CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "stormwinds_effect", u->faction));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    test_clear_messages(u->faction);
+
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
+    CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "stormwinds_effect", u->faction));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    test_clear_messages(u->faction);
+
+    param.flag = 0;
     CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
     CuAssertPtrNotNull(tc, c = get_curse(sh->attribs, &ct_stormwind));
     CuAssertIntEquals(tc, 1, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "stormwinds_effect"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "stormwinds_effect", u->faction));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    test_clear_messages(u->faction);
+
+    /* not twice: */
+    CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
+    CuAssertPtrEquals(tc, c, get_curse(sh->attribs, &ct_stormwind));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_spell_on_ship_already"));
+    test_clear_messages(u->faction);
+    a_removeall(&sh->attribs, NULL);
+
+    /* not on flying ships: */
+    levitate_ship(sh, u, 1.0, 1);
+    CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
+    CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_spell_on_flying_ship"));
+
     test_teardown();
 }
 

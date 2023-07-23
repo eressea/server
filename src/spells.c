@@ -2199,7 +2199,7 @@ int sp_stormwinds(castorder * co)
 {
     ship *sh;
     unit *u;
-    int erfolg = 0;
+    int erfolg = 0, cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     spellparameter *pa = co->par;
@@ -2233,13 +2233,16 @@ int sp_stormwinds(castorder * co)
                 continue;
         }
 
-        /* Duration = 1, nur diese Runde */
-        create_curse(caster, &sh->attribs, &ct_stormwind, co->force, 1,
-            zero_effect, 0);
-        /* Da der Spruch nur diese Runde wirkt wird er nie im Report
-         * erscheinen */
-        erfolg++;
-        max_targets--;
+        if (pa->param[n]->flag == 0) {
+            /* Duration = 1, nur diese Runde */
+            create_curse(caster, &sh->attribs, &ct_stormwind, co->force, 1,
+                zero_effect, 0);
+            /* Da der Spruch nur diese Runde wirkt wird er nie im Report
+             * erscheinen */
+            ++erfolg;
+        }
+        cost = co->level;
+        --max_targets;
 
         /* melden vorbereiten: */
         for (u = r->units; u; u = u->next) {
@@ -2268,7 +2271,7 @@ int sp_stormwinds(castorder * co)
     }
     if (m)
         msg_release(m);
-    return erfolg ? co->level : 0;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
