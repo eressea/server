@@ -47,7 +47,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdarg.h> 
+#include <stdarg.h>
 #include <stdbool.h>           // for true
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
@@ -629,9 +629,23 @@ struct message * test_find_messagetype_ex(struct message_list *msgs, const char 
     return NULL;
 }
 
-struct message * test_find_messagetype(struct message_list *msgs, const char *name)
+struct message *test_find_messagetype(struct message_list *msgs, const char *name)
 {
     return test_find_messagetype_ex(msgs, name, NULL);
+}
+
+struct message *test_find_region_message(const region *r, const char *name, const faction *f)
+{
+    if (f) {
+        const struct individual_message *imsg;
+        for (imsg = r->individual_messages; imsg; imsg = imsg->next) {
+            if (imsg->viewer == f) {
+                return test_find_messagetype(imsg->msgs, name);
+            }
+        }
+        return NULL;
+    }
+    return test_find_messagetype(r->msgs, name);
 }
 
 int test_count_messagetype(struct message_list *msgs, const char *name)
@@ -657,9 +671,25 @@ void test_clear_messagelist(message_list **msgs) {
 
 void test_clear_messages(faction *f) {
     if (f->msgs) {
-        free_messagelist(f->msgs->begin);
-        free(f->msgs);
-        f->msgs = NULL;
+        test_clear_messagelist(&f->msgs);
+    }
+}
+
+void test_clear_region_messages(struct region *r)
+{
+    if (r->msgs) {
+        test_clear_messagelist(&r->msgs);
+    }
+    if (r->individual_messages) {
+        struct individual_message *imsg = r->individual_messages;
+        while (imsg)
+        {
+            struct individual_message *inext = imsg->next;
+            test_clear_messagelist(&imsg->msgs);
+            free(imsg);
+            imsg = inext;
+        }
+        r->individual_messages = NULL;
     }
 }
 

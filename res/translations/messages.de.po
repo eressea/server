@@ -20,7 +20,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit hat
 msgid "recruit"
 msgstr "\"$unit($unit) in $region($region) rekrutiert $int($amount) von $int($want) Personen.\""
 
-msgid "sp_dreamreading_effect"
+msgid "dreamreading_effect"
 msgstr "\"$unit($mage) verliert sich in die Träume von $unit($unit) und erhält einen Eindruck von $region($region).\""
 
 msgid "analyse_ship_age"
@@ -287,10 +287,10 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dafür braucht 
 msgid "error117"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Rasse kann das nicht herstellen.\""
 
-msgid "sp_depression_effect"
+msgid "depression_effect"
 msgstr "\"$unit($mage) sorgt in $region($region) für Trübsal unter den Bauern.\""
 
-msgid "sp_mindblast_effect"
+msgid "mindblast_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren Erinnerungen, $int($dead) wurden getötet.\""
 
 msgid "error113"
@@ -305,7 +305,7 @@ msgstr "\"$unit($mage) beginnt ein Ritual der Wiederbelebung. $int($amount) Krie
 msgid "error223"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hungernde Einheiten können nicht bewachen.\""
 
-msgid "sp_confusion_effect_1"
+msgid "confusion_effect_1"
 msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander.\""
 
 msgid "itemcloak"
@@ -493,7 +493,7 @@ msgctxt "curseinfo"
 msgid "magicwalls"
 msgstr "\"Diese Mauern wirken, als wären sie direkt aus der Erde gewachsen und nicht erbaut. ($int36($id))\""
 
-msgid "sp_clone_effect"
+msgid "clone_effect"
 msgstr "\"$unit($mage) erschafft einen Klon.\""
 
 msgid "enemy_discovers_spy_msg"
@@ -594,7 +594,7 @@ msgstr "\"Einheiten vor der $int($turn). Runde:\""
 msgid "error245"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff hat schon einen Namen.\""
 
-msgid "sp_chaosrow_effect_0"
+msgid "chaosrow_effect_0"
 msgstr "\"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
 
 msgid "error135"
@@ -755,7 +755,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier kan
 msgid "orcgrowth"
 msgstr "\"$unit($unit) vermehrt sich um $int($amount) $race($race,$amount).\""
 
-msgid "sp_wolfhowl_effect"
+msgid "wolfhowl_effect"
 msgstr "\"$unit($mage) ruft $int($amount) $race($race, $amount) zu Hilfe.\""
 
 msgid "tidalwave"
@@ -783,7 +783,7 @@ msgstr "\"Auf dem Markt wird für $resource($product,0) $int($price) Silber verl
 msgid "stealfail"
 msgstr "\"$unit($unit) gelang es nicht, sich nahe genug an $unit($target) heranzuschleichen.\""
 
-msgid "sp_disturbingdreams_effect"
+msgid "disturbingdreams_effect"
 msgstr "\"$unit($mage) sorgt für schlechten Schlaf in $region($region).\""
 
 msgid "spy_discovered_msg"
@@ -916,7 +916,7 @@ msgstr "\"$unit($unit) wurde von $unit.dative($target) beim versuchten Diebstahl
 msgid "analyse_unit_age"
 msgstr "\"$unit($mage) fand heraus, dass auf $unit($unit) der Zauber '$curse($curse)' liegt, der noch etwa $int($months) Wochen bestehen bleibt.\""
 
-msgid "sp_permtransfer_effect"
+msgid "permtransfer_effect"
 msgstr "\"$unit($mage) opfert $unit($target) $int($amount) Aura.\""
 
 msgid "shipfly"
@@ -1058,7 +1058,7 @@ msgstr "\"$unit($unit) wird in $region($region) von einer seltsamen Krankheit be
 msgid "error1"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf dem Schiff befinden sich zu wenige erfahrene Seeleute.\""
 
-msgid "sp_icastle_effect"
+msgid "icastle_effect"
 msgstr "\"Verwundert blicken die Bauern von $region($region) auf ein neues Gebäude.\""
 
 msgid "recruit_archetype"
@@ -1088,7 +1088,7 @@ msgstr "\"$unit($mage) belegt $unit($target) mit einem Zauber.\""
 msgid "error18"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff ist zu schwer beladen, um in See zu stechen.\""
 
-msgid "sp_raisepeasants_effect"
+msgid "raisepeasants_effect"
 msgstr "\"$unit($mage) wiegelt in $region($region) $int($amount) Bauern zum Aufstand auf.\""
 
 msgid "pump_effect"
@@ -1444,7 +1444,7 @@ msgstr "\"$unit($unit) weigert sich, nach $direction($direction) zu reisen.\""
 msgid "error197"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Um einen Heimstein zu erschaffen, muß der Zauberer in einer Burg sein.\""
 
-msgid "sp_flee_effect_1"
+msgid "flee_effect_1"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden von Furcht gepackt.\""
 
 msgid "overrun_by_iceberg_des"
@@ -1512,7 +1512,7 @@ msgstr "\"$unit($unit) beschwört einen magischen Wind, der die Schiffe über da
 msgid "error102"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren Güter handeln.\""
 
-msgid "sp_drought_effect"
+msgid "drought_effect"
 msgstr "\"$unit($mage) verflucht das Land in $region($region), und eine Dürreperiode beginnt.\""
 
 msgid "error_giveeye"
@@ -1676,7 +1676,7 @@ msgstr "\"Vogelzwitschern begleitet $unit($unit) auf all seinen Wegen. ($int36($
 msgid "sailforbidden"
 msgstr "\"Die Mannschaft der $ship($ship) weigert sich, nach $region($region) zu reisen.\""
 
-msgid "sp_raisepeasantmob_effect"
+msgid "raisepeasantmob_effect"
 msgstr "\"$unit($mage) wiegelt in $region($region) die Bauern zum Aufstand auf.\""
 
 msgid "error31"
@@ -1796,13 +1796,13 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Dieser Zauber k
 msgid "bagpipeoffear_region"
 msgstr "\"$unit($unit) spielt einen Dudelsack. Ausser sich vor Furcht geben die Bauern $int($money) Silber.\""
 
-msgid "sp_chaosrow_effect_1"
+msgid "chaosrow_effect_1"
 msgstr "\"$unit($mage) murmelt eine düster klingende Formel. Ein plötzlicher Tumult entsteht und bringt die Kampfaufstellung durcheinander.\""
 
 msgid "use_item"
 msgstr "\"$unit($unit) benutzt $int($amount) $resource($item,$amount).\""
 
-msgid "sp_movecastle_effect"
+msgid "movecastle_effect"
 msgstr "\"Ein Beben erschüttert $building($building). Viele kleine Pseudopodien erheben das Gebäude und tragen es in Richtung $direction($direction).\""
 
 msgid "feedback_no_contact_resist"
@@ -1883,7 +1883,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Einheit i
 msgid "error_pflnorecruit"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - In der Ebene der Herausforderung kann niemand rekrutiert werden.\""
 
-msgid "sp_mindblast_temp_effect"
+msgid "mindblast_temp_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell). $int($amount) Krieger verloren kurzzeitig ihr Gedächtnis.\""
 
 msgid "buildbuilding"
@@ -2043,7 +2043,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die maximale Au
 msgid "shipnoshore"
 msgstr "\"Die $ship($ship) entdeckt, dass $region($region) Festland ist.\""
 
-msgid "sp_sweetdreams_effect"
+msgid "sweetdreams_effect"
 msgstr "\"$unit($mage) verschafft $unit($unit) ein schönes Nachtleben in $region($region).\""
 
 msgid "error3"
@@ -2173,7 +2173,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Eine Allianz da
 msgid "error190"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber funktioniert nur in der materiellen Welt.\""
 
-msgid "sp_flee_effect_0"
+msgid "flee_effect_0"
 msgstr "\"$unit($mage) zaubert $spell($spell), aber es gab niemanden, der beeinflusst werden konnte.\""
 
 msgid "error146"
@@ -2391,7 +2391,7 @@ msgstr "\"$unit($unit) findet eine kleine Flöte, die eine wundersame Melodie sp
 msgid "renamed_building_seen"
 msgstr "\"$building($building) in $region($region) bekommt von $unit.dative($renamer) einen Spitznamen.\""
 
-msgid "sp_shadowknights_effect"
+msgid "shadowknights_effect"
 msgstr "\"$unit($mage) beschwört Trugbilder herauf.\""
 
 msgid "give"
@@ -2409,10 +2409,10 @@ msgstr "\"SIEG! $if($eq($n,1), \"Die Partei $winners hat\", \"Die Parteien $winn
 msgid "shipsink"
 msgstr "\"Die $ship($ship) ist zu stark beschädigt und sinkt.\""
 
-msgid "sp_bloodsacrifice_effect"
+msgid "bloodsacrifice_effect"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) gewinnt durch das Ritual $int($amount) Aura.\""
 
-msgid "sp_confusion_effect_0"
+msgid "confusion_effect_0"
 msgstr "\"$unit($mage) stimmt einen seltsamen Gesang an. Ein plötzlicher Tumult entsteht, der sich jedoch schnell wieder legt.\""
 
 msgid "pest"
@@ -2541,7 +2541,7 @@ msgstr "\"$if($eq($dead,1),\"Ein Bauer verhungert\",\"$int($dead) Bauern verhung
 msgid "transport"
 msgstr "\"$unit($unit) transportiert $unit($target) von $region($start) nach $region($end).\""
 
-msgid "sp_holyground_effect"
+msgid "holyground_effect"
 msgstr "\"$unit($mage) beschwört Naturgeister in den Boden von $region($region).\""
 
 msgctxt "curseinfo"
@@ -2627,7 +2627,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Illusionen kön
 msgid "nr_stat_header"
 msgstr "\"Statistik für $region($region):\""
 
-msgid "sp_strongwalls_effect"
+msgid "strongwalls_effect"
 msgstr "\"$unit($mage) läßt die Mauern von $building($building) in einem unheimlichen magischen Licht erglühen.\""
 
 msgctxt "curseinfo"
@@ -2870,6 +2870,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Diese Schiffe k
 msgid "dissolve_units_2"
 msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $if($eq($number,1),\"wurde zum Baum\", \"wurden zu Bäumen\").\""
 
-msgid "sp_eternizewall_effect"
+msgid "eternizewall_effect"
 msgstr "\"Mit einem Ritual bindet $unit($mage) die magischen Kräfte der Erde von $region($region) in die Mauern von $building($building).\""
 

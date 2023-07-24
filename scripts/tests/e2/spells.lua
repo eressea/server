@@ -392,3 +392,26 @@ function test_courting()
     assert_not_nil(u3)
     assert_not_nil(string.find(u3:show(), "Goblin"))
 end
+
+function test_cast_summonent()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("demon")
+    local u = unit.create(f, r)
+    u.magic = "cerddor"
+    u.aura = 200
+    u:add_spell("summonent")
+    u:set_skill("magic", 20)
+    r:set_resource("tree", 1)
+    u:add_order('ZAUBERE STUFE 2 "Erwecke Ents"')
+    process_orders()
+    assert_equal(188, u.aura)
+    local u3 = nil
+    for u2 in r.units do
+        if u2 ~= u then
+            u3 = u2
+            break
+        end
+    end
+    assert_not_nil(u3)
+    assert_equal(1, u3.number)
+end

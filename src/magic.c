@@ -1111,19 +1111,12 @@ variant resist_chance(const unit *magician, const void *obj, int objtyp, int bon
     }
 
     case TYP_REGION:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((region *)obj)->attribs, C_RESIST_MAGIC, 0); */
         a = ((const region *)obj)->attribs;
         break;
 
     case TYP_BUILDING:
-        /* Bonus durch Zauber
-        probability +=
-            0.01 * get_curseeffect(((building *)obj)->attribs, C_RESIST_MAGIC, 0); */
         a = ((const building *)obj)->attribs;
-        /* Bonus durch Typ
-        probability += 0.01 * ((building *)obj)->type->magres; */
+        /* Bonus durch Typ */
         prob = frac_add(prob, ((const building *)obj)->type->magres);
         break;
 
@@ -2505,6 +2498,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     unit * mage = NULL;
     param_t param;
 
+    assert(u);
     if (LongHunger(u)) {
         cmistake(u, ord, 224, MSG_MAGIC);
         return 0;
@@ -2863,7 +2857,7 @@ void magic(void)
             }
             /* erst bezahlen, dann Kostenzaehler erhoehen */
             if (co->level > 0) {
-                pay_spell(mage, caster, sp, cast_level, co->distance);
+                pay_spell(mage, caster, sp, co->level, co->distance);
             }
             if (fumbled) {
                 do_fumble(co);
