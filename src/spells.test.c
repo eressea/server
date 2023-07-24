@@ -4,19 +4,22 @@
 #include "magic.h"
 #include "teleport.h"
 
+#include <kernel/attrib.h>
 #include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include "kernel/ship.h"            // for SK_MELEE
 #include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/terrain.h>
+#include <kernel/terrainid.h>
 #include <kernel/unit.h>
-#include <kernel/order.h>
-#include <kernel/attrib.h>
+
 #include "util/keyword.h"
 #include "util/message.h"
+#include "util/rand.h"
 #include "util/variant.h"  // for variant
 
 #include <spells/regioncurse.h>
@@ -33,6 +36,20 @@
 
 #include <stdbool.h>                 // for false
 #include <stdio.h>
+
+static void setup_terrains(CuTest *tc) {
+    test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("ocean", SEA_REGION | SWIM_INTO | FLY_INTO);
+    test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    test_create_terrain("swamp", LAND_REGION | WALK_INTO | FLY_INTO);
+    test_create_terrain("desert", LAND_REGION | WALK_INTO | FLY_INTO);
+    init_terrains();
+    CuAssertPtrNotNull(tc, newterrain(T_GLACIER));
+    CuAssertPtrNotNull(tc, newterrain(T_OCEAN));
+    CuAssertPtrNotNull(tc, newterrain(T_PLAIN));
+    CuAssertPtrNotNull(tc, newterrain(T_SWAMP));
+    CuAssertPtrNotNull(tc, newterrain(T_DESERT));
+}
 
 static void test_good_dreams(CuTest *tc) {
     struct region *r;
@@ -292,7 +309,7 @@ static void test_view_reality(CuTest *tc) {
     /* can only cast in astral space */
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_only"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spell_astral_only"));
 
     test_clear_messagelist(&f->msgs);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
@@ -302,7 +319,7 @@ static void test_view_reality(CuTest *tc) {
     /* there is no connection from ra to rx */
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
 
     test_clear_messagelist(&f->msgs);
@@ -313,7 +330,7 @@ static void test_view_reality(CuTest *tc) {
     /* units exist, r can be seen, but rx is out of range */
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 9, sp_viewreality(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "viewreality_effect"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "viewreality_effect"));
     CuAssertIntEquals(tc, 5, get_observer(r, f));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
 
@@ -324,7 +341,7 @@ static void test_view_reality(CuTest *tc) {
     c = create_curse(u, &ra->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
     remove_curse(&ra->attribs, c);
 
@@ -332,7 +349,7 @@ static void test_view_reality(CuTest *tc) {
     c = create_curse(u, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
 
     test_teardown();
@@ -362,7 +379,7 @@ static void test_show_astral(CuTest *tc) {
     /* error: unit is in astral space */
     test_create_castorder(&co, u, 10, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "spell_astral_forbidden"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spell_astral_forbidden"));
 
     test_clear_messagelist(&f->msgs);
     move_unit(u, r, NULL);
@@ -370,7 +387,7 @@ static void test_show_astral(CuTest *tc) {
     /* error: no target region */
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
 
     rx = test_create_region(real2tp(r->x), real2tp(r->y), NULL);
@@ -381,8 +398,8 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "showastral_effect"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error220"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "showastral_effect"));
 
     test_create_unit(f, ra);
     test_create_unit(f, rx);
@@ -391,20 +408,20 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, 9, sp_showastral(&co));
     CuAssertIntEquals(tc, 5, get_observer(rx, f));
     CuAssertIntEquals(tc, -1, get_observer(ra, f));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "showastral_effect"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "showastral_effect"));
 
     /* astral block on r */
     c = create_curse(u, &r->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error216"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     remove_curse(&r->attribs, c);
 
     /* astral block on rx */
     c = create_curse(u, &rx->attribs, &ct_astralblock, 50.0, 1, 50, 0);
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error220"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error220"));
     remove_curse(&rx->attribs, c);
 
     test_teardown();
@@ -440,7 +457,7 @@ static void test_summonent(CuTest *tc) {
     /* keine Bäume, keine Kosten */
     rsettrees(r, 2, 0);
     CuAssertIntEquals(tc, 0, sp_summonent(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error204"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error204"));
     CuAssertPtrEquals(tc, NULL, u->next);
     test_clear_messages(u->faction);
 
@@ -550,7 +567,7 @@ static void test_treewalkenter(CuTest *tc) {
 
     param.flag = 0;
     CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "feedback_no_contact"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "feedback_no_contact"));
     test_clear_messages(u->faction);
 
     contact_unit(u2, u);
@@ -634,7 +651,7 @@ static void test_drought(CuTest *tc) {
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_drought(&co));
     /* Meldung nur bei Fernzaubern: */
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "drought_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "drought_effect"));
     CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
     CuAssertIntEquals(tc, co.level, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
@@ -649,6 +666,189 @@ static void test_drought(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_drought(&co));
     CuAssertPtrEquals(tc, c, get_curse(r->attribs, &ct_drought));
     CuAssertIntEquals(tc, co.level, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+
+    test_teardown();
+}
+
+static void test_great_drought(CuTest *tc) {
+    unit *u;
+    faction *f;
+    castorder co;
+    curse *c;
+    region *r;
+
+    test_setup();
+    setup_terrains(tc);
+    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, newterrain(T_PLAIN)));
+    rsetroad(r, D_EAST, 100);
+    rsettrees(r, 2, 200);
+    rsettrees(r, 1, 200);
+    rsettrees(r, 0, 200);
+    rsethorses(r, 200);
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+
+    /* [0, 25) = terraforming success: */
+    random_source_inject_constants(0.0, 24);
+    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertPtrEquals(tc, (void *)newterrain(T_PLAIN), (void *)r->terrain);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_no_terraform", NULL));
+    /* Parteimeldung nur bei Fernzaubern: */
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
+    test_clear_region_messages(r);
+    test_clear_messages(f);
+
+    /* casting again reinforces the curse, but does not kill more trees+horses */
+    co.level++;
+    co.force += 1.0;
+    rsetroad(r, D_EAST, 100);
+    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
+    CuAssertPtrEquals(tc, c, get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
+
+    test_teardown();
+}
+
+static void test_great_drought_glacier(CuTest *tc) {
+    unit *u;
+    faction *f;
+    castorder co;
+    curse *c;
+    region *r;
+
+    test_setup();
+    setup_terrains(tc);
+    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
+    r->buildings = test_create_building(r, NULL);
+    rsetroad(r, D_EAST, 100);
+    rsettrees(r, 2, 200);
+    rsettrees(r, 1, 200);
+    rsettrees(r, 0, 200);
+    rsethorses(r, 200);
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+
+    /* [50, 200) = no terraforming: */
+    random_source_inject_constants(0.0, 50);
+    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertPtrEquals(tc, (void *)newterrain(T_GLACIER), (void *)r->terrain);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_no_terraform", NULL));
+    /* Parteimeldung nur bei Fernzaubern: */
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, r->buildings);
+
+    test_teardown();
+}
+
+static void test_great_drought_to_swamp(CuTest *tc) {
+    unit *u, *u2;
+    faction *f;
+    castorder co;
+    curse *c;
+    region *r;
+
+    test_setup();
+    setup_terrains(tc);
+    u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
+    u2 = test_create_unit(f = test_create_faction(), r); /* observer unit */
+    r->buildings = test_create_building(r, NULL);
+    rsetroad(r, D_EAST, 100);
+    rsettrees(r, 2, 200);
+    rsettrees(r, 1, 200);
+    rsettrees(r, 0, 200);
+    rsethorses(r, 200);
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+
+    /* [0, 25) = terraforming success, to swamp */
+    random_source_inject_constants(0.0, 24);
+    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
+    CuAssertPtrEquals(tc, (void *)newterrain(T_SWAMP), (void *)r->terrain);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_glacier_to_swamp", NULL));
+    /* Parteimeldung nur bei Fernzaubern: */
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rhorses(r));
+    CuAssertPtrNotNull(tc, r->buildings);
+
+    test_teardown();
+}
+
+static void test_great_drought_to_ocean(CuTest *tc) {
+    unit *u, *u2;
+    faction *f;
+    castorder co;
+    curse *c;
+    region *r;
+
+    test_setup();
+    setup_terrains(tc);
+    u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
+    u->ship = test_create_ship(r, NULL);
+    r->buildings = test_create_building(r, NULL);
+    u2 = test_create_unit(f = test_create_faction(), r); /* observer unit */
+    rsetroad(r, D_EAST, 100);
+    rsettrees(r, 2, 200);
+    rsettrees(r, 1, 200);
+    rsettrees(r, 0, 200);
+    rsethorses(r, 200);
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+
+    /* [25, 50) = terraforming success, to ocean */
+    random_source_inject_constants(0.0, 25);
+    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
+    CuAssertPtrEquals(tc, (void *)newterrain(T_OCEAN), (void *)r->terrain);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "drought_glacier_to_ocean", NULL));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "drought_to_ocean_global"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "drought_to_ocean_global"));
+    CuAssertIntEquals(tc, 0, u2->number);
+    CuAssertIntEquals(tc, 1, u->number);
+    CuAssertPtrEquals(tc, NULL, r->buildings);
+    /* Parteimeldung nur bei Fernzaubern: */
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
+    CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
     CuAssertIntEquals(tc, 100, rtrees(r, 2));
@@ -680,14 +880,14 @@ static void test_stormwinds(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
     CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
     CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "stormwinds_effect", u->faction));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "stormwinds_reduced"));
     test_clear_messages(u->faction);
 
     param.flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
     CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
     CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "stormwinds_effect", u->faction));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "stormwinds_reduced"));
     test_clear_messages(u->faction);
 
     param.flag = 0;
@@ -696,13 +896,13 @@ static void test_stormwinds(CuTest *tc) {
     CuAssertIntEquals(tc, 1, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "stormwinds_effect", u->faction));
-    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "stormwinds_reduced"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "stormwinds_reduced"));
     test_clear_messages(u->faction);
 
     /* not twice: */
     CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
     CuAssertPtrEquals(tc, c, get_curse(sh->attribs, &ct_stormwind));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_spell_on_ship_already"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error_spell_on_ship_already"));
     test_clear_messages(u->faction);
     a_removeall(&sh->attribs, NULL);
 
@@ -710,7 +910,7 @@ static void test_stormwinds(CuTest *tc) {
     levitate_ship(sh, u, 1.0, 1);
     CuAssertIntEquals(tc, 0, sp_stormwinds(&co));
     CuAssertPtrEquals(tc, NULL, get_curse(sh->attribs, &ct_stormwind));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error_spell_on_flying_ship"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error_spell_on_flying_ship"));
 
     test_teardown();
 }
@@ -744,7 +944,7 @@ static void test_fumblecurse(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, c->duration);
     CuAssertDblEquals(tc, co.force * .5, c->effect, 0.01);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "fumblecurse"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u2->faction, "fumblecurse"));
 
     test_teardown();
 }
@@ -763,7 +963,7 @@ static void test_deathcloud(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, c->duration);
     CuAssertDblEquals(tc, co.force * .5, c->effect, 0.01);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "deathcloud_effect"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "deathcloud_effect"));
     test_teardown();
 }
 
@@ -821,7 +1021,7 @@ static void test_migrants(CuTest *tc) {
     param.flag = 0;
     CuAssertIntEquals(tc, 0, sp_migranten(&co));
     CuAssertPtrEquals(tc, f, u2->faction);
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "spellfail::contact"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail::contact"));
     test_clear_messages(u->faction);
 
     contact_unit(u2, u);
@@ -851,6 +1051,10 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_treewalkexit);
     SUITE_ADD_TEST(suite, test_holyground);
     SUITE_ADD_TEST(suite, test_drought);
+    SUITE_ADD_TEST(suite, test_great_drought);
+    SUITE_ADD_TEST(suite, test_great_drought_glacier);
+    SUITE_ADD_TEST(suite, test_great_drought_to_swamp);
+    SUITE_ADD_TEST(suite, test_great_drought_to_ocean);
     SUITE_ADD_TEST(suite, test_stormwinds);
     SUITE_ADD_TEST(suite, test_fumblecurse);
     SUITE_ADD_TEST(suite, test_deathcloud);

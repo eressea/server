@@ -246,7 +246,7 @@ msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) d
 msgid "fleescared"
 msgstr "\"$int($amount) peasants fled in fear of $unit($unit).\""
 
-msgid "drought_effect_3"
+msgid "drought_glacier_to_ocean"
 msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region). The crops wither, horses die of thirst. A famine claims the lives of many peasants. The trees die and their bald branches cannot protect from the torrid sun that mercilessly burns the grounds. The drought permanently alters the region.\""
 
 msgid "spellfail_pump"
@@ -1155,7 +1155,7 @@ msgstr "\"$unit($unit) disappears.\""
 msgid "error127"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Your faction cannot hire so many strangers.\""
 
-msgid "drought_effect_2"
+msgid "drought_no_terraform"
 msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region). The crops wither, horses die of thirst. A famine claims the lives of many peasants. The trees die and their bald branches cannot protect from the torrid sun that mercilessly burns the grounds.\""
 
 msgid "usepotion"
@@ -2022,7 +2022,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The building ca
 msgid "teach_asgood"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) needs to be at least 2 levels better than $unit($student).\""
 
-msgid "drought_effect_1"
+msgid "drought_glacier_to_swamp"
 msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region). Ice melts and turns the lands into swamps. Powerful rivers wash away the fertile soil and drown people and animals alike. What buildings have not succumbed to the floods sink into the mire. The torrid sun changes the region forever.\""
 
 msgid "error204"
@@ -2298,7 +2298,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) 
 msgid "error79"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - A ship or a castle must be supplied.\""
 
-msgid "drought_effect_4"
+msgid "drought_to_ocean_global"
 msgstr "\"$unit($mage) calls the torching power of the sun upon $region($region). The ice melts and and the region is consumed by a tidal wave.\""
 
 msgctxt "curseinfo"

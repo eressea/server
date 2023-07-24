@@ -40,11 +40,11 @@ Thumbs.db
 tmp/
 tests/orders.txt
 tests/config.lua
-tests/reports/
-tests/data/185.dat
-/quicklist/
-/cutest/
-/critbit/
+/tests/reports
+/tests/data
+/quicklist
+/cutest
+/critbit
 *.mo
 /.vs
 /.idea/

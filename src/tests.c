@@ -634,6 +634,11 @@ struct message *test_find_messagetype(struct message_list *msgs, const char *nam
     return test_find_messagetype_ex(msgs, name, NULL);
 }
 
+struct message *test_find_faction_message(const faction *f, const char *name)
+{
+    return test_find_messagetype_ex(f->msgs, name, NULL);
+}
+
 struct message *test_find_region_message(const region *r, const char *name, const faction *f)
 {
     if (f) {

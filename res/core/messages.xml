@@ -5739,28 +5739,28 @@
     </type>
   </message>
 
-  <message name="drought_effect_1" section="magic">
+  <message name="drought_glacier_to_swamp" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_2" section="magic">
+  <message name="drought_no_terraform" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_3" section="magic">
+  <message name="drought_glacier_to_ocean" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_4" section="magic">
+  <message name="drought_to_ocean_global" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>

@@ -1651,6 +1651,39 @@ static int sp_create_stonegolem(castorder * co)
     return cast_level;
 }
 
+static void drought(unit *u, region *r, double vigour, int duration)
+{
+    curse *c;
+    message *msg;
+
+    report_spell(u, r, msg = msg_message("drought_effect", "mage region", u, r));
+    msg_release(msg);
+
+    /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
+     * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
+     * Auswirkungen.
+     */
+    c = get_curse(r->attribs, &ct_drought);
+    if (c) {
+        if (c->vigour < vigour) {
+            c->vigour = vigour;
+        }
+        if (c->duration < duration) {
+            c->duration = duration;
+        }
+    }
+    else {
+        /* Baeume und Pferde sterben */
+        rsettrees(r, 2, rtrees(r, 2) / 2);
+        rsettrees(r, 1, rtrees(r, 1) / 2);
+        rsettrees(r, 0, rtrees(r, 0) / 2);
+        rsethorses(r, rhorses(r) / 2);
+
+        create_curse(u, &r->attribs, &ct_drought,
+            vigour, duration, 4.0, 0);
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Grosse Duerre
  * Stufe:      17
@@ -1670,7 +1703,7 @@ static int sp_create_stonegolem(castorder * co)
  * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-static int sp_great_drought(castorder * co)
+int sp_great_drought(castorder * co)
 {
     unit *u;
     bool terraform = false;
@@ -1678,8 +1711,8 @@ static int sp_great_drought(castorder * co)
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
     double force = co->force;
-    int duration = 2;
-    double effect;
+    const char *mtype = "drought_no_terraform";
+    int roll_d200 = rng_int() % 200;
 
     if (fval(r->terrain, SEA_REGION)) {
         cmistake(caster, co->order, 189, MSG_MAGIC);
@@ -1687,46 +1720,22 @@ static int sp_great_drought(castorder * co)
         return 0;
     }
 
-    /* sterben */
-    rsetpeasants(r, rpeasants(r) / 2);    /* evtl wuerfeln */
-    rsettrees(r, 2, rtrees(r, 2) / 2);
-    rsettrees(r, 1, rtrees(r, 1) / 2);
-    rsettrees(r, 0, rtrees(r, 0) / 2);
-    rsethorses(r, rhorses(r) / 2);
+    drought(caster, r, co->force, 2);
 
-    /* Arbeitslohn = 1/4 */
-    effect = 4.0;                 /* curses: higher is stronger */
-    create_curse(caster, &r->attribs, &ct_drought, force, duration, effect,
-        0);
+    /* 25% chance of terraforming */
+    if (roll_d200 < 50) {
+        terraform = false;
 
-    /* terraforming */
-    if (rng_int() % 100 < 25) {
-        terraform = true;
-
-        switch (rterrain(r)) {
-        case T_PLAIN:
-            /* rsetterrain(r, T_GRASSLAND); */
-            destroy_all_roads(r);
-            break;
-
-        case T_SWAMP:
-            /* rsetterrain(r, T_GRASSLAND); */
-            destroy_all_roads(r);
-            break;
-            /*
-                  case T_GRASSLAND:
-                  rsetterrain(r, T_DESERT);
-                  destroy_all_roads(r);
-                  break;
-                  */
-        case T_GLACIER:
-            if (rng_int() % 100 < 50) {
+        if (rterrain(r) == T_GLACIER) {
+            terraform = true;
+            /* 50% chance of becoming either ocean or swamp */
+            if (roll_d200 < 25) {
                 rsetterrain(r, T_SWAMP);
-                destroy_all_roads(r);
+                mtype = "drought_glacier_to_swamp";
             }
             else {                /* Ozean */
-                destroy_all_roads(r);
                 rsetterrain(r, T_OCEAN);
+                mtype = "drought_glacier_to_ocean";
                 /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
                 for (u = r->units; u; u = u->next) {
                     if (!u->ship) {
@@ -1737,28 +1746,15 @@ static int sp_great_drought(castorder * co)
                     remove_building(&r->buildings, r->buildings);
                 }
             }
-            break;
-
-        default:
-            terraform = false;
-            break;
+        }
+        if (terraform) {
+            destroy_all_roads(r);
         }
     }
-
     if (!fval(r->terrain, SEA_REGION)) {
         /* not destroying the region, so it should be safe to make this a local
          * message */
         message *msg;
-        const char *mtype;
-        if (r->terrain == newterrain(T_SWAMP) && terraform) {
-            mtype = "drought_effect_1";
-        }
-        else if (!terraform) {
-            mtype = "drought_effect_2";
-        }
-        else {
-            mtype = "drought_effect_3";
-        }
         msg = msg_message(mtype, "mage region", caster, r);
         add_message(&r->msgs, msg);
         msg_release(msg);
@@ -1766,7 +1762,7 @@ static int sp_great_drought(castorder * co)
     else {
         /* possible that all units here get killed so better to inform with a global
          * message */
-        message *msg = msg_message("drought_effect_4", "mage region", caster, r);
+        message *msg = msg_message("drought_to_ocean_global", "mage region", caster, r);
         for (u = r->units; u; u = u->next)
             freset(u->faction, FFL_SELECT);
         for (u = r->units; u; u = u->next) {
@@ -2077,10 +2073,8 @@ static int sp_homestone(castorder * co)
  */
 int sp_drought(castorder * co)
 {
-    curse *c;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    message *msg;
 
     if (fval(r->terrain, SEA_REGION)) {
         cmistake(caster, co->order, 189, MSG_MAGIC);
@@ -2088,33 +2082,7 @@ int sp_drought(castorder * co)
         return 0;
     }
 
-    msg = msg_message("drought_effect", "mage region", caster, r);
-    report_spell(caster, r, msg);
-    msg_release(msg);
-
-    /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
-     * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
-     * Auswirkungen.
-     */
-    c = get_curse(r->attribs, &ct_drought);
-    if (c) {
-        if (c->vigour < co->force) {
-            c->vigour = co->force;
-        }
-        if (c->duration < co->level) {
-            c->duration = co->level;
-        }
-    }
-    else {
-        /* Baeume und Pferde sterben */
-        rsettrees(r, 2, rtrees(r, 2) / 2);
-        rsettrees(r, 1, rtrees(r, 1) / 2);
-        rsettrees(r, 0, rtrees(r, 0) / 2);
-        rsethorses(r, rhorses(r) / 2);
-
-        create_curse(caster, &r->attribs, &ct_drought, 
-            co->force, co->level, 4.0, 0);
-    }
+    drought(caster, r, co->force, co->level);
     return co->level;
 }
 

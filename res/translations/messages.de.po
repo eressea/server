@@ -246,7 +246,7 @@ msgstr "\"$unit($unit) in $region($region): $int($number) $race($race,$number) $
 msgid "fleescared"
 msgstr "\"$int($amount) Bauern flohen aus Furcht vor $unit($unit).\""
 
-msgid "drought_effect_3"
+msgid "drought_glacier_to_ocean"
 msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt. Die Dürre verändert die Region für immer.\""
 
 msgid "spellfail_pump"
@@ -1155,7 +1155,7 @@ msgstr "\"$unit($unit) wird durchscheinend und verschwindet.\""
 msgid "error127"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So viele Fremde kann Deine Partei nicht aufnehmen.\""
 
-msgid "drought_effect_2"
+msgid "drought_no_terraform"
 msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Die Felder verdorren und Pferde verdursten. Die Hungersnot kostet vielen Bauern das Leben. Vertrocknete Bäume recken ihre kahlen Zweige in den blauen Himmel, von dem erbarmungslos die sengende Sonne brennt.\""
 
 msgid "usepotion"
@@ -2022,7 +2022,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Gebäude ka
 msgid "teach_asgood"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($unit) muß mindestens 2 Stufen besser sein als $unit($student).\""
 
-msgid "drought_effect_1"
+msgid "drought_glacier_to_swamp"
 msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Eis schmilzt und verwandelt sich in Morast. Reißende Ströme spülen die mageren Felder weg und ersäufen Mensch und Tier. Was an Bauten nicht den Fluten zum Opfer fiel, verschlingt der Morast. Die sengende Hitze verändert die Region für immer.\""
 
 msgid "error204"
@@ -2298,7 +2298,7 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) 
 msgid "error79"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Ein Schiff oder eine Burg muß angegeben werden.\""
 
-msgid "drought_effect_4"
+msgid "drought_to_ocean_global"
 msgstr "\"$unit($mage) ruft das Feuer der Sonne auf $region($region) hinab. Das Eis zerbricht und eine gewaltige Flutwelle verschlingt die Region.\""
 
 msgctxt "curseinfo"
