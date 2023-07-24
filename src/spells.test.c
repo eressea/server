@@ -6,7 +6,8 @@
 
 #include <kernel/attrib.h>
 #include <kernel/curse.h>
-#include <kernel/event.h>
+#include "kernel/direction.h"
+#include "kernel/event.h"
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
@@ -773,7 +774,7 @@ static void test_great_drought_glacier(CuTest *tc) {
 }
 
 static void test_great_drought_to_swamp(CuTest *tc) {
-    unit *u, *u2;
+    unit *u;
     faction *f;
     castorder co;
     curse *c;
@@ -782,7 +783,7 @@ static void test_great_drought_to_swamp(CuTest *tc) {
     test_setup();
     setup_terrains(tc);
     u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
-    u2 = test_create_unit(f = test_create_faction(), r); /* observer unit */
+    test_create_unit(f = test_create_faction(), r); /* observer unit+faction */
     r->buildings = test_create_building(r, NULL);
     rsetroad(r, D_EAST, 100);
     rsettrees(r, 2, 200);
