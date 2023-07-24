@@ -1709,8 +1709,6 @@ int sp_great_drought(castorder * co)
     bool terraform = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double force = co->force;
     const char *mtype = "drought_no_terraform";
     int roll_d200 = rng_int() % 200;
 
@@ -1776,7 +1774,7 @@ int sp_great_drought(castorder * co)
         }
         msg_release(msg);
     }
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
