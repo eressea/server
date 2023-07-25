@@ -905,7 +905,7 @@ int sp_goodwinds(castorder * co)
  * Flags:
  * (FARCASTING|SPELLLEVEL|REGIONSPELL|ONSHIPCAST|TESTRESISTANCE)
  */
-static int sp_magicstreet(castorder * co)
+int sp_magicstreet(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);

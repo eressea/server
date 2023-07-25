@@ -984,12 +984,24 @@ static void test_magicboost(CuTest *tc) {
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
 
     CuAssertPtrNotNull(tc, a = a_find(u->attribs, &at_eventhandler));
-    /*
-    CuAssertPtrNotNull(tc, c = get_curse(u->attribs, &ct_auraboost));
-    CuAssertIntEquals(tc, 4, c->duration);
-    CuAssertDblEquals(tc, 200.0, c->effect, 0.01);
+    test_teardown();
+}
+
+static void test_magicstreet(CuTest *tc) {
+    unit *u;
+    faction *f;
+    region *r;
+    castorder co;
+    curse *c;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_magicstreet(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_magicstreet));
+    CuAssertIntEquals(tc, co.level + 1, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    */
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "path_effect", f));
     test_teardown();
 }
 
@@ -1061,6 +1073,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_deathcloud);
     SUITE_ADD_TEST(suite, test_magicboost);
     SUITE_ADD_TEST(suite, test_migrants);
+    SUITE_ADD_TEST(suite, test_magicstreet);
 
     return suite;
 }

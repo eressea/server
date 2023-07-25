@@ -35,6 +35,7 @@ extern "C" {
     int sp_magicboost(struct castorder* co);
     int sp_migranten(struct castorder* co);
     int sp_great_drought(struct castorder *co);
+    int sp_magicstreet(struct castorder *co);
 
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */
