@@ -265,7 +265,6 @@ static void test_blessstonecircle(CuTest *tc) {
     building *b;
     const struct building_type *btype;
     castorder co;
-    curse* c;
     spellparameter args;
     spllprm param;
     spllprm *params = &param;
@@ -285,16 +284,16 @@ static void test_blessstonecircle(CuTest *tc) {
     
     test_create_castorder(&co, u, 3, 4., 0, &args);
     CuAssertIntEquals(tc, co.level, sp_blessstonecircle(&co));
+    CuAssertPtrEquals(tc, (void *)btype, (void *)b->type);
+    CuAssertPtrEquals(tc, NULL, b->attribs);
 
     /* if target not found, no costs, no effect */
     param.flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
-    CuAssertPtrEquals(tc, btype, b->type);
 
     /* if target resists, pay in full, no effect */
     param.flag = TARGET_RESISTS;
     CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
-    CuAssertPtrEquals(tc, NULL, sh->attribs);
 
     test_teardown();
 }
@@ -1116,6 +1115,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_magicboost);
     SUITE_ADD_TEST(suite, test_migrants);
     SUITE_ADD_TEST(suite, test_magicstreet);
+    SUITE_ADD_TEST(suite, test_blessstonecircle);
 
     return suite;
 }
