@@ -999,7 +999,7 @@ int sp_summonent(castorder * co)
  * (BUILDINGSPELL)
  *
  */
-static int sp_blessstonecircle(castorder * co)
+int sp_blessstonecircle(castorder * co)
 {
     building *b;
     region *r = co_get_region(co);

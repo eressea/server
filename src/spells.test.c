@@ -5,6 +5,7 @@
 #include "teleport.h"
 
 #include <kernel/attrib.h>
+#include <kernel/building.h>
 #include <kernel/curse.h>
 #include "kernel/direction.h"
 #include "kernel/event.h"
@@ -248,6 +249,47 @@ static void test_goodwinds(CuTest *tc) {
     param.flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
     CuAssertPtrEquals(tc, NULL, sh->attribs);
+
+    /* if target resists, pay in full, no effect */
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
+    CuAssertPtrEquals(tc, NULL, sh->attribs);
+
+    test_teardown();
+}
+
+static void test_blessstonecircle(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    building *b;
+    const struct building_type *btype;
+    castorder co;
+    curse* c;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    b = test_create_building(r, test_create_buildingtype("stonecircle"));
+    btype = test_create_buildingtype("blessedstonecircle");
+
+    args.length = 1;
+    args.param = &params;
+    param.flag = 0;
+    param.typ = SPP_BUILDING;
+    param.data.b = b;
+    
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_blessstonecircle(&co));
+
+    /* if target not found, no costs, no effect */
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
+    CuAssertPtrEquals(tc, btype, b->type);
 
     /* if target resists, pay in full, no effect */
     param.flag = TARGET_RESISTS;
