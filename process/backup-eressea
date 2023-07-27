@@ -1,4 +1,6 @@
 #!/bin/bash
+DIR=$(dirname $0)
+source "$DIR/boxcli.sh"
 if [ -z "$ERESSEA" ] ; then
   ERESSEA="$HOME/eressea"
   echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
@@ -6,15 +8,7 @@ fi
 GAME=$1
 
 upload() {
-  SRC="$1"
-  DST=$(basename "$SRC")
-  SELECT=".name=\"$DST\""
-  FILE_ID=$(box folders:get --json 2654558997 |  jq ".item_collection.entries[] | select($SELECT) | .id" | tr -d \")
-  if [ -n "$FILE_ID" ]; then
-    box files:upload -p 2654558997 "$SRC"
-  else
-    box files:versions:upload "$FILE_ID" "$SRC"
-  fi
+  box-upload "$1"
 }
 
 if [ ! -d "$ERESSEA/game-$GAME" ]; then
