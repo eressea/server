@@ -60,6 +60,7 @@ function test_ship_damage_catapult()
     local u1 = unit.create(f1, r, 10)
     u1.hp = u1.hp * 100
     u1.ship = sh
+    u1.name = 'Xolgrim'
     local f2 = faction.create('human')
     local u2 = unit.create(f2, r)
     u2.name = 'Xolgrim'
@@ -69,7 +70,7 @@ function test_ship_damage_catapult()
     u2:add_item('catapultammo', 10)
     assert_equal(0, sh.damage)
     process_orders()
-    assert_not_equal(0, sh.damage)
+    assert_not_equal(0, sh.damage) -- intermittent!
 end
 
 function test_ship_damage_seaserpent()

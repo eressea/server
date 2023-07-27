@@ -449,7 +449,7 @@ static void reportcasualties(battle * b, fighter * fig, int dead)
     msg_release(m);
 }
 
-static int
+static bool
 contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
 {
     int p, vw = BASE_CHANCE - TDIFF_CHANGE * skilldiff;
@@ -471,7 +471,7 @@ contest_classic(int skilldiff, const armor_type * ar, const armor_type * sh)
 /** new rule for Eressea 1.5
  * \param skilldiff - the attack skill with every modifier applied
  */
-static int
+static bool
 contest_new(int skilldiff, const troop dt, const armor_type * ar,
     const armor_type * sh)
 {
@@ -486,10 +486,10 @@ contest_new(int skilldiff, const troop dt, const armor_type * ar,
         double tosave = defense * 0.05;
         return !chance(tosave);
     }
-    return 0;
+    return false;
 }
 
-static int
+static bool
 contest(int skdiff, const troop dt, const armor_type * ar,
     const armor_type * sh)
 {
