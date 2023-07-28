@@ -57,15 +57,15 @@ function test_ship_damage_catapult()
     local r = region.create(0, 0, 'plain')
     local sh = ship.create(r, "caravel")
     local f1 = faction.create('human')
-    local u1 = unit.create(f1, r, 10)
+    local u1 = unit.create(f1, r, 20)
     u1.hp = u1.hp * 100
     u1.ship = sh
     local f2 = faction.create('human')
     local u2 = unit.create(f2, r)
-    u2.name = 'Xolgrim'
     u2:add_order('ATTACKIERE ' .. itoa36(u1.id))
     u2:set_skill('catapult', 10)
     u2:add_item('catapult', 1)
+    u2:add_item('platemail', 10)
     u2:add_item('catapultammo', 10)
     assert_equal(0, sh.damage)
     process_orders()
