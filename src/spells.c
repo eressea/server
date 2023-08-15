@@ -2180,7 +2180,11 @@ int sp_stormwinds(castorder * co)
         if (pa->param[n]->flag == TARGET_NOTFOUND) {
             continue;
         }
-
+        --max_targets;
+        if (pa->param[n]->flag == TARGET_RESISTS) {
+            cost = co->level;
+            continue;
+        }
         sh = pa->param[n]->data.sh;
 
         if (sh->number > 1) {
@@ -2198,16 +2202,13 @@ int sp_stormwinds(castorder * co)
                 continue;
         }
 
-        if (pa->param[n]->flag == 0) {
-            /* Duration = 1, nur diese Runde */
-            create_curse(caster, &sh->attribs, &ct_stormwind, co->force, 1,
-                zero_effect, 0);
-            /* Da der Spruch nur diese Runde wirkt wird er nie im Report
-             * erscheinen */
-            ++erfolg;
-        }
+        /* Duration = 1, nur diese Runde */
+        create_curse(caster, &sh->attribs, &ct_stormwind, co->force, 1,
+            zero_effect, 0);
+        /* Da der Spruch nur diese Runde wirkt wird er nie im Report
+         * erscheinen */
+        ++erfolg;
         cost = co->level;
-        --max_targets;
 
         /* melden vorbereiten: */
         for (u = r->units; u; u = u->next) {

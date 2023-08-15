@@ -1585,15 +1585,15 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
             case SPP_TEMP:
             case SPP_UNIT:
                 if (!verify_unit(target_r, caster, sp, spobj, co->order))
-                    ++ * invalid;
+                    ++*invalid;
                 break;
             case SPP_BUILDING:
                 if (!verify_building(target_r, caster, sp, spobj, co->order))
-                    ++ * invalid;
+                    ++*invalid;
                 break;
             case SPP_SHIP:
                 if (!verify_ship(target_r, caster, sp, spobj, co->order))
-                    ++ * invalid;
+                    ++*invalid;
                 break;
             default:
                 break;
