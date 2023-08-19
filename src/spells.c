@@ -385,10 +385,10 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
         if (!c || c == c1) {
             double remain = destr_curse(c1, cast_level, force);
             if (remain < force) {
-                succ = cast_level;
                 force = remain;
             }
             if (c1->vigour <= 0) {
+                ++succ;
                 a_remove(alist, a);
             }
         }
@@ -671,7 +671,7 @@ static int sp_summon_familiar(castorder * co)
  * Flag:
  *  (FARCASTING|SPELLLEVEL|ONSHIPCAST|TESTCANSEE)
  * */
-static int sp_destroy_magic(castorder * co)
+int sp_destroy_magic(castorder * co)
 {
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
@@ -686,6 +686,14 @@ static int sp_destroy_magic(castorder * co)
     /* da jeder Zauber force verbraucht und der Zauber auf alles und nicht
      * nur einen Spruch wirken soll, wird die Wirkung hier verstaerkt */
     force *= 4;
+
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return co->level;
+
+    if (pa->param[0]->flag == TARGET_NOTFOUND)
+        return 0;
 
     /* Objekt ermitteln */
     obj = pa->param[0]->typ;
@@ -728,9 +736,9 @@ static int sp_destroy_magic(castorder * co)
         return 0;
     }
 
-    succ = break_curse(ap, cast_level, force, c);
+    succ = break_curse(ap, co->level, force, c);
 
-    if (succ) {
+    if (succ > 0) {
         ADDMSG(&caster->faction->msgs, msg_message("destroy_magic_effect",
             "unit region command succ target", caster, caster->region, co->order, succ,
             ts));
@@ -740,8 +748,7 @@ static int sp_destroy_magic(castorder * co)
             "unit region command", caster, caster->region, co->order));
     }
 
-    if (succ < 1) succ = 1;
-    return succ;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */

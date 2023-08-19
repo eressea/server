@@ -249,7 +249,7 @@ static void rhash_uid(region * r)
             }
             assert(uidhash[key].r != r || !"duplicate registration");
         }
-        r->uid = uid = rng_int();
+        r->uid = uid = genrand_int31();
     }
 }
 

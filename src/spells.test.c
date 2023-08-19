@@ -258,46 +258,6 @@ static void test_goodwinds(CuTest *tc) {
     test_teardown();
 }
 
-static void test_blessstonecircle(CuTest *tc) {
-    struct region *r;
-    struct faction *f;
-    unit *u;
-    building *b;
-    const struct building_type *btype;
-    castorder co;
-    spellparameter args;
-    spllprm param;
-    spllprm *params = &param;
-
-    test_setup();
-    r = test_create_plain(0, 0);
-    f = test_create_faction();
-    u = test_create_unit(f, r);
-    b = test_create_building(r, test_create_buildingtype("stonecircle"));
-    btype = test_create_buildingtype("blessedstonecircle");
-
-    args.length = 1;
-    args.param = &params;
-    param.flag = 0;
-    param.typ = SPP_BUILDING;
-    param.data.b = b;
-    
-    test_create_castorder(&co, u, 3, 4., 0, &args);
-    CuAssertIntEquals(tc, co.level, sp_blessstonecircle(&co));
-    CuAssertPtrEquals(tc, (void *)btype, (void *)b->type);
-    CuAssertPtrEquals(tc, NULL, b->attribs);
-
-    /* if target not found, no costs, no effect */
-    param.flag = TARGET_NOTFOUND;
-    CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
-
-    /* if target resists, pay in full, no effect */
-    param.flag = TARGET_RESISTS;
-    CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
-
-    test_teardown();
-}
-
 static void test_bad_dreams(CuTest *tc) {
     struct region *r;
     struct faction *f1, *f2;
@@ -1085,6 +1045,202 @@ static void test_migrants(CuTest *tc) {
     test_teardown();
 }
 
+static void test_blessstonecircle(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    building *b;
+    const struct building_type *btype;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    b = test_create_building(r, test_create_buildingtype("stonecircle"));
+    btype = test_create_buildingtype("blessedstonecircle");
+
+    args.length = 1;
+    args.param = &params;
+    param.flag = 0;
+    param.typ = SPP_BUILDING;
+    param.data.b = b;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, co.level, sp_blessstonecircle(&co));
+    CuAssertPtrEquals(tc, (void *)btype, (void *)b->type);
+    CuAssertPtrEquals(tc, NULL, b->attribs);
+
+    /* if target not found, no costs, no effect */
+    param.flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_goodwinds(&co));
+
+    /* if target resists, pay in full, no effect */
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_goodwinds(&co));
+
+    test_teardown();
+}
+
+static void test_destroy_magic_region(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    curse *c;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_NOTFOUND;
+    param.typ = SPP_REGION;
+    param.data.r = NULL;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, 0, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    param.data.r = r;
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    param.flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+
+    /* completely remove a weak curse: */
+    test_clear_messages(f);
+    c = create_curse(u, &param.data.r->attribs, &ct_holyground, co.level, 1, 1.0, 0);
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, r->attribs);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    /* weaken a strong curse: */
+    test_clear_messages(f);
+    c = create_curse(u, &param.data.r->attribs, &ct_holyground, 5.0, 1, 1.0, 0);
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertDblEquals(tc, 5.0 - (co.level + 1) / 2, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 1.0, c->effect, 0.01);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+
+    test_teardown();
+}
+
+static void test_destroy_magic_unit(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_NOTFOUND;
+    param.typ = SPP_UNIT;
+    param.data.u = NULL;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, 0, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    param.data.u = test_create_unit(f, r);
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    test_teardown();
+}
+
+static void test_destroy_magic_building(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_NOTFOUND;
+    param.typ = SPP_BUILDING;
+    param.data.b = NULL;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, 0, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    param.data.b = test_create_building(r, NULL);
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    test_teardown();
+}
+
+static void test_destroy_magic_ship(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter args;
+    spllprm param;
+    spllprm *params = &param;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    args.length = 1;
+    args.param = &params;
+    param.flag = TARGET_NOTFOUND;
+    param.typ = SPP_SHIP;
+    param.data.sh = NULL;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+    CuAssertIntEquals(tc, 0, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    param.data.sh = test_create_ship(r, NULL);
+    param.flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1116,6 +1272,10 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_migrants);
     SUITE_ADD_TEST(suite, test_magicstreet);
     SUITE_ADD_TEST(suite, test_blessstonecircle);
+    SUITE_ADD_TEST(suite, test_destroy_magic_region);
+    SUITE_ADD_TEST(suite, test_destroy_magic_unit);
+    SUITE_ADD_TEST(suite, test_destroy_magic_building);
+    SUITE_ADD_TEST(suite, test_destroy_magic_ship);
 
     return suite;
 }
