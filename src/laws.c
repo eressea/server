@@ -850,6 +850,8 @@ void demographics(void)
     season_t last_weeks_season = calendar_season(turn);
 
     for (r = regions; r; r = r->next) {
+        /** Ageing of regions starts when they are first discovered.
+         * This should prevent monsters from being created there. */
         if (r->age>0 || r->units || r->attribs) {
             ++r->age; /* also oceans. no idea why we didn't always do that */
         }
