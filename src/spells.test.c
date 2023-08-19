@@ -1116,6 +1116,7 @@ static void test_destroy_magic_region(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
+    /* even without a curse to destroy, we still have to pay */
     param.flag = 0;
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
@@ -1171,6 +1172,12 @@ static void test_destroy_magic_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
+    /* even without a curse to destroy, we still have to pay */
+    param.flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
+
     test_teardown();
 }
 
@@ -1203,6 +1210,12 @@ static void test_destroy_magic_building(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    /* even without a curse to destroy, we still have to pay */
+    param.flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
 
     test_teardown();
 }
@@ -1237,6 +1250,12 @@ static void test_destroy_magic_ship(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+
+    /* even without a curse to destroy, we still have to pay */
+    param.flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
 
     test_teardown();
 }
