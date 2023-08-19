@@ -674,7 +674,6 @@ static int sp_summon_familiar(castorder * co)
 int sp_destroy_magic(castorder * co)
 {
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
     curse *c = NULL;
