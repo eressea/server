@@ -1602,8 +1602,8 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     if (i > 0)
         fprintf(F, "%d;max_heroes\n", i);
 
-    if (faction_age(f) > 1 && f->lastorders != turn) {
-        fprintf(F, "%d;nmr\n", turn - f->lastorders);
+    if (faction_age(f) > 1 && f->lastorders != turn - 1) {
+        fprintf(F, "%d;nmr\n", turn - 1 - f->lastorders);
     }
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);
