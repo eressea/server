@@ -1319,11 +1319,11 @@ static struct iron_weapon {
     } rusty;
 } ironweapons[] = {
     { 1.0f, {.name = "sword" }, {.name = "rustysword"} },
-    { 1.0f, "axe", "rustyaxe" },
-    { 1.0f, "greatsword", "rustygreatsword" },
-    { 0.5f, "halberd", "rustyhalberd" },
-    { 0.5f, "shield", "rustyshield" },
-    { 0.2f, "chainmail", "rustychainmail" },
+    { 1.0f, {.name = "axe" }, {.name = "rustyaxe" } },
+    { 1.0f, {.name = "greatsword" }, {.name = "rustygreatsword" }},
+    { 0.5f, {.name = "halberd" }, {.name = "rustyhalberd" } },
+    { 0.5f, {.name = "shield" }, {.name = "rustyshield" } },
+    { 0.2f, {.name = "chainmail"}, {.name = "rustychainmail" }},
     { 0.0f, NULL, NULL }
 };
 
