@@ -1307,66 +1307,71 @@ static void fumble_ents(const castorder * co)
  */
  /* Syntax: ZAUBER [REGION x y] [STUFE 2] "Rosthauch" 1111 2222 3333 */
 
-typedef struct iron_weapon {
-    const struct item_type *type;
-    const struct item_type *rusty;
+static struct iron_weapon {
     float chance;
-    struct iron_weapon *next;
-} iron_weapon;
+    union {
+        const char *name;
+        const struct item_type *type;
+    } weapon;
+    union {
+        const char *name;
+        const struct item_type *type;
+    } rusty;
+} ironweapons[] = {
+    { 1.0f, {.name = "sword" }, {.name = "rustysword"} },
+    { 1.0f, "axe", "rustyaxe" },
+    { 1.0f, "greatsword", "rustygreatsword" },
+    { 0.5f, "halberd", "rustyhalberd" },
+    { 0.5f, "shield", "rustyshield" },
+    { 0.2f, "chainmail", "rustychainmail" },
+    { 0.0f, NULL, NULL }
+};
 
-static iron_weapon *ironweapons = NULL;
-
-void
-add_ironweapon(const struct item_type *type, const struct item_type *rusty,
-    float chance)
+void init_spells(void)
 {
-    iron_weapon *iweapon = malloc(sizeof(iron_weapon));
-    assert(iweapon);
-    iweapon->type = type;
-    iweapon->rusty = rusty;
-    iweapon->chance = chance;
-    iweapon->next = ironweapons;
-    ironweapons = iweapon;
+    int i, n = 0;
+    for (i = 0; ironweapons[i].weapon.name; ++i) {
+        struct iron_weapon *iweapon = ironweapons + i;
+        const item_type *itype = it_find(iweapon->weapon.name);
+        if (itype) {
+            ironweapons[n].weapon.type = itype;
+            ironweapons[n].chance = iweapon->chance;
+            ironweapons[n].rusty.type = it_find(iweapon->rusty.name);
+            ++n;
+        }
+    }
+    ironweapons[n].weapon.name = NULL;
+    ironweapons[n].chance = 0.0f;
 }
 
-static int sp_rosthauch(castorder * co)
+int sp_rosthauch(castorder * co)
 {
     int n;
-    int success = 0;
+    bool success = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int force = (int)co->force;
+    int force = 6 * (int)co->force;
     spellparameter *pa = co->par;
 
-    if (ironweapons == NULL) {
-        add_ironweapon(it_find("sword"), it_find("rustysword"), 1.0);
-        add_ironweapon(it_find("axe"), it_find("rustyaxe"), 1.0);
-        add_ironweapon(it_find("greatsword"), it_find("rustygreatsword"), 1.0);
-        add_ironweapon(it_find("halberd"), it_find("rustyhalberd"), 0.5f);
-        add_ironweapon(it_find("shield"), it_find("rustyshield"), 0.5f);
-        add_ironweapon(it_find("chainmail"), it_find("rustychainmail"), 0.2f);
-    }
-
-    if (force > 0) {
-        force = rng_int() % ((int)(force * 10)) + force;
-    }
     /* fuer jede Einheit */
-    for (n = 0; n < pa->length; n++) {
+    for (n = 0; n < pa->length && force > 0; n++) {
         unit *u = pa->param[n]->data.u;
         int ironweapon = 0;
-        iron_weapon *iweapon = ironweapons;
+        int i;
 
-        if (force <= 0)
-            break;
+        if (pa->param[n]->flag == TARGET_NOTFOUND)
+            continue;
+        success = true;
         if (pa->param[n]->flag)
             continue;
 
-        for (; iweapon != NULL; iweapon = iweapon->next) {
-            item **ip = i_find(&u->items, iweapon->type);
+        for (i = 0; force > 0 && ironweapons[i].weapon.type; ++i) {
+            struct iron_weapon *iweapon = ironweapons + i;
+            item **ip = i_find(&u->items, iweapon->weapon.type);
             if (*ip) {
-                double chance = (*ip)->number;
-                if (chance > force) chance = force;
+                item *it = *ip;
+                double chance = (it->number > force) ? force : it->number;
                 if (iweapon->chance < 1.0) {
                     chance *= iweapon->chance;
                 }
@@ -1374,14 +1379,12 @@ static int sp_rosthauch(castorder * co)
                     int ichange = (int)chance;
                     force -= ichange;
                     ironweapon += ichange;
-                    i_change(ip, iweapon->type, -ichange);
-                    if (iweapon->rusty) {
-                        i_change(&u->items, iweapon->rusty, ichange);
+                    i_change(ip, iweapon->weapon.type, -ichange);
+                    if (iweapon->rusty.type) {
+                        i_change(&u->items, iweapon->rusty.type, ichange);
                     }
                 }
             }
-            if (force <= 0)
-                break;
         }
 
         if (ironweapon > 0) {
@@ -1392,7 +1395,6 @@ static int sp_rosthauch(castorder * co)
             ADDMSG(&u->faction->msgs, msg_message("rust_effect",
                 "mage target amount",
                 cansee(u->faction, r, caster, 0) ? caster : NULL, u, ironweapon));
-            success += ironweapon;
         }
         else {
             /* {$mage mage} legt einen Rosthauch auf {target}, doch der
@@ -1405,7 +1407,7 @@ static int sp_rosthauch(castorder * co)
      * unguenstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
      * darum wird hier nur fuer alle Faelle in denen noch weniger Waffen
      * betroffen wurden ein Kostennachlass gegeben */
-    return (success < cast_level) ? success : cast_level;
+    return success ? cast_level : 0;
 }
 
 /* ------------------------------------------------------------- */

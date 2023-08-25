@@ -178,8 +178,7 @@ int sp_petrify(struct castorder * co)
         --force;
     }
 
-    m =
-        msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp,
+    m = msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp,
         stoned);
     message_all(b, m);
     msg_release(m);

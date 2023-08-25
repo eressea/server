@@ -10,6 +10,7 @@
 #include "kernel/direction.h"
 #include "kernel/event.h"
 #include <kernel/faction.h>
+#include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -1260,6 +1261,70 @@ static void test_destroy_magic_ship(CuTest *tc) {
     test_teardown();
 }
 
+static void test_rosthauch(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2, *u3;
+    castorder co;
+    spellparameter args;
+    spllprm param[2];
+    spllprm *params[2] = { param, param + 1 };
+    item_type *it_sword, *it_rsword, *it_shield, *it_rshield;
+
+    test_setup();
+    it_sword = test_create_itemtype("sword");
+    it_rsword = test_create_itemtype("rustysword");
+    it_shield = test_create_itemtype("shield");
+    it_rshield = test_create_itemtype("rustyshield");
+    // must call this to register iron items:
+    init_spells();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    args.length = 2;
+    args.param = params;
+    param[0].flag = TARGET_NOTFOUND;
+    param[0].typ = SPP_UNIT;
+    param[0].data.u = u2 = test_create_unit(test_create_faction(), r);
+    param[1].flag = TARGET_NOTFOUND;
+    param[1].data.u = u3 = test_create_unit(u2->faction, r);
+    param[1].typ = SPP_UNIT;
+
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+
+    /* if target not found, no costs, no effect */
+    CuAssertIntEquals(tc, 0, sp_rosthauch(&co));
+
+    /* if target resists, pay in full, no effect */
+    param[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
+
+    /* target found, pay even if nothing happened: */
+    param[0].flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
+
+    /* at level 4, destroy up to 24 swords: */
+    i_change(&u2->items, it_sword, 40);
+    CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
+    CuAssertIntEquals(tc, 16, i_get(u2->items, it_sword));
+    CuAssertIntEquals(tc, 24, i_get(u2->items, it_rsword));
+
+    /* spell can work on more than one unit, shields are affected after swords, 
+     * only 50% can be rusted.
+     * force of 24 = 16 sword, 4 shields
+     */
+    param[1].flag = 0;
+    i_change(&u2->items, it_shield, 2);
+    i_change(&u3->items, it_shield, 12);
+    CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_sword));
+    CuAssertIntEquals(tc, 1, i_get(u2->items, it_shield));
+    CuAssertIntEquals(tc, 9, i_get(u3->items, it_shield));
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1295,6 +1360,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_magic_unit);
     SUITE_ADD_TEST(suite, test_destroy_magic_building);
     SUITE_ADD_TEST(suite, test_destroy_magic_ship);
+    SUITE_ADD_TEST(suite, test_rosthauch);
 
     return suite;
 }
