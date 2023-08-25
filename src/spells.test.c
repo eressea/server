@@ -1321,6 +1321,7 @@ static void test_rosthauch(CuTest *tc) {
     CuAssertIntEquals(tc, 0, i_get(u2->items, it_sword));
     CuAssertIntEquals(tc, 1, i_get(u2->items, it_shield));
     CuAssertIntEquals(tc, 9, i_get(u3->items, it_shield));
+    CuAssertIntEquals(tc, 3, i_get(u3->items, it_rshield));
 
     test_teardown();
 }
