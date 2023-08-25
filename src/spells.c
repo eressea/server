@@ -1324,7 +1324,7 @@ static struct iron_weapon {
     { 0.5f, {.name = "halberd" }, {.name = "rustyhalberd" } },
     { 0.5f, {.name = "shield" }, {.name = "rustyshield" } },
     { 0.2f, {.name = "chainmail"}, {.name = "rustychainmail" }},
-    { 0.0f, NULL, NULL }
+    { 0.0f, {.name = NULL}, { .name = NULL} }
 };
 
 void init_spells(void)
