@@ -1367,25 +1367,29 @@ static void test_sparkle(CuTest *tc) {
 static void test_summon_familiar(CuTest *tc) {
     struct region *r;
     struct faction *f;
-    race *rc;
+    race *rc, *rc_special;
     unit *u, *u2;
     castorder co;
 
     test_setup();
     rc = test_create_race("human");
     rc->familiars[0] = test_create_race("goblin");
-    rc->familiars[M_DRAIG] = test_create_race("demon");
+    rc->familiars[M_DRAIG] = rc_special = test_create_race("demon");
     r = test_create_plain(0, 0);
     f = test_create_faction();
     f->race = rc;
     f->magiegebiet = M_DRAIG;
     u = test_create_unit(f, r);
-    test_create_castorder(&co, u, 3, 4., 0, NULL);
+
+    /* mit force 20 bekommt man garantiert den magiegebiet-familiar: */
+    random_source_inject_constants(0.0, 0);
+    test_create_castorder(&co, u, 3, 20., 0, NULL);
 
     CuAssertIntEquals(tc, co.level, sp_summon_familiar(&co));
     CuAssertPtrNotNull(tc, u2 = get_familiar(u));
     CuAssertTrue(tc, is_familiar(u2));
     CuAssertPtrEquals(tc, u, get_familiar_mage(u2));
+    CuAssertPtrEquals(tc, rc_special, (race *)u_race(u2));
 }
 
 CuSuite *get_spells_suite(void)
