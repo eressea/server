@@ -602,11 +602,10 @@ static unit * make_familiar(unit * mage, region *r, const race *rc, const char *
     return fam;
 }
 
-static int sp_summon_familiar(castorder * co)
+int sp_summon_familiar(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     const race *rc;
     message *msg;
     char zText[2048];
@@ -616,7 +615,7 @@ static int sp_summon_familiar(castorder * co)
         cmistake(caster, co->order, 199, MSG_MAGIC);
         return 0;
     }
-    rc = select_familiar(caster->_race, cast_level, caster->faction->magiegebiet);
+    rc = select_familiar(caster->_race, (int)co->force, caster->faction->magiegebiet);
     if (rc == NULL) {
         log_error("could not find suitable familiar for %s.\n", unitname(caster));
         return 0;

@@ -1364,6 +1364,30 @@ static void test_sparkle(CuTest *tc) {
     test_teardown();
 }
 
+static void test_summon_familiar(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    race *rc;
+    unit *u, *u2;
+    castorder co;
+
+    test_setup();
+    rc = test_create_race("human");
+    rc->familiars[0] = test_create_race("goblin");
+    rc->familiars[M_DRAIG] = test_create_race("demon");
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->race = rc;
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    test_create_castorder(&co, u, 3, 4., 0, NULL);
+
+    CuAssertIntEquals(tc, co.level, sp_summon_familiar(&co));
+    CuAssertPtrNotNull(tc, u2 = get_familiar(u));
+    CuAssertTrue(tc, is_familiar(u2));
+    CuAssertPtrEquals(tc, u, get_familiar_mage(u2));
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1401,6 +1425,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_magic_ship);
     SUITE_ADD_TEST(suite, test_rosthauch);
     SUITE_ADD_TEST(suite, test_sparkle);
+    SUITE_ADD_TEST(suite, test_summon_familiar);
 
     return suite;
 }

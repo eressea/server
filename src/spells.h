@@ -10,6 +10,11 @@ extern const struct curse_type ct_deathcloud;
 void register_spells(void);
 void init_spells(void);
 
+#define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
+#define ACTION_CANSEE     0x02  /* to people who can see the actor */
+#define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
+int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
+
 #define SHOWASTRAL_MAX_RADIUS 5
 int sp_baddreams(struct castorder * co);
 int sp_gooddreams(struct castorder * co);
@@ -36,7 +41,4 @@ int sp_blessstonecircle(struct castorder *co);
 int sp_destroy_magic(struct castorder *co);
 int sp_rosthauch(struct castorder *co);
 int sp_sparkle(struct castorder *co);
-#define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
-#define ACTION_CANSEE     0x02  /* to people who can see the actor */
-#define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
-int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
+int sp_summon_familiar(struct castorder *co);
