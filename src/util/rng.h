@@ -18,5 +18,3 @@ int rng_injectable_int(void);
 # define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
-
-#define random(i) (rng_injectable_int() % (i))

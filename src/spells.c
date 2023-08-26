@@ -1353,7 +1353,7 @@ int sp_rosthauch(castorder * co)
     int force;
     spellparameter *pa = co->par;
 
-    force = (1 + random(2)) * 6 * (int)co->force;
+    force = (1 + (rng_int() & 1)) * 6 * (int)co->force;
     /* fuer jede Einheit */
     for (n = 0; n < pa->length && force > 0; n++) {
         unit *u = pa->param[n]->data.u;
