@@ -2,12 +2,12 @@
 
 /* util includes */
 #include <critbit.h>
-#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
+
 #include <selist.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

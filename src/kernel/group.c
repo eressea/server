@@ -15,10 +15,10 @@
 #include <util/base36.h>
 #include <kernel/gamedata.h>
 #include <util/resolve.h>
-#include <util/strings.h>
 #include <util/unicode.h>
 
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

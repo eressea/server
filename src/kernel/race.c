@@ -27,10 +27,10 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
+#include <strings.h>
 
 /* attrib includes */
 #include <attributes/raceprefix.h>

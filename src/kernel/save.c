@@ -60,20 +60,20 @@
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
 #include <util/unicode.h>
 
-#include <selist.h>
-#include <stream.h>
-#include <filestream.h>
-#include <limits.h>
-#include <storage.h>
 #include <binarystore.h>
+#include <filestream.h>
+#include <selist.h>
+#include <storage.h>
+#include <stream.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 
 /* libc includes */
+#include <limits.h>
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>

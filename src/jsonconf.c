@@ -38,8 +38,8 @@
 #include "util/param.h"
 #include "util/path.h"
 #include "util/pofile.h"
-#include "util/strings.h"
 
+#include <strings.h>
 
 /* external libraries */
 #include <stb_ds.h>

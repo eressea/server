@@ -21,7 +21,8 @@
 #include "util/message.h"
 #include "util/crmessage.h"
 #include "util/nrmessage.h"
-#include "util/strings.h"
+
+#include <strings.h>
 
 #include <expat.h>
 #include <stb_ds.h>

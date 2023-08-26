@@ -17,10 +17,10 @@
 #include "util/keyword.h"
 #include "util/param.h"
 #include <util/language.h>
-#include <util/strings.h>
 
-#include <stream.h>
 #include <memstream.h>
+#include <stream.h>
+#include <strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

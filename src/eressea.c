@@ -52,7 +52,7 @@
 #include "vortex.h"
 #include "wormhole.h"
 
-#include <util/strings.h>
+#include <strings.h>
 
 #include <assert.h>
 #include <errno.h>

@@ -23,7 +23,6 @@ password.test.c
 rand.test.c
 # rng.test.c
 # resolve.test.c
-strings.test.c
 log.test.c
 # translation.test.c
 umlaut.test.c
@@ -55,7 +54,6 @@ pofile.c
 rand.c
 resolve.c
 stb.c
-strings.c
 translation.c
 umlaut.c
 unicode.c

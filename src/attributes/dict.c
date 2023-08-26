@@ -14,8 +14,8 @@
 #include <util/log.h>
 #include <kernel/gamedata.h>
 #include <util/resolve.h>
-#include <util/strings.h>
 
+#include <strings.h>
 #include <storage.h>
 
 /* stdc includes */

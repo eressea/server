@@ -7,7 +7,8 @@
 
 #include <util/log.h>
 #include <util/language.h>
-#include <util/strings.h>
+
+#include <strings.h>
 
 #include <lua.h>
 #include <lauxlib.h>

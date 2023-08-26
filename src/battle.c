@@ -52,11 +52,11 @@
 #include "util/macros.h"
 #include "util/message.h"
 #include "util/parser.h"
-#include "util/strings.h"
 #include "util/stats.h"
 #include "util/rand.h"
 #include "util/rng.h"
 
+#include <strings.h>
 #include <selist.h>
 
 /* libc includes */

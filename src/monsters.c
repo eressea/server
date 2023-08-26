@@ -40,7 +40,6 @@
 #include "util/stats.h"
 #include "util/rand.h"
 #include "util/rng.h"
-#include "util/strings.h"
 
 /* attributes includes */
 #include "attributes/hate.h"
@@ -50,8 +49,10 @@
 
 #include "spells/regioncurse.h"
 
-#include <stb_ds.h>
 #include <selist.h>
+#include <strings.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <stdio.h>

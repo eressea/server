@@ -60,11 +60,11 @@
 #include "util/message.h"
 #include "util/path.h"
 #include "util/password.h"
-#include "util/strings.h"
 #include "util/translation.h"
 
-#include <stream.h>
 #include <selist.h>
+#include <stream.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 

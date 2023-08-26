@@ -28,11 +28,11 @@
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <critbit.h>
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

@@ -25,7 +25,6 @@
 /* util includes */
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
-#include <util/strings.h>
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
@@ -33,9 +32,9 @@
 #include <util/language.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/strings.h>
 
 #include <storage.h>
+#include <strings.h>
 
 #include <modules/autoseed.h>
 

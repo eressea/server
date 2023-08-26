@@ -8,8 +8,9 @@
 #include "region.h"
 #include "unit.h"
 
-#include <util/strings.h>
 #include "util/variant.h"  // for variant
+
+#include <strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

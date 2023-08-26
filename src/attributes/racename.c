@@ -1,7 +1,8 @@
 #include "racename.h"
 
 #include <kernel/attrib.h>
-#include <util/strings.h>
+
+#include <strings.h>
 
 /* libc includes */
 #include <stdlib.h>

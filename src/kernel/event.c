@@ -4,9 +4,9 @@
 /* util includes */
 #include <kernel/gamedata.h>
 #include <util/log.h>
-#include <util/strings.h>
 
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

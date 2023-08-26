@@ -1,14 +1,16 @@
 #include "attrib.h"
 
 #include <kernel/gamedata.h>
-#include <util/strings.h>
 #include <util/variant.h>     // for variant
 
+#include <memstream.h>
 #include <storage.h>
 #include <stream.h>           // for stream, stream_i
-#include <memstream.h>
+#include <strings.h>
+
 #include <CuTest.h>
 #include <tests.h>
+
 #include <string.h>
 
 static void test_attrib_new(CuTest * tc)
