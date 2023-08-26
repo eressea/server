@@ -1291,6 +1291,7 @@ static void test_rosthauch(CuTest *tc) {
     param[1].data.u = u3 = test_create_unit(u2->faction, r);
     param[1].typ = SPP_UNIT;
 
+    random_source_inject_constants(0.0, 0);
     test_create_castorder(&co, u, 3, 4., 0, &args);
 
     /* if target not found, no costs, no effect */

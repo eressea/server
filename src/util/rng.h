@@ -1,15 +1,8 @@
-#ifndef UTIL_RNG_H
-#define UTIL_RNG_H
-
 #define RNG_MT
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    /* generates a random number on [0,1)-real-interval */
-    double rng_injectable_double(void);
-    int rng_injectable_int(void);
+/* generates a random number on [0,1)-real-interval */
+double rng_injectable_double(void);
+int rng_injectable_int(void);
 
 #ifdef RNG_MT
 # include "mtrand.h"
@@ -25,7 +18,5 @@ extern "C" {
 # define rng_double ((rand()%RAND_MAX)/(double)RAND_MAX)
 # define RNG_RAND_MAX RAND_MAX
 #endif
-#ifdef __cplusplus
-}
-#endif
-#endif
+
+#define random(i) (rng_injectable_int() % (i))

@@ -1350,9 +1350,10 @@ int sp_rosthauch(castorder * co)
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int force = 6 * (int)co->force;
+    int force;
     spellparameter *pa = co->par;
 
+    force = (1 + random(2)) * 6 * (int)co->force;
     /* fuer jede Einheit */
     for (n = 0; n < pa->length && force > 0; n++) {
         unit *u = pa->param[n]->data.u;
@@ -1370,12 +1371,12 @@ int sp_rosthauch(castorder * co)
             item **ip = i_find(&u->items, iweapon->weapon.type);
             if (*ip) {
                 item *it = *ip;
-                double chance = (it->number > force) ? force : it->number;
+                double change = (it->number > force) ? force : it->number;
                 if (iweapon->chance < 1.0) {
-                    chance *= iweapon->chance;
+                    change *= iweapon->chance;
                 }
-                if (chance > 0) {
-                    int ichange = (int)chance;
+                if (change > 0) {
+                    int ichange = (int)change;
                     force -= ichange;
                     ironweapon += ichange;
                     i_change(ip, iweapon->weapon.type, -ichange);
