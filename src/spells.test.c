@@ -1326,6 +1326,44 @@ static void test_rosthauch(CuTest *tc) {
     test_teardown();
 }
 
+
+static void test_sparkle(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter args;
+    spllprm param[2];
+    spllprm *params[2] = { param, param + 1 };
+    curse *c;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    param[0].typ = SPP_UNIT;
+    param[0].data.u = u2 = test_create_unit(test_create_faction(), r);
+    param[0].flag = TARGET_NOTFOUND;
+    args.length = 1;
+    args.param = params;
+    test_create_castorder(&co, u, 3, 4., 0, &args);
+
+    CuAssertIntEquals(tc, 0, sp_sparkle(&co));
+
+    param[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_sparkle(&co));
+
+    param[0].flag = 0;
+    CuAssertIntEquals(tc, co.level, sp_sparkle(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_sparkle));
+    CuAssertIntEquals(tc, co.level + 1, c->duration);
+    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
+    CuAssertDblEquals(tc, 0.0, c->effect - (int)c->effect, 0.01);
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1362,6 +1400,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_magic_building);
     SUITE_ADD_TEST(suite, test_destroy_magic_ship);
     SUITE_ADD_TEST(suite, test_rosthauch);
+    SUITE_ADD_TEST(suite, test_sparkle);
 
     return suite;
 }

@@ -1490,37 +1490,34 @@ int sp_kaelteschutz(castorder * co)
  */
  /* Syntax: ZAUBER "Funkenregen" eh1 */
 
-static int sp_sparkle(castorder * co)
+int sp_sparkle(castorder * co)
 {
     unit *u;
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     spellparameter *pa = co->par;
-    int duration = cast_level + 1;
-    double effect;
+    int duration = co->level + 1;
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return cast_level;
+        return co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
         return 0;
 
     u = pa->param[0]->data.u;
-    effect = (float)(rng_int() % 0xffffff);
-    create_curse(caster, &u->attribs, &ct_sparkle, (float)cast_level,
-        duration, effect, u->number);
+    create_curse(caster, &u->attribs, &ct_sparkle, co->force,
+        duration, (double)(rng_int() % 0xffffff), u->number);
 
     ADDMSG(&caster->faction->msgs, msg_message("sparkle_effect", "mage target",
         caster, u));
     if (u->faction != caster->faction) {
-        ADDMSG(&u->faction->msgs, msg_message("sparkle_effect", "mage target", caster,
-            u));
+        ADDMSG(&u->faction->msgs, msg_message("sparkle_effect", "mage target",
+            caster, u));
     }
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */

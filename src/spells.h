@@ -35,7 +35,7 @@ int sp_magicstreet(struct castorder *co);
 int sp_blessstonecircle(struct castorder *co);
 int sp_destroy_magic(struct castorder *co);
 int sp_rosthauch(struct castorder *co);
-
+int sp_sparkle(struct castorder *co);
 #define ACTION_RESET      0x01  /* reset the one-time-flag FFL_SELECT (on first pass) */
 #define ACTION_CANSEE     0x02  /* to people who can see the actor */
 #define ACTION_CANNOTSEE  0x04  /* to people who can not see the actor */
