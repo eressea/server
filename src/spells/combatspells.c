@@ -178,8 +178,7 @@ int sp_petrify(struct castorder * co)
         --force;
     }
 
-    m =
-        msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp,
+    m = msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp,
         stoned);
     message_all(b, m);
     msg_release(m);
@@ -518,7 +517,7 @@ int sp_mindblast(struct castorder * co)
         }
     }
 
-    m = msg_message("sp_mindblast_temp_effect", "mage spell amount", mage, sp, k);
+    m = msg_message("mindblast_temp_effect", "mage spell amount", mage, sp, k);
     message_all(b, m);
     msg_release(m);
     return level;
@@ -654,7 +653,7 @@ static fighter *summon_allies(const fighter *fi, const race *rc, int number) {
     a->data.ca[1] = 100;
     a_add(&u->attribs, a);
     
-    msg = msg_message("sp_wolfhowl_effect", "mage amount race", mage, u->number, rc);
+    msg = msg_message("wolfhowl_effect", "mage amount race", mage, u->number, rc);
     message_all(b, msg);
     msg_release(msg);
 
@@ -722,7 +721,7 @@ int sp_shadowknights(struct castorder * co)
 
     make_fighter(b, u, fi->side, is_attacker(fi));
 
-    msg = msg_message("sp_shadowknights_effect", "mage", mage);
+    msg = msg_message("shadowknights_effect", "mage", mage);
     message_all(b, msg);
     msg_release(msg);
 
@@ -749,7 +748,7 @@ int sp_strong_wall(struct castorder * co)
     create_curse(mage, &burg->attribs, &ct_strongwall, power, 1, effect, 0);
 
     msg =
-        msg_message("sp_strongwalls_effect", "mage building", mage, mage->building);
+        msg_message("strongwalls_effect", "mage building", mage, mage->building);
     message_all(b, msg);
     msg_release(msg);
 
@@ -839,10 +838,10 @@ int sp_chaosrow(struct castorder * co)
     selist_free(fgs);
 
     if (chaosrow) {
-        mtype = (k > 0) ? "sp_chaosrow_effect_1" : "sp_chaosrow_effect_0";
+        mtype = (k > 0) ? "chaosrow_effect_1" : "sp_chaosrow_effect_0";
     }
     else {
-        mtype = (k > 0) ? "sp_confusion_effect_1" : "sp_confusion_effect_0";
+        mtype = (k > 0) ? "confusion_effect_1" : "sp_confusion_effect_0";
     }
     m = msg_message(mtype, "mage", mage);
     message_all(b, m);
@@ -877,7 +876,7 @@ int flee_spell(struct castorder * co, int strength)
 
     force = (int)get_force(power, strength);
     if (force<=0 || !count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
-        msg = msg_message("sp_flee_effect_0", "mage spell", mage, sp);
+        msg = msg_message("flee_effect_0", "mage spell", mage, sp);
         message_all(b, msg);
         msg_release(msg);
         return 0;
@@ -907,7 +906,7 @@ int flee_spell(struct castorder * co, int strength)
     }
     selist_free(fgs);
 
-    msg = msg_message("sp_flee_effect_1", "mage spell amount", mage, sp, panik);
+    msg = msg_message("flee_effect_1", "mage spell amount", mage, sp, panik);
     message_all(b, msg);
     msg_release(msg);
 

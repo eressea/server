@@ -464,6 +464,21 @@ function test_no_speedsail_on_convoy()
     assert_equal(nil, sh:get_curse('shipspeedup'))
 end
 
+function test_build_new_ship()
+    local r = region.create(1, 0, 'plain')
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 25)
+    u:set_skill('shipcraft', 1)
+    u:add_item("log", 50)
+    u:add_order("MACHE Langboot")
+    process_orders()
+    local sh = u.ship
+    assert_not_nil(sh)
+    assert_equal("Langboot", sh.name)
+    assert_equal(25, sh.size)
+    assert_equal(25, u:get_item('log'))
+end
+
 function test_build_ship()
     local r = region.create(1, 0, 'plain')
     local f = faction.create("insect")

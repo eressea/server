@@ -1,7 +1,8 @@
 #include "prefix.h"
 
 #include <util/log.h>
-#include <util/strings.h>
+
+#include <strings.h>
 
 #include <assert.h>
 #include <stddef.h>

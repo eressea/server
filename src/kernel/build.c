@@ -39,7 +39,8 @@
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/resolve.h>
-#include <util/strings.h>
+
+#include <strings.h>
 
 /* from libc */
 #include <assert.h>

@@ -937,14 +937,14 @@
     </type>
   </message>
 
-  <message name="sp_flee_effect_0" section="magic">
+  <message name="flee_effect_0" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
     </type>
   </message>
 
-  <message name="sp_flee_effect_1" section="magic">
+  <message name="flee_effect_1" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
@@ -1023,7 +1023,7 @@
     </type>
   </message>
 
-  <message name="sp_eternizewall_effect" section="magic">
+  <message name="eternizewall_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
@@ -1031,7 +1031,7 @@
     </type>
   </message>
 
-  <message name="sp_permtransfer_effect" section="magic">
+  <message name="permtransfer_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="target" type="unit"/>
@@ -1201,13 +1201,13 @@
     </type>
   </message>
 
-  <message name="sp_icastle_effect" section="magic">
+  <message name="icastle_effect" section="magic">
     <type>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="sp_bloodsacrifice_effect" section="magic">
+  <message name="bloodsacrifice_effect" section="magic">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -1216,7 +1216,7 @@
     </type>
   </message>
 
-  <message name="sp_holyground_effect" section="magic">
+  <message name="holyground_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
@@ -1253,14 +1253,14 @@
       <arg name="region" type="region"/>
     </type>
   </message>
-  <message name="sp_raisepeasantmob_effect" section="magic">
+  <message name="raisepeasantmob_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="sp_raisepeasants_effect" section="magic">
+  <message name="raisepeasants_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
@@ -1268,7 +1268,7 @@
     </type>
   </message>
 
-  <message name="sp_depression_effect" section="magic">
+  <message name="depression_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
@@ -1352,7 +1352,7 @@
     </type>
   </message>
 
-  <message name="sp_movecastle_effect" section="magic">
+  <message name="movecastle_effect" section="magic">
     <type>
       <arg name="building" type="building"/>
       <arg name="direction" type="direction"/>
@@ -5603,7 +5603,7 @@
     </type>
   </message>
   
-  <message name="sp_wolfhowl_effect" section="battle">
+  <message name="wolfhowl_effect" section="battle">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="amount" type="int"/>
@@ -5611,37 +5611,37 @@
     </type>
   </message>
   
-  <message name="sp_shadowknights_effect" section="battle">
+  <message name="shadowknights_effect" section="battle">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_chaosrow_effect_0" section="battle">
+  <message name="chaosrow_effect_0" section="battle">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_chaosrow_effect_1" section="battle">
+  <message name="chaosrow_effect_1" section="battle">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_confusion_effect_0" section="battle">
+  <message name="confusion_effect_0" section="battle">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_confusion_effect_1" section="battle">
+  <message name="confusion_effect_1" section="battle">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_strongwalls_effect" section="battle">
+  <message name="strongwalls_effect" section="battle">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="building" type="building"/>
@@ -5673,20 +5673,20 @@
     </type>
   </message>
   
-  <message name="sp_drought_effect" section="magic">
+  <message name="drought_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
   
-  <message name="sp_clone_effect" section="magic">
+  <message name="clone_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
     </type>
   </message>
   
-  <message name="sp_dreamreading_effect" section="magic">
+  <message name="dreamreading_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
@@ -5694,7 +5694,7 @@
     </type>
   </message>
   
-  <message name="sp_sweetdreams_effect" section="magic">
+  <message name="sweetdreams_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="unit" type="unit"/>
@@ -5702,7 +5702,7 @@
     </type>
   </message>
   
-  <message name="sp_disturbingdreams_effect" section="magic">
+  <message name="disturbingdreams_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
@@ -5739,28 +5739,28 @@
     </type>
   </message>
 
-  <message name="drought_effect_1" section="magic">
+  <message name="drought_glacier_to_swamp" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_2" section="magic">
+  <message name="drought_no_terraform" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_3" section="magic">
+  <message name="drought_glacier_to_ocean" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="drought_effect_4" section="magic">
+  <message name="drought_to_ocean_global" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="region" type="region"/>
@@ -5796,7 +5796,7 @@
     </type>
   </message>
 
-  <message name="sp_mindblast_effect" section="magic">
+  <message name="mindblast_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>
@@ -5805,7 +5805,7 @@
     </type>
   </message>
 
-  <message name="sp_mindblast_temp_effect" section="magic">
+  <message name="mindblast_temp_effect" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="spell" type="spell"/>

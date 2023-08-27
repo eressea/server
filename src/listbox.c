@@ -1,6 +1,7 @@
 #include "listbox.h"
 
-#include <util/strings.h>
+#include <strings.h>
+
 #include <curses.h>
 
 #include <stdbool.h>

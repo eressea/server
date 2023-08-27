@@ -19,8 +19,9 @@
 #include <util/language.h>
 #include <util/macros.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/unicode.h>
+
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

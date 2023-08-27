@@ -2,12 +2,12 @@
 
 #include <util/log.h>
 #include <kernel/gamedata.h>
-#include <util/strings.h>
 
 #include "spellbook.h"
 
 #include <selist.h>
 #include <storage.h>
+#include <strings.h>
 
 #include <assert.h>
 #include <stdlib.h>

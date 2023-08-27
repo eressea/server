@@ -69,12 +69,12 @@
 #include <util/nrmessage.h>
 #include "util/param.h"
 #include <util/rng.h>
-#include <util/strings.h>
 
 #include <format.h>
 #include <selist.h>
 #include <filestream.h>
 #include <stream.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

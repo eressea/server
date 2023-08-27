@@ -84,47 +84,6 @@ extern "C" {
     extern struct attrib_type at_curse;
 
     /* ------------------------------------------------------------- */
-    /* Zauberwirkungen */
-    /* nicht vergessen curse_type zu aktualisieren und Reihenfolge beachten!
-     */
-
-    enum {
-        C_FOGTRAP,
-        C_ANTIMAGICZONE,
-        C_FARVISION,
-        C_GBDREAM,
-        C_AURA,
-        C_MAELSTROM,
-        C_BLESSEDHARVEST,
-        C_DROUGHT,
-        C_BADLEARN,
-        C_SHIP_SPEEDUP,             /*  9 - Sturmwind-Zauber */
-        C_SHIP_FLYING,              /* 10 - Luftschiff-Zauber */
-        C_SHIP_NODRIFT,             /* 11 - GuenstigeWinde-Zauber */
-        C_DEPRESSION,
-        C_MAGICWALLS,               /* 13 - Heimstein */
-        C_STRONGWALL,               /* 14 - Feste Mauer - Precombat */
-        C_ASTRALBLOCK,              /* 15 - Astralblock */
-        C_GENEROUS,                 /* 16 - Unterhaltung vermehren */
-        C_PEACE,                    /* 17 - Regionsweit Attacken verhindern */
-        C_MAGICSTREET,              /* 19 - magisches Strassennetz */
-        C_RESIST_MAGIC,             /* 20 - veraendert Magieresistenz von Objekten */
-        C_SONG_BADMR,               /* 21 - veraendert Magieresistenz */
-        C_SONG_GOODMR,              /* 22 - veraendert Magieresistenz */
-        C_SLAVE,                    /* 23 - dient fremder Partei */
-        C_CALM,                     /* 25 - Beinflussung */
-        C_OLDRACE,
-        C_FUMBLE,
-        C_RIOT,                     /*region in Aufruhr */
-        C_CURSED_BY_THE_GODS,
-        C_SPEED,                    /* Beschleunigt */
-        C_ORC,
-        C_MBOOST,
-        C_KAELTESCHUTZ,
-        MAXCURSE                    /* OBS: when removing curses, remember to update read_ccompat() */
-    };
-
-    /* ------------------------------------------------------------- */
     /* Flags */
 
     /* Verhalten von Zaubern auf Units beim Uebergeben von Personen */
@@ -229,9 +188,6 @@ extern "C" {
      */
 
     void destroy_curse(curse * c);
-
-    /* ignoriert CURSE_ISNEW */
-    bool is_cursed_internal(struct attrib *ap, const curse_type * ctype);
 
     /* loescht einen konkreten Spruch auf einem Objekt.  */
     bool remove_curse(struct attrib **ap, const struct curse *c);

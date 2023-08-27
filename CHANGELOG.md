@@ -1,5 +1,13 @@
+# 28.3
+
+  - Zauberkosten sind abhängig von der Zauberstufe, oder Effekt:
+	- Ritual der Aufnahme: Kosten abhängig von der Anzahl betroffener Personen.
+  - Bei Zeitdehnung wird die Dauer aufgerundet, (Zauberstufe+1)/2
+  - Verstärkende Wirkungen von Ring der Macht und Magierturm bei Zaubern repariert, e.g. Zeitdehnung
+  - Sog des Lebens respektiert die Magieresistenz der Zielregion
+
 # 27.1
- 
+
   - Neue Formel zur Vermischung von Talenten bei GIB PERSON und REKRUTIERE
   - Bauern in übervölkerten Regionen vermehren sich nicht
   - Samen wachsen nicht zu Schößlingen heran, wenn sie dadurch Bauern die Felder wegnehmen.

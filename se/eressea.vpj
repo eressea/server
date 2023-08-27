@@ -354,7 +354,6 @@
             <F N="../src/kernel/spellbook.c"/>
             <F N="../src/spells/spells.c"/>
             <F N="../src/spy.c"/>
-            <F N="../src/util/strings.c"/>
             <F N="../critbit/strtolh.c"/>
             <F N="../src/study.c"/>
             <F N="../src/summary.c"/>

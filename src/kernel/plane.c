@@ -8,10 +8,10 @@
 /* util includes */
 #include <kernel/attrib.h>
 #include <util/resolve.h>
-#include <util/strings.h>
 #include <util/lists.h>
 
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

@@ -44,10 +44,10 @@ void expandstealing(region * r, econ_request * stealorders)
      */
 
     for (j = 0; j != norders; j++) {
-        unit *u;
+        unit *u = requests[j]->unit;
         int n = 0;
 
-        if (requests[j]->unit->n > requests[j]->unit->wants) {
+        if (u->n > u->wants) {
             break;
         }
 
@@ -173,7 +173,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     if (n <= 0) {
         /* Wenn Goblins mit einem Tarnungstalent von mindestens 4 klauen, bekommen 
          * sie mindestens 50 Silber, selbst dann, wenn sie erwischt werden. */
-        if (u_race(u) == get_race(RC_GOBLIN) && effsk >= 4) {
+        if (effsk >= 4 && u_race(u) == get_race(RC_GOBLIN)) {
             ADDMSG(&u->faction->msgs, msg_message("stealfatal", "unit target", u,
                 u2));
             ADDMSG(&u2->faction->msgs, msg_message("thiefdiscover", "unit target", u,
@@ -194,15 +194,17 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
         }
     }
 
-    i = i_get(u->items, rring->itype);
-    if (i > u->number) i = u->number;
-    if (i > 0) {
-        n *= STEALINCOME * (u->number + i * (roqf_factor() - 1));
+    if (rring) {
+        i = i_get(u->items, rring->itype);
+        if (i > u->number) i = u->number;
+        if (i > 0) {
+            n *= (u->number + i * (roqf_factor() - 1));
+        }
+        else {
+            n *= u->number;
+        }
     }
-    else {
-        n *= u->number * STEALINCOME;
-    }
-
+    n *= STEALINCOME;
     u->wants = n;
 
     /* wer dank unsichtbarkeitsringen klauen kann, muss nicht unbedingt ein

@@ -20,10 +20,10 @@
 #include <util/message.h>
 #include <util/parser.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
 
 #include <selist.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

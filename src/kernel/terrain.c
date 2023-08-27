@@ -5,14 +5,15 @@
 #include <spells/regioncurse.h>
 
 /* kernel includes */
+#include "attrib.h"
 #include "curse.h"
 #include "region.h"
 #include "resources.h"
 #include "terrainid.h"
 
 #include <util/log.h>
-#include <kernel/attrib.h>
-#include <util/strings.h>
+
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -37,7 +38,7 @@ const char *terrainnames[MAXTERRAINS] = {
 };
 
 static terrain_type *registered_terrains;
-static int terrain_changes = 1;
+static int terrain_changes = 0;
 
 bool terrain_changed(int *cache) {
     assert(cache);
@@ -126,11 +127,10 @@ const struct terrain_type *newterrain(terrain_t t)
 {
     static int changed;
     const struct terrain_type *result;
-    if (t == NOTERRAIN) {
+    assert(t < MAXTERRAINS);
+    if (t < 0 || t >= MAXTERRAINS) {
         return NULL;
     }
-    assert(t >= 0);
-    assert(t < MAXTERRAINS);
     if (terrain_changed(&changed)) {
         memset(newterrains, 0, sizeof(newterrains));
         result = NULL;

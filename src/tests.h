@@ -60,10 +60,13 @@ int test_set_item(struct unit * u, const struct item_type *itype, int value);
 void test_translate_param(const struct locale *lang, enum param_t param, const char *text);
 const char * test_get_messagetype(const struct message *msg);
 int test_count_messagetype(struct message_list *msgs, const char *name);
-struct message * test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
-struct message * test_find_messagetype(struct message_list *msgs, const char *name);
-struct message * test_get_last_message(struct message_list *mlist);
+struct message *test_find_messagetype_ex(struct message_list *msgs, const char *name, struct message *prev);
+struct message *test_find_messagetype(struct message_list *msgs, const char *name);
+struct message *test_find_region_message(const struct region *r, const char *name, const struct faction *f);
+struct message *test_find_faction_message(const struct faction *f, const char *name);
+struct message *test_get_last_message(struct message_list *mlist);
 void test_clear_messages(struct faction *f);
+void test_clear_region_messages(struct region *r);
 void test_clear_messagelist(struct message_list **msgs);
 void assert_message(struct CuTest * tc, struct message *msg, char *name, int numpar);
 

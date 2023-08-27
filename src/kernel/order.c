@@ -14,9 +14,9 @@
 #include <util/log.h>
 #include <util/param.h>
 #include <util/parser.h>
-#include <util/strings.h>
 
 #include <stream.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

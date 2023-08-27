@@ -10,7 +10,16 @@ function setup()
     conf = [[{
     "races" : { "human" : {} },
     "terrains" : { "plain" : { "flags" : [ "land" ] } },
-    "keywords" : { "de" : { "study": "LERNEN", "teach": "LEHREN" } },
+    "keywords" : { "de" : {
+        "autostudy": "LERNEN AUTO",
+        "study": "LERNEN",
+        "teach": "LEHREN"
+    } },
+    "parameters" : {
+        "de" : {
+            "AUTO": "AUTO"
+        }
+    },
     "skills" : { "de": {
         "tactics" : "Taktik",
         "alchemy" : "Alchemie",
@@ -117,4 +126,17 @@ function test_study_multiple_teachers()
     make_teacher(u1, f, "tactics")
     process_orders()
     assert_equal(u1.number, u1:get_item("money"))
+end
+
+function test_auto_study_expensive()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    u:clear_orders()
+    u:add_order("@LERNE AUTO Taktik")
+    u:add_item("money", 200)
+    process_orders()
+    assert_equal(0, u:get_item("money"))
+    assert_equal(1, u:get_skill("tactics"))
+    assert_equal("@LERNEN Taktik", u:get_order())
 end

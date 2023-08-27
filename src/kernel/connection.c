@@ -12,10 +12,10 @@
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/rng.h>
-#include <util/strings.h>
 
 #include <selist.h>
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

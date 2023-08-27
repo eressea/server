@@ -29,8 +29,9 @@
 #include <util/log.h>
 #include <selist.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/unicode.h>
+
+#include <strings.h>
 
 /* libc includes */
 #include <limits.h>

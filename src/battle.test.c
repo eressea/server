@@ -28,8 +28,9 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/strings.h"
 #include "util/variant.h"
+
+#include <strings.h>
 
 #include <CuTest.h>
 

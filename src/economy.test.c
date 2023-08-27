@@ -894,6 +894,47 @@ static void test_maintain_buildings(CuTest* tc) {
     test_teardown();
 }
 
+static void test_maintainer_oversized(CuTest* tc) {
+    region *r;
+    building *b;
+    building_type *btype;
+    unit *u;
+    faction *f;
+    maintenance *req;
+    item_type *itype;
+
+    test_setup();
+    setup_economy();
+    btype = test_create_buildingtype("Hort");
+    btype->maxsize = 10;
+    btype->maxcapacity = 10;
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    set_number(u, btype->maxcapacity + 1);
+    b = test_create_building(r, btype);
+    itype = test_create_itemtype("money");
+    b->size = btype->maxsize;
+    u_set_building(u, b);
+
+    req = calloc(2, sizeof(maintenance));
+    req[0].number = 100;
+    req[0].rtype = itype->rtype;
+    btype->maintenance = req;
+
+    /* we can afford to pay: */
+    i_change(&u->items, itype, 100);
+    b->flags = 0;
+    maintain_buildings(r);
+    CuAssertIntEquals(tc, 0, fval(b, BLD_UNMAINTAINED));
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(r->msgs, "maintenance_nowork"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "maintenance"));
+    test_clear_messagelist(&f->msgs);
+
+    test_teardown();
+}
+
 static void test_maintain_buildings_curse(CuTest* tc) {
     region* r;
     building* b;
@@ -1430,6 +1471,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
+    SUITE_ADD_TEST(suite, test_maintainer_oversized);
     SUITE_ADD_TEST(suite, test_maintain_buildings_curse);
     SUITE_ADD_TEST(suite, test_recruit);
     SUITE_ADD_TEST(suite, test_recruit_insect);

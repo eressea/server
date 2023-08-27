@@ -59,9 +59,9 @@
 #include <util/parser.h>
 #include <util/rand.h>
 #include <util/rng.h>
-#include <util/strings.h>
 
 #include <storage.h>
+#include <strings.h>
 #include <stb_ds.h>
 
 /* libc includes */
@@ -2384,7 +2384,7 @@ int follow_ship(unit * u, order * ord)
 
 /* Bewegung, Verfolgung, Piraterie */
 
-/** ships that folow other ships
+/** ships that follow other ships
  * Dann generieren die jagenden Einheiten ihre Befehle und
  * bewegen sich.
  * Following the trails of other ships.

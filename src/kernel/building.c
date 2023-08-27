@@ -26,12 +26,12 @@
 #include <util/param.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
 
-#include <storage.h>
-#include <selist.h>
 #include <critbit.h>
+#include <selist.h>
+#include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -399,7 +399,6 @@ building *new_building(const struct building_type * btype, region * r,
     int id = newbuildingid();
     building *b = building_create(id);
     const char *bname;
-    char buffer[32];
 
     assert(size > 0);
     b->type = btype;
@@ -413,7 +412,6 @@ building *new_building(const struct building_type * btype, region * r,
         bname = param_name(P_GEBAEUDE, lang);
     }
     assert(bname);
-    snprintf(buffer, sizeof(buffer), "%s %s", bname, itoa36(b->no));
     b->name = str_strdup(bname);
     b->size = size;
     return b;

@@ -10,6 +10,26 @@ function setup()
     eressea.free_game()
 end
 
+function test_cart_example()
+  local r0 = region.create(0, 0, 'plain')
+  local r1 = region.create(1, 0, 'plain')
+  local r2 = region.create(2, 0, 'plain')
+  local f = faction.create('troll')
+
+  local u = unit.create(f, r0, 4)
+  u:add_item('cart', 2)
+  u:add_item('horse', 2)
+  u:add_item('money', 2 * 10000 + 1080 * 4 + 2000 * 2)
+  u:set_orders('NACH O O O')
+  process_orders()
+  assert_equal(r1, u.region)
+
+  u:add_item('money', 1)
+  u:set_orders('NACH O O O')
+  process_orders()
+  assert_equal(r1, u.region)
+end
+
 function test_trolls_with_horses()
     local r0 = region.create(0, 0, 'plain')
     local r1 = region.create(1, 0, 'plain')
@@ -23,6 +43,7 @@ function test_trolls_with_horses()
     assert_not_nil(r0)
     local u1 = unit.create(f, r0, 20)
     u1:add_item('cart', 5)
+
     -- trolls carry 10.8 GE, carts carry 100 GE:
     u1:add_item('money', 100 * (5 * 100 + 2 * 108))
 
@@ -30,6 +51,13 @@ function test_trolls_with_horses()
     u1:add_order('NACH O O O')
     process_orders()
     assert_equal(r1, u1.region)
+
+    u1:clear_orders()
+    u1:add_order('NACH O O O')
+    u1:add_item('money', 1)
+    process_orders()
+    assert_equal(r1, u1.region)
+    u1:add_item('money', -1)
 
     --  20 trolls can also lead 20 horses
     u1:add_item('horse', 20)

@@ -8,12 +8,22 @@
 #include "resources.h"
 #include "unit.h"
 #include "terrain.h"
+#include "terrainid.h"
 #include "item.h"
 
 
 #include <CuTest.h>
 #include <tests.h>
 #include <stdlib.h>
+
+void test_newterrain(CuTest *tc) {
+    terrain_type *t_plain;
+
+    test_setup();
+    init_terrains();
+    t_plain = get_or_create_terrain("plain");
+    CuAssertPtrEquals(tc, t_plain, (void *)newterrain(T_PLAIN));
+}
 
 void test_terraform(CuTest *tc) {
     region *r;
@@ -126,6 +136,7 @@ static void test_mourning(CuTest *tc) {
 CuSuite *get_region_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_newterrain);
     SUITE_ADD_TEST(suite, test_terraform);
     SUITE_ADD_TEST(suite, test_trees);
     SUITE_ADD_TEST(suite, test_mourning);

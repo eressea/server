@@ -63,16 +63,16 @@ static char g_bigbuf[BUFFERSIZE];
 #include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/crmessage.h>
-#include <util/strings.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
 #include <util/nrmessage.h>
 
-#include <selist.h>
 #include <filestream.h>
+#include <selist.h>
 #include <stream.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 
@@ -1602,8 +1602,8 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     if (i > 0)
         fprintf(F, "%d;max_heroes\n", i);
 
-    if (faction_age(f) > 1 && f->lastorders != turn) {
-        fprintf(F, "%d;nmr\n", turn - f->lastorders);
+    if (faction_age(f) > 1 && f->lastorders != turn - 1) {
+        fprintf(F, "%d;nmr\n", turn - 1 - f->lastorders);
     }
 
     fprintf(F, "\"%s\";Parteiname\n", f->name);

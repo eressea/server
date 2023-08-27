@@ -31,7 +31,6 @@ extern "C" {
     int sp_igjarjuk(struct castorder * co);
     int sp_dragonodem(struct castorder * co);
     int sp_reduceshield(struct castorder * co);
-    int sp_armorshield(struct castorder * co);
     int sp_stun(struct castorder * co);
     int sp_undeadhero(struct castorder * co);
     int sp_immolation(struct castorder * co);

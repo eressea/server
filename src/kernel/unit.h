@@ -86,7 +86,7 @@ typedef struct unit {
     struct attrib* attribs;
     status_t status;
     int n;                      /* helper temporary variable, used in economy, enno: attribut? */
-    int wants;                  /* enno: attribut? */
+    int wants;                  /* enno: attribut, econ_request.qty? */
 } unit;
 
 extern struct attrib_type at_creator;

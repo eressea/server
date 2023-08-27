@@ -285,6 +285,7 @@ set(TESTS_SRC
   sort.test.c
   spells.test.c
   spy.test.c
+  steal.test.c
   study.test.c
   summary.test.c
   teleport.test.c

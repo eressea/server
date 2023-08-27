@@ -42,11 +42,11 @@
 #include <util/password.h>
 #include <util/path.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/variant.h>
 
 #include <selist.h>
 #include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>

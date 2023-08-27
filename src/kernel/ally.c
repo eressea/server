@@ -11,10 +11,10 @@
 #include "objtypes.h"
 
 #include <kernel/attrib.h>
-#include <util/strings.h>
 #include <kernel/gamedata.h>
 
 #include <storage.h>
+#include <strings.h>
 
 #include <assert.h>
 #include <string.h>

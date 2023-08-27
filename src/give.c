@@ -1029,7 +1029,7 @@ static int reserve_i(unit* u, struct order* ord, int flags)
 {
     if (u->number > 0) {
         char token[128];
-        int use, count;
+        int use, count, res;
         const item_type* itype;
         const char* s;
         param_t p = NOPARAM;
@@ -1048,6 +1048,7 @@ static int reserve_i(unit* u, struct order* ord, int flags)
         if (itype == NULL)
             return 0;
 
+        res = get_reservation(u, itype);
         set_resvalue(u, itype, 0);      /* make sure the pool is empty */
 
         if (p == P_ANY) {
@@ -1056,7 +1057,8 @@ static int reserve_i(unit* u, struct order* ord, int flags)
         if (count > 0) {
             use = use_pooled(u, itype->rtype, flags, count);
             if (use) {
-                set_resvalue(u, itype, use);
+                if (use > res) res = use;
+                set_resvalue(u, itype, res);
                 change_resource(u, itype->rtype, use);
                 return use;
             }

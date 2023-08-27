@@ -26,11 +26,11 @@
 #include <util/base36.h>
 #include <util/password.h>
 #include <util/path.h>
-#include <util/strings.h>
 
+#include <memstream.h>
 #include <storage.h>
 #include <stream.h>
-#include <memstream.h>
+#include <strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

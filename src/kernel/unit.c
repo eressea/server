@@ -43,10 +43,10 @@
 #include <util/rand.h>
 #include <util/resolve.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/variant.h>
 
 #include <storage.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 

@@ -28,12 +28,12 @@
 #include <util/param.h>
 #include <util/parser.h>
 #include <util/rng.h>
-#include <util/strings.h>
 #include <util/umlaut.h>
 
-#include <storage.h>
-#include <selist.h>
 #include <critbit.h>
+#include <selist.h>
+#include <storage.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 
@@ -226,8 +226,8 @@ static int newshipid(void) {
 
 ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
 {
-    static char buffer[32];
     ship *sh = (ship *)calloc(1, sizeof(ship));
+    const char* sname;
 
     if (!sh) abort();
     assert(stype);
@@ -237,8 +237,17 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     sh->region = r;
     sh->number = 1;
 
-    snprintf(buffer, sizeof(buffer), "%s %s", param_name(P_SHIP, lang), itoa36(sh->no));
-    sh->name = str_strdup(buffer);
+    if (lang) {
+        sname = LOC(lang, stype->_name);
+        if (!sname) {
+            sname = param_name(P_SHIP, lang);
+        }
+    }
+    else {
+        sname = param_name(P_SHIP, NULL);
+    }
+    assert(sname);
+    sh->name = str_strdup(sname);
     shash(sh);
     if (r) {
         addlist(&r->ships, sh);

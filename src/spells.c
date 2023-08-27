@@ -69,14 +69,14 @@
 #include <util/rand.h>
 #include <util/log.h>
 #include <util/nrmessage.h>
-#include <util/strings.h>
 #include <util/variant.h>
 #include <util/goodies.h>
 #include <util/resolve.h>
 #include <util/rng.h>
 
-#include <storage.h>
 #include <stb_ds.h>
+#include <storage.h>
+#include <strings.h>
 
 /* libc includes */
 #include <assert.h>
@@ -385,10 +385,10 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
         if (!c || c == c1) {
             double remain = destr_curse(c1, cast_level, force);
             if (remain < force) {
-                succ = cast_level;
                 force = remain;
             }
             if (c1->vigour <= 0) {
+                ++succ;
                 a_remove(alist, a);
             }
         }
@@ -602,11 +602,10 @@ static unit * make_familiar(unit * mage, region *r, const race *rc, const char *
     return fam;
 }
 
-static int sp_summon_familiar(castorder * co)
+int sp_summon_familiar(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     const race *rc;
     message *msg;
     char zText[2048];
@@ -616,7 +615,7 @@ static int sp_summon_familiar(castorder * co)
         cmistake(caster, co->order, 199, MSG_MAGIC);
         return 0;
     }
-    rc = select_familiar(caster->_race, cast_level, caster->faction->magiegebiet);
+    rc = select_familiar(caster->_race, (int)co->force, caster->faction->magiegebiet);
     if (rc == NULL) {
         log_error("could not find suitable familiar for %s.\n", unitname(caster));
         return 0;
@@ -655,7 +654,7 @@ static int sp_summon_familiar(castorder * co)
     report_race_skills(rc, caster->faction->locale, &sbs);
     ADDMSG(&caster->faction->msgs, msg_message("familiar_describe",
         "mage race skills", caster, rc, zText));
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -671,10 +670,9 @@ static int sp_summon_familiar(castorder * co)
  * Flag:
  *  (FARCASTING|SPELLLEVEL|ONSHIPCAST|TESTCANSEE)
  * */
-static int sp_destroy_magic(castorder * co)
+int sp_destroy_magic(castorder * co)
 {
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
     curse *c = NULL;
@@ -686,6 +684,14 @@ static int sp_destroy_magic(castorder * co)
     /* da jeder Zauber force verbraucht und der Zauber auf alles und nicht
      * nur einen Spruch wirken soll, wird die Wirkung hier verstaerkt */
     force *= 4;
+
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (pa->param[0]->flag == TARGET_RESISTS)
+        return co->level;
+
+    if (pa->param[0]->flag == TARGET_NOTFOUND)
+        return 0;
 
     /* Objekt ermitteln */
     obj = pa->param[0]->typ;
@@ -728,9 +734,9 @@ static int sp_destroy_magic(castorder * co)
         return 0;
     }
 
-    succ = break_curse(ap, cast_level, force, c);
+    succ = break_curse(ap, co->level, force, c);
 
-    if (succ) {
+    if (succ > 0) {
         ADDMSG(&caster->faction->msgs, msg_message("destroy_magic_effect",
             "unit region command succ target", caster, caster->region, co->order, succ,
             ts));
@@ -740,8 +746,7 @@ static int sp_destroy_magic(castorder * co)
             "unit region command", caster, caster->region, co->order));
     }
 
-    if (succ < 1) succ = 1;
-    return succ;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -843,13 +848,10 @@ static int sp_transferaura(castorder * co)
  * (SHIPSPELL|ONSHIPCAST|SPELLLEVEL|TESTRESISTANCE)
  */
 
-static int sp_goodwinds(castorder * co)
+int sp_goodwinds(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double power = co->force;
-    int duration = cast_level + 1;
     spellparameter *pa = co->par;
     message *m;
     ship *sh;
@@ -858,7 +860,7 @@ static int sp_goodwinds(castorder * co)
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return cast_level;
+        return co->level;
     
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
@@ -872,8 +874,8 @@ static int sp_goodwinds(castorder * co)
 
     /* keine Probleme mit C_SHIP_SPEEDUP und C_SHIP_FLYING */
     /* NODRIFT bewirkt auch +1 Geschwindigkeit */
-    create_curse(caster, &sh->attribs, &ct_nodrift, power, duration,
-        zero_effect, 0);
+    create_curse(caster, &sh->attribs, &ct_nodrift, co->force,
+        co->level + 1, zero_effect, 0);
 
     /* melden, 1x pro Partei */
     freset(caster->faction, FFL_SELECT);
@@ -893,7 +895,7 @@ static int sp_goodwinds(castorder * co)
     }
     msg_release(m);
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -908,7 +910,7 @@ static int sp_goodwinds(castorder * co)
  * Flags:
  * (FARCASTING|SPELLLEVEL|REGIONSPELL|ONSHIPCAST|TESTRESISTANCE)
  */
-static int sp_magicstreet(castorder * co)
+int sp_magicstreet(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -949,12 +951,10 @@ static int sp_magicstreet(castorder * co)
  * Flags:
  * (SPELLLEVEL)
  */
-static int sp_summonent(castorder * co)
+int sp_summonent(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double power = co->force;
     unit *u;
     attrib *a;
     int ents, p2;
@@ -966,7 +966,7 @@ static int sp_summonent(castorder * co)
     }
 
     ents = rtrees(r, 2);
-    p2 = (int)(power * power);
+    p2 = (int)(co->force * co->force);
     if (ents > p2) ents = p2;
 
     u = create_unit(r, caster->faction, ents, get_race(RC_TREEMAN), 0, NULL, caster);
@@ -987,7 +987,7 @@ static int sp_summonent(castorder * co)
         msg_release(unseen);
         msg_release(seen);
     }
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1004,7 +1004,7 @@ static int sp_summonent(castorder * co)
  * (BUILDINGSPELL)
  *
  */
-static int sp_blessstonecircle(castorder * co)
+int sp_blessstonecircle(castorder * co)
 {
     building *b;
     region *r = co_get_region(co);
@@ -1059,13 +1059,11 @@ static int sp_blessstonecircle(castorder * co)
  * Flags:
  * (OCEANCASTABLE | ONSHIPCAST | REGIONSPELL | TESTRESISTANCE)
  */
-static int sp_maelstrom(castorder * co)
+int sp_maelstrom(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     curse *c;
-    int duration = (int)co->force + 1;
 
     if (!fval(r->terrain, SEA_REGION)) {
         cmistake(caster, co->order, 205, MSG_MAGIC);
@@ -1076,7 +1074,8 @@ static int sp_maelstrom(castorder * co)
     /* Attribut auf Region.
      * Existiert schon ein curse, so wird dieser verstaerkt
      * (Max(Dauer), Max(Staerke))*/
-    c = create_curse(caster, &r->attribs, &ct_maelstrom, co->force, duration, co->force, 0);
+    c = create_curse(caster, &r->attribs, &ct_maelstrom, co->force,
+        co->level + 1, co->force, 0);
 
     /* melden, 1x pro Partei */
     if (c) {
@@ -1087,7 +1086,7 @@ static int sp_maelstrom(castorder * co)
         msg_release(unseen);
     }
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1146,19 +1145,21 @@ static int sp_mallorn(castorder * co)
  * Flags:
  * (FARCASTING | SPELLLEVEL | ONSHIPCAST | REGIONSPELL)
  */
-static int sp_blessedharvest(castorder * co)
+int sp_blessedharvest(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    int duration = (int)co->force + 1;
     /* Attribut auf Region.
      * Existiert schon ein curse, so wird dieser verstaerkt
      * (Max(Dauer), Max(Staerke))*/
 
     if (create_curse(caster, &r->attribs, &ct_blessedharvest, co->force,
-        duration, 1.0, 0)) {
-        const char * effect = co->sp->sname[0] == 'b' ? "harvest_effect" : "raindance_effect";
+        co->level + 1, 1.0, 0)) {
+        const char* effect = "harvest_effect";
+        // HACK: same function for harvest and raindance, different message:
+        if (co->sp && co->sp->sname && co->sp->sname[0] != 'b') {
+            effect = "raindance_effect";
+        }
         message *seen = msg_message(effect, "mage", caster);
         message *unseen = msg_message(effect, "mage", (unit *)NULL);
         report_effect(r, caster, seen, unseen);
@@ -1166,7 +1167,7 @@ static int sp_blessedharvest(castorder * co)
         msg_release(unseen);
     }
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1305,81 +1306,85 @@ static void fumble_ents(const castorder * co)
  */
  /* Syntax: ZAUBER [REGION x y] [STUFE 2] "Rosthauch" 1111 2222 3333 */
 
-typedef struct iron_weapon {
-    const struct item_type *type;
-    const struct item_type *rusty;
+static struct iron_weapon {
     float chance;
-    struct iron_weapon *next;
-} iron_weapon;
+    union {
+        const char *name;
+        const struct item_type *type;
+    } weapon;
+    union {
+        const char *name;
+        const struct item_type *type;
+    } rusty;
+} ironweapons[] = {
+    { 1.0f, {.name = "sword" }, {.name = "rustysword"} },
+    { 1.0f, {.name = "axe" }, {.name = "rustyaxe" } },
+    { 1.0f, {.name = "greatsword" }, {.name = "rustygreatsword" }},
+    { 0.5f, {.name = "halberd" }, {.name = "rustyhalberd" } },
+    { 0.5f, {.name = "shield" }, {.name = "rustyshield" } },
+    { 0.2f, {.name = "chainmail"}, {.name = "rustychainmail" }},
+    { 0.0f, {.name = NULL}, { .name = NULL} }
+};
 
-static iron_weapon *ironweapons = NULL;
-
-void
-add_ironweapon(const struct item_type *type, const struct item_type *rusty,
-    float chance)
+void init_spells(void)
 {
-    iron_weapon *iweapon = malloc(sizeof(iron_weapon));
-    assert(iweapon);
-    iweapon->type = type;
-    iweapon->rusty = rusty;
-    iweapon->chance = chance;
-    iweapon->next = ironweapons;
-    ironweapons = iweapon;
+    int i, n = 0;
+    for (i = 0; ironweapons[i].weapon.name; ++i) {
+        struct iron_weapon *iweapon = ironweapons + i;
+        const item_type *itype = it_find(iweapon->weapon.name);
+        if (itype) {
+            ironweapons[n].weapon.type = itype;
+            ironweapons[n].chance = iweapon->chance;
+            ironweapons[n].rusty.type = it_find(iweapon->rusty.name);
+            ++n;
+        }
+    }
+    ironweapons[n].weapon.name = NULL;
+    ironweapons[n].chance = 0.0f;
 }
 
-static int sp_rosthauch(castorder * co)
+int sp_rosthauch(castorder * co)
 {
     int n;
-    int success = 0;
+    bool success = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    int force = (int)co->force;
+    int force;
     spellparameter *pa = co->par;
 
-    if (ironweapons == NULL) {
-        add_ironweapon(it_find("sword"), it_find("rustysword"), 1.0);
-        add_ironweapon(it_find("axe"), it_find("rustyaxe"), 1.0);
-        add_ironweapon(it_find("greatsword"), it_find("rustygreatsword"), 1.0);
-        add_ironweapon(it_find("halberd"), it_find("rustyhalberd"), 0.5f);
-        add_ironweapon(it_find("shield"), it_find("rustyshield"), 0.5f);
-        add_ironweapon(it_find("chainmail"), it_find("rustychainmail"), 0.2f);
-    }
-
-    if (force > 0) {
-        force = rng_int() % ((int)(force * 10)) + force;
-    }
+    force = (1 + (rng_int() & 1)) * 6 * (int)co->force;
     /* fuer jede Einheit */
-    for (n = 0; n < pa->length; n++) {
+    for (n = 0; n < pa->length && force > 0; n++) {
         unit *u = pa->param[n]->data.u;
         int ironweapon = 0;
-        iron_weapon *iweapon = ironweapons;
+        int i;
 
-        if (force <= 0)
-            break;
+        if (pa->param[n]->flag == TARGET_NOTFOUND)
+            continue;
+        success = true;
         if (pa->param[n]->flag)
             continue;
 
-        for (; iweapon != NULL; iweapon = iweapon->next) {
-            item **ip = i_find(&u->items, iweapon->type);
+        for (i = 0; force > 0 && ironweapons[i].weapon.type; ++i) {
+            struct iron_weapon *iweapon = ironweapons + i;
+            item **ip = i_find(&u->items, iweapon->weapon.type);
             if (*ip) {
-                double chance = (*ip)->number;
-                if (chance > force) chance = force;
+                item *it = *ip;
+                double change = (it->number > force) ? force : it->number;
                 if (iweapon->chance < 1.0) {
-                    chance *= iweapon->chance;
+                    change *= iweapon->chance;
                 }
-                if (chance > 0) {
-                    int ichange = (int)chance;
+                if (change > 0) {
+                    int ichange = (int)change;
                     force -= ichange;
                     ironweapon += ichange;
-                    i_change(ip, iweapon->type, -ichange);
-                    if (iweapon->rusty) {
-                        i_change(&u->items, iweapon->rusty, ichange);
+                    i_change(ip, iweapon->weapon.type, -ichange);
+                    if (iweapon->rusty.type) {
+                        i_change(&u->items, iweapon->rusty.type, ichange);
                     }
                 }
             }
-            if (force <= 0)
-                break;
         }
 
         if (ironweapon > 0) {
@@ -1390,7 +1395,6 @@ static int sp_rosthauch(castorder * co)
             ADDMSG(&u->faction->msgs, msg_message("rust_effect",
                 "mage target amount",
                 cansee(u->faction, r, caster, 0) ? caster : NULL, u, ironweapon));
-            success += ironweapon;
         }
         else {
             /* {$mage mage} legt einen Rosthauch auf {target}, doch der
@@ -1403,7 +1407,7 @@ static int sp_rosthauch(castorder * co)
      * unguenstigsten Fall kann pro Stufe nur eine Waffe verzaubert werden,
      * darum wird hier nur fuer alle Faelle in denen noch weniger Waffen
      * betroffen wurden ein Kostennachlass gegeben */
-    return (success < cast_level) ? success : cast_level;
+    return success ? cast_level : 0;
 }
 
 /* ------------------------------------------------------------- */
@@ -1424,21 +1428,15 @@ static int sp_rosthauch(castorder * co)
  */
  /* Syntax: ZAUBER [STUFE n] "Kaelteschutz" eh1 [eh2 [eh3 [...]]] */
 
-static int sp_kaelteschutz(castorder * co)
+int sp_kaelteschutz(castorder * co)
 {
     unit *u;
-    int n, i = 0;
+    int n, cost = 0;
     int men;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     double force = co->force;
-    double effect;
     spellparameter *pa = co->par;
-    int duration = (int)force;
-
-    if (duration < cast_level) duration = cast_level;
-    ++duration;
 
     force *= 10;                  /* 10 Personen pro Force-Punkt */
 
@@ -1447,32 +1445,34 @@ static int sp_kaelteschutz(castorder * co)
         if (force < 1)
             break;
 
-        if (pa->param[n]->flag)
+        if (pa->param[n]->flag == TARGET_NOTFOUND)
             continue;
 
-        u = pa->param[n]->data.u;
+        if (pa->param[n]->flag == 0)
+        {
+            u = pa->param[n]->data.u;
 
-        if (force < u->number) {
-            men = (int)force;
+            if (force < u->number) {
+                men = (int)force;
+            }
+            else {
+                men = u->number;
+            }
+
+            create_curse(caster, &u->attribs, &ct_insectfur, co->force,
+                co->level + 1, zero_effect, men);
+
+            force -= u->number;
+            ADDMSG(&caster->faction->msgs, msg_message("heat_effect", "mage target", caster,
+                u));
+            if (u->faction != caster->faction)
+                ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
+                    cansee(u->faction, r, caster, 0) ? caster : NULL, u));
         }
-        else {
-            men = u->number;
-        }
-
-        effect = 1;
-        create_curse(caster, &u->attribs, &ct_insectfur, (float)cast_level,
-            duration, effect, men);
-
-        force -= u->number;
-        ADDMSG(&caster->faction->msgs, msg_message("heat_effect", "mage target", caster,
-            u));
-        if (u->faction != caster->faction)
-            ADDMSG(&u->faction->msgs, msg_message("heat_effect", "mage target",
-                cansee(u->faction, r, caster, 0) ? caster : NULL, u));
-        i = cast_level;
+        cost = co->level;
     }
     /* Erstattung? */
-    return i;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
@@ -1490,37 +1490,34 @@ static int sp_kaelteschutz(castorder * co)
  */
  /* Syntax: ZAUBER "Funkenregen" eh1 */
 
-static int sp_sparkle(castorder * co)
+int sp_sparkle(castorder * co)
 {
     unit *u;
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
     spellparameter *pa = co->par;
-    int duration = cast_level + 1;
-    double effect;
+    int duration = co->level + 1;
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return cast_level;
+        return co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
         return 0;
 
     u = pa->param[0]->data.u;
-    effect = (float)(rng_int() % 0xffffff);
-    create_curse(caster, &u->attribs, &ct_sparkle, (float)cast_level,
-        duration, effect, u->number);
+    create_curse(caster, &u->attribs, &ct_sparkle, co->force,
+        duration, (double)(rng_int() % 0xffffff), u->number);
 
     ADDMSG(&caster->faction->msgs, msg_message("sparkle_effect", "mage target",
         caster, u));
     if (u->faction != caster->faction) {
-        ADDMSG(&u->faction->msgs, msg_message("sparkle_effect", "mage target", caster,
-            u));
+        ADDMSG(&u->faction->msgs, msg_message("sparkle_effect", "mage target",
+            caster, u));
     }
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1659,6 +1656,39 @@ static int sp_create_stonegolem(castorder * co)
     return cast_level;
 }
 
+static void drought(unit *u, region *r, double vigour, int duration)
+{
+    curse *c;
+    message *msg;
+
+    report_spell(u, r, msg = msg_message("drought_effect", "mage region", u, r));
+    msg_release(msg);
+
+    /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
+     * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
+     * Auswirkungen.
+     */
+    c = get_curse(r->attribs, &ct_drought);
+    if (c) {
+        if (c->vigour < vigour) {
+            c->vigour = vigour;
+        }
+        if (c->duration < duration) {
+            c->duration = duration;
+        }
+    }
+    else {
+        /* Baeume und Pferde sterben */
+        rsettrees(r, 2, rtrees(r, 2) / 2);
+        rsettrees(r, 1, rtrees(r, 1) / 2);
+        rsettrees(r, 0, rtrees(r, 0) / 2);
+        rsethorses(r, rhorses(r) / 2);
+
+        create_curse(u, &r->attribs, &ct_drought,
+            vigour, duration, 4.0, 0);
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* Name:       Grosse Duerre
  * Stufe:      17
@@ -1678,16 +1708,14 @@ static int sp_create_stonegolem(castorder * co)
  * (FARCASTING | REGIONSPELL | TESTRESISTANCE)
  */
 
-static int sp_great_drought(castorder * co)
+int sp_great_drought(castorder * co)
 {
     unit *u;
     bool terraform = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double force = co->force;
-    int duration = 2;
-    double effect;
+    const char *mtype = "drought_no_terraform";
+    int roll_d200 = rng_int() % 200;
 
     if (fval(r->terrain, SEA_REGION)) {
         cmistake(caster, co->order, 189, MSG_MAGIC);
@@ -1695,46 +1723,22 @@ static int sp_great_drought(castorder * co)
         return 0;
     }
 
-    /* sterben */
-    rsetpeasants(r, rpeasants(r) / 2);    /* evtl wuerfeln */
-    rsettrees(r, 2, rtrees(r, 2) / 2);
-    rsettrees(r, 1, rtrees(r, 1) / 2);
-    rsettrees(r, 0, rtrees(r, 0) / 2);
-    rsethorses(r, rhorses(r) / 2);
+    drought(caster, r, co->force, 2);
 
-    /* Arbeitslohn = 1/4 */
-    effect = 4.0;                 /* curses: higher is stronger */
-    create_curse(caster, &r->attribs, &ct_drought, force, duration, effect,
-        0);
+    /* 25% chance of terraforming */
+    if (roll_d200 < 50) {
+        terraform = false;
 
-    /* terraforming */
-    if (rng_int() % 100 < 25) {
-        terraform = true;
-
-        switch (rterrain(r)) {
-        case T_PLAIN:
-            /* rsetterrain(r, T_GRASSLAND); */
-            destroy_all_roads(r);
-            break;
-
-        case T_SWAMP:
-            /* rsetterrain(r, T_GRASSLAND); */
-            destroy_all_roads(r);
-            break;
-            /*
-                  case T_GRASSLAND:
-                  rsetterrain(r, T_DESERT);
-                  destroy_all_roads(r);
-                  break;
-                  */
-        case T_GLACIER:
-            if (rng_int() % 100 < 50) {
+        if (rterrain(r) == T_GLACIER) {
+            terraform = true;
+            /* 50% chance of becoming either ocean or swamp */
+            if (roll_d200 < 25) {
                 rsetterrain(r, T_SWAMP);
-                destroy_all_roads(r);
+                mtype = "drought_glacier_to_swamp";
             }
             else {                /* Ozean */
-                destroy_all_roads(r);
                 rsetterrain(r, T_OCEAN);
+                mtype = "drought_glacier_to_ocean";
                 /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
                 for (u = r->units; u; u = u->next) {
                     if (!u->ship) {
@@ -1745,28 +1749,15 @@ static int sp_great_drought(castorder * co)
                     remove_building(&r->buildings, r->buildings);
                 }
             }
-            break;
-
-        default:
-            terraform = false;
-            break;
+        }
+        if (terraform) {
+            destroy_all_roads(r);
         }
     }
-
     if (!fval(r->terrain, SEA_REGION)) {
         /* not destroying the region, so it should be safe to make this a local
          * message */
         message *msg;
-        const char *mtype;
-        if (r->terrain == newterrain(T_SWAMP) && terraform) {
-            mtype = "drought_effect_1";
-        }
-        else if (!terraform) {
-            mtype = "drought_effect_2";
-        }
-        else {
-            mtype = "drought_effect_3";
-        }
         msg = msg_message(mtype, "mage region", caster, r);
         add_message(&r->msgs, msg);
         msg_release(msg);
@@ -1774,7 +1765,7 @@ static int sp_great_drought(castorder * co)
     else {
         /* possible that all units here get killed so better to inform with a global
          * message */
-        message *msg = msg_message("drought_effect_4", "mage region", caster, r);
+        message *msg = msg_message("drought_to_ocean_global", "mage region", caster, r);
         for (u = r->units; u; u = u->next)
             freset(u->faction, FFL_SELECT);
         for (u = r->units; u; u = u->next) {
@@ -1788,7 +1779,7 @@ static int sp_great_drought(castorder * co)
         }
         msg_release(msg);
     }
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -1807,12 +1798,11 @@ static int sp_great_drought(castorder * co)
  * Flags:
  * (UNITSPELL | SPELLLEVEL | TESTCANSEE)
  */
-static int sp_treewalkenter(castorder * co)
+int sp_treewalkenter(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     spellparameter *pa = co->par;
-    double power = co->force;
     int cast_level = co->level;
     region *rt;
     int remaining_cap;
@@ -1837,7 +1827,7 @@ static int sp_treewalkenter(castorder * co)
         return 0;
     }
 
-    remaining_cap = (int)(power * 500);
+    remaining_cap = (int)(co->force * 500);
 
     /* fuer jede Einheit */
     for (n = 0; n < pa->length; n++) {
@@ -1896,16 +1886,15 @@ static int sp_treewalkenter(castorder * co)
  * Flags:
  * (UNITSPELL|SPELLLEVEL)
  */
-static int sp_treewalkexit(castorder * co)
+int sp_treewalkexit(castorder * co)
 {
     region *rt;
     unit *u;
     int remaining_cap;
     int n;
-    int erfolg = 0;
+    int cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    double power = co->force;
     spellparameter *pa = co->par;
     int cast_level = co->level;
 
@@ -1920,7 +1909,7 @@ static int sp_treewalkexit(castorder * co)
         return 0;
     }
 
-    remaining_cap = (int)(power * 500);
+    remaining_cap = (int)(co->force * 500);
 
     if (pa->param[0]->typ != SPP_REGION) {
         report_failure(caster, co->order);
@@ -1940,21 +1929,30 @@ static int sp_treewalkexit(castorder * co)
         return 0;
     }
 
+    if (pa->param[0]->flag == TARGET_RESISTS) {
+        /* target region resists the magical invasion */
+        return co->level;
+    }
+
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < pa->length; n++) {
-        if (pa->param[n]->flag)
+        if (pa->param[n]->flag == TARGET_NOTFOUND) {
             continue;
-
+        }
         u = pa->param[n]->data.u;
 
-        if (!ucontact(u, caster)) {
-            ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
-                "feedback_no_contact", "target", u));
+        if (!can_survive(u, rt)) {
+            cmistake(caster, co->order, 231, MSG_MAGIC);
         }
         else {
             int w = weight(u);
-            if (!can_survive(u, rt)) {
-                cmistake(caster, co->order, 231, MSG_MAGIC);
+
+            if (pa->param[n]->flag == TARGET_RESISTS) {
+                cost = cast_level;
+            }
+            else if (!ucontact(u, caster)) {
+                ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
+                    "feedback_no_contact", "target", u));
             }
             else if (remaining_cap - w < 0) {
                 ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
@@ -1963,7 +1961,7 @@ static int sp_treewalkexit(castorder * co)
             else {
                 remaining_cap = remaining_cap - w;
                 move_unit(u, rt, NULL);
-                erfolg = cast_level;
+                cost = cast_level;
 
                 /* Meldungen in der Ausgangsregion */
                 astral_disappear(r, u);
@@ -1973,7 +1971,7 @@ static int sp_treewalkexit(castorder * co)
             }
         }
     }
-    return erfolg;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
@@ -1988,17 +1986,16 @@ static int sp_treewalkexit(castorder * co)
  * ZAUBER "Heiliger Boden"
  * Flags: (0)
  */
-static int sp_holyground(castorder * co)
+int sp_holyground(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
-    double power = co->force;
-    message *msg = msg_message("sp_holyground_effect", "mage region", caster, r);
+    message *msg = msg_message("holyground_effect", "mage region", caster, r);
     report_spell(caster, r, msg);
     msg_release(msg);
 
-    create_curse(caster, &r->attribs, &ct_holyground, power * power, 1, zero_effect, 0);
+    create_curse(caster, &r->attribs, &ct_holyground, co->force * co->force, 1, zero_effect, 0);
 
     a_removeall(&r->attribs, &at_deathcount);
 
@@ -2077,15 +2074,10 @@ static int sp_homestone(castorder * co)
  * Flags:
  * (FARCASTING|REGIONSPELL|TESTRESISTANCE),
  */
-static int sp_drought(castorder * co)
+int sp_drought(castorder * co)
 {
-    curse *c;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double power = co->force;
-    int duration = (int)power + 1;
-    message *msg;
 
     if (fval(r->terrain, SEA_REGION)) {
         cmistake(caster, co->order, 189, MSG_MAGIC);
@@ -2093,32 +2085,8 @@ static int sp_drought(castorder * co)
         return 0;
     }
 
-    /* melden, 1x pro Partei */
-    msg = msg_message("sp_drought_effect", "mage region", caster, r);
-    report_spell(caster, r, msg);
-    msg_release(msg);
-
-    /* Wenn schon Duerre herrscht, dann setzen wir nur den Power-Level
-     * hoch (evtl dauert dann die Duerre laenger).  Ansonsten volle
-     * Auswirkungen.
-     */
-    c = get_curse(r->attribs, &ct_drought);
-    if (c) {
-        c->vigour = fmax(c->vigour, power);
-        if (c->duration < (int)power) c->duration = (int)power;
-    }
-    else {
-        double effect = 4.0;
-        /* Baeume und Pferde sterben */
-        rsettrees(r, 2, rtrees(r, 2) / 2);
-        rsettrees(r, 1, rtrees(r, 1) / 2);
-        rsettrees(r, 0, rtrees(r, 0) / 2);
-        rsethorses(r, rhorses(r) / 2);
-
-        create_curse(caster, &r->attribs, &ct_drought, power, duration, effect,
-            0);
-    }
-    return cast_level;
+    drought(caster, r, co->force, co->level);
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -2197,16 +2165,15 @@ static int sp_ironkeeper(castorder * co)
  *  (SHIPSPELL|ONSHIPCAST|OCEANCASTABLE|TESTRESISTANCE)
  */
 
-static int sp_stormwinds(castorder * co)
+int sp_stormwinds(castorder * co)
 {
     ship *sh;
     unit *u;
-    int erfolg = 0;
+    int erfolg = 0, cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
-    double power = co->force;
     spellparameter *pa = co->par;
-    int n, force = (int)power;
+    int n, max_targets = (int)co->force;
     message *m = NULL;
 
     /* melden vorbereiten */
@@ -2214,13 +2181,15 @@ static int sp_stormwinds(castorder * co)
     for (u = r->units; u; u = u->next)
         freset(u->faction, FFL_SELECT);
 
-    for (n = 0; n < pa->length; n++) {
-        if (force <= 0)
-            break;
-
-        if (pa->param[n]->flag)
+    for (n = 0; n < pa->length && max_targets > 0; n++) {
+        if (pa->param[n]->flag == TARGET_NOTFOUND) {
             continue;
-
+        }
+        --max_targets;
+        if (pa->param[n]->flag == TARGET_RESISTS) {
+            cost = co->level;
+            continue;
+        }
         sh = pa->param[n]->data.sh;
 
         if (sh->number > 1) {
@@ -2239,12 +2208,12 @@ static int sp_stormwinds(castorder * co)
         }
 
         /* Duration = 1, nur diese Runde */
-        create_curse(caster, &sh->attribs, &ct_stormwind, power, 1,
+        create_curse(caster, &sh->attribs, &ct_stormwind, co->force, 1,
             zero_effect, 0);
         /* Da der Spruch nur diese Runde wirkt wird er nie im Report
          * erscheinen */
-        erfolg++;
-        force--;
+        ++erfolg;
+        cost = co->level;
 
         /* melden vorbereiten: */
         for (u = r->units; u; u = u->next) {
@@ -2273,7 +2242,7 @@ static int sp_stormwinds(castorder * co)
     }
     if (m)
         msg_release(m);
-    return erfolg;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
@@ -2475,21 +2444,18 @@ static int sp_forest_fire(castorder * co)
  *  (UNITSPELL | SPELLLEVEL | TESTCANSEE | TESTRESISTANCE)
  *
  */
-static int sp_fumblecurse(castorder * co)
+int sp_fumblecurse(castorder * co)
 {
     unit *target;
     int duration;
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double force = co->force;
-    double effect;
+    spellparameter* pa = co->par;
     curse *c;
-    spellparameter *pa = co->par;
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return cast_level;
+        return co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
@@ -2497,16 +2463,15 @@ static int sp_fumblecurse(castorder * co)
 
     target = pa->param[0]->data.u;
 
-    duration = cast_level - effskill(target, SK_MAGIC, NULL);
+    duration = co->level - effskill(target, SK_MAGIC, NULL);
     if (duration < 2) {
         int rx = rng_int() % 3;
         if (duration < rx) duration = rx;
     }
     ++duration;
 
-    effect = force / 2;
     c = create_curse(caster, &target->attribs, &ct_fumble,
-        force, duration, effect, 0);
+        co->force, duration, co->force / 2, 0);
     if (c == NULL) {
         report_failure(caster, co->order);
         return 0;
@@ -2515,21 +2480,16 @@ static int sp_fumblecurse(castorder * co)
     ADDMSG(&target->faction->msgs, msg_message("fumblecurse", "unit region",
         target, target->region));
 
-    return cast_level;
+    return co->level;
 }
 
 static void patzer_fumblecurse(const castorder * co)
 {
     unit *mage = co_get_magician(co);
-    int cast_level = co->level;
-    double force = co->force;
-    int duration = (cast_level / 2) + 1;
-    double effect;
     curse *c;
 
-    effect = force / 2;
-    c = create_curse(mage, &mage->attribs, &ct_fumble, force,
-        duration, effect, 0);
+    c = create_curse(mage, &mage->attribs, &ct_fumble, co->force,
+        (co->level + 1) / 2, co->force / 2, 0);
     if (c != NULL) {
         ADDMSG(&mage->faction->msgs, msg_message("magic_fumble",
             "unit region command", mage, mage->region, co->order));
@@ -2838,19 +2798,15 @@ static int dc_age(struct curse *c)
     return AT_AGE_KEEP;
 }
 
-static struct curse_type ct_deathcloud = {
+const struct curse_type ct_deathcloud = {
     "deathcloud", CURSETYP_REGION, 0, NO_MERGE, cinfo_simple, NULL, NULL, NULL,
     NULL, dc_age
 };
 
 static curse *mk_deathcloud(unit * mage, region * r, double force, int duration)
 {
-    double effect;
-    curse *c;
-
-    effect = force / 2;
-    c =
-        create_curse(mage, &r->attribs, &ct_deathcloud, force, duration, effect, 0);
+    curse *c = create_curse(mage, &r->attribs, &ct_deathcloud,
+        force, duration, force / 2, 0);
     c->data.v = r;
     return c;
 }
@@ -2898,7 +2854,7 @@ static int dc_read_compat(variant *var, void *target, gamedata *data)
 *   (FARCASTING | REGIONSPELL | TESTRESISTANCE)
 */
 
-static int sp_deathcloud(castorder * co)
+int sp_deathcloud(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -3121,13 +3077,10 @@ static int sp_chaossuction(castorder * co)
  *  (ONSHIPCAST)
  */
 
-static int sp_magicboost(castorder * co)
+int sp_magicboost(castorder * co)
 {
     curse *c;
     unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double power = co->force;
-    double effect;
     trigger *tsummon;
 
     /* fehler, wenn schon ein boost */
@@ -3136,20 +3089,19 @@ static int sp_magicboost(castorder * co)
         return 0;
     }
 
-    effect = 6;
-    create_curse(caster, &caster->attribs, &ct_magicboost, power, 10, effect, 1);
+    create_curse(caster, &caster->attribs, &ct_magicboost, co->force, 10, 6.0, 1);
+
     /* one aura boost with 200% aura now: */
-    effect = 200;
-    c = create_curse(caster, &caster->attribs, &ct_auraboost, power, 4, effect, 1);
+    c = create_curse(caster, &caster->attribs, &ct_auraboost, co->force, 4, 200.0, 1);
 
     /* and one aura boost with 50% aura in 5 weeks: */
-    tsummon = trigger_createcurse(caster, caster, &ct_auraboost, power, 6, 50, 1);
+    tsummon = trigger_createcurse(caster, caster, &ct_auraboost, co->force, 6, 50.0, 1);
     add_trigger(&caster->attribs, "timer", trigger_timeout(5, tsummon));
 
     ADDMSG(&caster->faction->msgs, msg_message("magicboost_effect",
         "unit region command", c->magician, caster->region, co->order));
 
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -3210,7 +3162,7 @@ static int sp_bloodsacrifice(castorder * co)
     caster->hp++;
     change_spellpoints(caster, aura);
     ADDMSG(&caster->faction->msgs,
-        msg_message("sp_bloodsacrifice_effect",
+        msg_message("bloodsacrifice_effect",
             "unit region command amount", caster, caster->region, co->order, aura));
     return cast_level;
 }
@@ -3725,7 +3677,7 @@ static int sp_raisepeasantmob(castorder * co)
     create_curse(mage, &r->attribs, &ct_riotzone, (float)cast_level, duration,
         (float)anteil, 0);
 
-    msg = msg_message("sp_raisepeasantmob_effect", "mage region", mage, r);
+    msg = msg_message("raisepeasantmob_effect", "mage region", mage, r);
     report_spell(mage, r, msg);
     msg_release(msg);
 
@@ -3743,24 +3695,23 @@ static int sp_raisepeasantmob(castorder * co)
  * Flag:
  *  (UNITSPELL | SPELLLEVEL | TESTCANSEE)
  */
-static int sp_migranten(castorder * co)
+int sp_migranten(castorder * co)
 {
     unit *target;
-    region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int max_force = (int) co->force;
     spellparameter *pa = co->par;
 
+    target = pa->param[0]->data.u;        /* Zieleinheit */
+
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
     if (pa->param[0]->flag == TARGET_RESISTS)
-        return co->level;
+        return target->number;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
     if (pa->param[0]->flag)
         return 0;
-
-    target = pa->param[0]->data.u;        /* Zieleinheit */
 
     /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
     if (u_race(target) == mage->faction->race) {
@@ -3786,7 +3737,7 @@ static int sp_migranten(castorder * co)
         return 0;
     }
     /* maximal Stufe Personen */
-    if (target->number > max_force || target->number > max_spellpoints(mage, r)) {
+    if (target->number > max_force) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_toomanytargets", ""));
         return 0;
@@ -4347,7 +4298,7 @@ static int sp_raisepeasants(castorder * co)
     a_add(&u2->attribs, a);
 
     msg =
-        msg_message("sp_raisepeasants_effect", "mage region amount", caster, r,
+        msg_message("raisepeasants_effect", "mage region amount", caster, r,
             u2->number);
     r_addmessage(r, NULL, msg);
     if (caster->region != r) {
@@ -4381,7 +4332,7 @@ static int sp_depression(castorder * co)
     create_curse(mage, &r->attribs, &ct_depression, force, duration,
         zero_effect, 0);
 
-    msg = msg_message("sp_depression_effect", "mage region", mage, r);
+    msg = msg_message("depression_effect", "mage region", mage, r);
     r_addmessage(r, NULL, msg);
     if (mage->region != r) {
         add_message(&mage->faction->msgs, msg);
@@ -4482,7 +4433,7 @@ int sp_icastle(castorder * co)
     ADDMSG(&mage->faction->msgs, msg_message("icastle_create",
         "unit region command", mage, mage->region, co->order));
 
-    msg = msg_message("sp_icastle_effect", "region", r);
+    msg = msg_message("icastle_effect", "region", r);
     report_spell(mage, r, msg);
     msg_release(msg);
 
@@ -4679,7 +4630,7 @@ int sp_clonecopy(castorder * co)
 
     create_newclone(mage, clone);
 
-    msg = msg_message("sp_clone_effect", "mage", mage);
+    msg = msg_message("clone_effect", "mage", mage);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
 
@@ -4725,7 +4676,7 @@ int sp_dreamreading(castorder * co)
     set_observer(u->region, mage->faction, effskill(u, SK_PERCEPTION, u->region), 2);
 
     msg =
-        msg_message("sp_dreamreading_effect", "mage unit region", mage, u,
+        msg_message("dreamreading_effect", "mage unit region", mage, u,
             u->region);
     r_addmessage(r, mage->faction, msg);
     msg_release(msg);
@@ -4773,7 +4724,7 @@ int sp_sweetdreams(castorder * co)
         effect = 0.05f;
         create_curse(mage, &u->attribs, &ct_orcish, power, duration, effect, men);
 
-        msg = msg_message("sp_sweetdreams_effect", "mage unit region", mage, u, r);
+        msg = msg_message("sweetdreams_effect", "mage unit region", mage, u, r);
         r_addmessage(r, mage->faction, msg);
         if (u->faction != mage->faction) {
             r_addmessage(r, u->faction, msg);
@@ -4796,7 +4747,7 @@ int sp_disturbingdreams(castorder * co)
     effect = 10;
     create_curse(mage, &r->attribs, &ct_badlearn, power, duration, effect, 0);
 
-    ADDMSG(&mage->faction->msgs, msg_message("sp_disturbingdreams_effect",
+    ADDMSG(&mage->faction->msgs, msg_message("disturbingdreams_effect",
         "mage region", mage, r));
     return cast_level;
 }
@@ -5541,7 +5492,7 @@ static int sp_eternizewall(castorder * co)
     for (u = r->units; u; u = u->next)
         freset(u->faction, FFL_SELECT);
     msg =
-        msg_message("sp_eternizewall_effect", "mage building region", mage, b, r);
+        msg_message("eternizewall_effect", "mage building region", mage, b, r);
     for (u = r->units; u; u = u->next) {
         if (!fval(u->faction, FFL_SELECT)) {
             fset(u->faction, FFL_SELECT);
@@ -5622,7 +5573,7 @@ int sp_permtransfer(castorder * co)
         change_maxspellpoints(tu, aura / 3);
     }
 
-    msg = msg_message("sp_permtransfer_effect", "mage target amount", mage, tu, aura);
+    msg = msg_message("permtransfer_effect", "mage target amount", mage, tu, aura);
     add_message(&caster->faction->msgs, msg);
     if (tu->faction != caster->faction) {
         add_message(&tu->faction->msgs, msg);
@@ -5700,7 +5651,7 @@ int sp_movecastle(castorder * co)
         }
     }
 
-    msg = msg_message("sp_movecastle_effect", "building direction", b, dir);
+    msg = msg_message("movecastle_effect", "building direction", b, dir);
     r_addmessage(r, NULL, msg);
     msg_release(msg);
 
@@ -5913,16 +5864,14 @@ static int sp_magicrunes(castorder * co)
 
 int sp_speed2(castorder * co)
 {
-    int n, maxmen, used = 0, dur, men;
+    int n, maxmen, used = 0, cost = 0, dur, men;
     unit *u;
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
 
-    maxmen = 2 * cast_level * cast_level;
-    dur = cast_level / 2;
-    if (dur < 1) dur = 1;
+    maxmen = 2 * (int)(force * force);
+    dur = (1 + co->level) / 2;
 
     for (n = 0; n < pa->length; n++) {
         double effect;
@@ -5930,8 +5879,12 @@ int sp_speed2(castorder * co)
         if (maxmen < 1)
             break;
 
-        if (pa->param[n]->flag)
+        if (pa->param[n]->flag) {
+            if (pa->param[n]->flag == TARGET_RESISTS) {
+                cost = co->level;
+            }
             continue;
+        }
 
         u = pa->param[n]->data.u;
 
@@ -5944,10 +5897,7 @@ int sp_speed2(castorder * co)
 
     ADDMSG(&mage->faction->msgs, msg_message("speed_time_effect",
         "unit region amount", mage, mage->region, used));
-    /* Effektiv benoetigten cast_level (mindestens 1) zurueckgeben */
-    used = (int)sqrt(used / 2);
-    if (used < 1) used = 1;
-    return used;
+    return used > 0 ? co->level : cost;
 }
 
 /* ------------------------------------------------------------- */

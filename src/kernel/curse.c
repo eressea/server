@@ -696,16 +696,12 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 double destr_curse(curse * c, int cast_level, double force)
 {
     if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
-        double probability = 0.1 + (cast_level - c->vigour) * 0.2;
-        /* pro Stufe Unterschied -20% */
-        if (chance(probability)) {
-            force -= c->vigour;
-            if (c->type->change_vigour) {
-                c->type->change_vigour(c, -(cast_level + 1) / 2);
-            }
-            else {
-                c->vigour -= (cast_level + 1) / 2.0;
-            }
+        force -= c->vigour;
+        if (c->type->change_vigour) {
+            c->type->change_vigour(c, -(cast_level + 1) / 2);
+        }
+        else {
+            c->vigour -= (cast_level + 1) / 2.0;
         }
     }
     else {                      /* Zauber ist staerker als curse */

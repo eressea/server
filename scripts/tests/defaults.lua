@@ -182,7 +182,6 @@ function test_default_short()
     local f = faction.create("human")
     local u = unit.create(f, r, 1)
     region.create(1, 0, "plain")
-    u.name = 'Xolgrim'
     u:add_order('UNTERHALTE')
     u:set_orders('ARBEITE\nDEFAULT "GIB 1 2 Silber"')
     process_orders()
