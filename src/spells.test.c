@@ -18,6 +18,7 @@
 #include "kernel/skill.h"            // for SK_MELEE
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
+#include "kernel/types.h"
 #include <kernel/unit.h>
 
 #include "util/keyword.h"
