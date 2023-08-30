@@ -2593,11 +2593,11 @@ static int sp_firewall(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     spellparameter *pa = co->par;
-    direction_t dir;
+    int dir;
     region *r2;
 
-    dir = get_direction(pa->param[0]->data.xs, caster->faction->locale);
-    if (dir < MAXDIRECTIONS && dir != NODIRECTION) {
+    dir = (int) get_direction(pa->param[0]->data.xs, caster->faction->locale);
+    if (dir >= 0) {
         r2 = rconnect(r, dir);
     }
     else {
@@ -3587,16 +3587,16 @@ static int sp_song_susceptmagic(castorder * co)
 
 static int sp_rallypeasantmob(castorder * co)
 {
-    unit *u, *un;
     int erfolg = 0;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
+    unit *u = r->units;
     message *msg;
     curse *c;
 
-    for (u = r->units; u; u = un) {
-        un = u->next;
+    while (u) {
+        unit *un = u->next;
         if (is_monsters(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
             rsetpeasants(r, rpeasants(r) + u->number);
             rsetmoney(r, rmoney(r) + get_money(u));
@@ -3605,6 +3605,7 @@ static int sp_rallypeasantmob(castorder * co)
             set_number(u, 0);
             erfolg = cast_level;
         }
+        u = un;
     }
 
     c = get_curse(r->attribs, &ct_riotzone);
