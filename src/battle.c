@@ -3018,11 +3018,6 @@ static void print_stats(battle * b)
     }
 }
 
-static int weapon_weight(const weapon * w)
-{
-    return w->attackskill + w->defenseskill;
-}
-
 side * get_side(battle * b, const struct unit * u)
 {
     side * s;
@@ -3092,8 +3087,8 @@ static void equip_weapons(fighter* fig)
     item* itm;
     unit* u = fig->unit;
     int wpless = weapon_skill(NULL, u, true);
-    size_t w;
-    int p_melee = 0, p_missile = 0, i;
+    size_t w, i;
+    int p_melee = 0, p_missile = 0;
 
     fig->weapons = NULL;
     for (itm = u->items; itm; itm = itm->next) {

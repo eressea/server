@@ -2,11 +2,7 @@
 ROOT=$(git rev-parse --show-toplevel)
 BUILD=build
 if [ -z "$JOBS" ] ; then
-  if [ -e /usr/sbin/sysctl ]; then
-    JOBS=`sysctl -n hw.ncpu`
-  else
-    JOBS=`nproc`
-  fi
+  JOBS=`nproc`
 fi
 DISTCC=`which distcc`
 if [ ! -z "$DISTCC" ] ; then
