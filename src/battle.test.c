@@ -403,12 +403,12 @@ static int test_armor(troop dt, weapon_type *awtype, bool magic) {
   return calculate_armor(dt, 0, awtype, select_armor(dt, false), select_armor(dt, true), magic);
 }
 
-static int test_resistance(troop dt) {
+static int test_resistance(troop dt, bool magic) {
     const weapon *dw = select_weapon(dt, false, true);
     return apply_resistance(1000, dt,
         dw ? WEAPON_TYPE(dw) : NULL,
         select_armor(dt, false),
-        select_armor(dt, true), true);
+        select_armor(dt, true), magic);
 }
 
 static void test_calculate_armor(CuTest * tc)
@@ -438,7 +438,7 @@ static void test_calculate_armor(CuTest * tc)
     dt.fighter = setup_fighter(&b, du);
     CuAssertIntEquals_Msg(tc, "default ac", 0, test_armor(dt, 0, false));
 
-    CuAssertIntEquals_Msg(tc, "magres unmodified", 1000, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "magres unmodified", 1000, test_resistance(dt, true));
     free_battle(b);
 
     b = NULL;
@@ -474,13 +474,13 @@ static void test_calculate_armor(CuTest * tc)
 
     CuAssertIntEquals_Msg(tc, "magical attack", 3, test_armor(dt, wtype, true));
     CuAssertIntEquals_Msg(tc, "magres unmodified", 1000,
-        test_resistance(dt));
+        test_resistance(dt, true));
 
     ashield->flags |= ATF_LAEN;
     achain->flags |= ATF_LAEN;
 
     CuAssertIntEquals_Msg(tc, "laen armor", 3, test_armor(dt, wtype, true));
-    CuAssertIntEquals_Msg(tc, "laen magres bonus", 250, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "laen magres bonus", 250, test_resistance(dt, true));
     free_battle(b);
     test_teardown();
 }
@@ -534,15 +534,15 @@ static void test_magic_resistance(CuTest *tc)
 
     i_change(&du->items, ishield, 1);
     dt.fighter = setup_fighter(&b, du);
-    CuAssertIntEquals_Msg(tc, "no magres reduction", 1000, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "no magres reduction", 1000, test_resistance(dt, true));
     magres = magic_resistance(du);
     CuAssertIntEquals_Msg(tc, "no magres reduction", 0, magres.sa[0]);
 
     ashield->flags |= ATF_LAEN;
     ashield->magres = v10p;
-    CuAssertIntEquals_Msg(tc, "laen reduction => 10%%", 900, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "laen reduction => 10%%", 900, test_resistance(dt, true));
     CuAssertIntEquals_Msg(tc, "no magic, no resistance", 1000,
-        test_resistance(dt));
+        test_resistance(dt, false));
     free_battle(b);
 
     b = NULL;
@@ -552,7 +552,7 @@ static void test_magic_resistance(CuTest *tc)
     ashield->flags |= ATF_LAEN;
     ashield->magres = v10p;
     dt.fighter = setup_fighter(&b, du);
-    CuAssertIntEquals_Msg(tc, "2x laen reduction => 81%%", 810, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "2x laen reduction => 81%%", 810, test_resistance(dt, true));
     free_battle(b);
 
     b = NULL;
@@ -560,18 +560,18 @@ static void test_magic_resistance(CuTest *tc)
     i_change(&du->items, ichain, -1);
     set_level(du, SK_MAGIC, 2);
     dt.fighter = setup_fighter(&b, du);
-    CuAssertIntEquals_Msg(tc, "skill reduction => 90%%", 900, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "skill reduction => 90%%", 900, test_resistance(dt, true));
     magres = magic_resistance(du);
     CuAssert(tc, "skill reduction", frac_equal(magres, v10p));
     rc->magres = v50p; /* percentage, gets added to skill bonus */
-    CuAssertIntEquals_Msg(tc, "race reduction => 40%%", 400, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "race reduction => 40%%", 400, test_resistance(dt, true));
     magres = magic_resistance(du);
     CuAssert(tc, "race bonus => 60%%", frac_equal(magres, frac_make(60, 100)));
 
     rc->magres = frac_make(15, 10); /* 150% resistance should not cause negative damage multiplier */
     magres = magic_resistance(du);
     CuAssert(tc, "magic resistance is never > 0.9", frac_equal(magres, frac_make(9, 10)));
-    CuAssertIntEquals_Msg(tc, "damage reduction is never < 0.1", 100, test_resistance(dt));
+    CuAssertIntEquals_Msg(tc, "damage reduction is never < 0.1", 100, test_resistance(dt, true));
 
     free_battle(b);
     test_teardown();

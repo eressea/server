@@ -42,7 +42,7 @@ int *casualties)
         int i, k = 0;
         message *msg;
         for (i = 0; i <= at->index; ++i) {
-            struct weapon *wp = fi->person[i].melee;
+            const weapon *wp = fi->person[i].melee;
             if (wp != NULL && wp->item->type == wtype->itype)
                 ++k;
         }

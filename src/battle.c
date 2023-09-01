@@ -3074,75 +3074,66 @@ static int tactics_bonus(int num) {
     return bonus;
 }
 
-typedef struct weight_s {
-    unsigned int index;
-    int weight;
-    bool missile;
-} weight_s;
-
-static int cmp_weight(const void *lhs, const void *rhs)
+static int cmp_weapon(const void *lhs, const void *rhs)
 {
-    const weight_s *a = (const weight_s *)lhs;
-    const weight_s *b = (const weight_s *)rhs;
-    return b->weight - a->weight;
+    const weapon *a = (const weapon *)lhs;
+    const weapon *b = (const weapon *)rhs;
+    return b->attackskill - a->attackskill + b->defenseskill - a->defenseskill;
 }
 
 /* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
 * ihr kaempfen koennten, und was ihr Wert darin ist. */
 static void equip_weapons(fighter* fig)
 {
-#define WMAX 20
     item* itm;
     unit* u = fig->unit;
     int wpless = weapon_skill(NULL, u, true);
-    unsigned int w = 0;
-    static weight_s index[WMAX];
+    size_t w;
     int p_melee = 0, p_missile = 0, i;
 
     fig->weapons = NULL;
-    for (itm = u->items; itm && w != WMAX; itm = itm->next) {
-        weapon wp;
+    for (itm = u->items; itm; itm = itm->next) {
+        weapon * wp;
         const weapon_type *wtype = resource2weapon(itm->type->rtype);
         if (wtype == NULL || itm->number == 0) {
             continue;
         }
-        wp.attackskill = weapon_skill(wtype, u, true);
-        wp.defenseskill = weapon_skill(wtype, u, false);
-        wp.item = itm;
-        arrput(fig->weapons, wp);
-        if (wp.attackskill >= 0 || wp.defenseskill >= 0) {
-            assert(w < WMAX);
-            index[w].index = w;
-            index[w].weight = weapon_weight(&wp);
-            index[w].missile = fval(wtype, WTF_MISSILE);
-            ++w;
-        }
+        wp = arraddnptr(fig->weapons, 1);
+        wp->attackskill = weapon_skill(wtype, u, true);
+        wp->defenseskill = weapon_skill(wtype, u, false);
+        wp->item = itm;
     }
-    if (w == 0) {
-        /* this unit has no useful wepons */
-        return;
-    }
-    qsort(index, w, sizeof(weight_s), cmp_weight);
+    w = arrlen(fig->weapons);
+    qsort(fig->weapons, w, sizeof(weapon), cmp_weapon);
 
-    /* now fig->weapons[index[0].index].item is the units' best weapon */
+    /* now fig->weapons[0].item is the unit's best weapon */
 
     /* hand out weapons: */
     for (i = 0; i != w; ++i) {
-        int idx = index[i].index;
-        int count = fig->weapons[idx].item->number;
-        while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
-            if (index[i].missile) {
-                if (p_missile < fig->alive) {
-                    struct person *p = fig->person + fig->alive - ++p_missile;
-                    p->missile = fig->weapons + idx;
-                    --count;
+        const weapon *wp = fig->weapons + i;
+        const weapon_type *wtype = WEAPON_TYPE(wp);
+        bool is_missile = wtype->flags & WTF_MISSILE;
+        if (!is_missile && wpless > wp->attackskill + wp->defenseskill) {
+            /* we fight better with bare hands than this melee weapon */
+            continue;
+        }
+        if (wp->attackskill >= 0 || wp->defenseskill >= 0)
+        {
+            int count = wp->item->number;
+            while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
+                if (is_missile) {
+                    if (p_missile < fig->alive) {
+                        struct person *p = fig->person + fig->alive - ++p_missile;
+                        p->missile = wp;
+                        --count;
+                    }
                 }
-            }
-            else {
-                if (p_melee < fig->alive) {
-                    struct person *p = fig->person + p_melee++;
-                    p->melee = fig->weapons + idx;
-                    --count;
+                else {
+                    if (p_melee < fig->alive) {
+                        struct person *p = fig->person + p_melee++;
+                        p->melee = wp;
+                        --count;
+                    }
                 }
             }
         }

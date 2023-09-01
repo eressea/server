@@ -144,8 +144,8 @@ typedef struct fighter {
         unsigned char speed;
         unsigned char reload;
         unsigned char last_action;
-        struct weapon* missile;   /* missile weapon */
-        struct weapon* melee;     /* melee weapon */
+        const struct weapon* missile;   /* missile weapon */
+        const struct weapon* melee;     /* melee weapon */
     } *person;
     unsigned int flags;
     struct {
