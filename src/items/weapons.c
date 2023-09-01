@@ -42,8 +42,8 @@ int *casualties)
         int i, k = 0;
         message *msg;
         for (i = 0; i <= at->index; ++i) {
-            struct weapon *wp = fi->person[i].melee;
-            if (wp != NULL && wp->type == wtype)
+            const weapon *wp = fi->person[i].melee;
+            if (wp != NULL && wp->item->type == wtype->itype)
                 ++k;
         }
         msg = msg_message("useflamingsword", "amount unit", k, fi->unit);
@@ -75,7 +75,6 @@ int *casualties)
     battle *b = af->side->battle;
     troop dt;
     int d = 0, enemies;
-    weapon *wp;
     const resource_type *rtype;
 
     if (au->status >= ST_AVOID) {
@@ -83,8 +82,7 @@ int *casualties)
         return false;
     }
 
-    wp = af->person[at->index].missile;
-    assert(wp->type == wtype);
+    assert(wtype == WEAPON_TYPE(af->person[at->index].missile));
     assert(af->person[at->index].reload == 0);
     rtype = rt_find("catapultammo");
 
@@ -105,7 +103,7 @@ int *casualties)
         message *msg;
 
         for (i = 0; i <= at->index; ++i) {
-            if (af->person[i].reload == 0 && af->person[i].missile == wp)
+            if (af->person[i].reload == 0 && af->person[i].missile->item->type == wtype->itype)
                 ++k;
         }
         msg = msg_message("usecatapult", "amount unit", k, au);
@@ -125,9 +123,9 @@ int *casualties)
             break;
 
         /* If battle succeeds */
-        if (hits(*at, dt, wp)) {
+        if (hits(*at, dt, wtype)) {
             int chance_pct = config_get_int("rules.catapult.damage.chance_percent", 5);
-            d += terminate(dt, *at, AT_STANDARD, wp->type->damage[0], true);
+            d += terminate(dt, *at, AT_STANDARD, wtype->damage[0], true);
             structural_damage(dt, 0, chance_pct);
         }
     }

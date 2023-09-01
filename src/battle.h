@@ -6,6 +6,7 @@
 
 struct message;
 struct selist;
+struct weapon_type;
 union variant;
 
 /** more defines **/
@@ -95,10 +96,12 @@ typedef struct battle {
 } battle;
 
 typedef struct weapon {
-    const struct weapon_type* type;
+    const struct item* item;
     int attackskill;
     int defenseskill;
 } weapon;
+
+#define WEAPON_TYPE(wp) ((wp) ? (wp)->item->type->rtype->wtype : NULL)
 
 typedef struct troop {
     struct fighter* fighter;
@@ -142,8 +145,8 @@ typedef struct fighter {
         unsigned char speed;
         unsigned char reload;
         unsigned char last_action;
-        struct weapon* missile;   /* missile weapon */
-        struct weapon* melee;     /* melee weapon */
+        const struct weapon* missile;   /* missile weapon */
+        const struct weapon* melee;     /* melee weapon */
     } *person;
     unsigned int flags;
     struct {
@@ -195,13 +198,13 @@ int count_enemies(struct battle* b, const struct fighter* af,
     int minrow, int maxrow, int select);
 int natural_armor(struct unit* u);
 const struct armor_type* select_armor(struct troop t, bool shield);
-struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);
+const struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);
 int calculate_armor(troop dt, const struct weapon_type* dwtype, const struct weapon_type* awtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
 int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
 bool terminate(troop dt, troop at, int type, const char* damage,
     bool missile);
 void message_all(battle* b, struct message* m);
-bool hits(troop at, troop dt, weapon* awp);
+bool hits(troop at, troop dt, const struct weapon_type *awp);
 void damage_building(struct battle* b, struct building* bldg,
     int damage_abs);
 
