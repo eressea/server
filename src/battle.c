@@ -11,6 +11,13 @@
 #include "study.h"
 #include "spy.h"
 
+#include "reports.h"
+
+/* attributes includes */
+#include "attributes/key.h"
+#include "attributes/racename.h"
+#include "attributes/otherfaction.h"
+
 #include "spells/buildingcurse.h"
 #include "spells/regioncurse.h"
 #include "spells/unitcurse.h"
@@ -36,13 +43,6 @@
 #include "kernel/unit.h"
 #include "kernel/spell.h"
 
-#include "reports.h"
-
-/* attributes includes */
-#include "attributes/key.h"
-#include "attributes/racename.h"
-#include "attributes/otherfaction.h"
-
 /* util includes */
 #include "kernel/attrib.h"
 #include "util/base36.h"
@@ -67,6 +67,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+
+#include <stb_ds.h>
 
 #define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
 #define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
@@ -510,10 +512,10 @@ static bool is_riding(const troop t)
     return false;
 }
 
-static weapon *preferred_weapon(const troop t, bool attacking)
+static const weapon *preferred_weapon(const troop t, bool attacking)
 {
-    weapon *missile = t.fighter->person[t.index].missile;
-    weapon *melee = t.fighter->person[t.index].melee;
+    const weapon *missile = t.fighter->person[t.index].missile;
+    const weapon *melee = t.fighter->person[t.index].melee;
     if (attacking) {
         if (melee == NULL || (missile && missile->attackskill > melee->attackskill)) {
             return missile;
@@ -528,22 +530,26 @@ static weapon *preferred_weapon(const troop t, bool attacking)
     return melee;
 }
 
-weapon *select_weapon(const troop t, bool attacking, bool ismissile)
+const struct weapon *select_weapon(const troop t, bool attacking, bool ismissile)
 /* select the primary weapon for this trooper */
 {
+    const weapon *w = NULL;
     if (attacking) {
         if (ismissile) {
             /* from the back rows, have to use your missile weapon */
-            return t.fighter->person[t.index].missile;
+            w = t.fighter->person[t.index].missile;
         }
     }
     else {
         if (!ismissile) {
             /* have to use your melee weapon if it's melee */
-            return t.fighter->person[t.index].melee;
+            w = t.fighter->person[t.index].melee;
         }
     }
-    return preferred_weapon(t, attacking);
+    if (!w) {
+        w = preferred_weapon(t, attacking);
+    }
+    return w;
 }
 
 static bool i_canuse(const unit * u, const item_type * itype)
@@ -657,7 +663,7 @@ weapon_effskill(troop t, troop enemy, const weapon * w,
     /* Alle Modifier berechnen, die fig durch die Waffen bekommt. */
     if (w) {
         int skill = 0;
-        const weapon_type *wtype = w->type;
+        const weapon_type *wtype = WEAPON_TYPE(w);
 
         if (attacking) {
             skill = w->attackskill;
@@ -1052,7 +1058,7 @@ int calculate_armor(troop dt, const weapon_type *dwtype, const weapon_type *awty
 int apply_resistance(int damage, troop dt, const weapon_type *dwtype, const armor_type *armor, const armor_type *shield, bool magic) {
     const fighter *df = dt.fighter;
     unit *du = df->unit;
-
+    
     if (!magic)
         return damage;
 
@@ -1159,7 +1165,7 @@ static void calculate_defense_type(troop at, troop dt, int type, bool missile,
     weapon = select_weapon(dt, false, true);      /* missile=true to get the unmodified best weapon she has */
     *defskill = weapon_effskill(dt, at, weapon, false, false);
     if (weapon != NULL)
-        *dwtype = weapon->type;
+        *dwtype = WEAPON_TYPE(weapon);
 }
 
 static void calculate_attack_type(troop at, troop dt, int type, bool missile,
@@ -1171,7 +1177,7 @@ static void calculate_attack_type(troop at, troop dt, int type, bool missile,
         weapon = select_weapon(at, true, missile);
         *attskill = weapon_effskill(at, dt, weapon, true, missile);
         if (weapon)
-            *awtype = weapon->type;
+            *awtype = WEAPON_TYPE(weapon);
         if (*awtype && fval(*awtype, WTF_MAGICAL))
             *magic = true;
         break;
@@ -1441,24 +1447,18 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     for (si = 0; as->enemies[si]; ++si) {
         side *ds = as->enemies[si];
         fighter *df;
-        int unitrow[NUMROWS];
+        int unitrow[NUMROWS] = { 0 };
         int offset = 0;
 
         if (select & SELECT_DISTANCE)
             offset = get_unitrow(af, ds) - FIGHT_ROW;
-
-        if (select & SELECT_ADVANCE) {
-            int ui;
-            for (ui = 0; ui != NUMROWS; ++ui)
-                unitrow[ui] = -1;
-        }
 
         for (df = ds->fighters; df; df = df->next) {
             int dr;
 
             dr = statusrow(df->status);
             if (select & SELECT_ADVANCE) {
-                if (unitrow[dr] < 0) {
+                if (unitrow[dr] == 0) {
                     unitrow[dr] = get_unitrow(df, as);
                 }
                 dr = unitrow[dr];
@@ -1612,9 +1612,7 @@ static bool select_row(const side *vs, const fighter *fig, void *cbdata)
 
 selist *fighters(battle * b, const side * vs, int minrow, int maxrow, int mask)
 {
-    struct selector sel;
-    sel.maxrow = maxrow;
-    sel.minrow = minrow;
+    struct selector sel = { .maxrow = maxrow, .minrow = minrow };
     return select_fighters(b, vs, mask, select_row, &sel);
 }
 
@@ -1853,9 +1851,10 @@ int skilldiff(troop at, troop dt, int dist)
     fighter *af = at.fighter, *df = dt.fighter;
     unit *au = af->unit, *du = df->unit;
     int is_protected = 0, skdiff = 0;
-    weapon *awp = select_weapon(at, true, dist > 1);
+    const weapon *awp = select_weapon(at, true, dist > 1);
     static int rc_cache;
     static const race *rc_halfling, *rc_goblin;
+    const weapon_type *wtype;
 
     if (rc_changed(&rc_cache)) {
         rc_halfling = get_race(RC_HALFLING);
@@ -1903,21 +1902,22 @@ int skilldiff(troop at, troop dt, int dist)
     }
     /* Effekte der Waffen */
     skdiff += weapon_effskill(at, dt, awp, true, dist > 1);
-    if (awp && fval(awp->type, WTF_MISSILE)) {
+    wtype = awp ? WEAPON_TYPE(awp) : NULL;
+    if (wtype && fval(wtype, WTF_MISSILE)) {
         skdiff -= is_protected;
-        if (awp->type->modifiers) {
+        if (wtype->modifiers) {
             int w;
-            for (w = 0; awp->type->modifiers[w].value != 0; ++w) {
-                if (awp->type->modifiers[w].flags & WMF_MISSILE_TARGET) {
+            for (w = 0; wtype->modifiers[w].value != 0; ++w) {
+                if (wtype->modifiers[w].flags & WMF_MISSILE_TARGET) {
                     /* skill decreases by targeting difficulty (bow -2, catapult -4) */
-                    skdiff -= awp->type->modifiers[w].value;
+                    skdiff -= wtype->modifiers[w].value;
                     break;
                 }
             }
         }
     }
     if (skill_formula == FORMULA_ORIG) {
-        weapon *dwp = select_weapon(dt, false, dist > 1);
+        const weapon *dwp = select_weapon(dt, false, dist > 1);
         skdiff -= weapon_effskill(dt, at, dwp, false, dist > 1);
     }
     return skdiff;
@@ -1926,7 +1926,7 @@ int skilldiff(troop at, troop dt, int dist)
 static int setreload(troop at)
 {
     fighter *af = at.fighter;
-    const weapon_type *wtype = af->person[at.index].missile->type;
+    const weapon_type *wtype = WEAPON_TYPE(af->person[at.index].missile);
     if (wtype->reload == 0)
         return 0;
     return af->person[at.index].reload = wtype->reload;
@@ -1937,20 +1937,20 @@ int getreload(troop at)
     return at.fighter->person[at.index].reload;
 }
 
-bool hits(troop at, troop dt, weapon * awp)
+bool hits(troop at, troop dt, const weapon_type *awp)
 {
     fighter *af = at.fighter, *df = dt.fighter;
     const armor_type *armor, *shield = NULL;
     int skdiff = 0;
     const int dist = get_unitrow(af, df->side) + get_unitrow(df, af->side) - 1;
     const bool missiles_only = dist > 1;
-    weapon *dwp = select_weapon(dt, false, missiles_only);
+    const weapon_type *dwp;
 
     if (!df->alive)
         return false;
     if (getreload(at))
         return false;
-    if (missiles_only && (awp == NULL || !fval(awp->type, WTF_MISSILE)))
+    if (missiles_only && (awp == NULL || !fval(awp, WTF_MISSILE)))
         return false;
 
     /* mark this person as hit. */
@@ -1965,17 +1965,18 @@ bool hits(troop at, troop dt, weapon * awp)
         return false;
 
     /* effect of sp_reeling_arrows combatspell */
-    if (af->side->battle->reelarrow && awp && fval(awp->type, WTF_MISSILE)
+    if (af->side->battle->reelarrow && awp && fval(awp, WTF_MISSILE)
         && rng_double() < 0.5) {
         return false;
     }
 
-    skdiff = skilldiff(at, dt, dist);
     /* Verteidiger bekommt eine Ruestung */
-    armor = select_armor(dt, true);
-    if (dwp == NULL || (dwp->type->flags & WTF_USESHIELD)) {
+    dwp = WEAPON_TYPE(select_weapon(dt, false, missiles_only));
+    if (dwp == NULL || (dwp->flags & WTF_USESHIELD)) {
         shield = select_armor(dt, false);
     }
+    armor = select_armor(dt, true);
+    skdiff = skilldiff(at, dt, dist);
     if (!contest(skdiff, dt, armor, shield)) {
         return false;
     }
@@ -2104,15 +2105,20 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 ta.fighter->person[ta.index].reload--;
             }
             else {
-                weapon* wp = ta.fighter->person[ta.index].missile;
+                const weapon* wp = ta.fighter->person[ta.index].missile;
+                const weapon_type *wtype = NULL;
                 bool missile = false;
                 if (count_enemies(b, af, melee_range[0], melee_range[1],
                     SELECT_ADVANCE | SELECT_DISTANCE | SELECT_FIND) > 0) {
                     wp = preferred_weapon(ta, true);
                 }
 
-                if (wp && fval(wp->type, WTF_MISSILE))
-                    missile = true;
+                if (wp) {
+                    wtype = WEAPON_TYPE(wp);
+                    if (fval(wtype, WTF_MISSILE)) {
+                        missile = true;
+                    }
+                }
                 if (missile) {
                     td = select_opponent(b, ta, missile_range[0], missile_range[1]);
                 }
@@ -2124,29 +2130,29 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 if (ta.fighter->person[ta.index].last_action < b->turn) {
                     ta.fighter->person[ta.index].last_action = b->turn;
                 }
-                if (hits(ta, td, wp)) {
+                if (hits(ta, td, wtype)) {
                     const char* d;
-                    if (wp == NULL)
+                    if (wtype == NULL)
                         d = u_race(au)->def_damage;
                     else if (is_riding(ta))
-                        d = wp->type->damage[1];
+                        d = wtype->damage[1];
                     else
-                        d = wp->type->damage[0];
+                        d = wtype->damage[0];
                     terminate(td, ta, a->type, d, missile);
                 }
 
                 /* spezialattacken der waffe nur, wenn erste attacke in der runde.
                  * sonst helden mit feuerschwertern zu maechtig */
-                if (numattack == 0 && wp && wp->type->attack) {
+                if (numattack == 0 && wtype && wtype->attack) {
                     int dead = 0;
-                    if (wp->type->attack(&ta, wp->type, &dead)) {
+                    if (wtype->attack(&ta, wtype, &dead)) {
                         af->catmsg += dead;
                         if (af->person[ta.index].last_action < b->turn) {
                             af->person[ta.index].last_action = b->turn;
                         }
                     }
                 }
-                if (wp && wp->type->reload && !getreload(ta)) {
+                if (wtype && wtype->reload && !getreload(ta)) {
                     setreload(ta);
                 }
             }
@@ -2221,12 +2227,10 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
 
 static void do_attack(fighter * af)
 {
-    troop ta;
     unit *au = af->unit;
     side *side = af->side;
     battle *b = side->battle;
-
-    ta.fighter = af;
+    troop ta = { .fighter = af, .index = af->fighting };
 
     assert(au && au->number);
     /* Da das Zuschlagen auf Einheiten und nicht auf den einzelnen
@@ -2234,7 +2238,6 @@ static void do_attack(fighter * af)
      * Rolle spielen, Das tut sie nur dann, wenn jeder, der am Anfang der
      * Runde lebte, auch zuschlagen darf. Ansonsten ist der, der zufaellig
      * mit einer grossen Einheit zuerst drankommt, extrem bevorteilt. */
-    ta.index = af->fighting;
 
     while (ta.index--) {
         /* Wir suchen eine beliebige Feind-Einheit aus. An der koennen
@@ -2253,8 +2256,9 @@ static void do_attack(fighter * af)
                     if (u_race(au)->attack[a].type != AT_STANDARD)
                         continue;
                     else {
-                        weapon *wp = preferred_weapon(ta, true);
-                        if (wp != NULL && wp->type->reload)
+                        const weapon *wp = preferred_weapon(ta, true);
+                        const weapon_type *wtype = WEAPON_TYPE(wp);
+                        if (wp != NULL && wtype->reload)
                             continue;
                     }
                 }
@@ -2400,10 +2404,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
                 int dr = get_unitrow(df, NULL);
                 if (dr >= minrow && dr <= maxrow) {
                     if (df->alive - df->removed > allies) {
-                        troop dt;
-                        assert(allies >= 0);
-                        dt.index = allies;
-                        dt.fighter = df;
+                        troop dt = { .fighter = df, .index = allies };
                         return dt;
                     }
                     allies -= (df->alive - df->removed);
@@ -2551,7 +2552,7 @@ static void reorder_fleeing(region * r)
     unit **usrc = &r->units;
     unit **udst = &r->units;
     unit *ufirst = NULL;
-    unit *u;
+    unit *u = NULL;
 
     for (; *udst; udst = &u->next) {
         u = *udst;
@@ -2902,7 +2903,8 @@ static void print_stats(battle * b)
         bfaction *bf;
 
         for (bf = b->factions; bf; bf = bf->next) {
-            char buf[1024], *bufp = buf;
+            static char buf[1024];
+            char *bufp = buf;
             size_t rsize, size = sizeof(buf);
             int komma = 0;
             faction *f = bf->faction;
@@ -2931,6 +2933,7 @@ static void print_stats(battle * b)
                 fbattlerecord(b, f, buf);
 
             bufp = buf;
+            buf[0] = 0;
             size = sizeof(buf);
             komma = 0;
             header = LOC(f->locale, "battle_helpers");
@@ -3011,12 +3014,9 @@ static void print_stats(battle * b)
     }
 }
 
-static int weapon_weight(const weapon * w, bool missile)
+static int weapon_weight(const weapon * w)
 {
-    if (missile == !!(fval(w->type, WTF_MISSILE))) {
-        return w->attackskill + w->defenseskill;
-    }
-    return 0;
+    return w->attackskill + w->defenseskill;
 }
 
 side * get_side(battle * b, const struct unit * u)
@@ -3074,6 +3074,19 @@ static int tactics_bonus(int num) {
     return bonus;
 }
 
+typedef struct weight_s {
+    unsigned int index;
+    int weight;
+    bool missile;
+} weight_s;
+
+static int cmp_weight(const void *lhs, const void *rhs)
+{
+    const weight_s *a = (const weight_s *)lhs;
+    const weight_s *b = (const weight_s *)rhs;
+    return b->weight - a->weight;
+}
+
 /* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
 * ihr kaempfen koennten, und was ihr Wert darin ist. */
 static void equip_weapons(fighter* fig)
@@ -3081,87 +3094,61 @@ static void equip_weapons(fighter* fig)
 #define WMAX 20
     item* itm;
     unit* u = fig->unit;
-    weapon weapons[WMAX];
-    int owp[WMAX];
-    int dwp[WMAX];
-    int wcount[WMAX];
-    int wused[WMAX];
-    int i, oi = 0, di = 0, w = 0;
+    int wpless = weapon_skill(NULL, u, true);
+    unsigned int w = 0;
+    static weight_s index[WMAX];
+    int p_melee = 0, p_missile = 0, i;
 
+    fig->weapons = NULL;
     for (itm = u->items; itm && w != WMAX; itm = itm->next) {
-        const weapon_type* wtype = resource2weapon(itm->type->rtype);
-        if (wtype == NULL || itm->number == 0)
+        weapon wp;
+        const weapon_type *wtype = resource2weapon(itm->type->rtype);
+        if (wtype == NULL || itm->number == 0) {
             continue;
-        weapons[w].attackskill = weapon_skill(wtype, u, true);
-        weapons[w].defenseskill = weapon_skill(wtype, u, false);
-        if (weapons[w].attackskill >= 0 || weapons[w].defenseskill >= 0) {
-            weapons[w].type = wtype;
-            wused[w] = 0;
-            wcount[w] = itm->number;
+        }
+        wp.attackskill = weapon_skill(wtype, u, true);
+        wp.defenseskill = weapon_skill(wtype, u, false);
+        wp.item = itm;
+        arrput(fig->weapons, wp);
+        if (wp.attackskill >= 0 || wp.defenseskill >= 0) {
+            assert(w < WMAX);
+            index[w].index = w;
+            index[w].weight = weapon_weight(&wp);
+            index[w].missile = fval(wtype, WTF_MISSILE);
             ++w;
         }
-        assert(w != WMAX);
     }
-    fig->weapons = malloc((1 + (size_t)w) * sizeof(weapon));
-    if (fig->weapons) {
-        memcpy(fig->weapons, weapons, w * sizeof(weapon));
-        fig->weapons[w].type = NULL;
-        for (i = 0; i != w; ++i) {
-            int j, o = 0, d = 0;
-            for (j = 0; j != i; ++j) {
-                if (weapon_weight(fig->weapons + j,
-                    true) >= weapon_weight(fig->weapons + i, true))
-                    ++d;
-                if (weapon_weight(fig->weapons + j,
-                    false) >= weapon_weight(fig->weapons + i, false))
-                    ++o;
-            }
-            for (j = i + 1; j != w; ++j) {
-                if (weapon_weight(fig->weapons + j,
-                    true) > weapon_weight(fig->weapons + i, true))
-                    ++d;
-                if (weapon_weight(fig->weapons + j,
-                    false) > weapon_weight(fig->weapons + i, false))
-                    ++o;
-            }
-            owp[o] = i;
-            dwp[d] = i;
-        }
+    if (w == 0) {
+        /* this unit has no useful wepons */
+        return;
     }
-    /* jetzt enthalten owp und dwp eine absteigend schlechter werdende Liste der Waffen
-     * oi and di are the current index to the sorted owp/dwp arrays
-     * owp, dwp contain indices to the figther::weapons array */
+    qsort(index, w, sizeof(weight_s), cmp_weight);
 
-     /* hand out melee weapons: */
-    for (i = 0; i != fig->alive; ++i) {
-        int wpless = weapon_skill(NULL, u, true);
-        while (oi != w
-            && (wused[owp[oi]] == wcount[owp[oi]]
-                || fval(fig->weapons[owp[oi]].type, WTF_MISSILE))) {
-            ++oi;
-        }
-        if (oi == w)
-            break;                  /* no more weapons available */
-        if (weapon_weight(fig->weapons + owp[oi], false) <= wpless) {
-            continue;               /* we fight better with bare hands */
-        }
-        fig->person[i].melee = &fig->weapons[owp[oi]];
-        ++wused[owp[oi]];
-    }
-    /* hand out missile weapons (from back to front, in case of mixed troops). */
-    for (di = 0, i = fig->alive; i-- != 0;) {
-        while (di != w && (wused[dwp[di]] == wcount[dwp[di]]
-            || !fval(fig->weapons[dwp[di]].type, WTF_MISSILE))) {
-            ++di;
-        }
-        if (di == w)
-            break;                  /* no more weapons available */
-        if (weapon_weight(fig->weapons + dwp[di], true) > 0) {
-            fig->person[i].missile = &fig->weapons[dwp[di]];
-            ++wused[dwp[di]];
+    /* now fig->weapons[index[0].index].item is the units' best weapon */
+
+    /* hand out weapons: */
+    for (i = 0; i != w; ++i) {
+        int idx = index[i].index;
+        int count = fig->weapons[idx].item->number;
+        while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
+            if (index[i].missile) {
+                if (p_missile < fig->alive) {
+                    struct person *p = fig->person + fig->alive - ++p_missile;
+                    p->missile = fig->weapons + idx;
+                    --count;
+                }
+            }
+            else {
+                if (p_melee < fig->alive) {
+                    struct person *p = fig->person + p_melee++;
+                    p->melee = fig->weapons + idx;
+                    --count;
+                }
+            }
         }
     }
 }
+
 static void equip_armor(fighter* fig)
 {
     item* itm;
@@ -3451,7 +3438,7 @@ static void free_fighter(fighter * fig)
     }
     i_freeall(&fig->loot);
     free(fig->person);
-    free(fig->weapons);
+    arrfree(fig->weapons);
 
 }
 
@@ -3910,7 +3897,7 @@ static void battle_flee(battle * b)
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 unit *u = fig->unit;
-                troop dt;
+                troop dt = { .fighter = fig, .index = fig->alive - fig->removed };
                 /* Flucht nicht bei mehr als 600 HP. Damit Wyrme toetbar bleiben. */
                 int runhp = (int)(0.9 + unit_max_hp(u) * hpflee(u->status));
                 if (runhp > 600) runhp = 600;
@@ -3920,8 +3907,6 @@ static void battle_flee(battle * b)
                     continue;
                 }
 
-                dt.fighter = fig;
-                dt.index = fig->alive - fig->removed;
                 while (s->size[SUM_ROW] && dt.index != 0) {
                     --dt.index;
                     assert(dt.index >= 0 && dt.index < fig->unit->number);

@@ -281,15 +281,16 @@ int sp_combatrosthauch(struct castorder * co)
 
     for (qi = 0, ql = fgs; force>0 && ql; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
-        int w;
+        unsigned int w;
+        size_t len = arrlen(df->weapons);
 
-        for (w = 0; df->weapons[w].type != NULL; ++w) {
+        for (w = 0; w != len; ++w) {
             weapon *wp = df->weapons;
             if (df->unit->items && force > 0) {
-                item ** itp = i_find(&df->unit->items, wp->type->itype);
+                item ** itp = i_find(&df->unit->items, wp->item->type);
                 if (*itp) {
                     item *it = *itp;
-                    requirement *mat = wp->type->itype->construction->materials;
+                    requirement *mat = wp->item->type->construction->materials;
                     int n = force;
                     if (it->number < n) n = it->number;
 
@@ -298,7 +299,7 @@ int sp_combatrosthauch(struct castorder * co)
                             int p;
                             force -= n;
                             k += n;
-                            i_change(itp, wp->type->itype, -n);
+                            i_change(itp, wp->item->type, -n);
                             for (p = 0; n && p != df->unit->number; ++p) {
                                 if (df->person[p].melee == wp) {
                                     df->person[p].melee = NULL;

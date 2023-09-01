@@ -34,6 +34,8 @@
 
 #include <CuTest.h>
 
+#include <stb_ds.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 
@@ -98,9 +100,43 @@ static void test_make_fighter(CuTest * tc)
     test_teardown();
 }
 
+static void test_select_weapon(CuTest *tc) {
+    item_type *it_missile, *it_axe, *it_sword;
+    item *i_missile, *i_sword, *i_axe;
+    unit *au;
+    fighter *af;
+    battle *b;
+
+    test_setup();
+    au = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    set_number(au, 3);
+    set_level(au, SK_MELEE, 1);
+    it_axe = test_create_itemtype("axe");
+    new_weapontype(it_axe, 0, frac_zero, NULL, 1, 0, 0, SK_MELEE);
+    i_axe = i_change(&au->items, it_axe, 1);
+    it_sword = test_create_itemtype("sword");
+    new_weapontype(it_sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    i_sword = i_change(&au->items, it_sword, 1);
+    it_missile = test_create_itemtype("crossbow");
+    new_weapontype(it_missile, WTF_MISSILE, frac_zero, NULL, 0, 0, 0, SK_CROSSBOW);
+    i_missile = i_change(&au->items, it_missile, 2);
+
+    b = make_battle(au->region);
+    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
+    CuAssertIntEquals(tc, 3, (int)arrlen(af->weapons));
+    CuAssertPtrEquals(tc, i_axe, (item *)af->person[0].melee->item);
+    CuAssertPtrEquals(tc, NULL, (weapon *)af->person[0].missile);
+    CuAssertPtrEquals(tc, i_sword, (item *)af->person[1].melee->item);
+    CuAssertPtrEquals(tc, i_missile, (item *)af->person[1].missile->item);
+    CuAssertPtrEquals(tc, NULL, (weapon *)af->person[2].melee);
+    CuAssertPtrEquals(tc, i_missile, (item *)af->person[2].missile->item);
+    free_battle(b);
+
+    test_teardown();
+}
+
 static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
-    weapon_type * wtype;
     unit *au;
     fighter *af;
     battle *b;
@@ -109,49 +145,48 @@ static void test_select_weapon_restricted(CuTest *tc) {
     test_setup();
     au = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     itype = test_create_itemtype("halberd");
-    wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
     i_change(&au->items, itype, 1);
     rc = test_create_race("smurf");
     CuAssertIntEquals(tc, 0, rc->mask_item & au->_race->mask_item);
 
+    /* melee weapon, can be used by any race: */
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
-    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
+    CuAssertIntEquals(tc, 1, (int)arrlen(af->weapons));
+    CuAssertPtrEquals(tc, au->items, (void *)af->weapons[0].item);
+    CuAssertPtrEquals(tc, af->weapons, (void *)af->person[0].melee);
     free_battle(b);
 
+    /* weapon is for denied to our race: */
     itype->mask_deny = rc_mask(au->_race);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
+    CuAssertIntEquals(tc, 1, (int)arrlen(af->weapons));
+    CuAssertPtrEquals(tc, au->items, (void *)af->weapons[0].item);
+    CuAssertPtrNotNull(tc, af->person);
+    CuAssertPtrEquals(tc, NULL, (void *)af->person[0].melee);
     free_battle(b);
 
+    /* weapon is for exclusive use by our race: */
     itype->mask_deny = 0;
     itype->mask_allow = rc_mask(au->_race);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
-    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
+    CuAssertIntEquals(tc, 1, (int)arrlen(af->weapons));
+    CuAssertPtrEquals(tc, au->items, (void *)af->weapons[0].item);
+    CuAssertPtrEquals(tc, af->weapons, (void *)af->person[0].melee);
     free_battle(b);
 
+    /* weapon is for exclusive use by another race: */
     itype->mask_deny = 0;
     itype->mask_allow = rc_mask(rc);
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[0].type);
-    free_battle(b);
-
-    itype->mask_deny = 0;
-    itype->mask_allow = rc_mask(au->_race);
-    b = make_battle(au->region);
-    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertPtrNotNull(tc, af->weapons);
-    CuAssertPtrEquals(tc, wtype, (void *)af->weapons[0].type);
-    CuAssertPtrEquals(tc, NULL, (void *)af->weapons[1].type);
+    CuAssertIntEquals(tc, 1, (int)arrlen(af->weapons));
+    CuAssertPtrEquals(tc, au->items, (void *)af->weapons[0].item);
+    CuAssertPtrEquals(tc, NULL, (void *)af->person[0].melee);
     free_battle(b);
 
     test_teardown();
@@ -369,9 +404,11 @@ static int test_armor(troop dt, weapon_type *awtype, bool magic) {
 }
 
 static int test_resistance(troop dt) {
-  return apply_resistance(1000, dt,
-                  select_weapon(dt, false, true) ? select_weapon(dt, false, true)->type : 0,
-                  select_armor(dt, false), select_armor(dt, true), true);
+    const weapon *dw = select_weapon(dt, false, true);
+    return apply_resistance(1000, dt,
+        dw ? WEAPON_TYPE(dw) : NULL,
+        select_armor(dt, false),
+        select_armor(dt, true), true);
 }
 
 static void test_calculate_armor(CuTest * tc)
@@ -505,9 +542,7 @@ static void test_magic_resistance(CuTest *tc)
     ashield->magres = v10p;
     CuAssertIntEquals_Msg(tc, "laen reduction => 10%%", 900, test_resistance(dt));
     CuAssertIntEquals_Msg(tc, "no magic, no resistance", 1000,
-        apply_resistance(1000, dt,
-            select_weapon(dt, false, true) ? select_weapon(dt, false, true)->type : 0,
-            select_armor(dt, false), select_armor(dt, true), false));
+        test_resistance(dt));
     free_battle(b);
 
     b = NULL;
@@ -969,6 +1004,7 @@ CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_make_fighter);
+    SUITE_ADD_TEST(suite, test_select_weapon);
     SUITE_ADD_TEST(suite, test_select_weapon_restricted);
     SUITE_ADD_TEST(suite, test_select_armor);
     SUITE_ADD_TEST(suite, test_battle_fleeing);
