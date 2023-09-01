@@ -55,7 +55,21 @@ int *casualties)
     if (!enemies) {
         if (casualties)
             *casualties = 0;
-        return false;                /* if no enemy found, no use doing standarad attack */
+        return true;                /* if no enemy found, no use doing standarad attack */
+    }
+
+    if (fi->catmsg == -1) {
+        int i, k = 0;
+        message *msg;
+        for (i = 0; i <= at->index; ++i) {
+            struct weapon *wp = fi->person[i].melee;
+            if (wp != NULL && wp->type == wtype)
+                ++k;
+        }
+        msg = msg_message("useflamingsword", "amount unit", k, fi->unit);
+        message_all(fi->side->battle, msg);
+        msg_release(msg);
+        fi->catmsg = 0;
     }
 
     do {
