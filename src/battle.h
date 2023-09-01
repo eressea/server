@@ -100,7 +100,7 @@ typedef struct weapon {
     int defenseskill;
 } weapon;
 
-#define WEAPON_TYPE(wp) ((wp)->item->type->rtype->wtype)
+#define WEAPON_TYPE(wp) ((wp) ? (wp)->item->type->rtype->wtype : NULL)
 
 typedef struct troop {
     struct fighter* fighter;

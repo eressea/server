@@ -516,15 +516,19 @@ static const weapon *preferred_weapon(const troop t, bool attacking)
 {
     const weapon *missile = t.fighter->person[t.index].missile;
     const weapon *melee = t.fighter->person[t.index].melee;
-    if (attacking) {
-        if (melee == NULL || (missile && missile->attackskill > melee->attackskill)) {
-            return missile;
-        }
+    if (!melee) {
+        return missile;
     }
-    else {
-        if (melee == NULL || (missile
-            && missile->defenseskill > melee->defenseskill)) {
-            return missile;
+    if (missile) {
+        if (attacking) {
+            if (missile && missile->attackskill > melee->attackskill) {
+                return missile;
+            }
+        }
+        else {
+            if (missile && missile->defenseskill > melee->defenseskill) {
+                return missile;
+            }
         }
     }
     return melee;
@@ -3112,10 +3116,25 @@ static void equip_weapons(fighter* fig)
     for (i = 0; i != w; ++i) {
         const weapon *wp = fig->weapons + i;
         const weapon_type *wtype = WEAPON_TYPE(wp);
-        bool is_missile = wtype->flags & WTF_MISSILE;
+        bool is_missile;
+        assert(wtype);
+
+        is_missile = (wtype->flags & WTF_MISSILE);
         if (!is_missile && wpless > wp->attackskill + wp->defenseskill) {
             /* we fight better with bare hands than this melee weapon */
             continue;
+        }
+        if (is_missile) {
+            if (p_missile == fig->alive) {
+                /* everyone already has a missile weapon */
+                continue;
+            }
+        }
+        else {
+            if (p_melee == fig->alive) {
+                /* everyone already has a melee weapon */
+                continue;
+            }
         }
         if (wp->attackskill >= 0 || wp->defenseskill >= 0)
         {
@@ -3127,12 +3146,20 @@ static void equip_weapons(fighter* fig)
                         p->missile = wp;
                         --count;
                     }
+                    else {
+                        /* everyone already has a missile weapon */
+                        break;
+                    }
                 }
                 else {
                     if (p_melee < fig->alive) {
                         struct person *p = fig->person + p_melee++;
                         p->melee = wp;
                         --count;
+                    }
+                    else {
+                        /* everyone already has a melee weapon */
+                        break;
                     }
                 }
             }
