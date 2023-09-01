@@ -6,6 +6,7 @@
 
 struct message;
 struct selist;
+struct weapon_type;
 union variant;
 
 /** more defines **/
