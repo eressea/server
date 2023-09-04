@@ -212,11 +212,12 @@ typedef bool(*select_fun)(const struct side* vs, const struct fighter* fig, void
 struct selist* select_fighters(struct battle* b, const struct side* vs, int mask, select_fun cb, void* cbdata);
 struct selist* fighters(struct battle* b, const struct side* vs,
     int minrow, int maxrow, int mask);
+void flee_all(struct fighter *fig);
 
 int count_allies(const struct side* as, int minrow, int maxrow,
     int select, int allytype);
 bool helping(const struct side* as, const struct side* ds);
-void rmfighter(fighter* df, int i);
+void reduce_fighter(fighter* df, int i);
 struct fighter* select_corpse(struct battle* b, struct fighter* af);
 int statusrow(int status);
 void drain_exp(struct unit* u, int d);

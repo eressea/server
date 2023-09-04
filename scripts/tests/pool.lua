@@ -12,7 +12,7 @@ function setup()
     eressea.settings.set("rules.magic.playerschools", "")
     conf = [[{
         "races": {
-            "human" : { "flags" : [ "giveitem", "getitem" ] }
+            "human" : { "flags" : [ "getitem" ] }
         },
         "terrains" : {
             "plain": { "flags" : [ "land" ] }
@@ -35,7 +35,7 @@ end
 
 function test_give_nopool()
     local r = region.create(1, 1, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     u1:add_item("money", 100)
@@ -47,7 +47,7 @@ end
 
 function test_give_from_faction()
     local r = region.create(1, 1, "plain")
-    local f = faction.create("human", "test@example.com", "de")
+    local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
     local u3 = unit.create(f, r, 1)
@@ -64,8 +64,8 @@ function test_give_divisor()
     eressea.settings.set("rules.items.give_divisor", 2)
     eressea.settings.set("GiveRestriction", 0)
     local r = region.create(1, 1, "plain")
-    local f1 = faction.create("human", "test@example.com", "de")
-    local f2 = faction.create("human", "test@example.com", "de")
+    local f1 = faction.create("human")
+    local f2 = faction.create("human")
     local u1 = unit.create(f1, r, 1)
     local u2 = unit.create(f2, r, 1)
     u2:add_order("KONTAKTIERE " .. itoa36(u1.id))

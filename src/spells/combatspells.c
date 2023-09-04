@@ -1196,7 +1196,7 @@ int sp_appeasement(struct castorder * co)
     fi->run.hp = mage->hp;
     fi->run.number = mage->number;
     /* fighter leeren */
-    rmfighter(fi, mage->number);
+    reduce_fighter(fi, mage->number);
 
     m = msg_message("cast_escape_effect", "mage spell", fi->unit, sp);
     message_all(b, m);
