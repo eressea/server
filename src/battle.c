@@ -827,7 +827,7 @@ bool meffect_blocked(battle * b, meffect * s, side * as)
 
 /* rmfighter wird schon im PRAECOMBAT gebraucht, da gibt es noch keine
  * troops */
-void rmfighter(fighter * df, int i)
+void reduce_fighter(fighter * df, int i)
 {
     side *ds = df->side;
 
@@ -853,12 +853,22 @@ void rmfighter(fighter * df, int i)
     df->alive -= i;
 }
 
+void flee_all(fighter *fig)
+{
+    unit *u = fig->unit;
+    fig->run.hp = u->hp;
+    fig->run.number = u->number;
+    fig->side->flee += u->number;
+    setguard(u, false);
+    reduce_fighter(fig, u->number);
+}
+
 static void rmtroop(troop dt)
 {
     fighter *df = dt.fighter;
 
     /* troop ist immer eine einzelne Person */
-    rmfighter(df, 1);
+    reduce_fighter(df, 1);
 
     assert(dt.index >= 0 && dt.index < df->unit->number);
     if (dt.index != df->alive - df->removed) {
@@ -1150,7 +1160,7 @@ static void destroy_items(troop dt) {
   for (pitm = &du->items; *pitm;) {
       item *itm = *pitm;
       const item_type *itype = itm->type;
-      if (!(itype->flags & (ITF_CURSED | ITF_NOTLOST)) && dt.index < itm->number) {
+      if (!(itype->flags & ITF_NOTLOST) && dt.index < itm->number) {
           /* 25% Grundchance, dass ein Item kaputtgeht. */
           if (rng_int() % 4 < 1) {
               i_change(pitm, itype, -1);
@@ -2424,6 +2434,9 @@ static int loot_quota(const unit * src, const unit * dst,
     const item_type * type, int n)
 {
     UNUSED_ARG(type);
+    if (loot_divisor <= 0) {
+        return 0;
+    }
     if (dst && src && src->faction != dst->faction) {
         assert(loot_divisor <= 0 || loot_divisor >= 1);
         if (loot_divisor > 1) {
@@ -2466,7 +2479,7 @@ void loot_items(fighter * corpse)
                     int looting = 0;
                     int maxrow = 0;
                     /* mustloot: we absolutely, positively must have somebody loot this thing */
-                    bool mustloot = 0 != (itm->type->flags & (ITF_CURSED | ITF_NOTLOST));
+                    bool mustloot = 0 != (itm->type->flags & (ITF_CURSED|ITF_NOTLOST));
 
                     item_add(itm, -loot);
                     maxloot -= loot;
@@ -3822,11 +3835,7 @@ static bool start_battle(region * r, battle ** bp)
                             int effect = get_effect(u2, it_mistletoe);
                             if (effect >= u->number) {
                                 change_effect(u2, it_mistletoe, -u2->number);
-                                c2->run.hp = u2->hp;
-                                c2->run.number = u2->number;
-                                c2->side->flee += u2->number;
-                                setguard(u2, false);
-                                rmfighter(c2, u2->number);
+                                flee_all(c2);
                             }
                         }
                     }

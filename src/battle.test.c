@@ -653,12 +653,51 @@ static void test_loot_items(CuTest* tc)
 {
     troop ta, td;
     region* r;
+    faction *f;
     unit* ua, * ud;
     battle* b = NULL;
     const resource_type* rtype;
     race* rc;
 
     test_setup();
+    config_set_int("rules.items.loot_divisor", 1); // everything is looted 100%
+    test_create_horse();
+    rc = test_create_race("ghost");
+    rc->flags |= RCF_FLY; /* bug 2887 */
+
+    r = test_create_plain(0, 0);
+    ud = test_create_unit(f = test_create_faction(), r);
+    ud->status = ST_FLEE; /* bug 2887 */
+    ua = test_create_unit(f, r);
+    u_setrace(ua, rc);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+
+    ta.fighter->alive = 0;
+
+    rtype = get_resourcetype(R_HORSE);
+    i_change(&ua->items, rtype->itype, 1);
+    loot_items(ta.fighter);
+    CuAssertIntEquals(tc, 1, i_get(td.fighter->loot, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(ua->items, rtype->itype));
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_loot_notlost_items(CuTest* tc)
+{
+    troop ta, td;
+    region* r;
+    unit* ua, * ud;
+    battle* b = NULL;
+    const resource_type* rtype;
+    race* rc;
+
+    test_setup();
+    config_set_int("rules.items.loot_divisor", 0); // nothing is looted
     test_create_horse();
     rc = test_create_race("ghost");
     rc->flags |= RCF_FLY; /* bug 2887 */
@@ -687,6 +726,127 @@ static void test_loot_items(CuTest* tc)
     loot_items(ta.fighter);
     CuAssertIntEquals(tc, 1, i_get(td.fighter->loot, rtype->itype));
     CuAssertIntEquals(tc, 0, i_get(ua->items, rtype->itype));
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_loot_cursed_items_self(CuTest* tc)
+{
+    troop ta, td;
+    region* r;
+    faction *f;
+    unit* ua, * ud;
+    battle* b = NULL;
+    const resource_type* rtype;
+    race* rc;
+
+    test_setup();
+    config_set_int("rules.items.loot_divisor", 1); // everything is looted
+    test_create_horse();
+    rc = test_create_race("ghost");
+    rc->flags |= RCF_FLY; /* bug 2887 */
+
+    r = test_create_plain(0, 0);
+    ud = test_create_unit(f = test_create_faction(), r);
+    ud->status = ST_FLEE; /* bug 2887 */
+    ua = test_create_unit(f, r);
+    u_setrace(ua, rc);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+
+    ta.fighter->alive = 0;
+
+    rtype = get_resourcetype(R_HORSE);
+    rtype->itype->flags |= ITF_CURSED; /* must be looted by own faction */
+    i_change(&ua->items, rtype->itype, 1);
+    loot_items(ta.fighter);
+    CuAssertIntEquals(tc, 1, i_get(td.fighter->loot, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(ua->items, rtype->itype));
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_loot_cursed_items_other(CuTest* tc)
+{
+    troop ta, td;
+    region* r;
+    unit* ua, * ud;
+    battle* b = NULL;
+    const resource_type* rtype;
+    race* rc;
+
+    test_setup();
+    config_set_int("rules.items.loot_divisor", 1); // everything is looted
+    test_create_horse();
+    rc = test_create_race("ghost");
+    rc->flags |= RCF_FLY; /* bug 2887 */
+
+    r = test_create_plain(0, 0);
+    ud = test_create_unit(test_create_faction(), r);
+    ud->status = ST_FLEE; /* bug 2887 */
+    ua = test_create_unit(test_create_faction(), r);
+    u_setrace(ua, rc);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+
+    ta.fighter->alive = 0;
+
+    rtype = get_resourcetype(R_HORSE);
+    rtype->itype->flags |= ITF_CURSED; /* must not be looted */
+    i_change(&ua->items, rtype->itype, 1);
+    loot_items(ta.fighter);
+    CuAssertIntEquals(tc, 0, i_get(td.fighter->loot, rtype->itype));
+    CuAssertIntEquals(tc, 0, i_get(ua->items, rtype->itype));
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_no_loot_from_fleeing(CuTest* tc)
+{
+    troop ta, td;
+    region* r;
+    unit* ua, * ud;
+    battle* b = NULL;
+    const resource_type* rtype;
+    race* rc;
+
+    test_setup();
+    test_create_horse();
+    rc = test_create_race("ghost");
+    rc->flags |= RCF_FLY; /* bug 2887 */
+
+    r = test_create_plain(0, 0);
+    ud = test_create_unit(test_create_faction(), r);
+    ud->status = ST_FLEE; /* bug 2887 */
+    ua = test_create_unit(test_create_faction(), r);
+    u_setrace(ua, rc);
+    td.fighter = setup_fighter(&b, ud);
+    td.index = 0;
+    ta.fighter = setup_fighter(&b, ua);
+    ta.index = 0;
+
+    ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
+    ta.fighter->side->enemies[0] = td.fighter->side;
+    ta.fighter->side->enemies[1] = NULL;
+    td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
+    td.fighter->side->enemies[0] = ta.fighter->side;
+    td.fighter->side->enemies[1] = NULL;
+
+    flee_all(ta.fighter);
+
+    rtype = get_resourcetype(R_HORSE);
+    rtype->itype->flags |= ITF_NOTLOST; /* must always be looted */
+    i_change(&ua->items, rtype->itype, 1);
+    loot_items(ta.fighter);
+    CuAssertIntEquals(tc, 0, i_get(td.fighter->loot, rtype->itype));
+    CuAssertIntEquals(tc, 1, i_get(ua->items, rtype->itype));
 
     free_battle(b);
     test_teardown();
@@ -1026,6 +1186,10 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_tactics_chance);
     SUITE_ADD_TEST(suite, test_terminate);
     SUITE_ADD_TEST(suite, test_loot_items);
+    SUITE_ADD_TEST(suite, test_loot_notlost_items);
+    SUITE_ADD_TEST(suite, test_loot_cursed_items_self);
+    SUITE_ADD_TEST(suite, test_loot_cursed_items_other);
+    SUITE_ADD_TEST(suite, test_no_loot_from_fleeing);
     DISABLE_TEST(suite, test_drain_exp);
     return suite;
 }

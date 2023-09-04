@@ -24,7 +24,7 @@
   </resource>
 
   <resource name="ring_of_levitation" appearance="ring">
-    <item notlost="yes" weight="0" cursed="true" use="yes" />
+    <item cursed="true" notlost="yes" weight="0" use="yes" />
   </resource>
 
   <resource name="birthdaycake">
@@ -74,7 +74,7 @@
 <!-- gimmicks, etc. -->
   <resource name="aog">
     <!-- Amulett des Treffens -->
-    <item notlost="yes" cursed="true" weight="0"/>
+    <item cursed="true" notlost="yes" weight="0"/>
   </resource>
 
   <resource name="aoc" appearance="amulet">
