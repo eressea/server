@@ -143,6 +143,19 @@ static void test_faction_password_bad(CuTest *tc) {
     test_teardown();
 }
 
+static void test_faction_no_bad(CuTest *tc) {
+    FILE *F;
+
+    test_setup();
+    test_create_locale();
+    F = tmpfile();
+    fprintf(F, "PARTEI 1372915\n");
+    rewind(F);
+    CuAssertIntEquals(tc, 0, parseorders(F));
+    fclose(F);
+    test_teardown();
+}
+
 CuSuite *get_orderfile_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -151,6 +164,7 @@ CuSuite *get_orderfile_suite(void)
     SUITE_ADD_TEST(suite, test_no_foreign_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);
+    SUITE_ADD_TEST(suite, test_faction_no_bad);
 
     return suite;
 }
