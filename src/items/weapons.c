@@ -43,7 +43,7 @@ int *casualties)
         message *msg;
         for (i = 0; i <= at->index; ++i) {
             const weapon *wp = fi->person[i].melee;
-            if (wp != NULL && wp->item->type == wtype->itype)
+            if (WEAPON_TYPE(wp) == wtype)
                 ++k;
         }
         msg = msg_message("useflamingsword", "amount unit", k, fi->unit);
@@ -103,7 +103,7 @@ int *casualties)
         message *msg;
 
         for (i = 0; i <= at->index; ++i) {
-            if (af->person[i].reload == 0 && af->person[i].missile->item->type == wtype->itype)
+            if (af->person[i].reload == 0 && WEAPON_TYPE(af->person[i].missile) == wtype)
                 ++k;
         }
         msg = msg_message("usecatapult", "amount unit", k, au);

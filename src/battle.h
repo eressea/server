@@ -96,12 +96,15 @@ typedef struct battle {
 } battle;
 
 typedef struct weapon {
-    const struct item* item;
+    union {
+        struct item *ref;
+        const struct item_type *type;
+    } item;
     int attackskill;
     int defenseskill;
 } weapon;
 
-#define WEAPON_TYPE(wp) ((wp) ? (wp)->item->type->rtype->wtype : NULL)
+#define WEAPON_TYPE(wp) ((wp && (wp)->item.type) ? (wp)->item.type->rtype->wtype : NULL)
 
 typedef struct troop {
     struct fighter* fighter;
