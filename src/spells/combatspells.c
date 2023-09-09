@@ -287,10 +287,11 @@ int sp_combatrosthauch(struct castorder * co)
         for (w = 0; w != len; ++w) {
             weapon *wp = df->weapons;
             if (df->unit->items && force > 0) {
-                item ** itp = i_find(&df->unit->items, wp->item->type);
+                const item_type *itype = wp->item.type;
+                item ** itp = i_find(&df->unit->items, itype);
                 if (*itp) {
                     item *it = *itp;
-                    requirement *mat = wp->item->type->construction->materials;
+                    requirement *mat = itype->construction->materials;
                     int n = force;
                     if (it->number < n) n = it->number;
 
@@ -299,7 +300,7 @@ int sp_combatrosthauch(struct castorder * co)
                             int p;
                             force -= n;
                             k += n;
-                            i_change(itp, wp->item->type, -n);
+                            i_change(itp, itype, -n);
                             for (p = 0; n && p != df->unit->number; ++p) {
                                 if (df->person[p].melee == wp) {
                                     df->person[p].melee = NULL;

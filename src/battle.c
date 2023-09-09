@@ -665,9 +665,9 @@ weapon_effskill(troop t, troop enemy, const weapon * w,
     fighter *tf = t.fighter;
     unit *tu = t.fighter->unit;
     /* Alle Modifier berechnen, die fig durch die Waffen bekommt. */
-    if (w) {
+    if (w && w->item.type) {
         int skill = 0;
-        const weapon_type *wtype = WEAPON_TYPE(w);
+        const weapon_type *wtype = resource2weapon(w->item.type->rtype);
 
         if (attacking) {
             skill = w->attackskill;
@@ -1941,9 +1941,12 @@ static int setreload(troop at)
 {
     fighter *af = at.fighter;
     const weapon_type *wtype = WEAPON_TYPE(af->person[at.index].missile);
-    if (wtype->reload == 0)
-        return 0;
-    return af->person[at.index].reload = wtype->reload;
+    if (wtype) {
+        if (wtype->reload != 0) {
+            return af->person[at.index].reload = wtype->reload;
+        }
+    }
+    return 0;
 }
 
 int getreload(troop at)
@@ -3113,7 +3116,7 @@ static void equip_weapons(fighter* fig)
         wp = arraddnptr(fig->weapons, 1);
         wp->attackskill = weapon_skill(wtype, u, true);
         wp->defenseskill = weapon_skill(wtype, u, false);
-        wp->item = itm;
+        wp->item.ref = itm;
     }
     w = arrlen(fig->weapons);
     qsort(fig->weapons, w, sizeof(weapon), cmp_weapon);
@@ -3122,11 +3125,12 @@ static void equip_weapons(fighter* fig)
 
     /* hand out weapons: */
     for (i = 0; i != w; ++i) {
-        const weapon *wp = fig->weapons + i;
-        const weapon_type *wtype = WEAPON_TYPE(wp);
+        weapon *wp = fig->weapons + i;
+        const item *itm = wp->item.ref;
+        const weapon_type *wtype = resource2weapon(item2resource(itm->type));
         bool is_missile;
         assert(wtype);
-
+        wp->item.type = itm->type;
         is_missile = (wtype->flags & WTF_MISSILE);
         if (!is_missile && wpless > wp->attackskill + wp->defenseskill) {
             /* we fight better with bare hands than this melee weapon */
@@ -3146,7 +3150,7 @@ static void equip_weapons(fighter* fig)
         }
         if (wp->attackskill >= 0 || wp->defenseskill >= 0)
         {
-            int count = wp->item->number;
+            int count = itm->number;
             while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
                 if (is_missile) {
                     if (p_missile < fig->alive) {
