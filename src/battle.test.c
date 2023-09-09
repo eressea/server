@@ -147,13 +147,13 @@ static void test_select_weapon(CuTest *tc) {
     set_level(au, SK_MELEE, 1);
     it_axe = test_create_itemtype("axe");
     new_weapontype(it_axe, 0, frac_zero, NULL, 1, 0, 0, SK_MELEE);
-    i_axe = i_change(&au->items, it_axe, 1);
+    i_change(&au->items, it_axe, 1);
     it_sword = test_create_itemtype("sword");
     new_weapontype(it_sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
-    i_sword = i_change(&au->items, it_sword, 1);
+    i_change(&au->items, it_sword, 1);
     it_missile = test_create_itemtype("crossbow");
     new_weapontype(it_missile, WTF_MISSILE, frac_zero, NULL, 0, 0, 0, SK_CROSSBOW);
-    i_missile = i_change(&au->items, it_missile, 2);
+    i_change(&au->items, it_missile, 2);
 
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
