@@ -586,11 +586,6 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
         btype = b->type;
     }
 
-    if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
-        /* only one of these per region */
-        cmistake(u, ord, 93, MSG_PRODUCE);
-        return 0;
-    }
     if (btype->flags & BTF_NOBUILD) {
         /* special building, cannot be built */
         cmistake(u, ord, 221, MSG_PRODUCE);
@@ -599,6 +594,11 @@ build_building(unit * u, const building_type * btype, int id, int want, order * 
     if (!r->land) {
         /* special terrain, cannot build */
         cmistake(u, ord, 221, MSG_PRODUCE);
+        return 0;
+    }
+    if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
+        /* only one of these per region */
+        cmistake(u, ord, 93, MSG_PRODUCE);
         return 0;
     }
     if (btype->flags & BTF_ONEPERTURN) {
