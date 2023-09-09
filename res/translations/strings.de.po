@@ -4690,7 +4690,7 @@ msgid "unit_guards"
 msgstr "bewacht die Region"
 
 msgid "pavilion"
-msgstr "Pavillion"
+msgstr "Pavillon"
 
 msgctxt "race"
 msgid "spell_d"
