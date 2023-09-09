@@ -158,12 +158,12 @@ static void test_select_weapon(CuTest *tc) {
     b = make_battle(au->region);
     af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
     CuAssertIntEquals(tc, 3, (int)arrlen(af->weapons));
-    CuAssertPtrEquals(tc, i_axe, (item *)af->person[0].melee->item);
+    CuAssertPtrEquals(tc, it_axe, (item_type *)af->person[0].melee->item.type);
     CuAssertPtrEquals(tc, NULL, (weapon *)af->person[0].missile);
-    CuAssertPtrEquals(tc, i_sword, (item *)af->person[1].melee->item);
-    CuAssertPtrEquals(tc, i_missile, (item *)af->person[1].missile->item);
+    CuAssertPtrEquals(tc, it_sword, (item_type *)af->person[1].melee->item.type);
+    CuAssertPtrEquals(tc, it_missile, (item_type *)af->person[1].missile->item.type);
     CuAssertPtrEquals(tc, NULL, (weapon *)af->person[2].melee);
-    CuAssertPtrEquals(tc, i_missile, (item *)af->person[2].missile->item);
+    CuAssertPtrEquals(tc, it_missile, (item_type *)af->person[2].missile->item.type);
     free_battle(b);
 
     test_teardown();
