@@ -341,7 +341,7 @@ static void test_build_building_no_materials(CuTest *tc) {
     u = setup_build(&bf);
     btype = bf.btype;
     set_level(u, SK_BUILDING, 1);
-    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
     CuAssertIntEquals(tc, ENOMATERIALS, build_building(u, btype, 0, 4, u->orders));
     CuAssertPtrEquals(tc, NULL, u->region->buildings);
     CuAssertPtrEquals(tc, NULL, u->building);
@@ -358,7 +358,7 @@ static void test_build_building_with_golem(CuTest *tc) {
     btype = bf.btype;
 
     set_level(bf.u, SK_BUILDING, 1);
-    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
     CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 1, u->orders));
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertIntEquals(tc, 1, u->region->buildings->size);
@@ -379,9 +379,9 @@ static void test_build_building_success(CuTest *tc) {
     assert(btype && rtype && rtype->itype);
     assert(!u->region->buildings);
 
-    i_change(&bf.u->items, rtype->itype, 1);
+    i_change(&u->items, rtype->itype, 1);
     set_level(u, SK_BUILDING, 1);
-    u->orders = create_order(K_MAKE, u->faction->locale, 0);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
     CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
@@ -396,6 +396,66 @@ static void test_build_roqf_factor(CuTest *tc) {
     config_set("rules.economy.roqf", "50");
     CuAssertIntEquals(tc, 50, roqf_factor());
     test_teardown();
+}
+
+static void test_build_building_nobuild_fail(CuTest *tc) {
+    unit *u;
+    build_fixture bf = { 0 };
+    building_type *btype;
+    const resource_type *rtype;
+
+    u = setup_build(&bf);
+
+    rtype = get_resourcetype(R_STONE);
+    btype = bf.btype;
+    assert(btype && rtype && rtype->itype);
+    assert(!u->region->buildings);
+    btype->flags |= BTF_NOBUILD;
+
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_BUILDING, 1);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
+    CuAssertIntEquals(tc, 0, build_building(u, btype, 0, 4, u->orders));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error221"));
+    CuAssertPtrEquals(tc, NULL, u->region->buildings);
+    CuAssertPtrEquals(tc, NULL, u->building);
+    CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
+    teardown_build(&bf);
+}
+
+static void test_build_building_unique(CuTest *tc) {
+    unit *u;
+    build_fixture bf = { 0 };
+    building_type *btype;
+    const resource_type *rtype;
+
+    u = setup_build(&bf);
+
+    rtype = get_resourcetype(R_STONE);
+    btype = bf.btype;
+    assert(btype && rtype && rtype->itype);
+    i_change(&u->items, rtype->itype, 2);
+    set_level(u, SK_BUILDING, 1);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
+
+    btype->flags |= BTF_UNIQUE;
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "error93"));
+    CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
+    CuAssertPtrNotNull(tc, u->building);
+    leave_building(u);
+    CuAssertIntEquals(tc, 0, build_building(u, btype, 0, 4, u->orders));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error93"));
+    CuAssertIntEquals(tc, 1, i_get(u->items, rtype->itype));
+    test_clear_messages(u->faction);
+
+    /* NOBUILD before UNIQUE*/
+    btype->flags |= BTF_UNIQUE|BTF_NOBUILD;
+    CuAssertIntEquals(tc, 0, build_building(u, btype, 0, 4, u->orders));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error221"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "error93"));
+
+    teardown_build(&bf);
 }
 
 CuSuite *get_build_suite(void)
@@ -416,6 +476,8 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_stage_continue);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
+    SUITE_ADD_TEST(suite, test_build_building_nobuild_fail);
+    SUITE_ADD_TEST(suite, test_build_building_unique);
     return suite;
 }
 
