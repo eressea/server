@@ -26,6 +26,7 @@
 #include "kernel/alliance.h"
 #include "kernel/build.h"
 #include "kernel/building.h"
+#include "kernel/callbacks.h"
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/equipment.h"
@@ -2163,7 +2164,8 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 if (numattack == 0 && wtype && wtype->attack) {
                     int dead = 0;
                     if (wtype->attack(&ta, wtype, &dead)) {
-                        af->catmsg += dead;
+                        ++af->special.attacks;
+                        af->special.kills += dead;
                         if (af->person[ta.index].last_action < b->turn) {
                             af->person[ta.index].last_action = b->turn;
                         }
@@ -2285,12 +2287,30 @@ static void do_attack(fighter * af)
     }
     /* Der letzte Katapultschuetze setzt die
      * Ladezeit neu und generiert die Meldung. */
-    if (af->catmsg >= 0) {
-        struct message *m =
-            msg_message("killed_battle", "unit dead", au, af->catmsg);
+    if (af->special.attacks > 0) {
+        struct message *m;
+        if (callbacks.report_special_attacks) {
+            const weapon_type *wtype = NULL;
+            for (ta.index = 0; ta.index != af->fighting; ++ta.index) {
+                const weapon *wp = preferred_weapon(ta, true);
+                wtype = WEAPON_TYPE(wp);
+                if (wtype && wtype->attack) {
+                    break;
+                }
+                else {
+                    wtype = NULL;
+                }
+
+            }
+            if (wtype && wtype->attack) {
+                callbacks.report_special_attacks(af, wtype->itype);
+            }
+        }
+        m = msg_message("killed_battle", "unit dead", au, af->special.kills);
         message_all(b, m);
         msg_release(m);
-        af->catmsg = -1;
+        af->special.kills = 0;
+        af->special.attacks = 0;
     }
 }
 
@@ -3093,7 +3113,12 @@ static int cmp_weapon(const void *lhs, const void *rhs)
 {
     const weapon *a = (const weapon *)lhs;
     const weapon *b = (const weapon *)rhs;
-    return b->attackskill - a->attackskill + b->defenseskill - a->defenseskill;
+    int diff = b->attackskill - a->attackskill + b->defenseskill - a->defenseskill;
+    if (diff == 0) {
+        if (a->item.ref->type->rtype->wtype->attack) return 1;
+        if (b->item.ref->type->rtype->wtype->attack) return -1;
+    }
+    return diff;
 }
 
 /* Fuer alle Waffengattungen wird bestimmt, wie viele der Personen mit
@@ -3263,7 +3288,8 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->side = s1;
     fig->alive = u->number;
     fig->side->alive += u->number;
-    fig->catmsg = -1;
+    fig->special.kills = 0;
+    fig->special.attacks = 0;
 
     /* Freigeben nicht vergessen! */
     assert(fig->alive > 0);

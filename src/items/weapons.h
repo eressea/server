@@ -1,7 +1,6 @@
 #pragma once
-#ifndef H_ITM_WEAPONS
-#define H_ITM_WEAPONS
+
+struct fighter;
+struct weapon_type;
 
 void register_weapons(void);
-
-#endif
