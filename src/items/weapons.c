@@ -55,7 +55,7 @@ int *casualties)
     if (!enemies) {
         if (casualties)
             *casualties = 0;
-        return true;                /* if no enemy found, no use doing standarad attack */
+        return false;                /* if no enemy found, no use doing standarad attack */
     }
 
     if (fi->catmsg == -1) {
