@@ -120,6 +120,7 @@ typedef struct armor {
 /*** fighter::flags ***/
 #define FIG_ATTACKER   1<<0
 #define FIG_NOLOOT     1<<1
+
 typedef struct fighter {
     struct fighter* next;
     struct side* side;
@@ -138,7 +139,10 @@ typedef struct fighter {
     int horses;                 /* Anzahl brauchbarer Pferde der Einheit */
     int elvenhorses;            /* Anzahl brauchbarer Elfenpferde der Einheit */
     struct item* loot;
-    int catmsg;                 /* Merkt sich, ob Katapultmessage schon generiert. */
+    struct {
+        int attacks;
+        int kills;
+    } special;
     struct person {
         int hp;                   /* Trefferpunkte der Personen */
         int flags;

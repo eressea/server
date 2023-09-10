@@ -21,6 +21,7 @@ extern "C" {
             int amount, struct order *ord);
         void(*produce_resource)(struct region *, const struct resource_type *, int);
         int(*limit_resource)(const struct region *, const struct resource_type *);
+        void (*report_special_attacks)(const struct fighter *fig, const struct item_type *itype);
     };
 
     extern struct callback_struct callbacks;

@@ -3,6 +3,7 @@
 
 #include <kernel/unit.h>
 #include <kernel/build.h>
+#include <kernel/callbacks.h>
 #include <kernel/config.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
@@ -20,6 +21,24 @@
 
 /* damage types */
 
+static void report_special_attacks(const fighter *af, const item_type *itype)
+{
+    battle *b = af->side->battle;
+    unit *au = af->unit;
+    message *msg;
+    int k = af->special.attacks;
+    const weapon_type *wtype = resource2weapon(itype->rtype);
+
+    if (wtype->skill == SK_CATAPULT) {
+        msg = msg_message("usecatapult", "amount unit", k, au);
+    }
+    else {
+        msg = msg_message("useflamingsword", "amount unit", k, au);
+    }
+    message_all(b, msg);
+    msg_release(msg);
+}
+
 static bool
 attack_firesword(const troop * at, const struct weapon_type *wtype,
 int *casualties)
@@ -35,21 +54,7 @@ int *casualties)
     if (!enemies) {
         if (casualties)
             *casualties = 0;
-        return true;                /* if no enemy found, no use doing standarad attack */
-    }
-
-    if (fi->catmsg == -1) {
-        int i, k = 0;
-        message *msg;
-        for (i = 0; i <= at->index; ++i) {
-            const weapon *wp = fi->person[i].melee;
-            if (WEAPON_TYPE(wp) == wtype)
-                ++k;
-        }
-        msg = msg_message("useflamingsword", "amount unit", k, fi->unit);
-        message_all(fi->side->battle, msg);
-        msg_release(msg);
-        fi->catmsg = 0;
+        return false;                /* if no enemy found, no use doing standarad attack */
     }
 
     do {
@@ -68,13 +73,13 @@ int *casualties)
 
 static bool
 attack_catapult(const troop * at, const struct weapon_type *wtype,
-int *casualties)
+    int *casualties)
 {
     fighter *af = at->fighter;
     unit *au = af->unit;
     battle *b = af->side->battle;
     troop dt;
-    int d = 0, enemies;
+    int shots = INT_MAX, d = 0, enemies;
     const resource_type *rtype;
 
     if (au->status >= ST_AVOID) {
@@ -82,12 +87,13 @@ int *casualties)
         return false;
     }
 
-    assert(wtype == WEAPON_TYPE(af->person[at->index].missile));
+    assert(wtype && wtype == WEAPON_TYPE(af->person[at->index].missile));
     assert(af->person[at->index].reload == 0);
     rtype = rt_find("catapultammo");
 
     if (rtype) {
-        if (get_pooled(au, rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1) <= 0) {
+        shots = get_pooled(au, rtype, GET_SLACK | GET_RESERVE | GET_POOLED_SLACK, 1);
+        if (shots <= 0) {
             return false;
         }
     }
@@ -98,25 +104,11 @@ int *casualties)
         return false;
     }
 
-    if (af->catmsg == -1) {
-        int i, k = 0;
-        message *msg;
-
-        for (i = 0; i <= at->index; ++i) {
-            if (af->person[i].reload == 0 && WEAPON_TYPE(af->person[i].missile) == wtype)
-                ++k;
-        }
-        msg = msg_message("usecatapult", "amount unit", k, au);
-        message_all(b, msg);
-        msg_release(msg);
-        af->catmsg = 0;
-    }
-
     if (rtype) {
         use_pooled(au, rtype, GET_DEFAULT, 1);
     }
 
-    while (--enemies >= 0) {
+    while (enemies-- > 0) {
         /* Select defender */
         dt = select_enemy(af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
         if (!dt.fighter)
@@ -138,6 +130,7 @@ int *casualties)
 
 void register_weapons(void)
 {
+    callbacks.report_special_attacks = report_special_attacks;
     register_function((pf_generic)attack_catapult, "attack_catapult");
     register_function((pf_generic)attack_firesword, "attack_firesword");
 }
