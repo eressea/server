@@ -17,6 +17,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <stdlib.h>
 
 /* damage types */
