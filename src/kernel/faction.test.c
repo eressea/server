@@ -42,20 +42,38 @@ static void test_destroyfaction(CuTest *tc) {
     init_resources();
 
     r = test_create_plain(0, 0);
-    rsethorses(r, 10);
     rsetpeasants(r, 100);
-    rsetmoney(r, 1000);
     f = test_create_faction();
     u = test_create_unit(f, r);
-    i_change(&u->items, it_find("horse"), 10);
-    i_change(&u->items, it_find("money"), 1000);
     scale_number(u, 100);
     CuAssertPtrEquals(tc, f, factions);
     CuAssertPtrEquals(tc, NULL, f->next);
     destroyfaction(&factions);
     CuAssertPtrEquals(tc, NULL, factions);
-    CuAssertIntEquals(tc, 20, rhorses(r));
     CuAssertIntEquals(tc, 200, rpeasants(r));
+    test_teardown();
+}
+
+static void test_destroyfaction_items(CuTest *tc) {
+    faction *f;
+    region *r;
+    unit* u;
+
+    test_setup();
+    init_resources();
+
+    r = test_create_plain(0, 0);
+    rsethorses(r, 10);
+    rsetmoney(r, 1000);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    i_change(&u->items, it_find("horse"), 10);
+    i_change(&u->items, it_find("money"), 1000);
+    CuAssertPtrEquals(tc, f, factions);
+    CuAssertPtrEquals(tc, NULL, f->next);
+    destroyfaction(&factions);
+    CuAssertPtrEquals(tc, NULL, factions);
+    CuAssertIntEquals(tc, 20, rhorses(r));
     CuAssertIntEquals(tc, 2000, rmoney(r));
     test_teardown();
 }
@@ -563,6 +581,7 @@ CuSuite *get_faction_suite(void)
     SUITE_ADD_TEST(suite, test_addfaction);
     SUITE_ADD_TEST(suite, test_remove_empty_factions);
     SUITE_ADD_TEST(suite, test_destroyfaction);
+    SUITE_ADD_TEST(suite, test_destroyfaction_items);
     SUITE_ADD_TEST(suite, test_destroyfaction_undead);
     SUITE_ADD_TEST(suite, test_destroyfaction_demon);
     SUITE_ADD_TEST(suite, test_destroyfaction_orc);

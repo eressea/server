@@ -424,21 +424,21 @@ void destroyfaction(faction ** fp)
     }
 
     while (u) {
+        region *r = u->region;
         /* give away your stuff, to ghosts if you cannot (quest items) */
         if (u->items) {
-            region *r = u->region;
             int result = gift_items(u, GIFT_FRIENDS | GIFT_PEASANTS);
             if (result != 0) {
                 save_special_items(u);
             }
-            if (r->land && playerrace(u_race(u))) {
-                const race *rc = u_race(u);
-                /* Personen gehen nur an die Bauern, wenn sie auch von dort stammen */
-                if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
-                    int p = rpeasants(u->region);
-                    p += (int)(u->number / rc->recruit_multi);
-                    rsetpeasants(r, p);
-                }
+        }
+        if (r->land && playerrace(u_race(u))) {
+            const race *rc = u_race(u);
+            /* Personen gehen nur an die Bauern, wenn sie auch von dort stammen */
+            if ((rc->ec_flags & ECF_REC_ETHEREAL) == 0) {
+                int p = rpeasants(u->region);
+                p += (int)(u->number / rc->recruit_multi);
+                rsetpeasants(r, p);
             }
         }
         set_number(u, 0);
