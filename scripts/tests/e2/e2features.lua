@@ -636,3 +636,22 @@ function test_seacast()
     process_orders()
     assert_equal(8, u2.region.x)
 end
+
+-- Solthar: long orders prevent trading
+function test_bug_2978()
+    local r = region.create(0, 0, 'plain')
+    r.peasants = 10000
+    r.luxury = 'balm'
+    local f = faction.create('human')
+    local u = unit.create(f, r, 1)
+    u:add_item("jewel", 1)
+    assert_equal(1, u:get_item("jewel"))
+    u:add_item("stone", 2)
+    u:add_order("MACHE 2 Burg")
+    u:add_order("VERKAUFE ALLES Juwel")
+    u:set_skill("trade", 10)
+    u:set_skill("building", 10)
+    process_orders()
+    write_report(f)
+    assert_equal(1, u:get_item("jewel"))
+end

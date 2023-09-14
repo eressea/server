@@ -57,7 +57,6 @@ function test_guarded_empty_units_cannot_recruit()
     u2:set_skill("melee", 1)
     u2.guard = true
 
-    u1.name='Xolthar'
     u1:add_item("money", 100)
     u1:add_order("GIB 0 ALLES PERSONEN")
     u1:add_order("REKRUTIERE 1")

@@ -1385,6 +1385,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     const luxury_type *ltype = NULL;
     const char *s;
 
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return;
+    }
+
     if (u->ship && is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
@@ -1674,9 +1679,9 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     static int bt_cache;
     static const struct building_type *castle_bt, *caravan_bt;
 
-    if (bt_changed(&bt_cache)) {
-        castle_bt = bt_find("castle");
-        caravan_bt = bt_find("caravan");
+    if (fval(u, UFL_LONGACTION)) {
+        cmistake(u, ord, 52, MSG_PRODUCE);
+        return false;
     }
 
     if (u->ship && is_guarded(r, u)) {
@@ -1685,6 +1690,11 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
     }
     /* sellorders sind KEIN array, weil fuer alle items DIE SELBE resource
      * (das geld der region) aufgebraucht wird. */
+
+    if (bt_changed(&bt_cache)) {
+        castle_bt = bt_find("castle");
+        caravan_bt = bt_find("caravan");
+    }
 
     init_order(ord, NULL);
     s = gettoken(token, sizeof(token));
@@ -2472,9 +2482,9 @@ static void peasant_taxes(region * r)
 
 void produce(struct region *r)
 {
-    econ_request *taxorders, *lootorders, *sellorders, *stealorders, *buyorders;
-    unit *u;
     bool limited = true;
+    econ_request *taxorders = NULL, *lootorders = NULL, *sellorders = NULL, *stealorders = NULL, *buyorders = NULL;
+    unit *u;
     long entertaining = 0, working = 0;
     econ_request *nextrequest = econ_requests;
     static int bt_cache;
@@ -2509,15 +2519,8 @@ void produce(struct region *r)
         peasant_taxes(r);
     }
 
-    buyorders = 0;
-    sellorders = 0;
-    taxorders = 0;
-    lootorders = 0;
-    stealorders = 0;
-
     for (u = r->units; u; u = u->next) {
         order *ord;
-        bool trader = false;
         keyword_t todo;
 
         if (!long_order_allowed(u, false)) continue;
@@ -2534,28 +2537,29 @@ void produce(struct region *r)
             continue;
         }
 
-        for (ord = u->orders; ord; ord = ord->next) {
-            keyword_t kwd = getkeyword(ord);
-            if (kwd == K_BUY) {
-                buy(u, &buyorders, ord);
-                trader = true;
+        if (u->thisorder == NULL) {
+            bool trader = false;
+            for (ord = u->orders; ord; ord = ord->next) {
+                keyword_t kwd = getkeyword(ord);
+                if (kwd == K_BUY) {
+                    buy(u, &buyorders, ord);
+                    trader = true;
+                }
+                else if (kwd == K_SELL) {
+                    /* sell returns true if the sale is not limited
+                     * by the region limit */
+                    limited &= !sell(u, &sellorders, ord);
+                    trader = true;
+                }
             }
-            else if (kwd == K_SELL) {
-                /* sell returns true if the sale is not limited
-                 * by the region limit */
-                limited &= !sell(u, &sellorders, ord);
-                trader = true;
+            if (trader) {
+                attrib *a = a_find(u->attribs, &at_trades);
+                if (a && a->data.i) {
+                    produceexp(u, SK_TRADE, u->number);
+                }
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
-        if (trader) {
-            attrib *a = a_find(u->attribs, &at_trades);
-            if (a && a->data.i) {
-                produceexp(u, SK_TRADE, u->number);
-            }
-            fset(u, UFL_LONGACTION | UFL_NOTMOVING);
-            continue;
-        }
-
         todo = getkeyword(u->thisorder);
         if (todo == NOKEYWORD)
             continue;
