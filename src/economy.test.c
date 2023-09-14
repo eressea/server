@@ -617,6 +617,42 @@ static void test_buy_prices_rising(CuTest* tc) {
     test_teardown();
 }
 
+static void test_trade_is_long_action(CuTest *tc) {
+    unit *u;
+    region *r;
+    const item_type *it_luxury, *it_sold;
+    const resource_type *rt_silver;
+    test_setup();
+    setup_production();
+    r = setup_trade_region(tc, NULL);
+    test_create_building(r, test_create_buildingtype("castle"))->size = 2;
+    rt_silver = get_resourcetype(R_SILVER);
+    CuAssertPtrNotNull(tc, rt_silver);
+    CuAssertPtrNotNull(tc, rt_silver->itype);
+    it_luxury = r_luxury(r);
+    it_sold = it_find("balm");
+    CuAssertTrue(tc, it_sold != it_luxury);
+    CuAssertPtrNotNull(tc, it_luxury);
+    u = test_create_unit(test_create_faction(), r);
+    test_set_item(u, it_sold, 100);
+    test_set_item(u, rt_silver->itype, 1000);
+    set_level(u, SK_TRADE, 1);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "1 %s", LOC(u->faction->locale, resourcename(it_sold->rtype, 0))));
+    produce(u->region);
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "error52"));
+    CuAssertIntEquals(tc, UFL_NOTMOVING | UFL_LONGACTION, u->flags & (UFL_NOTMOVING | UFL_LONGACTION));
+    CuAssertIntEquals(tc, 1, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 99, i_get(u->items, it_sold));
+
+    produce(u->region);
+    // error, but message is created in update_long_order!
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "error52"));
+    CuAssertIntEquals(tc, 1, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 99, i_get(u->items, it_sold));
+    test_teardown();
+}
+
 static void test_buy_cmd(CuTest *tc) {
     region * r;
     unit *u;
@@ -1459,6 +1495,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_normals_recruit);
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
+    SUITE_ADD_TEST(suite, test_trade_is_long_action);
     SUITE_ADD_TEST(suite, test_buy_cmd);
     SUITE_ADD_TEST(suite, test_buy_twice);
     SUITE_ADD_TEST(suite, test_buy_prices);
