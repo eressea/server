@@ -1145,6 +1145,7 @@ static void handlekey(state * st, int c)
     case KEY_SAVE:
         savedata(st);
         break;
+    case 'O':
     case KEY_OPEN:
         loaddata(st);
         break;
