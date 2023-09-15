@@ -165,8 +165,8 @@ static void test_long_order_multi_long(CuTest* tc) {
     unit_addorder(u, create_order(K_MOVE, u->faction->locale, NULL));
     unit_addorder(u, create_order(K_DESTROY, u->faction->locale, NULL));
     update_long_orders();
-    CuAssertPtrNotNull(tc, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrNotNull(tc, u->thisorder);
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_teardown();
 }
@@ -180,8 +180,23 @@ static void test_long_order_multi_buy(CuTest* tc) {
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
     update_long_orders();
-    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
+    test_teardown();
+}
+
+static void test_long_order_trade_and_other(CuTest *tc) {
+
+    unit *u;
+    test_setup();
+    mt_create_error(52);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    unit_addorder(u, create_order(K_WORK, u->faction->locale, 0));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, 0));
+    update_long_orders();
+    CuAssertPtrNotNull(tc, u->orders);
+    CuAssertIntEquals(tc, K_WORK, getkeyword(u->thisorder));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error52"));
     test_teardown();
 }
@@ -362,6 +377,7 @@ CuSuite *get_defaults_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_cast);
     SUITE_ADD_TEST(suite, test_long_order_attack);
     SUITE_ADD_TEST(suite, test_long_order_buy_sell);
+    SUITE_ADD_TEST(suite, test_long_order_trade_and_other);
     SUITE_ADD_TEST(suite, test_long_order_multi_long);
     SUITE_ADD_TEST(suite, test_long_order_multi_buy);
     SUITE_ADD_TEST(suite, test_long_order_multi_sell);
