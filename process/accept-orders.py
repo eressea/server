@@ -1,23 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import os
 import os.path
-import ConfigParser
+import io
+try:
+  	from configparser import ConfigParser
+except ImportError:
+	from ConfigParser import ConfigParser
 import string
 import logging
 import sys
 import subprocess
 import time
 import socket
-import rfc822
 from stat import ST_MTIME
-from email.Utils import parseaddr
-from email.Parser import Parser
+from email.utils import parseaddr, parsedate_tz, mktime_tz
+try:
+    from email.parser import BytesParser as Parser
+except:
+    from email.parser import Parser
 
-if sys.version_info[0] > 2:
-    print("this script has not yet been converted to work with python 3")
-    sys.exit(2)
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
 elif 'HOME' in os.environ:
@@ -39,7 +42,7 @@ inifile = os.path.join(gamedir, 'eressea.ini')
 if not os.path.exists(inifile):
     print("no such file: " . inifile)
 else:
-    config = ConfigParser.ConfigParser()
+    config = ConfigParser()
     config.read(inifile)
     if config.has_option('game', 'email'):
         frommail = config.get('game', 'email')
@@ -63,57 +66,57 @@ rejecthtml = True
 
 messages = {
         "multipart-en" :
-                "ERROR: The orders you sent contain no plaintext. " \
-                "The Eressea server cannot process orders containing HTML " \
-                "or invalid attachments, which are the reasons why this " \
-                "usually happens. Please change the settings of your mail " \
-                "software and re-send the orders.",
+                u"ERROR: The orders you sent contain no plaintext. " \
+                u"The Eressea server cannot process orders containing HTML " \
+                u"or invalid attachments, which are the reasons why this " \
+                u"usually happens. Please change the settings of your mail " \
+                u"software and re-send the orders.",
 
         "multipart-de" :
-                "FEHLER: Die von dir eingeschickte Mail enthält keinen " \
-                "Text. Evtl. hast Du den Zug als HTML oder als anderweitig " \
-                "ungültig formatierte Mail ingeschickt. Wir können ihn " \
-                "deshalb nicht berücksichtigen. Schicke den Zug nochmals " \
-                "als reinen Text ohne Formatierungen ein.",
+                u"FEHLER: Die von dir eingeschickte Mail enthält keinen " \
+                u"Text. Evtl. hast Du den Zug als HTML oder als anderweitig " \
+                u"ungültig formatierte Mail ingeschickt. Wir können ihn " \
+                u"deshalb nicht berücksichtigen. Schicke den Zug nochmals " \
+                u"als reinen Text ohne Formatierungen ein.",
 
         "maildate-de":
-                "Es erreichte uns bereits ein Zug mit einem späteren " \
-                "Absendedatum (%s > %s). Entweder ist deine " \
-                "Systemzeit verstellt, oder ein Zug hat einen anderen Zug von " \
-                "dir auf dem Transportweg überholt. Entscheidend für die " \
-                "Auswertungsreihenfolge ist das Absendedatum, d.h. der Date:-Header " \
-                "deiner Mail.",
+                u"Es erreichte uns bereits ein Zug mit einem späteren " \
+                u"Absendedatum (%s > %s). Entweder ist deine " \
+                u"Systemzeit verstellt, oder ein Zug hat einen anderen Zug von " \
+                u"dir auf dem Transportweg überholt. Entscheidend für die " \
+                u"Auswertungsreihenfolge ist das Absendedatum, d.h. der Date:-Header " \
+                u"deiner Mail.",
 
         "maildate-en":
-                "The server already received an order file that was sent at a later " \
-                "date (%s > %s). Either your system clock is wrong, or two messages have " \
-                "overtaken each other on the way to the server. The order of " \
-                "execution on the server is always according to the Date: header in " \
-                "your mail.",
+                u"The server already received an order file that was sent at a later " \
+                u"date (%s > %s). Either your system clock is wrong, or two messages have " \
+                u"overtaken each other on the way to the server. The order of " \
+                u"execution on the server is always according to the Date: header in " \
+                u"your mail.",
 
         "nodate-en":
-                "Your message did not contain a valid Date: header in accordance with RFC2822.",
+                u"Your message did not contain a valid Date: header in accordance with RFC2822.",
 
         "nodate-de":
-                "Deine Nachricht enthielt keinen gueltigen Date: header nach RFC2822.",
+                u"Deine Nachricht enthielt keinen gueltigen Date: header nach RFC2822.",
 
         "error-de":
-                "Fehler",
+                u"Fehler",
 
         "error-en":
-                "Error",
+                u"Error",
 
         "warning-de":
-                "Warnung",
+                u"Warnung",
 
         "warning-en":
-                "Warning",
+                u"Warning",
 
         "subject-de":
-                "Befehle angekommen",
+                u"Befehle angekommen",
 
         "subject-en":
-                "orders received"
+                u"orders received"
 }
 
 # return 1 if addr is a valid email address
@@ -178,7 +181,7 @@ def available_file(dirname, basename):
     return maxdate, filename
 
 def formatpar(string, l=76, indent=2):
-    words = string.split(string)
+    words = string.split()
     res = ""
     ll = 0
     first = 1
@@ -190,7 +193,7 @@ def formatpar(string, l=76, indent=2):
             ll = len(word)
         else:
             if ll + len(word) > l:
-                res = res + "\n"+" "*indent+word
+                res = res + u"\n"+" "*indent+word
                 ll = len(word) + indent
             else:
                 res = res+" "+word
@@ -199,7 +202,7 @@ def formatpar(string, l=76, indent=2):
     return res+"\n"
 
 def store_message(message, filename):
-    outfile = open(filename, "w")
+    outfile = io.open(filename, "wb")
     outfile.write(message.as_string())
     outfile.close()
     return
@@ -225,7 +228,7 @@ def write_part(outfile, part, sender):
     except:
         outfile.write(msg)
         return False
-    outfile.write("\n");
+    outfile.write("\n".encode('ascii'));
     return True
 
 def copy_orders(message, filename, sender, mtime):
@@ -234,13 +237,13 @@ def copy_orders(message, filename, sender, mtime):
     if writeheaders:
         header_dir = dirname + '/headers'
         if not os.path.exists(header_dir): os.mkdir(header_dir)
-        outfile = open(header_dir + '/' + basename, "w")
+        outfile = io.open(header_dir + '/' + basename, "wb")
         for name, value in message.items():
-            outfile.write(name + ": " + value + "\n")
+            outfile.write((name + ": " + value + "\n").encode('utf8', 'ignore'))
         outfile.close()
 
     found = False
-    outfile = open(filename, "w")
+    outfile = io.open(filename, "wb")
     if message.is_multipart():
         for part in message.get_payload():
             if write_part(outfile, part, sender):
@@ -284,7 +287,7 @@ def accept(game, locale, stream, extend=None):
     if maildate is None:
         turndate = time.time()
     else:
-        turndate = rfc822.mktime_tz(rfc822.parsedate_tz(maildate))
+        turndate = mktime_tz(parsedate_tz(maildate))
 
     text_ok = copy_orders(message, filename, email, turndate)
 
@@ -292,7 +295,7 @@ def accept(game, locale, stream, extend=None):
     if not maildate is None:
         os.utime(filename, (turndate, turndate))
         logger.debug("mail date is '%s' (%d)" % (maildate, turndate))
-        if False and turndate < maxdate:
+        if turndate < maxdate:
             logger.warning("inconsistent message date " + email)
             warning = " (" + messages["warning-" + locale] + ")"
             msg = msg + formatpar(messages["maildate-" + locale] % (time.ctime(maxdate), time.ctime(turndate)), 76, 2) + "\n"
@@ -312,14 +315,19 @@ def accept(game, locale, stream, extend=None):
         savedir = savedir + "/rejected"
         if not os.path.exists(savedir): os.mkdir(savedir)
         maxdate, filename = available_file(savedir, prefix + email)
-        store_message(message, filename)
+        if filename is None:
+            logger.error("too many failed attempts")
+        else:
+            store_message(message, filename)
         fail = True
 
     if sendmail and warning is not None:
         logger.warning(warning)
         subject = gamename + " " + messages["subject-"+locale] + warning
-        ps = subprocess.Popen(['mutt', '-s', subject, email], stdin=subprocess.PIPE)
-        ps.communicate(msg)
+        ps = subprocess.Popen(['mutt', '-s', subject, email], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        output = ps.communicate(msg.encode("utf8", "ignore"))
+        if output[0] != '':
+            logger.warning(output[0])
 
     if not sendmail:
         print(text_ok, fail, email)
@@ -341,7 +349,7 @@ delay = None # TODO: parse the turn delay
 locale = sys.argv[2]
 infile = sys.stdin
 if len(sys.argv)>3:
-    infile = open(sys.argv[3], "r")
+    infile = open(sys.argv[3], "rb")
 retval = accept(game, locale, infile, delay)
 if infile!=sys.stdin:
     infile.close()
