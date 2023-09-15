@@ -12,3 +12,5 @@ add_executable(atoi36
   ${CMAKE_SOURCE_DIR}/src/util/base36.c
   )
 target_include_directories(atoi36 PRIVATE ${CMAKE_SOURCE_DIR}/src/util)
+
+install(TARGETS inifile DESTINATION "bin")
