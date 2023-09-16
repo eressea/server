@@ -21,5 +21,6 @@ fi
 BIN_DIR="build"
 
 ROOT=$(git rev-parse --show-toplevel)
-cd $ROOT/$BIN_DIR
-make install
+PREFIX=$(dirname "$ROOT")/server
+cd "$ROOT"
+cmake --install "$BIN_DIR" --prefix "$PREFIX"
