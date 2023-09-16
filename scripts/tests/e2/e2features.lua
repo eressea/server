@@ -652,6 +652,5 @@ function test_bug_2978()
     u:set_skill("trade", 10)
     u:set_skill("building", 10)
     process_orders()
-    write_report(f)
     assert_equal(1, u:get_item("jewel"))
 end
