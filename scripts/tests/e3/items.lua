@@ -26,6 +26,7 @@ function test_water_of_life()
     trees = r:get_resource('tree')-trees
     if trees~=5 then
         init_reports()
+        f.id = atoi36('tree')
         write_report(f)
         print(f, get_turn())
     end
