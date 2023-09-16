@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 static int g_quit;
 int force_color = 0;
@@ -1089,6 +1090,132 @@ static int exec_key_binding(int keycode)
     return -1;
 }
 
+static void show_help(void) 
+{
+    WINDOW *wn, *pad;
+    int line, col, ch=0;
+    int height, width;
+    const char* const help[] = {
+        "",
+        "GETTING AROUND",
+        "",
+        "arrow keys, position keys: move cursor",
+        "g: go to coordinate",
+        "/: search for ... r: region by name, u: unit by id, f: faction by id, F: faction from list",
+        "n: find next element according to last search",
+        "SPACE: select / unselect current region",
+        "TAB: jump to next selected region (by space or t)",
+        "p: jump between planes",
+        "a: jump to corresponding astral region / real region",
+        "",
+        "",
+        "DISPLAY",
+        "",
+        "I: show/hide info about ... f: factions, u: units, s: ships, b: buildings",
+        "d: map mode ... t: show terrains, l: show luxurues",
+        "",
+        "",
+        "MANIPULATING DATA",
+        "",
+        "O: open data file",
+        "S: save data file",
+        "f, Ctrl-t: terraform region at cursor",
+        "CTRL+b: fill block with oceans",
+        "B: build island E3 style",
+        "s: seed next player from newfactions at current region",
+        "A: reset area (set region age to 0) for whole contiguos region",
+        "c: clear (reset resources) region under cursor",
+        "C: clear rectangle under cursor (2 regions up and to the right)"
+        "",
+        "h: mark regions ... n: none,   i: island under cursor, t: terrain type, s: with ships,",
+        "   u: with units, p: with player units, m: with monsters, f: with units of a faction,",
+        "   c: chaos regions, v: new regions with age 0",
+        "H: unmark regions (as above)",
+        "t: select regions (for batch commands, as above)",
+        "T: un-select regions (as above)",
+        ";: run batch command for selected regions ... 'r': reset region, 't': terraform', 'f': fix (very special)",
+        "",
+        "",
+        "OTHER",
+        "",
+        "Ctrl+L: redraw",
+        "L: open lua prompt (exit/execute with enter)",
+        "Q: quit",
+        "" };
+    int lines = sizeof help / sizeof *help, cols = 0;
+    const char* title = "HELP (exit with q)";
+    const int BORDERX = 2, BORDERY = 2;
+    bool exit = FALSE;
+
+    for (line = 0; line < lines; ++line) {
+       if (cols < (int) strlen(help[line])) cols = (int) strlen(help[line]);
+    }
+ 
+    getmaxyx(stdscr, height, width); 
+
+    wn = newwin(height - 2 * BORDERY, width - 2 * BORDERY, 2, 2);
+    pad = newpad(lines, cols);
+    box(wn, 0, 0);
+    mvwprintw(wn, 0, 2, "[ %s ]", title);
+    for (line=0;line<lines;++line) {
+        wmove(pad, line, 0);
+        waddstr(pad, help[line]);
+        waddstr(pad, "\n");
+    }
+    line = 0;
+    col = 0;
+    wrefresh(wn);
+    prefresh(pad, line, 0, BORDERY + 1, BORDERX + 2, height - BORDERY * 2, width - BORDERX * 2);
+
+    while(!exit)
+    {
+        switch (ch)
+        {
+        case 'q':
+        case 'Q':
+        case 27:             /* esc */
+            exit = true;
+            break;
+        case KEY_UP:
+            --line;
+            break;
+        case KEY_DOWN:
+            ++line;
+            break;
+        case KEY_RIGHT:
+            col += width / 2 - 2 * BORDERX;
+            break;
+        case KEY_LEFT:
+            col -= width / 2 - 2 * BORDERX;
+            break;
+        case FAST_UP: 
+            line -= height - 2 - 2 * BORDERY;
+            break;
+        case FAST_DOWN:
+            line += height - 2 - 2 * BORDERY;
+            break;
+        case KEY_END: 
+            col = cols - width / 2 + BORDERX * 2;
+            break;
+        case KEY_HOME:
+            col = 0;
+            break;
+        }
+        if (line < 0) line = 0;
+        if (line > lines - 1) line = lines - 1;
+        if (col > cols - width / 2 + BORDERX * 2) col = cols - width / 2 + BORDERX * 2;
+        if (col < 0) col = 0;
+
+        box(wn, 0, 0);
+        mvwprintw(wn, 0, 2, "[ %s %d/%d %d/%d]", title, line+1, lines, col+1, cols);
+        wnoutrefresh(wn);
+        wrefresh(wn);
+        prefresh(pad, line, col, BORDERY + 1, BORDERX + 2, height - BORDERY * 2, width - BORDERX * 2);
+
+        if (!exit) ch = getch();
+    }
+}
+
 static void handlekey(state * st, int c)
 {
     window *wnd;
@@ -1147,6 +1274,13 @@ static void handlekey(state * st, int c)
         break;
     case KEY_OPEN:
         loaddata(st);
+        break;
+    case '?': /* help */
+        show_help();
+        st->modified = 1;
+        st->wnd_info->update |= 1;
+        st->wnd_status->update |= 1;
+        st->wnd_map->update |= 3;
         break;
     case 'B':
         cnormalize(&st->cursor, &nx, &ny);
