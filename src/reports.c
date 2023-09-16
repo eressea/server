@@ -1542,7 +1542,7 @@ int write_reports(faction * f, int options, const char *password)
                 }
                 if (errno) {
                     error = errno;
-                    log_fatal("error %d during %s report for faction %s: %s", errno, rtype->extension, factionname(f), strerror(error));
+                    log_fatal("error %d writing report %s for faction %s: %s", errno, filename, factionname(f), strerror(error));
                     errno = 0;
                 }
             } while (error);
