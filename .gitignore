@@ -38,10 +38,7 @@ Thumbs.db
 *.cfg
 *.cmd
 tmp/
-tests/orders.txt
 tests/config.lua
-/tests/reports
-/tests/data
 /quicklist
 /cutest
 /critbit
