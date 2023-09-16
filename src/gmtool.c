@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 static int g_quit;
 int force_color = 0;
