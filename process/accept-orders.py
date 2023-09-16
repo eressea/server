@@ -4,10 +4,7 @@
 import os
 import os.path
 import io
-try:
-  	from configparser import ConfigParser
-except ImportError:
-	from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import string
 import logging
 import sys
@@ -16,10 +13,7 @@ import time
 import socket
 from stat import ST_MTIME
 from email.utils import parseaddr, parsedate_tz, mktime_tz
-try:
-    from email.parser import BytesParser as Parser
-except:
-    from email.parser import Parser
+from email.parser import Parser
 
 if 'ERESSEA' in os.environ:
     dir = os.environ['ERESSEA']
@@ -349,7 +343,7 @@ delay = None # TODO: parse the turn delay
 locale = sys.argv[2]
 infile = sys.stdin
 if len(sys.argv)>3:
-    infile = open(sys.argv[3], "rb")
+    infile = io.open(sys.argv[3], "rt")
 retval = accept(game, locale, infile, delay)
 if infile!=sys.stdin:
     infile.close()
