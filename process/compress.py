@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from sys import argv, exit
 import os
+import io
 import os.path
 
 gamename='Eressea'
@@ -9,7 +10,7 @@ gamename='Eressea'
 if(len(argv) >= 3):
   gamename=argv[2]
 
-template="""#!/bin/bash
+template=u"""#!/bin/bash
 #PATH=$PATH:$HOME/bin
 
 addr=%(email)s
@@ -19,7 +20,7 @@ addr=%(email)s
 
 turn = argv[1]
 try:
-    infile = open("reports.txt", "rt")
+    infile = io.open("reports.txt", "rt")
 except:
     print("%s: reports.txt file does not exist" % (argv[0], ))
     exit(0)
@@ -78,7 +79,7 @@ for line in infile.readlines():
         if os.path.isfile(extra):
             files = files + [extra]
     options["files"] = ' '.join(files)
-    batch = open("%s.sh" % options["faction"], "wt")
+    batch = io.open("%s.sh" % options["faction"], "wt")
     batch.write(template % options)
     batch.close()
 infile.close()
