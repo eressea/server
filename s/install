@@ -11,7 +11,7 @@ if [ "$FORCE" != "yes" ] ; then
   BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
   if [ "$BRANCH" != "master" ] ; then
     echo "You should only install stable versions from the master branch. Use -f to override."
-    exit
+    exit 1
   fi
 fi
 [ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
