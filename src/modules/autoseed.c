@@ -791,7 +791,7 @@ static void smooth_island(region_list * island)
             int n, nland = 0;
             get_neighbours(r, rn);
             for (n = 0; n != MAXDIRECTIONS && nland <= 1; ++n) {
-                if (rn[n]->land) {
+                if (rn[n] && rn[n]->land) {
                     ++nland;
                     r = rn[n];
                 }
@@ -803,7 +803,7 @@ static void smooth_island(region_list * island)
                 for (n = 0; n != MAXDIRECTIONS; ++n) {
                     int n1 = (n + 1) % MAXDIRECTIONS;
                     int n2 = (n + 1 + MAXDIRECTIONS) % MAXDIRECTIONS;
-                    if (!rn[n]->land && rn[n1] != r && rn[n2] != r) {
+                    if (rn[n] && !rn[n]->land && rn[n1] != r && rn[n2] != r) {
                         r = rlist->data;
                         runhash(r);
                         runhash(rn[n]);
