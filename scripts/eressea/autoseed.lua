@@ -8,7 +8,8 @@ local trees = 800
 local min_peasants = 2000
 -- number of starters per region:
 local per_region = 2
-    
+
+-- count a resource in a neighborhood
 local function score(r, res)
     assert(r)
     res = res or "peasant"
@@ -22,10 +23,11 @@ local function score(r, res)
     return peas
 end
 
+-- select regions with enough resources
 local function select_regions(regions, peasants, trees)
     local sel = {}
     for r in regions do
-        if not r.plane and r.terrain~="ocean" and not r.units() then
+        if (not r.plane or r.plane.id == 0) and r.terrain~="ocean" and not r.units() then
             if r:get_resource("peasant") >= min_peasants then
                 sp = score(r, "peasant")
                 st = score(r, "tree")
@@ -40,6 +42,7 @@ local function select_regions(regions, peasants, trees)
     return sel
 end
 
+-- read a newfactions file
 local function read_players()
 --    return {{ email = "noreply@mailinator.com", race = "dwarf",  lang = "de" }}
     local players =  {}
@@ -59,6 +62,7 @@ local function read_players()
     return players
 end
 
+-- create a new faction
 local function seed(r, email, race, lang)
     assert(r)
     local f = faction.create(race, email, lang)
@@ -83,8 +87,8 @@ local function get_faction_by_email(email)
     return nil
 end
 
+-- seeds players from newfactions into existing regions with enough resources
 function autoseed.init()
-    -- local newbs = {}
     local num_seeded = per_region
     local start = nil
 
@@ -97,17 +101,18 @@ function autoseed.init()
         local sel
         eressea.log.info(#players .. ' new players')
         sel = select_regions(regions(), peasants, trees)
-        if #sel == 0 then
-            eressea.log.error("autoseed could not select regions for new factions")
+        local num_sel = #sel
+        if num_sel * per_region < #players then
+            eressea.log.error("autoseed could not select enough regions for new factions")
         else
             for _, p in ipairs(players) do
                 if num_seeded == per_region then
-                    local index = rng_int() % #sel
+                    local index = rng_int() % num_sel
                     start = nil
                     while not start do
                         start = sel[index + 1]
-                        sel[index+1] = nil
-                        index = (index + 1) % #sel
+                        sel[index + 1] = nil
+                        index = (index + 1) % num_sel
                     end
                     num_seeded = 0
                 end
