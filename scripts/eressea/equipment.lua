@@ -138,6 +138,7 @@ function equip_unit(u, name, flags)
             for name, level in pairs(skills) do
                 u:set_skill(name, level)
             end
+            u.hp = u.hp_max * u.number
         end
         local spells = set['spells']
         if spells then
