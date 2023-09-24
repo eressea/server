@@ -1,23 +1,32 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
+
+function usage() {
+cat <<HEREDOC
+usage: $0 [-f]
+Use -f if you are not installing from the master branch. This is considered unsafe."
+HEREDOC
+exit 1
+}
 
 FORCE=0
 while getopts f o; do
   case "${o}" in
-  f) usage ; FORCE=yes ;;
+  f) FORCE=yes ;;
+  ?) echo "unknown option ${o}"; usage ;;
   esac
 done
-
 if [ "$FORCE" != "yes" ] ; then
   BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
   if [ "$BRANCH" != "master" ] ; then
-    echo "You should only install stable versions from the master branch. Use -f to override."
+    echo "You are in the branch $BRANCH, but you should only install stable versions from the master branch. Use -f to override."
     exit 1
   fi
 fi
-[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+[ -z "${CC+x}" ] && [ -n "$(which clang)" ] && CC="clang"
+[ -z "${CC+x}" ] && [ -n "$(which gcc)" ] && CC="gcc"
+[ -z "${CC+x}" ] && [ -n "$(which tcc)" ] && CC="tcc"
+[ -z "${CC+x}" ] && [ -n "$(which cc)" ] && CC="cc"
 BIN_DIR="build"
 
 ROOT=$(git rev-parse --show-toplevel)

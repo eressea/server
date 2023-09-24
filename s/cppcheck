@@ -1,5 +1,7 @@
-#!/bin/sh
-IGNORE=$(find src -name "*.test.c" | awk '{ print "-i"$1 }')
+#!/bin/bash
+set -euo pipefail
+
+#IGNORE=$(find src -name "*.test.c" | awk '{ print "-i"$1 }')
 
 #cppcheck $IGNORE -isrc/tests.c \
 cppcheck --quiet --enable=warning,style,performance,portability -U_MSC_VER -UCLEANUP_CODE -UTODO \

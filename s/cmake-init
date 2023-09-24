@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
 ERESSEA_DB=memory
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
@@ -22,7 +23,7 @@ fi
 
 # Parse command line arguments
 eval set -- "$options"
-until [ -z "$1" ] ; do
+until [ -z "${1+x}" ] ; do
   case $1 in
     -d|--db)
       ERESSEA_DB=$2
@@ -34,7 +35,7 @@ until [ -z "$1" ] ; do
   esac
   shift
 done
-while [ ! -z "$1" ] ; do
+while [ -n "${1+x}" ] ; do
 if [ "$1" = "--with-db" ] ; then
 ERESSEA_DB=db
 elif [ "$1" = "--with-sqlite" ] ; then
@@ -47,16 +48,16 @@ done
 
 git submodule update --init
 ROOT=$(git rev-parse --show-toplevel)
-[ -z $BUILD ] && BUILD=Debug
-[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+[ -z "${BUILD+x}" ] && BUILD=Debug
+[ -z "${CC+x}" ] && [ -n "$(which clang)" ] && CC="clang"
+[ -z "${CC+x}" ] && [ -n "$(which gcc)" ] && CC="gcc"
+[ -z "${CC+x}" ] && [ -n "$(which tcc)" ] && CC="tcc"
+[ -z "${CC+x}" ] && [ -n "$(which cc)" ] && CC="cc"
 
-[ -z $MACHINE ] && MACHINE=`uname -m`
+[ -z "${MACHINE+x}" ] && MACHINE="$(uname -m)"
 BIN_DIR="$ROOT/build"
-rm -rf $BIN_DIR
-mkdir -p $BIN_DIR
+rm -rf "$BIN_DIR"
+mkdir -p "$BIN_DIR"
 
 # use anything installed in /opt or /usr
 LIBRARY_PATH=/opt/lib:/opt/lib/$MACHINE:/usr/lib/$MACHINE
@@ -64,13 +65,11 @@ INCLUDE_PATH=/opt/include:/usr/include
 PREFIX_PATH=/opt
 
 # I like to put stuff in ~/usr if I don't have permission to install packages on the machine:
-if [ -d $HOME/usr ]; then
+if [ -d "$HOME/usr" ]; then
   LIBRARY_PATH=$HOME/usr/lib:$HOME/usr/lib/$MACHINE:$LIBRARY_PATH
   INCLUDE_PATH=$HOME/usr/include:$HOME/usr/include/$MACHINE:$INCLUDE_PATH
   PREFIX_PATH=$HOME/usr:$HOME/usr/local:$PREFIX_PATH
 fi
-
-DEST=$(dirname $ROOT)/server
 
 LUA_INCLUDE=/usr/include
 LUA_DIR=/usr
@@ -104,7 +103,7 @@ HEREDOC
 
 set -e
 
-cd $BIN_DIR
-cmake -C config.cmake .. $*
-cd $OLDPWD
+cd "$BIN_DIR"
+cmake -C config.cmake .. "$@"
+cd "$OLDPWD"
 
