@@ -146,6 +146,20 @@ static window *win_create(WINDOW * hwin)
     return wnd;
 }
 
+static void untag_all_regions(selection *s) {
+    int i;
+    tag **tp;
+    tag *t;
+    for(i=0; i < MAXTHASH; ++i) {
+        tp = &s->tags[i];
+        while(*tp) {
+            t = *tp;
+            *tp = t->nexthash;
+            free(t);
+        }
+    }
+}
+
 static void untag_region(selection * s, int nx, int ny)
 {
     unsigned int key = ((nx << 12) ^ ny);
@@ -1673,6 +1687,10 @@ static void update_view(view * vi)
     }
 }
 
+static void close_view(view *display) {
+    free(display->regions);
+}
+
 state *state_open(void)
 {
     state *st = (state *)calloc(1, sizeof(state));
@@ -1694,6 +1712,7 @@ void state_close(state * st)
 {
     assert(st == current_state);
     current_state = st->prev;
+    free(st->selected);
     free(st);
 }
 
@@ -1804,7 +1823,10 @@ void run_mapper(void)
     /* FIXME: reset logging
         log_flags = old_flags;
     */
+    untag_all_regions(st->selected);
+    close_view(&st->display);
     state_close(st);
+
 }
 
 int
