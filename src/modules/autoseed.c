@@ -875,6 +875,8 @@ int build_island(int x, int y, int minsize, newfaction ** players, int numfactio
         r = regionqueue_pop(&rlist);
     }
 
+    free_regionlist(rlist);
+
     smooth_island(island);
 
     if (nsize > minsize / 2) {
@@ -926,5 +928,8 @@ int build_island(int x, int y, int minsize, newfaction ** players, int numfactio
             rsetmoney(r, rmoney(r) * 4);
         }
     }
+
+    free_regionlist(island);
+
     return nfactions;
 }
