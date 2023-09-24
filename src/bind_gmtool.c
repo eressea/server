@@ -4,11 +4,13 @@
 #include "gmtool.h"
 #include "gmtool_structs.h"
 
+#include <kernel/config.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
 #include <modules/autoseed.h>
 #include <util/log.h>
 #include <util/macros.h>
+#include <util/path.h>
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -155,8 +157,15 @@ static int gmtool_make_island(lua_State * L)
     int x = (int)tolua_tonumber(L, 1, 0);
     int y = (int)tolua_tonumber(L, 2, 0);
     int s = (int)tolua_tonumber(L, 3, 0);
+    const char *path = tolua_tostring(L, 4, NULL);
+    newfaction *new_players = NULL;
+    if (path) {
+        char sbuffer[512];
+        path_join(basepath(), path, sbuffer, sizeof(sbuffer));
+        new_players = read_newfactions(sbuffer);
+    }
 
-    s = build_island(x, y, s, NULL, 0);
+    s = build_island(x, y, s, &new_players, count_newfactions(new_players));
     lua_pushinteger(L, s);
     return 1;
 }

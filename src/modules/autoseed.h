@@ -21,7 +21,7 @@ extern "C" {
 
     extern int autoseed(newfaction ** players, int nsize, int max_agediff);
     extern newfaction *read_newfactions(const char *filename);
-
+    extern int count_newfactions(newfaction * newfactions);
     extern int build_island(int x, int y, int minsize, newfaction **players, int numfactions);
 
 #ifdef __cplusplus
