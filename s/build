@@ -41,5 +41,7 @@ CMAKE_ARGS="-DERESSEA_BUILDNO:STRING=$REV $CMAKE_ARGS"
 fi
 
 cmake ${CMAKE_ARGS}
-make $MAKEOPTS && ctest -LE ci-only
+make $MAKEOPTS
+ctest -LE ci-only
+
 cd "$OLDPWD"
