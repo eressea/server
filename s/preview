@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 
 function usage() {
 cat <<HEREDOC
@@ -14,17 +15,17 @@ exit 1
 }
 
 function abort() {
-echo $1
-[ -z $2 ] && exit -1
-exit $2 # otherwise
+echo "$1"
+[ -z "${2+x}" ] && exit 1
+exit "$2" # otherwise
 }
 
 function build() {
-assert_dir $SOURCE
-cd $SOURCE
+assert_dir "$SOURCE"
+cd "$SOURCE"
 rm -rf tolua
 git fetch
-[ -z $1 ] || git checkout $1 
+[ -z "${1+x}" ] || git checkout "$1"
 git pull --rebase -q || abort "failed to update source. do you have local changes?"
 git submodule update
 s/cmake-init
@@ -32,26 +33,26 @@ s/build > /dev/null || abort "build failed."
 }
 
 function assert_file() {
-[ -e $1 ] || abort "missing file: $1"
+[ -e "$1" ] || abort "missing file: $1"
 }
 
 function assert_files() {
-while [ ! -z $1 ] ; do
-assert_file $1
+while [ -n "${1+x}" ] ; do
+assert_file "$1"
 shift
 done
 }
 
 function assert_dir() {
-[ -d $1 ] || abort "missing directory: $1"
+[ -d "$1" ] || abort "missing directory: $1"
 }
 
 function setup() {
-assert_dir $SOURCE
-assert_dir $LIVE
-mkdir -p $TESTROOT
-assert_dir $TESTROOT
-cd $TESTROOT
+assert_dir "$SOURCE"
+assert_dir "$LIVE"
+mkdir -p "$TESTROOT"
+assert_dir "$TESTROOT"
+cd "$TESTROOT"
 
 cat >| eressea.ini <<HEREDOC
 [lua]
@@ -64,36 +65,36 @@ HEREDOC
 
 function run() {
 echo "testing turn $turn of game $game"
-assert_dir $TESTROOT
-cd $TESTROOT
+assert_dir "$TESTROOT"
+cd "$TESTROOT"
 [ ! -e execute.lock ] || abort "lockfile prevents running game $game"
 [ -d data ] || mkdir data
 assert_dir data
-assert_files $LIVE/orders.$turn $LIVE/data/$turn.dat
-ln -f $LIVE/orders.$turn
-ln -f $LIVE/data/$turn.dat data/
+assert_files "$LIVE/orders.$turn" "$LIVE/data/$turn.dat"
+ln -f "$LIVE/orders.$turn" .
+ln -f "$LIVE/data/$turn.dat" data/
 rm -rf reports
 mkdir -p reports
 
 SUPP="$SOURCE/share/debian-7_8.supp"
 SERVER="$SOURCE/build/eressea/eressea"
 VALGRIND=$(which valgrind)
-if [ ! -z $VALGRIND ]; then
+if [ -n "$VALGRIND" ]; then
 SERVER="$VALGRIND --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $SERVER"
 fi
-$SERVER -v$verbose -t$turn $SOURCE/scripts/run-turn.lua
-let turn=$turn+1
-[ -e data/$turn.dat ] || abort "no data file created"
+$SERVER -v"$verbose" -t"$turn" "$SOURCE/scripts/run-turn.lua"
+let turn="$turn"+1
+[ -e "data/$turn.dat" ] || abort "no data file created"
 }
 
 function send() {
 zip="$turn-$1.zip"
-zip -q -u $zip $turn-$1.?r
+zip -q -u "$zip" "$turn-$1.?r"
 email=$(grep "faction=$1:" reports.txt | cut -d: -f2 | sed 's/email=//')
 echo "sending reports to $1 / $email"
 info=/dev/null
 [ -e ../email.txt ] && info=../email.txt
-cat $info | mutt -s "Testauswertung Spiel $game Partei $1" -a $zip -- $email
+mutt -s "Testauswertung Spiel $game Partei $1" -a "$zip" -- "$email" < "$info"
 }
 
 game=0
@@ -121,47 +122,48 @@ while getopts :g:t:f:v: o; do
 done
 shift $((OPTIND-1))
 
-[ -z $ERESSEA ] && ERESSEA=$HOME/eressea
-[ -d $ERESSEA ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
-[ -z $1 ] && usage
-[ -z $SOURCE ] && SOURCE=$ERESSEA/git
-[ -d $SOURCE ] || abort "missing source directory: $SOURCE"
-[ -d LIVE ] || LIVE=$ERESSEA/game-$game
-[ -d TESTROOT ] || TESTROOT=$LIVE/test
+[ -z "${ERESSEA+x}" ] && ERESSEA="$HOME/eressea"
+[ -d "$ERESSEA" ] || abort "invalid or missing env variable ERESSEA ($ERESSEA)"
+[ -z "${1+x}" ] && usage
+[ -z "${SOURCE+x}" ] && SOURCE="$ERESSEA/git"
+[ -d "$SOURCE" ] || abort "missing source directory: $SOURCE"
+[[ -n "${LIVE+x}" && -d "$LIVE" ]] || LIVE=$ERESSEA/game-$game
+[[ -n "${LIVE+x}" && -d "$TESTROOT" ]] || TESTROOT=$LIVE/test
 
-while [ ! -z $1 ]; do
+while [ -n "${1+x}" ]; do
 case "$1" in
 "build")
   shift
-  build $*
+  build "$@"
   ;;
 "setup")
   setup
   ;;
 "run")
-  if [ $turn -eq 0 ]; then
-    [ -f $LIVE/turn ] || abort "missing turn file in $LIVE, and no turn specified"
-    let turn=$(cat $LIVE/turn)-1
+  if [ "$turn" -eq 0 ]; then
+    [ -f "$LIVE/turn" ] || abort "missing turn file in $LIVE, and no turn specified"
+    let turn=$(cat "$LIVE/turn")-1
   fi
   run
   ;;
 "send")
   shift
   sent=0
-  cd $TESTROOT/reports
-  if [ $turn -eq 0 ]; then
-    [ -f $TESTROOT/turn ] || abort "missing turn file, and no turn specified"
-    let turn=$(cat $TESTROOT/turn)
+  cd "$TESTROOT/reports"
+  if [ "$turn" -eq 0 ]; then
+    [ -f "$TESTROOT/turn" ] || abort "missing turn file, and no turn specified"
+    let turn=$(cat "$TESTROOT/turn")
   fi
   [ -f reports.txt ] || abort "missing reports.txt for game $game"
-  for faction in $* ; do
-    send $faction
+  for faction in "$@" ; do
+    send "$faction"
     sent=1
   done
   if [ $sent -eq 0 ]; then
-    if [ -e ../$factions ]; then
-      for faction in $(grep -v -E '^#' ../$factions) ; do
-        send $faction
+    if [ -e "../$factions" ]; then
+      grep -v -E '^#' "../$factions" |
+      while read -r faction; do
+        send "$faction"
       done
     fi
   fi
