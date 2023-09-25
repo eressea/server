@@ -146,6 +146,20 @@ static window *win_create(WINDOW * hwin)
     return wnd;
 }
 
+static void untag_all_regions(selection *s) {
+    int i;
+    tag **tp;
+    tag *t;
+    for(i=0; i < MAXTHASH; ++i) {
+        tp = &s->tags[i];
+        while(*tp) {
+            t = *tp;
+            *tp = t->nexthash;
+            free(t);
+        }
+    }
+}
+
 static void untag_region(selection * s, int nx, int ny)
 {
     unsigned int key = ((nx << 12) ^ ny);
@@ -1053,7 +1067,7 @@ static void savedata(state *st) {
     }
 }
 
-static void seed_player(state *st, const newfaction *player) {
+static bool seed_player(state *st, const newfaction *player) {
     if (player) {
         region *r;
         int nx = st->cursor.x;
@@ -1062,11 +1076,15 @@ static void seed_player(state *st, const newfaction *player) {
         pnormalize(&nx, &ny, st->cursor.pl);
         r = findregion(nx, ny);
         if (r) {
-            faction *f = addfaction(player->email, player->password,
-                player->race, player->lang);
-            addplayer(r, f);
+            if (r->land) {
+                faction *f = addfaction(player->email, player->password,
+                    player->race, player->lang);
+                addplayer(r, f);
+                return true;
+            }
         }
     }
+    return false;
 }
 
 static bool confirm(WINDOW * win, const char *q) {
@@ -1518,11 +1536,14 @@ static void handlekey(state * st, int c)
     case 's': /* seed */
         if (new_players) {
             newfaction * next = new_players->next;
-            seed_player(st, new_players);
-            free(new_players->email);
-            free(new_players->password);
-            free(new_players);
-            new_players = next;
+            if (seed_player(st, new_players)) {
+                free(new_players->email);
+                free(new_players->password);
+                free(new_players);
+                new_players = next;
+                st->wnd_info->update |= 1;
+                /*st->wnd_map->update |= 3;*/
+            }
         }
         break;
     case '/':
@@ -1673,6 +1694,10 @@ static void update_view(view * vi)
     }
 }
 
+static void close_view(view *display) {
+    free(display->regions);
+}
+
 state *state_open(void)
 {
     state *st = (state *)calloc(1, sizeof(state));
@@ -1694,6 +1719,7 @@ void state_close(state * st)
 {
     assert(st == current_state);
     current_state = st->prev;
+    free(st->selected);
     free(st);
 }
 
@@ -1804,7 +1830,10 @@ void run_mapper(void)
     /* FIXME: reset logging
         log_flags = old_flags;
     */
+    untag_all_regions(st->selected);
+    close_view(&st->display);
     state_close(st);
+
 }
 
 int
