@@ -1294,8 +1294,8 @@ static void handlekey(state * st, int c)
         }
 
         if (new_players) {
-            int seeded = 0, count = count_newfactions(new_players);
-            seeded = build_island(nx, ny, n, &new_players, count);
+            int count = count_newfactions(new_players);
+            build_island(nx, ny, n, &new_players, count);
         } else {
             build_island(nx, ny, n, NULL, 0);
         }
