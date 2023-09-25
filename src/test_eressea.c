@@ -147,6 +147,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(otherfaction);
     ADD_SUITE(piracy);
     ADD_SUITE(prefix);
+    ADD_SUITE(races);
     ADD_SUITE(recruit);
     ADD_SUITE(renumber);
     ADD_SUITE(report);
