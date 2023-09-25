@@ -865,7 +865,16 @@ int build_island(int x, int y, int minsize, newfaction ** players, int numfactio
         fset(r, RF_MARK);
         if (r->land) {
             if (nsize < minsize) {
-                nsize += random_neighbours(r, &rlist, random_terrain, minsize - nsize);
+                int new_lands = random_neighbours(r, &rlist, random_terrain, minsize - nsize);
+                if (new_lands == 0) {
+                    direction_t dir = rng_int() % MAXDIRECTIONS;
+                    region *rn = rconnect(r, dir);
+                    do {
+                        terraform_region(rn, random_terrain(NODIRECTION));
+                    } while (!rn->land);
+                    new_lands = 1;
+                }
+                nsize += new_lands;
             }
             else {
                 nsize += random_neighbours(r, &rlist, get_ocean, minsize - nsize);
