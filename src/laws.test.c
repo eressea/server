@@ -4,6 +4,7 @@
 #include "eressea.h"
 #include "guard.h"
 #include "magic.h"                   // for create_mage
+#include "reports.h"
 
 #include <kernel/ally.h>
 #include <kernel/alliance.h>
@@ -1775,6 +1776,8 @@ static void test_show_both(CuTest *tc) {
     unit *u;
     struct locale *loc;
     message * msg;
+    attrib *a;
+    const item_type *itype;
 
     test_setup();
     mt_create_va(mt_new("msg_event", NULL), "string:string", MT_NEW_END);
@@ -1796,9 +1799,13 @@ static void test_show_both(CuTest *tc) {
     msg = test_find_messagetype(u->faction->msgs, "msg_event");
     CuAssertPtrNotNull(tc, msg);
     CuAssertTrue(tc, memcmp("Elf:", msg->parameters[0].v, 4) == 0);
-    msg = test_find_messagetype(u->faction->msgs, "displayitem");
-    CuAssertPtrNotNull(tc, msg);
-    CuAssertTrue(tc, memcmp("Elfenpferd Informationen", msg->parameters[2].v, 4) == 0);
+
+    a = a_find(u->faction->attribs, &at_showitem);
+    CuAssertPtrNotNull(tc, a);
+    itype = (const item_type *) a->data.v;
+
+    CuAssertPtrEquals(tc, finditemtype("elfenpferd", loc)->rtype, itype->rtype);
+
     test_clear_messages(u->faction);
     free_order(ord);
     test_teardown();

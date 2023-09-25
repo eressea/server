@@ -1,5 +1,6 @@
 #include "alchemy.h"
 #include "guard.h"
+#include "reports.h"
 #include "study.h"
 
 #include <kernel/attrib.h>
@@ -266,7 +267,7 @@ bool display_potions(struct unit *u)
     const potion_type *ptype;
     for (ptype = potiontypes; ptype != NULL; ptype = ptype->next) {
         if (ptype->level * 2 <= skill) {
-            show_item(u, ptype->itype);
+            display_potion(u->faction, ptype->itype);
             ++c;
         }
     }

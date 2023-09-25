@@ -1915,12 +1915,54 @@ static void report_market(stream * out, const region *r, const faction *f) {
     }
 }
 
+static void report_potion(stream *out, const faction *f, const item_type *itype, char *potions_shown) {
+    char buf[1024];
+    const char *pname = resourcename(itype->rtype, 0);
+    const char *description;
+    sbstring sbs;
+
+    if (*potions_shown == 0) {
+        newline(out);
+        centre(out, LOC(f->locale, "section_newpotions"), true);
+        *potions_shown = 1;
+    }
+
+    newline(out);
+    centre(out, LOC(f->locale, pname), true);
+    snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
+        potion_level(itype));
+    centre(out, buf, true);
+    newline(out);
+
+    if (itype->construction) {
+        sbs_init(&sbs, buf, sizeof(buf));
+        sbs_strcat(&sbs, LOC(f->locale, "nr_herbsrequired"));
+        sbs_strcat(&sbs, ":");
+
+        requirement *rm = itype->construction->materials;
+        while (rm->number) {
+            sbs_strcat(&sbs, LOC(f->locale, resourcename(rm->rtype, 0)));
+            ++rm;
+            if (rm->number) {
+                sbs_strcat(&sbs, ", ");
+            }
+        }
+    }
+    centre(out, buf, true);
+    newline(out);
+    description = LOC(f->locale, mkname("describe", pname));
+    if (description)
+        centre(out, description, true);
+    else
+        centre(out, "---", true);
+}
+
 int
 report_plaintext(const char *filename, report_context * ctx,
     const char *bom)
 {
     int age, flag = 0;
-    char ch;
+    char potions_shown;
     int anyunits, no_units, no_people;
     region *r;
     faction *f = ctx->f;
@@ -2067,46 +2109,13 @@ report_plaintext(const char *filename, report_context * ctx,
         }
     }
 
-    ch = 0;
+    potions_shown = 0;
     ERRNO_CHECK();
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
-        if (itype) {
-            const char *pname = resourcename(itype->rtype, 0);
-            const char *description;
-
-            if (ch == 0) {
-                newline(out);
-                centre(out, LOC(f->locale, "section_newpotions"), true);
-                ch = 1;
-            }
-
-            newline(out);
-            centre(out, LOC(f->locale, pname), true);
-            snprintf(buf, sizeof(buf), "%s %d", LOC(f->locale, "nr_level"),
-                potion_level(itype));
-            centre(out, buf, true);
-            newline(out);
-
-            sbs_init(&sbs, buf, sizeof(buf));
-            sbs_strcat(&sbs, LOC(f->locale, "nr_herbsrequired"));
-            sbs_strcat(&sbs, ":");
-
-            if (itype->construction) {
-                requirement *rm = itype->construction->materials;
-                while (rm->number) {
-                    sbs_strcat(&sbs, LOC(f->locale, resourcename(rm->rtype, 0)));
-                    ++rm;
-                    if (rm->number) {
-                        sbs_strcat(&sbs, ", ");
-                    }
-                }
-            }
-            centre(out, buf, true);
-            newline(out);
-            description = LOC(f->locale, mkname("describe", pname));
-            centre(out, description, true);
+        if (itype && itype->flags & ITF_POTION) {
+            report_potion(out, f, itype, &potions_shown);
         }
     }
     newline(out);

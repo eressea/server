@@ -1654,8 +1654,7 @@ report_computer(const char *filename, report_context * ctx, const char *bom)
     for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem;
         a = a->next) {
         const item_type *itype = (const item_type *)a->data.v;
-
-        if (itype) {
+        if (itype && itype->flags & ITF_POTION) {
             report_itemtype(F, f, itype);
         }
     }

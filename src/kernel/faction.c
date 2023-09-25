@@ -149,12 +149,6 @@ faction *getfaction(void)
     return findfaction(getid());
 }
 
-void set_show_item(faction * f, const struct item_type *itype)
-{
-    attrib *a = a_add(&f->attribs, a_new(&at_showitem));
-    a->data.v = (void *)itype;
-}
-
 const char *factionname(const faction * f)
 {
     typedef char name[OBJECTIDSIZE + 1];

@@ -110,6 +110,11 @@ extern "C" {
         int *number, bool singular);
     void report_building(const struct building *b, const char **btype,
         const char **billusion);
+
+    void display_race(struct faction * f, const struct race * rc);
+    void display_potion(struct faction *f, const struct item_type * itype);
+    void display_item(struct faction *f, const struct item_type * itype);
+
     void add_seen_faction(struct faction *self, struct faction *seen);
     size_t f_regionid(const struct region *r, const struct faction *f,
         char *buffer, size_t size);

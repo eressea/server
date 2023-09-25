@@ -461,6 +461,38 @@ void report_raceinfo(const struct race *rc, const struct locale *lang, struct sb
     sbs_strcat(sbp, ".");
 }
 
+void display_race(faction * f, const race * rc)
+{
+    char buf[2048];
+    sbstring sbs;
+
+    sbs_init(&sbs, buf, sizeof(buf));
+    report_raceinfo(rc, f->locale, &sbs);
+    addmessage(0, f, buf, MSG_EVENT, ML_IMPORTANT);
+}
+
+static void show_item_type(faction *f, const item_type * itype)
+{
+    attrib *a;
+
+    a = a_find(f->attribs, &at_showitem);
+    while (a && a->data.v != itype)
+        a = a->next;
+    if (!a) {
+        a = a_add(&f->attribs, a_new(&at_showitem));
+        a->data.v = (void *)itype;
+    }
+}
+
+void display_potion(faction *f, const item_type * itype) {
+    show_item_type(f, itype);
+}
+
+void display_item(faction *f, const item_type * itype)
+{
+    show_item_type(f, itype);
+}
+
 void
 report_building(const struct building *b, const char **name,
     const char **illusion)
@@ -1589,6 +1621,38 @@ static void check_messages_exist(void) {
     ct_checknames();
 }
 
+static void display_shown_items(void) {
+    faction *f;
+    attrib *a;
+    message *msg;
+
+    for (f = factions; f; f = f->next) {
+        for (a = a_find(f->attribs, &at_showitem); a && a->type == &at_showitem; ) {
+            const item_type *itype = (const item_type *)a->data.v;
+            attrib *anext = a->next;
+
+            if (itype && !(itype->flags & ITF_POTION)) {
+                const char *name;
+                const char *key;
+                const char *info;
+
+                name = resourcename(itype->rtype, 0);
+                key = mkname("iteminfo", name);
+                info = locale_getstring(f->locale, key);
+
+                if (info == NULL) {
+                    info = LOC(f->locale, mkname("iteminfo", "no_info"));
+                }
+                ADDMSG(&f->msgs, msg = msg_message("displayitem", "weight item description",
+                    itype->weight, itype->rtype, info));
+
+                a_remove(&f->attribs, a);
+            }
+            a = anext;
+        }
+    }
+}
+
 int init_reports(void)
 {
     region *r;
@@ -1601,6 +1665,7 @@ int init_reports(void)
         }
         reorder_units(r);
     }
+    display_shown_items();
     return 0;
 }
 
