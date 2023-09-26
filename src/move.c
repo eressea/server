@@ -212,9 +212,7 @@ static int eff_weight(const unit * u)
     return weight(u);
 }
 
-static void
-get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
-    int *p_vcap)
+void get_transporters(const item * itm, capacities *cap)
 {
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
@@ -238,10 +236,10 @@ get_transporters(const item * itm, int *p_animals, int *p_acap, int *p_vehicles,
             }
         }
     }
-    *p_vehicles = vehicles;
-    *p_animals = animals;
-    *p_vcap = vcap;
-    *p_acap = acap;
+    cap->vehicles = vehicles;
+    cap->animals = animals;
+    cap->vcap = vcap;
+    cap->acap = acap;
 }
 
 static int walking_horse_limit(const unit *u, int skill) {
@@ -252,14 +250,20 @@ static int riding_horse_limit(const unit *u, int skill) {
     return skill * 2 * u->number;
 }
 
-static int ridingcapacity(const unit * u)
+static int ridingcapacity(const unit * u, const capacities * cap)
 {
-    int vehicles = 0, vcap = 0;
-    int animals = 0, acap = 0;
     int horses;
+    int vehicles = 0;
+    int animals = 0;
+    int vcap = 0;
+    int acap = 0;
 
-    get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
-
+    if (cap) {
+        vehicles = cap->vehicles;
+        animals = cap->animals;
+        vcap = cap->vcap;
+        acap = cap->acap;
+    }
     /* Man traegt sein eigenes Gewicht plus seine Kapazitaet! Die Menschen
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zaehlt nur, wenn er
      ** von zwei Pferden gezogen wird */
@@ -283,10 +287,15 @@ int walkingcapacity(const struct unit *u)
     int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
+    capacities cap;
     const struct resource_type *rhorse = rt_find("horse");
     const struct resource_type *rbelt = rt_find("trollbelt");
 
-    get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
+    get_transporters(u->items, &cap);
+    vehicles = cap.vehicles;
+    animals = cap.animals;
+    vcap = cap.vcap;
+    acap = cap.acap;
 
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
@@ -355,7 +364,7 @@ enum {
     E_CANWALK_TOOHEAVY
 };
 
-static int canwalk(unit * u)
+static int canwalk(unit * u, const capacities *cap)
 {
     int maxwagen, maxpferde;
     int vehicles = 0, vcap = 0;
@@ -366,8 +375,6 @@ static int canwalk(unit * u)
     if (is_monsters(u->faction))
         return E_CANWALK_OK;
 
-    get_transporters(u->items, &animals, &acap, &vehicles, &vcap);
-
     maxpferde = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
     maxwagen = maxpferde / 2;
     if (u_race(u) == get_race(RC_TROLL)) {
@@ -375,8 +382,14 @@ static int canwalk(unit * u)
         if (maxwagen < trolls) maxwagen = trolls;
     }
 
-    if (animals > maxpferde)
-        return E_CANWALK_TOOMANYHORSES;
+    if (cap) {
+        animals = cap->animals;
+        if (animals > maxpferde)
+            return E_CANWALK_TOOMANYHORSES;
+        vehicles = cap->vehicles;
+        vcap = cap->vcap;
+        acap = cap->acap;
+    }
 
     if (walkingcapacity(u) - eff_weight(u) >= 0)
         return E_CANWALK_OK;
@@ -420,7 +433,7 @@ bool canswim(unit * u)
     return false;
 }
 
-static int walk_speed(const unit * u)
+static int walk_speed(const unit * u, const capacities *cap)
 {
     int horses = 0, maxhorses, unicorns = 0;
     int skill;
@@ -452,7 +465,7 @@ static int walk_speed(const unit * u)
         }
         return 0;
     }
-    if (ridingcapacity(u) - eff_weight(u) >= 0) {
+    if (ridingcapacity(u, cap) - eff_weight(u) >= 0) {
         if (horses) {
             if (horses == unicorns) {
                 if (skill >= 5) {
@@ -1462,7 +1475,7 @@ static void make_route(unit * u, order * ord, region_list ** routep)
  * Normalerweise verliert man 3 BP pro Region, bei Strassen nur 2 BP.
  * Ausserdem: Wenn Einheit transportiert, nur halbe BP
  */
-int movement_speed(const unit * u)
+int movement_speed(const unit * u, const capacities * cap)
 {
     int mp = 0;
     const race *rc = u_race(u);
@@ -1478,7 +1491,7 @@ int movement_speed(const unit * u)
             mp = BP_DRAGON;
         }
         else {
-            mp = walk_speed(u);
+            mp = walk_speed(u, cap);
             if (mp >= BP_RIDING) {
                 dk = 1.0;
             }
@@ -1531,7 +1544,7 @@ static void var_create_regions(arg_regions *dst, const region_list * begin, int 
     }
 }
 
-static const region_list *travel_route(unit * u,
+static const region_list *travel_route(unit * u, const capacities *cap,
     const region_list * route_begin, const region_list * route_end, order * ord,
     int mode)
 {
@@ -1677,7 +1690,7 @@ static const region_list *travel_route(unit * u,
         if (mode == TRAVEL_RUNNING) {
             walkmode = 0;
         }
-        else if (walk_speed(u) >= BP_RIDING) {
+        else if (walk_speed(u, cap) >= BP_RIDING) {
             walkmode = 1;
             produceexp(u, SK_RIDING, u->number);
         }
@@ -2080,11 +2093,14 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 {
     region *r = u->region;
     int mp;
+    capacities cap;
     if (u->building && !can_leave(u)) {
         cmistake(u, ord, 150, MSG_MOVE);
         return route_begin;
     }
-    switch (canwalk(u)) {
+
+    get_transporters(u->items, &cap);
+    switch (canwalk(u, &cap)) {
     case E_CANWALK_TOOHEAVY:
         cmistake(u, ord, 57, MSG_MOVE);
         return route_begin;
@@ -2096,7 +2112,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
         return route_begin;
     }
 
-    mp = movement_speed(u);
+    mp = movement_speed(u, &cap);
     /* Siebenmeilentee */
     if (get_effect(u, oldpotiontype[P_FAST]) >= u->number) {
         mp *= 2;
@@ -2105,7 +2121,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
 
     route_end = cap_route(r, route_begin, route_end, mp);
 
-    route_end = travel_route(u, route_begin, route_end, ord, mode);
+    route_end = travel_route(u, &cap, route_begin, route_end, ord, mode);
     if (u->flags&UFL_FOLLOWED) {
         get_followers(u, r, route_end, followers);
     }
@@ -2136,7 +2152,7 @@ static const region_list *travel_i(unit * u, const region_list * route_begin,
                         getunit(u->region, ut->faction, &u2);
                         if (u2 == u) {
                             const region_list *route_to =
-                                travel_route(ut, route_begin, route_end, ord,
+                                travel_route(ut, &cap, route_begin, route_end, ord,
                                     TRAVEL_TRANSPORTED);
 
                             if (route_to != route_begin) {

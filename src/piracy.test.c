@@ -54,7 +54,6 @@ static void setup_piracy(void) {
 static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const char *p_shiptype,
     unit **victim, int v_r_flags, const char *v_shiptype) {
     terrain_type *vterrain;
-    ship_type *st_boat = NULL;
     race *rc;
     faction *f;
 
@@ -65,10 +64,14 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     assert(*victim);
 
     if (v_shiptype) {
-        st_boat = st_get_or_create(v_shiptype);
-        u_set_ship(*victim, test_create_ship((*victim)->region, st_boat));
-        arrsetlen(st_boat->coasts, 1);
-        st_boat->coasts[0] = vterrain;
+        ship_type * st_boat = st_get_or_create(v_shiptype);
+        if (st_boat) {
+            u_set_ship(*victim, test_create_ship((*victim)->region, st_boat));
+            arrsetlen(st_boat->coasts, 1);
+            if (st_boat->coasts) {
+                st_boat->coasts[0] = vterrain;
+            }
+        }
     }
 
     *pirate = create_unit(test_create_region(0, 0, get_or_create_terrain("terrain2")), f = test_create_faction(), 1, rc = rc_get_or_create("pirate"), 0, 0, 0);
@@ -76,10 +79,14 @@ static void setup_pirate(unit **pirate, int p_r_flags, int p_rc_flags, const cha
     assert(f && *pirate);
 
     if (p_shiptype) {
-        st_boat = st_get_or_create(p_shiptype);
-        u_set_ship(*pirate, test_create_ship((*pirate)->region, st_boat));
-        arrsetlen(st_boat->coasts, 1);
-        st_boat->coasts[0] = vterrain;
+        ship_type * st_boat = st_get_or_create(p_shiptype);
+        if (st_boat) {
+            u_set_ship(*pirate, test_create_ship((*pirate)->region, st_boat));
+            arrsetlen(st_boat->coasts, 1);
+            if (st_boat->coasts) {
+                st_boat->coasts[0] = vterrain;
+            }
+        }
     }
 
     f->locale = get_or_create_locale("de");

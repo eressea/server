@@ -533,6 +533,15 @@ item_type *test_create_horse(void) {
     return itype;
 }
 
+item_type *test_create_cart(void) {
+    item_type * itype;
+    itype = test_create_itemtype("cart");
+    itype->flags |= ITF_BIG | ITF_VEHICLE;
+    itype->weight = 4000;
+    itype->capacity = 14000;
+    return itype;
+}
+
 /** creates a small world and some stuff in it.
  * two terrains: 'plain' and 'ocean'
  * one race: 'human'
