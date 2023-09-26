@@ -732,7 +732,7 @@ static void test_follow_unit(CuTest* tc) {
     unit_addorder(u, ord);
     u->thisorder = copy_order(ord);
 
-    /* Verfolger müssen ihre Ziele finden, ehe diese sich bewegen */
+    /* Verfolger mï¿½ssen ihre Ziele finden, ehe diese sich bewegen */
     follow_cmds(u);
     CuAssertPtrEquals(tc, &at_follow, (void *)u->attribs->type);
     CuAssertPtrEquals(tc, u2, u->attribs->data.v);
