@@ -326,6 +326,7 @@ int walkingcapacity(const struct unit *u, const capacities *cap)
     int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
+    capacities cap;
     const struct resource_type *rhorse = rt_find("horse");
     const struct resource_type *rbelt = rt_find("trollbelt");
 
