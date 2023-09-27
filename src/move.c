@@ -1607,7 +1607,7 @@ static const region_list *travel_route(unit * u, const capacities *cap,
 
             if (fval(current->terrain, SEA_REGION) || fval(next->terrain, SEA_REGION)) {
                 /* trying to enter or exit ocean with horses, are we? */
-                if (has_horses(u)) {
+                if (cap && cap->animals) {
                     /* tries to do it with horses */
                     if (ord != NULL)
                         cmistake(u, ord, 67, MSG_MOVE);
