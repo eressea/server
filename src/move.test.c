@@ -823,6 +823,14 @@ static void test_movement_speed(CuTest *tc) {
     CuAssertIntEquals(tc, 0, cap.vcap);
     CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
+    i_change(&u->items, it_horse, 1);
+    i_change(&u->items, it_cart, 1);
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, 2, cap.animals);
+    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
+    CuAssertIntEquals(tc, 1, cap.vehicles);
+    CuAssertIntEquals(tc, it_cart->capacity, cap.vcap);
+
     test_teardown();
 }
 

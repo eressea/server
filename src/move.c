@@ -366,8 +366,8 @@ enum {
 static int canwalk(unit * u, const capacities *cap)
 {
     int maxwagen, maxpferde;
-    int vehicles = 0, vcap = 0;
-    int animals = 0, acap = 0;
+    int vehicles = 0;
+    int animals = 0;
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
@@ -386,8 +386,6 @@ static int canwalk(unit * u, const capacities *cap)
         if (animals > maxpferde)
             return E_CANWALK_TOOMANYHORSES;
         vehicles = cap->vehicles;
-        vcap = cap->vcap;
-        acap = cap->acap;
     }
 
     if (walkingcapacity(u, cap) - eff_weight(u) >= 0)
