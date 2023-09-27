@@ -10,6 +10,7 @@ struct region;
 struct region_list;
 struct ship;
 struct unit;
+struct item;
 
 extern struct attrib_type at_shiptrail;
 extern int *storms;
