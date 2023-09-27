@@ -49,7 +49,6 @@ void leave_trail(struct ship *sh, struct region *from,
                         struct region_list *route);
 void move_ship(struct ship *sh, struct region *from,
 struct region *to, struct region_list *route);
-int walkingcapacity(const struct unit *u);
 void follow_cmds(struct unit *u);
 struct unit *owner_buildingtyp(const struct region *r,
     const struct building_type *bt);
@@ -79,3 +78,4 @@ typedef struct capacities {
 
 void get_transporters(const struct item *itm, struct capacities *cap);
 int movement_speed(const struct unit *u, const struct capacities *cap);
+int walkingcapacity(const struct unit *u, const struct capacities *cap);

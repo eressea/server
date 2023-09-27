@@ -281,22 +281,21 @@ static int ridingcapacity(const unit * u, const capacities * cap)
     return vehicles * vcap + animals * acap;
 }
 
-int walkingcapacity(const struct unit *u)
+int walkingcapacity(const struct unit *u, const capacities *cap)
 {
     int n, people, pferde_fuer_wagen, horses;
     int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
-    capacities cap;
     const struct resource_type *rhorse = rt_find("horse");
     const struct resource_type *rbelt = rt_find("trollbelt");
 
-    get_transporters(u->items, &cap);
-    vehicles = cap.vehicles;
-    animals = cap.animals;
-    vcap = cap.vcap;
-    acap = cap.acap;
-
+    if (cap) {
+        vehicles = cap->vehicles;
+        animals = cap->animals;
+        vcap = cap->vcap;
+        acap = cap->acap;
+    }
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
 
@@ -391,7 +390,7 @@ static int canwalk(unit * u, const capacities *cap)
         acap = cap->acap;
     }
 
-    if (walkingcapacity(u) - eff_weight(u) >= 0)
+    if (walkingcapacity(u, cap) - eff_weight(u) >= 0)
         return E_CANWALK_OK;
 
     /* Stimmt das Gewicht, impliziert dies hier, dass alle Wagen ohne

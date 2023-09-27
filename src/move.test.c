@@ -273,42 +273,47 @@ static void test_ship_allowed_insect(CuTest * tc)
 
 static void test_walkingcapacity(CuTest *tc) {
     unit *u;
-    int cap;
+    int capacity;
     const struct item_type *itype;
+    capacities cap;
 
     test_setup();
     init_resources();
 
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    cap = u->number * (u->_race->capacity + u->_race->weight);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, NULL));
     scale_number(u, 2);
-    cap = u->number * (u->_race->capacity + u->_race->weight);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, NULL));
 
     itype = it_find("horse");
     assert(itype);
     i_change(&u->items, itype, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
     i_change(&u->items, itype, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
 
     itype = test_create_itemtype("cart");
     assert(itype);
     i_change(&u->items, itype, 1);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
     set_level(u, SK_RIDING, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
 
     itype = test_create_itemtype("trollbelt");
     assert(itype);
     i_change(&u->items, itype, 1);
-    CuAssertIntEquals(tc, cap + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u));
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u, &cap));
     config_set("rules.trollbelt.multiplier", "5");
-    CuAssertIntEquals(tc, cap + 4 * u->_race->capacity, walkingcapacity(u));
+    CuAssertIntEquals(tc, capacity + 4 * u->_race->capacity, walkingcapacity(u, &cap));
 
     test_teardown();
 }

@@ -83,33 +83,23 @@ static double random_move_chance(void) {
 static void reduce_weight(unit * u)
 {
     int capacity, weight = 0;
-    item **itmp = &u->items;
-    int horses = get_resource(u, get_resourcetype(R_HORSE));
+    item * itm;
 
-    if (horses > 0) {
-        if (horses > u->number * 2) horses = u->number * 2;
-        change_resource(u, get_resourcetype(R_HORSE), -horses);
-    }
-
-    /* 0. ditch any vehicles */
-    while (*itmp != NULL) {
-        item *itm = *itmp;
+    /* 0. calculate weight, without animals & vehicles */
+    for (itm = u->items; itm; itm = itm->next) {
         const item_type *itype = itm->type;
-        if (itype->flags & ITF_VEHICLE) {
+        if (itype->flags & (ITF_VEHICLE|ITF_ANIMAL)) {
             give_peasants(u, itm->type, itm->number);
         }
         else {
             weight += itm->number * itype->weight;
         }
-        if (*itmp == itm)
-            itmp = &itm->next;
     }
 
-    capacity = walkingcapacity(u);
+    capacity = walkingcapacity(u, NULL);
 
     /* 1. get rid of anything that isn't silver or really lightweight or helpful in combat */
-    for (itmp = &u->items; *itmp && capacity > 0;) {
-        item *itm = *itmp;
+    for (itm = u->items; itm && capacity > 0; itm = itm->next) {
         const item_type *itype = itm->type;
         weight += itm->number * itype->weight;
         if (weight > capacity) {
@@ -125,12 +115,9 @@ static void reduce_weight(unit * u)
                 }
             }
         }
-        if (*itmp == itm)
-            itmp = &itm->next;
     }
 
-    for (itmp = &u->items; *itmp && weight > capacity;) {
-        item *itm = *itmp;
+    for (itm = u->items; itm && weight > capacity; itm = itm->next) {
         const item_type *itype = itm->type;
         weight += itm->number * itype->weight;
         if (itype->capacity < itype->weight) {
@@ -141,8 +128,6 @@ static void reduce_weight(unit * u)
             give_peasants(u, itm->type, reduce);
             weight -= reduce * itype->weight;
         }
-        if (*itmp == itm)
-            itmp = &itm->next;
     }
 }
 
