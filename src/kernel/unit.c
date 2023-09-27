@@ -1506,7 +1506,9 @@ int unit_getweight(const unit * u)
 
 int unit_getcapacity(const unit * u)
 {
-    return walkingcapacity(u);
+    capacities cap;
+    get_transporters(u->items, &cap);
+    return walkingcapacity(u, &cap);
 }
 
 void renumber_unit(unit *u, int no) {

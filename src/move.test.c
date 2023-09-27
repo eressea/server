@@ -273,42 +273,47 @@ static void test_ship_allowed_insect(CuTest * tc)
 
 static void test_walkingcapacity(CuTest *tc) {
     unit *u;
-    int cap;
+    int capacity;
     const struct item_type *itype;
+    capacities cap;
 
     test_setup();
     init_resources();
 
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    cap = u->number * (u->_race->capacity + u->_race->weight);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, NULL));
     scale_number(u, 2);
-    cap = u->number * (u->_race->capacity + u->_race->weight);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity = u->number * (u->_race->capacity + u->_race->weight);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, NULL));
 
     itype = it_find("horse");
     assert(itype);
     i_change(&u->items, itype, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
     i_change(&u->items, itype, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
 
     itype = test_create_itemtype("cart");
     assert(itype);
     i_change(&u->items, itype, 1);
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
     set_level(u, SK_RIDING, 1);
-    cap += itype->capacity;
-    CuAssertIntEquals(tc, cap, walkingcapacity(u));
+    capacity += itype->capacity;
+    CuAssertIntEquals(tc, capacity, walkingcapacity(u, &cap));
 
     itype = test_create_itemtype("trollbelt");
     assert(itype);
     i_change(&u->items, itype, 1);
-    CuAssertIntEquals(tc, cap + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u));
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, capacity + (STRENGTHMULTIPLIER-1) * u->_race->capacity, walkingcapacity(u, &cap));
     config_set("rules.trollbelt.multiplier", "5");
-    CuAssertIntEquals(tc, cap + 4 * u->_race->capacity, walkingcapacity(u));
+    CuAssertIntEquals(tc, capacity + 4 * u->_race->capacity, walkingcapacity(u, &cap));
 
     test_teardown();
 }
@@ -794,21 +799,37 @@ static void test_movement_speed(CuTest *tc) {
     unit * u;
     race * rc;
     const struct item_type *it_horse;
+    const struct item_type *it_cart;
+    capacities cap;
 
     test_setup();
     it_horse = test_create_horse();
+    it_cart = test_create_cart();
     rc = test_create_race(NULL);
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
 
     rc->speed = 1.0;
-    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u, NULL));
 
     rc->speed = 2.0;
-    CuAssertIntEquals(tc, 2 * BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, 2 * BP_WALKING, movement_speed(u, NULL));
 
     set_level(u, SK_RIDING, 1);
     i_change(&u->items, it_horse, 1);
-    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, 1, cap.animals);
+    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
+    CuAssertIntEquals(tc, 0, cap.vehicles);
+    CuAssertIntEquals(tc, 0, cap.vcap);
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
+
+    i_change(&u->items, it_horse, 1);
+    i_change(&u->items, it_cart, 1);
+    get_transporters(u->items, &cap);
+    CuAssertIntEquals(tc, 2, cap.animals);
+    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
+    CuAssertIntEquals(tc, 1, cap.vehicles);
+    CuAssertIntEquals(tc, it_cart->capacity, cap.vcap);
 
     test_teardown();
 }
@@ -929,7 +950,7 @@ static void test_movement_speed_dragon(CuTest *tc) {
     rc->flags |= RCF_DRAGON;
     rc->speed = 1.5;
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
-    CuAssertIntEquals(tc, 6, movement_speed(u));
+    CuAssertIntEquals(tc, 6, movement_speed(u, NULL));
     test_teardown();
 }
 
@@ -937,6 +958,7 @@ static void test_movement_speed_unicorns(CuTest *tc) {
     unit *u;
     item_type* it_unicorn;
     item_type const *it_horse;
+    capacities cap;
 
     test_setup();
     init_resources();
@@ -949,61 +971,72 @@ static void test_movement_speed_unicorns(CuTest *tc) {
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     scale_number(u, 10);
     i_change(&u->items, it_unicorn, 5);
+    get_transporters(u->items, &cap);
 
     /* 5 animals can carry 2 people each: */
     set_level(u, SK_RIDING, 1);
     CuAssertIntEquals(tc, u->number / 2, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
     /* at level 1, riders can move 2 animals each */
     i_change(&u->items, it_unicorn, 15);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 2 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
     /* any more animals, and they walk: */
     i_change(&u->items, it_unicorn, 1);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 1 + 2 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u, &cap));
 
     /* up to 5 animals per person can we walked: */
     i_change(&u->items, it_unicorn, 29);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 5 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u, &cap));
 
     /* but no more! */
     i_change(&u->items, it_unicorn, 1);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 1 + 5 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, 0, movement_speed(u));
+    CuAssertIntEquals(tc, 0, movement_speed(u, &cap));
 
     /* at level 5, unicorns give a speed boost: */
     set_level(u, SK_RIDING, 5);
     /* we can now ride at most 10 animals each: */
     i_change(&u->items, it_unicorn, 49);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 10 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u, &cap));
 
     /* too many animals, we must walk: */
     i_change(&u->items, it_unicorn, 1);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 1 + 10 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u, &cap));
 
     /* at level 5, we can each walk 21 animals: */
     i_change(&u->items, it_unicorn, 109);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 21 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_WALKING, movement_speed(u, &cap));
 
     /* too many animals, we cannot move: */
     i_change(&u->items, it_unicorn, 1);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 1 + 21 * u->number, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, 0, movement_speed(u));
+    CuAssertIntEquals(tc, 0, movement_speed(u, &cap));
 
     /* max animals for riding, then add one (slow) horse */
     i_change(&u->items, it_unicorn, -112);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 10 * u->number - 1, i_get(u->items, it_unicorn));
-    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u));
+    CuAssertIntEquals(tc, BP_UNICORN, movement_speed(u, &cap));
     i_change(&u->items, it_horse, 1);
+    get_transporters(u->items, &cap);
     CuAssertIntEquals(tc, 1, i_get(u->items, it_horse));
-    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u));
+    CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
     test_teardown();
 }
