@@ -212,34 +212,65 @@ static int eff_weight(const unit * u)
     return weight(u);
 }
 
+static void add_capacity(capacity_s *caps, const item *itm, size_t length)
+{
+    int i;
+    for (i = 0; i != length && caps[i].type; ++i) {
+        if (caps[i].type == itm->type) {
+            break;
+        }
+    }
+    assert(i < length);
+    if (caps[i].type == NULL) {
+        caps[i].type = itm->type;
+        caps[i].count = itm->number;
+        if (i + 1 < length) {
+            caps[i + 1].type = NULL;
+        }
+    }
+    else {
+        caps[i].count += itm->number;
+    }
+}
+
+static int cmp_capacities(const void *a, const void *b)
+{
+    const capacity_s * lhs = (const capacity_s *) a;
+    const capacity_s * rhs = (const capacity_s *) b;
+    int lcap = lhs->type->capacity - lhs->type->weight;
+    int rcap = rhs->type->capacity - rhs->type->weight;
+    return rcap - lcap;
+}
+
+static void sort_capacities(capacity_s *caps, size_t maxlen) {
+    unsigned int i;
+    for (i = 0; i != maxlen; ++i) {
+        if (caps[i].type == NULL) break;
+    }
+    qsort(caps, i, sizeof(capacity_s), cmp_capacities);
+}
+
 void get_transporters(const item * itm, capacities *cap)
 {
-    int vehicles = 0, vcap = 0;
-    int animals = 0, acap = 0;
-
+    cap->num_animals = 0;
+    cap->num_vehicles = 0;
+    cap->animals[0].type = NULL;
+    cap->vehicles[0].type = NULL;
     for (; itm != NULL; itm = itm->next) {
         const item_type *itype = itm->type;
         if (itype->capacity > 0) {
             if (itype->flags & ITF_ANIMAL) {
-                animals += itm->number;
-                if (acap == 0)
-                    acap = itype->capacity;
-                assert(acap == itype->capacity
-                    || !"animals with different capacity not supported");
+                add_capacity(cap->animals, itm, MAX_ANIMALS);
+                cap->num_animals += itm->number;
             }
             if (itype->flags & ITF_VEHICLE) {
-                vehicles += itm->number;
-                if (vcap == 0)
-                    vcap = itype->capacity;
-                assert(vcap == itype->capacity
-                    || !"vehicles with different capacity not supported");
+                add_capacity(cap->vehicles, itm, MAX_VEHICLES);
+                cap->num_vehicles += itm->number;
             }
         }
     }
-    cap->vehicles = vehicles;
-    cap->animals = animals;
-    cap->vcap = vcap;
-    cap->acap = acap;
+    sort_capacities(cap->animals, MAX_ANIMALS);
+    sort_capacities(cap->vehicles, MAX_VEHICLES);
 }
 
 static int walking_horse_limit(const unit *u, int skill) {
@@ -250,57 +281,61 @@ static int riding_horse_limit(const unit *u, int skill) {
     return skill * 2 * u->number;
 }
 
+void get_transport_capacity(const capacity_s *caps, size_t maxlen, int limit, int *cap_out, int *count_out)
+{
+    int cap = 0, count = 0;
+    unsigned int i;
+    for (i = 0; (i != maxlen) && caps[i].type; ++i) {
+        int num = (caps[i].count < limit) ? caps[i].count : limit;
+        limit -= num;
+        count += num;
+        cap += caps[i].type->capacity * num;
+    }
+    *cap_out = cap;
+    *count_out = count;
+}
+
 static int ridingcapacity(const unit * u, const capacities * cap)
 {
-    int horses;
-    int vehicles = 0;
-    int animals = 0;
-    int vcap = 0;
-    int acap = 0;
+    int vehicles = 0, max_vehicles;
+    int animals = 0, max_animals;
+    int vcap = 0, acap = 0;
 
-    if (cap) {
-        vehicles = cap->vehicles;
-        animals = cap->animals;
-        vcap = cap->vcap;
-        acap = cap->acap;
-    }
     /* Man traegt sein eigenes Gewicht plus seine Kapazitaet! Die Menschen
      ** tragen nichts (siehe walkingcapacity). Ein Wagen zaehlt nur, wenn er
      ** von zwei Pferden gezogen wird */
 
-    horses = riding_horse_limit(u, effskill(u, SK_RIDING, NULL));
-    if (animals > horses) animals = horses;
-
-    if (fval(u_race(u), RCF_HORSE))
+    max_animals = riding_horse_limit(u, effskill(u, SK_RIDING, NULL));
+    get_transport_capacity(cap->animals, MAX_ANIMALS, max_animals,
+        &acap, &animals);
+    if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
+    }
 
     /* maximal diese Pferde koennen zum Ziehen benutzt werden */
-    horses = animals / HORSES_PER_CART;
-    if (horses < vehicles) vehicles = horses;
+    max_vehicles = animals / HORSES_PER_CART;
+    get_transport_capacity(cap->vehicles, MAX_VEHICLES, max_vehicles,
+        &vcap, &vehicles);
 
     return vehicles * vcap + animals * acap;
 }
 
 int walkingcapacity(const struct unit *u, const capacities *cap)
 {
-    int n, people, pferde_fuer_wagen, horses;
+    int n, people, horses, carts;
     int wagen_mit_pferden;
     int vehicles = 0, vcap = 0;
     int animals = 0, acap = 0;
     const struct resource_type *rhorse = rt_find("horse");
     const struct resource_type *rbelt = rt_find("trollbelt");
 
-    if (cap) {
-        vehicles = cap->vehicles;
-        animals = cap->animals;
-        vcap = cap->vcap;
-        acap = cap->acap;
-    }
     /* Das Gewicht, welches die Pferde tragen, plus das Gewicht, welches
      * die Leute tragen */
-
-    horses = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
-    pferde_fuer_wagen = (animals < horses) ? animals : horses;
+    if (cap) {
+        horses = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
+        get_transport_capacity(cap->animals, MAX_ANIMALS, horses,
+            &acap, &animals);
+    }
     if (fval(u_race(u), RCF_HORSE)) {
         animals += u->number;
         people = 0;
@@ -309,29 +344,33 @@ int walkingcapacity(const struct unit *u, const capacities *cap)
         people = u->number;
     }
 
-    /* maximal diese Pferde koennen zum Ziehen benutzt werden */
-    horses = pferde_fuer_wagen / HORSES_PER_CART;
-    wagen_mit_pferden = (vehicles < horses) ? vehicles : horses;
+    if (cap) {
+        vehicles = cap->num_vehicles;
+        /* maximal diese Pferde koennen zum Ziehen benutzt werden */
+        wagen_mit_pferden = animals / HORSES_PER_CART;
+        if (wagen_mit_pferden < vehicles) vehicles = wagen_mit_pferden;
 
-    n = wagen_mit_pferden * vcap;
+        carts = wagen_mit_pferden;
+        if (u_race(u) == get_race(RC_TROLL)) {
+            int wagen_ohne_pferde, wagen_mit_trollen;
+            /* 4 Trolle ziehen einen Wagen. */
+            /* Unbesetzte Wagen feststellen */
+            wagen_ohne_pferde = vehicles - wagen_mit_pferden;
 
-    if (u_race(u) == get_race(RC_TROLL)) {
-        int wagen_ohne_pferde, wagen_mit_trollen;
-        /* 4 Trolle ziehen einen Wagen. */
-        /* Unbesetzte Wagen feststellen */
-        wagen_ohne_pferde = vehicles - wagen_mit_pferden;
+            /* Genug Trolle, um die Restwagen zu ziehen? */
+            wagen_mit_trollen = u->number / 4;
+            if (wagen_mit_trollen > wagen_ohne_pferde) {
+                wagen_mit_trollen = wagen_ohne_pferde;
+            }
+            carts += wagen_mit_trollen;
 
-        /* Genug Trolle, um die Restwagen zu ziehen? */
-        wagen_mit_trollen = u->number / 4;
-        if (wagen_mit_trollen > wagen_ohne_pferde) {
-            wagen_mit_trollen = wagen_ohne_pferde;
+            /* Wagenkapazitaet hinzuzaehlen */
         }
 
-        /* Wagenkapazitaet hinzuzaehlen */
-        n += wagen_mit_trollen * vcap;
+        get_transport_capacity(cap->vehicles, MAX_VEHICLES, carts,
+            &vcap, &vehicles);
     }
-
-    n += animals * acap;
+    n = acap + vcap;
     n += people * personcapacity(u);
     /* Goliathwasser */
     if (rhorse) {
@@ -382,10 +421,10 @@ static int canwalk(unit * u, const capacities *cap)
     }
 
     if (cap) {
-        animals = cap->animals;
+        animals = cap->num_animals;
         if (animals > maxpferde)
             return E_CANWALK_TOOMANYHORSES;
-        vehicles = cap->vehicles;
+        vehicles = cap->num_vehicles;
     }
 
     if (walkingcapacity(u, cap) - eff_weight(u) >= 0)
@@ -462,17 +501,18 @@ static int walk_speed(const unit * u, const capacities *cap)
         }
         return 0;
     }
-    if (ridingcapacity(u, cap) - eff_weight(u) >= 0) {
-        if (horses) {
-            if (horses == unicorns) {
-                if (skill >= 5) {
-                    return BP_UNICORN;
+    if (cap) {
+        if (ridingcapacity(u, cap) - eff_weight(u) >= 0) {
+            if (horses) {
+                if (horses == unicorns) {
+                    if (skill >= 5) {
+                        return BP_UNICORN;
+                    }
                 }
+                return BP_RIDING;
             }
-            return BP_RIDING;
         }
     }
-
     return BP_WALKING;
 }
 
@@ -1607,7 +1647,7 @@ static const region_list *travel_route(unit * u, const capacities *cap,
 
             if (fval(current->terrain, SEA_REGION) || fval(next->terrain, SEA_REGION)) {
                 /* trying to enter or exit ocean with horses, are we? */
-                if (cap && cap->animals) {
+                if (cap && cap->num_animals) {
                     /* tries to do it with horses */
                     if (ord != NULL)
                         cmistake(u, ord, 67, MSG_MOVE);

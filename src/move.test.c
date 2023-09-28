@@ -817,19 +817,21 @@ static void test_movement_speed(CuTest *tc) {
     set_level(u, SK_RIDING, 1);
     i_change(&u->items, it_horse, 1);
     get_transporters(u->items, &cap);
-    CuAssertIntEquals(tc, 1, cap.animals);
-    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
-    CuAssertIntEquals(tc, 0, cap.vehicles);
-    CuAssertIntEquals(tc, 0, cap.vcap);
+    CuAssertPtrEquals(tc, (void *)it_horse, (void *)cap.animals[0].type);
+    CuAssertIntEquals(tc, 1, cap.animals[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.animals[1].type);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.vehicles[0].type);
     CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
     i_change(&u->items, it_horse, 1);
     i_change(&u->items, it_cart, 1);
     get_transporters(u->items, &cap);
-    CuAssertIntEquals(tc, 2, cap.animals);
-    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
-    CuAssertIntEquals(tc, 1, cap.vehicles);
-    CuAssertIntEquals(tc, it_cart->capacity, cap.vcap);
+    CuAssertPtrEquals(tc, (void *)it_horse, (void *)cap.animals[0].type);
+    CuAssertIntEquals(tc, 2, cap.animals[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.animals[1].type);
+    CuAssertPtrEquals(tc, (void *)it_cart, (void *)cap.vehicles[0].type);
+    CuAssertIntEquals(tc, 1, cap.vehicles[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.vehicles[1].type);
 
     test_teardown();
 }
