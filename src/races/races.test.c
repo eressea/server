@@ -10,9 +10,6 @@
 
 #include <CuTest.h>
 
-#include <stb_ds.h>
-
-#include <stdbool.h>
 #include <stdio.h>
 
 #include "tests.h"

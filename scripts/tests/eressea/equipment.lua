@@ -17,13 +17,15 @@ function setup()
 {
     "races": {
         "human": { "hp" : 20 },
-        "demon": { "hp" : 25 }
+        "demon": { "hp" : 25 },
+        "goblin": { "hp" : 30 }
     },
     "terrains": {
         "plain" : {}
     },
     "items" : {
-        "stone" : {}
+        "stone" : {},
+        "roi" : {}
     },
     "spells" : { "bug" : {} }
 }
@@ -41,6 +43,32 @@ function add_test_equipment(u, flags)
     u.number = 2
 end
 
+function test_noflags()
+       local r = region.create(0,0,'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r)
+    u.magic = 'illaun'
+
+    equipment.add('test_equip', {
+        ['items'] = { ['stone'] = 10, },
+        ['skills'] = { ['magic'] = 1, },
+        ['spells'] = { ['bug'] = 2},
+        ['callback'] = add_test_equipment
+    })
+
+    assert_equal(0, u:get_item('stone'))
+
+    equip_unit(u, 'test_equip')
+    assert_equal(10, u:get_item('stone'))
+    assert_equal(1, u:get_skill('magic'))
+    for sp in u.spells do
+        assert_equal("bug", sp.name)
+        assert_equal(2, sp.level)
+    end
+    assert_equal(255, u:get_item('money'))
+    assert_equal(2, u.number)
+    assert_equal(u.hp_max * u.number, u.hp)
+end
 
 function test_equip_unit()
     local r = region.create(0,0,'plain')
@@ -99,16 +127,26 @@ function test_equip_hp()
     equip_unit(u, 'test_equip', EQUIP_SKILLS + EQUIP_SPECIAL)
     assert_equal(1, u:get_skill('stamina'))
     assert_equal(math.floor(2*20*1.07), u.hp)
-
 end
 
-function test_equip_demo()
-    local r = region.create(0,0,'plain')
+function test_equip_demon()
+    local r = region.create(0, 0, 'plain')
     local f = faction.create('demon')
     local u = unit.create(f, r)
 
     equip_unit(u, 'seed_demon', EQUIP_SKILLS + EQUIP_SPECIAL)
     assert_equal(15, u:get_skill('stamina'))
     assert_equal(u.hp_max, u.hp)
+
+end
+
+function test_equip_goblin()
+    local r = region.create(0, 0, 'plain')
+    local f = faction.create('goblin')
+    local u = unit.create(f, r)
+
+    equip_unit(u, 'seed_goblin', EQUIP_ALL)
+    assert_equal(10, u.number)
+    assert_equal(u.hp_max * u.number, u.hp)
 
 end

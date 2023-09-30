@@ -133,6 +133,7 @@ EQUIP_ALL     = 255
 
 function equip_unit(u, name, flags)
     local set = mysets[name]
+    flags = flags or EQUIP_ALL
     if set then
         local items = set['items']
         -- hmmm, lua 5.3 has actual bitwise operators ...
