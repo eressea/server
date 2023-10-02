@@ -269,7 +269,7 @@ static void test_join_monsters(CuTest *tc)
     CuAssertIntEquals(tc, -1, u_geteffstealth(u));
     CuAssertPtrEquals(tc, NULL, u->orders);
     CuAssertPtrEquals(tc, NULL, u->thisorder);
-    CuAssertIntEquals(tc, 0, (UFL_GROUP, UFL_NOAID | UFL_STEALTH | UFL_HERO | UFL_ANON_FACTION) & u->flags);
+    CuAssertIntEquals(tc, 0, (UFL_GROUP | UFL_NOAID | UFL_STEALTH | UFL_HERO | UFL_ANON_FACTION) & u->flags);
 
     test_teardown();
 }
