@@ -18,6 +18,7 @@
 #include "kernel/equipment.h"
 #include "kernel/event.h"
 #include "kernel/faction.h"
+#include "kernel/group.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/order.h"
@@ -181,7 +182,8 @@ bool join_monsters(unit *u, faction *monsters) {
     u_setfaction(u, monsters);
     u->status = ST_FIGHT;
     a_removeall(&u->attribs, &at_otherfaction);
-    u->flags &= ~UFL_ANON_FACTION;
+    set_group(u, NULL);
+    u->flags &= ~(UFL_NOAID | UFL_HERO | UFL_ANON_FACTION);
     u_seteffstealth(u, -1);
     u_freeorders(u);
     return true;
