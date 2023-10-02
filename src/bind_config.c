@@ -4,6 +4,7 @@
 #include "bind_config.h"
 
 #include "eressea.h"
+#include "spells.h"
 #include "jsonconf.h"
 
 #include <kernel/item.h>
@@ -33,6 +34,7 @@ int config_parse(const char *json)
         json_config(conf);
         cJSON_Delete(conf);
         init_resources();
+        init_spells();
         return 0;
     }
     else {

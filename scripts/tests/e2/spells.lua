@@ -415,3 +415,28 @@ function test_cast_summonent()
     assert_not_nil(u3)
     assert_equal(1, u3.number)
 end
+
+function test_cast_rostregen()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r)
+    local u2 = unit.create(faction.create("human"), r)
+    u.magic = "gwyrrd"
+    u.aura = 200
+    u:add_spell("rustweapon")
+    u:set_skill("magic", 20)
+    u2:add_item("sword", 1)
+    u2:add_item("axe", 1)
+    u2:add_item("shield", 2)
+    u2:add_item("chainmail", 5)
+    u:add_order('ZAUBERE STUFE 10 Rostregen ' .. itoa36(u2.id))
+    process_orders()
+    assert_equal(0, u2:get_item("sword"))
+    assert_equal(1, u2:get_item("rustysword"))
+    assert_equal(0, u2:get_item("axe"))
+    assert_equal(1, u2:get_item("rustyaxe"))
+    assert_equal(1, u2:get_item("shield"))
+    assert_equal(1, u2:get_item("rustyshield"))
+    assert_equal(4, u2:get_item("chainmail"))
+    assert_equal(1, u2:get_item("rustychainmail"))
+end
