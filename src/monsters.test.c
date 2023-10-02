@@ -5,6 +5,7 @@
 #include "kernel/attrib.h"
 #include "kernel/config.h"
 #include "kernel/faction.h"
+#include "kernel/group.h"
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
@@ -20,10 +21,14 @@
 #include "util/message.h"
 
 #include "attributes/hate.h"
+#include "attributes/otherfaction.h"
+#include "attributes/stealth.h"
 
 #include <CuTest.h>
 #include <tests.h>
+
 #include <assert.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -209,7 +214,7 @@ static void test_dragon_attacks_the_rich(CuTest * tc)
 
 void random_growl(const unit *u, region *tr, int rand);
 
-static void test_dragon_moves(CuTest * tc)
+static void test_dragon_moves(CuTest *tc)
 {
     region *r;
     unit *u, *m;
@@ -236,6 +241,35 @@ static void test_dragon_moves(CuTest * tc)
     assert_int_parameter(tc, msg, 1, 1);
     assert_pointer_parameter(tc, msg, 2, findregion(1,0));
     assert_string_parameter(tc, msg, 3, "growl3");
+
+    test_teardown();
+}
+
+static void test_join_monsters(CuTest *tc)
+{
+    unit *u, *m;
+    order *ord;
+
+    test_setup();
+    create_monsters(&u, &m);
+    join_group(u, "Klabauter");
+    set_otherfaction(u, m->faction);
+    u_seteffstealth(u, 20);
+    unit_addorder(u, ord = create_order(K_WORK, u->faction->locale, NULL));
+    u->thisorder = copy_order(ord);
+
+    u->flags = INT_MAX;
+    u->status = ST_AGGRO;
+
+    CuAssertTrue(tc, join_monsters(u, m->faction));
+    CuAssertPtrEquals(tc, m->faction, u->faction);
+    CuAssertIntEquals(tc, ST_FIGHT, u->status);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(u));
+    CuAssertPtrEquals(tc, NULL, get_group(u));
+    CuAssertIntEquals(tc, -1, u_geteffstealth(u));
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertIntEquals(tc, 0, (UFL_GROUP, UFL_NOAID | UFL_STEALTH | UFL_HERO | UFL_ANON_FACTION) & u->flags);
 
     test_teardown();
 }
@@ -307,6 +341,7 @@ CuSuite *get_monsters_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_attack_not);
     SUITE_ADD_TEST(suite, test_dragon_attacks_the_rich);
     SUITE_ADD_TEST(suite, test_dragon_moves);
+    SUITE_ADD_TEST(suite, test_join_monsters);
     SUITE_ADD_TEST(suite, test_monsters_learn_exp);
     return suite;
 }
