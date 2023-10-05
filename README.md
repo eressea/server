@@ -11,7 +11,7 @@ install all of them:
 
     sudo apt-get install git cmake gcc make luarocks \
         liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
-        libcjson-dev libiniparser-dev libexpat1-dev
+        libcjson-dev libiniparser-dev libexpat1-dev libutf8proc-dev
 
 ## How to check out and build the Eressea server
 
@@ -19,9 +19,10 @@ This repository relies heavily on the use of submodules, and it pulls in
 most of the code from those. The build system being used is CMake.
 Here's how you clone and build the source on Linux or macOS:
 
-    git clone --recursive git://github.com/eressea/server.git source
+    git clone --recursive https://github.com/eressea/server.git source
     cd source
     git submodule update --init
+    ./configure
     s/build
 
 If you got this far and all went well, you have built the server, and
