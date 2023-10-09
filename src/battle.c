@@ -1153,25 +1153,6 @@ static bool survives(fighter *af, troop dt, battle *b) {
     return false;
 }
 
-static void destroy_items(troop dt) {
-  unit *du = dt.fighter->unit;
-
-  item **pitm;
-
-  for (pitm = &du->items; *pitm;) {
-      item *itm = *pitm;
-      const item_type *itype = itm->type;
-      if (!(itype->flags & ITF_NOTLOST) && dt.index < itm->number) {
-          /* 25% Grundchance, dass ein Item kaputtgeht. */
-          if (rng_int() % 4 < 1) {
-              i_change(pitm, itype, -1);
-          }
-      }
-      if (*pitm == itm) {
-          pitm = &itm->next;
-      }
-  }
-}
 
 static void calculate_defense_type(troop at, troop dt, int type, bool missile,
     const weapon_type **dwtype, int *defskill)
@@ -1342,8 +1323,6 @@ terminate(troop dt, troop at, int type, const char *damage_formula, bool missile
         return false;
 
     ++at.fighter->kills;
-
-    destroy_items(dt);
 
     kill_troop(dt);
 
