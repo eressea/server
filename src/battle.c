@@ -2468,8 +2468,7 @@ void loot_items(fighter * corpse)
     while (itm) {
         int maxloot = itm->number;
         if (u->number != dead) {
-            int quota = u->number / dead;
-            maxloot = maxloot / quota;
+            maxloot = maxloot * dead / u->number;
         }
         if (maxloot > 0) {
             int i = (maxloot > 10) ? 10 : maxloot;
