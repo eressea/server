@@ -5,7 +5,7 @@ import os
 import os.path
 import io
 from configparser import ConfigParser
-import string
+import codecs
 import logging
 import sys
 import subprocess
@@ -208,6 +208,8 @@ def write_part(outfile, part, sender):
         return False
     charset = part.get_content_charset()
     payload = part.get_payload(decode=True)
+    if payload.startswith(codecs.BOM_UTF8):
+        payload = payload[3:]
 
     if charset is None:
         charset = "latin1"
