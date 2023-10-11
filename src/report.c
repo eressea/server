@@ -87,7 +87,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-#define TEMPLATE_BOM 1
+#define TEMPLATE_BOM 0
 
 /* pre-C99 compatibility */
 #ifndef SIZE_MAX
