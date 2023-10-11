@@ -19,7 +19,6 @@
 #endif
 
 #include "signals.h"
-#include "spells.h"
 #include "bindings.h"
 
 #include <iniparser.h>
