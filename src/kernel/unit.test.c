@@ -222,6 +222,82 @@ static int cb_skillmod(const unit *u, const region *r, skill_t sk, int level) {
     return level + 3;
 }
 
+static void test_effskill(CuTest *tc) {
+    region *r;
+    faction *f;
+    unit *u;
+    race *rc;
+
+    test_setup();
+    test_create_locale();
+    rc = test_create_race("smurf");
+    rc->bonus[SK_ALCHEMY] = -1;
+    rc->bonus[SK_CATAPULT] = 1;
+    f = test_create_faction_ex(rc, NULL);
+    r = test_create_plain(0, 0);
+    u = test_create_unit(f, r);
+
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+    CuAssertIntEquals(tc, 0, effskill(u, SK_BUILDING, r));
+    CuAssertIntEquals(tc, 0, effskill(u, SK_CATAPULT, r));
+
+    set_level(u, SK_ALCHEMY, 1);
+    set_level(u, SK_BUILDING, 1);
+    set_level(u, SK_CATAPULT, 1);
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+    CuAssertIntEquals(tc, 1, effskill(u, SK_BUILDING, r));
+    CuAssertIntEquals(tc, 2, effskill(u, SK_CATAPULT, r));
+    set_level(u, SK_ALCHEMY, 2);
+    set_level(u, SK_BUILDING, 2);
+    set_level(u, SK_CATAPULT, 2);
+    CuAssertIntEquals(tc, 1, effskill(u, SK_ALCHEMY, r));
+    CuAssertIntEquals(tc, 2, effskill(u, SK_BUILDING, r));
+    CuAssertIntEquals(tc, 3, effskill(u, SK_CATAPULT, r));
+
+    test_teardown();
+}
+
+static void test_effskill_insects(CuTest *tc) {
+    region *r;
+    faction *f;
+    unit *u;
+    race *rc;
+    const terrain_type *t_swamp, *t_desert, *t_plain, *t_mountain;
+
+    test_setup();
+    test_create_locale();
+    init_terrains();
+    t_mountain = test_create_terrain("mountain", LAND_REGION | WALK_INTO | FLY_INTO);
+    t_swamp = test_create_terrain("swamp", LAND_REGION | WALK_INTO | FLY_INTO);
+    t_desert = test_create_terrain("desert", LAND_REGION | WALK_INTO | FLY_INTO);
+    t_plain = test_create_terrain("plain", LAND_REGION | FOREST_REGION | WALK_INTO | CAVALRY_REGION | FLY_INTO);
+    rc = test_create_race("insect");
+    f = test_create_faction_ex(rc, NULL);
+    r = test_create_region(0, 0, t_plain);
+    u = test_create_unit(f, r);
+
+    r->terrain = t_plain;
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_desert;
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_swamp;
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_mountain;
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+
+    set_level(u, SK_ALCHEMY, 1);
+    r->terrain = t_plain;
+    CuAssertIntEquals(tc, 1, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_desert;
+    CuAssertIntEquals(tc, 2, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_swamp;
+    CuAssertIntEquals(tc, 2, effskill(u, SK_ALCHEMY, r));
+    r->terrain = t_mountain;
+    CuAssertIntEquals(tc, 0, effskill(u, SK_ALCHEMY, r));
+
+    test_teardown();
+}
+
 static void test_skillmod(CuTest *tc) {
     unit *u;
     attrib *a;
@@ -1019,6 +1095,8 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_names);
     SUITE_ADD_TEST(suite, test_unlimited_units);
     SUITE_ADD_TEST(suite, test_default_name);
+    SUITE_ADD_TEST(suite, test_effskill);
+    SUITE_ADD_TEST(suite, test_effskill_insects);
     SUITE_ADD_TEST(suite, test_skillmod);
     SUITE_ADD_TEST(suite, test_skill_hunger);
     SUITE_ADD_TEST(suite, test_skill_familiar);
