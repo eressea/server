@@ -348,7 +348,7 @@ int walkingcapacity(const struct unit *u, const capacities *cap)
         vehicles = cap->num_vehicles;
         /* maximal diese Pferde koennen zum Ziehen benutzt werden */
         wagen_mit_pferden = animals / HORSES_PER_CART;
-        if (wagen_mit_pferden < vehicles) vehicles = wagen_mit_pferden;
+        if (wagen_mit_pferden > vehicles) wagen_mit_pferden = vehicles;
 
         carts = wagen_mit_pferden;
         if (u_race(u) == get_race(RC_TROLL)) {
