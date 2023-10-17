@@ -317,7 +317,7 @@ static int ridingcapacity(const unit * u, const capacities * cap)
     get_transport_capacity(cap->vehicles, MAX_VEHICLES, max_vehicles,
         &vcap, &vehicles);
 
-    return vehicles * vcap + animals * acap;
+    return vcap + acap;
 }
 
 int walkingcapacity(const struct unit *u, const capacities *cap)

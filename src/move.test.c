@@ -321,11 +321,12 @@ static void test_walkingcapacity(CuTest *tc) {
 static void test_horses_pull_carts(CuTest *tc)
 {
     unit *u;
-    region *r1, *r2;
+    region *r1, *r2, *r3;
     const struct item_type *it_horse;
     const struct item_type *it_cart;
     const struct item_type *it_silver;
     int capacity = 0;
+    const char *dir;
 
     test_setup();
     it_horse = test_create_horse();
@@ -333,27 +334,39 @@ static void test_horses_pull_carts(CuTest *tc)
     it_silver = test_create_silver();
     r1 = test_create_plain(0, 0);
     r2 = test_create_plain(1, 0);
+    r3 = test_create_plain(2, 0);
     u = test_create_unit(test_create_faction(), r1);
     scale_number(u, 20);
-    capacity = u->_race->capacity * u->number;
+    set_level(u, SK_RIDING, 1);
     i_change(&u->items, it_horse, 20);
     capacity += (it_horse->capacity - it_horse->weight) * 20;
     i_change(&u->items, it_cart, 10);
     capacity += (it_cart->capacity - it_cart->weight) * 10;
+    capacity -= u->number * u->_race->weight;
     i_change(&u->items, it_silver, capacity);
 
+    dir = LOC(u->faction->locale, directions[D_EAST]);
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "%s %s", dir, dir);
+    movement();
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "travel"));
+    CuAssertPtrEquals(tc, r3, u->region);
+    test_clear_messages(u->faction);
+
+    u->flags = 0;
     u->thisorder = create_order(K_MOVE, u->faction->locale,
-        LOC(u->faction->locale, directions[D_EAST]));
+        LOC(u->faction->locale, directions[D_WEST]));
+    // make too heavy to ride:
+    i_change(&u->items, it_silver, (u->_race->weight + u->_race->capacity) * u->number);
     movement();
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "travel"));
     CuAssertPtrEquals(tc, r2, u->region);
     test_clear_messages(u->faction);
 
     u->flags = 0;
-    free_order(u->thisorder);
     u->thisorder = create_order(K_MOVE, u->faction->locale,
         LOC(u->faction->locale, directions[D_WEST]));
-    i_change(&u->items, it_silver, 1); // too heavy, cannot move
+    // make too heavy for walking:
+    i_change(&u->items, it_silver, 1);
     movement();
     CuAssertPtrEquals(tc, r2, u->region);
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error57"));
