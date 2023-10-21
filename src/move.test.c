@@ -318,6 +318,102 @@ static void test_walkingcapacity(CuTest *tc) {
     test_teardown();
 }
 
+static void test_horses_pull_carts(CuTest *tc)
+{
+    unit *u;
+    region *r1, *r2, *r3;
+    const struct item_type *it_horse;
+    const struct item_type *it_cart;
+    const struct item_type *it_silver;
+    int capacity = 0;
+    const char *dir;
+
+    test_setup();
+    it_horse = test_create_horse();
+    it_cart = test_create_cart();
+    it_silver = test_create_silver();
+    r1 = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    r3 = test_create_plain(2, 0);
+    u = test_create_unit(test_create_faction(), r1);
+    scale_number(u, 20);
+    set_level(u, SK_RIDING, 1);
+    i_change(&u->items, it_horse, 20);
+    capacity += (it_horse->capacity - it_horse->weight) * 20;
+    i_change(&u->items, it_cart, 10);
+    capacity += (it_cart->capacity - it_cart->weight) * 10;
+    capacity -= u->number * u->_race->weight;
+    i_change(&u->items, it_silver, capacity);
+
+    dir = LOC(u->faction->locale, directions[D_EAST]);
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "%s %s", dir, dir);
+    movement();
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "travel"));
+    CuAssertPtrEquals(tc, r3, u->region);
+    test_clear_messages(u->faction);
+
+    u->flags = 0;
+    u->thisorder = create_order(K_MOVE, u->faction->locale,
+        LOC(u->faction->locale, directions[D_WEST]));
+    // make too heavy to ride:
+    i_change(&u->items, it_silver, (u->_race->weight + u->_race->capacity) * u->number);
+    movement();
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "travel"));
+    CuAssertPtrEquals(tc, r2, u->region);
+    test_clear_messages(u->faction);
+
+    u->flags = 0;
+    u->thisorder = create_order(K_MOVE, u->faction->locale,
+        LOC(u->faction->locale, directions[D_WEST]));
+    // make too heavy for walking:
+    i_change(&u->items, it_silver, 1);
+    movement();
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error57"));
+    test_teardown();
+}
+
+static void test_trolls_pull_carts(CuTest *tc)
+{
+    unit *u;
+    race *rc;
+    region *r1, *r2;
+    const struct item_type *it_cart;
+    const struct item_type *it_silver;
+    int capacity = 0;
+
+    test_setup();
+    rc = test_create_race("troll");
+    rc->capacity = 1080;
+    rc->weight = 2000;
+    it_cart = test_create_cart();
+    it_silver = test_create_silver();
+    r1 = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    u = test_create_unit(test_create_faction_ex(rc, NULL), r1);
+    scale_number(u, 20);
+    capacity = u->_race->capacity * u->number;
+    i_change(&u->items, it_cart, 5);
+    capacity += (it_cart->capacity - it_cart->weight) * 5;
+    i_change(&u->items, it_silver, capacity);
+
+    u->thisorder = create_order(K_MOVE, u->faction->locale,
+        LOC(u->faction->locale, directions[D_EAST]));
+    movement();
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "travel"));
+
+    u->flags = 0;
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_MOVE, u->faction->locale,
+        LOC(u->faction->locale, directions[D_WEST]));
+    i_change(&u->items, it_silver, 1); // too heavy, cannot move
+    movement();
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error57"));
+    test_teardown();
+}
+
 static void test_ship_trails(CuTest *tc) {
     ship *sh;
     region *r1, *r2, *r3;
@@ -817,19 +913,21 @@ static void test_movement_speed(CuTest *tc) {
     set_level(u, SK_RIDING, 1);
     i_change(&u->items, it_horse, 1);
     get_transporters(u->items, &cap);
-    CuAssertIntEquals(tc, 1, cap.animals);
-    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
-    CuAssertIntEquals(tc, 0, cap.vehicles);
-    CuAssertIntEquals(tc, 0, cap.vcap);
+    CuAssertPtrEquals(tc, (void *)it_horse, (void *)cap.animals[0].type);
+    CuAssertIntEquals(tc, 1, cap.animals[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.animals[1].type);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.vehicles[0].type);
     CuAssertIntEquals(tc, BP_RIDING, movement_speed(u, &cap));
 
     i_change(&u->items, it_horse, 1);
     i_change(&u->items, it_cart, 1);
     get_transporters(u->items, &cap);
-    CuAssertIntEquals(tc, 2, cap.animals);
-    CuAssertIntEquals(tc, it_horse->capacity, cap.acap);
-    CuAssertIntEquals(tc, 1, cap.vehicles);
-    CuAssertIntEquals(tc, it_cart->capacity, cap.vcap);
+    CuAssertPtrEquals(tc, (void *)it_horse, (void *)cap.animals[0].type);
+    CuAssertIntEquals(tc, 2, cap.animals[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.animals[1].type);
+    CuAssertPtrEquals(tc, (void *)it_cart, (void *)cap.vehicles[0].type);
+    CuAssertIntEquals(tc, 1, cap.vehicles[0].count);
+    CuAssertPtrEquals(tc, NULL, (void *)cap.vehicles[1].type);
 
     test_teardown();
 }
@@ -1132,6 +1230,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_movement_speed_dragon);
     SUITE_ADD_TEST(suite, test_movement_speed_unicorns);
     SUITE_ADD_TEST(suite, test_walkingcapacity);
+    SUITE_ADD_TEST(suite, test_horses_pull_carts);
+    SUITE_ADD_TEST(suite, test_trolls_pull_carts);
     SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
