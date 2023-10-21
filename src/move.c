@@ -214,7 +214,7 @@ static int eff_weight(const unit * u)
 
 static void add_capacity(capacity_s *caps, const item *itm, size_t length)
 {
-    int i;
+    unsigned int i;
     for (i = 0; i != length && caps[i].type; ++i) {
         if (caps[i].type == itm->type) {
             break;
