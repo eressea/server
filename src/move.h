@@ -72,9 +72,19 @@ direction_t drift_target(struct ship *sh);
 struct order * cycle_route(struct order * ord, const struct locale *lang, int gereist);
 struct order * make_movement_order(const struct locale *lang, direction_t steps[], int length);
 
+#define MAX_ANIMALS 2
+#define MAX_VEHICLES 2
+
+typedef struct capacity_s {
+    int count;
+    const struct item_type *type;
+} capacity_s;
+
 typedef struct capacities {
-    int animals, vehicles;
-    int acap, vcap;
+    capacity_s animals[MAX_ANIMALS];
+    int num_animals;
+    capacity_s vehicles[MAX_VEHICLES];
+    int num_vehicles;
 } capacities;
 
 void get_transporters(const struct item *itm, struct capacities *cap);

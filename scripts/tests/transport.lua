@@ -29,10 +29,23 @@ function setup()
             }
         },
         "items" : {
+            "money" : {
+                "weight" : 1
+            },
             "horse" : {
                 "capacity" : 7000,
                 "weight" : 5000,
                 "flags" : [ "big", "animal" ]
+            },
+            "cart" : {
+                "capacity" : 14000,
+                "weight" : 4000,
+                "flags" : [ "big", "vehicle" ]
+            },
+            "catapult" : {
+                "capacity" : 10000,
+                "weight" : 10000,
+                "flags" : [ "big", "vehicle" ]
             }
         },
         "terrains" : {
@@ -115,4 +128,68 @@ function test_aquarian_transport_capacity()
 
     assert_not_equal(r1, u1.region)
     assert_not_equal(r1, u2.region)
+end
+
+function test_carts_carry_carts()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local r3 = region.create(2, 0, "plain")
+    local f = faction.create()
+    local u = unit.create(f, r1, 1)
+    u:set_skill('riding', 1)
+    u:add_item('horse', 2)
+    u:add_item('cart', 3)
+    u:add_item('money', 5000)
+
+    u:set_orders("NACH O O")
+    process_orders()
+    assert_equal(r3, u.region)
+
+    u:add_item('money', 1)
+    u:set_orders("NACH W W")
+    process_orders()
+    assert_equal(r2, u.region)
+end
+
+function test_pull_catapults()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local r3 = region.create(2, 0, "plain")
+    local f = faction.create()
+    local u = unit.create(f, r1, 1)
+    u:set_skill('riding', 1)
+    u:add_item('horse', 2)
+    u:add_item('catapult', 1)
+    u:add_item('money', 3000)
+
+    u:set_orders("NACH O O")
+    process_orders()
+    assert_equal(r3, u.region)
+
+    u:add_item('money', 1)
+    u:set_orders("NACH W W")
+    process_orders()
+    assert_equal(r2, u.region)
+end
+
+function test_vehicle_mix()
+    local r1 = region.create(0, 0, "plain")
+    local r2 = region.create(1, 0, "plain")
+    local r3 = region.create(2, 0, "plain")
+    local f = faction.create()
+    local u = unit.create(f, r1, 1)
+    u:set_skill('riding', 1)
+    u:add_item('horse', 2)
+    u:add_item('cart', 1)
+    u:add_item('catapult', 1)
+    u:add_item('money', 3000)
+
+    u:set_orders("NACH O O")
+    process_orders()
+    assert_equal(r3, u.region)
+
+    u:add_item('money', 1)
+    u:set_orders("NACH W W")
+    process_orders()
+    assert_equal(r2, u.region)
 end
