@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>           // for true
+#include <stdarg.h>
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
 #include <string.h>
