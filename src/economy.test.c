@@ -391,8 +391,6 @@ static void test_sell_nothing_message(CuTest* tc) {
     unit* u, *u2;
     building* b;
     const item_type* it_luxury;
-    const luxury_type* ltype;
-    int max_products;
 
     test_setup();
     setup_production();
@@ -400,9 +398,7 @@ static void test_sell_nothing_message(CuTest* tc) {
     init_terrains();
     r = setup_trade_region(tc, NULL);
     it_luxury = r_luxury(r);
-    ltype = it_luxury->rtype->ltype;
     rsetpeasants(r, TRADE_FRACTION * 10);
-    max_products = rpeasants(r) / TRADE_FRACTION;
     b = test_create_building(r, test_create_buildingtype("castle"));
     b->size = 2;
     u = test_create_unit(test_create_faction(), r);
