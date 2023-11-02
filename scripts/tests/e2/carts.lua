@@ -215,3 +215,40 @@ function test_trolls_ride_carts()
     process_orders()
     assert_equal(r3, u1.region) -- can still walk
 end
+
+function test_catapults_are_vehicles()
+    local r0 = region.create(0, 0, "plain")
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "plain")
+    local f = faction.create()
+    local u = unit.create(f, r0, 2)
+    u:add_item("horse", 2)
+    u:add_item("catapult", 1)
+    u:add_item("money", 2000)
+    u:set_skill("riding", 1, true)
+    u:set_orders("NACH O O")
+    process_orders()
+    assert_equal(r2, u.region) -- can ride
+    u:set_orders("NACH W W")
+    u:add_item("money", 1) -- just one wafer thin mint
+    process_orders()
+    assert_equal(r1, u.region) -- can still walk
+end
+
+function test_trolls_pull_catapults()
+    local r0 = region.create(0, 0, "plain")
+    local r1 = region.create(1, 0, "plain")
+    local r2 = region.create(2, 0, "plain")
+    local f = faction.create("troll")
+    local u = unit.create(f, r0, 4)
+    u:add_item("catapult", 1)
+    u:set_skill("riding", 1, true)
+    u:set_orders("NACH O O")
+    u:add_item("money", 1080 * u.number)
+    process_orders()
+    assert_equal(r1, u.region) -- can still walk
+    u:set_orders("NACH W W")
+    u:add_item("money", 1) -- just one wafer thin mint
+    process_orders()
+    assert_equal(r1, u.region) -- can no longer walk
+end
