@@ -2,7 +2,7 @@
 <eressea>
 <resources>
 <resource name="catapult">
-  <item weight="10000" big="yes">
+  <item weight="10000" capacity="10000" vehicle="yes" big="yes">
     <construction skill="cartmaking" minskill="5">
       <requirement type="log" quantity="10"/>
     </construction>
