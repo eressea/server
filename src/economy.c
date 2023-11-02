@@ -1464,8 +1464,10 @@ void add_income(unit * u, income_t type, int want, int qty)
 {
     if (want == INT_MAX)
         want = qty;
-    ADDMSG(&u->faction->msgs, msg_message("income",
-        "unit region mode wanted amount", u, u->region, (int)type, want, qty));
+    if (qty > 0 || type != IC_TRADE) {
+        ADDMSG(&u->faction->msgs, msg_message("income",
+            "unit region mode wanted amount", u, u->region, (int)type, want, qty));
+    }
 }
 
 /* Steuersaetze in % bei Burggroesse */

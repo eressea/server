@@ -386,6 +386,45 @@ static void test_sell_all(CuTest* tc) {
     CuAssertIntEquals(tc, max_products * 2 * ltype->price, i_get(u->items, it_find("money")));
 }
 
+static void test_sell_nothing_message(CuTest* tc) {
+    region* r;
+    unit* u, *u2;
+    building* b;
+    const item_type* it_luxury;
+    const luxury_type* ltype;
+    int max_products;
+
+    test_setup();
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    it_luxury = r_luxury(r);
+    ltype = it_luxury->rtype->ltype;
+    rsetpeasants(r, TRADE_FRACTION * 10);
+    max_products = rpeasants(r) / TRADE_FRACTION;
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    u = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, 10);
+    set_level(u2, SK_TRADE, 10);
+    i_change(&u->items, it_find("money"), 500);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "5 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    it_luxury = it_find("balm");
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    i_change(&u2->items, it_luxury, 50);
+    unit_addorder(u2, create_order(K_SELL, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    produce(r);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "income"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "income"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "sellamount"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error264"));
+}
+
 static void test_trade_limits(CuTest *tc) {
     region *r;
     unit *u;
@@ -1504,6 +1543,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_buy_before_sell);
     SUITE_ADD_TEST(suite, test_sell_over_demand);
     SUITE_ADD_TEST(suite, test_sell_all);
+    SUITE_ADD_TEST(suite, test_sell_nothing_message);
     SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
