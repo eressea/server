@@ -331,11 +331,12 @@ region *r_connect(const region * r, direction_t dir)
     region *result;
     int x, y;
     region *rmodify = (region *)r;
-    assert(dir >= 0 && dir < MAXDIRECTIONS);
+    if (dir < 0 || dir >= MAXDIRECTIONS) {
+        return NULL;
+    }
     if (r->connect[dir]) {
         return r->connect[dir];
     }
-    assert(dir < MAXDIRECTIONS);
     x = r->x + delta_x[dir];
     y = r->y + delta_y[dir];
     pnormalize(&x, &y, rplane(r));
@@ -1142,13 +1143,13 @@ static void reset_herbs(region *r) {
 }
 
 static void create_land(region *r) {
-    static struct surround {
-        struct surround *next;
+    struct surround {
         const luxury_type *type;
         int value;
-    } *trash = NULL, *nb = NULL;
+    } *nb = NULL;
     const luxury_type *ltype = NULL;
     int mnr = 0;
+    int max_luxuries = get_maxluxuries();
     ptrdiff_t i;
 
     assert(r);
@@ -1170,28 +1171,22 @@ static void create_land(region *r) {
         }
         if (sale) {
             direction_t d;
+            arrsetcap(nb, max_luxuries);
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 region *nr = rconnect(r, d);
                 if (nr && nr->land) {
-                    struct surround *sr = nb;
-                    while (sr && sr->type != sale->type)
-                        sr = sr->next;
-                    if (!sr) {
-                        if (trash) {
-                            sr = trash;
-                            trash = trash->next;
+                    ptrdiff_t i;
+                    for (i = arrlen(nb) - 1; i >= 0; --i) {
+                        struct surround *sr = nb + i;
+                        if (sr->type == sale->type) {
+                            ++sr->value;
+                            break;
                         }
-                        else {
-                            sr = calloc(1, sizeof(struct surround));
-                            if (!sr) abort();
-                        }
-                        sr->next = nb;
+                    }
+                    if (i < 0) {
+                        struct surround *sr = arraddnptr(nb, 1);
                         sr->type = sale->type;
                         sr->value = 1;
-                        nb = sr;
-                    }
-                    else {
-                        ++sr->value;
                     }
                     ++mnr;
                 }
@@ -1200,7 +1195,7 @@ static void create_land(region *r) {
     }
     if (!nb) {
         /* TODO: this is really lame */
-        int i = get_maxluxuries();
+        int i = max_luxuries;
         if (i > 0) {
             i = rng_int() % i;
             ltype = luxurytypes;
@@ -1208,20 +1203,15 @@ static void create_land(region *r) {
                 ltype = ltype->next;
         }
     }
-    else {
+    else if (mnr > 0) {
         int i = rng_int() % mnr;
-        struct surround *srd = nb;
-        while (i > srd->value) {
-            i -= srd->value;
-            srd = srd->next;
+        ptrdiff_t p;
+        for (p = arrlen(nb) - 1; p >= 0 && i > nb[p].value; --p) {
+            i -= nb[p].value;
         }
-        if (srd->type)
-            setluxuries(r, srd->type);
-        while (srd->next != NULL)
-            srd = srd->next;
-        srd->next = trash;
-        trash = nb;
-        nb = NULL;
+        if (p >= 0 && nb[p].type) {
+            setluxuries(r, nb[p].type);
+        }
     }
 }
 
