@@ -115,8 +115,6 @@
 
 /** Ausbreitung und Vermehrung */
 #define MAXDEMAND      25
-#define DMRISE         0.1F     /* weekly chance that demand goes up */
-#define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
 
 param_t findparam_ex(const char *s, const struct locale * lang)
 {
@@ -851,10 +849,9 @@ static void cb_increase_demand(struct demand *dmd, int n, void *data)
                 if (!bt_harbour) bt_harbour = bt_find("harbour");
                 if (buildingtype_exists(r, bt_harbour, true)) {
                     rise = DMRISEHAFEN;
-                    return;
                 }
             }
-            if (rng_double() < rise)
+            if (rng_double() <= rise)
                 ++dmd[i].value;
         }
     }
