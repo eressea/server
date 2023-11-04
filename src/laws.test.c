@@ -1025,6 +1025,38 @@ static void setup_terrains(CuTest *tc) {
     CuAssertPtrNotNull(tc, newterrain(T_VOLCANO_SMOKING));
 }
 
+static void test_demographics_demand(CuTest *tc) {
+    region *r;
+    int d;
+    const struct luxury_type *lt_balm, *lt_jewel;
+    const struct building_type *btype;
+    test_setup();
+    btype = test_create_buildingtype("harbour");
+    random_source_inject_constants(DMRISE, 0);
+    lt_balm = new_luxurytype(test_create_itemtype("balm"), 5);
+    lt_jewel = new_luxurytype(test_create_itemtype("jewel"), 7);
+    CuAssertIntEquals(tc, 2, get_maxluxuries());
+    r = test_create_plain(0, 0);
+    setluxuries(r, lt_jewel);
+    CuAssertPtrEquals(tc, (struct item_type *)lt_jewel->itype, (struct item_type *)r_luxury(r));
+    CuAssertIntEquals(tc, 0, r_demand(r, lt_jewel));
+    CuAssertTrue(tc, 0 != (d = r_demand(r, lt_balm)));
+    CuAssertTrue(tc, r_has_demands(r));
+    demographics();
+    CuAssertTrue(tc, r_has_demands(r));
+    CuAssertIntEquals(tc, 0, r_demand(r, lt_jewel));
+    CuAssertIntEquals(tc, d + 1, r_demand(r, lt_balm));
+    random_source_inject_constants(DMRISEHAFEN, 0);
+
+    // no harbour, no further increases:
+    demographics();
+    CuAssertIntEquals(tc, d + 1, r_demand(r, lt_balm));
+    // new increase with harbour:
+    test_create_building(r, btype);
+    demographics();
+    CuAssertIntEquals(tc, d + 2, r_demand(r, lt_balm));
+}
+
 static void test_luck_message(CuTest *tc) {
     region* r;
     attrib *a;
@@ -2589,6 +2621,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_mail_faction_no_msg);
     SUITE_ADD_TEST(suite, test_mail_region_no_msg);
     SUITE_ADD_TEST(suite, test_mail_faction_no_target);
+    SUITE_ADD_TEST(suite, test_demographics_demand);
     SUITE_ADD_TEST(suite, test_luck_message);
     SUITE_ADD_TEST(suite, test_show_without_item);
     SUITE_ADD_TEST(suite, test_show_race);

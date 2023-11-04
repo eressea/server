@@ -570,6 +570,22 @@ int rroad(const region * r, direction_t d)
     return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
 }
 
+void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, int, void *), void *data)
+{
+    assert(r);
+    if (r->land && r->land->_demands) {
+        size_t n = arrlen(r->land->_demands);
+        if (n > 0 && n <= INT_MAX) {
+            callback(r->land->_demands, (int)n, data);
+        }
+    }
+}
+
+bool r_has_demands(const struct region *r)
+{
+    return r->land && r->land->_demands;
+}
+
 bool r_isforest(const region * r)
 {
     if (fval(r->terrain, FOREST_REGION)) {
@@ -696,18 +712,21 @@ void rsetherbtype(region *r, const struct item_type *itype) {
 
 void r_setdemand(region * r, const luxury_type * ltype, int value)
 {
-    struct demand *d, **dp = &r->land->demands;
+    ptrdiff_t i;
+    struct demand *d = NULL;
 
     if (ltype == NULL)
         return;
 
-    while (*dp && (*dp)->type != ltype)
-        dp = &(*dp)->next;
-    d = *dp;
+    for (i = arrlen(r->land->_demands) - 1; i >= 0; --i) {
+        if (r->land->_demands[i].type == ltype) {
+            d = r->land->_demands + i;
+            break;
+        }
+    }
+
     if (!d) {
-        d = *dp = malloc(sizeof(struct demand));
-        assert(d);
-        d->next = NULL;
+        d = arraddnptr(r->land->_demands, 1);
         d->type = ltype;
     }
     d->value = value;
@@ -715,12 +734,14 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
 
 const item_type *r_luxury(const region * r)
 {
-    struct demand *dmd;
-    if (r->land) {
-        assert(r->land->demands || !"need to call fix_demand on a region");
-        for (dmd = r->land->demands; dmd; dmd = dmd->next) {
-            if (dmd->value == 0)
+    assert(r);
+    if (r->land && r->land->_demands) {
+        ptrdiff_t i;
+        for (i = arrlen(r->land->_demands) - 1; i >= 0; --i) {
+            const struct demand *dmd = r->land->_demands + i;
+            if (dmd->value == 0) {
                 return dmd->type->itype;
+            }
         }
     }
     return NULL;
@@ -728,15 +749,17 @@ const item_type *r_luxury(const region * r)
 
 int r_demand(const region * r, const luxury_type * ltype)
 {
-    struct demand *d;
-
-    assert(r && r->land);
-    d = r->land->demands;
-    while (d && d->type != ltype)
-        d = d->next;
-    if (!d)
-        return -1;
-    return d->value;
+    assert(r);
+    if (r->land && r->land->_demands) {
+        ptrdiff_t i;
+        for (i = arrlen(r->land->_demands) - 1; i >= 0; --i) {
+            const struct demand *dmd = r->land->_demands + i;
+            if (dmd->type == ltype) {
+                return dmd->value;
+            }
+        }
+    }
+    return -1;
 }
 
 const char *rname(const region * r, const struct locale *lang)
@@ -829,11 +852,7 @@ void remove_region(region ** rlist, region * r)
 void free_land(land_region * lr)
 {
     free(lr->ownership);
-    while (lr->demands) {
-        struct demand *d = lr->demands;
-        lr->demands = d->next;
-        free(d);
-    }
+    arrfree(lr->_demands);
     free(lr->name);
     free(lr->display);
     free(lr);
@@ -1025,24 +1044,24 @@ static char *makename(void)
 void setluxuries(region * r, const luxury_type * sale)
 {
     const luxury_type *ltype;
+    int maxluxuries = get_maxluxuries();
+    ptrdiff_t i;
 
     assert(r->land);
 
-    if (r->land->demands) {
-        freelist(r->land->demands);
-        r->land->demands = NULL;
-    }
+    arrfree(r->land->_demands);
+    r->land->_demands = NULL;
 
-    for (ltype = luxurytypes; ltype; ltype = ltype->next) {
-        struct demand *dmd = malloc(sizeof(struct demand));
-        if (!dmd) abort();
+    arraddnptr(r->land->_demands, maxluxuries);
+    for (i = 0, ltype = luxurytypes; ltype; ++i, ltype = ltype->next) {
+        struct demand *dmd = r->land->_demands + i;
         dmd->type = ltype;
-        if (ltype != sale)
+        if (ltype != sale) {
             dmd->value = 1 + rng_int() % 5;
-        else
+        } 
+        else {
             dmd->value = 0;
-        dmd->next = r->land->demands;
-        r->land->demands = dmd;
+        }
     }
 }
 
@@ -1129,8 +1148,8 @@ static void create_land(region *r) {
         int value;
     } *trash = NULL, *nb = NULL;
     const luxury_type *ltype = NULL;
-    direction_t d;
     int mnr = 0;
+    ptrdiff_t i;
 
     assert(r);
     assert(r->land);
@@ -1140,35 +1159,42 @@ static void create_land(region *r) {
     r->land->ownership = NULL;
     region_set_morale(r, MORALE_DEFAULT, -1);
     region_setname(r, makename());
+    reset_herbs(r);
     fix_demand(r);
-    for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *nr = rconnect(r, d);
-        if (nr && nr->land) {
-            struct demand *sale = r->land->demands;
-            while (sale && sale->value != 0)
-                sale = sale->next;
-            if (sale) {
-                struct surround *sr = nb;
-                while (sr && sr->type != sale->type)
-                    sr = sr->next;
-                if (!sr) {
-                    if (trash) {
-                        sr = trash;
-                        trash = trash->next;
+    if (r->land->_demands) {
+        const struct demand *sale = NULL;
+        for (i = arrlen(r->land->_demands) - 1; i >= 0; --i) {
+            if (r->land->_demands[i].value == 0) {
+                sale = r->land->_demands + i;
+            }
+        }
+        if (sale) {
+            direction_t d;
+            for (d = 0; d != MAXDIRECTIONS; ++d) {
+                region *nr = rconnect(r, d);
+                if (nr && nr->land) {
+                    struct surround *sr = nb;
+                    while (sr && sr->type != sale->type)
+                        sr = sr->next;
+                    if (!sr) {
+                        if (trash) {
+                            sr = trash;
+                            trash = trash->next;
+                        }
+                        else {
+                            sr = calloc(1, sizeof(struct surround));
+                            if (!sr) abort();
+                        }
+                        sr->next = nb;
+                        sr->type = sale->type;
+                        sr->value = 1;
+                        nb = sr;
                     }
                     else {
-                        sr = calloc(1, sizeof(struct surround));
-                        if (!sr) abort();
+                        ++sr->value;
                     }
-                    sr->next = nb;
-                    sr->type = sale->type;
-                    sr->value = 1;
-                    nb = sr;
+                    ++mnr;
                 }
-                else {
-                    ++sr->value;
-                }
-                ++mnr;
             }
         }
     }
@@ -1197,8 +1223,6 @@ static void create_land(region *r) {
         trash = nb;
         nb = NULL;
     }
-
-    reset_herbs(r);
 }
 
 void terraform_region(region * r, const terrain_type * terrain)

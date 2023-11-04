@@ -62,6 +62,11 @@ extern "C" {
         const char *password;
     } report_context;
 
+    typedef struct output_context {
+        const struct faction *f;
+        struct stream *out;
+    } output_context;
+
     void prepare_report(report_context *ctx, struct faction *f, const char *password);
     void finish_reports(report_context *ctx);
     void get_addresses(report_context * ctx);
