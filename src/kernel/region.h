@@ -209,7 +209,7 @@ void r_setdemand(struct region *r, const struct luxury_type *ltype,
     int value);
 int r_demand(const struct region *r, const struct luxury_type *ltype);
 void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, int, void *), void *data);
-bool r_has_demand(const struct region *r);
+bool r_has_demands(const struct region *r);
 bool r_isforest(const struct region *r);
 
 const char *write_regionname(const struct region *r, const struct faction *f,

@@ -186,7 +186,7 @@ static void test_fix_demand(CuTest *tc) {
     terraform_region(r, tplain);
     CuAssertPtrNotNull(tc, r->land);
     CuAssertIntEquals(tc, 0, fix_demand(r));
-    CuAssertTrue(tc, r_has_demand(r));
+    CuAssertTrue(tc, r_has_demands(r));
     CuAssertPtrNotNull(tc, r_luxury(r));
     test_teardown();
 }

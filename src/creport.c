@@ -1406,7 +1406,7 @@ void cr_output_region(struct stream* out, const struct faction* f,
                     }
                 }
                 else if (rpeasants(r) / TRADE_FRACTION > 0) {
-                    if (r_has_demand(r)) {
+                    if (r_has_demands(r)) {
                         output_context ctx = {f, out };
                         creport_block(out, "PREISE");
                         r_foreach_demand(r, cb_output_price, &ctx);

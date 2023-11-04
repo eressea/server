@@ -1041,9 +1041,9 @@ static void test_demographics_demand(CuTest *tc) {
     CuAssertPtrEquals(tc, (struct item_type *)lt_jewel->itype, (struct item_type *)r_luxury(r));
     CuAssertIntEquals(tc, 0, r_demand(r, lt_jewel));
     CuAssertTrue(tc, 0 != (d = r_demand(r, lt_balm)));
-    CuAssertTrue(tc, r_has_demand(r));
+    CuAssertTrue(tc, r_has_demands(r));
     demographics();
-    CuAssertTrue(tc, r_has_demand(r));
+    CuAssertTrue(tc, r_has_demands(r));
     CuAssertIntEquals(tc, 0, r_demand(r, lt_jewel));
     CuAssertIntEquals(tc, d + 1, r_demand(r, lt_balm));
     random_source_inject_constants(DMRISEHAFEN, 0);

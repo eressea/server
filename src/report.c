@@ -774,7 +774,7 @@ static void report_prices(struct stream *out, const region * r, const faction * 
     char buf[4096];
     sbstring sbs;
 
-    if (!r_has_demand(r))
+    if (!r_has_demands(r))
         return;
     r_foreach_demand(r, cb_price_info, &info);
     assert(info.sale != NULL);

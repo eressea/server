@@ -581,7 +581,7 @@ void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, 
     }
 }
 
-bool r_has_demand(const struct region *r) {
+bool r_has_demands(const struct region *r) {
     return r->land && r->land->demands;
 }
 

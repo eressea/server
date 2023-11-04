@@ -4,18 +4,19 @@
 #include "save.h"
 
 #include "config.h"
-#include "race.h"
-#include "version.h"
+#include "ally.h"
+#include "attrib.h"
 #include "building.h"
+#include "event.h"
+#include "faction.h"
+#include "gamedata.h"
+#include "group.h"
+#include "item.h"
+#include "race.h"
+#include "region.h"
 #include "ship.h"
 #include "unit.h"
-#include "group.h"
-#include "ally.h"
-#include "faction.h"
-#include "region.h"
-#include "attrib.h"
-#include "event.h"
-#include "gamedata.h"
+#include "version.h"
 
 #include <attributes/key.h>
 
@@ -134,13 +135,18 @@ static void test_readwrite_region(CuTest * tc)
     storage store;
     region *r;
     const char * lipsum = "Lorem ipsum dolor sit amet";
+    const luxury_type *lt_balm, *lt_jewel;
 
     test_setup();
+    lt_balm = new_luxurytype(test_create_itemtype("balm"), 5);
+    lt_jewel = new_luxurytype(test_create_itemtype("jewel"), 7);
     r = test_create_plain(0, 0);
     free(r->land->name);
     r->land->name = str_strdup("Hodor");
     CuAssertStrEquals(tc, "Hodor", r->land->name);
     region_setinfo(r, lipsum);
+    setluxuries(r, lt_balm);
+    r_setdemand(r, lt_jewel, 5);
     CuAssertStrEquals(tc, lipsum, r->land->display);
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
@@ -150,6 +156,9 @@ static void test_readwrite_region(CuTest * tc)
     test_reset();
     gamedata_init(&data, &store, RELEASE_VERSION);
     r = read_region(&data);
+    CuAssertTrue(tc, r_has_demands(r));
+    CuAssertIntEquals(tc, 5, r_demand(r, lt_jewel));
+    CuAssertPtrEquals(tc, (struct item_type *)lt_balm->itype, (struct item_type *)r_luxury(r));
     CuAssertPtrNotNull(tc, r);
     CuAssertStrEquals(tc, "Hodor", r->land->name);
     CuAssertStrEquals(tc, lipsum, r->land->display);
