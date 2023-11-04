@@ -58,7 +58,6 @@ typedef struct region_owner {
 } region_owner;
 
 typedef struct demand {
-    struct demand *_next;
     const struct luxury_type *type;
     int value;
 } demand;
@@ -66,7 +65,7 @@ typedef struct demand {
 typedef struct land_region {
     char *name;
     char *display;
-    demand *demands;
+    demand *_demands;
     const struct item_type *herbtype;
     unsigned short horses;
     unsigned short herbs;

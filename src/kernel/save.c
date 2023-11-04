@@ -808,7 +808,7 @@ static void read_demands(gamedata *data, region *r) {
         READ_INT(data->store, &n);
         r_setdemand(r, rtype->ltype, n);
     }
-    if (!r->land->demands) {
+    if (!r_has_demands(r)) {
         fix_demand(r);
     }
 }
