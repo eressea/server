@@ -839,13 +839,29 @@ void nmr_warnings(void)
     }
 }
 
+static void cb_increase_demand(struct demand *dmd, void *data)
+{
+    region *r = (region * )data;
+    if (dmd->value > 0 && dmd->value < MAXDEMAND) {
+        float rise = DMRISE;
+        if (r->buildings) {
+            const struct building_type *bt_harbour = bt_find("harbour");
+            if (buildingtype_exists(r, bt_harbour, true)) {
+                rise = DMRISEHAFEN;
+                return;
+            }
+        }
+        if (rng_double() < rise)
+            ++dmd->value;
+    }
+}
+
 void demographics(void)
 {
     region *r;
     int plant_rules = config_get_int("rules.grow.formula", 3);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
-    const struct building_type *bt_harbour = bt_find("harbour");
     season_t current_season = calendar_season(turn + 1);
     season_t last_weeks_season = calendar_season(turn);
 
@@ -859,17 +875,8 @@ void demographics(void)
 
         if (!fval(r->terrain, SEA_REGION)) {
             /* die Nachfrage nach Produkten steigt. */
-            struct demand *dmd;
             if (r->land) {
-                for (dmd = r->land->demands; dmd; dmd = dmd->next) {
-                    if (dmd->value > 0 && dmd->value < MAXDEMAND) {
-                        float rise = DMRISE;
-                        if (buildingtype_exists(r, bt_harbour, true))
-                            rise = DMRISEHAFEN;
-                        if (rng_double() < rise)
-                            ++dmd->value;
-                    }
-                }
+                r_foreach_demand(r, cb_increase_demand, r);
                 /* Seuchen erst nachdem die Bauern sich vermehrt haben
                  * und gewandert sind */
 

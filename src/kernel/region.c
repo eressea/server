@@ -570,6 +570,21 @@ int rroad(const region * r, direction_t d)
     return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
 }
 
+void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, void *), void *data)
+{
+    assert(r);
+    if (r->land && r->land->demands) {
+        struct demand *dmd;
+        for (dmd = r->land->demands; dmd; dmd = dmd->_next) {
+            callback(dmd, data);
+        }
+    }
+}
+
+bool r_has_demand(const struct region *r) {
+    return r->land && r->land->demands;
+}
+
 bool r_isforest(const region * r)
 {
     if (fval(r->terrain, FOREST_REGION)) {
@@ -702,12 +717,12 @@ void r_setdemand(region * r, const luxury_type * ltype, int value)
         return;
 
     while (*dp && (*dp)->type != ltype)
-        dp = &(*dp)->next;
+        dp = &(*dp)->_next;
     d = *dp;
     if (!d) {
         d = *dp = malloc(sizeof(struct demand));
         assert(d);
-        d->next = NULL;
+        d->_next = NULL;
         d->type = ltype;
     }
     d->value = value;
@@ -718,7 +733,7 @@ const item_type *r_luxury(const region * r)
     struct demand *dmd;
     if (r->land) {
         assert(r->land->demands || !"need to call fix_demand on a region");
-        for (dmd = r->land->demands; dmd; dmd = dmd->next) {
+        for (dmd = r->land->demands; dmd; dmd = dmd->_next) {
             if (dmd->value == 0)
                 return dmd->type->itype;
         }
@@ -733,7 +748,7 @@ int r_demand(const region * r, const luxury_type * ltype)
     assert(r && r->land);
     d = r->land->demands;
     while (d && d->type != ltype)
-        d = d->next;
+        d = d->_next;
     if (!d)
         return -1;
     return d->value;
@@ -831,7 +846,7 @@ void free_land(land_region * lr)
     free(lr->ownership);
     while (lr->demands) {
         struct demand *d = lr->demands;
-        lr->demands = d->next;
+        lr->demands = d->_next;
         free(d);
     }
     free(lr->name);
@@ -1041,7 +1056,7 @@ void setluxuries(region * r, const luxury_type * sale)
             dmd->value = 1 + rng_int() % 5;
         else
             dmd->value = 0;
-        dmd->next = r->land->demands;
+        dmd->_next = r->land->demands;
         r->land->demands = dmd;
     }
 }
@@ -1146,7 +1161,7 @@ static void create_land(region *r) {
         if (nr && nr->land) {
             struct demand *sale = r->land->demands;
             while (sale && sale->value != 0)
-                sale = sale->next;
+                sale = sale->_next;
             if (sale) {
                 struct surround *sr = nb;
                 while (sr && sr->type != sale->type)

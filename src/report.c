@@ -717,58 +717,76 @@ static void append_message(sbstring *sbp, message *m, const faction * f) {
     sbp->end += size;
 }
 
+typedef struct price_info_ctx {
+    int n;
+    const luxury_type *sale;
+} price_info_ctx;
+
+static void cb_price_info(struct demand *dmd, void *data)
+{
+    price_info_ctx *ctx = (price_info_ctx *)data;
+    if (dmd->value == 0)
+        ctx->sale = dmd->type;
+    else if (dmd->value > 0)
+        ++ctx->n;
+}
+
+typedef struct report_demand_ctx {
+    int n;
+    sbstring *sbs;
+    const faction *f;
+} report_demand_ctx;
+
+static void cb_report_demand(struct demand *dmd, void *data)
+{
+    report_demand_ctx *ctx = (report_demand_ctx *)data;
+    if (dmd->value > 0) {
+        const faction *f = ctx->f;
+        message *m = msg_message("nr_market_price", "product price",
+            dmd->type->itype->rtype, dmd->value * dmd->type->price);
+        append_message(ctx->sbs, m, f);
+        msg_release(m);
+        --ctx->n;
+        if (ctx->n == 0) {
+            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_end"));
+        }
+        else if (ctx->n == 1) {
+            sbs_strcat(ctx->sbs, " ");
+            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_final"));
+            sbs_strcat(ctx->sbs, " ");
+        }
+        else {
+            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_next"));
+            sbs_strcat(ctx->sbs, " ");
+        }
+    }
+}
+
 static void report_prices(struct stream *out, const region * r, const faction * f)
 {
-    const luxury_type *sale = NULL;
-    struct demand *dmd;
+    price_info_ctx info = { 0, NULL };
     message *m;
-    int n = 0;
     char buf[4096];
     sbstring sbs;
 
-    if (r->land == NULL || r->land->demands == NULL)
+    if (!r_has_demand(r))
         return;
-    for (dmd = r->land->demands; dmd; dmd = dmd->next) {
-        if (dmd->value == 0)
-            sale = dmd->type;
-        else if (dmd->value > 0)
-            n++;
-    }
-    assert(sale != NULL);
+    r_foreach_demand(r, cb_price_info, &info);
+    assert(info.sale != NULL);
 
     m = msg_message("nr_market_sale", "product price",
-        sale->itype->rtype, sale->price);
+        info.sale->itype->rtype, info.sale->price);
     newline(out);
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     sbs_adopt(&sbs, buf, sizeof(buf));
 
-    if (n > 0) {
+    if (info.n > 0) {
+        report_demand_ctx data = { info.n, &sbs, f };
         sbs_strcat(&sbs, " ");
         sbs_strcat(&sbs, LOC(f->locale, "nr_trade_intro"));
         sbs_strcat(&sbs, " ");
-
-        for (dmd = r->land->demands; dmd; dmd = dmd->next) {
-            if (dmd->value > 0) {
-                m = msg_message("nr_market_price", "product price",
-                    dmd->type->itype->rtype, dmd->value * dmd->type->price);
-                append_message(&sbs, m, f);
-                msg_release(m);
-                n--;
-                if (n == 0) {
-                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_end"));
-                }
-                else if (n == 1) {
-                    sbs_strcat(&sbs, " ");
-                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_final"));
-                    sbs_strcat(&sbs, " ");
-                }
-                else {
-                    sbs_strcat(&sbs, LOC(f->locale, "nr_trade_next"));
-                    sbs_strcat(&sbs, " ");
-                }
-            }
-        }
+        r_foreach_demand(r, cb_report_demand, &data);
     }
     paragraph(out, buf, 0, 0, 0);
 }

@@ -58,7 +58,7 @@ typedef struct region_owner {
 } region_owner;
 
 typedef struct demand {
-    struct demand *next;
+    struct demand *_next;
     const struct luxury_type *type;
     int value;
 } demand;
@@ -197,12 +197,7 @@ void rsetherbs(struct region *r, int value);
 void rsetherbtype(struct region *r, const struct item_type *itype);
 
 #define rbuildings(r) ((r)->buildings)
-
 #define rherbtype(r) ((r)->land?(r)->land->herbtype:NULL)
-
-
-bool r_isforest(const struct region *r);
-
 #define rterrain(r) (oldterrain((r)->terrain))
 #define rsetterrain(r, t) ((r)->terrain = newterrain(t))
 
@@ -213,6 +208,9 @@ const char *rname(const struct region *r, const struct locale *lang);
 void r_setdemand(struct region *r, const struct luxury_type *ltype,
     int value);
 int r_demand(const struct region *r, const struct luxury_type *ltype);
+void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, void *), void *data);
+bool r_has_demand(const struct region *r);
+bool r_isforest(const struct region *r);
 
 const char *write_regionname(const struct region *r, const struct faction *f,
     char *buffer, size_t size);

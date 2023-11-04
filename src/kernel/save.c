@@ -902,10 +902,16 @@ region *read_region(gamedata *data)
     return r;
 }
 
+static void cb_write_demand(demand *demand, void *userdata)
+{
+    gamedata *data = (gamedata *)userdata;
+    WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
+    WRITE_INT(data->store, demand->value);
+}
+
 static void write_landregion(gamedata* data, const region* r)
 {
     const item_type* rht;
-    struct demand* demand;
     ptrdiff_t i, len = arrlen(r->resources);
 
     assert(r->land);
@@ -945,10 +951,7 @@ static void write_landregion(gamedata* data, const region* r)
     WRITE_INT(data->store, rherbs(r));
     WRITE_INT(data->store, rpeasants(r));
     WRITE_INT(data->store, rmoney(r));
-    for (demand = r->land->demands; demand; demand = demand->next) {
-        WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-        WRITE_INT(data->store, demand->value);
-    }
+    r_foreach_demand(r, cb_write_demand, data);
     WRITE_TOK(data->store, "end");
     WRITE_SECTION(data->store);
     WRITE_INT(data->store, region_get_morale(r));
