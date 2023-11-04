@@ -795,6 +795,24 @@ static void read_landregion(gamedata* data, region* r)
     rsetmoney(r, n);
 }
 
+static void read_demands(gamedata *data, region *r) {
+    char name[64];
+    int n;
+    for (;;) {
+        const struct resource_type *rtype;
+        READ_STR(data->store, name, sizeof(name));
+        if (!strcmp(name, "end"))
+            break;
+        rtype = rt_find(name);
+        assert(rtype && rtype->ltype);
+        READ_INT(data->store, &n);
+        r_setdemand(r, rtype->ltype, n);
+    }
+    if (!r_has_demands(r)) {
+        fix_demand(r);
+    }
+}
+
 static region *readregion(gamedata *data, int x, int y)
 {
     region *r;
@@ -855,20 +873,7 @@ static region *readregion(gamedata *data, int x, int y)
     assert(r->terrain != NULL);
 
     if (r->land) {
-        int n;
-        for (;;) {
-            const struct resource_type *rtype;
-            READ_STR(data->store, name, sizeof(name));
-            if (!strcmp(name, "end"))
-                break;
-            rtype = rt_find(name);
-            assert(rtype && rtype->ltype);
-            READ_INT(data->store, &n);
-            r_setdemand(r, rtype->ltype, n);
-        }
-        if (!r->land->demands) {
-            fix_demand(r);
-        }
+        read_demands(data, r);
         if (data->version < NOLANDITEM_VERSION) {
             read_items(data->store, NULL);
         }
@@ -902,10 +907,25 @@ region *read_region(gamedata *data)
     return r;
 }
 
+static void cb_write_demand(demand *demand, int n, void *userdata)
+{
+    gamedata *data = (gamedata *)userdata;
+    int i;
+    for (i = 0; i != n; ++i) {
+        WRITE_TOK(data->store, resourcename(demand[i].type->itype->rtype, 0));
+        WRITE_INT(data->store, demand[i].value);
+    }
+}
+
+static void write_demands(gamedata *data, const region *r)
+{
+    r_foreach_demand(r, cb_write_demand, data);
+    WRITE_TOK(data->store, "end");
+}
+
 static void write_landregion(gamedata* data, const region* r)
 {
     const item_type* rht;
-    struct demand* demand;
     ptrdiff_t i, len = arrlen(r->resources);
 
     assert(r->land);
@@ -945,11 +965,7 @@ static void write_landregion(gamedata* data, const region* r)
     WRITE_INT(data->store, rherbs(r));
     WRITE_INT(data->store, rpeasants(r));
     WRITE_INT(data->store, rmoney(r));
-    for (demand = r->land->demands; demand; demand = demand->next) {
-        WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-        WRITE_INT(data->store, demand->value);
-    }
-    WRITE_TOK(data->store, "end");
+    write_demands(data, r);
     WRITE_SECTION(data->store);
     WRITE_INT(data->store, region_get_morale(r));
     write_owner(data, r->land->ownership);

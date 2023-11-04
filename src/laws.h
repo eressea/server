@@ -6,6 +6,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define DMRISE         0.1F     /* weekly chance that demand goes up */
+#define DMRISEHAFEN    0.2F     /* weekly chance that demand goes up with harbor */
+
     enum param_t;
 
     struct locale;

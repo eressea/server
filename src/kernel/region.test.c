@@ -41,9 +41,9 @@ void test_terraform(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, r->land);
     terraform_region(r, t_plain);
     CuAssertPtrNotNull(tc, r->land);
-    CuAssertPtrNotNull(tc, r->land->demands);
-    CuAssertPtrEquals(tc, itype, (void *)r->land->demands->type->itype);
-    CuAssertIntEquals(tc, 0, r->land->demands->type->price);
+    CuAssertTrue(tc, r_has_demands(r));
+    CuAssertPtrEquals(tc, itype, (item_type *)r_luxury(r));
+    CuAssertIntEquals(tc, 0, r_demand(r, itype->rtype->ltype));
     rsetroad(r, D_NORTHWEST, 10);
     terraform_region(r, t_ocean);
     CuAssertIntEquals(tc, 0, rroad(r, D_NORTHWEST));
