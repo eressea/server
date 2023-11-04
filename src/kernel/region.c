@@ -570,13 +570,13 @@ int rroad(const region * r, direction_t d)
     return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
 }
 
-void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, void *), void *data)
+void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, int, void *), void *data)
 {
     assert(r);
     if (r->land && r->land->demands) {
         struct demand *dmd;
         for (dmd = r->land->demands; dmd; dmd = dmd->_next) {
-            callback(dmd, data);
+            callback(dmd, 1, data);
         }
     }
 }

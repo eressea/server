@@ -722,13 +722,16 @@ typedef struct price_info_ctx {
     const luxury_type *sale;
 } price_info_ctx;
 
-static void cb_price_info(struct demand *dmd, void *data)
+static void cb_price_info(struct demand *dmd, int n, void *data)
 {
     price_info_ctx *ctx = (price_info_ctx *)data;
-    if (dmd->value == 0)
-        ctx->sale = dmd->type;
-    else if (dmd->value > 0)
-        ++ctx->n;
+    int i;
+    for (i = 0; i != n; ++i) {
+        if (dmd[i].value == 0)
+            ctx->sale = dmd[i].type;
+        else if (dmd[i].value > 0)
+            ++ctx->n;
+    }
 }
 
 typedef struct report_demand_ctx {
@@ -737,31 +740,33 @@ typedef struct report_demand_ctx {
     const faction *f;
 } report_demand_ctx;
 
-static void cb_report_demand(struct demand *dmd, void *data)
+static void cb_report_demand(struct demand *dmd, int n, void *data)
 {
     report_demand_ctx *ctx = (report_demand_ctx *)data;
-    if (dmd->value > 0) {
-        const faction *f = ctx->f;
-        message *m = msg_message("nr_market_price", "product price",
-            dmd->type->itype->rtype, dmd->value * dmd->type->price);
-        append_message(ctx->sbs, m, f);
-        msg_release(m);
-        --ctx->n;
-        if (ctx->n == 0) {
-            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_end"));
-        }
-        else if (ctx->n == 1) {
-            sbs_strcat(ctx->sbs, " ");
-            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_final"));
-            sbs_strcat(ctx->sbs, " ");
-        }
-        else {
-            sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_next"));
-            sbs_strcat(ctx->sbs, " ");
+    int i;
+    for (i = 0; i != n; ++i) {
+        if (dmd[i].value > 0) {
+            const faction *f = ctx->f;
+            message *m = msg_message("nr_market_price", "product price",
+                dmd[i].type->itype->rtype, dmd[i].value * dmd[i].type->price);
+            append_message(ctx->sbs, m, f);
+            msg_release(m);
+            --ctx->n;
+            if (ctx->n == 0) {
+                sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_end"));
+            }
+            else if (ctx->n == 1) {
+                sbs_strcat(ctx->sbs, " ");
+                sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_final"));
+                sbs_strcat(ctx->sbs, " ");
+            }
+            else {
+                sbs_strcat(ctx->sbs, LOC(f->locale, "nr_trade_next"));
+                sbs_strcat(ctx->sbs, " ");
+            }
         }
     }
 }
-
 static void report_prices(struct stream *out, const region * r, const faction * f)
 {
     price_info_ctx info = { 0, NULL };

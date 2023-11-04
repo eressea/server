@@ -902,11 +902,14 @@ region *read_region(gamedata *data)
     return r;
 }
 
-static void cb_write_demand(demand *demand, void *userdata)
+static void cb_write_demand(demand *demand, int n, void *userdata)
 {
     gamedata *data = (gamedata *)userdata;
-    WRITE_TOK(data->store, resourcename(demand->type->itype->rtype, 0));
-    WRITE_INT(data->store, demand->value);
+    int i;
+    for (i = 0; i != n; ++i) {
+        WRITE_TOK(data->store, resourcename(demand[i].type->itype->rtype, 0));
+        WRITE_INT(data->store, demand[i].value);
+    }
 }
 
 static void write_landregion(gamedata* data, const region* r)

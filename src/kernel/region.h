@@ -208,7 +208,7 @@ const char *rname(const struct region *r, const struct locale *lang);
 void r_setdemand(struct region *r, const struct luxury_type *ltype,
     int value);
 int r_demand(const struct region *r, const struct luxury_type *ltype);
-void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, void *), void *data);
+void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, int, void *), void *data);
 bool r_has_demand(const struct region *r);
 bool r_isforest(const struct region *r);
 

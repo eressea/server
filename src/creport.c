@@ -1280,15 +1280,18 @@ static void cr_output_region_compat(FILE* F, report_context* ctx, region* r)
     cr_output_region(&strm, ctx->f, r, r->seen.mode);
 }
 
-void cr_output_price(struct demand *dmd, void *data)
+static void cb_output_price(struct demand *dmd, int n, void *data)
 {
     output_context *ctx = (output_context *)data;
     struct stream *out = ctx->out;
     const faction *f = ctx->f;
-    const char *ch = resourcename(dmd->type->itype->rtype, 0);
-    creport_tag_int(out, translate(ch, LOC(f->locale, ch)), (dmd->value
-        ? dmd->value * dmd->type->price
-        : -dmd->type->price));
+    int i;
+    for (i = 0; i != n; ++i) {
+        const char *ch = resourcename(dmd[i].type->itype->rtype, 0);
+        creport_tag_int(out, translate(ch, LOC(f->locale, ch)), (dmd[i].value
+            ? dmd[i].value * dmd[i].type->price
+            : -dmd[i].type->price));
+    }
 }
 
 void cr_output_region(struct stream* out, const struct faction* f,
@@ -1406,7 +1409,7 @@ void cr_output_region(struct stream* out, const struct faction* f,
                     if (r_has_demand(r)) {
                         output_context ctx = {f, out };
                         creport_block(out, "PREISE");
-                        r_foreach_demand(r, cr_output_price, &ctx);
+                        r_foreach_demand(r, cb_output_price, &ctx);
                     }
                 }
             }

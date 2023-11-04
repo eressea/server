@@ -839,20 +839,24 @@ void nmr_warnings(void)
     }
 }
 
-static void cb_increase_demand(struct demand *dmd, void *data)
+static void cb_increase_demand(struct demand *dmd, int n, void *data)
 {
     region *r = (region * )data;
-    if (dmd->value > 0 && dmd->value < MAXDEMAND) {
-        float rise = DMRISE;
-        if (r->buildings) {
-            const struct building_type *bt_harbour = bt_find("harbour");
-            if (buildingtype_exists(r, bt_harbour, true)) {
-                rise = DMRISEHAFEN;
-                return;
+    const struct building_type *bt_harbour = NULL;
+    int i;
+    for (i = 0; i != n; ++i) {
+        if (dmd[i].value > 0 && dmd[i].value < MAXDEMAND) {
+            float rise = DMRISE;
+            if (r->buildings) {
+                if (!bt_harbour) bt_harbour = bt_find("harbour");
+                if (buildingtype_exists(r, bt_harbour, true)) {
+                    rise = DMRISEHAFEN;
+                    return;
+                }
             }
+            if (rng_double() < rise)
+                ++dmd[i].value;
         }
-        if (rng_double() < rise)
-            ++dmd->value;
     }
 }
 
