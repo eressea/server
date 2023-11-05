@@ -1,10 +1,11 @@
 #ifndef H_KRNL_REPORTS
 #define H_KRNL_REPORTS
 
-#include <time.h>
-#include <kernel/objtypes.h>
-#include <kernel/types.h>
+#include "kernel/objtypes.h"
+#include "kernel/types.h"
+
 #include <stdbool.h>
+#include <time.h>
 
 #ifdef __cplusplus
 extern "C" {
