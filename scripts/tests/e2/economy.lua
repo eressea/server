@@ -187,8 +187,9 @@ end
 
 function test_trade_limits()
     local r = region.create(0, 0, "plain")
-    local f = faction.create("human")
+    local f = faction.create("elf")
     local u = unit.create(f, r, 1)
+    u.name = 'Xolgrim'
     u.building = building.create(r, "castle", 2)
     u:set_skill("trade", 7)
     u:add_item("jewel", 80)

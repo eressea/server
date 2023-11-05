@@ -300,6 +300,10 @@ static region *setup_trade_region(CuTest *tc, const struct terrain_type *terrain
     item_type *it_luxury;
     struct locale * lang = test_create_locale();
 
+    new_luxurytype(it_luxury = test_create_itemtype("oil"), 5);
+    locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
+    CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
+
     new_luxurytype(it_luxury = test_create_itemtype("balm"), 5);
     locale_setstring(lang, it_luxury->rtype->_name, it_luxury->rtype->_name);
     CuAssertStrEquals(tc, it_luxury->rtype->_name, LOC(lang, resourcename(it_luxury->rtype, 0)));
@@ -421,7 +425,7 @@ static void test_sell_nothing_message(CuTest* tc) {
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error264"));
 }
 
-static void test_sell_limits(CuTest *tc) {
+static void test_trade_limits(CuTest *tc) {
     region *r;
     unit *u;
     building *b;
@@ -455,7 +459,7 @@ static void test_buy_limits(CuTest *tc) {
     region *r;
     unit *u;
     building *b;
-    const item_type *it_jewel, *it_balm;
+    const item_type *it_jewel;
 
     test_setup();
     setup_production();
@@ -466,17 +470,15 @@ static void test_buy_limits(CuTest *tc) {
     b->size = 2;
     rsetpeasants(r, TRADE_FRACTION * 20);
     it_jewel = it_find("jewel");
-    it_balm = it_find("balm");
     u = test_create_unit(test_create_faction(), r);
     set_level(u, SK_TRADE, 1);
     i_change(&u->items, it_find("money"), 5000);
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, "5 %s",
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "30 %s",
         LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
-    unit_addorder(u, create_order(K_BUY, u->faction->locale, "10 %s",
-        LOC(u->faction->locale, resourcename(it_balm->rtype, 0))));
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "20 %s",
+        LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
     produce(r);
-    CuAssertIntEquals(tc, 5, i_get(u->items, it_jewel));
-    CuAssertIntEquals(tc, 5, i_get(u->items, it_balm));
+    CuAssertIntEquals(tc, 10, i_get(u->items, it_jewel));
     test_teardown();
 }
 
@@ -1569,7 +1571,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_sell_over_demand);
     SUITE_ADD_TEST(suite, test_sell_all);
     SUITE_ADD_TEST(suite, test_sell_nothing_message);
-    SUITE_ADD_TEST(suite, test_sell_limits);
+    SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_buy_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
