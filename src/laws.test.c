@@ -674,7 +674,6 @@ static void test_cannot_create_unit_above_limit(CuTest * tc)
     faction *f;
 
     test_setup();
-    test_create_world();
     f = test_create_faction();
     config_set("rules.limit.faction", "4");
 
