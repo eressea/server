@@ -64,8 +64,7 @@ static void test_good_dreams(CuTest *tc) {
     curse *curse;
     
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);
@@ -269,8 +268,7 @@ static void test_bad_dreams(CuTest *tc) {
     curse *curse;
     
     test_setup();
-    test_create_world();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     f1 = test_create_faction();
     f2 = test_create_faction();
     u1 = test_create_unit(f1, r);

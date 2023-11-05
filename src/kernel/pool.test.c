@@ -22,11 +22,10 @@ void test_reservation(CuTest *tc) {
     region *r;
     struct resource_type *rtype;
     test_setup();
-    test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f && rtype && rtype->itype);
     u = test_create_unit(f, r);
     assert(u);
@@ -120,11 +119,10 @@ void test_pool_bug_2042(CuTest *tc) {
     struct resource_type *rtype;
 
     test_setup();
-    test_create_world();
     rtype = rt_get_or_create("money");
     it_get_or_create(rtype);
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f && rtype && rtype->itype);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
@@ -143,10 +141,9 @@ void test_pool_use(CuTest *tc) {
     struct item_type *itype;
 
     test_setup();
-    test_create_world();
     itype = it_get_or_create(rt_get_or_create("money"));
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     assert(r && f && itype);
     u1 = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
@@ -190,10 +187,11 @@ void test_change_resource(CuTest * tc)
     int i;
 
     test_setup();
-    test_create_world();
+    init_resources();
+
     enable_skill(SK_MAGIC, true);
 
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
     f = test_create_faction();
     u = test_create_unit(f, r);
     CuAssertPtrNotNull(tc, u);

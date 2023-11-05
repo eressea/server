@@ -40,7 +40,6 @@ struct region *test_create_plain(int x, int y);
 struct faction* test_create_faction(void);
 struct faction *test_create_faction_ex(const struct race *rc, const struct locale *lang);
 struct unit *test_create_unit(struct faction *f, struct region *r);
-void test_create_world(void);
 struct item_type * test_create_horse(void);
 struct item_type * test_create_cart(void);
 struct item_type * test_create_silver(void);

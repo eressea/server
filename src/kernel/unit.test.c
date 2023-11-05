@@ -37,9 +37,8 @@ static void test_remove_empty_units(CuTest *tc) {
     int uid;
 
     test_setup();
-    test_create_world();
 
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     uid = u->no;
     remove_empty_units();
     CuAssertPtrNotNull(tc, findunit(uid));
@@ -54,9 +53,8 @@ static void test_remove_empty_units_in_region(CuTest *tc) {
     int uid;
 
     test_setup();
-    test_create_world();
 
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u = test_create_unit(u->faction, u->region);
     CuAssertPtrNotNull(tc, u->nextF);
     uid = u->no;
@@ -75,9 +73,8 @@ static void test_remove_units_without_faction(CuTest *tc) {
     int uid;
 
     test_setup();
-    test_create_world();
 
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     uid = u->no;
     u_setfaction(u, 0);
     remove_empty_units_in_region(u->region);
@@ -91,9 +88,8 @@ static void test_remove_units_with_dead_faction(CuTest *tc) {
     int uid;
 
     test_setup();
-    test_create_world();
 
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     uid = u->no;
     u->faction->_alive = false;
     remove_empty_units_in_region(u->region);
@@ -129,8 +125,7 @@ static void test_unit_name(CuTest *tc) {
     unit *u;
 
     test_setup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     renumber_unit(u, 666);
     unit_setname(u, "Hodor");
     CuAssertStrEquals(tc, "Hodor (ii)", unitname(u));
@@ -185,8 +180,7 @@ static void test_names(CuTest *tc) {
     unit *u;
 
     test_setup();
-    test_create_world();
-    u = test_create_unit(test_create_faction(), findregion(0, 0));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
     unit_setname(u, "Hodor");
     unit_setid(u, 5);

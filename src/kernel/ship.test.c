@@ -114,11 +114,10 @@ static void test_ship_set_owner(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
     stype = st_find("boat");
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     u1 = test_create_unit(f, r);
@@ -142,13 +141,12 @@ static void test_shipowner_goes_to_next_when_empty(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -173,13 +171,12 @@ static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -204,14 +201,13 @@ static void test_shipowner_goes_to_same_faction_when_empty(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f1 = test_create_faction();
     f2 = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -240,13 +236,12 @@ static void test_shipowner_goes_to_next_after_leave(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -271,13 +266,12 @@ static void test_shipowner_goes_to_other_after_leave(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -302,14 +296,13 @@ static void test_shipowner_goes_to_same_faction_after_leave(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f1 = test_create_faction();
     f2 = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -340,13 +333,12 @@ static void test_shipowner_resets_when_empty(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
@@ -369,13 +361,12 @@ void test_shipowner_goes_to_empty_unit_after_leave(CuTest * tc)
     const struct ship_type *stype;
 
     test_setup();
-    test_create_world();
 
-    stype = st_find("boat");
+    stype = test_create_shiptype("boat");
     CuAssertPtrNotNull(tc, stype);
 
     f1 = test_create_faction();
-    r = findregion(0, 0);
+    r = test_create_plain(0, 0);
 
     sh = test_create_ship(r, stype);
     CuAssertPtrNotNull(tc, sh);
