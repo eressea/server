@@ -1,8 +1,8 @@
 #ifndef H_MAGIC
 #define H_MAGIC
 
-#include <kernel/types.h>
-#include <util/variant.h>
+#include "kernel/types.h"
+#include "util/variant.h"
 #include <stdbool.h>
 
 #ifdef __cplusplus
