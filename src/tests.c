@@ -33,7 +33,6 @@
 
 #include "util/keyword.h"
 #include "util/language.h"
-#include "util/lists.h"
 #include "util/log.h"
 #include "util/message.h"
 #include "util/param.h"
@@ -48,7 +47,6 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <stdarg.h> 
 #include <stdbool.h>           // for true
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
@@ -204,20 +202,6 @@ struct unit *test_create_unit(struct faction *f, struct region *r)
     if (!f) f = test_create_faction_ex(rc, NULL);
     if (!r) r = test_create_plain(0, 0);
     return create_unit(r, f, 1, rc ? rc : rc_get_or_create("human"), 0, 0, 0);
-}
-
-static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
-    strlist **slp = (strlist **)udata;
-    addstrlist(slp, str_strdup(format));
-}
-
-struct log_t * test_log_start(int flags, strlist **slist) {
-    return log_create(flags, slist, log_list);
-}
-
-void test_log_stop(struct log_t *log, struct strlist *slist) {
-    freestrlist(slist);
-    log_destroy(log);
 }
 
 void test_log_stderr(int flags) {

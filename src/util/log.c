@@ -4,6 +4,7 @@
 #include "log.h"
 
 #include "path.h"
+#include "lists.h"
 #include "strings.h"
 #include "unicode.h"
 
@@ -315,4 +316,18 @@ int log_level(log_t * log, int flags)
     int old = log->flags;
     log->flags = flags;
     return old;
+}
+
+static void log_list(void *udata, int flags, const char *module, const char *format, va_list args) {
+    strlist **slp = (strlist **)udata;
+    addstrlist(slp, str_strdup(format));
+}
+
+struct log_t * test_log_start(int flags, strlist **slist) {
+    return log_create(flags, slist, log_list);
+}
+
+void test_log_stop(struct log_t *log, struct strlist *slist) {
+    freestrlist(slist);
+    log_destroy(log);
 }

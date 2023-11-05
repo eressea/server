@@ -18,8 +18,6 @@ struct terrain_type;
 struct castorder;
 struct spellparameter;
 struct locale;
-struct strlist;
-struct log_t;
 
 struct CuTest;
 
@@ -30,8 +28,6 @@ void test_setup_test(struct CuTest *tc, const char *file, int line);
 void test_teardown(void);
 void test_reset(void);
 void test_log_stderr(int on);
-struct log_t * test_log_start(int flags, struct strlist **slist);
-void test_log_stop(struct log_t *log, struct strlist *slist);
 
 void test_create_calendar(void);
 void test_use_astral(void);
