@@ -1286,30 +1286,29 @@ static void expandbuying(region * r, econ_request * buyorders)
                     struct trade* t = NULL;
                     int buy_max = max_trades(u);
                     a = a_find(u->attribs, &at_luxuries);
-                    if (a == NULL) {
-                        a = a_add(&u->attribs, a_new(&at_luxuries));
-                    }
                     if (a) {
-                        t = (struct trade*)a->data.v;
+                        t = (struct trade *)a->data.v;
                         buy_max -= t->trades;
+                    } else {
+                        a = a_add(&u->attribs, a_new(&at_luxuries));
+                        t = (struct trade *)a->data.v;
                     }
-
-                    use_pooled(u, rsilver, GET_DEFAULT, price);
-                    if (t) {
+                    if (buy_max > 0) {
+                        use_pooled(u, rsilver, GET_DEFAULT, price);
                         t->price += price;
                         ++t->trades;
-                    }
 
-                    rsetmoney(r, rmoney(r) + price);
+                        rsetmoney(r, rmoney(r) + price);
 
-                    /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
-                     * der Preis Multiplikator fuer das Produkt um den Faktor 1. Der Zaehler
-                     * wird wieder auf 0 gesetzt. */
-                    if (++number == max_products) {
-                        number = 0;
-                        ++multi;
+                        /* Falls mehr als max_products Bauern ein Produkt verkauft haben, steigt
+                         * der Preis Multiplikator fuer das Produkt um den Faktor 1. Der Zaehler
+                         * wird wieder auf 0 gesetzt. */
+                        if (++number == max_products) {
+                            number = 0;
+                            ++multi;
+                        }
+                        fset(u, UFL_LONGACTION | UFL_NOTMOVING);
                     }
-                    fset(u, UFL_LONGACTION | UFL_NOTMOVING);
                 }
             }
         }
@@ -1379,7 +1378,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
 {
     char token[128];
     region *r = u->region;
-    int n, k;
+    int n;
     econ_request *o;
     const item_type *itype = NULL;
     const luxury_type *ltype = NULL;
@@ -1423,14 +1422,11 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
     }
 
     /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
-    k = max_trades(u);
-    if (k <= 0) {
+    if (effskill(u, SK_TRADE, u->region) <= 0) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "skill_needed", "skill", SK_TRADE));
         return;
     }
-
-    if (n > k) n = k;
 
     if (!n) {
         cmistake(u, ord, 102, MSG_COMMERCE);
