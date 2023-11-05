@@ -184,3 +184,15 @@ function test_bug_2361_familiar_cannot_forget_magic_()
     -- familiars cannot forget magic:
     assert_equal(5, uf:get_skill('magic'))
 end
+
+function test_trade_limits()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u.building = building.create(r, "castle", 2)
+    u:set_skill("trade", 7)
+    u:add_item("jewel", 80)
+    u:set_orders("VERKAUFE 80 Juwel")
+    process_orders()
+    assert_equal(10, u:get_item('jewel'))
+end
