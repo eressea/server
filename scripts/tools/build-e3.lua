@@ -177,7 +177,7 @@ function justWords(str)
 end
 
 function rebuild()
-  free_game()
+  eressea.free_game()
   local w = 110
   local h = 80
   local pl = plane.create(0, -w/2, -h/2, w+1, h+1)
@@ -187,7 +187,7 @@ function rebuild()
 end
 
 function testwelt()
-  free_game()
+  eressea.free_game()
   local w = 10
   local h = 10
   local pl = plane.create(0, -w/2, -h/2, w+1, h+1)
