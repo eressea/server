@@ -1,25 +1,35 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-eval $(luarocks path)
+eval "$(luarocks path)"
 ROOT=$(git rev-parse --show-toplevel)
 export LUA_PATH="$ROOT/scripts/?.lua;$LUA_PATH"
-BUILD=$ROOT/build
+BUILD="$ROOT/build"
 
-UNIT_TESTS="$BUILD/eressea/test_eressea"
-RUN_TESTS="$BUILD/eressea/eressea"
-if [ "$1" = "-V" ]; then
-SUPP=$ROOT/share/ubuntu-12_04.supp
-UNIT_TESTS="valgrind --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $UNIT_TESTS"
-RUN_TESTS="valgrind --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $RUN_TESTS"
+function run_test() {
+	if [ "$1" = "-V" ]; then
+		shift 1
+		SUPP="$ROOT/share/ubuntu-12_04.supp"
+		valgrind --quiet --suppressions="$SUPP" --error-exitcode=1 --leak-check=no "$@"
+	else
+		shift 1
+		"$@"
+	fi
+}
+
+TEST_EXEC="$BUILD/eressea/test_eressea"
+ERESSEA_EXEC="$BUILD/eressea/eressea"
+VAL=''
+if [[ -n "${1+x}" && "$1" = "-V" ]]; then
+	VAL='-V'
 fi
 
-cd $ROOT/tests
-$UNIT_TESTS
-$RUN_TESTS -v1 ../scripts/run-tests.lua
-$RUN_TESTS -v1 ../scripts/run-tests-e2.lua
-$RUN_TESTS -v1 ../scripts/run-tests-e3.lua
-$RUN_TESTS --version
+cd "$ROOT/tests"
+run_test "$VAL" "$TEST_EXEC"
+run_test "$VAL" "$ERESSEA_EXEC" -v1 ../scripts/run-tests.lua
+run_test "$VAL" "$ERESSEA_EXEC" -v1 ../scripts/run-tests-e2.lua
+run_test "$VAL" "$ERESSEA_EXEC" -v1 ../scripts/run-tests-e3.lua
+"$ERESSEA_EXEC" --version
 rm -rf reports orders.txt score score.alliances datum turn
 
-cd $OLDWPD
+cd "$OLDPWD"

@@ -1,14 +1,12 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+set -euo pipefail
 
-ROOT=`pwd`
-while [ ! -d $ROOT/.git ]; do
-  ROOT=`dirname $ROOT`
-done
+ROOT=$(git rev-parse --show-toplevel)
 
-cd $ROOT
+cd "$ROOT"
 git pull --rebase
-git submodule update
+git submodule update --init
+s/cmake-init
 s/build
 s/runtests
 s/install
