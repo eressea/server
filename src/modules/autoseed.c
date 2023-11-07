@@ -166,6 +166,15 @@ newfaction *read_newfactions(const char *filename)
     return newfactions;
 }
 
+int count_newfactions(newfaction * newfactions) {
+    int count = 0;
+    while (newfactions) {
+        newfactions = newfactions->next;
+        ++count;
+    }
+    return count;
+}
+
 extern int numnewbies;
 
 static const terrain_type *preferred_terrain(const struct race *rc)

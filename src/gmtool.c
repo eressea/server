@@ -1310,7 +1310,13 @@ static void handlekey(state * st, int c)
         else {
             n = minpop;
         }
-        build_island(nx, ny, n, NULL, 0);
+
+        if (new_players) {
+            int count = count_newfactions(new_players);
+            build_island(nx, ny, n, &new_players, count);
+        } else {
+            build_island(nx, ny, n, NULL, 0);
+        }
         st->modified = 1;
         st->wnd_info->update |= 1;
         st->wnd_status->update |= 1;
