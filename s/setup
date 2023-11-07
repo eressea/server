@@ -1,13 +1,6 @@
 #!/bin/bash
 
-ROOT=$(pwd)
-while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
-  if [ "/" = "$ROOT" ]; then
-    echo "could not find root, are you in the git repository?"
-    exit
-  fi
-done
+ROOT=$(git rev-parse --show-toplevel)
 ERESSEA=$(dirname $ROOT)
 
 function abort() {
@@ -99,7 +92,7 @@ ini_start
 ini_sec game
 ini_add game locales de,en
 ini_add game id $game
-ini_add game start 1
+ini_add game start 0
 ini_sec lua
 ini_add lua install $SOURCE
 ini_add lua rules $rules
