@@ -300,6 +300,7 @@ set(TESTS_SRC
   spells/flyingship.test.c
   spells/regioncurse.test.c
   triggers/shock.test.c
+  races/races.test.c
   ${ATTRIBUTES_TESTS}
   ${UTIL_TESTS}
   ${KERNEL_TESTS}

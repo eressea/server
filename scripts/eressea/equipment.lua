@@ -124,31 +124,42 @@ local mysets = {
     },
 }
 
+EQUIP_SKILLS   = 2
+EQUIP_SPELLS  = 4
+EQUIP_ITEMS   = 8
+EQUIP_SPECIAL = 16
+EQUIP_ALL     = 255
+
+
 function equip_unit(u, name, flags)
     local set = mysets[name]
+    flags = flags or EQUIP_ALL
     if set then
         local items = set['items']
-        if items then
+        -- hmmm, lua 5.3 has actual bitwise operators ...
+        if items and bit32.band(flags, EQUIP_ITEMS) > 0 then
             for name, count in pairs(items) do
                 u:add_item(name, count * u.number)
             end
         end
         local skills = set['skills']
-        if skills then
+        if skills and bit32.band(flags, EQUIP_SKILLS) > 0 then
             for name, level in pairs(skills) do
                 u:set_skill(name, level)
             end
         end
         local spells = set['spells']
-        if spells then
+        if spells and bit32.band(flags, EQUIP_SPELLS) > 0 then
             for name, level in pairs(spells) do
                 u:add_spell(name, level)
             end
         end
         local callback = set['callback']
-        if callback and type(callback) == 'function' then
+        if callback and bit32.band(flags, EQUIP_SPECIAL) > 0 and type(callback) == 'function' then
             callback(u, flags)
         end
+
+        u.hp = u.hp_max * u.number
         return true
     end
     return false

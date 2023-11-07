@@ -35,7 +35,8 @@ void equip_newunits(struct unit *u)
     case RC_GOBLIN:
         rtype = rt_find("roi");
         set_show_item(u->faction, rtype->itype);
-        set_number(u, 10);
+        scale_number(u, 10);
+	
         break;
     case RC_HUMAN:
         if (u->building == NULL) {

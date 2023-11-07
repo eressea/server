@@ -146,6 +146,7 @@ function seed()
               b.name = "Home"
             end
             b.size = 10
+            u.hp = u.hp * 10
             u.building = b
           end
         end
