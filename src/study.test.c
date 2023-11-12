@@ -180,6 +180,50 @@ static void test_study_race_noteach(CuTest *tc) {
     test_teardown();
 }
 
+static void test_study_speed(CuTest *tc) {
+    unit *u;
+    race *rc;
+    skill *sv;
+
+    test_setup();
+    learn_inject();
+    rc = test_create_race("orc");
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    set_level(u, SK_BUILDING, 1);
+    set_level(u, SK_CATAPULT, 1);
+    set_study_speed(rc, SK_BUILDING, -5);
+    sv = unit_skill(u, SK_BUILDING);
+    sv->weeks = 1;
+    CuAssertIntEquals(tc, -5, rc->study_speed[SK_BUILDING]);
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_BUILDING]);
+    random_source_inject_constants(0.0, 0);
+    study_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, u, log_learners[0].u);
+    CuAssertIntEquals(tc, SK_BUILDING, log_learners[0].sk);
+    CuAssertIntEquals(tc, 25, log_learners[0].days);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+
+    random_source_inject_constants(0.0, 5);
+    u->flags &= ~UFL_LONGACTION;
+    study_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, u, log_learners[1].u);
+    CuAssertIntEquals(tc, SK_BUILDING, log_learners[1].sk);
+    CuAssertIntEquals(tc, 25, log_learners[1].days);
+    CuAssertIntEquals(tc, 2, sv->level);
+
+    free_order(u->thisorder);
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_CATAPULT]);
+    u->flags &= ~UFL_LONGACTION;
+    study_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, u, log_learners[2].u);
+    CuAssertIntEquals(tc, SK_CATAPULT, log_learners[2].sk);
+    CuAssertIntEquals(tc, 30, log_learners[2].days);
+
+    learn_reset();
+    test_teardown();
+}
+
 static void test_check_student(CuTest *tc) {
     unit *u;
     race *rc;
@@ -313,8 +357,8 @@ static void test_academy_building(CuTest *tc) {
     teach_cmd(u, u->thisorder);
     learn_reset();
     CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "teach_asgood"));
-    CuAssertPtrEquals(tc, u, (unit *)(msg)->parameters[0].v);
-    CuAssertPtrEquals(tc, u2, (unit *)(msg)->parameters[3].v);
+    CuAssertPtrEquals(tc, u, (unit *)msg->parameters[0].v);
+    CuAssertPtrEquals(tc, u2, (unit *)msg->parameters[3].v);
 
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
@@ -814,6 +858,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_study_race_noteach);
+    SUITE_ADD_TEST(suite, test_study_speed);
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_academy_bonus);
