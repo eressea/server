@@ -718,7 +718,6 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
         int weeks = 0;
         if (inject_learn_fun) {
             inject_learn_fun(u, sk, days);
-            return;
         }
         while (days >= leveldays) {
             ++weeks;
