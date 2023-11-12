@@ -116,7 +116,7 @@ bool magic_lowskill(unit * u)
     return u_race(u) == toad_rc;
 }
 
-int study_cost(struct unit *u, skill_t sk)
+int study_cost(struct unit *u, enum skill_t sk)
 {
     if (sk == SK_MAGIC) {
         static int config;
@@ -164,7 +164,7 @@ static int study_days(unit * u, skill_t sk)
         speed += u_race(u)->study_speed[sk];
         if (speed < STUDYDAYS) {
             skill *sv = unit_skill(u, sk);
-            if (sv == 0) {
+            if (sv == NULL) {
                 speed = STUDYDAYS;
             }
         }
@@ -468,7 +468,7 @@ static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
     selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
 }
 
-bool check_student(const struct unit *u, struct order *ord, skill_t sk) {
+bool check_student(const struct unit *u, struct order *ord, enum skill_t sk) {
     int err = 0;
     const race *rc = u_race(u);
 
@@ -696,7 +696,7 @@ static int produceexp_days(void) {
     return rule;
 }
 
-void produceexp_ex(struct unit *u, skill_t sk, int n, learn_fun learn)
+void produceexp_ex(struct unit *u, enum skill_t sk, int n, learn_fun learn)
 {
     assert(u && n <= u->number);
     if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
@@ -718,13 +718,12 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
         int weeks = 0;
         if (inject_learn_fun) {
             inject_learn_fun(u, sk, days);
-            return;
         }
         while (days >= leveldays) {
             ++weeks;
             days -= leveldays;
         }
-        if (days > 0 && rng_int() % leveldays < days) {
+        if (days > 0 && rng_int() % leveldays >= leveldays - days) {
             ++weeks;
         }
         if (weeks > 0) {
@@ -752,7 +751,7 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
-void produceexp(struct unit *u, skill_t sk, int n)
+void produceexp(struct unit *u, enum skill_t sk, int n)
 {
     produceexp_ex(u, sk, n, increase_skill_days);
 }
@@ -762,7 +761,7 @@ void produceexp(struct unit *u, skill_t sk, int n)
  * @return int
  *   The additional spend, i.e. from an academy.
  */
-int learn_skill(unit *u, skill_t sk, int days, int studycost) {
+int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     region *r = u->region;
     int cost = 0;
 
@@ -826,7 +825,7 @@ int learn_skill(unit *u, skill_t sk, int days, int studycost) {
     return cost;
 }
 
-void change_skill_days(unit *u, skill_t sk, int days) {
+void change_skill_days(unit *u, enum skill_t sk, int days) {
     if (days < 0) {
         reduce_skill_days(u, sk, -days);
     }
