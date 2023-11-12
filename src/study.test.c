@@ -180,6 +180,32 @@ static void test_study_race_noteach(CuTest *tc) {
     test_teardown();
 }
 
+static void test_study_speed(CuTest *tc) {
+    unit *u;
+    race *rc;
+    skill *sv;
+
+    test_setup();
+    rc = test_create_race("orc");
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    set_level(u, SK_BUILDING, 1);
+    set_study_speed(rc, SK_BUILDING, -5);
+    sv = unit_skill(u, SK_BUILDING);
+    sv->weeks = 1;
+    CuAssertIntEquals(tc, -5, rc->study_speed[SK_BUILDING]);
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_BUILDING]);
+    random_source_inject_constants(0.0, 0);
+    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+
+    random_source_inject_constants(0.0, 5);
+    u->flags &= ~UFL_LONGACTION;
+    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 2, sv->level);
+    test_teardown();
+}
+
 static void test_check_student(CuTest *tc) {
     unit *u;
     race *rc;
@@ -814,6 +840,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_teacher);
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_study_race_noteach);
+    SUITE_ADD_TEST(suite, test_study_speed);
     SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_academy_bonus);

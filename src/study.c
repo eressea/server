@@ -164,7 +164,7 @@ static int study_days(unit * u, skill_t sk)
         speed += u_race(u)->study_speed[sk];
         if (speed < STUDYDAYS) {
             skill *sv = unit_skill(u, sk);
-            if (sv == 0) {
+            if (sv == NULL) {
                 speed = STUDYDAYS;
             }
         }
@@ -724,7 +724,7 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
             ++weeks;
             days -= leveldays;
         }
-        if (days > 0 && rng_int() % leveldays < days) {
+        if (days > 0 && rng_int() % leveldays >= leveldays - days) {
             ++weeks;
         }
         if (weeks > 0) {
