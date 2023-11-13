@@ -266,8 +266,6 @@ extern "C" {
     extern const struct item_type *oldpotiontype[];
     extern struct attrib_type at_showitem;        /* show this potion's description */
 
-    void show_item(struct unit * u, const struct item_type * itype);
-
     const struct resource_type *get_resourcetype(resource_t rt);
     struct item *item_spoil(const struct race *rc, int size);
 

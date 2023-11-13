@@ -1,5 +1,6 @@
 #include "reports.h"
 
+#include "eressea.h"
 #include "guard.h"
 #include "lighthouse.h"
 #include "laws.h"
@@ -9,6 +10,7 @@
 #include "attributes/attributes.h"
 
 #include "kernel/ally.h"
+#include <kernel/attrib.h>
 #include "kernel/calendar.h"
 #include "kernel/config.h"
 #include "kernel/building.h"
@@ -22,7 +24,7 @@
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
 
-#include "util/language.h"
+#include <util/language.h>
 #include "util/lists.h"
 #include "util/message.h"
 #include "util/nrmessage.h"
@@ -1188,6 +1190,69 @@ static void test_reports_genpassword(CuTest *tc) {
     test_teardown();
 }
 
+
+static void test_show_item(CuTest *tc) {
+    race *rc;
+    faction *f;
+    attrib *a;
+    item_type * itype;
+
+    test_setup();
+    itype = test_create_itemtype("elvenhorse");
+
+    rc = test_create_race("elf");
+    test_create_unit(f = test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+
+    display_item(f, itype);
+
+    a = a_find(f->attribs, &at_showitem);
+    CuAssertPtrNotNull(tc, a);
+    CuAssertPtrEquals(tc, itype, a->data.v);
+
+    test_teardown();
+}
+
+
+static void test_item_messages(CuTest *tc) {
+    race *rc;
+    faction *f;
+    unit *u;
+    message * msg;
+    attrib *a;
+    item_type * itype;
+    struct locale *loc;
+
+    test_setup();
+    mt_create_va(mt_new("msg_event", NULL), "string:string", MT_NEW_END);
+    mt_create_va(mt_new("displayitem", NULL), "weight:int", "item:resource", "description:string", MT_NEW_END);
+    rc = test_create_race("elf");
+    itype = test_create_itemtype("elvenhorse");
+
+
+    loc = get_or_create_locale("de");
+    locale_setstring(loc, "elvenhorse", "Elfenpferd");
+    locale_setstring(loc, "elvenhorse_p", "Elfenpferde");
+    locale_setstring(loc, "iteminfo::elvenhorse", "Elfenpferd Informationen");
+    locale_setstring(loc, "race::elf_p", "Elfen");
+    locale_setstring(loc, "race::elf", "Elf");
+    init_locale(loc);
+
+    u = test_create_unit(f = test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+    u->faction->locale = loc;
+
+    a = a_add(&f->attribs, a_new(&at_showitem));
+    a->data.v = (void *)itype;
+
+    init_reports();
+
+    msg = test_find_messagetype(u->faction->msgs, "displayitem");
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertTrue(tc, memcmp("Elfenpferd", msg->parameters[2].v, 4) == 0);
+
+    test_clear_messages(u->faction);
+    test_teardown();
+}
+
 CuSuite* get_reports_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1224,5 +1289,7 @@ CuSuite* get_reports_suite(void)
     SUITE_ADD_TEST(suite, test_visible_unit);
     SUITE_ADD_TEST(suite, test_eval_functions);
     SUITE_ADD_TEST(suite, test_reports_genpassword);
+    SUITE_ADD_TEST(suite, test_item_messages);
+    SUITE_ADD_TEST(suite, test_show_item);
     return suite;
 }

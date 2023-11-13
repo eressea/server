@@ -1,4 +1,5 @@
 #include "races.h"
+#include "reports.h"
 
 #include <kernel/building.h>
 #include <kernel/faction.h>
@@ -27,15 +28,17 @@ void equip_newunits(struct unit *u)
 {
     struct region *r = u->region;
     const struct resource_type *rtype;
+
     switch (old_race(u_race(u))) {
     case RC_ELF:
         rtype = rt_find("fairyboot");
-        set_show_item(u->faction, rtype->itype);
+        display_item(u->faction, rtype->itype);
         break;
     case RC_GOBLIN:
         rtype = rt_find("roi");
-        set_show_item(u->faction, rtype->itype);
-        set_number(u, 10);
+        display_item(u->faction, rtype->itype);
+        scale_number(u, 10);
+	
         break;
     case RC_HUMAN:
         if (u->building == NULL) {
@@ -49,7 +52,7 @@ void equip_newunits(struct unit *u)
         break;
     case RC_CAT:
         rtype = rt_find("roi");
-        set_show_item(u->faction, rtype->itype);
+        display_item(u->faction, rtype->itype);
         break;
     case RC_AQUARIAN:
     {
