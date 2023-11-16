@@ -434,6 +434,32 @@ static void test_build_building_produceexp(CuTest *tc)
     teardown_build(&bf);
 }
 
+static void test_build_building_produceexp(CuTest *tc)
+{
+    unit *u;
+    build_fixture bf = { 0 };
+    const building_type *btype;
+    const resource_type *rtype;
+    skill *sv;
+
+    u = setup_build(&bf);
+    config_set_int("study.produceexp", STUDYDAYS);
+
+    rtype = get_resourcetype(R_STONE);
+    btype = bf.btype;
+    assert(btype && rtype && rtype->itype);
+    assert(!u->region->buildings);
+
+    i_change(&u->items, rtype->itype, 1);
+    set_level(u, SK_BUILDING, 1);
+    sv = unit_skill(u, SK_BUILDING);
+    sv->weeks = 2;
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
+    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    teardown_build(&bf);
+}
+
 static void test_build_roqf_factor(CuTest *tc) {
     test_setup();
     CuAssertIntEquals(tc, 10, roqf_factor());
@@ -543,6 +569,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_with_potion_and_ring);
     SUITE_ADD_TEST(suite, test_build_building_success);
+    SUITE_ADD_TEST(suite, test_build_building_produceexp);
     SUITE_ADD_TEST(suite, test_build_building_stages);
     SUITE_ADD_TEST(suite, test_build_building_stage_continue);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
