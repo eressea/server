@@ -17,6 +17,7 @@ struct building_type;
 struct ship_type;
 struct terrain_type;
 struct castorder;
+struct skill;
 struct spellparameter;
 struct locale;
 
