@@ -29,6 +29,7 @@
 #include "kernel/unit.h"
 #include "kernel/race.h"
 #include "kernel/ship.h"
+#include "kernel/skills.h"
 #include "kernel/spell.h"
 
 #include "util/keyword.h"
@@ -51,6 +52,17 @@
 #include <stdio.h>             // for fprintf, stderr
 #include <stdlib.h>
 #include <string.h>
+
+struct skill *test_set_skill(unit *u, enum skill_t sk, int level, int weeks)
+{
+    skill *sv;
+    set_level(u, sk, level);
+    sv = unit_skill(u, sk);
+    if (weeks > 0) {
+        sv->weeks = weeks;
+    }
+    return sv;
+}
 
 int test_set_item(unit * u, const item_type *itype, int value)
 {
