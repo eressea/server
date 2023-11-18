@@ -451,9 +451,7 @@ static void test_build_building_produceexp(CuTest *tc)
     assert(!u->region->buildings);
 
     i_change(&u->items, rtype->itype, 1);
-    set_level(u, SK_BUILDING, 1);
-    sv = unit_skill(u, SK_BUILDING);
-    sv->weeks = 2;
+    sv = test_set_skill(u, SK_BUILDING, 1, 2);
     u->orders = create_order(K_MAKE, u->faction->locale, NULL);
     CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
     CuAssertIntEquals(tc, 1, sv->weeks);
