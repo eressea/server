@@ -1596,7 +1596,7 @@ msgid "error158"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Magicians always work alone!\""
 
 msgid "spyreport_mage"
-msgstr "\"$unit($target) is a ${type}-magician\""
+msgstr "\"$unit($target) is a ${school} magician\""
 
 msgid "error268"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - You cannot transfer items here.\""

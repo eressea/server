@@ -26,6 +26,7 @@
 
 /* util includes */
 #include <util/base36.h>
+#include <util/language.h>
 #include <util/message.h>
 #include <util/param.h>
 #include <util/parser.h>
@@ -61,8 +62,8 @@ void spy_message(int spy, const unit * u, const unit * target)
         magic_t mtype = unit_get_magic(target);
         /* for mages, spells and magic school */
         if (mtype != M_GRAY && mtype < MAXMAGIETYP && mtype >= 0) {
-            ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target type", u,
-                target, magic_school[mtype]));
+            ADDMSG(&u->faction->msgs, msg_message("spyreport_mage", "spy target school", u,
+                target, LOC(u->faction->locale, magic_school[mtype])));
         }
     }
     if (spy > 6) {
