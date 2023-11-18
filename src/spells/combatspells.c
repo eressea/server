@@ -840,10 +840,10 @@ int sp_chaosrow(struct castorder * co)
     selist_free(fgs);
 
     if (chaosrow) {
-        mtype = (k > 0) ? "chaosrow_effect_1" : "sp_chaosrow_effect_0";
+        mtype = (k > 0) ? "chaosrow_effect_1" : "chaosrow_effect_0";
     }
     else {
-        mtype = (k > 0) ? "confusion_effect_1" : "sp_confusion_effect_0";
+        mtype = (k > 0) ? "confusion_effect_1" : "confusion_effect_0";
     }
     m = msg_message(mtype, "mage", mage);
     message_all(b, m);
