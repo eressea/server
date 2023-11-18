@@ -3,6 +3,7 @@
 #include "contact.h"
 #include "give.h"
 #include "recruit.h"
+#include "study.h"
 
 #include <spells/buildingcurse.h>
 
@@ -19,6 +20,7 @@
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/ship.h>
+#include <kernel/skills.h>
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include <kernel/unit.h>
@@ -241,6 +243,7 @@ static void setup_production(void) {
     mt_create_va(mt_new("income", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END);
     mt_create_va(mt_new("buy", NULL), "unit:unit", "money:int", MT_NEW_END);
     mt_create_va(mt_new("buyamount", NULL), "unit:unit", "amount:int", "resource:resource", MT_NEW_END);
+    mt_create_va(mt_new("sellamount", NULL), "unit:unit", "amount:int", "resource:resource", MT_NEW_END);
 }
 
 static void test_heroes_dont_recruit(CuTest * tc) {
@@ -322,7 +325,7 @@ static unit *setup_trade_unit(CuTest *tc, region *r, const struct race *rc) {
 
     UNUSED_ARG(tc);
     u = test_create_unit(test_create_faction_ex(rc, NULL), r);
-    set_level(u, SK_TRADE, 2);
+    test_set_skill(u, SK_TRADE, 2, 1);
     return u;
 }
 
@@ -452,6 +455,39 @@ static void test_trade_limits(CuTest *tc) {
     produce(r);
     CuAssertIntEquals(tc, 5, i_get(u->items, it_jewel));
     CuAssertIntEquals(tc, 5, i_get(u->items, it_balm));
+    test_teardown();
+}
+
+static void test_trade_produceexp(CuTest *tc) {
+    region *r;
+    unit *u;
+    building *b;
+    skill *sv;
+    const item_type *it_jewel, *it_balm;
+
+    test_setup();
+    config_set_int("study.produceexp", STUDYDAYS);
+    setup_production();
+    setup_terrains(tc);
+    init_terrains();
+    r = setup_trade_region(tc, NULL);
+    b = test_create_building(r, test_create_buildingtype("castle"));
+    b->size = 2;
+    rsetpeasants(r, TRADE_FRACTION * 20);
+    it_jewel = it_find("jewel");
+    u = test_create_unit(test_create_faction(), r);
+    sv = test_set_skill(u, SK_TRADE, 2, 1);
+    i_change(&u->items, it_find("money"), 500);
+    unit_addorder(u, create_order(K_BUY, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
+    it_balm = it_find("balm");
+    i_change(&u->items, it_balm, 20);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "10 %s",
+        LOC(u->faction->locale, resourcename(it_balm->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 10, i_get(u->items, it_jewel));
+    CuAssertIntEquals(tc, 10, i_get(u->items, it_balm));
+    CuAssertIntEquals(tc, 3, sv->level);
     test_teardown();
 }
 
@@ -1572,6 +1608,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_sell_all);
     SUITE_ADD_TEST(suite, test_sell_nothing_message);
     SUITE_ADD_TEST(suite, test_trade_limits);
+    SUITE_ADD_TEST(suite, test_trade_produceexp);
     SUITE_ADD_TEST(suite, test_buy_limits);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);

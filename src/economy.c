@@ -1328,21 +1328,13 @@ static void expandbuying(region * r, econ_request * buyorders)
                             "unit amount resource", u, t->trades, it_sold->rtype));
                         i_change(&u->items, it_sold, t->trades);
                     }
+                    /* prevent reporting this as a sale */
                     t->price = 0;
                 }
             }
         }
     }
 }
-
-attrib_type at_trades = {
-    "trades",
-    DEFAULT_INIT,
-    DEFAULT_FINALIZE,
-    DEFAULT_AGE,
-    NO_WRITE,
-    NO_READ
-};
 
 bool trade_needs_castle(const terrain_type *terrain, const race *rc)
 {
@@ -1660,7 +1652,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                 }
             }
             add_income(u, IC_TRADE, t->price, t->price);
-            a_remove(&u->attribs, a);
         }
     }
 }
@@ -2551,10 +2542,7 @@ void produce(struct region *r)
                 }
             }
             if (trader) {
-                attrib *a = a_find(u->attribs, &at_trades);
-                if (a && a->data.i) {
-                    produceexp(u, SK_TRADE, u->number);
-                }
+                produceexp(u, SK_TRADE, u->number);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
