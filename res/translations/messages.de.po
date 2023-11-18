@@ -1596,7 +1596,7 @@ msgid "error158"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Magier arbeiten grundsätzlich nur alleine!\""
 
 msgid "spyreport_mage"
-msgstr "\"$unit($target) ist ein ${type}-Magier.\""
+msgstr "\"$unit($target) ist ein ${school} Magier.\""
 
 msgid "error268"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Hier kann man nichts übergeben.\""
