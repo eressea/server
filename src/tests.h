@@ -16,6 +16,7 @@ struct building_type;
 struct ship_type;
 struct terrain_type;
 struct castorder;
+struct skill;
 struct spellparameter;
 struct locale;
 
@@ -52,6 +53,7 @@ struct building_type* test_create_castle(void);
 void test_create_castorder(struct castorder *co, struct unit *u, int level, float force, int range, struct spellparameter *par);
 struct spell * test_create_spell(void);
 int test_set_item(struct unit * u, const struct item_type *itype, int value);
+struct skill *test_set_skill(struct unit *u, enum skill_t sk, int level, int weeks);
 
 void test_translate_param(const struct locale *lang, enum param_t param, const char *text);
 const char * test_get_messagetype(const struct message *msg);
