@@ -8,6 +8,7 @@
 #include "order.h"
 #include "race.h"
 #include "region.h"
+#include "ship.h"
 #include "skill.h"  // for SK_BUILDING, SK_ARMORER
 #include "study.h"  // for STUDYDAYS
 #include "unit.h"
@@ -30,6 +31,7 @@ typedef struct build_fixture {
     race *rc;
     construction cons;
     building_type *btype;
+    ship_type *stype;
 } build_fixture;
 
 static unit * setup_build(build_fixture *bf) {
@@ -37,8 +39,16 @@ static unit * setup_build(build_fixture *bf) {
     init_resources();
 
     test_create_itemtype("stone");
+    test_create_itemtype("log");
     bf->btype = test_create_buildingtype("castle");
+    bf->stype = test_create_shiptype("boat");
     bf->rc = test_create_race("human");
+    bf->r = test_create_plain(0, 0);
+    bf->f = test_create_faction_ex(bf->rc, NULL);
+    assert(bf->rc && bf->f && bf->r);
+    bf->u = test_create_unit(bf->f, bf->r);
+    assert(bf->u);
+
     bf->r = test_create_plain(0, 0);
     bf->f = test_create_faction_ex(bf->rc, NULL);
     assert(bf->rc && bf->f && bf->r);
@@ -486,6 +496,33 @@ static void test_build_building_unique(CuTest *tc) {
     teardown_build(&bf);
 }
 
+static void test_build_ship_success(CuTest *tc)
+{
+    unit *u;
+    skill *sv;
+    build_fixture bf = { 0 };
+    const ship_type *stype;
+    const item_type *itype;
+
+    u = setup_build(&bf);
+
+    itype = it_find("log");
+    stype = bf.stype;
+    assert(stype && itype);
+    assert(!u->region->ships);
+
+    i_change(&u->items, itype, 1);
+    sv = test_set_skill(u, SK_SHIPBUILDING, 2, 1);
+    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
+    CuAssertIntEquals(tc, 1, build_ship(u, stype, 0, 4, u->orders));
+    CuAssertPtrNotNull(tc, u->region->ships);
+    CuAssertPtrEquals(tc, u->region->ships, u->ship);
+    CuAssertIntEquals(tc, 1, u->ship->size);
+    CuAssertIntEquals(tc, 0, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 3, sv->weeks);
+    teardown_build(&bf);
+}
+
 CuSuite *get_build_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -507,6 +544,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     SUITE_ADD_TEST(suite, test_build_building_nobuild_fail);
     SUITE_ADD_TEST(suite, test_build_building_unique);
+    SUITE_ADD_TEST(suite, test_build_ship_success);
     return suite;
 }
 
