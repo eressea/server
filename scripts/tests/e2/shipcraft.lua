@@ -23,6 +23,7 @@ function test_build_ship()
     process_orders()
     assert_not_nil(u.ship)
     assert_equal(16, u.ship.size)
+    assert_equal('caravel', u.ship.type)
     assert_equal(284, u:get_item('log'))
 end
 
@@ -55,4 +56,67 @@ function test_build_ship_with_ring_and_potion()
     assert_not_nil(u.ship)
     assert_equal(183, u.ship.size)
     assert_equal(117, u:get_item('log'))
+end
+
+function test_build_ship_on_ship()
+    local sh = ship.create(u.region, 'caravel')
+    sh.size = 16
+    u.ship = sh
+    u.number = 10
+    u:set_orders('MACHE SCHIFF')
+    process_orders()
+    assert_equal(sh, u.ship)
+    assert_equal(32, u.ship.size)
+    assert_equal(284, u:get_item('log'))
+end
+
+function test_build_ship_on_ship_with_type()
+    local sh = ship.create(u.region, 'caravel')
+    sh.size = 16
+    u.ship = sh
+    u.number = 10
+    u:set_orders('MACHE Karavelle')
+    process_orders()
+    assert_not_equal(sh, u.ship)
+    assert_equal(16, u.ship.size)
+    assert_equal(16, sh.size)
+    assert_equal(284, u:get_item('log'))
+end
+
+function test_build_ship_with_id()
+    local sh = ship.create(u.region, 'caravel')
+    sh.size = 16
+    u.ship = ship.create(u.region, 'longboat')
+    u.number = 10
+    u:set_orders('MACHE SCHIFF ' .. itoa36(sh.id))
+    process_orders()
+    assert_not_equal(sh, u.ship)
+    assert_equal(32, sh.size)
+    assert_equal(284, u:get_item('log'))
+end
+
+function test_build_ship_with_type_ignores_id()
+    local sh = ship.create(u.region, 'caravel')
+    sh.size = 16
+    u.number = 10
+    u:set_orders('MACHE Karavelle ' .. itoa36(sh.id))
+    process_orders()
+    assert_not_equal(sh, u.ship)
+    assert_equal(16, sh.size)
+    assert_equal(16, u.ship.size)
+    assert_equal(284, u:get_item('log'))
+end
+
+function test_build_ship_with_type_ignores_my_id()
+    local sh = ship.create(u.region, 'caravel')
+    sh.size = 16
+    u.ship = ship.create(u.region, 'longboat')
+    u.number = 10
+    u:set_orders('MACHE Karavelle ' .. itoa36(sh.id))
+    process_orders()
+    assert_not_equal(sh, u.ship)
+    assert_equal(16, sh.size)
+    assert_equal(16, u.ship.size)
+    assert_equal('caravel', u.ship.type)
+    assert_equal(284, u:get_item('log'))
 end
