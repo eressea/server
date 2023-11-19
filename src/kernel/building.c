@@ -12,15 +12,20 @@
 #include "race.h"
 #include "region.h"
 #include "skill.h"
+#include "study.h"
 #include "terrain.h"
 #include "lighthouse.h"
 
 /* util includes */
 #include <kernel/attrib.h>
-#include <util/base36.h>
 #include <kernel/event.h>
-#include <util/functions.h>
 #include <kernel/gamedata.h>
+#include <kernel/messages.h>
+#include <kernel/order.h>
+
+#include <util/base36.h>
+#include <util/functions.h>
+#include <util/keyword.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/param.h>
@@ -415,6 +420,230 @@ building *new_building(const struct building_type * btype, region * r,
     b->name = str_strdup(bname);
     b->size = size;
     return b;
+}
+
+static int build_stages(unit *u, const building_type *btype, int built, int n, int basesk, int *skill_total) {
+
+    const building_stage *stage;
+    int made = 0;
+
+    for (stage = btype->stages; stage; stage = stage->next) {
+        const construction *con = &stage->construction;
+        if (con->maxsize < 0 || con->maxsize > built) {
+            int err, want = INT_MAX;
+            if (n < INT_MAX) {
+                /* do not build more than n total */
+                want = n - made;
+            }
+            if (con->maxsize > 0) {
+                /* do not build more than the rest of the stage */
+                int todo = con->maxsize - built;
+                if (todo < want) {
+                    want = todo;
+                }
+            }
+            err = build_limited(u, con, 1, built, want, basesk, skill_total);
+            if (err < 0) {
+                if (made == 0) {
+                    /* could not make any part at all */
+                    return err;
+                }
+                else {
+                    /* could not build any part of this stage (low skill, etc). */
+                    break;
+                }
+            }
+            else {
+                /* err is the amount we built of this stage */
+                built += err;
+                made += err;
+                if (con->maxsize > 0 && built < con->maxsize) {
+                    /* we did not finish the stage, can quit here */
+                    break;
+                }
+            }
+        }
+        /* build the next stage: */
+        if (built >= con->maxsize && con->maxsize > 0) {
+            built -= con->maxsize;
+        }
+    }
+    return made;
+}
+
+static int build_failure(unit *u, order *ord, const building_type *btype, int want, int err) {
+    switch (err) {
+    case ECOMPLETE:
+        /* the building is already complete */
+        cmistake(u, ord, 4, MSG_PRODUCE);
+        break;
+    case ENOMATERIALS:
+        ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
+            &btype->stages->construction, want));
+        break;
+    case ELOWSKILL:
+    case ENEEDSKILL:
+        /* no skill, or not enough skill points to build */
+        cmistake(u, ord, 50, MSG_PRODUCE);
+        break;
+    }
+    return err;
+}
+
+int
+build_building(unit *u, const building_type *btype, int id, int want, order *ord)
+{
+    region *r = u->region;
+    int n = want, built = 0;
+    building *b = NULL;
+    /* einmalige Korrektur */
+    const char *btname;
+    order *new_order = NULL;
+    const struct locale *lang = u->faction->locale;
+    int skills, basesk;         /* number of skill points remainig */
+
+    assert(u->number);
+    assert(btype->stages);
+
+    basesk = effskill(u, SK_BUILDING, NULL);
+    skills = build_skill(u, basesk, 0, SK_BUILDING);
+    if (skills == 0) {
+        cmistake(u, ord, 101, MSG_PRODUCE);
+        return 0;
+    }
+
+    /* Falls eine Nummer angegeben worden ist, und ein Gebaeude mit der
+     * betreffenden Nummer existiert, ist b nun gueltig. Wenn keine Burg
+     * gefunden wurde, dann wird nicht einfach eine neue erbaut. Ansonsten
+     * baut man an der eigenen burg weiter. */
+
+     /* Wenn die angegebene Nummer falsch ist, KEINE Burg bauen! */
+    if (id > 0) {                 /* eine Nummer angegeben, keine neue Burg bauen */
+        b = findbuilding(id);
+        if (!b || b->region != u->region) { /* eine Burg mit dieser Nummer gibt es hier nicht */
+            /* vieleicht Tippfehler und die eigene Burg ist gemeint? */
+            if (u->building && u->building->type == btype) {
+                b = u->building;
+            }
+            else {
+                /* keine neue Burg anfangen wenn eine Nummer angegeben war */
+                cmistake(u, ord, 6, MSG_PRODUCE);
+                return 0;
+            }
+        }
+    }
+    else if (u->building && u->building->type == btype) {
+        b = u->building;
+    }
+
+    if (b) {
+        btype = b->type;
+    }
+
+    if (btype->flags & BTF_NOBUILD) {
+        /* special building, cannot be built */
+        cmistake(u, ord, 221, MSG_PRODUCE);
+        return 0;
+    }
+    if (!r->land) {
+        /* special terrain, cannot build */
+        cmistake(u, ord, 221, MSG_PRODUCE);
+        return 0;
+    }
+    if (fval(btype, BTF_UNIQUE) && buildingtype_exists(r, btype, false)) {
+        /* only one of these per region */
+        cmistake(u, ord, 93, MSG_PRODUCE);
+        return 0;
+    }
+    if (btype->flags & BTF_ONEPERTURN) {
+        if (b && fval(b, BLD_EXPANDED)) {
+            cmistake(u, ord, 318, MSG_PRODUCE);
+            return 0;
+        }
+        n = 1;
+    }
+    if (b) {
+        bool rule_other = config_get_int("rules.build.other_buildings", 1) != 0;
+        if (!rule_other) {
+            unit *owner = building_owner(b);
+            if (!owner || owner->faction != u->faction) {
+                cmistake(u, ord, 5, MSG_PRODUCE);
+                return 0;
+            }
+        }
+        built = b->size;
+    }
+
+    if (btype->maxsize > 0) {
+        int remain = btype->maxsize - built;
+        if (remain < n) {
+            n = remain;
+        }
+    }
+    built = build_stages(u, btype, built, n, basesk, &skills);
+
+    if (built < 0) {
+        return build_failure(u, ord, btype, want, built);
+    }
+
+    if (b) {
+        b->size += built;
+    }
+    else {
+        /* build a new building */
+        b = new_building(btype, r, lang, built);
+        b->type = btype;
+
+        /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
+        if (u->number && leave(u, false)) {
+            u_set_building(u, b);
+        }
+    }
+
+    btname = LOC(lang, btype->_name);
+
+    if (want <= built) {
+        /* gebaeude fertig */
+        new_order = default_order(lang);
+    }
+    else if (want != INT_MAX && btname) {
+        /* reduzierte restgroesse */
+        const char *hasspace = strchr(btname, ' ');
+        if (hasspace) {
+            new_order =
+                create_order(K_MAKE, lang, "%d \"%s\" %i", n - built, btname, b->no);
+        }
+        else {
+            new_order =
+                create_order(K_MAKE, lang, "%d %s %i", n - built, btname, b->no);
+        }
+    }
+    else if (btname) {
+        /* Neues Haus, Befehl mit Gebaeudename */
+        const char *hasspace = strchr(btname, ' ');
+        if (hasspace) {
+            new_order = create_order(K_MAKE, lang, "\"%s\" %i", btname, b->no);
+        }
+        else {
+            new_order = create_order(K_MAKE, lang, "%s %i", btname, b->no);
+        }
+    }
+
+    if (new_order) {
+        replace_order(&u->orders, ord, new_order);
+        free_order(new_order);
+    }
+
+    ADDMSG(&u->faction->msgs, msg_message("buildbuilding",
+        "building unit size", b, u, built));
+
+    if (b->type->maxsize > 0 && b->size > b->type->maxsize) {
+        log_error("build: %s has size=%d, maxsize=%d", buildingname(b), b->size, b->type->maxsize);
+    }
+    fset(b, BLD_EXPANDED);
+
+    produceexp(u, SK_BUILDING, (built < u->number) ? built : u->number);
+    return built;
 }
 
 static building *deleted_buildings;
