@@ -2546,7 +2546,7 @@
     <type>
       <arg name="spy" type="unit"/>
       <arg name="target" type="unit"/>
-      <arg name="type" type="string"/>
+      <arg name="school" type="string"/>
     </type>
   </message>
   <message name="spyreport_skills" section="events">
