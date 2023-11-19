@@ -39,7 +39,7 @@ extern "C" {
     int recycle(struct unit* u, construction* con, int size);
 
     void build_road(struct unit *u, int size, direction_t d);
-
+    int build_limited(struct unit *u, const construction *con, int completed, int number, int want, int basesk, int *skill_total);
     struct building *getbuilding(const struct region *r);
 
     int roqf_factor(void);
