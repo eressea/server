@@ -194,5 +194,9 @@ function test_trade_limits()
     u:add_item("jewel", 80)
     u:set_orders("VERKAUFE 80 Juwel")
     process_orders()
+    if u:get_item('jewel') ~= 10 then
+        -- try catching an intermittent test
+        u.faction:debug_messages()
+    end
     assert_equal(10, u:get_item('jewel'))
 end

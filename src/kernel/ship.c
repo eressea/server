@@ -1,5 +1,6 @@
 #include <kernel/config.h>
 #include "ship.h"
+#include "study.h"
 
 #include <attributes/movement.h>
 #include <spells/shipcurse.h>
@@ -629,9 +630,10 @@ static void build_ship(unit* u, ship* sh, int want)
         sh->damage = sh->damage - repair;
     }
 
-    if (n)
+    if (n) {
         ADDMSG(&u->faction->msgs,
             msg_message("buildship", "ship unit size", sh, u, n));
+    }
 }
 
 void create_ship(unit* u, const struct ship_type* newtype, int want,
