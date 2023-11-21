@@ -376,12 +376,18 @@ ship_type * test_create_shiptype(const char * name)
     stype->cargo = 1000;
     stype->damage = 1;
     if (!stype->construction) {
-        stype->construction = calloc(1, sizeof(construction));
+        construction *con = stype->construction = calloc(1, sizeof(construction));
         assert(stype->construction);
         stype->construction->maxsize = 5;
         stype->construction->minskill = 1;
         stype->construction->reqsize = 1;
         stype->construction->skill = SK_SHIPBUILDING;
+        con->materials = malloc(2 * sizeof(requirement));
+        if (con->materials) {
+            con->materials[0].number = 1;
+            con->materials[0].rtype = rt_get_or_create("log");
+            con->materials[1].number = 0;
+        }
     }
 
     arrsetlen(stype->coasts, 1);

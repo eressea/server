@@ -382,38 +382,12 @@ static void test_build_building_with_golem(CuTest *tc) {
 static void test_build_building_success(CuTest *tc)
 {
     unit *u;
-    build_fixture bf = { 0 };
-    const building_type *btype;
-    const resource_type *rtype;
-
-    u = setup_build(&bf);
-
-    rtype = get_resourcetype(R_STONE);
-    btype = bf.btype;
-    assert(btype && rtype && rtype->itype);
-    assert(!u->region->buildings);
-
-    i_change(&u->items, rtype->itype, 1);
-    set_level(u, SK_BUILDING, 1);
-    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
-    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
-    CuAssertPtrNotNull(tc, u->region->buildings);
-    CuAssertPtrEquals(tc, u->region->buildings, u->building);
-    CuAssertIntEquals(tc, 1, u->building->size);
-    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    teardown_build(&bf);
-}
-
-static void test_build_building_produceexp(CuTest *tc)
-{
-    unit *u;
-    build_fixture bf = { 0 };
-    const building_type *btype;
-    const resource_type *rtype;
     skill *sv;
+    build_fixture bf = { 0 };
+    const building_type *btype;
+    const resource_type *rtype;
 
     u = setup_build(&bf);
-    config_set_int("study.produceexp", STUDYDAYS);
 
     rtype = get_resourcetype(R_STONE);
     btype = bf.btype;
@@ -424,6 +398,10 @@ static void test_build_building_produceexp(CuTest *tc)
     sv = test_set_skill(u, SK_BUILDING, 1, 2);
     u->orders = create_order(K_MAKE, u->faction->locale, NULL);
     CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
+    CuAssertPtrNotNull(tc, u->region->buildings);
+    CuAssertPtrEquals(tc, u->region->buildings, u->building);
+    CuAssertIntEquals(tc, 1, u->building->size);
+    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
     CuAssertIntEquals(tc, 1, sv->weeks);
     teardown_build(&bf);
 }
@@ -505,6 +483,7 @@ static void test_build_ship_success(CuTest *tc)
     const item_type *itype;
 
     u = setup_build(&bf);
+    config_set_int("study.produceexp", STUDYDAYS);
 
     itype = it_find("log");
     stype = bf.stype;
@@ -512,14 +491,14 @@ static void test_build_ship_success(CuTest *tc)
     assert(!u->region->ships);
 
     i_change(&u->items, itype, 1);
-    sv = test_set_skill(u, SK_SHIPBUILDING, 2, 1);
+    sv = test_set_skill(u, SK_SHIPBUILDING, 1, 2);
     u->orders = create_order(K_MAKE, u->faction->locale, NULL);
-    CuAssertIntEquals(tc, 1, build_ship(u, stype, 0, 4, u->orders));
+    create_ship(u, stype, 4, u->orders);
     CuAssertPtrNotNull(tc, u->region->ships);
     CuAssertPtrEquals(tc, u->region->ships, u->ship);
     CuAssertIntEquals(tc, 1, u->ship->size);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertIntEquals(tc, 3, sv->weeks);
+    CuAssertIntEquals(tc, 1, sv->weeks);
     teardown_build(&bf);
 }
 
@@ -537,7 +516,6 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_with_potion);
     SUITE_ADD_TEST(suite, test_build_with_potion_and_ring);
     SUITE_ADD_TEST(suite, test_build_building_success);
-    SUITE_ADD_TEST(suite, test_build_building_produceexp);
     SUITE_ADD_TEST(suite, test_build_building_stages);
     SUITE_ADD_TEST(suite, test_build_building_stage_continue);
     SUITE_ADD_TEST(suite, test_build_building_with_golem);
