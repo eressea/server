@@ -541,7 +541,6 @@ static void test_build_ship_success(CuTest *tc)
     const item_type *itype;
 
     u = setup_build(&bf);
-    config_set_int("study.produceexp", STUDYDAYS);
 
     itype = it_find("log");
     stype = bf.stype;
