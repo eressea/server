@@ -36,6 +36,7 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_setup();
+    config_set_int("study.produceexp", STUDYDAYS);
     init_resources();
 
     test_create_itemtype("stone");
@@ -483,7 +484,6 @@ static void test_build_ship_success(CuTest *tc)
     const item_type *itype;
 
     u = setup_build(&bf);
-    config_set_int("study.produceexp", STUDYDAYS);
 
     itype = it_find("log");
     stype = bf.stype;
