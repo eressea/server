@@ -191,12 +191,14 @@ function test_trade_limits()
     local u = unit.create(f, r, 1)
     u.building = building.create(r, "castle", 2)
     u:set_skill("trade", 7)
-    u:add_item("jewel", 80)
-    u:set_orders("VERKAUFE 80 Juwel")
-    process_orders()
-    if u:get_item('jewel') ~= 10 then
-        -- try catching an intermittent test
-        u.faction:debug_messages()
+    local lux = "jewel"
+    local loc = "Juwel"
+    if lux == r.luxury then
+        lux = "balm"
+        loc = "Balsam"
     end
-    assert_equal(10, u:get_item('jewel'))
+    u:add_item(lux, 80)
+    u:set_orders("VERKAUFE 80 " .. loc)
+    process_orders()
+    assert_equal(10, u:get_item(lux))
 end
