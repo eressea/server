@@ -80,7 +80,7 @@ static void handle_order(void *userData, const char *str) {
         param_t p = get_param(tok, lang);
         if (p == P_FACTION || p == P_GAMENAME) {
             tok = parse_token(&input, buffer, sizeof(buffer));
-            if (tok) {
+            if (tok && strlen(tok)<5) {
                 int no = atoi36(tok);
                 tok = parse_token(&input, buffer, sizeof(buffer));
                 handle_faction(userData, no, tok);

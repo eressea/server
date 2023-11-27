@@ -131,17 +131,19 @@ void funhash(faction * f)
 
 static faction *ffindhash(int no)
 {
-    int index = no % FMAXHASH;
-    faction *f = factionhash[index];
-    while (f && f->no != no)
-        f = f->nexthash;
-    return f;
+    if (no > 0) {
+        int index = no % FMAXHASH;
+        faction *f = factionhash[index];
+        while (f && f->no != no)
+            f = f->nexthash;
+        return f;
+    }
+    return NULL;
 }
 
 faction *findfaction(int n)
 {
-    faction *f = ffindhash(n);
-    return f;
+    return ffindhash(n);
 }
 
 faction *getfaction(void)
