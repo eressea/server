@@ -295,18 +295,6 @@ static void test_study_bug_2194(CuTest *tc) {
     test_teardown();
 }
 
-static CuTest *g_tc;
-
-static void cb_learn_one(unit *u, skill_t sk, int days) {
-    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertIntEquals(g_tc, 20, days);
-}
-
-static void cb_learn_two(unit *u, skill_t sk, int days) {
-    CuAssertIntEquals(g_tc, SK_ALCHEMY, sk);
-    CuAssertIntEquals(g_tc, 40, days);
-}
-
 static void test_academy_building(CuTest *tc) {
     unit *u, *u1, *u2;
     struct locale * loc;
