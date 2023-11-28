@@ -995,7 +995,7 @@ void split_allocations(region * r)
             if (al->get) {
                 assert(itype || !"not implemented for non-items");
                 i_change(&al->unit->items, itype, al->get);
-                produceexp(al->unit, itype->construction->skill, al->unit->number);
+                produceexp(al->unit, itype->construction->skill);
             }
             if (al->want == INT_MAX)
                 al->want = al->get;
@@ -1825,7 +1825,7 @@ static void plant(unit * u, int raw)
         if (rng_int() % 10 < skill)
             planted++;
     }
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
 
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
@@ -1895,7 +1895,7 @@ static void breedtrees(unit * u, int raw)
     }
 
     /* Alles ok. Samen abziehen. */
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
     use_pooled(u, rtype, GET_DEFAULT, n);
 
     ADDMSG(&u->faction->msgs, msg_message("plant",
@@ -1936,7 +1936,7 @@ static void breedhorses(unit * u)
         }
     }
 
-    produceexp(u, SK_HORSE_TRAINING, u->number);
+    produceexp(u, SK_HORSE_TRAINING);
 
     ADDMSG(&u->faction->msgs, msg_message("raised", "unit amount", u, breed));
 }
@@ -2028,7 +2028,7 @@ static void research_cmd(unit * u, struct order *ord)
         return;
     }
 
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
 
     if (rherbs(r) > 0) {
         const item_type *itype = rherbtype(r);
@@ -2068,8 +2068,9 @@ static void expandentertainment(region * r, econ_request *ecbegin, econ_request 
             m -= u->n;
             total -= o->qty;
 
-            /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-            produceexp(u, SK_ENTERTAINMENT, (u->n < u->number) ? u->n : u->number);
+            if (u->n > 0) {
+                produceexp(u, SK_ENTERTAINMENT);
+            }
             add_income(u, IC_ENTERTAIN, o->qty, u->n);
             fset(u, UFL_LONGACTION | UFL_NOTMOVING);
         }
@@ -2542,7 +2543,7 @@ void produce(struct region *r)
                 }
             }
             if (trader) {
-                produceexp(u, SK_TRADE, u->number);
+                produceexp(u, SK_TRADE);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }

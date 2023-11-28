@@ -793,7 +793,7 @@ void plan_monsters(faction * f)
 
             if (skill_enabled(SK_PERCEPTION)) {
                 /* Monster bekommen jede Runde ein paar Tage Wahrnehmung dazu */
-                produceexp(u, SK_PERCEPTION, u->number);
+                produceexp(u, SK_PERCEPTION);
             }
 
             /* Befehle muessen jede Runde neu gegeben werden: */

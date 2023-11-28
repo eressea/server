@@ -642,7 +642,9 @@ build_building(unit *u, const building_type *btype, int id, int want, order *ord
     }
     fset(b, BLD_EXPANDED);
 
-    produceexp(u, SK_BUILDING, (built < u->number) ? built : u->number);
+    if (built > 0) {
+        produceexp(u, SK_BUILDING);
+    }
     return built;
 }
 

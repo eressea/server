@@ -138,7 +138,7 @@ int spy_cmd(unit * u, struct order *ord)
     spychance = 0.1 + fmax(spy * 0.05, 0.0);
 
     if (chance(spychance)) {
-        produceexp(u, SK_SPY, u->number);
+        produceexp(u, SK_SPY);
         spy_message(spy, u, target);
     }
     else {

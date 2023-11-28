@@ -307,19 +307,6 @@ static void cb_learn_two(unit *u, skill_t sk, int days) {
     CuAssertIntEquals(g_tc, 40, days);
 }
 
-static void test_produceexp(CuTest *tc) {
-    unit *u;
-
-    g_tc = tc;
-    setup_study();
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    scale_number(u, 2);
-    config_set("study.produceexp", "20");
-    produceexp_ex(u, SK_ALCHEMY, 1, cb_learn_one);
-    produceexp_ex(u, SK_ALCHEMY, 2, cb_learn_two);
-    test_teardown();
-}
-
 static void test_academy_building(CuTest *tc) {
     unit *u, *u1, *u2;
     struct locale * loc;
@@ -859,7 +846,6 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_study_race_noteach);
     SUITE_ADD_TEST(suite, test_study_speed);
-    SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_academy_bonus);
     SUITE_ADD_TEST(suite, test_demon_skillchanges);

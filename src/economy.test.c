@@ -767,6 +767,7 @@ static void test_buy_cmd(CuTest *tc) {
     setup_terrains(tc);
     r = setup_trade_region(tc, test_create_terrain("swamp", LAND_REGION));
     init_terrains();
+    config_set_int("study.produceexp", 0);
 
     it_luxury = r_luxury(r);
     CuAssertPtrNotNull(tc, it_luxury);

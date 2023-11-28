@@ -155,7 +155,13 @@ const attrib_type at_learning = {
     ATF_UNIQUE
 };
 
-#define EXPERIENCEDAYS 10
+static int produceexp_days(void) {
+    static int config, rule;
+    if (config_changed(&config)) {
+        rule = config_get_int("study.produceexp", 10);
+    }
+    return rule;
+}
 
 static int study_days(unit * u, skill_t sk)
 {
@@ -208,7 +214,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             const struct building_type *btype = bt_find("academy");
             if (active_building(student, btype)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->days += students * EXPERIENCEDAYS;  /* learning erhoehen */
+                teach->days += students * produceexp_days();  /* learning erhoehen */
                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
                 if (academy_students) {
                     *academy_students += students;
@@ -688,23 +694,6 @@ bool can_teach(const unit* u)
     return !(fval(u, UFL_WERE) || fval(u_race(u), RCF_NOTEACH));
 }
 
-static int produceexp_days(void) {
-    static int config, rule;
-    if (config_changed(&config)) {
-        rule = config_get_int("study.produceexp", EXPERIENCEDAYS);
-    }
-    return rule;
-}
-
-void produceexp_ex(struct unit *u, enum skill_t sk, int n, learn_fun learn)
-{
-    assert(u && n <= u->number);
-    if (n > 0 && (is_monsters(u->faction) || playerrace(u_race(u)))) {
-        int days = produceexp_days();
-        learn(u, sk, days * n);
-    }
-}
-
 static learn_fun inject_learn_fun = 0;
 
 void inject_learn(learn_fun fun) {
@@ -732,6 +721,17 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
     }
 }
 
+void produceexp(struct unit *u, enum skill_t sk)
+{
+    assert(u);
+    if (u->number > 0) {
+        const struct race *rc = u_race(u);
+        if ((rc->flags & RCF_NOLEARN) == 0 && rc_can_learn(rc, sk)) {
+            increase_skill_days(u, sk, produceexp_days() * u->number);
+        }
+    }
+}
+
 static void reduce_skill_days(unit *u, skill_t sk, int days) {
     if (days > 0) {
         skill *sv = unit_skill(u, sk);
@@ -749,11 +749,6 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
             }
         }
     }
-}
-
-void produceexp(struct unit *u, enum skill_t sk, int n)
-{
-    produceexp_ex(u, sk, n, increase_skill_days);
 }
 
 /** 
@@ -786,7 +781,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
                 n = n * avail / cost;
                 cost = n * studycost;
             }
-            days += EXPERIENCEDAYS * n;
+            days += produceexp_days() * n;
         }
 
         /* the artacademy currently improves the learning of entertainment
@@ -803,7 +798,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
         if (get_effect(u, oldpotiontype[P_WISE])) {
             int effect = get_effect(u, oldpotiontype[P_WISE]);
             if (effect > u->number) effect = u->number;
-            days += effect * EXPERIENCEDAYS;
+            days += effect * produceexp_days();
             change_effect(u, oldpotiontype[P_WISE], -effect);
         }
         if (get_effect(u, oldpotiontype[P_FOOL])) {
@@ -815,7 +810,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     }
 
     if (is_cursed(r->attribs, &ct_badlearn)) {
-        days -= EXPERIENCEDAYS * u->number;
+        days -= produceexp_days() * u->number;
     }
 
     if (fval(u, UFL_HUNGER)) {
