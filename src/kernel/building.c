@@ -286,8 +286,7 @@ static local_names *get_bnames(const struct locale *lang)
                     btype->_name, locale_name(lang));
             }
             else {
-                variant type;
-                type.v = (void *)btype;
+                variant type = { .v = (void *)btype };
                 addtoken((struct tnode **)&bn->names, n, type);
             }
         }

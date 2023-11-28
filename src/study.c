@@ -468,9 +468,7 @@ static bool cb_msg_teach(void *el, void *arg) {
 }
 
 static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
-    struct teach_data cbdata;
-    cbdata.sk = sk;
-    cbdata.u = u;
+    struct teach_data cbdata = { .sk = sk, .u = u };
     selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
 }
 
