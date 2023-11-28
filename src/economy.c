@@ -162,9 +162,9 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
             if (o->qty > 0) {
                 unsigned int j;
                 for (j = o->qty; j; j--) {
-                    split[i] = o;
-                    o->unit->n = 0;
-                    i++;
+                    u = o->unit;
+                    u->n = 0;
+                    split[i++] = o;
                 }
             }
         }
@@ -2058,20 +2058,21 @@ static void expandentertainment(region * r, econ_request *ecbegin, econ_request 
         if (o->type == ECON_ENTERTAIN) {
             double part = m / (double)total;
             unit *u = o->unit;
+            int n;
 
             if (total <= m)
-                u->n = o->qty;
+                n = o->qty;
             else
-                u->n = (int)(o->qty * part);
-            change_money(u, u->n);
-            rsetmoney(r, rmoney(r) - u->n);
-            m -= u->n;
+                n = (int)(o->qty * part);
+            change_money(u, n);
+            rsetmoney(r, rmoney(r) - n);
+            m -= n;
             total -= o->qty;
 
-            if (u->n > 0) {
+            if (n > 0) {
                 produceexp(u, SK_ENTERTAINMENT);
             }
-            add_income(u, IC_ENTERTAIN, o->qty, u->n);
+            add_income(u, IC_ENTERTAIN, o->qty, n);
             fset(u, UFL_LONGACTION | UFL_NOTMOVING);
         }
     }
@@ -2143,7 +2144,7 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
         for (o = work_begin; o != work_end; ++o) {
             if (o->type == ECON_WORK) {
                 unit *u = o->unit;
-                int workers;
+                int workers, n;
 
                 if (u->number == 0)
                     continue;
@@ -2159,14 +2160,14 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
 
                 assert(workers >= 0);
 
-                u->n = workers * wage(u->region, u_race(u));
+                n = workers * wage(u->region, u_race(u));
 
                 jobs -= workers;
                 assert(jobs >= 0);
 
-                change_money(u, u->n);
+                change_money(u, n);
                 total -= o->unit->number;
-                add_income(u, IC_WORK, o->qty, u->n);
+                add_income(u, IC_WORK, o->qty, n);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
@@ -2261,8 +2262,9 @@ void expandtax(region * r, econ_request * taxorders)
     if (norders > 0) {
         unsigned int i;
         for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-            change_money(g_requests[i]->unit, TAXFRACTION);
-            g_requests[i]->unit->n += TAXFRACTION;
+            u = g_requests[i]->unit;
+            change_money(u, TAXFRACTION);
+            u->n += TAXFRACTION;
             rsetmoney(r, rmoney(r) - TAXFRACTION);
         }
         free(g_requests);
