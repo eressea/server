@@ -286,8 +286,7 @@ static local_names *get_bnames(const struct locale *lang)
                     btype->_name, locale_name(lang));
             }
             else {
-                variant type;
-                type.v = (void *)btype;
+                variant type = { .v = (void *)btype };
                 addtoken((struct tnode **)&bn->names, n, type);
             }
         }
@@ -642,7 +641,9 @@ build_building(unit *u, const building_type *btype, int id, int want, order *ord
     }
     fset(b, BLD_EXPANDED);
 
-    produceexp(u, SK_BUILDING, (built < u->number) ? built : u->number);
+    if (built > 0) {
+        produceexp(u, SK_BUILDING);
+    }
     return built;
 }
 

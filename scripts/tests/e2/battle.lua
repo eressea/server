@@ -52,7 +52,7 @@ function test_complex_battle()
 end
 
 function test_ship_damage_catapult()
-    -- eressea.settings.set("rules.catapult.damage.ship", 1.0)
+    eressea.settings.set("rules.catapult.damage.ship", 0.5)
     eressea.settings.set("rules.catapult.damage.chance_percent", 100)
     local r = region.create(0, 0, 'plain')
     local sh = ship.create(r, "caravel")

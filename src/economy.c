@@ -162,9 +162,9 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
             if (o->qty > 0) {
                 unsigned int j;
                 for (j = o->qty; j; j--) {
-                    split[i] = o;
-                    o->unit->n = 0;
-                    i++;
+                    u = o->unit;
+                    u->n = 0;
+                    split[i++] = o;
                 }
             }
         }
@@ -995,7 +995,7 @@ void split_allocations(region * r)
             if (al->get) {
                 assert(itype || !"not implemented for non-items");
                 i_change(&al->unit->items, itype, al->get);
-                produceexp(al->unit, itype->construction->skill, al->unit->number);
+                produceexp(al->unit, itype->construction->skill);
             }
             if (al->want == INT_MAX)
                 al->want = al->get;
@@ -1825,7 +1825,7 @@ static void plant(unit * u, int raw)
         if (rng_int() % 10 < skill)
             planted++;
     }
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
 
     /* Alles ok. Abziehen. */
     use_pooled(u, rt_water, GET_DEFAULT, 1);
@@ -1895,7 +1895,7 @@ static void breedtrees(unit * u, int raw)
     }
 
     /* Alles ok. Samen abziehen. */
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
     use_pooled(u, rtype, GET_DEFAULT, n);
 
     ADDMSG(&u->faction->msgs, msg_message("plant",
@@ -1936,7 +1936,7 @@ static void breedhorses(unit * u)
         }
     }
 
-    produceexp(u, SK_HORSE_TRAINING, u->number);
+    produceexp(u, SK_HORSE_TRAINING);
 
     ADDMSG(&u->faction->msgs, msg_message("raised", "unit amount", u, breed));
 }
@@ -2028,7 +2028,7 @@ static void research_cmd(unit * u, struct order *ord)
         return;
     }
 
-    produceexp(u, SK_HERBALISM, u->number);
+    produceexp(u, SK_HERBALISM);
 
     if (rherbs(r) > 0) {
         const item_type *itype = rherbtype(r);
@@ -2058,19 +2058,21 @@ static void expandentertainment(region * r, econ_request *ecbegin, econ_request 
         if (o->type == ECON_ENTERTAIN) {
             double part = m / (double)total;
             unit *u = o->unit;
+            int n;
 
             if (total <= m)
-                u->n = o->qty;
+                n = o->qty;
             else
-                u->n = (int)(o->qty * part);
-            change_money(u, u->n);
-            rsetmoney(r, rmoney(r) - u->n);
-            m -= u->n;
+                n = (int)(o->qty * part);
+            change_money(u, n);
+            rsetmoney(r, rmoney(r) - n);
+            m -= n;
             total -= o->qty;
 
-            /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-            produceexp(u, SK_ENTERTAINMENT, (u->n < u->number) ? u->n : u->number);
-            add_income(u, IC_ENTERTAIN, o->qty, u->n);
+            if (n > 0) {
+                produceexp(u, SK_ENTERTAINMENT);
+            }
+            add_income(u, IC_ENTERTAIN, o->qty, n);
             fset(u, UFL_LONGACTION | UFL_NOTMOVING);
         }
     }
@@ -2142,7 +2144,7 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
         for (o = work_begin; o != work_end; ++o) {
             if (o->type == ECON_WORK) {
                 unit *u = o->unit;
-                int workers;
+                int workers, n;
 
                 if (u->number == 0)
                     continue;
@@ -2158,14 +2160,14 @@ expandwork(region * r, econ_request * work_begin, econ_request * work_end, int m
 
                 assert(workers >= 0);
 
-                u->n = workers * wage(u->region, u_race(u));
+                n = workers * wage(u->region, u_race(u));
 
                 jobs -= workers;
                 assert(jobs >= 0);
 
-                change_money(u, u->n);
+                change_money(u, n);
                 total -= o->unit->number;
-                add_income(u, IC_WORK, o->qty, u->n);
+                add_income(u, IC_WORK, o->qty, n);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
@@ -2260,8 +2262,9 @@ void expandtax(region * r, econ_request * taxorders)
     if (norders > 0) {
         unsigned int i;
         for (i = 0; i != norders && rmoney(r) > TAXFRACTION; i++) {
-            change_money(g_requests[i]->unit, TAXFRACTION);
-            g_requests[i]->unit->n += TAXFRACTION;
+            u = g_requests[i]->unit;
+            change_money(u, TAXFRACTION);
+            u->n += TAXFRACTION;
             rsetmoney(r, rmoney(r) - TAXFRACTION);
         }
         free(g_requests);
@@ -2542,7 +2545,7 @@ void produce(struct region *r)
                 }
             }
             if (trader) {
-                produceexp(u, SK_TRADE, u->number);
+                produceexp(u, SK_TRADE);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
