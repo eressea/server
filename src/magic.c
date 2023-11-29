@@ -2871,7 +2871,7 @@ void magic(void)
         unit *u;
         for (u = r->units; u; u = u->next) {
             if (is_mage(u) && spellcount(u) > 0) {
-                produceexp(u, SK_MAGIC, u->number);
+                produceexp(u, SK_MAGIC);
                 /* Spruchlistenaktualisierung ist in Regeneration */
             }
         }

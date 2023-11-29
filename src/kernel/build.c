@@ -168,10 +168,9 @@ void build_road(unit * u, int size, direction_t d)
         }
         scale_number(u, u->number - golemsused);
     }
-    else {
+    else if (n > 0) {
         use_pooled(u, get_resourcetype(R_STONE), GET_DEFAULT, n);
-        /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-        produceexp(u, SK_ROAD_BUILDING, (n < u->number) ? n : u->number);
+        produceexp(u, SK_ROAD_BUILDING);
     }
     ADDMSG(&u->faction->msgs, msg_message("buildroad",
         "region unit size", r, u, n));
@@ -415,7 +414,7 @@ int build(unit * u, int number, const construction * con, int completed, int wan
     made = build_limited(u, con, completed, number, want, basesk, &skills);
     /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
     if (made > 0) {
-        produceexp(u, con->skill, (made < u->number) ? made : u->number);
+        produceexp(u, con->skill);
     }
     return made;
 }

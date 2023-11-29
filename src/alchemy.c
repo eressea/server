@@ -105,7 +105,7 @@ void herbsearch(unit * u, int max_take)
     rsetherbs(r, rherbs(r) - herbsfound);
 
     if (herbsfound) {
-        produceexp(u, SK_HERBALISM, u->number);
+        produceexp(u, SK_HERBALISM);
         i_change(&u->items, whichherb, herbsfound);
         ADDMSG(&u->faction->msgs, msg_message("herbfound",
             "unit region amount herb", u, r, herbsfound, whichherb->rtype));

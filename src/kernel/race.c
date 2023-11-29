@@ -150,14 +150,15 @@ const struct race *findrace(const char *s, const struct locale *lang)
 }
 
 const struct race *get_race(race_t rt) {
-    const char * name;
-
     assert(rt < MAXRACES);
-    name = racenames[rt];
-    if (!name) {
-        return NULL;
+    if (rt < MAXRACES && rt >=0) {
+        const char *name = racenames[rt];
+        if (!name) {
+            return NULL;
+        }
+        return rc_find(name);
     }
-    return rc_find(name);
+    return NULL;
 }
 
 typedef struct xref {
@@ -593,8 +594,7 @@ void init_races(struct locale* lang)
     tokens = get_translations(lang, UT_RACES);
     for (rc = races; rc; rc = rc->next) {
         const char* name;
-        variant var;
-        var.v = (void*)rc;
+        variant var = { .v = (void *)rc };
         name = locale_string(lang, rc_name_s(rc, NAME_PLURAL), false);
         if (name) addtoken((struct tnode**)tokens, name, var);
         name = locale_string(lang, rc_name_s(rc, NAME_SINGULAR), false);
