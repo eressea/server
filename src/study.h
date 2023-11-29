@@ -35,18 +35,15 @@ int study_cost(struct unit *u, enum skill_t sk);
 bool check_student(const struct unit *u, struct order *ord,
         enum skill_t sk);
 
-typedef void(*learn_fun)(struct unit *u, enum skill_t sk, int days);
-
 int learn_skill(struct unit *u, enum skill_t sk, int days,
         int studycost);
 void change_skill_days(struct unit *u, enum skill_t sk, int days);
 
-void produceexp(struct unit *u, enum skill_t sk, int n);
-void produceexp_ex(struct unit *u, enum skill_t sk, int n,
-        learn_fun learn);
+void produceexp(struct unit *u, enum skill_t sk);
 
 void demon_skillchange(struct unit *u);
 
+typedef void(*learn_fun)(struct unit *u, enum skill_t sk, int days);
 void inject_learn(learn_fun fun);
 
 #endif

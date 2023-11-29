@@ -11,7 +11,6 @@
 #include "kernel/region.h"
 #include "kernel/ship.h"
 #include "kernel/skill.h"
-#include "kernel/skills.h"
 #include "kernel/status.h"
 #include "kernel/terrain.h"
 #include "kernel/unit.h"
@@ -244,20 +243,14 @@ static void test_dragon_moves(CuTest * tc)
 static void test_monsters_learn_exp(CuTest * tc)
 {
     unit *u, *m;
-    skill* sk;
 
     test_setup();
     create_monsters(&u, &m);
-    config_set("study.produceexp", "30");
+    config_set_int("study.produceexp", STUDYDAYS);
 
     u_setrace(u, u_race(m));
-    produceexp(u, SK_MELEE, u->number);
-    sk = unit_skill(u, SK_MELEE);
-    CuAssertTrue(tc, !sk);
-
-    produceexp(m, SK_MELEE, u->number);
-    sk = unit_skill(m, SK_MELEE);
-    CuAssertTrue(tc, sk && (sk->level > 0 || (sk->level == 0 && sk->weeks > 0)));
+    produceexp(u, SK_MELEE);
+    CuAssertPtrNotNull(tc, unit_skill(u, SK_MELEE));
 
     test_teardown();
 }

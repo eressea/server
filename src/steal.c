@@ -217,7 +217,7 @@ void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)
     o->data.steal.no = u2->no;
     o->data.steal.goblin = goblin;      /* Merken, wenn Goblin-Spezialklau */
 
-    /* Nur soviel PRODUCEEXP wie auch tatsaechlich gemacht wurde */
-    if (n > u->number) n = u->number;
-    produceexp(u, SK_STEALTH, n);
+    if (n > 0) {
+        produceexp(u, SK_STEALTH);
+    }
 }

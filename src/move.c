@@ -698,7 +698,7 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
                 ulist = &u->next;
                 u->ship = sh; /* undo the trick -- do not use u_set_ship here */
                 if (effskill(u, SK_SAILING, from) >= 1) {
-                    produceexp(u, SK_SAILING, u->number);
+                    produceexp(u, SK_SAILING);
                 }
             }
             else {
@@ -1729,7 +1729,7 @@ static const region_list *travel_route(unit * u, const capacities *cap,
         }
         else if (walk_speed(u, cap) >= BP_RIDING) {
             walkmode = 1;
-            produceexp(u, SK_RIDING, u->number);
+            produceexp(u, SK_RIDING);
         }
         else {
             walkmode = 2;
