@@ -700,12 +700,14 @@ void inject_learn(learn_fun fun) {
 
 static void increase_skill_days(unit *u, skill_t sk, int days) {
     assert(sk >= 0 && sk < MAXSKILLS && days >= 0);
+    if (inject_learn_fun) {
+        inject_learn_fun(u, sk, days);
+    }
     if (days > 0) {
+        // int steps = days * SKILL_STEPS_PER_WEEK / STUDYDAYS;
+        // increase_skill_steps(u, sk, steps);
         int leveldays = STUDYDAYS * u->number;
         int weeks = 0;
-        if (inject_learn_fun) {
-            inject_learn_fun(u, sk, days);
-        }
         while (days >= leveldays) {
             ++weeks;
             days -= leveldays;

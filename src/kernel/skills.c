@@ -75,7 +75,7 @@ static bool rule_random_progress(void)
 {
     static int rule, config;
     if (config_changed(&config)) {
-        rule = config_get_int("study.random_progress", 1);
+        rule = config_get_int("study.random_progress", 0);
     }
     return rule != 0;
 }

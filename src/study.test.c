@@ -459,8 +459,22 @@ static void test_demon_skillchanges(CuTest *tc) {
     test_teardown();
 }
 
+static void test_change_skill_days(CuTest *tc) {
+    unit *u;
+    skill *sv;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    change_skill_days(u, SK_CROSSBOW, STUDYDAYS);
+    CuAssertPtrNotNull(tc, sv = unit_skill(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 0, sv->old);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+}
+
 static void test_study_cmd(CuTest *tc) {
     unit *u;
+    skill *sv;
 
     setup_study();
     init_resources();
@@ -468,7 +482,10 @@ static void test_study_cmd(CuTest *tc) {
     u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
     learn_inject();
     study_cmd(u, u->thisorder);
+    sv = unit_skill(u, SK_CROSSBOW);
     learn_reset();
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, sv->level * 2, sv->weeks);
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
     CuAssertIntEquals(tc, STUDYDAYS, log_learners[0].days);
@@ -814,6 +831,7 @@ static void test_teach_many_to_many(CuTest *tc) {
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_change_skill_days);
     SUITE_ADD_TEST(suite, test_study_cmd);
     SUITE_ADD_TEST(suite, test_study_cost);
     SUITE_ADD_TEST(suite, test_study_cost_magic);

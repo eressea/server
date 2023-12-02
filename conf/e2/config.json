@@ -3,6 +3,8 @@
 		"game.name": "Eressea",
 		"game.mailcmd": "ERESSEA",
 		"game.id": 2,
+		"game.era": 2,
+		"game.start": 184,
 		"orders.default": "work",
 		"NewbieImmunity": 8,
 		"modules.astralspace": true,
@@ -18,8 +20,6 @@
 		"hunger.long": false,
 		"hunger.damage": "1d8+6",
 		"init_spells": 0,
-		"game.era": 2,
-		"game.start": 184,
 		"rules.ship.overload.damage.max": 0.0,
 		"rules.reserve.twophase": true,
 		"rules.give.max_men": -1,
@@ -36,7 +36,8 @@
 		"rules.guard.region_type_stop_prob": 0.05,
 		"rules.economy.repopulate_maximum": 500,
 		"rules.lighthouse.unit_capacity": true,
-		"rules.tactics.formula": 1
+		"rules.tactics.formula": 1,
+		"study.random_progress": true
 	},
 	"disabled": [
 		"jsreport"
