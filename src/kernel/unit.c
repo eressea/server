@@ -577,12 +577,12 @@ void set_level(struct unit * u, enum skill_t sk, unsigned int value)
     for (len = arrlen(u->skills), s = 0; s != len; ++s) {
         skill* sv = u->skills + s;
         if (sv->id == sk) {
-            sk_set(sv, value);
+            sk_set_level(sv, value);
             return;
         }
         ++sv;
     }
-    sk_set(add_skill(u, sk), value);
+    sk_set_level(add_skill(u, sk), value);
 }
 
 static int leftship_age(struct attrib *a, void *owner)
@@ -964,7 +964,7 @@ skill *add_skill(unit * u, enum skill_t sk)
         ptrdiff_t s, len = arrlen(u->skills);
         for (s = 0; s != len; ++s) {
             sv = u->skills + s;
-            if (sv->id >= sk) break;
+            if (SK_SKILL(sv) >= sk) break;
         }
         arrins(u->skills, s, skins);
         sv = u->skills + s;
@@ -982,12 +982,12 @@ skill *add_skill(unit * u, enum skill_t sk)
 
 skill *unit_skill(const unit * u, enum skill_t sk)
 {
-    assert(u);
+    assert(u && sk != NOSKILL);
 
     if (u->skills) {
         ptrdiff_t len = arrlen(u->skills);
         skill* sv = u->skills;
-        while (sv != u->skills + len && sv->id <= sk) {
+        while (sv != u->skills + len && SK_SKILL(sv) <= sk) {
             if (sv->id == sk) {
                 return sv;
             }
@@ -1001,7 +1001,7 @@ bool has_skill(const unit * u, enum skill_t sk)
 {
     ptrdiff_t len = arrlen(u->skills);
     skill *sv = u->skills;
-    while (sv != u->skills + len && sv->id <= sk) {
+    while (sv != u->skills + len && SK_SKILL(sv) <= sk) {
         if (sv->id == sk) {
             return (sv->level > 0);
         }

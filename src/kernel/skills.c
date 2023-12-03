@@ -95,12 +95,18 @@ static int progress_weeks(unsigned int level, bool random_progress)
     return level;
 }
 
-void sk_set(skill* sv, unsigned int level)
+void skill_set(skill *sv, unsigned int level, unsigned int weeks)
 {
-    assert(sv && level != 0);
-    sv->weeks = progress_weeks(level + 1, rule_random_progress());
+    assert(weeks <= WEEKS_FROM_LEVEL_MAX(level + 1));
     sv->level = level;
-    assert(sv->weeks <= sv->level * 2 + 3);
+    sv->weeks = weeks;
+    assert(sv->weeks == weeks && sv->level == level);
+}
+
+void sk_set_level(skill *sv, unsigned int level)
+{
+    int weeks = progress_weeks(level + 1, rule_random_progress());
+    skill_set(sv, level, weeks);
 }
 
 void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
@@ -111,7 +117,7 @@ void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
     }
     while (sv->weeks <= weeks) {
         weeks -= sv->weeks;
-        sk_set(sv, sv->level + 1);
+        sk_set_level(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
     assert(sv->weeks <= sv->level * 2 + 3);
@@ -132,7 +138,7 @@ void reduce_skill(unit * u, skill * sv, unsigned int weeks)
     }
     if (sv->level == 0) {
         /* reroll */
-        sv->weeks = progress_weeks(sv->level + 1, rule_random_progress());
+        sk_set_level(sv, sv->level + 1);
     }
     assert(sv->weeks <= sv->level * 2 + 3);
 }

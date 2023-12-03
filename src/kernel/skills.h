@@ -3,11 +3,13 @@
 
 #include "skill.h"
 
+#define WEEKS_FROM_LEVEL_MAX(level) ((level) * 2 + 1)
+
 typedef struct skill {
-    int id : 8;
-    unsigned int level : 8;
-    unsigned int weeks : 8;
-    unsigned int old : 8;
+    unsigned int id : 5;
+    unsigned int level : 7;
+    unsigned int old : 7;
+    unsigned int weeks : 13;
 } skill;
 
 struct race;
@@ -36,7 +38,9 @@ struct attrib *make_skillmod(enum skill_t sk, skillmod_fun special,
 void increase_skill(struct unit * u, enum skill_t sk, unsigned int weeks);
 void reduce_skill(struct unit *u, skill * sv, unsigned int weeks);
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
-void sk_set(skill * sv, unsigned int level);
+void sk_set_level(skill * sv, unsigned int level);
 int skill_compare(const skill* sk, const skill* sc);
+
+#define SK_SKILL(sv) ((skill_t) (sv->id))
 
 #endif
