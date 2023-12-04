@@ -955,7 +955,7 @@ void remove_skills(unit * u) {
     arrfree(u->skills);
 }
 
-skill *add_skill(unit * u, enum skill_t sk)
+struct skill *add_skill(struct unit * u, enum skill_t sk)
 {
     skill* sv;
     skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
