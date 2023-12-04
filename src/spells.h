@@ -23,6 +23,7 @@ int sp_showastral(struct castorder * co);
 int sp_speed2(struct castorder* co);
 int sp_goodwinds(struct castorder* co);
 int sp_summonent(struct castorder* co);
+int sp_summonundead(struct castorder *co);
 int sp_maelstrom(struct castorder* co);
 int sp_blessedharvest(struct castorder* co);
 int sp_kaelteschutz(struct castorder* co);
