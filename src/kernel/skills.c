@@ -85,7 +85,7 @@ static int progress_weeks(unsigned int level, bool random_progress)
 {
     assert(level > 0);
     if (random_progress) {
-        unsigned int coins = 2 * (level - 1);
+        unsigned int coins = MAX_WEEKS_TO_NEXT_LEVEL(level - 1) - 1;
         int heads = 1;
         while (coins--) {
             heads += rng_int() % 2;
@@ -95,12 +95,18 @@ static int progress_weeks(unsigned int level, bool random_progress)
     return level;
 }
 
-void sk_set(skill* sv, unsigned int level)
+void skill_set(skill *sv, unsigned int level, unsigned int weeks)
 {
-    assert(sv && level != 0);
-    sv->weeks = progress_weeks(level + 1, rule_random_progress());
+    assert(weeks <= MAX_WEEKS_TO_NEXT_LEVEL(level));
     sv->level = level;
-    assert(sv->weeks <= sv->level * 2 + 3);
+    sv->weeks = weeks;
+    assert(sv->weeks == weeks && sv->level == level);
+}
+
+void sk_set_level(skill *sv, unsigned int level)
+{
+    int weeks = progress_weeks(level + 1, rule_random_progress());
+    skill_set(sv, level, weeks);
 }
 
 void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
@@ -111,19 +117,16 @@ void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
     }
     while (sv->weeks <= weeks) {
         weeks -= sv->weeks;
-        sk_set(sv, sv->level + 1);
+        sk_set_level(sv, sv->level + 1);
     }
     sv->weeks -= weeks;
-    assert(sv->weeks <= sv->level * 2 + 3);
+    assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 }
 
 void reduce_skill(unit * u, skill * sv, unsigned int weeks)
 {
-    unsigned int max_weeks = sv->level + 1;
+    unsigned int max_weeks = MAX_WEEKS_TO_NEXT_LEVEL(sv->level);
 
-    if (rule_random_progress()) {
-        max_weeks += sv->level;
-    }
     sv->weeks += weeks;
     while (sv->level > 0 && sv->weeks > max_weeks) {
         sv->weeks -= sv->level;
@@ -132,9 +135,9 @@ void reduce_skill(unit * u, skill * sv, unsigned int weeks)
     }
     if (sv->level == 0) {
         /* reroll */
-        sv->weeks = progress_weeks(sv->level + 1, rule_random_progress());
+        sk_set_level(sv, sv->level + 1);
     }
-    assert(sv->weeks <= sv->level * 2 + 3);
+    assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 }
 
 int skill_compare(const skill * sk, const skill * sc)

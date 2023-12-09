@@ -56,7 +56,9 @@ struct order *ord)
 
         if (s) {
             sk = get_skill(s, u->faction->locale);
-            sv = unit_skill(u, sk);
+            if (sk != NOSKILL) {
+                sv = unit_skill(u, sk);
+            }
         }
 
         if (sv && sv->level > 2) {

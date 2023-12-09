@@ -367,8 +367,8 @@ static void write_skills(gamedata *data, const unit *u) {
     for (i = 0; i != skill_size; ++i) {
         skill *sv = u->skills + i;
 #ifndef NDEBUG
-        assert(sv->id > sk);
-        sk = sv->id;
+        assert(SK_SKILL(sv) > sk);
+        sk = SK_SKILL(sv);
         assert(sv->weeks <= sv->level * 2 + 1);
 #endif
         WRITE_INT(data->store, sv->id);

@@ -238,6 +238,7 @@ static struct unit *create_recruiter(void) {
 
 static void setup_production(void) {
     init_resources();
+    config_set_int("study.produceexp", 0);
     mt_create_feedback("error_cannotmake");
     mt_create_va(mt_new("produce", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "resource:resource", MT_NEW_END);
     mt_create_va(mt_new("income", NULL), "unit:unit", "region:region", "amount:int", "wanted:int", "mode:int", MT_NEW_END);
@@ -466,9 +467,9 @@ static void test_trade_produceexp(CuTest *tc) {
     const item_type *it_jewel, *it_balm;
 
     test_setup();
-    config_set_int("study.produceexp", STUDYDAYS);
     setup_production();
     setup_terrains(tc);
+    config_set_int("study.produceexp", STUDYDAYS);
     init_terrains();
     r = setup_trade_region(tc, NULL);
     b = test_create_building(r, test_create_buildingtype("castle"));
@@ -752,6 +753,18 @@ static void test_trade_is_long_action(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "error52"));
     CuAssertIntEquals(tc, 1, i_get(u->items, it_luxury));
     CuAssertIntEquals(tc, 99, i_get(u->items, it_sold));
+    test_teardown();
+}
+
+static void test_forget_cmd(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_set_skill(u, SK_CATAPULT, 3, 4);
+    u->thisorder = create_order(K_FORGET, u->faction->locale, skillname(SK_CATAPULT, u->faction->locale));
+    forget_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->skills);
     test_teardown();
 }
 
@@ -1599,6 +1612,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_heroes_dont_recruit);
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_trade_is_long_action);
+    SUITE_ADD_TEST(suite, test_forget_cmd);
     SUITE_ADD_TEST(suite, test_buy_cmd);
     SUITE_ADD_TEST(suite, test_buy_twice);
     SUITE_ADD_TEST(suite, test_buy_prices);
