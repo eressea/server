@@ -489,6 +489,39 @@ static void test_summonent(CuTest *tc) {
     test_teardown();
 }
 
+static void test_summonundead(CuTest *tc) {
+    unit *u, *us;
+    region *r;
+    castorder co;
+    struct race *rc;
+    skill_t sk;
+    int level = 8; /* <=8: Skeletons */
+
+    test_setup();
+    rc = test_create_race(racenames[RC_SKELETON]);
+    deathcounts(r = test_create_plain(0, 0), 1000);
+    u = test_create_unit(test_create_faction(), r);
+    test_create_castorder(&co, u, level, (float)level + 1.0f, 0, NULL);
+
+    CuAssertIntEquals(tc, 8, sp_summonundead(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "summonundead_effect_1"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "summonundead_effect_2", NULL));
+    CuAssertPtrNotNull(tc, us = u->next);
+    CuAssertPtrEquals(tc, u->faction, us->faction);
+    CuAssertPtrEquals(tc, rc, (race *)u_race(us));
+    for (sk = 0; sk != MAXSKILLS; ++sk) {
+        if (rc->bonus[sk] > 0) {
+            CuAssertIntEquals(tc, level, get_level(us, sk));
+        }
+    }
+    if (rc->bonus[SK_STAMINA]) {
+        CuAssertIntEquals(tc, unit_max_hp(us) * us->number, us->hp);
+    }
+    test_clear_messages(u->faction);
+
+    test_teardown();
+}
+
 static void test_maelstrom(CuTest *tc) {
     unit *u;
     region *r;
@@ -1405,6 +1438,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_goodwinds);
     SUITE_ADD_TEST(suite, test_change_race);
     SUITE_ADD_TEST(suite, test_summonent);
+    SUITE_ADD_TEST(suite, test_summonundead);
     SUITE_ADD_TEST(suite, test_maelstrom);
     SUITE_ADD_TEST(suite, test_blessedharvest);
     SUITE_ADD_TEST(suite, test_kaelteschutz);

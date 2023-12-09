@@ -11,7 +11,64 @@
 
 #include <stddef.h>
 
-static void test_skills(CuTest * tc)
+static void test_skill_set(CuTest *tc)
+{
+    skill value = { .id = SK_ALCHEMY, .old = 1, .level = 1 };
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    sk_set_level(&value, 2);
+    CuAssertIntEquals(tc, 1, value.old);
+    CuAssertIntEquals(tc, 2, value.level);
+    CuAssertIntEquals(tc, 3, value.weeks);
+
+    skill_set(&value, 3, 6);
+    CuAssertIntEquals(tc, 1, value.old);
+    CuAssertIntEquals(tc, 3, value.level);
+    CuAssertIntEquals(tc, 6, value.weeks);
+}
+
+static void test_skill_change(CuTest *tc)
+{
+    unit *u;
+    skill *sv;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    increase_skill(u, SK_CROSSBOW, 1);
+    sv = unit_skill(u, SK_CROSSBOW);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 2, sv->weeks);
+    increase_skill(u, SK_CROSSBOW, 1);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 1, sv->weeks);
+    increase_skill(u, SK_CROSSBOW, 1);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 3, sv->weeks);
+    increase_skill(u, SK_CROSSBOW, 4);
+    CuAssertIntEquals(tc, 3, sv->level);
+    CuAssertIntEquals(tc, 3, sv->weeks);
+
+    reduce_skill(u, sv, 1);
+    CuAssertIntEquals(tc, 3, sv->level);
+    CuAssertIntEquals(tc, 4, sv->weeks);
+    reduce_skill(u, sv, 1);
+    CuAssertIntEquals(tc, 3, sv->level);
+    CuAssertIntEquals(tc, 5, sv->weeks);
+    reduce_skill(u, sv, 2);
+    CuAssertIntEquals(tc, 3, sv->level);
+    CuAssertIntEquals(tc, 7, sv->weeks);
+    reduce_skill(u, sv, 1);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 5, sv->weeks);
+    sv->level = 10;
+    reduce_skill(u, sv, 25);
+    CuAssertIntEquals(tc, 8, sv->level);
+    CuAssertIntEquals(tc, 11, sv->weeks);
+}
+
+static void test_set_level(CuTest * tc)
 {
     unit *u;
 
@@ -97,7 +154,9 @@ static void test_skills_merge(CuTest* tc)
 CuSuite *get_skills_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_skills);
+    SUITE_ADD_TEST(suite, test_skill_set);
+    SUITE_ADD_TEST(suite, test_skill_change);
+    SUITE_ADD_TEST(suite, test_set_level);
     SUITE_ADD_TEST(suite, test_skills_merge);
     return suite;
 }

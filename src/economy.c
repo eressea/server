@@ -267,7 +267,7 @@ int give_control_cmd(unit * u, order * ord)
     return 0;
 }
 
-static int forget_cmd(unit * u, order * ord)
+int forget_cmd(unit * u, order * ord)
 {
     char token[128];
     skill_t sk;
