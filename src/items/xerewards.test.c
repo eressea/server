@@ -56,17 +56,17 @@ static void test_skillpotion(CuTest *tc) {
 
     change_skill_days(u, SK_ENTERTAINMENT, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_ENTERTAINMENT);
-    sk_set(pSkill, 5);
+    sk_set_level(pSkill, 5);
     initialWeeks_Entertainment = pSkill->weeks = 4;
 
     change_skill_days(u, SK_STAMINA, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_STAMINA);
-    sk_set(pSkill, 5);
+    sk_set_level(pSkill, 5);
     initialWeeks_Stamina = pSkill->weeks = 4;
 
     change_skill_days(u, SK_MAGIC, STUDYDAYS * u->number);
     pSkill = unit_skill(u, SK_MAGIC);
-    sk_set(pSkill, 5);
+    sk_set_level(pSkill, 5);
     initialWeeks_Magic = pSkill->weeks = 4;
 
     CuAssertIntEquals(tc, 1, use_skillpotion(u, itype, 1, NULL));

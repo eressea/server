@@ -3197,7 +3197,7 @@ static void skill_summoned(unit * u, int level)
  * Patzer:
  *   Erzeugt Monsteruntote
  */
-static int sp_summonundead(castorder * co)
+int sp_summonundead(castorder * co)
 {
     int undead, dc;
     unit *u;
