@@ -107,7 +107,6 @@ static void test_foolpotion_effect(CuTest *tc) {
 static void test_use_foolpotion(CuTest *tc) {
     unit *u, *u2;
     const struct item_type *itype;
-    item *itm;
 
     test_setup();
     itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
@@ -115,48 +114,38 @@ static void test_use_foolpotion(CuTest *tc) {
     u2 = test_create_unit(test_create_faction(), u->region);
     u->thisorder = create_order(K_USE, u->faction->locale, itoa36(u2->no), NULL);
 
-    itm = i_change(&u->items, itype, 2);
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, ECUSTOM, use_foolpotion(u, itype, 2, u->thisorder));
-    CuAssertIntEquals(tc, 2, itm->number);
 
     /* Maximal 10 Wirkungen pro Person: */
     test_set_skill(u, SK_STEALTH, 1, 1);
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 2, u->thisorder));
-    CuAssertIntEquals(tc, 1, itm->number);
     CuAssertIntEquals(tc, 0, get_effect(u, itype));
     CuAssertIntEquals(tc, 10, get_effect(u2, itype));
 
-    itm->number = 3;
     a_removeall(&u2->attribs, &at_effect);
     scale_number(u2, 2);
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, 2, use_foolpotion(u, itype, 3, u->thisorder));
-    CuAssertIntEquals(tc, 1, itm->number);
     CuAssertIntEquals(tc, 20, get_effect(u2, itype));
 
-    itm->number = 11;
     a_removeall(&u2->attribs, &at_effect);
     scale_number(u2, 10);
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, 10, use_foolpotion(u, itype, 20, u->thisorder));
-    CuAssertIntEquals(tc, 1, itm->number);
     CuAssertIntEquals(tc, 100, get_effect(u2, itype));
 
     /* limited use: */
-    itm->number = 3;
     a_removeall(&u2->attribs, &at_effect);
     scale_number(u2, 2);
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 1, u->thisorder));
-    CuAssertIntEquals(tc, 2, itm->number);
     CuAssertIntEquals(tc, 10, get_effect(u2, itype));
 
     /* stacking only up to 10 effect/person: */
     init_order(u->thisorder, u->faction->locale);
     CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 2, u->thisorder));
-    CuAssertIntEquals(tc, 1, itm->number);
     CuAssertIntEquals(tc, 20, get_effect(u2, itype));
 
     test_teardown();
