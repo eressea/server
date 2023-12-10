@@ -313,6 +313,7 @@ void test_use_astral(void)
 void test_setup_test(CuTest *tc, const char *file, int line) {
     test_log_stderr(LOG_CPERROR);
     test_reset_full();
+    config_set("hunger.damage", "0");
     message_handle_missing(MESSAGE_MISSING_REPLACE);
     if (tc) {
         log_debug("start test: %s", tc->name);

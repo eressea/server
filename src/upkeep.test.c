@@ -13,6 +13,12 @@
 
 #include <assert.h>
 
+static void setup_upkeep(void)
+{
+    test_setup();
+    config_set("hunger.damage", NULL);
+}
+
 void test_upkeep_default(CuTest * tc)
 {
     region *r;
@@ -20,7 +26,7 @@ void test_upkeep_default(CuTest * tc)
     faction *f1, *f2;
     const item_type *i_silver;
 
-    test_setup();
+    setup_upkeep();
     init_resources();
     i_silver = it_find("money");
     assert(i_silver);
@@ -49,7 +55,7 @@ void test_upkeep_hunger_damage(CuTest * tc)
     unit *u1;
     faction *f1;
 
-    test_setup();
+    setup_upkeep();
     init_resources();
 
     r = test_create_plain(0, 0);
@@ -72,7 +78,7 @@ void test_upkeep_from_pool(CuTest * tc)
     unit *u1, *u2;
     const item_type *i_silver;
 
-    test_setup();
+    setup_upkeep();
     init_resources();
 
     i_silver = it_find("money");
@@ -106,7 +112,7 @@ void test_upkeep_from_friend(CuTest * tc)
     faction *f1, *f2;
     const item_type *i_silver;
 
-    test_setup();
+    setup_upkeep();
     init_resources();
 
     i_silver = it_find("money");
@@ -139,7 +145,7 @@ void test_lifestyle(CuTest *tc)
     unit *u;
     race *rc;
 
-    test_setup();
+    setup_upkeep();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     CuAssertIntEquals(tc, 10, lifestyle(u));
     u->number = 2;
@@ -159,7 +165,7 @@ void test_upkeep_free(CuTest * tc)
     unit *u;
     const item_type *i_silver;
 
-    test_setup();
+    setup_upkeep();
     init_resources();
 
     i_silver = it_find("money");

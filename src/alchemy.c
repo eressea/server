@@ -309,3 +309,35 @@ void scale_effects(attrib* alist, int n, int size)
         data->value = (long long)data->value * n / size;
     }
 }
+
+int use_foolpotion(unit *user, const item_type *itype, int amount,
+    struct order *ord)
+{
+    int targetno = read_unitid(user->faction, user->region);
+    unit *u = findunit(targetno);
+    int max_effects;
+    if (u == NULL || user->region != u->region) {
+        ADDMSG(&user->faction->msgs, msg_feedback(user, ord, "feedback_unit_not_found",
+            ""));
+        return ECUSTOM;
+    }
+    if (effskill(user, SK_STEALTH, NULL) <= effskill(u, SK_PERCEPTION, NULL)) {
+        cmistake(user, ord, 64, MSG_EVENT);
+        return ECUSTOM;
+    }
+    max_effects = u->number * 10 - get_effect(u, itype);
+    if (max_effects > 0) {
+        int use = (max_effects + 9) / 10;
+        int effects = max_effects;
+        if (use > amount) {
+            use = amount;
+            effects = use * 10;
+        }
+        change_effect(u, itype, effects);
+        ADDMSG(&user->faction->msgs, msg_message("givedumb",
+            "unit recipient amount", user, u, use));
+        return use;
+    }
+    return 0;
+}
+

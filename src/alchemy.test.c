@@ -1,13 +1,20 @@
 #include "alchemy.h"
 
+#include "guard.h"
+#include "laws.h"
+
+#include <util/base36.h>
+#include <util/keyword.h>
+
+#include <kernel/attrib.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
+#include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 #include <kernel/skill.h>
-
-#include "guard.h"
+#include <kernel/skills.h>
 
 #include <CuTest.h>
 #include "tests.h"
@@ -80,7 +87,71 @@ static void test_herbsearch(CuTest * tc)
     test_teardown();
 }
 
-static void test_scale_effects(CuTest* tc) {
+static void test_foolpotion_effect(CuTest *tc) {
+    unit *u;
+    const struct item_type *itype;
+
+    test_setup();
+	itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
+	u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+	test_set_skill(u, SK_MAGIC, 3, 1);
+	test_set_skill(u, SK_CROSSBOW, 2, 1);
+    change_effect(u, itype, 2);
+	demographics();
+	CuAssertIntEquals(tc, 1, get_effect(u, itype));
+	CuAssertIntEquals(tc, 2, unit_skill(u, SK_MAGIC)->weeks);
+	CuAssertIntEquals(tc, 1, unit_skill(u, SK_CROSSBOW)->weeks);
+	test_teardown();
+}
+
+static void test_use_foolpotion(CuTest *tc) {
+    unit *u, *u2;
+    const struct item_type *itype;
+
+    test_setup();
+    itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), u->region);
+    u->thisorder = create_order(K_USE, u->faction->locale, itoa36(u2->no), NULL);
+
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, ECUSTOM, use_foolpotion(u, itype, 2, u->thisorder));
+
+    /* Maximal 10 Wirkungen pro Person: */
+    test_set_skill(u, SK_STEALTH, 1, 1);
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 2, u->thisorder));
+    CuAssertIntEquals(tc, 0, get_effect(u, itype));
+    CuAssertIntEquals(tc, 10, get_effect(u2, itype));
+
+    a_removeall(&u2->attribs, &at_effect);
+    scale_number(u2, 2);
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, 2, use_foolpotion(u, itype, 3, u->thisorder));
+    CuAssertIntEquals(tc, 20, get_effect(u2, itype));
+
+    a_removeall(&u2->attribs, &at_effect);
+    scale_number(u2, 10);
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, 10, use_foolpotion(u, itype, 20, u->thisorder));
+    CuAssertIntEquals(tc, 100, get_effect(u2, itype));
+
+    /* limited use: */
+    a_removeall(&u2->attribs, &at_effect);
+    scale_number(u2, 2);
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 1, u->thisorder));
+    CuAssertIntEquals(tc, 10, get_effect(u2, itype));
+
+    /* stacking only up to 10 effect/person: */
+    init_order(u->thisorder, u->faction->locale);
+    CuAssertIntEquals(tc, 1, use_foolpotion(u, itype, 2, u->thisorder));
+    CuAssertIntEquals(tc, 20, get_effect(u2, itype));
+
+    test_teardown();
+}
+
+static void test_scale_effects(CuTest *tc) {
     unit* u;
     const struct item_type* ptype;
 
@@ -119,5 +190,7 @@ CuSuite *get_alchemy_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_herbsearch);
     SUITE_ADD_TEST(suite, test_scale_effects);
+    SUITE_ADD_TEST(suite, test_foolpotion_effect);
+    SUITE_ADD_TEST(suite, test_use_foolpotion);
     return suite;
 }

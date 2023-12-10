@@ -175,6 +175,8 @@ static bool RemoveNMRNewbie(void)
 static void dumbeffect(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
+        int weeks = u->number;
+        if (weeks > effect) weeks = effect;
         ptrdiff_t s, n = arrlen(u->skills);
         skill *sb = NULL;
         for (s = 0; s != n; ++s) {
@@ -186,13 +188,11 @@ static void dumbeffect(unit *u) {
         }
         /* bestes Talent raussuchen */
         if (sb != NULL) {
-            int weeks = u->number;
-            if (weeks > effect) weeks = effect;
             reduce_skill(u, sb, weeks);
             ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                 "unit weeks skill", u, weeks, (skill_t)sb->id));
         }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
-        change_effect(u, oldpotiontype[P_FOOL], -effect);
+        change_effect(u, oldpotiontype[P_FOOL], -weeks);
     }
 }
 

@@ -1871,6 +1871,7 @@ static void test_demon_hunger(CuTest * tc)
     unit *u;
 
     test_setup();
+    config_set("hunger.damage", NULL);
     init_resources();
     r = test_create_plain(0, 0);
     rc = test_create_race("demon");
