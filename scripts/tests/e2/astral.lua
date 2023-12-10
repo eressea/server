@@ -110,7 +110,6 @@ function test_pull_astral()
     assert_equal(u1.region, u2.region)
 
     u1.aura = 12 -- 2 Aura pro Stufe
-    u1.name = 'Xykon'
     u1:clear_orders()
     u1:add_order("ZAUBERE Astraler~Ruf -1 0 " .. itoa36(u2.id))
     r = region.create(-1,0, 'plain')

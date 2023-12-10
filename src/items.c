@@ -255,28 +255,6 @@ struct order *ord)
     return 0;
 }
 
-static int use_foolpotion(unit *u, const item_type *itype, int amount,
-    struct order *ord)
-{
-    int targetno = read_unitid(u->faction, u->region);
-    unit *target = findunit(targetno);
-    if (target == NULL || u->region != target->region) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "feedback_unit_not_found",
-            ""));
-        return ECUSTOM;
-    }
-    if (effskill(u, SK_STEALTH, NULL) <= effskill(target, SK_PERCEPTION, NULL)) {
-        cmistake(u, ord, 64, MSG_EVENT);
-        return ECUSTOM;
-    }
-    ADDMSG(&u->faction->msgs, msg_message("givedumb",
-        "unit recipient amount", u, target, amount));
-
-    change_effect(target, itype, amount);
-    use_pooled(u, itype->rtype, GET_DEFAULT, amount);
-    return 0;
-}
-
 static int
 use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
 struct order *ord)

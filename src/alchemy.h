@@ -1,6 +1,4 @@
 #pragma once
-#ifndef H_KRNL_ALCHEMY_H
-#define H_KRNL_ALCHEMY_H
 
 #include <stdbool.h>
 
@@ -53,4 +51,6 @@ bool display_potions(struct unit* u);
 int effect_value(const struct attrib* a);
 const struct item_type *effect_type(const struct attrib* a);
 
-#endif                          /* ALCHEMY_H */
+int use_foolpotion(struct unit *user, const struct item_type *itype,
+    int amount, struct order *ord);
+
