@@ -1,33 +1,19 @@
 #!/bin/sh
 ROOT=$(git rev-parse --show-toplevel)
 BUILD=build
-if [ -z "$JOBS" ] ; then
-  JOBS=`nproc`
-fi
-DISTCC=`which distcc`
-if [ ! -z "$DISTCC" ] ; then
-JOBS=`distcc -j`
-if [ -z "$JOBS" ] ; then
-JOBS=1
-elif [ $JOBS -gt 1 ] ; then
-[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
-CC="$DISTCC $CC"
-MAKEOPTS=-j$JOBS
-fi
-fi
-echo "Building with $JOBS jobs"
+[ -z "$CC" ] && [ -n "$(which clang)" ] && CC="clang"
+[ -z "$CC" ] && [ -n "$(which gcc)" ] && CC="gcc"
+[ -z "$CC" ] && [ -n "$(which tcc)" ] && CC="tcc"
+[ -z "$CC" ] && [ -n "$(which cc)" ] && CC="cc"
 
-if [ ! -d $ROOT/$BUILD ]; then
+if [ ! -d "$ROOT/$BUILD" ]; then
   echo "cannot find build directory $BUILD in $ROOT. did you run cmake-init?"
   exit
 fi
 
 echo "build eressea"
 CMAKE_ARGS=".."
-cd $ROOT/$BUILD
+cd "$ROOT/$BUILD" || exit
 BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
 if [ "$BRANCH" = "master" ] ; then
 VERSION=$(git describe --match 'v*.*.*' --tags | sed 's/^v//')
@@ -39,5 +25,6 @@ CMAKE_ARGS="-DERESSEA_BUILDNO:STRING=$REV $CMAKE_ARGS"
 fi
 
 cmake ${CMAKE_ARGS}
-make $MAKEOPTS && ctest -LE ci-only
-cd $OLDPWD
+make "$@" && ctest -LE ci-only
+cd "$OLDPWD" || exit
+
