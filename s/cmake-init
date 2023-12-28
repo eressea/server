@@ -72,31 +72,8 @@ fi
 
 DEST=$(dirname $ROOT)/server
 
-LUA_INCLUDE=/usr/include
-LUA_DIR=/usr
-if [ -d /usr/local/include/lua ]; then
-   LUA_INCLUDE=/usr/local/include/lua
-elif [ -d /usr/include/lua5.4 ]; then
-   LUA_INCLUDE=/usr/include/lua5.4
-elif [ -d /usr/include/lua5.3 ]; then
-   LUA_INCLUDE=/usr/include/lua5.3
-elif [ -d /usr/include/lua5.2 ]; then
-   LUA_INCLUDE=/usr/include/lua5.2
-elif [ -d /usr/include/lua5.1 ]; then
-   LUA_INCLUDE=/usr/include/lua5.1
-elif [ -d /usr/local/include/lua5.1 ]; then
-   LUA_DIR=/usr/local
-   LUA_INCLUDE=/usr/local/include/lua5.1
-fi
-
-if [ ! -e ${LUA_INCLUDE}/lua.h ]; then
-  echo "no compatible version of lua is installed in $LUA_INCLUDE."
-  exit 1
-fi
-
 cat >| build/config.cmake <<HEREDOC
 SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
-SET (LUA_DIR "$LUA_DIR" CACHE PATH "Lua root path")
 SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
