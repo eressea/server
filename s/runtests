@@ -20,6 +20,5 @@ $RUN_TESTS -v1 ../scripts/run-tests.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e2.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e3.lua
 $RUN_TESTS --version
-rm -rf reports orders.txt score score.alliances datum turn
 
 cd $OLDWPD
