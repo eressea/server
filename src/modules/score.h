@@ -9,6 +9,8 @@ extern "C" {
     struct item_type;
     typedef long long score_t;
 
+    void update_scores(void);
+    void write_scores(void);
     void score(void);
     score_t average_score_of_age(int age);
     int default_score(const struct item_type *itype);
