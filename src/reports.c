@@ -1604,23 +1604,22 @@ int init_reports(void)
     return 0;
 }
 
-int reports(void)
+int reports(const char *filename)
 {
     faction *f;
-    FILE *mailit;
+    FILE *mailit = NULL;
     int retval = 0;
-    char path[PATH_MAX];
     char buffer[PASSWORD_MAXSIZE];
-    const char* rpath = reportpath();
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
     remove_empty_units();
 
-    path_join(rpath, "reports.txt", path, sizeof(path));
-    mailit = fopen(path, "w");
-    if (mailit == NULL) {
-        log_error("%s could not be opened!\n", path);
+    if (filename) {
+        mailit = fopen(filename, "w");
+        if (mailit == NULL) {
+            log_error("%s could not be opened!\n", filename);
+        }
     }
 
     for (f = factions; f; f = f->next) {

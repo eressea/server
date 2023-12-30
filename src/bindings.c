@@ -53,6 +53,7 @@
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/order_parser.h>        // for OP_Parser, OrderParserStruct
+#include <util/path.h>
 #include <util/rand.h>
 #include <util/rng.h>
 
@@ -381,8 +382,11 @@ static int tolua_write_report(lua_State * L)
 static int tolua_write_reports(lua_State * L)
 {
     int result;
+    char path[PATH_MAX];
+    const char *rpath = reportpath();
+
     init_reports();
-    result = reports();
+    result = reports(path_join(rpath, "reports.txt", path, sizeof(path)));
     lua_pushinteger(L, result);
     return 1;
 }

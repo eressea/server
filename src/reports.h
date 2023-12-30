@@ -48,7 +48,7 @@ extern "C" {
     void sparagraph(struct strlist **SP, const char *s, unsigned int indent, char mark);
     const char *hp_status(const struct unit *u);
 
-    int reports(void);
+    int reports(const char *filename);
     int write_reports(struct faction *f, int options, const char *password);
     int init_reports(void);
 
