@@ -316,7 +316,14 @@ static int tolua_create_curse(lua_State * L)
 static int tolua_update_scores(lua_State * L)
 {
     UNUSED_ARG(L);
-    score();
+    update_scores();
+    return 0;
+}
+
+static int tolua_write_scores(lua_State * L)
+{
+    UNUSED_ARG(L);
+    write_scores();
     return 0;
 }
 
@@ -994,6 +1001,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, "get_nmrs", tolua_get_nmrs);
         tolua_function(L, "remove_empty_units", tolua_remove_empty_units);
         tolua_function(L, "update_scores", tolua_update_scores);
+        tolua_function(L, "write_scores", tolua_write_scores);
         tolua_function(L, "update_owners", tolua_update_owners);
         tolua_function(L, "create_curse", tolua_create_curse);
         tolua_function(L, "translate", &tolua_translate);
