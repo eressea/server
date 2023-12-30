@@ -65,6 +65,7 @@
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#include <limits.h>
 
 #include <assert.h>
 #include <errno.h>
