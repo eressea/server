@@ -58,7 +58,8 @@ function test_ship_damage_catapult()
     local sh = ship.create(r, "caravel")
     local f1 = faction.create('human')
     local u1 = unit.create(f1, r, 20)
-    u1.hp = u1.hp * 100
+    local hp = u1.hp * 100
+    u1.hp = hp
     u1.ship = sh
     local f2 = faction.create('human')
     local u2 = unit.create(f2, r)
@@ -69,6 +70,7 @@ function test_ship_damage_catapult()
     u2:add_item('catapultammo', 10)
     assert_equal(0, sh.damage)
     process_orders()
+    assert_not_equal(hp, u1.hp) -- u1 should have taken damage
     assert_not_equal(0, sh.damage) -- intermittent!
 end
 
