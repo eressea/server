@@ -12,6 +12,7 @@
 #include <tests.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 static void setup_upkeep(void)
 {
