@@ -51,13 +51,11 @@ score_t average_score_of_age(int age)
     return sum / count;
 }
 
-void score(void)
+void update_scores(void)
 {
-    FILE *scoreFP;
     region *r;
     faction *fc;
     score_t allscores = 0;
-    char path[4096];
 
     for (fc = factions; fc; fc = fc->next)
         fc->score = 0;
@@ -101,7 +99,7 @@ void score(void)
             if (f == NULL) {
                 continue;
             }
-            else if (rc->recruitcost>0) {
+            else if (rc->recruitcost > 0) {
                 f->score += (rc->recruitcost * u->number) / 50;
             }
             f->score += get_money(u) / 50;
@@ -141,6 +139,12 @@ void score(void)
     if (allscores == 0) {
         allscores = 1;
     }
+}
+
+void write_scores(void)
+{
+    FILE *scoreFP;
+    char path[4096];
 
     path_join(basepath(), "score", path, sizeof(path));
     scoreFP = fopen(path, "w");
@@ -203,6 +207,12 @@ void score(void)
             fclose(scoreFP);
         }
     }
+}
+
+void score(void)
+{
+    update_scores();
+    write_scores();
 }
 
 int default_score(const item_type *itype) {
