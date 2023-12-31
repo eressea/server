@@ -18,7 +18,7 @@ function abort() {
 
 function usage() {
 cat <<USAGE
-Usage: $u [-hfn] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
+Usage: $1 [-hfn] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
   -h   print this message
   -f   force overwrite of existing game
   -g   game id
@@ -35,7 +35,7 @@ src=server
 edit=1
 while getopts :d:g:r:s:hfn o; do
   case "${o}" in
-  h) usage ; exit 0 ;;
+  h) usage $(basename $0); exit 0 ;;
   s) src=${OPTARG} ;;
   d) dir=${OPTARG} ;;
   f) force=1 ;;
