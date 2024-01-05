@@ -95,7 +95,7 @@ static int progress_weeks(unsigned int level, bool random_progress)
     return level;
 }
 
-void skill_set(skill *sv, unsigned int level, unsigned int weeks)
+static void skill_set(skill *sv, unsigned int level, unsigned int weeks)
 {
     assert(weeks <= MAX_WEEKS_TO_NEXT_LEVEL(level));
     sv->level = level;

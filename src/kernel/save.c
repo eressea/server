@@ -369,7 +369,7 @@ static void write_skills(gamedata *data, const unit *u) {
 #ifndef NDEBUG
         assert(SK_SKILL(sv) > sk);
         sk = SK_SKILL(sv);
-        assert(sv->weeks <= sv->level * 2 + 1);
+        assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 #endif
         WRITE_INT(data->store, sv->id);
         WRITE_INT(data->store, sv->level);

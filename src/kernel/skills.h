@@ -39,7 +39,6 @@ void increase_skill(struct unit * u, enum skill_t sk, unsigned int weeks);
 void reduce_skill(struct unit *u, skill * sv, unsigned int weeks);
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
 void sk_set_level(skill * sv, unsigned int level);
-void skill_set(skill *sv, unsigned int level, unsigned int weeks);
 int skill_compare(const skill* sk, const skill* sc);
 
 #define SK_SKILL(sv) ((skill_t) (sv->id))

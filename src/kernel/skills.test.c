@@ -21,11 +21,6 @@ static void test_skill_set(CuTest *tc)
     CuAssertIntEquals(tc, 1, value.old);
     CuAssertIntEquals(tc, 2, value.level);
     CuAssertIntEquals(tc, 3, value.weeks);
-
-    skill_set(&value, 3, 6);
-    CuAssertIntEquals(tc, 1, value.old);
-    CuAssertIntEquals(tc, 3, value.level);
-    CuAssertIntEquals(tc, 6, value.weeks);
 }
 
 static void test_skill_change(CuTest *tc)
