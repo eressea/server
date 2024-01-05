@@ -555,8 +555,7 @@ int study_cmd(unit * u, order * ord)
     studycost = study_cost(u, sk);
 
     if (studycost > 0 && !ExpensiveMigrants() && is_migrant(u)) {
-        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn",
-            ""));
+        ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "error_migrants_nolearn", NULL));
         return -1;
     }
 
@@ -707,11 +706,8 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
         // int steps = days * SKILL_STEPS_PER_WEEK / STUDYDAYS;
         // increase_skill_steps(u, sk, steps);
         int leveldays = STUDYDAYS * u->number;
-        int weeks = 0;
-        while (days >= leveldays) {
-            ++weeks;
-            days -= leveldays;
-        }
+        int weeks = days / leveldays;
+        days -= weeks * leveldays;
         if (days > 0 && rng_int() % leveldays >= leveldays - days) {
             ++weeks;
         }

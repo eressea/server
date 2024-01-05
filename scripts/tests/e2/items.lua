@@ -423,7 +423,6 @@ function test_use_foolpotion()
     assert_equal(1, f:count_msg_type('error64'))
 
     u:set_skill("stealth", 1)
-    u2.name = 'Xolgrim'
     u2:set_skill('crossbow', 1)
     turn_process()
     assert_equal(2, u:get_item('p7'))
