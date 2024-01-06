@@ -31,17 +31,17 @@ static void test_skill_change(CuTest *tc)
     test_setup();
     config_set_int("study.random_progress", 0);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    increase_skill(u, SK_CROSSBOW, 1);
+    increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
     sv = unit_skill(u, SK_CROSSBOW);
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 2, sv->weeks);
-    increase_skill(u, SK_CROSSBOW, 1);
+    increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
     CuAssertIntEquals(tc, 1, sv->level);
     CuAssertIntEquals(tc, 1, sv->weeks);
-    increase_skill(u, SK_CROSSBOW, 1);
+    increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 3, sv->weeks);
-    increase_skill(u, SK_CROSSBOW, 4);
+    increase_skill(u, SK_CROSSBOW, 4 * SKILL_DAYS_PER_WEEK);
     CuAssertIntEquals(tc, 3, sv->level);
     CuAssertIntEquals(tc, 3, sv->weeks);
 

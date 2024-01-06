@@ -109,7 +109,7 @@ void sk_set_level(skill *sv, unsigned int level)
     skill_set(sv, level, weeks);
 }
 
-void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
+static void increase_skill_weeks(unit *u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
     if (!sv) {
@@ -121,6 +121,21 @@ void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
     }
     sv->weeks -= weeks;
     assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
+}
+
+void increase_skill(unit *u, skill_t sk, unsigned int days)
+{
+    // int steps = days * SKILL_STEPS_PER_WEEK / STUDYDAYS;
+    // increase_skill_steps(u, sk, steps);
+    unsigned int leveldays = SKILL_DAYS_PER_WEEK * (unsigned)u->number;
+    unsigned int weeks = days / leveldays;
+    days -= weeks * leveldays;
+    if (days > 0 && rng_int() % leveldays >= leveldays - days) {
+        ++weeks;
+    }
+    if (weeks > 0) {
+        increase_skill_weeks(u, sk, weeks);
+    }
 }
 
 void reduce_skill(unit * u, skill * sv, unsigned int weeks)

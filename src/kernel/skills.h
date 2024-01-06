@@ -4,11 +4,13 @@
 #include "skill.h"
 
 #define MAX_WEEKS_TO_NEXT_LEVEL(level) ((level) * 2 + 1)
-
+#define SKILL_DAYS_PER_WEEK 30
 typedef struct skill {
     unsigned int id : 5;
+	// max level 127
     unsigned int level : 7;
     unsigned int old : 7;
+	// max 8191 days = 273 weeks = level 135
     unsigned int weeks : 13;
 } skill;
 
@@ -35,7 +37,7 @@ int skillmod(const struct unit *u, const struct region *r,
 struct attrib *make_skillmod(enum skill_t sk, skillmod_fun special,
         double multiplier, int bonus);
 
-void increase_skill(struct unit * u, enum skill_t sk, unsigned int weeks);
+void increase_skill(struct unit * u, enum skill_t sk, unsigned int days);
 void reduce_skill(struct unit *u, skill * sv, unsigned int weeks);
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
 void sk_set_level(skill * sv, unsigned int level);

@@ -525,10 +525,6 @@ int study_cmd(unit * u, order * ord)
     static const race *rc_snotling;
     static int rc_cache;
 
-    if (rc_changed(&rc_cache)) {
-        rc_snotling = get_race(RC_SNOTLING);
-    }
-
     (void)init_order(ord, u->faction->locale);
     sk = getskill(u->faction->locale);
 
@@ -536,8 +532,12 @@ int study_cmd(unit * u, order * ord)
         return -1;
     }
 
+    if (rc_changed(&rc_cache)) {
+        rc_snotling = get_race(RC_SNOTLING);
+    }
+
     /* snotlings koennen Talente nur bis T8 lernen */
-    if (u_race(u) == rc_snotling) {
+    if (rc_snotling && u_race(u) == rc_snotling) {
         if (get_level(u, sk) >= 8) {
             cmistake(u, ord, 308, MSG_EVENT);
             return -1;
@@ -697,23 +697,13 @@ void inject_learn(learn_fun fun) {
     inject_learn_fun = fun;
 }
 
-static void increase_skill_days(unit *u, skill_t sk, int days) {
+static void study_skill_days(unit *u, skill_t sk, int days) {
     assert(sk >= 0 && sk < MAXSKILLS && days >= 0);
     if (inject_learn_fun) {
         inject_learn_fun(u, sk, days);
     }
     if (days > 0) {
-        // int steps = days * SKILL_STEPS_PER_WEEK / STUDYDAYS;
-        // increase_skill_steps(u, sk, steps);
-        int leveldays = STUDYDAYS * u->number;
-        int weeks = days / leveldays;
-        days -= weeks * leveldays;
-        if (days > 0 && rng_int() % leveldays >= leveldays - days) {
-            ++weeks;
-        }
-        if (weeks > 0) {
-            increase_skill(u, sk, weeks);
-        }
+        increase_skill(u, sk, days);
     }
 }
 
@@ -723,7 +713,7 @@ void produceexp(struct unit *u, enum skill_t sk)
     if (u->number > 0) {
         const struct race *rc = u_race(u);
         if ((rc->flags & RCF_NOLEARN) == 0 && rc_can_learn(rc, sk)) {
-            increase_skill_days(u, sk, produceexp_days() * u->number);
+            study_skill_days(u, sk, produceexp_days() * u->number);
         }
     }
 }
@@ -812,7 +802,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    increase_skill_days(u, sk, days);
+    study_skill_days(u, sk, days);
     return cost;
 }
 
@@ -821,7 +811,7 @@ void change_skill_days(unit *u, enum skill_t sk, int days) {
         reduce_skill_days(u, sk, -days);
     }
     else {
-        increase_skill_days(u, sk, days);
+        study_skill_days(u, sk, days);
     }
 }
 

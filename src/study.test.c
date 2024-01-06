@@ -479,7 +479,7 @@ static void test_study_cmd(CuTest *tc) {
     setup_study();
     init_resources();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    u->thisorder = create_order(K_STUDY, u->faction->locale, "CROSSBOW");
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_CROSSBOW]);
     learn_inject();
     study_cmd(u, u->thisorder);
     sv = unit_skill(u, SK_CROSSBOW);
