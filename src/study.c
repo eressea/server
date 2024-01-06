@@ -135,8 +135,6 @@ int study_cost(struct unit *u, enum skill_t sk)
     return skill_cost(sk);
 }
 
-/* ------------------------------------------------------------- */
-
 static void init_learning(variant *var)
 {
     var->v = calloc(1, sizeof(teaching_info));
@@ -722,17 +720,7 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
     if (days > 0) {
         skill *sv = unit_skill(u, sk);
         if (sv) {
-            while (days > 0) {
-                if (days >= STUDYDAYS * u->number) {
-                    reduce_skill(u, sv, 1);
-                    days -= STUDYDAYS;
-                }
-                else {
-                    if (chance(days / ((double)STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
-                        reduce_skill(u, sv, 1);
-                    days = 0;
-                }
-            }
+            reduce_skill(u, sv, days);
         }
     }
 }
@@ -852,7 +840,7 @@ void demon_skillchange(unit *u)
         if (sv->level > 0 && roll < upchance + downchance) {
             int weeks = 1 + rng_int() % 3;
             if (roll < downchance) {
-                reduce_skill(u, sv, weeks);
+                reduce_skill_weeks(u, sv, weeks);
                 if (sv->level < 1) {
                     /* demons should never forget below 1 */
                     set_level(u, sv->id, 1);

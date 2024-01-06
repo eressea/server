@@ -32,6 +32,7 @@ enum magic_t getmagicskill(const struct locale *lang);
 enum skill_t getskill(const struct locale *lang);
 bool is_migrant(struct unit *u);
 int study_cost(struct unit *u, enum skill_t sk);
+
 bool check_student(const struct unit *u, struct order *ord,
         enum skill_t sk);
 

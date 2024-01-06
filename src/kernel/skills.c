@@ -138,7 +138,7 @@ void increase_skill(unit *u, skill_t sk, unsigned int days)
     }
 }
 
-void reduce_skill(unit * u, skill * sv, unsigned int weeks)
+void reduce_skill_weeks(unit * u, skill * sv, unsigned int weeks)
 {
     unsigned int max_weeks = MAX_WEEKS_TO_NEXT_LEVEL(sv->level);
 
@@ -152,6 +152,19 @@ void reduce_skill(unit * u, skill * sv, unsigned int weeks)
         /* reroll */
         sk_set_level(sv, sv->level + 1);
     }
+    assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
+}
+
+void reduce_skill(unit * u, skill * sv, unsigned int days)
+{
+    unsigned int leveldays = SKILL_DAYS_PER_WEEK * (unsigned)u->number;
+    unsigned int weeks = days / leveldays;
+    days -= weeks * leveldays;
+
+    if (days > 0 && rng_int() % leveldays >= leveldays - days) {
+        ++weeks;
+    }
+    reduce_skill_weeks(u, sv, weeks);
     assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 }
 
@@ -212,3 +225,10 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     }
     return result->level;
 }
+
+int skill_weeks(unit *u, skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->weeks : 1;
+}
+

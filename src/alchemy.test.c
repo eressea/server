@@ -2,9 +2,11 @@
 
 #include "guard.h"
 #include "laws.h"
+#include "study.h"
 
 #include <util/base36.h>
 #include <util/keyword.h>
+#include "util/rand.h"
 
 #include <kernel/attrib.h>
 #include <kernel/faction.h>
@@ -87,20 +89,39 @@ static void test_herbsearch(CuTest * tc)
     test_teardown();
 }
 
-static void test_foolpotion_effect(CuTest *tc) {
+static void test_foolpotion_effect_high(CuTest *tc) {
     unit *u;
     const struct item_type *itype;
 
     test_setup();
 	itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
 	u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-	test_set_skill(u, SK_MAGIC, 3, 1);
+	test_set_skill(u, SK_MELEE, 3, 1);
 	test_set_skill(u, SK_CROSSBOW, 2, 1);
     change_effect(u, itype, 2);
 	demographics();
 	CuAssertIntEquals(tc, 1, get_effect(u, itype));
-	CuAssertIntEquals(tc, 2, unit_skill(u, SK_MAGIC)->weeks);
-	CuAssertIntEquals(tc, 1, unit_skill(u, SK_CROSSBOW)->weeks);
+    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_MELEE));
+    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+	test_teardown();
+}
+
+static void test_foolpotion_effect_low(CuTest *tc) {
+    unit *u;
+    const struct item_type *itype;
+
+    test_setup();
+	itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
+	u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    scale_number(u, 2);
+	test_set_skill(u, SK_MELEE, 3, 1);
+	test_set_skill(u, SK_CROSSBOW, 2, 1);
+    change_effect(u, itype, 1);
+    random_source_inject_constants(0.f, 0);
+    demographics();
+	CuAssertIntEquals(tc, 0, get_effect(u, itype));
+	CuAssertIntEquals(tc, 1, skill_weeks(u, SK_MELEE));
+	CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
 	test_teardown();
 }
 
@@ -190,7 +211,8 @@ CuSuite *get_alchemy_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_herbsearch);
     SUITE_ADD_TEST(suite, test_scale_effects);
-    SUITE_ADD_TEST(suite, test_foolpotion_effect);
+    SUITE_ADD_TEST(suite, test_foolpotion_effect_high);
+    SUITE_ADD_TEST(suite, test_foolpotion_effect_low);
     SUITE_ADD_TEST(suite, test_use_foolpotion);
     return suite;
 }

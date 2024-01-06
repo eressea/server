@@ -45,22 +45,38 @@ static void test_skill_change(CuTest *tc)
     CuAssertIntEquals(tc, 3, sv->level);
     CuAssertIntEquals(tc, 3, sv->weeks);
 
-    reduce_skill(u, sv, 1);
+    reduce_skill_weeks(u, sv, 1);
     CuAssertIntEquals(tc, 3, sv->level);
     CuAssertIntEquals(tc, 4, sv->weeks);
-    reduce_skill(u, sv, 1);
+    reduce_skill_weeks(u, sv, 1);
     CuAssertIntEquals(tc, 3, sv->level);
     CuAssertIntEquals(tc, 5, sv->weeks);
-    reduce_skill(u, sv, 2);
+    reduce_skill_weeks(u, sv, 2);
     CuAssertIntEquals(tc, 3, sv->level);
     CuAssertIntEquals(tc, 7, sv->weeks);
-    reduce_skill(u, sv, 1);
+    reduce_skill_weeks(u, sv, 1);
     CuAssertIntEquals(tc, 2, sv->level);
     CuAssertIntEquals(tc, 5, sv->weeks);
     sv->level = 10;
-    reduce_skill(u, sv, 25);
+    reduce_skill_weeks(u, sv, 25);
     CuAssertIntEquals(tc, 8, sv->level);
     CuAssertIntEquals(tc, 11, sv->weeks);
+}
+
+static void test_skill_weeks(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
+
+    test_teardown();
 }
 
 static void test_set_level(CuTest * tc)
@@ -151,6 +167,7 @@ CuSuite *get_skills_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_skill_set);
     SUITE_ADD_TEST(suite, test_skill_change);
+    SUITE_ADD_TEST(suite, test_skill_weeks);
     SUITE_ADD_TEST(suite, test_set_level);
     SUITE_ADD_TEST(suite, test_skills_merge);
     return suite;

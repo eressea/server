@@ -492,7 +492,8 @@ static void test_study_cmd(CuTest *tc) {
     test_teardown();
 }
 
-static void test_study_magic(CuTest *tc) {
+static void test_study_magic(CuTest *tc)
+{
     unit *u;
     faction *f;
     const struct locale *lang;
