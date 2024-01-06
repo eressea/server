@@ -1064,6 +1064,54 @@ static void test_getunit(CuTest* tc) {
     test_teardown();
 }
 
+static void test_unit_level(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, 0, unit_level(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, 1, unit_level(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
+
+    test_teardown();
+}
+
+static void test_unit_weeks(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, 2, unit_weeks(u, SK_CROSSBOW));
+
+    test_teardown();
+}
+
+static void test_unit_days(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, unit_days(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, unit_days(u, SK_CROSSBOW));
+    test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2, unit_days(u, SK_CROSSBOW));
+
+    test_teardown();
+}
+
 CuSuite *get_unit_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1105,5 +1153,8 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_maintenance_cost);
     SUITE_ADD_TEST(suite, test_max_heroes);
     SUITE_ADD_TEST(suite, test_getunit);
+    SUITE_ADD_TEST(suite, test_unit_level);
+    SUITE_ADD_TEST(suite, test_unit_weeks);
+    SUITE_ADD_TEST(suite, test_unit_days);
     return suite;
 }

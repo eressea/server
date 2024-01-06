@@ -126,10 +126,14 @@ void usetprivate(struct unit* u, const char* c);
 struct unit* findnewunit(const struct region* r, const struct faction* f,
     int alias);
 
-const char* u_description(const unit* u, const struct locale* lang);
+const char* u_description(const struct unit* u, const struct locale* lang);
 struct skill* add_skill(struct unit* u, enum skill_t id);
 void remove_skill(struct unit* u, enum skill_t sk);
-struct skill* unit_skill(const struct unit* u, enum skill_t id);
+struct skill *unit_skill(const struct unit *u, enum skill_t id);
+unsigned int unit_level(const struct unit *u, enum skill_t sk);
+unsigned int unit_days(const struct unit *u, enum skill_t sk);
+/** number of times the unit must STUDY to reach the next level: */
+unsigned int unit_weeks(const struct unit *u, enum skill_t sk);
 bool has_skill(const unit* u, enum skill_t sk);
 int effskill(const struct unit* u, enum skill_t sk, const struct region* r);
 

@@ -545,18 +545,12 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
     return id;
 }
 
+/* TODO: merge with unit_level, no need to have both */
 unsigned int get_level(const unit * u, enum skill_t id)
 {
     assert(id != NOSKILL);
     if (skill_enabled(id)) {
-        size_t s, len;
-        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
-            skill* sv = u->skills + s;
-            if (sv->id == id) {
-                return sv->level;
-            }
-            ++sv;
-        }
+        return unit_level(u, id);
     }
     return 0;
 }
@@ -995,6 +989,24 @@ skill *unit_skill(const unit * u, enum skill_t sk)
         }
     }
     return NULL;
+}
+
+unsigned int unit_level(const unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->level : 0;
+}
+
+unsigned int unit_weeks(const unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->weeks : 1;
+}
+
+unsigned int unit_days(const unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return (sv ? sv->weeks : 1) * SKILL_DAYS_PER_WEEK;
 }
 
 bool has_skill(const unit * u, enum skill_t sk)

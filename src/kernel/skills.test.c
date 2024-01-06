@@ -33,48 +33,83 @@ static void test_skill_change(CuTest *tc)
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
     sv = unit_skill(u, SK_CROSSBOW);
-    CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 1, skill_level(sv));
+    CuAssertIntEquals(tc, 2, skill_weeks(sv));
     increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
-    CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1, skill_level(sv));
+    CuAssertIntEquals(tc, 1, skill_weeks(sv));
     increase_skill(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
-    CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 3, sv->weeks);
+    CuAssertIntEquals(tc, 2, skill_level(sv));
+    CuAssertIntEquals(tc, 3, skill_weeks(sv));
     increase_skill(u, SK_CROSSBOW, 4 * SKILL_DAYS_PER_WEEK);
-    CuAssertIntEquals(tc, 3, sv->level);
-    CuAssertIntEquals(tc, 3, sv->weeks);
+    CuAssertIntEquals(tc, 3, skill_level(sv));
+    CuAssertIntEquals(tc, 3, skill_weeks(sv));
 
     reduce_skill_weeks(u, sv, 1);
-    CuAssertIntEquals(tc, 3, sv->level);
-    CuAssertIntEquals(tc, 4, sv->weeks);
+    CuAssertIntEquals(tc, 3, skill_level(sv));
+    CuAssertIntEquals(tc, 4, skill_weeks(sv));
     reduce_skill_weeks(u, sv, 1);
-    CuAssertIntEquals(tc, 3, sv->level);
-    CuAssertIntEquals(tc, 5, sv->weeks);
+    CuAssertIntEquals(tc, 3, skill_level(sv));
+    CuAssertIntEquals(tc, 5, skill_weeks(sv));
     reduce_skill_weeks(u, sv, 2);
-    CuAssertIntEquals(tc, 3, sv->level);
-    CuAssertIntEquals(tc, 7, sv->weeks);
+    CuAssertIntEquals(tc, 3, skill_level(sv));
+    CuAssertIntEquals(tc, 7, skill_weeks(sv));
     reduce_skill_weeks(u, sv, 1);
-    CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 5, sv->weeks);
+    CuAssertIntEquals(tc, 2, skill_level(sv));
+    CuAssertIntEquals(tc, 5, skill_weeks(sv));
     sv->level = 10;
     reduce_skill_weeks(u, sv, 25);
-    CuAssertIntEquals(tc, 8, sv->level);
-    CuAssertIntEquals(tc, 11, sv->weeks);
+    CuAssertIntEquals(tc, 8, skill_level(sv));
+    CuAssertIntEquals(tc, 11, skill_weeks(sv));
+}
+
+static void test_skill_level(CuTest *tc)
+{
+    unit *u;
+    skill * sv;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, 0, skill_level(NULL));
+    sv = test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, 1, skill_level(sv));
+    sv = test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, 2, skill_level(sv));
+
+    test_teardown();
 }
 
 static void test_skill_weeks(CuTest *tc)
 {
     unit *u;
+    skill * sv;
 
     test_setup();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
-    test_set_skill(u, SK_CROSSBOW, 1, 1);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
-    test_set_skill(u, SK_CROSSBOW, 2, 2);
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, skill_weeks(NULL));
+    sv = test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, 1, skill_weeks(sv));
+    sv = test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, 2, skill_weeks(sv));
+
+    test_teardown();
+}
+
+static void test_skill_days(CuTest *tc)
+{
+    unit *u;
+    skill * sv;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, skill_days(NULL));
+    sv = test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, skill_days(sv));
+    sv = test_set_skill(u, SK_CROSSBOW, 2, 2);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2, skill_days(sv));
 
     test_teardown();
 }
@@ -92,8 +127,8 @@ static void test_set_level(CuTest * tc)
     CuAssertPtrNotNull(tc, u->skills);
     CuAssertIntEquals(tc, 1, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_CROSSBOW, u->skills->id);
-    CuAssertIntEquals(tc, 1, u->skills->level);
-    CuAssertIntEquals(tc, 2, u->skills->weeks);
+    CuAssertIntEquals(tc, 1, skill_level(u->skills));
+    CuAssertIntEquals(tc, 2, skill_weeks(u->skills));
     CuAssertIntEquals(tc, 1, get_level(u, SK_CROSSBOW));
     set_level(u, SK_CROSSBOW, 0);
     CuAssertPtrEquals(tc, NULL, u->skills);
@@ -167,7 +202,9 @@ CuSuite *get_skills_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_skill_set);
     SUITE_ADD_TEST(suite, test_skill_change);
+    SUITE_ADD_TEST(suite, test_skill_level);
     SUITE_ADD_TEST(suite, test_skill_weeks);
+    SUITE_ADD_TEST(suite, test_skill_days);
     SUITE_ADD_TEST(suite, test_set_level);
     SUITE_ADD_TEST(suite, test_skills_merge);
     return suite;

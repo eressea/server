@@ -455,8 +455,8 @@ static void test_demon_skillchange(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     test_set_skill(u, SK_CROSSBOW, 2, 1);
     test_set_skill(u, SK_MELEE, 2, 1);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
-    CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
 
     // make all changes add or subtract only one week:
     config_set_int("skillchange.demon.max", 1);
@@ -465,8 +465,8 @@ static void test_demon_skillchange(CuTest *tc) {
     config_set_int("skillchange.demon.down", 0);
     config_set_int("skillchange.demon.up", 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
-    CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
 
     /* 10 % chance of rise / fall */
     config_set_int("skillchange.demon.down", 10);
@@ -474,18 +474,18 @@ static void test_demon_skillchange(CuTest *tc) {
     // roll a loss:
     random_source_inject_constants(0.f, 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_MELEE));
+    CuAssertIntEquals(tc, 2, unit_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_weeks(u, SK_MELEE));
     // roll a gain:
     random_source_inject_constants(0.f, 10);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
     // roll no change:
     random_source_inject_constants(0.f, 20);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
     // sanity check:
-    CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
 
     test_teardown();
 }
@@ -500,8 +500,8 @@ static void test_demon_skillchange_hungry(CuTest *tc) {
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     fset(u, UFL_HUNGER);
     test_set_skill(u, SK_CROSSBOW, 2, 1);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
-    CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
 
     // make all changes add or subtract only one week:
     config_set_int("skillchange.demon.max", 1);
@@ -515,17 +515,17 @@ static void test_demon_skillchange_hungry(CuTest *tc) {
     // roll a normal loss:
     random_source_inject_constants(0.f, 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_weeks(u, SK_CROSSBOW));
     // this should be a success, is also still a loss:
     random_source_inject_constants(0.f, 10);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 3, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 3, unit_weeks(u, SK_CROSSBOW));
     // no positive change:
     random_source_inject_constants(0.f, 20);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 3, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 3, unit_weeks(u, SK_CROSSBOW));
     // sanity check:
-    CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_level(u, SK_CROSSBOW));
 
     test_teardown();
 }

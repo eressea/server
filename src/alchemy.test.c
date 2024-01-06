@@ -101,8 +101,8 @@ static void test_foolpotion_effect_high(CuTest *tc) {
     change_effect(u, itype, 2);
 	demographics();
 	CuAssertIntEquals(tc, 1, get_effect(u, itype));
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_MELEE));
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2, unit_weeks(u, SK_MELEE));
+    CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
 	test_teardown();
 }
 
@@ -120,8 +120,8 @@ static void test_foolpotion_effect_low(CuTest *tc) {
     random_source_inject_constants(0.f, 0);
     demographics();
 	CuAssertIntEquals(tc, 0, get_effect(u, itype));
-	CuAssertIntEquals(tc, 1, skill_weeks(u, SK_MELEE));
-	CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+	CuAssertIntEquals(tc, 1, unit_weeks(u, SK_MELEE));
+	CuAssertIntEquals(tc, 1, unit_weeks(u, SK_CROSSBOW));
 	test_teardown();
 }
 
