@@ -811,15 +811,16 @@ void demon_skillchange(unit *u)
     int upchance = 15, downchance = 10;
     static int config;
     static bool rule_hunger;
-    static int cfgup, cfgdown;
+    static int cfgup, cfgdown, max_change;
     size_t s, len;
 
     if (config_changed(&config)) {
         rule_hunger = config_get_int("hunger.demon.skills", 0) != 0;
         cfgup = config_get_int("skillchange.demon.up", 15);
         cfgdown = config_get_int("skillchange.demon.down", 10);
+        max_change = config_get_int("skillchange.demon.max", 3);
     }
-    if (cfgup == 0) {
+    if (max_change <= 0 || (cfgup + cfgdown <= 0)) {
         /* feature is disabled */
         return;
     }
@@ -838,7 +839,11 @@ void demon_skillchange(unit *u)
         skill* sv = u->skills + s;
         int roll = rng_int() % 100;
         if (sv->level > 0 && roll < upchance + downchance) {
-            int weeks = 1 + rng_int() % 3;
+            int weeks = 1;
+            if (max_change > 1) {
+                weeks += rng_int() % max_change;
+            }
+
             if (roll < downchance) {
                 reduce_skill_weeks(u, sv, weeks);
                 if (sv->level < 1) {

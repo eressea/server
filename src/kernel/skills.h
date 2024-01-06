@@ -44,6 +44,8 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
 void sk_set_level(skill * sv, unsigned int level);
 int skill_compare(const skill* sk, const skill* sc);
 
+int skill_level(struct unit *u, enum skill_t sk);
+int skill_days(struct unit *u, enum skill_t sk);
 /** number of times the unit must STUDY to reach the next level: */
 int skill_weeks(struct unit *u, enum skill_t sk);
 
