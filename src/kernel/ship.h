@@ -51,7 +51,7 @@ typedef struct ship_type {
 #define SF_FISHING (1<<4)         /* was on an ocean, can fish */
 #define SF_FLYING  (1<<5)         /* the ship can fly */
 
-#define SFL_SAVEMASK (SF_FLYING)
+#define SFL_SAVEMASK 0
 #define INCOME_FISHING 10
 
 typedef struct ship {

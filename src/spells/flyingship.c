@@ -103,27 +103,13 @@ static int flyingship_read(gamedata * data, curse * c, void *target)
 {
     ship *sh = (ship *)target;
     c->data.v = sh;
-    if (data->version < FOSS_VERSION) {
-        sh->flags |= SF_FLYING;
-        return 0;
-    }
-    assert(sh->flags & SF_FLYING);
-    return 0;
-}
-
-static int flyingship_age(curse * c)
-{
-    ship *sh = (ship *)c->data.v;
-    if (sh && c->duration == 1) {
-        sh->flags &= ~SF_FLYING;
-        return 1;
-    }
+    sh->flags |= SF_FLYING;
     return 0;
 }
 
 const struct curse_type ct_flyingship = { "flyingship",
 CURSETYP_NORM, 0, NO_MERGE, cinfo_ship, NULL, flyingship_read,
-NULL, NULL, flyingship_age
+NULL, NULL, NULL
 };
 
 void register_flyingship(void)

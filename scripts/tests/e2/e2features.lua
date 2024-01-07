@@ -253,8 +253,9 @@ function test_levitate()
   u:add_order("ARBEITE")
   levitate_ship(u.ship, u, 2, 1)
   assert_equal(32, u.ship.flags)
+  assert_not_nil(u.ship:get_curse('flyingship'))
   process_orders()
-  assert_equal(0, u.ship.flags)
+  assert_nil(u.ship:get_curse('flyingship'))
 end
 
 function test_levitation_ring()
