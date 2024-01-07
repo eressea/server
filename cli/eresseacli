@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function usage() {
+cat <<USAGE
+Usage: $1 [-h] [-p PREFIX] [-g GAMEDIR] <command> [options]
+  -h   print this message
+  -p   installation directory prefix (e.g. /usr/local)
+  -g   game directory
+USAGE
+}
+
+function pathname() {
+    file="$1"
+    dir="$2"
+    if [ ! -z "$dir" ] ; then
+        file="$dir/$file"
+    fi
+    echo "$file"
+}
+
+while getopts :p:g:h opt; do
+  case "${opt}" in
+  h) usage $(basename $0); exit 0 ;;
+  p) prefix=${OPTARG} ;;
+  g) gamedir=${OPTARG} ;;
+  *) echo "not implemented ${opt} ${OPTARG}" ;;
+  esac
+done
+
+if [ ! -z "$gamedir" ] ; then
+  ERESSEA="$gamedir"
+elif [ -z "$ERESSEA" ] ; then
+  ERESSEA="$PWD"
+fi
+
+if [ ! -z "$prefix" ] ; then
+  PREFIX="$prefix"
+elif [ ! -z "$ERESSEAPATH" ] ; then
+  PREFIX="$ERESSEAPATH"
+fi
+
+if [ ! -z "$ERESSEA" ] ; then
+  ERESSEA=$(realpath "$ERESSEA")
+fi
+
+if [ ! -z "$PREFIX" ] ; then
+  PREFIX=$(realpath "$PREFIX")
+fi
+
+LIBEXEC="$PREFIX/libexec"
+
+shift $((OPTIND-1))
+
+if [ ! -z "$1" ] ; then
+    command="$1"
+    shift
+    script=$(pathname "eressea-$command" "$LIBEXEC")
+    if [ -x "$script" ] ; then
+        export PREFIX
+        export ERESSEA
+        "$script" "$@"
+    else
+        echo "No such command $script"
+    fi
+fi

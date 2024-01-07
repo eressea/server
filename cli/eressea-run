@@ -1,0 +1,22 @@
+#!/bin/bash
+
+function usage() {
+cat <<USAGE
+Usage: $1 [-t TURN]
+  -h        print this message
+  -t TURN   run turn #
+USAGE
+}
+
+while getopts :r:i:h o; do
+  case "${o}" in
+  h) usage $(basename $0); exit 0 ;;
+  t) turn=${OPTARG} ;;
+  *) echo "not implemented ${o} ${OPTARG}" ;;
+  esac
+done
+shift $((OPTIND-1))
+
+
+echo "ERESSEA=$ERESSEA"
+echo "PREFIX=$PREFIX"

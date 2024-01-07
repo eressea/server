@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function usage() {
+cat <<USAGE
+Usage: $1 [-r RULES] [-i ID] [DIRECTORY]
+  -h        print this message
+  -i ID     game id
+  -r RULES  ruleset
+USAGE
+}
+
+id=1
+rules=e2
+while getopts :r:i:h o; do
+  case "${o}" in
+  h) usage $(basename $0); exit 0 ;;
+  i) id=${OPTARG} ;;
+  r) rules=${OPTARG} ;;
+  *) echo "not implemented ${o} ${OPTARG}" ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ ! -z "$1" ] ; then
+  ERESSEA="$ERESSEA/$1"
+fi
+
+echo "ERESSEA=$ERESSEA"
+echo "PREFIX=$PREFIX"
+
+mkdir -p "$ERESSEA"
+cd "$ERESSEA" || exit 1
+
+cat > eressea.ini <<INIFILE
+[game]
+locales = de,en
+id = $id
+start = 1
+[lua]
+install = $PREFIX
+rules = $rules
+INIFILE
+
+mkdir data
+mkdir reports
+echo 0 > turn
+touch newfactions
+ln -sf $PREFIX/share/eressea/scripts/run-turn.lua
+ln -sf $PREFIX/share/eressea/scripts/reports.lua
+ln -sf $PREFIX/share/eressea/scripts/config.lua

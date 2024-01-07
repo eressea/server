@@ -1,0 +1,27 @@
+#!/bin/bash
+search="$1"
+
+build=""
+echo -e "${PATH//:/\\n}" | sort -u | { while read -r directory
+do
+    base=$(basename "$directory")
+    if [ "$base" = 'bin' ] ; then
+        dir="$(dirname "$directory")/share/eressea"
+        if [ -d "$dir" ] ; then
+            if [ -z "$search" ] ; then
+                if [ -z "$build" ] ; then
+                    build="$dir"
+                else
+                    build="$build:$dir"
+                fi
+            else
+                if [ -e "$dir/$search" ]; then
+                    echo "$dir/$search"
+                    exit
+                fi
+            fi
+        fi
+    fi
+done
+echo "$build"
+}
