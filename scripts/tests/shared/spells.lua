@@ -183,3 +183,13 @@ function test_confusion_and_panic()
     end
     process_orders()
 end
+
+function test_mountainguards_cant_attack()
+    local r = region.create(0, 0, 'plain')
+    local u = unit.create(faction.create('human'), r, 1)
+    local f = faction.create('human')
+    local ug = unit.create(f, r, 1, "mountainguard")
+    ug:add_order("ATTACKIERE " .. itoa36(u.id))
+    process_orders()
+    assert_equal('race_no_attack', f.messages[1])
+end

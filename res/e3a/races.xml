@@ -651,7 +651,7 @@
     <skill name="stamina" modifier="-10"/>
     <attack type="4" damage="1d2"/>
   </race>
-  <race name="mountainguard" unarmedguard="yes" magres="50" weight="10000" capacity="2000" speed="0.0" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes">
+  <race name="mountainguard" unarmedguard="yes" magres="50" weight="10000" capacity="2000" speed="0.0" hp="1000" ac="12" damage="2d40" unarmedattack="0" unarmeddefense="0" attackmodifier="6" defensemodifier="8" cannotmove="yes" nolearn="yes" teach="no" noweapons="yes" noattack="yes">
     <ai splitsize="1"/>
     <attack type="4" damage="2d40"/>
   </race>
