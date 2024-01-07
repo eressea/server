@@ -212,14 +212,20 @@ def write_part(outfile, part, sender):
         payload = payload[3:]
 
     if charset is None:
-        charset = "latin1"
+        charsets = [ 'utf8', 'latin1' ]
+    else:
+        charsets = [ charset, 'utf8', 'latin1']
+    for cs in charsets:
+        try:
+            msg = payload.decode(cs)
+            break
+        except:
+            logger.debug("could not decode %s mesage from %s" % (cs, sender))
+    if not msg:
+        msg = payload.decode('utf8', 'ignore')
+
     try:
-        msg = payload.decode(charset, "ignore")
-    except:
-        msg = payload
-        charset = None
-    try:
-        utf8 = msg.encode("utf-8", "ignore")
+        utf8 = msg.encode("utf8", "ignore")
         outfile.write(utf8)
     except:
         outfile.write(msg)

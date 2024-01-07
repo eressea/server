@@ -1468,6 +1468,7 @@ ship *read_ship(gamedata *data)
 
     if (data->version >= FOSS_VERSION) {
         READ_INT(store, &sh->flags);
+        sh->flags &= SFL_SAVEMASK;
     }
 
     /* Attribute rekursiv einlesen */
