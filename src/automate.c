@@ -26,7 +26,7 @@ static int cmp_scholars(const void *lhs, const void *rhs) {
     return (diff != 0) ? diff : b->u->number - a->u->number;
 }
 
-int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *o_skill)
+int autostudy_init(scholar scholars[], int max_scholars, unit **units, enum skill_t *o_skill)
 {
     unit *unext = NULL, *u = *units;
     faction *f = u->faction;
@@ -40,6 +40,7 @@ int autostudy_init(scholar scholars[], int max_scholars, unit **units, skill_t *
                     unext = u->next;
                     if (!can_teach(u)) {
                         cmistake(u, u->thisorder, 274, MSG_EVENT);
+                        set_keyword(u->thisorder, K_STUDY);
                         fset(u, UFL_MARK);
                     }
                     else if (long_order_allowed(u, false)) {

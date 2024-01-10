@@ -70,6 +70,26 @@ static void test_autostudy_init(CuTest *tc) {
     test_teardown();
 }
 
+static void test_autostudy_init_fallback(CuTest *tc) {
+    scholar scholar;
+    unit *u, *ulist;
+    faction *f;
+    region *r;
+    race *rc;
+    skill_t skill = NOSKILL;
+
+    test_setup();
+    rc = test_create_race("tunnelworm");
+    rc->flags |= RCF_NOTEACH;
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    ulist = u = test_create_unit(f, r);
+    u_setrace(u, rc);
+    u->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    CuAssertIntEquals(tc, 0, autostudy_init(&scholar, 1, &ulist, &skill));
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(u->thisorder));
+}
+
 /**
  * Reproduce Bug 2520
  */
@@ -494,6 +514,7 @@ CuSuite *get_automate_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_autostudy_init);
+    SUITE_ADD_TEST(suite, test_autostudy_init_fallback);
     SUITE_ADD_TEST(suite, test_autostudy_run);
     SUITE_ADD_TEST(suite, test_do_autostudy);
     SUITE_ADD_TEST(suite, test_autostudy_batches);

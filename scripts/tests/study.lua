@@ -8,7 +8,10 @@ end
 
 function setup()
     conf = [[{
-    "races" : { "human" : {} },
+    "races" : {
+        "human" : {},
+        "smurf" : { "flags" : [ "noteach" ] }
+    },
     "terrains" : { "plain" : { "flags" : [ "land" ] } },
     "keywords" : { "de" : {
         "autostudy": "LERNEN AUTO",
@@ -139,4 +142,15 @@ function test_auto_study_expensive()
     assert_equal(0, u:get_item("money"))
     assert_equal(1, u:get_skill("tactics"))
     assert_equal("@LERNEN Taktik", u:get_order())
+end
+
+function test_auto_study_noteach()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("smurf")
+    local u = unit.create(f, r)
+    u:clear_orders()
+    u:add_order("@LERNE AUTO Armbrust")
+    process_orders()
+    assert_equal(1, u:get_skill("crossbow"))
+    assert_equal("@LERNEN Armbrust", u:get_order())
 end

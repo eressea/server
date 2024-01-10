@@ -60,6 +60,7 @@ extern "C" {
 
     /* access functions for orders */
     keyword_t getkeyword(const order * ord);
+    void set_keyword(order *ord, keyword_t kwd);
     void set_order(order ** destp, order * src);
     char* get_command(const order *ord, const struct locale *lang,
         char *buffer, size_t size);
