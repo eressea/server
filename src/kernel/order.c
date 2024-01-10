@@ -26,6 +26,7 @@
 #include <string.h>
 
 # define ORD_KEYWORD(ord) (keyword_t)((ord)->command & 0xFFFF)
+# define ORD_FLAGS(ord) ((ord)->command & 0xFFFF0000)
 # define OD_STRING(odata) ((odata) ? (odata)->_str : NULL)
 
 order_data *odata_load(int id)
@@ -99,6 +100,12 @@ keyword_t getkeyword(const order * ord)
         return NOKEYWORD;
     }
     return ORD_KEYWORD(ord);
+}
+
+void set_keyword(order *ord, keyword_t kwd)
+{
+    int flags = ORD_FLAGS(ord);
+    ord->command = flags | (int)kwd;
 }
 
 /** returns a plain-text representation of the order.

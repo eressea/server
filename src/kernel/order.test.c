@@ -175,6 +175,39 @@ static void test_parse_autostudy(CuTest *tc) {
     test_teardown();
 }
 
+static void test_set_keyword(CuTest *tc) {
+    order *ord;
+    struct locale * lang;
+
+    test_setup();
+    lang = get_or_create_locale("en");
+    locale_setstring(lang, mkname("skill", skillnames[SK_ENTERTAINMENT]), "Entertainment");
+    locale_setstring(lang, keyword(K_STUDY), "STUDY");
+    locale_setstring(lang, keyword(K_AUTOSTUDY), "AUTOSTUDY");
+    locale_setstring(lang, param_name(P_AUTO, NULL), "AUTO");
+    init_locale(lang);
+
+    ord = parse_order("STUDY AUTO Entertainment", lang);
+    CuAssertIntEquals(tc, K_AUTOSTUDY, getkeyword(ord));
+    set_keyword(ord, K_STUDY);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    free_order(ord);
+
+    ord = parse_order("!@STUDY AUTO Entertainment", lang);
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertTrue(tc, is_silent(ord));
+    CuAssertIntEquals(tc, K_AUTOSTUDY, getkeyword(ord));
+    CuAssertIntEquals(tc, CMD_PERSIST|CMD_QUIET, ord->command & (CMD_PERSIST | CMD_QUIET));
+    set_keyword(ord, K_STUDY);
+    CuAssertIntEquals(tc, K_STUDY, getkeyword(ord));
+    CuAssertTrue(tc, is_persistent(ord));
+    CuAssertTrue(tc, is_silent(ord));
+    CuAssertIntEquals(tc, CMD_PERSIST | CMD_QUIET, ord->command & (CMD_PERSIST | CMD_QUIET));
+    free_order(ord);
+
+    test_teardown();
+}
+
 static void test_parse_make_temp(CuTest *tc) {
     char cmd[32];
     order *ord;
@@ -613,6 +646,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_parse_parameters);
     SUITE_ADD_TEST(suite, test_parse_make);
     SUITE_ADD_TEST(suite, test_parse_autostudy);
+    SUITE_ADD_TEST(suite, test_set_keyword);
     SUITE_ADD_TEST(suite, test_parse_make_temp);
     SUITE_ADD_TEST(suite, test_parse_maketemp);
     SUITE_ADD_TEST(suite, test_init_order);
