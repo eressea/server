@@ -12,7 +12,13 @@ msgstr ""
 "X-Generator: Poedit 2.0.7\n"
 
 msgid "rustychainmail"
-msgstr "rustychainmail"
+msgstr "rusty chainmail"
+
+msgid "rustyplate"
+msgstr "rusty platemail"
+
+msgid "rustyplate_p"
+msgstr "rusty platemails"
 
 msgctxt "spellinfo"
 msgid "destroy_magic"
@@ -2435,7 +2441,7 @@ msgid "magicherbbag"
 msgstr "bag of conservation"
 
 msgid "rustychainmail_p"
-msgstr "rustychainmails"
+msgstr "rusty chainmails"
 
 msgctxt "spellpar"
 msgid "direction"
