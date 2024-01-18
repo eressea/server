@@ -10,6 +10,7 @@
         "config://res/core/armor/laenshield.xml",
         "config://res/core/armor/plate.xml",
         "config://res/core/armor/rustychainmail.xml",
+        "config://res/core/armor/rustyplate.xml",
         "config://res/core/armor/rustyshield.xml",
         "config://res/core/armor/shield.xml",
         "config://res/core/resources/cart.xml",
