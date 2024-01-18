@@ -14,6 +14,12 @@ msgstr ""
 msgid "rustychainmail"
 msgstr "Rostiges Kettenhemd"
 
+msgid "rustyplate"
+msgstr "Rostiger Plattenpanzer"
+
+msgid "rustyplate_p"
+msgstr "Rostige Plattenpanzer"
+
 msgctxt "spellinfo"
 msgid "destroy_magic"
 msgstr ""

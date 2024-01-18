@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<eressea>
+  <resources>
+    <resource name="rustyplate">
+      <item weight="400" score="150" deny="cat">
+        <armor ac="3" penalty="0.45" magres="0.0"/>
+      </item>
+    </resource>
+  </resources>
+</eressea>
