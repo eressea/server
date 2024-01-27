@@ -938,7 +938,9 @@ void remove_skill(unit * u, enum skill_t sk)
 {
     ptrdiff_t len = arrlen(u->skills);
     if (len == 1) {
-        arrfree(u->skills);
+        if (u->skills->id == sk) {
+            arrfree(u->skills);
+        }
     }
     else if (len > 1) {
         ptrdiff_t s;
