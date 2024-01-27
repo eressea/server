@@ -429,6 +429,29 @@ static void test_skills(CuTest *tc) {
     test_teardown();
 }
 
+static void test_remove_skill(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    set_level(u, SK_ALCHEMY, 1);
+    set_level(u, SK_CROSSBOW, 1);
+    remove_skill(u, SK_ALCHEMY);
+    CuAssertPtrNotNull(tc, u->skills);
+    CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
+    CuAssertIntEquals(tc, 1, get_level(u, SK_CROSSBOW));
+    remove_skill(u, SK_ALCHEMY);
+    CuAssertPtrNotNull(tc, u->skills);
+    CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
+    CuAssertIntEquals(tc, 1, get_level(u, SK_CROSSBOW));
+    remove_skill(u, SK_CROSSBOW);
+    CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
+    CuAssertIntEquals(tc, 0, get_level(u, SK_CROSSBOW));
+    CuAssertPtrEquals(tc, NULL, u->skills);
+    test_teardown();
+}
+
+
 static void test_limited_skills(CuTest *tc) {
     unit *u;
 
@@ -1096,7 +1119,8 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_skills);
-    SUITE_ADD_TEST(suite, test_limited_skills);
+    SUITE_ADD_TEST(suite, test_skills);
+    SUITE_ADD_TEST(suite, test_remove_skill);
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_heal_factor);
