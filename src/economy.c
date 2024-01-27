@@ -377,7 +377,7 @@ void maintain_buildings(region * r)
     }
 }
 
-void economics(region * r)
+void do_give(region * r)
 {
     unit *u;
 
@@ -400,9 +400,6 @@ void economics(region * r)
                     if (p == P_UNIT && !transfer) {
                         transfer = ord;
                     }
-                }
-                else if (kwd == K_FORGET) {
-                    forget_cmd(u, ord);
                 }
                 if (u->orders == NULL) {
                     break;
