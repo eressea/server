@@ -1119,7 +1119,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_skill_familiar);
     SUITE_ADD_TEST(suite, test_inside_building);
     SUITE_ADD_TEST(suite, test_skills);
-    SUITE_ADD_TEST(suite, test_skills);
+    SUITE_ADD_TEST(suite, test_limited_skills);
     SUITE_ADD_TEST(suite, test_remove_skill);
     SUITE_ADD_TEST(suite, test_renumber_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
