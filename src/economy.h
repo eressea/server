@@ -63,7 +63,7 @@ extern "C" {
     int income(const struct unit *u);
     int entertainmoney(const struct region *r);
 
-    void economics(struct region *r);
+    void do_give(struct region *r);
     void destroy(struct region *r);
     void produce(struct region *r);
     void auto_work(struct region *r);
