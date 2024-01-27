@@ -906,7 +906,7 @@ param_t give_cmd(unit * u, order * ord)
         return p;
     }
     else if (p == NOPARAM) {
-        /* the most likely case: giving items to someone.
+        /* the most likely case: giving items, ships, or persons.
          * let's catch this and save ourselves the rest of the param_t checks.
          */
     } 

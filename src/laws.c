@@ -3704,12 +3704,13 @@ void init_processor(void)
 
     p += 10;                      /* in case it has any effects on alliance victories */
     add_proc_order(p, K_GIVE, give_control_cmd, 0, "GIB KOMMANDO");
+    add_proc_order(p, K_FORGET, forget_cmd, 0, "Vergessen");
 
     p += 10;                      /* reset rng again before economics */
     if (rule_force_leave(FORCE_LEAVE_ALL)) {
         add_proc_region(p, do_force_leave, "kick non-allies out of buildings/ships");
     }
-    add_proc_region(p, economics, "Geben, Vergessen");
+    add_proc_region(p, do_give, "Geben");
     add_proc_region(p+1, recruit, "Rekrutieren");
     add_proc_region(p+2, destroy, "Zerstoeren");
     add_proc_unit(p, follow_cmds, "Folge auf Einheiten setzen");
