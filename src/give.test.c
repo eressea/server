@@ -3,6 +3,8 @@
 #include "contact.h"
 #include "eressea.h"
 
+#include "attributes/otherfaction.h"
+
 #include <kernel/ally.h>
 #include <kernel/config.h>
 #include <kernel/faction.h>
@@ -112,6 +114,48 @@ static void test_give_unit(CuTest * tc) {
     CuAssertPtrEquals(tc, NULL, get_group(env.src));
     CuAssertIntEquals(tc, 1, env.f2->newbies);
     CuAssertPtrEquals(tc, NULL, env.f1->units);
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
+
+    /* must be allied to transfer a unit */
+    u_setfaction(env.src, env.f1);
+    ally_set(&env.f2->allies, env.f1, 0);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+
+    /* contact also works */
+    contact_unit(env.dst, env.src);
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
+
+    test_teardown();
+}
+
+static void test_give_unit_stealth(CuTest * tc) {
+    struct give env = { 0 };
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction();
+    env.f2 = test_create_faction();
+    setup_give(&env);
+    set_otherfaction(env.src, env.dst->faction);
+    CuAssertPtrEquals(tc, env.dst->faction, get_otherfaction(env.src));
+    CuAssertIntEquals(tc, 1, env.f1->num_units);
+    CuAssertIntEquals(tc, 1, env.f2->num_units);
+    join_group(env.src, "group");
+
+    config_set("rules.give.max_men", "0");
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f1, env.src->faction);
+    CuAssertIntEquals(tc, 0, env.f2->newbies);
+
+    config_set("rules.give.max_men", "-1");
+    give_unit(env.src, env.dst, NULL);
+    CuAssertPtrEquals(tc, env.f2, env.src->faction);
+    CuAssertPtrEquals(tc, NULL, get_group(env.src));
+    CuAssertIntEquals(tc, 1, env.f2->newbies);
+    CuAssertPtrEquals(tc, NULL, env.f1->units);
+    CuAssertPtrEquals(tc, NULL, get_otherfaction(env.src));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f1->msgs, "give_person"));
     CuAssertPtrNotNull(tc, test_find_messagetype(env.f2->msgs, "receive_person"));
 
@@ -851,6 +895,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give_men_hungry);
     SUITE_ADD_TEST(suite, test_give_men_cursed);
     SUITE_ADD_TEST(suite, test_give_unit);
+    SUITE_ADD_TEST(suite, test_give_unit_stealth);
     SUITE_ADD_TEST(suite, test_give_unit_humans);
     SUITE_ADD_TEST(suite, test_give_unit_cursed);
     SUITE_ADD_TEST(suite, test_give_unit_other_race);
