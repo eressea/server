@@ -1406,10 +1406,13 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
     return 0;
 }
 
-static int count_allies_cb(struct allies *all, faction *af, int status, void *udata) {
-    int *num = (int *)udata;
-    if (status > 0) {
-        ++*num;
+static int count_allies_cb(struct allies *al, faction *af, int status, void *udata) {
+    (void)al;
+    if (af && faction_alive(af)) {
+        int *num = (int *)udata;
+        if (status > 0) {
+            ++*num;
+        }
     }
     return 0;
 }
@@ -1480,70 +1483,73 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
     }
 }
 
-static int show_allies_cb(struct allies *all, faction *af, int status, void *udata) {
-    struct show_s * show = (struct show_s *)udata;
-    const faction * f = show->f;
-    sbstring *sbp = &show->sbs;
-    int mode = alliance_status(f, af, status);
+static int show_allies_cb(struct allies *al, faction *af, int status, void *udata) {
+    (void)al;
+    if (af && faction_alive(af)) {
+        struct show_s *show = (struct show_s *)udata;
+        const faction *f = show->f;
+        sbstring *sbp = &show->sbs;
+        int mode = alliance_status(f, af, status);
 
-    if (show->num_listed++ != 0) {
-        if (show->num_listed == show->num_allies) {
-            /* last entry */
-            sbs_strcat(sbp, LOC(f->locale, "list_and"));
+        if (show->num_listed++ != 0) {
+            if (show->num_listed == show->num_allies) {
+                /* last entry */
+                sbs_strcat(sbp, LOC(f->locale, "list_and"));
+            }
+            else {
+                /* neither first entry nor last*/
+                sbs_strcat(sbp, ", ");
+            }
+        }
+        sbs_strcat(sbp, factionname(af));
+        pump_paragraph(sbp, show->out, show->maxlen, false);
+        sbs_strcat(sbp, " (");
+        if ((mode & HELP_ALL) == HELP_ALL) {
+            sbs_strcat(sbp, param_name(P_ANY, f->locale));
+        }
+        else if (mode > 0) {
+            int h, hh = 0;
+            for (h = 1; h <= HELP_TRAVEL; h *= 2) {
+                int p = MAXPARAMS;
+                if ((mode & h) == h) {
+                    switch (h) {
+                    case HELP_TRAVEL:
+                        p = P_TRAVEL;
+                        break;
+                    case HELP_MONEY:
+                        p = P_MONEY;
+                        break;
+                    case HELP_FIGHT:
+                        p = P_FIGHT;
+                        break;
+                    case HELP_GIVE:
+                        p = P_GIVE;
+                        break;
+                    case HELP_GUARD:
+                        p = P_GUARD;
+                        break;
+                    case HELP_FSTEALTH:
+                        p = P_FACTIONSTEALTH;
+                        break;
+                    }
+                }
+                if (p != MAXPARAMS) {
+                    if (hh) {
+                        sbs_strcat(sbp, ", ");
+                    }
+                    sbs_strcat(sbp, param_name(p, f->locale));
+                    hh = 1;
+                }
+            }
+        }
+        if (show->num_allies == show->num_listed) {
+            sbs_strcat(sbp, ").\n");
+            pump_paragraph(sbp, show->out, show->maxlen, true);
         }
         else {
-            /* neither first entry nor last*/
-            sbs_strcat(sbp, ", ");
+            sbs_strcat(sbp, ")");
+            pump_paragraph(sbp, show->out, show->maxlen, false);
         }
-    }
-    sbs_strcat(sbp, factionname(af));
-    pump_paragraph(sbp, show->out, show->maxlen, false);
-    sbs_strcat(sbp, " (");
-    if ((mode & HELP_ALL) == HELP_ALL) {
-        sbs_strcat(sbp, param_name(P_ANY, f->locale));
-    }
-    else if (mode > 0) {
-        int h, hh = 0;
-        for (h = 1; h <= HELP_TRAVEL; h *= 2) {
-            int p = MAXPARAMS;
-            if ((mode & h) == h) {
-                switch (h) {
-                case HELP_TRAVEL:
-                    p = P_TRAVEL;
-                    break;
-                case HELP_MONEY:
-                    p = P_MONEY;
-                    break;
-                case HELP_FIGHT:
-                    p = P_FIGHT;
-                    break;
-                case HELP_GIVE:
-                    p = P_GIVE;
-                    break;
-                case HELP_GUARD:
-                    p = P_GUARD;
-                    break;
-                case HELP_FSTEALTH:
-                    p = P_FACTIONSTEALTH;
-                    break;
-                }
-            }
-            if (p != MAXPARAMS) {
-                if (hh) {
-                    sbs_strcat(sbp, ", ");
-                }
-                sbs_strcat(sbp, param_name(p, f->locale));
-                hh = 1;
-            }
-        }
-    }
-    if (show->num_allies == show->num_listed) {
-        sbs_strcat(sbp, ").\n");
-        pump_paragraph(sbp, show->out, show->maxlen, true);
-    }
-    else {
-        sbs_strcat(sbp, ")");
-        pump_paragraph(sbp, show->out, show->maxlen, false);
     }
     return 0;
 }
