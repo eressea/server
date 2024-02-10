@@ -996,10 +996,9 @@ struct print_ally_s {
 };
 
 static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
-    struct print_ally_s *data = (struct print_ally_s *)udata;
-
     UNUSED_ARG(al);
     if (af && faction_alive(af)) {
+        struct print_ally_s *data = (struct print_ally_s *)udata;
         int mode = alliance_status(data->f, af, status);
         print_ally(data->f, af, mode, data->F);
     }
