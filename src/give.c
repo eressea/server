@@ -9,6 +9,7 @@
 
  /* attributes includes */
 #include <attributes/racename.h>
+#include <attributes/otherfaction.h>
 
  /* kernel includes */
 #include <kernel/attrib.h>
@@ -591,6 +592,17 @@ int give_unit_allowed(const unit * u)
     return 0;
 }
 
+static void transfer_unit(unit *u, unit *u2)
+{
+    faction *f = get_otherfaction(u);
+    if (f == u2->faction) {
+        set_otherfaction(u, NULL);
+    }
+    u_setfaction(u, u2->faction);
+    u_freeorders(u);
+    u2->faction->newbies += u->number;
+}
+
 void give_unit(unit * u, unit * u2, order * ord)
 {
     int err, maxt = max_transfers();
@@ -714,9 +726,7 @@ void give_unit(unit * u, unit * u2, order * ord)
         return;
     }
     add_give_person(u, u2, u->number, ord, 0);
-    u_setfaction(u, u2->faction);
-    u_freeorders(u);
-    u2->faction->newbies += u->number;
+    transfer_unit(u, u2);
 }
 
 bool can_give_to(unit *u, unit *u2) {
