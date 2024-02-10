@@ -117,7 +117,7 @@ void write_allies(gamedata * data, const allies *alist)
         int i;
         for (i = 0; i != al->num; ++i) {
             const faction * f = al->factions[i];
-            if (f && f->_alive) {
+            if (f && faction_alive(f)) {
                 write_faction_reference(f, data->store);
                 assert(al->status[i] > 0);
                 WRITE_INT(data->store, al->status[i]);
