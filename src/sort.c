@@ -80,7 +80,7 @@ void do_sort(region *r)
                                     ship_set_owner(u);
                                 }
                                 else {
-                                    cmistake(v, ord, 261, MSG_EVENT);
+                                    cmistake(u, ord, 261, MSG_EVENT);
                                     break;
                                 }
                             }
@@ -90,7 +90,7 @@ void do_sort(region *r)
                                     building_set_owner(u);
                                 }
                                 else {
-                                    cmistake(v, ord, 261, MSG_EVENT);
+                                    cmistake(u, ord, 261, MSG_EVENT);
                                     break;
                                 }
                             }
