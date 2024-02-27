@@ -1461,7 +1461,7 @@ static int tax_per_size[7] = { 0, 6, 12, 18, 24, 30, 36 };
 static void expandselling(region * r, econ_request * sellorders, int limit)
 {
     int money, max_products;
-    int norders;
+    size_t norders;
     int maxsize = 0, maxeffsize = 0;
     int taxcollected = 0;
     int hafencollected = 0;
@@ -1535,88 +1535,93 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
     /* Verkauf: so programmiert, dass er leicht auf mehrere Gueter pro
      * Runde erweitert werden kann. */
 
-    norders = expandorders(r, sellorders);
+    norders = arrlen(sellorders);
     if (norders > 0) {
         int j;
         for (j = 0; j != norders; j++) {
-            unit *u = g_requests[j]->unit;
-            const luxury_type *search = NULL;
-            const luxury_type *ltype = g_requests[j]->data.trade.ltype;
+            const econ_request *request = sellorders + j;
+            unit *u = request->unit;
+            const luxury_type *search;
+            const luxury_type *ltype = request->data.trade.ltype;
+            int n, i, income = 0, products = 0;
             int multi = r_demand(r, ltype);
-            int i, price;
-            int use = 0;
-            int trade_max = max_trades(u);
-            attrib* a;
-            struct trade* t = NULL;
-            a = a_find(u->attribs, &at_luxuries);
+            attrib *a = a_find(u->attribs, &at_luxuries);
+            struct trade *t;
             if (!a) {
                 a = a_add(&u->attribs, a_new(&at_luxuries));
             }
-            t = (struct trade*)a->data.v;
-            if (t) {
-                trade_max -= t->trades;
-            }
-            if (trade_max <= 0) {
-                /* total trade limit is reached */
-                continue;
-            }
+            t = (struct trade *)a->data.v;
             for (i = 0, search = luxurytypes; search != ltype; search = search->next) {
                 /* TODO: this is slow and lame! */
                 ++i;
             }
-            if (counter[i] >= limit)
-                continue;
-            if (counter[i] + 1 > max_products && multi > 1)
-                --multi;
-            price = ltype->price * multi;
-
-            if (money >= price) {
-                if (hafenowner) {
-                    if (hafenowner->faction != u->faction) {
-                        int abgezogenhafen = price / 10;
-                        hafencollected += abgezogenhafen;
-                        price -= abgezogenhafen;
-                        money -= abgezogenhafen;
-                    }
-                }
-                if (maxb) {
-                    if (maxowner->faction != u->faction) {
-                        int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
-                        taxcollected += abgezogensteuer;
-                        price -= abgezogensteuer;
-                        money -= abgezogensteuer;
-                    }
-                }
+            for (n = 0; n != request->qty; ++n) {
+                int price;
+                int use = 0;
+                int trade_max = max_trades(u);
                 if (t) {
-                    ++t->trades;
-                    i_change(&t->items, ltype->itype, 1);
-                    t->price += price;
+                    trade_max -= t->trades;
                 }
-                ++use;
-                change_money(u, price);
-                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+                if (trade_max <= 0) {
+                    /* total trade limit is reached */
+                    continue;
+                }
+                if (counter[i] >= limit)
+                    continue;
+                if (counter[i] + 1 > max_products && multi > 1)
+                    --multi;
+                price = ltype->price * multi;
 
-                /* r->money -= price; --- dies wird eben nicht ausgefuehrt, denn die
-                 * Produkte koennen auch als Steuern eingetrieben werden. In der Region
-                 * wurden Silberstuecke gegen Luxusgueter des selben Wertes eingetauscht!
-                 * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
-                 * die Nachfrage fuer das Produkt um 1. Der Zaehler wird wieder auf 0
-                 * gesetzt. */
-
-                if (++counter[i] > max_products) {
-                    int d = r_demand(r, ltype);
-                    if (d > 1) {
-                        r_setdemand(r, ltype, d - 1);
+                if (money >= price) {
+                    if (hafenowner) {
+                        if (hafenowner->faction != u->faction) {
+                            int abgezogenhafen = price / 10;
+                            hafencollected += abgezogenhafen;
+                            price -= abgezogenhafen;
+                            money -= abgezogenhafen;
+                        }
                     }
-                    counter[i] = 0;
+                    if (maxb) {
+                        if (maxowner->faction != u->faction) {
+                            int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
+                            taxcollected += abgezogensteuer;
+                            price -= abgezogensteuer;
+                            money -= abgezogensteuer;
+                        }
+                    }
+                    if (t) {
+                        ++t->trades;
+                        i_change(&t->items, ltype->itype, 1);
+                        t->price += price;
+                    }
+                    ++use;
+                    income += price;
+
+                    /* r->money -= price; --- dies wird eben nicht ausgefuehrt, denn die
+                     * Produkte koennen auch als Steuern eingetrieben werden. In der Region
+                     * wurden Silberstuecke gegen Luxusgueter des selben Wertes eingetauscht!
+                     * Falls mehr als max_products Kunden ein Produkt gekauft haben, sinkt
+                     * die Nachfrage fuer das Produkt um 1. Der Zaehler wird wieder auf 0
+                     * gesetzt. */
+
+                    if (++counter[i] > max_products) {
+                        int d = r_demand(r, ltype);
+                        if (d > 1) {
+                            r_setdemand(r, ltype, d - 1);
+                        }
+                        counter[i] = 0;
+                    }
+                }
+                if (use > 0) {
+                    use_pooled(request->unit, ltype->itype->rtype, GET_DEFAULT, use);
                 }
             }
-            if (use > 0) {
-                use_pooled(g_requests[j]->unit, ltype->itype->rtype, GET_DEFAULT, use);
+            if (income > 0) {
+                change_money(u, income);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
         }
     }
-    free(g_requests);
 
     /* Steuern. Hier werden die Steuern dem Besitzer der groessten Burg gegeben. */
     if (maxowner) {
