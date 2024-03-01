@@ -549,6 +549,7 @@ CuSuite *get_build_suite(void)
     SUITE_ADD_TEST(suite, test_build_building_no_materials);
     SUITE_ADD_TEST(suite, test_build_building_nobuild_fail);
     SUITE_ADD_TEST(suite, test_build_building_unique);
+    SUITE_ADD_TEST(suite, test_build_building_produceexp);
     SUITE_ADD_TEST(suite, test_build_ship_success);
     return suite;
 }
