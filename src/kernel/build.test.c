@@ -414,9 +414,6 @@ static void test_build_building_produceexp(CuTest *tc)
     const building_type *btype;
     const resource_type *rtype;
     skill *sv;
-    build_fixture bf = { 0 };
-    const building_type *btype;
-    const resource_type *rtype;
 
     u = setup_build(&bf);
 
