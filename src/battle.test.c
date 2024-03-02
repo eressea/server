@@ -134,41 +134,6 @@ static void test_select_weapon(CuTest *tc) {
     test_teardown();
 }
 
-static void test_select_weapon(CuTest *tc) {
-    item_type *it_missile, *it_axe, *it_sword;
-    item *i_missile, *i_sword, *i_axe;
-    unit *au;
-    fighter *af;
-    battle *b;
-
-    test_setup();
-    au = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    set_number(au, 3);
-    set_level(au, SK_MELEE, 1);
-    it_axe = test_create_itemtype("axe");
-    new_weapontype(it_axe, 0, frac_zero, NULL, 1, 0, 0, SK_MELEE);
-    i_change(&au->items, it_axe, 1);
-    it_sword = test_create_itemtype("sword");
-    new_weapontype(it_sword, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
-    i_change(&au->items, it_sword, 1);
-    it_missile = test_create_itemtype("crossbow");
-    new_weapontype(it_missile, WTF_MISSILE, frac_zero, NULL, 0, 0, 0, SK_CROSSBOW);
-    i_change(&au->items, it_missile, 2);
-
-    b = make_battle(au->region);
-    af = make_fighter(b, au, make_side(b, au->faction, 0, 0, 0), false);
-    CuAssertIntEquals(tc, 3, (int)arrlen(af->weapons));
-    CuAssertPtrEquals(tc, it_axe, (item_type *)af->person[0].melee->item.type);
-    CuAssertPtrEquals(tc, NULL, (weapon *)af->person[0].missile);
-    CuAssertPtrEquals(tc, it_sword, (item_type *)af->person[1].melee->item.type);
-    CuAssertPtrEquals(tc, it_missile, (item_type *)af->person[1].missile->item.type);
-    CuAssertPtrEquals(tc, NULL, (weapon *)af->person[2].melee);
-    CuAssertPtrEquals(tc, it_missile, (item_type *)af->person[2].missile->item.type);
-    free_battle(b);
-
-    test_teardown();
-}
-
 static void test_select_weapon_restricted(CuTest *tc) {
     item_type *itype;
     unit *au;

@@ -434,35 +434,6 @@ static void test_build_building_produceexp(CuTest *tc)
     teardown_build(&bf);
 }
 
-static void test_build_building_produceexp(CuTest *tc)
-{
-    unit *u;
-    build_fixture bf = { 0 };
-    const building_type *btype;
-    const resource_type *rtype;
-    skill *sv;
-    build_fixture bf = { 0 };
-    const building_type *btype;
-    const resource_type *rtype;
-
-    u = setup_build(&bf);
-
-    rtype = get_resourcetype(R_STONE);
-    btype = bf.btype;
-    assert(btype && rtype && rtype->itype);
-    assert(!u->region->buildings);
-
-    i_change(&u->items, rtype->itype, 1);
-    sv = test_set_skill(u, SK_BUILDING, 1, 2);
-    u->orders = create_order(K_MAKE, u->faction->locale, NULL);
-    CuAssertIntEquals(tc, 1, build_building(u, btype, 0, 4, u->orders));
-    CuAssertPtrNotNull(tc, u->region->buildings);
-    CuAssertPtrEquals(tc, u->region->buildings, u->building);
-    CuAssertIntEquals(tc, 1, u->building->size);
-    CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    CuAssertIntEquals(tc, 1, sv->weeks);
-    teardown_build(&bf);
-}
 
 static void test_build_roqf_factor(CuTest *tc) {
     test_setup();
