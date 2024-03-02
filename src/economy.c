@@ -1573,22 +1573,6 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                 price = ltype->price * multi;
 
                 if (money >= price) {
-                    if (hafenowner) {
-                        if (hafenowner->faction != u->faction) {
-                            int abgezogenhafen = price / 10;
-                            hafencollected += abgezogenhafen;
-                            price -= abgezogenhafen;
-                            money -= abgezogenhafen;
-                        }
-                    }
-                    if (maxb) {
-                        if (maxowner->faction != u->faction) {
-                            int abgezogensteuer = price * tax_per_size[maxeffsize] / 100;
-                            taxcollected += abgezogensteuer;
-                            price -= abgezogensteuer;
-                            money -= abgezogensteuer;
-                        }
-                    }
                     if (t) {
                         ++t->trades;
                         i_change(&t->items, ltype->itype, 1);
@@ -1617,6 +1601,22 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                 }
             }
             if (income > 0) {
+                if (hafenowner) {
+                    if (hafenowner->faction != u->faction) {
+                        int abgezogenhafen = income / 10;
+                        hafencollected += abgezogenhafen;
+                        income -= abgezogenhafen;
+                        money -= abgezogenhafen;
+                    }
+                }
+                if (maxb) {
+                    if (maxowner->faction != u->faction) {
+                        int abgezogensteuer = income * tax_per_size[maxeffsize] / 100;
+                        taxcollected += abgezogensteuer;
+                        income -= abgezogensteuer;
+                        money -= abgezogensteuer;
+                    }
+                }
                 change_money(u, income);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
@@ -1646,6 +1646,7 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
         if (a) {
             item* itm;
             struct trade* t = NULL;
+            int income;
             t = (struct trade*)a->data.v;
             for (itm = t->items; itm; itm = itm->next) {
                 if (itm->number) {
@@ -1653,7 +1654,8 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
                         "unit amount resource", u, itm->number, itm->type->rtype));
                 }
             }
-            add_income(u, IC_TRADE, t->price, t->price);
+            income = t->price - hafencollected - taxcollected;
+            add_income(u, IC_TRADE, income, income);
         }
     }
 }
