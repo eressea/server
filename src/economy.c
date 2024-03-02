@@ -1537,13 +1537,13 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
 
     norders = arrlen(sellorders);
     if (norders > 0) {
-        int j;
+        unsigned int j;
         for (j = 0; j != norders; j++) {
             const econ_request *request = sellorders + j;
             unit *u = request->unit;
             const luxury_type *search;
             const luxury_type *ltype = request->data.trade.ltype;
-            int n, i, income = 0, products = 0;
+            int n, i, income = 0;
             int multi = r_demand(r, ltype);
             attrib *a = a_find(u->attribs, &at_luxuries);
             struct trade *t;
