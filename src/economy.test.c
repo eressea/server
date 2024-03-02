@@ -440,6 +440,52 @@ static void test_sales_taxes(CuTest *tc) {
     test_teardown();
 }
 
+static void test_import_taxes(CuTest *tc) {
+    region *r;
+    unit *u, *ub;
+    building *b;
+    const item_type *it_luxury, *it_money;
+    const luxury_type *ltype;
+    int max_products, revenue;
+    message *m;
+
+    test_setup();
+    setup_production();
+    r = setup_trade_region(tc, NULL);
+    it_luxury = r_luxury(r);
+    it_money = it_find("money");
+    ltype = it_luxury->rtype->ltype;
+    rsetpeasants(r, TRADE_FRACTION * 100);
+    max_products = rpeasants(r) / TRADE_FRACTION;
+    r_setdemand(r, ltype, 2);
+    b = test_create_building(r, test_create_castle());
+    b->size = 2;
+    b = test_create_building(r, test_create_buildingtype("harbour"));
+    b->size = b->type->maxsize;
+
+    ub = test_create_unit(test_create_faction(), r);
+    u_set_building(ub, b);
+
+    u = test_create_unit(test_create_faction(), r);
+    set_level(u, SK_TRADE, 10);
+    i_change(&u->items, it_luxury, max_products);
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "%d %s",
+        max_products,
+        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+
+    produce(r);
+    CuAssertIntEquals(tc, 0, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 2, r_demand(r, ltype));
+    revenue = max_products * 2 * ltype->price;
+    CuAssertIntEquals(tc, revenue * 90 / 100, i_get(u->items, it_money));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(u->faction, "income"));
+    CuAssertIntEquals(tc, revenue * 90 / 100, m->parameters[2].i);
+    CuAssertIntEquals(tc, revenue * 10 / 100, i_get(ub->items, it_money));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(ub->faction, "income"));
+    CuAssertIntEquals(tc, revenue * 10 / 100, m->parameters[2].i);
+    test_teardown();
+}
+
 static void test_sell_nothing_message(CuTest *tc) {
     region* r;
     unit* u, *u2;
@@ -1649,6 +1695,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_sell_over_demand);
     SUITE_ADD_TEST(suite, test_sell_all);
     SUITE_ADD_TEST(suite, test_sales_taxes);
+    SUITE_ADD_TEST(suite, test_import_taxes);
     SUITE_ADD_TEST(suite, test_sell_nothing_message);
     SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_produceexp);
