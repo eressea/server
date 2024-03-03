@@ -75,7 +75,7 @@ static void test_rename_building(CuTest * tc)
 
     test_setup();
     test_create_locale();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     r = test_create_plain(0, 0);
     b = new_building(btype, r, default_locale, 1);
     f = test_create_faction();
@@ -98,7 +98,7 @@ static void test_rename_building_twice(CuTest * tc)
 
     test_setup();
     test_create_locale();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     r = test_create_plain(0, 0);
     b = new_building(btype, r, default_locale, 1);
     f = test_create_faction();
@@ -125,7 +125,7 @@ static void test_enter_building(CuTest * tc)
     r = test_create_plain(0, 0);
     rc = test_create_race("human");
     u = test_create_unit(test_create_faction_ex(rc, NULL), r);
-    b = test_create_building(r, test_create_buildingtype("castle"));
+    b = test_create_building(r, test_create_castle());
 
     rc->flags = RCF_WALK;
     u->building = 0;
@@ -700,7 +700,7 @@ static void setup_pay_cmd(struct pay_fixture *fix) {
     test_setup();
     f = test_create_faction();
     r = test_create_plain(0, 0);
-    btcastle = test_create_buildingtype("castle");
+    btcastle = test_create_castle();
     btcastle->taxes = 100;
     b = test_create_building(r, btcastle);
     assert(b);
@@ -1154,7 +1154,7 @@ static void test_name_region(CuTest *tc) {
     order *ord;
 
     u = setup_name_cmd();
-    u_set_building(u, test_create_building(u->region, NULL));
+    u_set_building(u, test_create_building(u->region, test_create_castle()));
     f = u->faction;
 
     ord = create_order(K_NAME, f->locale, "%s ' Hodor Hodor '", param_name(P_REGION, f->locale));
@@ -1399,7 +1399,7 @@ static void test_name_cmd(CuTest *tc) {
     free_order(ord);
     
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", param_name(P_BUILDING, f->locale));
-    u_set_building(u, test_create_building(u->region, NULL));
+    u_set_building(u, test_create_building(u->region, test_create_castle()));
     name_cmd(u, ord);
     CuAssertStrEquals(tc, "Hodor", u->building->name);
     free_order(ord);
@@ -1445,9 +1445,9 @@ static void test_name_cmd_2274(CuTest *tc) {
     u1 = test_create_unit(test_create_faction(), r);
     u2 = test_create_unit(test_create_faction(), r);
     u3 = test_create_unit(u2->faction, r);
-    u_set_building(u1, test_create_building(r, NULL));
+    u_set_building(u1, test_create_building(r, test_create_castle()));
     u1->building->size = 10;
-    u_set_building(u2, test_create_building(r, NULL));
+    u_set_building(u2, test_create_building(r, test_create_castle()));
     u2->building->size = 20;
 
     f = u2->faction;

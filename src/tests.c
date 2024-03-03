@@ -352,9 +352,7 @@ building * test_create_building(region * r, const building_type * btype)
     building * b;
     assert(r);
     if (!btype) {
-        building_type *bt_castle = test_create_buildingtype("castle");
-        bt_castle->flags |= BTF_FORTIFICATION;
-        btype = bt_castle;
+        btype = test_create_buildingtype("test");
     }
     b = new_building(btype, r, default_locale, (btype->maxsize > 0) ? btype->maxsize : 1);
     return b;
@@ -362,7 +360,7 @@ building * test_create_building(region * r, const building_type * btype)
 
 ship * test_create_ship(region * r, const ship_type * stype)
 {
-    ship * s = new_ship(stype ? stype : test_create_shiptype("boat"), r, default_locale);
+    ship * s = new_ship(stype ? stype : test_create_shiptype("test"), r, default_locale);
     s->size = s->type->construction ? s->type->construction->maxsize : 1;
     return s;
 }

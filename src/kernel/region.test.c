@@ -58,8 +58,8 @@ static void test_region_get_owner(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    b1 = test_create_building(r, NULL);
-    b2 = test_create_building(r, NULL);
+    b1 = test_create_building(r, test_create_castle());
+    b2 = test_create_building(r, test_create_castle());
     b1->size = 5;
     b2->size = 10;
     u1 = test_create_unit(test_create_faction(), r);

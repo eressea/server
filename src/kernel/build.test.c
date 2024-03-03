@@ -41,7 +41,7 @@ static unit * setup_build(build_fixture *bf) {
 
     test_create_itemtype("stone");
     test_create_itemtype("log");
-    bf->btype = test_create_buildingtype("castle");
+    bf->btype = test_create_castle();
     bf->stype = test_create_shiptype("boat");
     bf->rc = test_create_race("human");
     bf->r = test_create_plain(0, 0);
@@ -67,37 +67,6 @@ static unit * setup_build(build_fixture *bf) {
     return bf->u;
 }
 
-static building_type *setup_castle(item_type *it_stone) {
-    building_type *btype;
-    building_stage *stage;
-    construction * cons;
-
-    btype = test_create_buildingtype("castle");
-    stage = btype->stages = calloc(1, sizeof(building_stage));
-    if (!stage) abort();
-    cons = &stage->construction;
-    cons->materials = calloc(2, sizeof(requirement));
-    if (!cons->materials) abort();
-    cons->materials[0].number = 1;
-    cons->materials[0].rtype = it_stone->rtype;
-    cons->minskill = 1;
-    cons->maxsize = 2;
-    cons->reqsize = 1;
-    cons->skill = SK_BUILDING;
-    stage = stage->next = calloc(1, sizeof(building_stage));
-    if (!stage) abort();
-    cons = &stage->construction;
-    cons->materials = calloc(2, sizeof(requirement));
-    if (!cons->materials) abort();
-    cons->materials[0].number = 1;
-    cons->materials[0].rtype = it_stone->rtype;
-    cons->minskill = 1;
-    cons->maxsize = 8;
-    cons->reqsize = 1;
-    cons->skill = SK_BUILDING;
-    return btype;
-}
-
 static void test_build_building_stages(CuTest *tc) {
     building_type *btype;
     item_type *it_stone;
@@ -106,7 +75,7 @@ static void test_build_building_stages(CuTest *tc) {
     test_setup();
     init_resources();
     it_stone = test_create_itemtype("stone");
-    btype = setup_castle(it_stone);
+    btype = test_create_castle();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u->building = test_create_building(u->region, btype);
     u->building->size = 1;
@@ -128,7 +97,7 @@ static void test_build_building_stage_continue(CuTest *tc) {
     test_setup();
     init_resources();
     it_stone = test_create_itemtype("stone");
-    btype = setup_castle(it_stone);
+    btype = test_create_castle();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_level(u, SK_BUILDING, 2);
     i_change(&u->items, it_stone, 4);
