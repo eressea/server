@@ -415,7 +415,7 @@ static void test_sales_taxes(CuTest *tc) {
     r_setdemand(r, ltype, 2);
     b = test_create_building(r, test_create_castle());
     b->size = 10; // 12% sales tax
-    CuAssertIntEquals(tc, 2, bt_effsize(b->type, b, b->size));
+    CuAssertIntEquals(tc, 2, buildingeffsize(b, false));
 
     ub = test_create_unit(test_create_faction(), r);
     u_set_building(ub, b);

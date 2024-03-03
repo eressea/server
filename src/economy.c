@@ -521,7 +521,7 @@ int destroy_cmd(unit* u, struct order* ord)
             return 138;
         }
         if (n >= b->size) {
-            building_stage* stage;
+            ptrdiff_t s, len = arrlen(b->type->a_stages);
             /* destroy completly */
             /* all units leave the building */
             for (u2 = r->units; u2; u2 = u2->next) {
@@ -530,7 +530,9 @@ int destroy_cmd(unit* u, struct order* ord)
                 }
             }
             ADDMSG(&u->faction->msgs, msg_message("destroy", "building unit", b, u));
-            for (stage = b->type->stages; stage; stage = stage->next) {
+
+            for (s = 0; s != len; ++s) {
+                building_stage *stage = b->type->a_stages + s;
                 size = recycle(u, &stage->construction, size);
             }
             remove_building(&r->buildings, b);
@@ -1188,7 +1190,7 @@ int make_cmd(unit * u, struct order *ord)
         if (pl && fval(pl, PFL_NOBUILD)) {
             cmistake(u, ord, 275, MSG_PRODUCE);
         }
-        else if (btype->stages) {
+        else if (btype->a_stages) {
             int id = getid();
             build_building(u, btype, id, want, ord);
         }

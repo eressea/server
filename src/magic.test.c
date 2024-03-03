@@ -700,7 +700,8 @@ static void test_illusioncastle(CuTest *tc)
     building_type *btype, *bt_icastle;
     const attrib *a;
     test_setup();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_buildingtype("hodor");
+    CuAssertPtrEquals(tc, NULL, btype->a_stages[0].name);
     bt_icastle = test_create_buildingtype("illusioncastle");
     b = test_create_building(test_create_plain(0, 0), bt_icastle);
     b->size = 1;
@@ -709,9 +710,9 @@ static void test_illusioncastle(CuTest *tc)
     CuAssertPtrNotNull(tc, a);
     CuAssertPtrEquals(tc, btype, (void *)icastle_type(a));
     CuAssertPtrEquals(tc, bt_icastle, (void *)b->type);
-    CuAssertStrEquals(tc, "castle", buildingtype(btype, b, b->size));
-    btype->stages->name = str_strdup("site");
-    CuAssertStrEquals(tc, "site", buildingtype(btype, b, b->size));
+    CuAssertStrEquals(tc, "hodor", buildingtype(btype, b, b->size));
+    btype->a_stages[0].name = str_strdup("chaos");
+    CuAssertStrEquals(tc, "chaos", buildingtype(btype, b, b->size));
     test_teardown();
 }
 
