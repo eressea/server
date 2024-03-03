@@ -319,7 +319,7 @@ static void test_buildingtype_exists(CuTest * tc)
 
     test_setup();
 
-    btype2 = test_create_buildingtype("castle");
+    btype2 = test_create_castle();
     assert(btype2);
     btype = test_create_buildingtype("lighhouse");
     btype->maxsize = 10;
@@ -356,7 +356,7 @@ static void test_active_building(CuTest *tc) {
 
     test_setup();
 
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     assert(btype && btype->maxsize == -1);
     b = test_create_building(r = test_create_plain(0, 0), btype);
     u = test_create_unit(test_create_faction(), r);
@@ -384,20 +384,20 @@ static void test_safe_building(CuTest *tc) {
     unit *u1, *u2;
 
     test_setup();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_buildingtype("house");
     u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    CuAssertTrue(tc, !in_safe_building(u1, u2));
     u1->building = test_create_building(u1->region, btype);
-    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    CuAssertTrue(tc, !in_safe_building(u1, u2));
     btype->flags |= BTF_FORTIFICATION;
-    CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
+    CuAssertTrue(tc, in_safe_building(u1, u2));
     u2->building = u1->building;
-    CuAssertIntEquals(tc, true, in_safe_building(u1, u2));
+    CuAssertTrue(tc, in_safe_building(u1, u2));
     u1->number = 2;
-    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    CuAssertTrue(tc, !in_safe_building(u1, u2));
     u1->building->size = 3;
-    CuAssertIntEquals(tc, false, in_safe_building(u1, u2));
+    CuAssertTrue(tc, !in_safe_building(u1, u2));
     test_teardown();
 }
 
@@ -407,7 +407,7 @@ static void test_visible_building(CuTest *tc) {
 
     test_setup();
     bt_light = test_create_buildingtype("lighthouse");
-    bt_castle = test_create_buildingtype("castle");
+    bt_castle = test_create_castle();
 
     b = test_create_building(test_create_plain(0, 0), bt_light);
     CuAssertPtrEquals(tc, bt_light, (void *)visible_building(b));
@@ -433,8 +433,8 @@ static void test_cmp_castle_size(CuTest *tc) {
 
     test_setup();
     r = test_create_plain(0, 0);
-    b1 = test_create_building(r, NULL);
-    b2 = test_create_building(r, NULL);
+    b1 = test_create_building(r, test_create_castle());
+    b2 = test_create_building(r, test_create_castle());
     u1 = test_create_unit(test_create_faction(), r);
     u_set_building(u1, b1);
     u2 = test_create_unit(test_create_faction(), r);
@@ -451,21 +451,12 @@ static void test_wage(CuTest *tc) {
     region *r;
     building *b;
     building_type *btype;
-    struct building_stage *stage;
     race *rc_orc, *rc_elf;
     test_setup();
     rc_orc = test_create_race("orc");
     rc_elf = test_create_race("elf");
     rc_elf->maintenance = 13;
-    btype = test_create_buildingtype("castle");
-    stage = btype->stages;
-    stage->construction.maxsize = 2; /* site */
-    stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction.maxsize = 8; /* tradepost */
-    stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction.maxsize = 40; /* fortification */
-    stage = stage->next = calloc(1, sizeof(struct building_stage));
-    stage->construction.maxsize = 200; /* tower */
+    btype = test_create_castle();
     r = test_create_plain(0, 0);
     CuAssertIntEquals(tc, 10, wage(r, rc_elf));
     CuAssertIntEquals(tc, 10, wage(r, rc_orc));
@@ -524,7 +515,7 @@ static void test_cmp_wage(CuTest *tc) {
     building_type *btype;
 
     test_setup();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     btype->taxes = 100;
     r = test_create_plain(0, 0);
     b1 = test_create_building(r, btype);
@@ -545,7 +536,7 @@ static void test_cmp_taxes(CuTest *tc) {
     unit *u1, *u2;
 
     test_setup();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     btype->taxes = 100;
     r = test_create_plain(0, 0);
     b1 = test_create_building(r, btype);
@@ -576,7 +567,7 @@ static void test_cmp_current_owner(CuTest *tc) {
     btype->stages->construction.maxsize = 1;
     btype->taxes = 200;
     b1 = test_create_building(r, btype);
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     btype->stages->construction.maxsize = 1;
     btype->taxes = 100;
     b2 = test_create_building(r, btype);
@@ -603,7 +594,7 @@ static void test_building_effsize(CuTest *tc) {
     construction *cons;
 
     test_setup();
-    btype = test_create_buildingtype("castle");
+    btype = test_create_castle();
     stage = btype->stages;
     assert(stage);
     cons = &stage->construction;

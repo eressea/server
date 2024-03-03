@@ -219,10 +219,6 @@ static void test_select_armor(CuTest *tc) {
     test_teardown();
 }
 
-static building_type * setup_castle(void) {
-    return test_create_castle();
-}
-
 static void test_defenders_get_building_bonus(CuTest * tc)
 {
     unit *du, *au;
@@ -235,7 +231,7 @@ static void test_defenders_get_building_bonus(CuTest * tc)
     building_type * btype;
 
     test_setup();
-    btype = setup_castle();
+    btype = test_create_castle();
     r = test_create_plain(0, 0);
     bld = test_create_building(r, btype);
 
@@ -288,7 +284,7 @@ static void test_attackers_get_no_building_bonus(CuTest * tc)
 
     test_setup();
     r = test_create_plain(0, 0);
-    btype = setup_castle();
+    btype = test_create_castle();
     btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
     bld->size = 10;
@@ -317,7 +313,7 @@ static void test_building_bonus_respects_size(CuTest * tc)
     faction * f;
 
     test_setup();
-    btype = setup_castle();
+    btype = test_create_castle();
     r = test_create_plain(0, 0);
     btype->flags |= BTF_FORTIFICATION;
     bld = test_create_building(r, btype);
@@ -347,7 +343,7 @@ static void test_building_defense_bonus(CuTest * tc)
     building_type * btype;
 
     test_setup();
-    btype = setup_castle();
+    btype = test_create_castle();
 
     btype->maxsize = -1; /* unlimited buildings get the castle bonus */
     CuAssertIntEquals(tc, 0, bt_protection(btype, 0));
@@ -988,7 +984,7 @@ static void test_battle_skilldiff_building(CuTest *tc)
     building_type *btype;
 
     test_setup();
-    btype = setup_castle();
+    btype = test_create_castle();
 
     r = test_create_plain(0, 0);
     ud = test_create_unit(test_create_faction(), r);
