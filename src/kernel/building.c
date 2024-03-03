@@ -38,6 +38,8 @@
 #include <storage.h>
 #include <strings.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <stdlib.h>
@@ -101,12 +103,13 @@ static void bt_register(building_type * btype)
 
 static void free_buildingtype(void *ptr) {
     building_type *btype = (building_type *)ptr;
-    while (btype->stages) {
-        building_stage *next = btype->stages->next;
-        free(btype->stages->name);
-        free(btype->stages);
-        btype->stages = next;
+    size_t s;
+    for (s = arrlen(btype->a_stages); s > 0; --s) {
+        building_stage *stage = btype->a_stages + s - 1;
+        free(stage->name);
     }
+    arrfree(btype->a_stages);
+
     free(btype->maintenance);
     free(btype->_name);
     free(btype);
@@ -184,15 +187,16 @@ const char *buildingtype(const building_type * btype, const building * b, int bs
             }
         }
     }
-    if (btype->stages && btype->stages->name) {
-        const building_stage *stage;
+    if (btype->a_stages) {
+        size_t s, len = arrlen(btype->a_stages);
         if (b) {
             bsize = adjust_size(b, bsize);
         }
-        for (stage = btype->stages; stage; stage = stage->next) {
+        for (s = 0; s != len; ++s) {
+            const building_stage *stage = btype->a_stages + s;
             bsize -= stage->construction.maxsize;
-            if (!stage->next || bsize <0) {
-                return stage->name;
+            if (stage->construction.maxsize < 0 || bsize < 0) {
+                return stage->name ? stage->name : btype->_name;
             }
         }
     }
@@ -423,10 +427,11 @@ building *new_building(const struct building_type * btype, region * r,
 
 static int build_stages(unit *u, const building_type *btype, int built, int n, int basesk, int *skill_total) {
 
-    const building_stage *stage;
     int made = 0;
+    size_t s, len = arrlen(btype->a_stages);
 
-    for (stage = btype->stages; stage; stage = stage->next) {
+    for (s = 0; s != len; ++s) {
+        const building_stage *stage = btype->a_stages + s;
         const construction *con = &stage->construction;
         if (con->maxsize < 0 || con->maxsize > built) {
             int err, want = INT_MAX;
@@ -478,7 +483,7 @@ static int build_failure(unit *u, order *ord, const building_type *btype, int wa
         break;
     case ENOMATERIALS:
         ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
-            &btype->stages->construction, want));
+            &btype->a_stages[0].construction, want));
         break;
     case ELOWSKILL:
     case ENEEDSKILL:
@@ -502,7 +507,7 @@ build_building(unit *u, const building_type *btype, int id, int want, order *ord
     int skills, basesk;         /* number of skill points remainig */
 
     assert(u->number);
-    assert(btype->stages);
+    assert(btype->a_stages);
 
     basesk = effskill(u, SK_BUILDING, NULL);
     skills = build_skill(u, basesk, 0, SK_BUILDING);
@@ -715,6 +720,34 @@ void free_buildings(void)
 
 extern struct attrib_type at_icastle;
 
+static int bt_effsize(const building_type *btype, const building *b, int bsize)
+{
+    if (b) {
+        bsize = adjust_size(b, bsize);
+    }
+
+    if (btype && btype->a_stages) {
+        int n = 0;
+        size_t s, len = arrlen(btype->a_stages);
+        for (s = 0; s != len; ++s) {
+            const building_stage *stage = btype->a_stages + s;
+            const construction *con = &stage->construction;
+            if (con->maxsize < 0) {
+                break;
+            }
+            else {
+                if (bsize >= con->maxsize) {
+                    bsize -= con->maxsize;
+                    ++n;
+                }
+            }
+        }
+        return n;
+    }
+
+    return 0;
+}
+
 /** returns the building's build stage (NOT size in people).
  * only makes sense for castles or similar buildings with multiple
  * stages */
@@ -745,34 +778,6 @@ const building_type *visible_building(const building *b) {
         }
     }
     return b->type;
-}
-
-int bt_effsize(const building_type * btype, const building * b, int bsize)
-{
-    if (b) {
-        bsize = adjust_size(b, bsize);
-    }
-
-    if (btype && btype->stages) {
-        int n = 0;
-        const building_stage *stage = btype->stages;
-        do {
-            const construction *con = &stage->construction;
-            if (con->maxsize < 0) {
-                break;
-            }
-            else {
-                if (bsize >= con->maxsize) {
-                    bsize -= con->maxsize;
-                    ++n;
-                }
-                stage = stage->next;
-            }
-        } while (stage && bsize > 0);
-        return n;
-    }
-
-    return 0;
 }
 
 const char *write_buildingname(const building * b, char *ibuf, size_t size)

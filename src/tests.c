@@ -406,16 +406,15 @@ building_type * test_create_buildingtype(const char * name)
 {
     construction *con = NULL;
     building_type *btype = bt_get_or_create(name);
-    if (btype->stages) {
-        con = &btype->stages->construction;
+    if (btype->a_stages) {
+        con = &btype->a_stages[0].construction;
     } else {
-        btype->stages = malloc(sizeof(building_stage));
-        if (btype->stages) {
-            con = &btype->stages->construction;
+        building_stage *stage = arraddnptr(btype->a_stages, 1);
+        if (stage) {
+            stage->name = NULL;
+            con = &stage->construction;
             con->materials = NULL;
             construction_init(con, 1, SK_BUILDING, 1, -1);
-            btype->stages->name = NULL;
-            btype->stages->next = NULL;
         }
     }
     if (con && !con->materials) {
@@ -434,11 +433,9 @@ building_type * test_create_buildingtype(const char * name)
     return btype;
 }
 
-static building_stage **init_stage(building_stage **stage_p, int minskill, int maxsize,
+static void init_stage(building_stage * stage, int minskill, int maxsize,
     const char *name, const resource_type *rtype)
 {
-    building_stage *stage = malloc(sizeof(building_stage));
-    assert(stage);
     stage->name = str_strdup(name);
     construction_init(&stage->construction, minskill, SK_BUILDING, 1, maxsize);
     stage->construction.materials = malloc(2 * sizeof(requirement));
@@ -447,8 +444,6 @@ static building_stage **init_stage(building_stage **stage_p, int minskill, int m
         stage->construction.materials[0].rtype = rtype;
         stage->construction.materials[1].number = 0;
     }
-    *stage_p = stage;
-    return &stage->next;
 }
 
 building_type *test_create_castle(void) {
@@ -458,17 +453,16 @@ building_type *test_create_castle(void) {
         rtype = test_create_itemtype("stone")->rtype;
     }
 
-    if (!btype->stages) {
-        building_stage **stage_p = &btype->stages;
+    if (!btype->a_stages) {
+        building_stage *stages = arraddnptr(btype->a_stages, 7);
         btype->flags |= BTF_FORTIFICATION;
-        stage_p = init_stage(stage_p, 1, 2, "site", rtype);
-        stage_p = init_stage(stage_p, 1, 8, "tradepost", rtype);
-        stage_p = init_stage(stage_p, 2, 40, "fortification", rtype);
-        stage_p = init_stage(stage_p, 3, 200, "tower", rtype);
-        stage_p = init_stage(stage_p, 4, 1000, "castle", rtype);
-        stage_p = init_stage(stage_p, 5, 5000, "fortress", rtype);
-        stage_p = init_stage(stage_p, 6, -1, "citadel", rtype);
-        *stage_p = NULL;
+        init_stage(stages + 0, 1, 2, "site", rtype);
+        init_stage(stages + 1, 1, 8, "tradepost", rtype);
+        init_stage(stages + 2, 2, 40, "fortification", rtype);
+        init_stage(stages + 3, 3, 200, "tower", rtype);
+        init_stage(stages + 4, 4, 1000, "castle", rtype);
+        init_stage(stages + 5, 5, 5000, "fortress", rtype);
+        init_stage(stages + 6, 6, -1, "citadel", rtype);
     }
     return btype;
 }

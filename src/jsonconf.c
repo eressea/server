@@ -361,7 +361,6 @@ static void json_stage(cJSON *json, building_stage *stage) {
 
 static void json_stages(cJSON *json, building_type *bt) {
     cJSON *child;
-    building_stage *stage, **sp = &bt->stages;
     int size = 0;
 
     if (json->type != cJSON_Array) {
@@ -370,18 +369,18 @@ static void json_stages(cJSON *json, building_type *bt) {
     }
 
     for (child = json->child; child; child = child->next) {
+        building_stage *stage;
         switch (child->type) {
         case cJSON_Object:
-            stage = calloc(1, sizeof(building_stage));
+            stage = arraddnptr(bt->a_stages, 1);
             if (!stage) abort();
+            memset(stage, 0, sizeof(building_stage));
             stage->construction.skill = SK_BUILDING;
             json_stage(child, stage);
             if (stage->construction.maxsize > 0) {
                 stage->construction.maxsize -= size;
                 size += stage->construction.maxsize;
             }
-            *sp = stage;
-            sp = &stage->next;
             break;
         default:
             log_error("building stage contains non-object type %d", child->type);
@@ -402,7 +401,7 @@ static void json_building(cJSON *json, building_type *bt) {
         switch (child->type) {
         case cJSON_Array:
             if (strcmp(child->string, "stages") == 0) {
-                if (!bt->stages) {
+                if (!bt->a_stages) {
                     json_stages(child, bt);
                 }
             }
@@ -416,12 +415,12 @@ static void json_building(cJSON *json, building_type *bt) {
         case cJSON_Object:
             if (strcmp(child->string, "construction") == 0) {
                 /* simple, single-stage building */
-                if (!bt->stages) {
-                    building_stage *stage = calloc(1, sizeof(building_stage));
+                if (!bt->a_stages) {
+                    building_stage *stage = arraddnptr(bt->a_stages, 1);
                     if (!stage) abort();
+                    memset(stage, 0, sizeof(building_stage));
                     stage->construction.skill = SK_BUILDING;
                     json_construction(child, &stage->construction);
-                    bt->stages = stage;
                 }
             }
             if (strcmp(child->string, "maintenance") == 0) {

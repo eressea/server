@@ -12,6 +12,8 @@
 
 #include <strings.h>
 
+#include <stb_ds.h>
+
 #include <CuTest.h>
 #include <tests.h>
 #include <stdbool.h>       // for false, true
@@ -298,7 +300,7 @@ static void test_btype_defaults(CuTest *tc) {
     CuAssertPtrNotNull(tc, btype);
     CuAssertStrEquals(tc, "hodor", btype->_name);
     CuAssertPtrEquals(tc, NULL, btype->maintenance);
-    CuAssertPtrEquals(tc, NULL, btype->stages);
+    CuAssertPtrEquals(tc, NULL, btype->a_stages);
     CuAssertDblEquals(tc, 1.0, btype->auraregen, 0.0);
     CuAssertIntEquals(tc, 0, btype->taxes);
     CuAssertIntEquals(tc, -1, btype->maxsize);
@@ -564,11 +566,11 @@ static void test_cmp_current_owner(CuTest *tc) {
     config_set("rules.region_owners", "1");
     r = test_create_plain(0, 0);
     btype = test_create_buildingtype("watch");
-    btype->stages->construction.maxsize = 1;
+    btype->a_stages[0].construction.maxsize = 1;
     btype->taxes = 200;
     b1 = test_create_building(r, btype);
     btype = test_create_castle();
-    btype->stages->construction.maxsize = 1;
+    btype->a_stages[0].construction.maxsize = 1;
     btype->taxes = 100;
     b2 = test_create_building(r, btype);
     b1->size = 1;
@@ -590,25 +592,13 @@ static void test_cmp_current_owner(CuTest *tc) {
 static void test_building_effsize(CuTest *tc) {
     building *b;
     building_type *btype;
-    building_stage *stage;
-    construction *cons;
 
     test_setup();
     btype = test_create_castle();
-    stage = btype->stages;
-    assert(stage);
-    cons = &stage->construction;
-    cons->maxsize = 5;
-
-    stage->next = calloc(1, sizeof(building_stage));
-    stage = stage->next;
-    cons = &stage->construction;
-    cons->maxsize = 5;
-
-    stage->next = calloc(1, sizeof(building_stage));
-    stage = stage->next;
-    cons = &stage->construction;
-    cons->maxsize = -1;
+    CuAssertTrue(tc, arrlen(btype->a_stages) >= 3);
+    btype->a_stages[0].construction.maxsize = 5;
+    btype->a_stages[1].construction.maxsize = 5;
+    btype->a_stages[2].construction.maxsize = -1;
 
     b = test_create_building(test_create_region(0,0,0), btype);
     b->size = 1;
@@ -649,17 +639,17 @@ static void test_buildingtype(CuTest *tc) {
     building_type *btype;
     test_setup();
 
+    btype = bt_get_or_create("portal");
+    CuAssertPtrEquals(tc, NULL, btype->a_stages);
+    CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
+
     btype = test_create_buildingtype("hodor");
-    CuAssertPtrNotNull(tc, btype->stages);
-    CuAssertPtrEquals(tc, NULL, btype->stages->name);
+    CuAssertPtrNotNull(tc, btype->a_stages);
+    CuAssertPtrEquals(tc, NULL, btype->a_stages[0].name);
     CuAssertStrEquals(tc, "hodor", buildingtype(btype, NULL, 1));
 
-    btype->stages->name = str_strdup("castle");
-    CuAssertStrEquals(tc, "castle", buildingtype(btype, NULL, 1));
-
-    btype = bt_get_or_create("portal");
-    CuAssertPtrEquals(tc, NULL, btype->stages);
-    CuAssertStrEquals(tc, "portal", buildingtype(btype, NULL, 1));
+    btype->a_stages[0].name = str_strdup("foobar");
+    CuAssertStrEquals(tc, "foobar", buildingtype(btype, NULL, 1));
 
     test_teardown();
 }

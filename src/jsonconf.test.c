@@ -389,24 +389,24 @@ static void test_castles(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, buildingtypes);
     json_config(json);
 
-    CuAssertPtrNotNull(tc, buildingtypes);
     bt = bt_find("castle");
     CuAssertPtrNotNull(tc, bt);
-    CuAssertPtrNotNull(tc, stage = bt->stages);
+    CuAssertIntEquals(tc, 3, (int)arrlen(bt->a_stages));
+    CuAssertPtrNotNull(tc, buildingtypes);
+
+    stage = bt->a_stages;
     CuAssertStrEquals(tc, "site", stage->name);
     CuAssertIntEquals(tc, 2, stage->construction.maxsize);
     CuAssertIntEquals(tc, SK_BUILDING, stage->construction.skill);
 
-    CuAssertPtrNotNull(tc, stage = stage->next);
+    stage = bt->a_stages + 1;
     CuAssertPtrEquals(tc, NULL, stage->name);
     CuAssertIntEquals(tc, 6, stage->construction.maxsize);
     CuAssertIntEquals(tc, SK_BUILDING, stage->construction.skill);
 
-    CuAssertPtrNotNull(tc, stage = stage->next);
+    stage = bt->a_stages + 2;
     CuAssertIntEquals(tc, -1, stage->construction.maxsize);
     CuAssertIntEquals(tc, SK_SHIPBUILDING, stage->construction.skill);
-
-    CuAssertPtrEquals(tc, NULL, stage->next);
 
     cJSON_Delete(json);
     test_teardown();
@@ -493,9 +493,9 @@ static void test_buildings(CuTest * tc)
     CuAssertIntEquals(tc, MTF_VARIABLE, bt->maintenance[0].flags);
     CuAssertIntEquals(tc, 0, bt->maintenance[1].number);
 
-    CuAssertPtrNotNull(tc, bt->stages);
-    CuAssertPtrEquals(tc, NULL, bt->stages->next);
-    con = &bt->stages->construction;
+    CuAssertPtrNotNull(tc, bt->a_stages);
+    CuAssertIntEquals(tc, 1, (int) arrlen(bt->a_stages));
+    con = &bt->a_stages->construction;
     CuAssertPtrNotNull(tc, con->materials);
     CuAssertIntEquals(tc, 2, con->materials[0].number);
     CuAssertPtrEquals(tc, (void *)get_resourcetype(R_STONE), (void *)con->materials[0].rtype);
