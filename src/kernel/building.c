@@ -482,6 +482,10 @@ static int build_failure(unit *u, order *ord, const building_type *btype, int wa
         cmistake(u, ord, 4, MSG_PRODUCE);
         break;
     case ENOMATERIALS:
+        /* this is incorrect, but we do not have any buildings that
+         * require different types or amounds of inputs at later stages.
+         * Especially because the only staged building are castles.
+         */
         ADDMSG(&u->faction->msgs, msg_materials_required(u, ord,
             &btype->a_stages[0].construction, want));
         break;
