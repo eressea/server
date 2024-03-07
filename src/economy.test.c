@@ -1667,6 +1667,33 @@ static void test_make_zero(CuTest* tc) {
     test_teardown();
 }
 
+static void test_entertain_fair(CuTest *tc) {
+    unit *u1, *u2;
+    region *r;
+    faction *f;
+    const item_type *itype;
+
+    test_setup();
+    init_resources();
+    itype = it_find("money");
+    f = test_create_faction();
+    r = test_create_plain(0, 0);
+    rsetmoney(r, ENTERTAINFRACTION * 1800);
+    u1 = test_create_unit(f, r);
+    scale_number(u1, 90);
+    test_set_skill(u1, SK_ENTERTAINMENT, 1, 1);
+    u1->thisorder = create_order(K_ENTERTAIN, f->locale, "1000", 0);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 10);
+    test_set_skill(u2, SK_ENTERTAINMENT, 9, 1);
+    u2->thisorder = create_order(K_ENTERTAIN, f->locale, "1000", 0);
+    produce(r);
+    CuAssertIntEquals(tc, 1800, i_get(u1->items, itype) + i_get(u2->items, itype));
+    CuAssertIntEquals(tc, 900, i_get(u2->items, itype));
+    CuAssertIntEquals(tc, 900, i_get(u1->items, itype));
+    test_teardown();
+}
+
 CuSuite *get_economy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1714,5 +1741,6 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_road_limit);
     SUITE_ADD_TEST(suite, test_destroy_road_guard);
     SUITE_ADD_TEST(suite, test_make_zero);
+    SUITE_ADD_TEST(suite, test_entertain_fair);
     return suite;
 }

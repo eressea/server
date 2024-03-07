@@ -73,8 +73,6 @@ static struct econ_request econ_requests[MAX_REQUESTS];
 
 static econ_request **g_requests; /* TODO: no need for this to be module-global */
 
-#define ENTERTAINFRACTION 20
-
 /* Ein Haendler kann nur 10 Gueter pro Talentpunkt handeln. */
 static int max_trades(const unit *u)
 {
@@ -2090,17 +2088,15 @@ static int entertain_cmd(unit * u, struct order *ord, econ_request **io_req)
     region *r = u->region;
     int wants, max_e;
     econ_request *req = *io_req;
-    static int entertainbase = 0;
-    static int entertainperlevel = 0;
+    static int entertainbase = -1;
+    static int entertainperlevel = -1;
 
     init_order(ord, NULL);
-    if (!entertainbase) {
-        const char *str = config_get("entertain.base");
-        entertainbase = str ? atoi(str) : 0;
+    if (entertainbase < 0) {
+        entertainbase = config_get_int("entertain.base", 0);
     }
-    if (!entertainperlevel) {
-        const char *str = config_get("entertain.perlevel");
-        entertainperlevel = str ? atoi(str) : 0;
+    if (entertainperlevel < 0) {
+        entertainperlevel = config_get_int("entertain.perlevel", 20);
     }
     if (fval(u, UFL_WERE)) {
         cmistake(u, ord, 58, MSG_INCOME);
