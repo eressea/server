@@ -40,7 +40,8 @@
 		"rules.tactics.formula": 1
 	},
 	"disabled": [
-		"jsreport"
+		"jsreport",
+		"expel"
 	],
 	"include": [
 		"config://conf/keywords.json",
