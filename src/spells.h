@@ -44,4 +44,5 @@ int sp_rosthauch(struct castorder *co);
 int sp_sparkle(struct castorder *co);
 int sp_summon_familiar(struct castorder *co);
 
-int sp_summonshadow(struct castorder *co);
+int sp_shadowdemons(struct castorder *co);
+int sp_shadowlords(struct castorder *co);
