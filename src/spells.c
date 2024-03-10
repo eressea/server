@@ -2948,7 +2948,7 @@ static int sp_plague(castorder * co)
  * Flag:
  *  (SPELLLEVEL)
  */
-static int sp_summonshadow(castorder * co)
+int sp_summonshadow(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -2960,7 +2960,7 @@ static int sp_summonshadow(castorder * co)
     u = create_unit(r, caster->faction, number, get_race(RC_SHADOW), 0, NULL, caster);
 
     /* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
-    val = get_level(caster, SK_MAGIC) + get_level(caster, SK_STEALTH);
+    val = (get_level(caster, SK_MAGIC) + get_level(caster, SK_STEALTH)) / 2;
 
     set_level(u, SK_STEALTH, val);
     set_level(u, SK_PERCEPTION, 1);
