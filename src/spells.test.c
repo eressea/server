@@ -1452,8 +1452,8 @@ static void test_shadowdemons(CuTest *tc) {
     CuAssertPtrEquals(tc, u->faction, u2->faction);
     CuAssertPtrEquals(tc, rc, (race *)u_race(u2));
     CuAssertIntEquals(tc, 100, u2->number);
-    CuAssertIntEquals(tc, 8, effskill(u2, SK_STEALTH, u2->region));
-    CuAssertIntEquals(tc, 1, effskill(u2, SK_PERCEPTION, u2->region));
+    CuAssertIntEquals(tc, 8, get_level(u2, SK_STEALTH));
+    CuAssertIntEquals(tc, 1, get_level(u2, SK_PERCEPTION));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "summonshadow_effect"));
 }
 
@@ -1480,8 +1480,8 @@ static void test_shadowlords(CuTest *tc) {
     CuAssertPtrEquals(tc, u->faction, u2->faction);
     CuAssertPtrEquals(tc, rc, (race *)u_race(u2));
     CuAssertIntEquals(tc, 100, u2->number);
-    CuAssertIntEquals(tc, 9, effskill(u2, SK_STEALTH, u2->region));
-    CuAssertIntEquals(tc, 5, effskill(u2, SK_PERCEPTION, u2->region));
+    CuAssertIntEquals(tc, 9, get_level(u2, SK_STEALTH));
+    CuAssertIntEquals(tc, 5, get_level(u2, SK_PERCEPTION));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "summon_effect"));
 }
 
