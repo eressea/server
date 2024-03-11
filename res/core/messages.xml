@@ -6013,6 +6013,14 @@
     </type>
   </message>
 
+  <message name="warpgate" section="events">
+    <type>
+      <arg name="from" type="region"/>
+      <arg name="to" type="region"/>
+      <arg name="unit" type="unit"/>
+    </type>
+  </message>
+
   <message name="tidalwave_kill" section="events">
     <type>
       <arg name="region" type="region"/>

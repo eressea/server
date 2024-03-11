@@ -761,6 +761,9 @@ msgstr "\"$unit($mage) calls for the help of $int($amount) $race($race, $amount)
 msgid "tidalwave"
 msgstr "\"A tidal wave wipes out $region($region) and all who lived there.\""
 
+msgid "warpgate"
+msgstr "\"$unit($unit) is teleported from from $region($from) to $region($to).\""
+
 msgid "cast_hero_effect"
 msgstr "\"$unit($mage) casts $spell($spell): $int($amount) fighters had their moral boosted.\""
 

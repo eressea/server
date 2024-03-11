@@ -50,11 +50,13 @@ int mtype_get_param(const message_type * mtype, const char *param)
 static lua_message *msg_create_message(const char *type)
 {
     lua_message *lmsg = malloc(sizeof(lua_message));
-    lmsg->msg = 0;
-    lmsg->args = 0;
-    lmsg->mtype = mt_find(type);
-    if (lmsg->mtype) {
-        lmsg->args = (variant *)calloc(lmsg->mtype->nparameters, sizeof(variant));
+    if (lmsg) {
+        lmsg->msg = 0;
+        lmsg->args = 0;
+        lmsg->mtype = mt_find(type);
+        if (lmsg->mtype) {
+            lmsg->args = (variant *)calloc(lmsg->mtype->nparameters, sizeof(variant));
+        }
     }
     return lmsg;
 }
