@@ -1270,11 +1270,7 @@ static void expandbuying(region * r, econ_request * buyorders)
                 int price = ltype->price * multi;
 
                 u = g_requests[j]->unit;
-                if (get_pooled(u, rsilver, GET_DEFAULT, price) < price)
-                {
-                    break;
-                }
-                else {
+                if (get_pooled(u, rsilver, GET_DEFAULT, price) >= price) {
                     /* u->n zaehlt das Geld, das verdient wurde. Dies muss gemacht werden,
                      * weil der Preis staendig sinkt,
                      * man sich also das verdiente Geld und die verkauften Produkte separat

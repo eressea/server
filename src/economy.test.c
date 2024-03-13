@@ -604,6 +604,36 @@ static void test_buy_limits(CuTest *tc) {
     test_teardown();
 }
 
+static void test_buy_limited_funds(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    building *b;
+    const item_type *it_jewel;
+
+    test_setup();
+    setup_production();
+    r = setup_trade_region(tc, NULL);
+    b = test_create_building(r, test_create_castle());
+    b->size = 2;
+    rsetpeasants(r, TRADE_FRACTION * 20);
+    it_jewel = it_find("jewel");
+    u1 = test_create_unit(test_create_faction(), r);
+    scale_number(u1, 10);
+    set_level(u1, SK_TRADE, 1);
+    i_change(&u1->items, it_find("money"), 5000);
+    unit_addorder(u1, create_order(K_BUY, u1->faction->locale, "100 %s",
+        LOC(u1->faction->locale, resourcename(it_jewel->rtype, 0))));
+    u2 = test_create_unit(test_create_faction(), r);
+    scale_number(u2, 100);
+    set_level(u2, SK_TRADE, 1);
+    unit_addorder(u2, create_order(K_BUY, u2->faction->locale, "1000 %s",
+        LOC(u2->faction->locale, resourcename(it_jewel->rtype, 0))));
+    produce(r);
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_jewel));
+    CuAssertIntEquals(tc, 100, i_get(u1->items, it_jewel));
+    test_teardown();
+}
+
 static void test_trade_needs_castle(CuTest *tc) {
     /* Handeln ist nur in Regionen mit Burgen m�glich. */
     race *rc;
@@ -1727,6 +1757,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_trade_limits);
     SUITE_ADD_TEST(suite, test_trade_produceexp);
     SUITE_ADD_TEST(suite, test_buy_limits);
+    SUITE_ADD_TEST(suite, test_buy_limited_funds);
     SUITE_ADD_TEST(suite, test_trade_needs_castle);
     SUITE_ADD_TEST(suite, test_trade_insect);
     SUITE_ADD_TEST(suite, test_maintain_buildings);
