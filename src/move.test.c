@@ -980,6 +980,109 @@ static void test_cycle_route(CuTest *tc) {
     test_teardown();
 }
 
+static void test_sailing_sets_coast(CuTest *tc) {
+    unit *u;
+    region *r1, *r2;
+    ship_type *stype;
+
+    test_setup();
+    r2 = test_create_plain(0, 0);
+    r1 = test_create_ocean(1, 0);
+    u = test_create_unit(test_create_faction(), r1);
+    u->ship = test_create_ship(r1, stype = test_create_shiptype("longboat"));
+    set_level(u, SK_SAILING, stype->sumskill);
+    CuAssertPtrEquals(tc, (void *)r2->terrain, stype->coasts[0]);
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "WEST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertIntEquals(tc, D_EAST, u->ship->coast);
+    test_teardown();
+}
+
+static void test_leave_coast_direction(CuTest *tc) {
+    unit *u;
+    region *r1, *r2;
+    ship_type *stype;
+
+    test_setup();
+    r1 = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(), r1);
+    u->ship = test_create_ship(r1, stype = test_create_shiptype("longboat"));
+    set_level(u, SK_SAILING, stype->sumskill);
+
+    r2 = test_create_ocean(1, 0);
+    u->ship->coast = D_EAST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertIntEquals(tc, NODIRECTION, u->ship->coast);
+    CuAssertIntEquals(tc, SF_MOVED, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+    u->ship->flags -= SF_MOVED;
+
+    move_ship(u->ship, r2, r1, NULL);
+    u->ship->coast = D_NORTHEAST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertIntEquals(tc, NODIRECTION, u->ship->coast);
+    CuAssertIntEquals(tc, SF_MOVED, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+    u->ship->flags -= SF_MOVED;
+
+    move_ship(u->ship, r2, r1, NULL);
+    u->ship->coast = D_SOUTHEAST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r2, u->region);
+    CuAssertIntEquals(tc, NODIRECTION, u->ship->coast);
+    CuAssertIntEquals(tc, SF_MOVED, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+    u->ship->flags -= SF_MOVED;
+
+    move_ship(u->ship, r2, r1, NULL);
+    u->ship->coast = D_WEST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r1, u->region);
+    CuAssertIntEquals(tc, D_WEST, u->ship->coast);
+    CuAssertIntEquals(tc, 0, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error182"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+
+    u->ship->coast = D_NORTHWEST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r1, u->region);
+    CuAssertIntEquals(tc, D_NORTHWEST, u->ship->coast);
+    CuAssertIntEquals(tc, 0, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error182"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+
+    u->ship->coast = D_SOUTHWEST;
+    u->thisorder = create_order(K_MOVE, u->faction->locale, "EAST");
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, r1, u->region);
+    CuAssertIntEquals(tc, D_SOUTHWEST, u->ship->coast);
+    CuAssertIntEquals(tc, 0, u->ship->flags & SF_MOVED);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error182"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "shipsail"));
+    test_clear_messages(u->faction);
+
+    test_teardown();
+}
+
 static void test_sail_into_harbour(CuTest* tc) {
     unit* u, *u2;
     region* r1, *r2;
@@ -1232,6 +1335,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_walkingcapacity);
     SUITE_ADD_TEST(suite, test_horses_pull_carts);
     SUITE_ADD_TEST(suite, test_trolls_pull_carts);
+    SUITE_ADD_TEST(suite, test_sailing_sets_coast);
+    SUITE_ADD_TEST(suite, test_leave_coast_direction);
     SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);

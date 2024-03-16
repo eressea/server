@@ -676,7 +676,7 @@ void move_ship(ship * sh, region * from, region * to, region_list * route)
         leave_trail(sh, from, route);
     }
 
-    if (route != NULL && from->units) {
+    if (from->units) {
         unit** iunit = &from->units;
         unit** ulist = &to->units;
         unit* ufirst = NULL;
@@ -2052,64 +2052,63 @@ static void sail(unit * u, order * ord, bool drifting)
             replace_order(&u->orders, ord, norder);
             free_order(norder);
         }
-        set_coast(sh, last_point, current_point);
+        if (route) {
+            set_coast(sh, last_point, current_point);
+            if (is_cursed(sh->attribs, &ct_flyingship)) {
+                ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
+                    starting_point, current_point));
+            }
+            else {
+                ADDMSG(&f->msgs, msg_message("shipsail", "ship from to", sh,
+                    starting_point, current_point));
+            }
 
-        if (is_cursed(sh->attribs, &ct_flyingship)) {
-            ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
-                starting_point, current_point));
-        }
-        else {
-            ADDMSG(&f->msgs, msg_message("shipsail", "ship from to", sh,
-                starting_point, current_point));
-        }
+            /* Das Schiff und alle Einheiten darin werden nun von
+             * starting_point nach current_point verschoben */
 
-        /* Das Schiff und alle Einheiten darin werden nun von
-         * starting_point nach current_point verschoben */
+             /* Verfolgungen melden */
+            if (fval(u, UFL_FOLLOWING)) {
+                caught_target_ship(current_point, u);
+            }
+            move_ship(sh, starting_point, current_point, route);
+            /* Hafengebuehren ? */
 
-        /* Verfolgungen melden */
-        if (fval(u, UFL_FOLLOWING)) {
-            caught_target_ship(current_point, u);
-        }
+            harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
+            if (harbourmaster != NULL) {
+                item *itm;
+                unit *u2;
+                item *trans = NULL;
 
-        move_ship(sh, starting_point, current_point, route);
+                for (u2 = current_point->units; u2; u2 = u2->next) {
+                    if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
 
-        /* Hafengebuehren ? */
+                        if (effskill(harbourmaster, SK_PERCEPTION, NULL) > effskill(u2, SK_STEALTH, NULL)) {
+                            for (itm = u2->items; itm; itm = itm->next) {
+                                const luxury_type *ltype = resource2luxury(itm->type->rtype);
+                                if (ltype != NULL && itm->number > 0) {
+                                    int st = itm->number * effskill(harbourmaster, SK_TRADE, NULL) / 50;
 
-        harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
-        if (harbourmaster != NULL) {
-            item *itm;
-            unit *u2;
-            item *trans = NULL;
-
-            for (u2 = current_point->units; u2; u2 = u2->next) {
-                if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
-
-                    if (effskill(harbourmaster, SK_PERCEPTION, NULL) > effskill(u2, SK_STEALTH, NULL)) {
-                        for (itm = u2->items; itm; itm = itm->next) {
-                            const luxury_type *ltype = resource2luxury(itm->type->rtype);
-                            if (ltype != NULL && itm->number > 0) {
-                                int st = itm->number * effskill(harbourmaster, SK_TRADE, NULL) / 50;
-
-                                if (st > itm->number) st = itm->number;
-                                if (st > 0) {
-                                    i_change(&u2->items, itm->type, -st);
-                                    i_change(&harbourmaster->items, itm->type, st);
-                                    i_add(&trans, i_new(itm->type, st));
+                                    if (st > itm->number) st = itm->number;
+                                    if (st > 0) {
+                                        i_change(&u2->items, itm->type, -st);
+                                        i_change(&harbourmaster->items, itm->type, st);
+                                        i_add(&trans, i_new(itm->type, st));
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            if (trans) {
-                message *msg =
-                    msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
-                        u->ship);
-                add_message(&u->faction->msgs, msg);
-                add_message(&harbourmaster->faction->msgs, msg);
-                msg_release(msg);
-                while (trans)
-                    i_remove(&trans, trans);
+                if (trans) {
+                    message *msg =
+                        msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
+                            u->ship);
+                    add_message(&u->faction->msgs, msg);
+                    add_message(&harbourmaster->faction->msgs, msg);
+                    msg_release(msg);
+                    while (trans)
+                        i_remove(&trans, trans);
+                }
             }
         }
     }
