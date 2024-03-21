@@ -64,7 +64,7 @@ static void do_shock(unit * u, const char *reason)
             skill* sv = u->skills + s;
             int weeks = (sv->level * sv->level - sv->level) / 2;
             int change = (weeks + 9) / 10;
-            reduce_skill(u, sv, change);
+            reduce_skill_weeks(u, sv, change);
         }
     }
     /* Dies ist ein Hack, um das skillmod und familiar-Attribut beim Mage

@@ -188,7 +188,7 @@ static void dumbeffect(unit *u) {
         }
         /* bestes Talent raussuchen */
         if (sb != NULL) {
-            reduce_skill(u, sb, weeks);
+            reduce_skill_weeks(u, sb, weeks);
             ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                 "unit weeks skill", u, weeks, (skill_t)sb->id));
         }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */

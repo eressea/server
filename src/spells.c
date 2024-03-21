@@ -4238,7 +4238,7 @@ static int sp_headache(castorder * co)
         int change = target->number;
         if (change > 10) change = 10;
         change *= (rng_uint() % 2 + 1) / target->number;
-        reduce_skill(target, smax, change);
+        reduce_skill_weeks(target, smax, change);
     }
     set_order(&target->thisorder, NULL);
 

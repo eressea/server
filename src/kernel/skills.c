@@ -109,7 +109,7 @@ void sk_set_level(skill *sv, unsigned int level)
     skill_set(sv, level, weeks);
 }
 
-void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
+void increase_skill_weeks(unit * u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
     if (!sv) {
@@ -123,7 +123,7 @@ void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
     assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 }
 
-void reduce_skill(unit * u, skill * sv, unsigned int weeks)
+void reduce_skill_weeks(unit * u, skill * sv, unsigned int weeks)
 {
     unsigned int max_weeks = MAX_WEEKS_TO_NEXT_LEVEL(sv->level);
 

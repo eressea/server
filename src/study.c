@@ -714,7 +714,7 @@ static void increase_skill_days(unit *u, skill_t sk, int days) {
             ++weeks;
         }
         if (weeks > 0) {
-            increase_skill(u, sk, weeks);
+            increase_skill_weeks(u, sk, weeks);
         }
     }
 }
@@ -736,12 +736,12 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
         if (sv) {
             while (days > 0) {
                 if (days >= STUDYDAYS * u->number) {
-                    reduce_skill(u, sv, 1);
+                    reduce_skill_weeks(u, sv, 1);
                     days -= STUDYDAYS;
                 }
                 else {
                     if (chance(days / ((double)STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
-                        reduce_skill(u, sv, 1);
+                        reduce_skill_weeks(u, sv, 1);
                     days = 0;
                 }
             }
@@ -869,7 +869,7 @@ void demon_skillchange(unit *u)
             }
 
             if (roll < downchance) {
-                reduce_skill(u, sv, weeks);
+                reduce_skill_weeks(u, sv, weeks);
                 if (sv->level < 1) {
                     /* demons should never forget below 1 */
                     set_level(u, sv->id, 1);
