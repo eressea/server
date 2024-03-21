@@ -197,3 +197,15 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     }
     return result->level;
 }
+
+int skill_level(unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->level : 0;
+}
+
+int skill_weeks(unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->weeks : 1;
+}
