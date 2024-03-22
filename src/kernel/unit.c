@@ -960,7 +960,7 @@ void remove_skills(unit * u) {
 struct skill *add_skill(struct unit * u, enum skill_t sk)
 {
     skill* sv;
-    skill skins = { .id = sk, .level = 0, .days = MAX_DAYS_TO_NEXT_LEVEL(0), .old = 0 };
+    skill skins = { .id = sk, .level = 0, .days = SKILL_DAYS_PER_WEEK, .old = 0 };
     assert(u);
     if (u->skills) {
         ptrdiff_t s, len = arrlen(u->skills);

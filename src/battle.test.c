@@ -1015,16 +1015,18 @@ static void test_battle_skilldiff_building(CuTest *tc)
 static void assert_skill(CuTest *tc, const char *msg, unit *u, skill_t sk, unsigned int level, unsigned int week, unsigned int weekmax)
 {
     skill *sv = unit_skill(u, sk);
+    unsigned int days = week * SKILL_DAYS_PER_WEEK;
+    unsigned int max_days = weekmax * SKILL_DAYS_PER_WEEK;
     if (sv) {
         char buf[256];
         sprintf(buf, "%s level %d != %d", msg, sv->level, level);
         CuAssertIntEquals_Msg(tc, buf, level, sv->level);
-        sprintf(buf, "%s week %d !<= %d !<= %d", msg, week, sv->weeks, weekmax);
-        CuAssert(tc, buf, sv->weeks >= week && sv->weeks <= weekmax);
+        sprintf(buf, "%s days %d !<= %d !<= %d", msg, week, sv->days, max_days);
+        CuAssert(tc, buf, sv->days >= days && sv->days <= max_days);
     }
     else {
-        CuAssertIntEquals_Msg(tc, msg, level, 0);
-        CuAssertIntEquals_Msg(tc, msg, week, 0);
+        CuAssertIntEquals_Msg(tc, msg, 0, level);
+        CuAssertIntEquals_Msg(tc, msg, 0, days);
     }
 }
 
@@ -1041,7 +1043,7 @@ static void test_drain_exp(CuTest *tc)
     set_level(u, SK_STAMINA, 3);
 
     CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);
-    CuAssertIntEquals(tc, 4, unit_skill(u, SK_STAMINA)->weeks);
+    CuAssertIntEquals(tc, 4 * SKILL_DAYS_PER_WEEK, unit_skill(u, SK_STAMINA)->days);
 
     assert_skill(tc, msg = "base", u, SK_STAMINA, 3, 4, 4);
     assert_skill(tc, msg, u, SK_STAMINA, 3, 4, 4);

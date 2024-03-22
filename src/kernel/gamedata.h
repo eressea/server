@@ -55,8 +55,9 @@
 #define REMOVE_FACTION_AGE_VERSION 377 /* save start_turn, not age, bug 2878 */
 #define FORBIDDEN_LAND_VERSION 378 /* forbidden regions (walls) do not store land info */
 #define FIX_SHADOWS_VERSION 379 /* shadowdemon/-master skills, bug 3011 */
+#define SKILL_DAYS_VERSION 380 /* skills are stored as days, not weeks */
 
-#define RELEASE_VERSION FIX_SHADOWS_VERSION /* use for new datafiles */
+#define RELEASE_VERSION SKILL_DAYS_VERSION /* use for new datafiles */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 

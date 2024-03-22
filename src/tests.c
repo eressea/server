@@ -59,7 +59,7 @@ struct skill *test_set_skill(unit *u, enum skill_t sk, int level, int weeks)
     set_level(u, sk, level);
     sv = unit_skill(u, sk);
     if (weeks > 0) {
-        sv->weeks = weeks;
+        sv->days = weeks * SKILL_DAYS_PER_WEEK;
     }
     return sv;
 }

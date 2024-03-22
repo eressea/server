@@ -10,7 +10,6 @@
 #include "region.h"
 #include "ship.h"
 #include "skill.h"  // for SK_BUILDING, SK_ARMORER
-#include "study.h"  // for STUDYDAYS
 #include "unit.h"
 
 #include <kernel/skills.h>
@@ -36,7 +35,7 @@ typedef struct build_fixture {
 
 static unit * setup_build(build_fixture *bf) {
     test_setup();
-    config_set_int("study.produceexp", STUDYDAYS);
+    config_set_int("study.produceexp", SKILL_DAYS_PER_WEEK);
     init_resources();
 
     test_create_itemtype("stone");
@@ -372,7 +371,7 @@ static void test_build_building_success(CuTest *tc)
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
     CuAssertIntEquals(tc, 1, u->building->size);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
     teardown_build(&bf);
 }
 
@@ -399,7 +398,7 @@ static void test_build_building_produceexp(CuTest *tc)
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
     CuAssertIntEquals(tc, 1, u->building->size);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
     teardown_build(&bf);
 }
 
@@ -494,7 +493,7 @@ static void test_build_ship_success(CuTest *tc)
     CuAssertPtrEquals(tc, u->region->ships, u->ship);
     CuAssertIntEquals(tc, 1, u->ship->size);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
     teardown_build(&bf);
 }
 

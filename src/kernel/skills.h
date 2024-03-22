@@ -2,7 +2,6 @@
 
 #include "skill.h"
 
-#define SKILL_DAYS_PER_WEEK 30
 #define MAX_WEEKS_TO_NEXT_LEVEL(level) ((level) * 2 + 1)
 #define MAX_DAYS_TO_NEXT_LEVEL(level) (SKILL_DAYS_PER_WEEK * MAX_WEEKS_TO_NEXT_LEVEL(level))
 
@@ -36,15 +35,14 @@ int skillmod(const struct unit *u, const struct region *r,
 struct attrib *make_skillmod(enum skill_t sk, skillmod_fun special,
         double multiplier, int bonus);
 
-void increase_skill_weeks(struct unit * u, enum skill_t sk, unsigned int weeks);
-void reduce_skill_weeks(struct unit *u, skill * sv, unsigned int weeks);
+void increase_skill_weeks(struct unit * u, enum skill_t sk, const unsigned int weeks);
+void reduce_skill_weeks(struct unit *u, skill * sv, const unsigned int weeks);
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
 void sk_set_level(skill * sv, unsigned int level);
 int skill_compare(const skill* sk, const skill* sc);
 
 int skill_level(struct unit *u, enum skill_t sk);
-/** number of times the unit must STUDY to reach the next level: */
-int skill_weeks(struct unit *u, enum skill_t sk);
-
+/** number of days-equivalent the unit must STUDY to reach the next level: */
+int skill_days(struct unit *u, enum skill_t sk);
 
 #define SK_SKILL(sv) ((skill_t) (sv->id))
