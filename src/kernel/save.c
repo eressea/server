@@ -316,7 +316,10 @@ static void read_skill(gamedata *data, skill *sv) {
         sv->old = sv->level = val;
         READ_INT(data->store, &val);
         assert(val < CHAR_MAX);
-        sv->weeks = val;
+        sv->days = val;
+        if (data->version < SKILL_DAYS_VERSION) {
+            sv->days *= SKILL_DAYS_PER_WEEK;
+        }
     }
 }
 

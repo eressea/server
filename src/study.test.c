@@ -127,7 +127,7 @@ static void test_study_no_teacher(CuTest *tc) {
     sv = unit_skill(fix.u, SK_CROSSBOW);
     CuAssertPtrNotNull(tc, sv);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
     CuAssertPtrEquals(tc, NULL, test_get_last_message(fix.u->faction->msgs));
     test_teardown();
 }
@@ -143,7 +143,7 @@ static void test_study_with_teacher(CuTest *tc) {
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 
@@ -157,7 +157,7 @@ static void test_study_with_bad_teacher(CuTest *tc) {
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 
@@ -176,7 +176,7 @@ static void test_study_race_noteach(CuTest *tc) {
     study_cmd(fix.u, fix.u->thisorder);
     CuAssertPtrNotNull(tc, sv = unit_skill(fix.u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 
@@ -193,7 +193,7 @@ static void test_study_speed(CuTest *tc) {
     set_level(u, SK_CATAPULT, 1);
     set_study_speed(rc, SK_BUILDING, -5);
     sv = unit_skill(u, SK_BUILDING);
-    sv->weeks = 1;
+    sv->days = 1 * SKILL_DAYS_PER_WEEK;
     CuAssertIntEquals(tc, -5, rc->study_speed[SK_BUILDING]);
     u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_BUILDING]);
     random_source_inject_constants(0.0, 0);
@@ -202,7 +202,7 @@ static void test_study_speed(CuTest *tc) {
     CuAssertIntEquals(tc, SK_BUILDING, log_learners[0].sk);
     CuAssertIntEquals(tc, 25, log_learners[0].days);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
 
     random_source_inject_constants(0.0, 5);
     u->flags &= ~UFL_LONGACTION;
@@ -410,16 +410,16 @@ void test_learn_skill_single(CuTest *tc) {
     setup_study();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS, 0));
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK, 0));
     CuAssertPtrNotNull(tc, sv = u->skills);
     CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS, 0));
-    CuAssertIntEquals(tc, 1, sv->weeks);
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS * 2, 0));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK, 0));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK * 2, 0));
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 
@@ -431,16 +431,16 @@ void test_learn_skill_multi(CuTest *tc) {
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     scale_number(u, 10);
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS * u->number, 0));
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK * u->number, 0));
     CuAssertPtrNotNull(tc, sv = u->skills);
     CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS * u->number, 0));
-    CuAssertIntEquals(tc, 1, sv->weeks);
-    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, STUDYDAYS  * u->number * 2, 0));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK * u->number, 0));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
+    CuAssertIntEquals(tc, 0, learn_skill(u, SK_ALCHEMY, SKILL_DAYS_PER_WEEK * u->number * 2, 0));
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 
@@ -455,7 +455,7 @@ static void test_demon_skillchange(CuTest *tc) {
     CuAssertPtrNotNull(tc, u);
     test_set_skill(u, SK_CROSSBOW, 2, 1);
     test_set_skill(u, SK_MELEE, 2, 1);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
 
     // make all changes add or subtract only one week:
@@ -465,7 +465,7 @@ static void test_demon_skillchange(CuTest *tc) {
     config_set_int("skillchange.demon.down", 0);
     config_set_int("skillchange.demon.up", 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
 
     /* 10 % chance of rise / fall */
@@ -474,16 +474,16 @@ static void test_demon_skillchange(CuTest *tc) {
     // roll a loss:
     random_source_inject_constants(0.f, 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_MELEE));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_MELEE));
     // roll a gain:
     random_source_inject_constants(0.f, 10);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     // roll no change:
     random_source_inject_constants(0.f, 20);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     // sanity check:
     CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
 
@@ -500,7 +500,7 @@ static void test_demon_skillchange_hungry(CuTest *tc) {
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     fset(u, UFL_HUNGER);
     test_set_skill(u, SK_CROSSBOW, 2, 1);
-    CuAssertIntEquals(tc, 1, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
 
     // make all changes add or subtract only one week:
@@ -515,15 +515,15 @@ static void test_demon_skillchange_hungry(CuTest *tc) {
     // roll a normal loss:
     random_source_inject_constants(0.f, 0);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 2, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     // this should be a success, is also still a loss:
     random_source_inject_constants(0.f, 10);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 3, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     // no positive change:
     random_source_inject_constants(0.f, 20);
     demon_skillchange(u);
-    CuAssertIntEquals(tc, 3, skill_weeks(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
     // sanity check:
     CuAssertIntEquals(tc, 2, skill_level(u, SK_CROSSBOW));
 
@@ -542,7 +542,7 @@ static void test_study_cmd(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, log_learners[0].days);
     test_teardown();
 }
 
@@ -624,7 +624,7 @@ static void test_study_cost(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_ALCHEMY, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * u->number, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * u->number, log_learners[0].days);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     test_teardown();
 }
@@ -652,7 +652,7 @@ static void test_teach_magic(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_MAGIC, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2, log_learners[0].days);
     CuAssertIntEquals(tc, 0, i_get(u->items, itype));
     test_teardown();
 }
@@ -674,7 +674,7 @@ static void test_teach_cmd(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2 * u->number, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 * u->number, log_learners[0].days);
     test_teardown();
 }
 
@@ -719,10 +719,10 @@ static void test_teach_two(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u1, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2 * u1->number, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 * u1->number, log_learners[0].days);
     CuAssertPtrEquals(tc, u2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[1].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 * u2->number, log_learners[1].days);
     test_teardown();
 }
 
@@ -752,10 +752,10 @@ static void test_teach_two_skills(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u1, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2 * u1->number, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 * u1->number, log_learners[0].days);
     CuAssertPtrEquals(tc, u2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_ENTERTAINMENT, log_learners[1].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 2 * u2->number, log_learners[1].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 * u2->number, log_learners[1].days);
     test_teardown();
 }
 
@@ -776,7 +776,7 @@ static void test_teach_one_to_many(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, STUDYDAYS * 10 + STUDYDAYS * u->number, log_learners[0].days);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 10 + SKILL_DAYS_PER_WEEK * u->number, log_learners[0].days);
     test_teardown();
 }
 
@@ -801,7 +801,7 @@ static void test_teach_many_to_one(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, u, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, 2 * STUDYDAYS * u->number, log_learners[0].days);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK * u->number, log_learners[0].days);
     test_teardown();
 }
 
@@ -875,10 +875,10 @@ static void test_teach_many_to_many(CuTest *tc) {
     learn_reset();
     CuAssertPtrEquals(tc, s1, log_learners[0].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[0].sk);
-    CuAssertIntEquals(tc, 2 * STUDYDAYS * s1->number, log_learners[0].days);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK * s1->number, log_learners[0].days);
     CuAssertPtrEquals(tc, s2, log_learners[1].u);
     CuAssertIntEquals(tc, SK_CROSSBOW, log_learners[1].sk);
-    CuAssertIntEquals(tc, 2 * STUDYDAYS * s2->number, log_learners[1].days);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK * s2->number, log_learners[1].days);
     test_teardown();
 }
 

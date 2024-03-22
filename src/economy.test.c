@@ -557,7 +557,7 @@ static void test_trade_produceexp(CuTest *tc) {
 
     test_setup();
     setup_production();
-    config_set_int("study.produceexp", STUDYDAYS);
+    config_set_int("study.produceexp", SKILL_DAYS_PER_WEEK);
     r = setup_trade_region(tc, NULL);
     b = test_create_building(r, test_create_castle());
     b->size = 2;

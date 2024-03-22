@@ -5,6 +5,8 @@
 
 #include <stdbool.h>
 
+#define SKILL_DAYS_PER_WEEK 30
+
 typedef enum skill_t {
     SK_ALCHEMY,
     SK_CROSSBOW,
