@@ -1,15 +1,16 @@
-#ifndef H_KRNL_SKILL
-#define H_KRNL_SKILL
+#pragma once
 
 #include "skill.h"
 
+#define SKILL_DAYS_PER_WEEK 30
 #define MAX_WEEKS_TO_NEXT_LEVEL(level) ((level) * 2 + 1)
+#define MAX_DAYS_TO_NEXT_LEVEL(level) (SKILL_DAYS_PER_WEEK * MAX_WEEKS_TO_NEXT_LEVEL(level))
 
 typedef struct skill {
     unsigned int id : 5;
     unsigned int level : 7;
     unsigned int old : 7;
-    unsigned int weeks : 13;
+    unsigned int days : 13;
 } skill;
 
 struct race;
@@ -47,5 +48,3 @@ int skill_weeks(struct unit *u, enum skill_t sk);
 
 
 #define SK_SKILL(sv) ((skill_t) (sv->id))
-
-#endif

@@ -797,7 +797,7 @@ void transfermen(unit* u, unit* dst, int n)
                     sn = add_skill(dst, sk);
                 }
                 sn->level = result.level;
-                sn->weeks = result.weeks;
+                sn->days = result.days;
             }
             else if (sn) {
                 remove_skill(dst, sk);
@@ -960,7 +960,7 @@ void remove_skills(unit * u) {
 struct skill *add_skill(struct unit * u, enum skill_t sk)
 {
     skill* sv;
-    skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
+    skill skins = { .id = sk, .level = 0, .days = MAX_DAYS_TO_NEXT_LEVEL(0), .old = 0 };
     assert(u);
     if (u->skills) {
         ptrdiff_t s, len = arrlen(u->skills);
