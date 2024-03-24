@@ -138,12 +138,12 @@ static void test_skills_merge(CuTest* tc)
     CuAssertIntEquals(tc, 5, result.level);
     CuAssertIntEquals(tc, 1, result.weeks);
 
-    /* max. far from next level: (T4, 10) + (T6, 14) = (T5, 11) */
-    src.weeks = src.level * 2 + 2;
-    dst.weeks = dst.level * 2 + 2;
+    /* max. far from next level: (T4, 9) + (T6, 13) = (T5, 10) */
+    src.weeks = MAX_WEEKS_TO_NEXT_LEVEL(src.level);
+    dst.weeks = MAX_WEEKS_TO_NEXT_LEVEL(dst.level);
     CuAssertIntEquals(tc, 5, merge_skill(&src, &dst, &result, 1, 1));
     CuAssertIntEquals(tc, 5, result.level);
-    CuAssertIntEquals(tc, 11, result.weeks);
+    CuAssertIntEquals(tc, 10, result.weeks);
 
     /* extreme values: (T99, 1) + (T1, 1) = (T70, 30) */
     src.level = 99;
