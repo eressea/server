@@ -160,7 +160,7 @@ static int level_from_weeks(int weeks, int n)
 {
     /*
     * Wieso funktioniert diese Formel?
-    * Dicord User @djannan:
+    * Discord User @djannan:
     * https://proofwiki.org/wiki/Difference_between_Odd_Squares_is_Divisible_by_8
     * Das hängt mit einer witzigen Eigenschaft der Quadtratzahlen zusammen.
     * Die Differenz der Quadrate zweier aufeinander folgenden ungerader
@@ -170,7 +170,7 @@ static int level_from_weeks(int weeks, int n)
     * Um aus jeder ungeraden Zahl jede Zahl zu gewinnen kommt die
     * -1)/2 am Ende.
     */
-    return (int)(sqrt(1.0 + (weeks * 8.0 / n)) - 1) / 2;
+    return (int)((sqrt(1.0 + (weeks * 8.0 / n)) - 1) / 2);
 }
 
 static int days_studied(const skill* sv)
@@ -179,35 +179,40 @@ static int days_studied(const skill* sv)
     return expect - (int)sv->days;
 }
 
+/**
+  * `n` persons with skill `sn` are merged into `add` persons with skill `sv`
+  */
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
 {
-    /* number of person-weeks the units have studied: */
     int total = add + n;
-    int days, weeks = (sn ? weeks_from_level(sn->level) : 0) * n
-        + (sv ? weeks_from_level(sv->level) : 0) * add;
+    /* number of person-weeks the units have already studied: */
+    int days, weeks = weeks_from_level(sn ? sn->level : 0) * n
+        + weeks_from_level(sv ? sv->level : 0) * add;
     /* level that combined unit should be at: */
     int level = level_from_weeks(weeks, total);
 
+    /* minimum new level, based only on weeks spent towards current levels: */
     result->level = level;
     /* average time to the next level: */
-    result->days = SKILL_DAYS_PER_WEEK * (level + 1);
+    result->days = (level + 1) * SKILL_DAYS_PER_WEEK;
 
-    /* see if we have any remaining weeks: */
+    /* add any remaining weeks to the already studied ones and convert to days: */
     weeks -= weeks_from_level(level) * total;
     days = weeks * SKILL_DAYS_PER_WEEK;
+
     /* adjusted by how much we already studied: */
     if (sv) days += days_studied(sv) * add;
     if (sn) days += days_studied(sn) * n;
     if (days < 0) {
         result->days -= days / total;
     }
-    else if (days / total) {
-        days = result->days - days / total;
-        while (days < 0) {
+    else if (days >= total) {
+        int pdays = total * result->days - days;
+        while (pdays < 0) {
             ++result->level;
-            days += result->level * SKILL_DAYS_PER_WEEK;
+            pdays += total * (result->level + 1) * SKILL_DAYS_PER_WEEK;
         }
-        result->days = days;
+        result->days = (pdays + total - 1 ) / total;
     }
     return result->level;
 }
