@@ -148,12 +148,13 @@ static struct curse_type ct_farvision = {
 
 /* --------------------------------------------------------------------- */
 
+#ifdef ENABLE_FOGTRAP_CURSE
 const struct curse_type ct_fogtrap = {
     "fogtrap",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
     cinfo_simple
 };
-
+#endif
 const struct curse_type ct_maelstrom = {
     "maelstrom",
     CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
@@ -258,7 +259,9 @@ const struct curse_type ct_healing = {
 
 void register_regioncurse(void)
 {
+#ifdef ENABLE_FOGTRAP_CURSE
     ct_register(&ct_fogtrap);
+#endif
     ct_register(&ct_antimagiczone);
     ct_register(&ct_farvision);
     ct_register(&ct_gbdream);

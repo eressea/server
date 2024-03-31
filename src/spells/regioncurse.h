@@ -13,12 +13,14 @@ extern const struct curse_type ct_astralblock;
 extern const struct curse_type ct_badmagicresistancezone;
 extern const struct curse_type ct_goodmagicresistancezone;
 extern const struct curse_type ct_holyground;
-extern const struct curse_type ct_fogtrap;
 extern const struct curse_type ct_magicstreet;
 extern const struct curse_type ct_maelstrom;
 extern const struct curse_type ct_riotzone;
 extern const struct curse_type ct_generous;
 extern const struct curse_type ct_badlearn;
+#ifdef ENABLE_FOGTRAP_CURSE
+extern const struct curse_type ct_fogtrap;
+#endif
 
 struct region;
 
