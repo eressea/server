@@ -2551,8 +2551,8 @@ msgctxt "curseinfo"
 msgid "maelstrom"
 msgstr "The maelstrom in this area will heavily damage all ships coming into its wake. ($int36($id))"
 
-msgid "leavefail"
-msgstr "\"$unit($unit) could not leave $region($region).\""
+msgid "enterfail"
+msgstr "\"$unit($unit) could not enter $region($region).\""
 
 msgid "reduced_production"
 msgstr "The region is ravaged, the ground infertile."

@@ -3,11 +3,13 @@
 #include "contact.h"
 #include "lighthouse.h"
 #include "attributes/follow.h"
+#include "spells/regioncurse.h"
 
 #include "kernel/attrib.h"
 #include "kernel/ally.h"
 #include "kernel/building.h"
 #include "kernel/config.h"
+#include "kernel/curse.h"
 #include "kernel/faction.h"
 #include "kernel/direction.h"          // for D_WEST, shortdirections, D_EAST, dire...
 #include "kernel/region.h"
@@ -39,6 +41,8 @@ static void setup_move(void) {
         "unit:unit", "start:region", "end:region", "mode:int", "regions:regions", MT_NEW_END);
     mt_create_va(mt_new("moveblocked", NULL),
         "unit:unit", "direction:int", MT_NEW_END);
+    mt_create_va(mt_new("enterfail", NULL),
+        "unit:unit", "region:region", MT_NEW_END);
 }
 
 static void test_ship_not_allowed_in_coast(CuTest * tc)
@@ -1327,6 +1331,98 @@ static void test_transport_stealthed(CuTest* tc)
     test_teardown();
 }
 
+#ifdef ENABLE_FOGTRAP_CURSE
+static void test_move_blocked_by_fogtrap(CuTest* tc) {
+    unit* u;
+    region* r, *rt;
+    struct locale* lang;
+
+    test_setup();
+    setup_move();
+    register_regioncurse();
+    rt = test_create_region(1, 0, NULL);
+    r = test_create_region(2, 0, NULL);
+    lang = test_create_locale();
+    u = test_create_unit(test_create_faction(), r);
+    u->faction->locale = lang;
+    u->thisorder = create_order(K_MOVE, lang, "WEST");
+    create_curse(u, &rt->attribs, ct_find("fogtrap"), 2.0, 2, 4.0, 0);
+    /* Es wird erst gar keine Route erzeugt: */
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "enterfail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "moveblocked"));
+    CuAssertPtrEquals(tc, r, u->region);
+    test_teardown();
+}
+#endif
+
+static void test_holyground_blocks_undead_moves(CuTest* tc) {
+    unit* u;
+    region* r, *rt;
+    struct locale* lang;
+    race* rc;
+
+    test_setup();
+    setup_move();
+    register_regioncurse();
+    rt = test_create_region(1, 0, NULL);
+    r = test_create_region(2, 0, NULL);
+    lang = test_create_locale();
+    u = test_create_unit(test_create_faction(), r);
+    u->faction->locale = lang;
+    rc = test_create_race("undead");
+    rc->flags |= RCF_UNDEAD;
+    u_setrace(u, rc);
+    u->thisorder = create_order(K_MOVE, lang, "WEST");
+    create_curse(u, &rt->attribs, ct_find("holyground"), 2.0, 2, 4.0, 0);
+    /* Es wird erst gar keine Route erzeugt: */
+    move_cmd(u, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "enterfail"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "moveblocked"));
+    CuAssertPtrEquals(tc, r, u->region);
+    test_teardown();
+}
+
+static void test_holyground_blocks_undead_follow(CuTest* tc) {
+    unit* u, *u2;
+    region* r, *rt;
+    struct locale* lang;
+    race* rc;
+
+    test_setup();
+    setup_move();
+    register_regioncurse();
+    rt = test_create_region(1, 0, NULL);
+    r = test_create_region(2, 0, NULL);
+    lang = test_create_locale();
+    u = test_create_unit(test_create_faction(), r);
+    u->faction->locale = lang;
+    rc = test_create_race("undead");
+    rc->flags |= RCF_UNDEAD;
+    u_setrace(u, rc);
+    u2 = test_create_unit(test_create_faction(), r);
+    u2->thisorder = create_order(K_MOVE, lang, "WEST");
+    u->orders = create_order(K_FOLLOW, lang, "%s %s",
+        param_name(P_UNIT, lang), itoa36(u2->no));
+    create_curse(u, &rt->attribs, ct_find("holyground"), 2.0, 2, 4.0, 0);
+
+    follow_cmds(u);
+    CuAssertIntEquals(tc, UFL_FOLLOWED, u2->flags & UFL_FOLLOWED);
+    CuAssertIntEquals(tc, UFL_FOLLOWING, u->flags & UFL_FOLLOWING);
+    move_cmd(u2, u2->thisorder);
+    CuAssertPtrEquals(tc, rt, u2->region);
+    CuAssertPtrEquals(tc, r, u->region);
+    CuAssertPtrEquals(tc, NULL, u2->thisorder);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u2->faction->msgs, "enterfail"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u2->faction->msgs, "moveblocked"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "moveblocked"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "enterfail"));
+    test_teardown();
+}
+
 CuSuite *get_move_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1375,5 +1471,10 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_make_movement_order);
     SUITE_ADD_TEST(suite, test_transport_unit);
     SUITE_ADD_TEST(suite, test_transport_stealthed);
+#ifdef ENABLE_FOGTRAP_CURSE
+    SUITE_ADD_TEST(suite, test_move_blocked_by_fogtrap);
+#endif
+    SUITE_ADD_TEST(suite, test_holyground_blocks_undead_moves);
+    SUITE_ADD_TEST(suite, test_holyground_blocks_undead_follow);
     return suite;
 }

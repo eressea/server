@@ -1103,14 +1103,14 @@ bool move_blocked(const unit * u, const region * r, const region * r2)
         }
         b = b->next;
     }
-
+#ifdef ENABLE_FOGTRAP_CURSE
     if (r->attribs) {
         curse *c = get_curse(r->attribs, &ct_fogtrap);
         if (curse_active(c)) {
             return true;
         }
     }
-
+#endif
     if (r2->attribs && fval(u_race(u), RCF_UNDEAD)) {
         curse *c = get_curse(r2->attribs, &ct_holyground);
         return curse_active(c);
@@ -1657,9 +1657,9 @@ static const region_list *travel_route(unit * u, const capacities *cap,
 
         }
 
-        /* movement blocked by a wall */
+        /* movement blocked by a wall or curse */
         if (reldir >= 0 && move_blocked(u, current, next)) {
-            ADDMSG(&u->faction->msgs, msg_message("leavefail",
+            ADDMSG(&u->faction->msgs, msg_message("enterfail",
                 "unit region", u, next));
             break;
         }

@@ -2551,8 +2551,8 @@ msgctxt "curseinfo"
 msgid "maelstrom"
 msgstr "Der Mahlstrom in dieser Region wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))"
 
-msgid "leavefail"
-msgstr "\"$unit($unit) konnte aus $region($region) nicht ausreisen.\""
+msgid "enterfail"
+msgstr "\"$unit($unit) konnte nach $region($region) nicht einreisen.\""
 
 msgid "reduced_production"
 msgstr "Die Region ist verwüstet, der Boden karg."
