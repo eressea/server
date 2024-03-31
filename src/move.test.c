@@ -1362,6 +1362,7 @@ static void test_holyground_blocks_undead_moves(CuTest* tc) {
     region* r, *rt;
     struct locale* lang;
     race* rc;
+    message* msg;
 
     test_setup();
     setup_move();
@@ -1380,7 +1381,9 @@ static void test_holyground_blocks_undead_moves(CuTest* tc) {
     move_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "enterfail"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "moveblocked"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "moveblocked"));
+    CuAssertPtrEquals(tc, u, msg->parameters[0].v);
+    CuAssertIntEquals(tc, D_WEST, msg->parameters[1].i);
     CuAssertPtrEquals(tc, r, u->region);
     test_teardown();
 }
@@ -1390,6 +1393,7 @@ static void test_holyground_blocks_undead_follow(CuTest* tc) {
     region* r, *rt;
     struct locale* lang;
     race* rc;
+    message* msg;
 
     test_setup();
     setup_move();
@@ -1419,7 +1423,9 @@ static void test_holyground_blocks_undead_follow(CuTest* tc) {
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u2->faction->msgs, "enterfail"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u2->faction->msgs, "moveblocked"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u->faction->msgs, "moveblocked"));
-    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "enterfail"));
+    CuAssertPtrNotNull(tc, msg = test_find_messagetype(u->faction->msgs, "enterfail"));
+    CuAssertPtrEquals(tc, u, msg->parameters[0].v);
+    CuAssertPtrEquals(tc, rt, msg->parameters[1].v);
     test_teardown();
 }
 
