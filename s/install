@@ -3,7 +3,10 @@
 FORCE=0
 while getopts f o; do
   case "${o}" in
-  f) usage ; FORCE=yes ;;
+  f) FORCE=yes
+  ;;
+  *) usage
+  ;;
   esac
 done
 
@@ -14,13 +17,20 @@ if [ "$FORCE" != "yes" ] ; then
     exit
   fi
 fi
-[ -z "$CC" ] && [ ! -z `which clang` ] && CC="clang"
-[ -z "$CC" ] && [ ! -z `which gcc` ] && CC="gcc"
-[ -z "$CC" ] && [ ! -z `which tcc` ] && CC="tcc"
-[ -z "$CC" ] && [ ! -z `which cc` ] && CC="cc"
+[ -z "$CC" ] && [ -n "$(which clang)" ] && CC="clang"
+[ -z "$CC" ] && [ -n "$(which gcc)" ] && CC="gcc"
+[ -z "$CC" ] && [ -n "$(which tcc)" ] && CC="tcc"
+[ -z "$CC" ] && [ -n "$(which cc)" ] && CC="cc"
 BIN_DIR="build"
 
 ROOT=$(git rev-parse --show-toplevel)
 PREFIX=$(dirname "$ROOT")/server
-cd "$ROOT"
+cd "$ROOT" || exit
 cmake --install "$BIN_DIR" --prefix "$PREFIX"
+if [ ! -e "$PREFIX/bin/backup-eressea" ] ; then
+    if [ -e ~/.onedrive-cli-token ] ; then
+        cd "$PREFIX" || exit
+        ln -sf backup-onedrive backup-eressea
+        cd - || exit
+    fi
+fi

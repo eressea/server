@@ -29,16 +29,16 @@ if [ ! -d backup ] ; then
   ln -sf "$HOME/backup/eressea/game-$GAME" backup
 fi
 
-if [ -e reports/reports.txt ] ; then
-  echo "backup reports $TURN, game $GAME"
-  tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
-  upload "backup/$TURN-reports.tar.bz2"
-fi
 files=("data/$TURN.dat" parteien.full parteien)
 if [ -e "orders.$TURN" ]; then
   files+=("orders.$TURN")
 fi
 echo "backup turn $TURN, game $GAME, files: ${files[*]}"
 tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-upload "backup/$TURN.tar.bz2"
+if [ -e reports/reports.txt ] ; then
+  upload "backup/$TURN.tar.bz2"
+  echo "backup reports $TURN, game $GAME"
+  tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+  upload "backup/$TURN-reports.tar.bz2"
+fi
 
