@@ -15,6 +15,7 @@
 #include "race.h"
 #include "region.h"
 #include "ship.h"
+#include "skill.h"
 #include "unit.h"
 #include "version.h"
 
