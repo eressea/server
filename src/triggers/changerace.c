@@ -46,8 +46,7 @@ static int changerace_handle(trigger * t, void *data)
     if (td->u) {
         if (td->race != NULL)
             u_setrace(td->u, td->race);
-        if (td->irace != NULL)
-            td->u->irace = td->irace;
+        td->u->irace = td->irace;
     }
     else {
         log_error("could not perform changerace::handle()\n");

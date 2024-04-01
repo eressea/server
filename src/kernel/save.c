@@ -583,22 +583,23 @@ unit *read_unit(gamedata *data)
             }
         }
     }
-    if (rc_toad || rc_smurf) {
-        if (rc == rc_toad || rc == rc_smurf) {
-            trigger **tp = get_triggers(u->attribs, "timer"), *t = NULL;
-            if (tp) {
-                while (*tp) {
-                    trigger *tr = *tp;
-                    if (tr->type == &tt_timeout) {
-                        t = tr;
-                        break;
-                    }
-                    tp = &tr->next;
-                }
-            }
+    if (data->version < FIX_SHAPESHIFT_IRACE_VERSION) {
+        if (rc != rc_demon && u->irace) {
+            /* bugfix 2991 */
+            trigger* t = get_timeout(u->attribs, "timer", &tt_changerace);
             if (t == NULL) {
-                log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
-                restore_race(u, u->faction->race);
+                log_error("%s was %s disguised as %s", unitname(u), u->_race->_name, u->irace->_name);
+                u->irace = NULL;
+            }
+        }
+        if (rc_toad || rc_smurf) {
+            /* bugfix 2732 */
+            if (rc == rc_toad || rc == rc_smurf) {
+                trigger* t = get_timeout(u->attribs, "timer", &tt_changerace);
+                if (t == NULL) {
+                    log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
+                    restore_race(u, u->faction->race);
+                }
             }
         }
     }
