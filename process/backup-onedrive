@@ -1,0 +1,44 @@
+#!/bin/bash
+DIR=$(dirname $0)
+if [ -z "$ERESSEA" ] ; then
+  ERESSEA="$HOME/eressea"
+  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+fi
+GAME=$1
+
+upload() {
+  onedrive-cli cp "./$1" "Eressea/game-$GAME"
+}
+
+if [ ! -d "$ERESSEA/game-$GAME" ]; then
+  echo "No such game: game-$GAME."
+  exit 1
+fi
+cd "$ERESSEA/game-$GAME" || exit
+TURN=$2
+if [ -z "$TURN" ]; then
+  TURN=$(cat turn)
+fi
+if [ ! -e "data/$TURN.dat" ]; then
+  echo "No data for turn $TURN in game $GAME."
+  exit 2
+fi
+if [ ! -d backup ] ; then
+  echo "creating missing backup directory for game $GAME."
+  mkdir -p "$HOME/backup/eressea/game-$GAME"
+  ln -sf "$HOME/backup/eressea/game-$GAME" backup
+fi
+
+if [ -e reports/reports.txt ] ; then
+  echo "backup reports $TURN, game $GAME"
+  tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+  upload "backup/$TURN-reports.tar.bz2"
+fi
+files=("data/$TURN.dat" parteien.full parteien)
+if [ -e "orders.$TURN" ]; then
+  files+=("orders.$TURN")
+fi
+echo "backup turn $TURN, game $GAME, files: ${files[*]}"
+tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+upload "backup/$TURN.tar.bz2"
+
