@@ -189,10 +189,10 @@ int rc_mask(const race *rc);
 int rc_get_mask(char *list);
 
 /* Flags. Do not reorder these without changing json_race() in jsonconf.c */
-#define RCF_PLAYABLE       (1<<0)   /* cannot be the race for a player faction (and other limits?) */
-#define RCF_KILLPEASANTS   (1<<1)   /* a monster that eats peasants */
-#define RCF_SCAREPEASANTS  (1<<2)   /* a monster that scares peasants out of the hex */
-#define RCF_NOSTEAL        (1<<3)   /* this race has high stealth, but is not allowed to steal */
+#define RCF_PLAYABLE       (1<<0)       /* cannot be the race for a player faction (and other limits?) */
+#define RCF_KILLPEASANTS   (1<<1)       /* a monster that eats peasants */
+#define RCF_SCAREPEASANTS  (1<<2)       /* a monster that scares peasants out of the hex */
+#define RCF_NOSTEAL        (1<<3)       /* this race has high stealth, but is not allowed to steal */
 #define RCF_MOVERANDOM     (1<<4)
 #define RCF_CANNOTMOVE     (1<<5)
 #define RCF_AI_LEARN       (1<<6)       /* Lernt automatisch wenn struct faction == 0 */
@@ -221,27 +221,28 @@ int rc_get_mask(char *list);
 #define RCF_DEFAULT (RCF_CANSAIL|RCF_AI_LEARN)
 
 /* Economic flags */
-#define ECF_GIVEPERSON     (1<<0)   /* Uebergibt Personen */
-#define ECF_GIVEUNIT       (1<<1)   /* Einheiten an andere Partei uebergeben */
-#define ECF_GETITEM        (1<<2)   /* nimmt Gegenstaende an */
-#define ECF_REC_ETHEREAL   (1<<3)       /* Rekrutiert aus dem Nichts */
-#define ECF_REC_UNLIMITED  (1<<4)       /* Rekrutiert ohne Limit */
+#define ECF_GIVEPERSON     (1<<0)      /* Uebergibt Personen */
+#define ECF_GIVEUNIT       (1<<1)      /* Einheiten an andere Partei uebergeben */
+#define ECF_GETITEM        (1<<2)      /* nimmt Gegenstaende an */
+#define ECF_REC_ETHEREAL   (1<<3)      /* Rekrutiert aus dem Nichts */
+#define ECF_REC_UNLIMITED  (1<<4)      /* Rekrutiert ohne Limit */
 #define ECF_STONEGOLEM     (1<<5)      /* race gets stonegolem properties */
 #define ECF_IRONGOLEM      (1<<6)      /* race gets irongolem properties */
 
 /* Battle-Flags */
-#define BF_EQUIPMENT    (1<<0)  /* Kann Ausruestung benutzen */
-#define BF_NOBLOCK      (1<<1)  /* Wird in die Rueckzugsberechnung nicht einbezogen */
-#define BF_RES_PIERCE   (1<<2)  /* Halber Schaden durch PIERCE */
-#define BF_RES_CUT      (1<<3)  /* Halber Schaden durch CUT */
-#define BF_RES_BASH     (1<<4)  /* Halber Schaden durch BASH */
-#define BF_INV_NONMAGIC (1<<5)  /* Immun gegen nichtmagischen Schaden */
-#define BF_NO_ATTACK    (1<<6)  /* Kann keine ATTACKIERE Befehle ausfuehren */
+#define BF_EQUIPMENT    (1<<0)         /* Kann Ausruestung benutzen */
+#define BF_NOBLOCK      (1<<1)         /* Wird in die Rueckzugsberechnung nicht einbezogen */
+#define BF_RES_PIERCE   (1<<2)         /* Halber Schaden durch PIERCE */
+#define BF_RES_CUT      (1<<3)         /* Halber Schaden durch CUT */
+#define BF_RES_BASH     (1<<4)         /* Halber Schaden durch BASH */
+#define BF_INV_NONMAGIC (1<<5)         /* Immun gegen nichtmagischen Schaden */
+#define BF_NO_ATTACK    (1<<6)         /* Kann keine ATTACKIERE Befehle ausfuehren */
 
 const char *racename(const struct locale *lang, const struct unit *u,
     const race * rc);
 
 #define playerrace(rc) ((rc)->flags & RCF_PLAYABLE)
+#define stealthrace(rc) (((rc)->flags & (RCF_PLAYABLE|RCF_NOLEARN)) == RCF_PLAYABLE)
 #define dragonrace(rc) ((rc)->flags & RCF_DRAGON)
 #define humanoidrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID) || playerrace(rc))
 #define undeadrace(rc) (((rc)->flags & RCF_UNDEAD) || (rc)==get_race(RC_DRACOID))

@@ -4490,7 +4490,7 @@ int sp_illusionary_shapeshift(castorder * co)
     }
 
     /* aehnlich wie in laws.c:setealth() */
-    if (!playerrace(rc)) {
+    if (!stealthrace(rc)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_shapeshift_fail", "target race", u, rc));
         return 0;
