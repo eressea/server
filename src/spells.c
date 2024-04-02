@@ -2173,7 +2173,8 @@ int sp_stormwinds(castorder * co)
 {
     ship *sh;
     unit *u;
-    int erfolg = 0, cost = 0;
+    unsigned int erfolg = 0;
+    int cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int max_targets = (int)co->force;
