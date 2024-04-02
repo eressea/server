@@ -23,6 +23,7 @@
 
 #include <storage.h>
 
+#include <stb_ds.h>
 #include <tolua.h>
 #include <lua.h>
 
@@ -126,7 +127,7 @@ produce_resource_lua(region * r, const resource_type * rtype, int norders)
     }
 }
 
-static void push_param(lua_State * L, char c, spllprm * param)
+static void push_param(lua_State * L, char c, spellparameter* param)
 {
     if (c == 'u')
         tolua_pushusertype(L, param->data.u, "unit");
@@ -189,13 +190,13 @@ static int lua_callspell(castorder * co, const char *fname)
         tolua_pushusertype(L, caster, "unit");
         lua_pushinteger(L, co->level);
         lua_pushnumber(L, co->force);
-        if (co->sp->parameter && co->par->length) {
+        if (co->sp->parameter && co->a_params) {
             const char *synp = co->sp->parameter;
-            int i = 0;
+            size_t i = 0, len = arrlen(co->a_params);
             ++nparam;
             lua_newtable(L);
-            while (*synp && i < co->par->length) {
-                spllprm *param = co->par->param[i];
+            while (*synp && i < len) {
+                spellparameter *param = co->a_params + i;
                 char c = *synp;
                 if (c == '+') {
                     push_param(L, *(synp - 1), param);

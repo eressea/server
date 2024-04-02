@@ -1445,7 +1445,7 @@ void regenerate_aura(void)
 }
 
 static bool
-verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
+verify_ship(region * r, unit * mage, const spell * sp, spellparameter * spobj,
     order * ord)
 {
     ship *sh = findship(spobj->data.i);
@@ -1468,7 +1468,7 @@ verify_ship(region * r, unit * mage, const spell * sp, spllprm * spobj,
 }
 
 static bool
-verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj,
+verify_building(region * r, unit * mage, const spell * sp, spellparameter* spobj,
     order * ord)
 {
     building *b = findbuilding(spobj->data.i);
@@ -1491,7 +1491,7 @@ verify_building(region * r, unit * mage, const spell * sp, spllprm * spobj,
 }
 
 message *msg_unitnotfound(const struct unit * mage, struct order * ord,
-    const struct spllprm * spobj)
+    const struct spellparameter * spobj)
 {
     /* Einheit nicht gefunden */
     char tbuf[20];
@@ -1510,7 +1510,7 @@ message *msg_unitnotfound(const struct unit * mage, struct order * ord,
 }
 
 static bool
-verify_unit(region * r, unit * mage, const spell * sp, spllprm * spobj,
+verify_unit(region * r, unit * mage, const spell * sp, spellparameter * spobj,
     order * ord)
 {
     unit *u = NULL;
@@ -1566,20 +1566,19 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
     unit *caster = co_get_caster(co);
     const spell *sp = co->sp;
     region *target_r = co_get_region(co);
-    spellparameter *sa = co->par;
 
     *invalid = 0;
     *resist = 0;
     *success = 0;
 
-    if (sa && sa->length) {
-        int i;
+    if (co->a_params) {
+        size_t i, len = arrlen(co->a_params);
         /* zuerst versuchen wir vorher nicht gefundene Objekte zu finden.
          * Wurde ein Objekt durch globalsuche gefunden, obwohl der Zauber
          * gar nicht global haette suchen duerften, setzen wir das Objekt
          * zurueck. */
-        for (i = 0; i < sa->length; i++) {
-            spllprm *spobj = sa->param[i];
+        for (i = 0; i < len; i++) {
+            spellparameter *spobj = co->a_params + i;
 
             switch (spobj->typ) {
             case SPP_TEMP:
@@ -1601,8 +1600,8 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
         }
 
         /* Nun folgen die Tests auf cansee und Magieresistenz */
-        for (i = 0; i < sa->length; i++) {
-            spllprm *spobj = sa->param[i];
+        for (i = 0; i < len; i++) {
+            spellparameter *spobj = co->a_params + i;
             unit *u;
             building *b;
             ship *sh;
@@ -1690,18 +1689,10 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
          * Magieresistenz der Region pruefen. */
         if ((sp->sptyp & REGIONSPELL)) {
             /* Zielobjekt Region anlegen */
-            spllprm *spobj = (spllprm *)malloc(sizeof(spllprm));
-            if (!spobj) abort();
+            spellparameter *spobj = arraddnptr(co->a_params, 1);
             spobj->flag = 0;
             spobj->typ = SPP_REGION;
             spobj->data.r = target_r;
-
-            sa = calloc(1, sizeof(spellparameter));
-            if (!sa) abort();
-            sa->length = 1;
-            sa->param = calloc(sa->length, sizeof(spllprm *));
-            sa->param[0] = spobj;
-            co->par = sa;
 
             if (((sp->sptyp & NORESISTANCE) == 0)) {
                 if (target_resists_magic(caster, target_r, TYP_REGION, 0)) {
@@ -1729,69 +1720,50 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 /* Hilfsstrukturen fuer ZAUBERE */
 /* ------------------------------------------------------------- */
 
-static void free_spellparameter(spellparameter * pa)
+static void free_spellparameter(spellparameter * param)
 {
-    int i;
-
-    assert(pa->param);
-
-    for (i = 0; i < pa->length; i++) {
-        assert(pa->param[i]);
-        switch (pa->param[i]->typ) {
-        case SPP_STRING:
-            free(pa->param[i]->data.s);
-            break;
-        default:
-            break;
-        }
-        free(pa->param[i]);
+    assert(param);
+    switch (param->typ) {
+    case SPP_STRING:
+        free(param->data.s);
+        break;
+    default:
+        break;
     }
-    free(pa->param);
-    free(pa);
 }
 
-static int addparam_string(const char *const param[], spllprm ** spobjp)
+static int addparam_string(const char *const param[], spellparameter * spobj)
 {
-    spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     assert(param[0]);
 
-    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_STRING;
     spobj->data.xs = str_strdup(param[0]);
     return 1;
 }
 
-static int addparam_int(const char *const param[], spllprm ** spobjp)
+static int addparam_int(const char *const param[], spellparameter * spobj)
 {
-    spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
-    assert(param[0]);
-
-    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_INT;
     spobj->data.i = atoi((char *)param[0]);
     return 1;
 }
 
-static int addparam_ship(const char *const param[], spllprm ** spobjp)
+static int addparam_ship(const char *const param[], spellparameter * spobj)
 {
-    spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     int id = atoi36((const char *)param[0]);
 
-    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_SHIP;
     spobj->data.i = id;
     return 1;
 }
 
-static int addparam_building(const char *const param[], spllprm ** spobjp)
+static int addparam_building(const char *const param[], spellparameter * spobj)
 {
-    spllprm *spobj = *spobjp = malloc(sizeof(spllprm));
     int id = atoi36((const char *)param[0]);
 
-    if (!spobj) abort();
     spobj->flag = 0;
     spobj->typ = SPP_BUILDING;
     spobj->data.i = id;
@@ -1799,7 +1771,7 @@ static int addparam_building(const char *const param[], spllprm ** spobjp)
 }
 
 static int
-addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
+addparam_region(const char *const param[], spellparameter * spobj, const unit * u,
     order * ord, message **err)
 {
     assert(param[0]);
@@ -1819,9 +1791,6 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
         rt = findregion(x, y);
 
         if (rt != NULL) {
-            spllprm *spobj = *spobjp = (spllprm *)malloc(sizeof(spllprm));
-
-            if (!spobj) abort();
             spobj->flag = 0;
             spobj->typ = SPP_REGION;
             spobj->data.r = rt;
@@ -1836,14 +1805,12 @@ addparam_region(const char *const param[], spllprm ** spobjp, const unit * u,
 }
 
 static int
-addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
+addparam_unit(const char *const param[], spellparameter * spobj, const unit * u,
     order * ord, message **err)
 {
-    spllprm *spobj;
     int i = 0;
     sppobj_t otype = SPP_UNIT;
 
-    *spobjp = NULL;
     if (isparam(param[0], u->faction->locale, P_TEMP)) {
         if (param[1] == NULL) {
             /* Fehler: Ziel vergessen */
@@ -1854,24 +1821,20 @@ addparam_unit(const char *const param[], spllprm ** spobjp, const unit * u,
         otype = SPP_TEMP;
     }
 
-    *spobjp = spobj = malloc(sizeof(spllprm));
-    if (spobj) {
-        spobj->flag = 0;
-        spobj->typ = otype;
-        spobj->data.i = atoi36((const char*)param[i]);
-    }
+    spobj->flag = 0;
+    spobj->typ = otype;
+    spobj->data.i = atoi36((const char*)param[i]);
     return i + 1;
 }
 
-static spellparameter *add_spellparameter(region * target_r, unit * u,
-    const char *syntax, const char *const param[], int size, struct order *ord)
+static spellparameter *add_spellparameters(region * target_r, unit * u,
+    const char *syntax, const char *const param[], size_t size, struct order *ord)
 {
     struct message *err = NULL;
-    int i = 0;
-    int p = 0;
+    size_t i = 0;
     const char *c;
-    spellparameter *par;
-    int minlen = 0;
+    spellparameter *par = NULL;
+    ptrdiff_t minlen = 0;
 
     for (c = syntax; *c != 0; ++c) {
         /* this makes sure that:
@@ -1888,25 +1851,18 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
 
     /* mindestens ein Ziel (Ziellose Zauber werden nicht
      * geparst) */
-    if (minlen && size == 0) {
-        /* Fehler: Ziel vergessen */
-        cmistake(u, ord, 203, MSG_MAGIC);
-        return 0;
+    if (size == 0) {
+        if (minlen > 0) {
+            /* Fehler: Ziel vergessen */
+            cmistake(u, ord, 203, MSG_MAGIC);
+        }
+        return NULL;
     }
-
-    par = malloc(sizeof(spellparameter));
-    if (!par) abort();
-    par->length = size;
-    if (!size) {
-        par->param = NULL;
-        return par;
-    }
-    par->param = malloc(size * sizeof(spllprm *));
-    if (!par->param) abort();
 
     while (!err && *c && i < size && param[i] != NULL) {
-        spllprm *spobj = NULL;
+        spellparameter spobj;
         int j = -1;
+        spobj.typ = SPP_NONE;
         switch (*c) {
         case '?':
             /* tja. das sollte moeglichst nur am Ende passieren,
@@ -1955,11 +1911,9 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             ++c;
             switch (findparam_ex(param[i++], u->faction->locale)) {
             case P_REGION:
-                spobj = (spllprm *)malloc(sizeof(spllprm));
-                if (!spobj) abort();
-                spobj->flag = 0;
-                spobj->typ = SPP_REGION;
-                spobj->data.r = target_r;
+                spobj.flag = 0;
+                spobj.typ = SPP_REGION;
+                spobj.data.r = target_r;
                 j = 0;
                 ++c;
                 break;
@@ -1996,23 +1950,27 @@ static spellparameter *add_spellparameter(region * target_r, unit * u,
             err = msg_error(u, ord, 209);
         }
         else {
-            if (spobj != NULL)
-                par->param[p++] = spobj;
+            if (spobj.typ != SPP_NONE) {
+                arrput(par, spobj);
+            }
             i += j;
         }
     }
 
     /* im Endeffekt waren es evtl. nur p parameter (weniger weil TEMP nicht gilt) */
-    par->length = p;
 
-    if (!err && p < minlen) {
+    if (arrlen(par) < minlen) {
         /* syntax error */
-        err = msg_error(u, ord, 209);
+        if (!err) {
+            err = msg_error(u, ord, 209);
+        }
     }
     if (err) {
         ADDMSG(&u->faction->msgs, err);
-        free_spellparameter(par);
-        par = NULL;
+        if (par) {
+            free_spellparameter(par);
+            par = NULL;
+        }
     }
     return par;
 }
@@ -2030,11 +1988,13 @@ struct region * co_get_region(const struct castorder * co) {
 }
 
 castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
-    int lev, double force, int range, struct order * ord, spellparameter * p)
+    int lev, double force, int range, struct order * ord, spellparameter * a_params)
 {
-    if (!co) co = (castorder*)calloc(1, sizeof(castorder));
+    if (!co) co = malloc(sizeof(castorder));
     if (!co) abort();
 
+    assert(a_params == NULL || arrlen(a_params) > 0);
+    co->next = NULL;
     co->magician.u = caster;
     co->_familiar = familiar;
     co->sp = sp;
@@ -2043,14 +2003,18 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->_rtarget = r ? r : (familiar ? familiar->region : (caster ? caster->region : NULL));
     co->distance = range;
     co->order = copy_order(ord);
-    co->par = p;
+    co->a_params = a_params;
 
     return co;
 }
 
 void free_castorder(struct castorder *co)
 {
-    if (co->par) free_spellparameter(co->par);
+    size_t i;
+    for (i = arrlen(co->a_params); i > 0; --i) {
+        free_spellparameter(co->a_params + i - 1);
+    }
+    arrfree(co->a_params);
     if (co->order) free_order(co->order);
 }
 
@@ -2649,7 +2613,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         /*
         * Magier zaubert durch Vertrauten: Doppelte Kosten.
         *
-        * Das hier über range zu machen ist ein Hack, deshalb passiert es erst
+        * Das hier ï¿½ber range zu machen ist ein Hack, deshalb passiert es erst
         * nach allen anderen Range-Checks.
         */
         range *= 2;
@@ -2657,9 +2621,9 @@ static castorder *cast_cmd(unit * u, order * ord)
 
     /**
      * level = Die Stufe, auf der gezaubert werden soll. 
-     * Kann nicht höher sein als das Talent des Zaubernden, oder im
+     * Kann nicht hï¿½her sein als das Talent des Zaubernden, oder im
      * Falle, dass ein Vertrauter einen Spruch seines Magiers zaubert,
-     * nicht höher als dessen halbes Talent.
+     * nicht hï¿½her als dessen halbes Talent.
      */
     if (level < 0) {
         level = default_spell_level(mage, sp);
@@ -2702,7 +2666,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 unitname(u), MAX_PARAMETERS, sp->sname);
         }
         args =
-            add_spellparameter(target_r, mage, sp->parameter,
+            add_spellparameters(target_r, mage, sp->parameter,
             (const char *const *)params, p, ord);
         for (i = 0; i != p; ++i) {
             free(params[i]);
@@ -2795,7 +2759,7 @@ void magic(void)
             co->level = max_spell_level(mage, caster, sp, cast_level, co->distance, &reslist);
 
             if (co->level < 1) {
-                /* Es fehlt eine Komponente vollständig: */
+                /* Es fehlt eine Komponente vollstï¿½ndig: */
                 assert(reslist);
                 report_missing_components(mage, ord, reslist);
                 free_components(reslist);
