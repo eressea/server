@@ -15,6 +15,7 @@
 #include "race.h"
 #include "region.h"
 #include "ship.h"
+#include "skill.h"
 #include "unit.h"
 #include "version.h"
 
@@ -475,6 +476,22 @@ static void test_version_no(CuTest *tc) {
     CuAssertIntEquals(tc, 0x10203, version_no("1.2.3-what.is.42"));
 }
 
+static void test_fix_shadows(CuTest *tc) {
+    unit *u1, *u2;
+
+    test_setup();
+    u1 = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u_setrace(u1, test_create_race("shadowdemon"));
+    test_set_skill(u1, SK_STEALTH, 16, 1);
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 0));
+    u_setrace(u2, test_create_race("shadowmaster"));
+    test_set_skill(u2, SK_STEALTH, 16, 1);
+    fix_shadows();
+    CuAssertIntEquals(tc, 8, get_level(u1, SK_STEALTH));
+    CuAssertIntEquals(tc, 15, get_level(u2, SK_STEALTH));
+    test_teardown();
+}
+
 CuSuite *get_save_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -492,6 +509,7 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_read_password);
     SUITE_ADD_TEST(suite, test_read_password_external);
     SUITE_ADD_TEST(suite, test_version_no);
+    SUITE_ADD_TEST(suite, test_fix_shadows);
 
     return suite;
 }

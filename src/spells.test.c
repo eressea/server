@@ -300,6 +300,10 @@ static void test_view_reality(CuTest *tc) {
         "unit:unit", "region:region", "command:order", MT_NEW_END);
     mt_create_va(mt_new("viewreality_effect", NULL),
         "unit:unit", MT_NEW_END);
+    mt_create_va(mt_new("summon_effect", NULL),
+        "mage:unit", "amount:int", "race:race", MT_NEW_END);
+    mt_create_va(mt_new("summonshadow_effect", NULL),
+        "mage:unit", "number:int", MT_NEW_END);
     rx = test_create_region(0, TP_RADIUS + 1, NULL);
     f = test_create_faction();
     u = test_create_unit(f, rx);
@@ -1384,6 +1388,62 @@ static void test_summon_familiar(CuTest *tc) {
     CuAssertPtrEquals(tc, rc_special, (race *)u_race(u2));
 }
 
+static void test_shadowdemons(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    race *rc;
+    castorder co;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    rc = test_create_race("shadowdemon");
+    CuAssertPtrEquals(tc, (void *)get_race(RC_SHADOW), rc);
+    test_set_skill(u, SK_MAGIC, 10, 1);
+    test_set_skill(u, SK_STEALTH, 6, 1);
+    test_create_castorder(&co, u, 3, 10., 0, NULL);
+
+    CuAssertIntEquals(tc, co.level, sp_shadowdemons(&co));
+    CuAssertPtrNotNull(tc, u2 = u->next);
+    CuAssertPtrEquals(tc, u->faction, u2->faction);
+    CuAssertPtrEquals(tc, rc, (race *)u_race(u2));
+    CuAssertIntEquals(tc, 100, u2->number);
+    CuAssertIntEquals(tc, 8, get_level(u2, SK_STEALTH));
+    CuAssertIntEquals(tc, 1, get_level(u2, SK_PERCEPTION));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "summonshadow_effect"));
+}
+
+static void test_shadowlords(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    race *rc;
+    castorder co;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    rc = test_create_race("shadowmaster");
+    CuAssertPtrEquals(tc, (void *)get_race(RC_SHADOWLORD), rc);
+    test_set_skill(u, SK_MAGIC, 10, 1);
+    test_set_skill(u, SK_STEALTH, 6, 1);
+    test_create_castorder(&co, u, 3, 10., 0, NULL);
+
+    CuAssertIntEquals(tc, co.level, sp_shadowlords(&co));
+    CuAssertPtrNotNull(tc, u2 = u->next);
+    CuAssertPtrEquals(tc, u->faction, u2->faction);
+    CuAssertPtrEquals(tc, rc, (race *)u_race(u2));
+    CuAssertIntEquals(tc, 100, u2->number);
+    CuAssertIntEquals(tc, 9, get_level(u2, SK_STEALTH));
+    CuAssertIntEquals(tc, 5, get_level(u2, SK_PERCEPTION));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "summon_effect"));
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1423,6 +1483,8 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_rosthauch);
     SUITE_ADD_TEST(suite, test_sparkle);
     SUITE_ADD_TEST(suite, test_summon_familiar);
+    SUITE_ADD_TEST(suite, test_shadowdemons);
+    SUITE_ADD_TEST(suite, test_shadowlords);
 
     return suite;
 }

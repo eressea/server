@@ -1,24 +1,24 @@
 #!/bin/bash
 
-ROOT=$(pwd)
-while [ ! -d $ROOT/.git ]; do
-  ROOT=$(dirname $ROOT)
+ROOT="$(pwd)"
+while [ ! -d "$ROOT/.git" ]; do
+  ROOT=$(dirname "$ROOT")
   if [ "/" = "$ROOT" ]; then
     echo "could not find root, are you in the git repository?"
     exit
   fi
 done
-ERESSEA=$(dirname $ROOT)
+ERESSEA=$(dirname "$ROOT")
 
 function abort() {
-  echo $1
-  [ -z $2 ] && exit -1
-  exit $2 # otherwise
+  echo "$1"
+  [ -z "$2" ] && exit 255 
+  exit "$2" # otherwise
 }
 
 function usage() {
 cat <<USAGE
-Usage: $u [-hfn] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
+Usage: $0 [-hfn] [-d DIR] [-g <game>] [-r <rules>] [-s DIR]
   -h   print this message
   -f   force overwrite of existing game
   -g   game id
@@ -46,29 +46,29 @@ while getopts :d:g:r:s:hfn o; do
   esac
 done
 
-[ $game -gt 0 ] || abort "must use a positive integer for game id"
-[ -z $SOURCE ] && SOURCE=$ERESSEA/$src
-[ -d $SOURCE ] || abort "invalid source directory $SOURCE"
-[ -z $rules ] && rules=e$game
-[ -z $dir ] && dir=game-$game
-[ -z $TOOLS ] && TOOLS=$SOURCE/build
-[ -e $TOOLS ] || TOOLS=$SOURCE/bin
-[ -z $INIFILE ] && INIFILE=$TOOLS/inifile
-[ -e $INIFILE ] || INIFILE=$TOOLS/iniparser/inifile
+[ "$game" -gt 0 ] || abort "must use a positive integer for game id"
+[ -z "$SOURCE" ] && SOURCE="$ERESSEA/$src"
+[ -d "$SOURCE" ] || abort "invalid source directory $SOURCE"
+[ -z "$rules" ] && rules="e$game"
+[ -z "$dir" ] && dir="game-$game"
+[ -z "$TOOLS" ] && TOOLS="$SOURCE/build"
+[ -e "$TOOLS" ] || TOOLS="$SOURCE/bin"
+[ -z "$INIFILE" ] && INIFILE="$TOOLS/inifile"
+[ -e "$INIFILE" ] || INIFILE="$TOOLS/iniparser/inifile"
 
-[ -e $SOURCE/conf/$rules/config.json ] || abort "cannot find conf/$rules/config.json"
+[ -e "$SOURCE/conf/$rules/config.json" ] || abort "cannot find conf/$rules/config.json"
 
-cd $ERESSEA
-if [ -d $dir ] ; then
+cd "$ERESSEA" || exit
+if [ -d "$dir" ] ; then
   [ $force -eq 1 ] || abort "$dir directory exists. Use -f to force"
 fi
-mkdir -p $dir
-cd $dir || abort "could not chdir to $dir"
+mkdir -p "$dir"
+cd "$dir" || abort "could not chdir to $dir"
 mkdir -p data reports
 
 function ini_sec() {
   if [ $edit -eq 1 ]; then
-    $INIFILE eressea.ini add $1
+    $INIFILE eressea.ini add "$1"
   else
     echo "[$1]" >> eressea.ini
   fi
@@ -76,7 +76,7 @@ function ini_sec() {
 
 function ini_add() {
   if [ $edit -eq 1 ]; then
-    $INIFILE eressea.ini add $1:$2 $3
+    $INIFILE eressea.ini add "$1:$2" "$3"
   else
     echo "$2 = $3" >> eressea.ini
   fi
@@ -84,7 +84,7 @@ function ini_add() {
 
 function ini_start() {
   if [ -e eressea.ini ]; then
-    if [ ! -e $INIFILE ] && [ $edit -eq 1 ]; then
+    if [ ! -e "$INIFILE" ] && [ $edit -eq 1 ]; then
       abort "missing editor for eressea.ini. use -n to create new file."
     fi
     rm -f eressea.ini
@@ -98,15 +98,15 @@ function ini_start() {
 ini_start
 ini_sec game
 ini_add game locales de,en
-ini_add game id $game
+ini_add game id "$game"
 ini_add game start 1
 ini_sec lua
-ini_add lua install $SOURCE
-ini_add lua rules $rules
+ini_add lua install "$SOURCE"
+ini_add lua rules "$rules"
 
 echo 0 > turn
 touch newfactions
-ln -sf $SOURCE/bin/eressea
-ln -sf $SOURCE/scripts/run-turn.lua
-ln -sf $SOURCE/scripts/reports.lua
-ln -sf $SOURCE/scripts/config.lua
+ln -sf "$SOURCE/bin/eressea" .
+ln -sf "$SOURCE/scripts/run-turn.lua" .
+ln -sf "$SOURCE/scripts/reports.lua" .
+ln -sf "$SOURCE/scripts/config.lua" .

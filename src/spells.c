@@ -2955,7 +2955,7 @@ static int sp_plague(castorder * co)
  * Flag:
  *  (SPELLLEVEL)
  */
-static int sp_summonshadow(castorder * co)
+int sp_shadowdemons(castorder * co)
 {
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -2967,7 +2967,7 @@ static int sp_summonshadow(castorder * co)
     u = create_unit(r, caster->faction, number, get_race(RC_SHADOW), 0, NULL, caster);
 
     /* Bekommen Tarnung = (Magie+Tarnung)/2 und Wahrnehmung 1. */
-    val = get_level(caster, SK_MAGIC) + get_level(caster, SK_STEALTH);
+    val = (get_level(caster, SK_MAGIC) + get_level(caster, SK_STEALTH)) / 2;
 
     set_level(u, SK_STEALTH, val);
     set_level(u, SK_PERCEPTION, 1);
@@ -2986,7 +2986,7 @@ static int sp_summonshadow(castorder * co)
  * Wirkung:
  *  Diese hoeheren Schattendaemonen sind erheblich gefaehrlicher als die
  *  einfachen Schattendaemonen.  Sie haben Tarnung entsprechend dem
- *  Magietalent des Beschwoerer-1 und Wahrnehmung 5, 75 HP,
+ *  Magietalent des Beschwoerers-1 und Wahrnehmung 5, 75 HP,
  *  Ruestungsschutz 4, Attacke-Bonus 11 und Verteidigungsbonus 13, machen
  *  bei einem Treffer 2d4 Schaden, entziehen einen Staerkepunkt und
  *  entziehen 5 Talenttage in einem zufaelligen Talent.
@@ -2995,7 +2995,7 @@ static int sp_summonshadow(castorder * co)
  * Flag:
  *  (SPELLLEVEL)
  * */
-static int sp_summonshadowlords(castorder * co)
+int sp_shadowlords(castorder * co)
 {
     unit *u;
     region *r = co_get_region(co);
@@ -3008,7 +3008,7 @@ static int sp_summonshadowlords(castorder * co)
         NULL, caster);
 
     /* Bekommen Tarnung = Magie und Wahrnehmung 5. */
-    set_level(u, SK_STEALTH, get_level(caster, SK_MAGIC));
+    set_level(u, SK_STEALTH, get_level(caster, SK_MAGIC) - 1);
     set_level(u, SK_PERCEPTION, 5);
 
     ADDMSG(&caster->faction->msgs, msg_message("summon_effect", "mage amount race",
@@ -6224,7 +6224,7 @@ static spelldata spell_functions[] = {
     { "firewall", sp_firewall, patzer_peasantmob },
     { "plague", sp_plague, patzer_peasantmob },
     { "chaosrow", sp_chaosrow, 0 },
-    { "summonshadow", sp_summonshadow, patzer_peasantmob },
+    { "summonshadow", sp_shadowdemons, patzer_peasantmob },
     { "undeadhero", sp_undeadhero, 0 },
     { "auraleak", sp_auraleak, 0 },
     { "draigfumbleshield", sp_fumbleshield, 0 },
@@ -6233,7 +6233,7 @@ static spelldata spell_functions[] = {
     { "unholypower", sp_unholypower, 0 },
     { "deathcloud", sp_deathcloud, patzer_deathcloud },
     { "summondragon", sp_summondragon, patzer_peasantmob },
-    { "summonshadowlords", sp_summonshadowlords, patzer_peasantmob },
+    { "summonshadowlords", sp_shadowlords, patzer_peasantmob },
     { "chaossuction", sp_chaossuction, patzer_peasantmob },
     /* M_ILLAUN */
     { "sparkledream", sp_sparkle, 0 },

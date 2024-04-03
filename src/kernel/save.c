@@ -1296,6 +1296,27 @@ static int cb_sb_maxlevel(spellbook_entry *sbe, void *cbdata) {
     return 0;
 }
 
+void fix_shadows(void)
+{
+    region *r;
+    const race *rc_demon = get_race(RC_SHADOW);
+    const race *rc_lord = get_race(RC_SHADOWLORD);
+    for (r = regions; r; r = r->next) {
+        unit *u;
+        for (u = r->units; u; u = u->next) {
+            const race *rc = u_race(u);
+            if (rc == rc_demon) {
+                int level = get_level(u, SK_STEALTH);
+                set_level(u, SK_STEALTH, level / 2);
+            } 
+            else if (rc == rc_lord) {
+                int level = get_level(u, SK_STEALTH);
+                set_level(u, SK_STEALTH, level - 1);
+            }
+        }
+    }
+}
+
 int readgame(const char *filename)
 {
     int n = -2, stream_version;
@@ -1331,6 +1352,9 @@ int readgame(const char *filename)
             log_debug("data in %s created with build %d.", filename, build);
         }
         n = read_game(&gdata);
+        if (gdata.version < FIX_SHADOWS_VERSION) {
+            fix_shadows();
+        }
         binstore_done(&store);
         fstream_done(&strm);
     }
