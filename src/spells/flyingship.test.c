@@ -9,19 +9,17 @@
 #include <util/message.h>
 
 #include <magic.h>
-
-#include <CuTest.h>
 #include <tests.h>
+
+#include <stb_ds.h>
+#include <CuTest.h>
 
 #include <stddef.h>          // for NULL
 
 static void test_flyingship(CuTest * tc)
 {
     castorder co;
-    spellparameter par;
-    spllprm par_data;
-    spllprm *par_data_ptr = &par_data;
-
+    spellparameter par_data, *par = NULL;
     region *r;
     faction *f;
     unit *u;
@@ -32,7 +30,6 @@ static void test_flyingship(CuTest * tc)
     mt_create_va(mt_new("flying_ship_result", NULL),
         "mage:unit", "ship:ship", MT_NEW_END);
 
-    par.param = &par_data_ptr;
     par_data.typ = SPP_SHIP;
     par_data.flag = 0;
 
@@ -49,20 +46,21 @@ static void test_flyingship(CuTest * tc)
     sh1 = test_create_ship(r, shipType1);
     par_data.data.sh = sh1;
 
-    test_create_castorder(&co, u, 10, 10.0, 0, &par);
+    arrput(par, par_data);
+
+    test_create_castorder(&co, u, 10, 10.0, 0, par);
     CuAssertTrue(tc, !flying_ship(sh1));
     CuAssertIntEquals(tc, 10, sp_flying_ship(&co));
     CuAssertTrue(tc, flying_ship(sh1));
-    co.par = 0;
 
     sh2 = test_create_ship(r, shipType2);
     par_data.data.sh = sh2;
 
-    test_create_castorder(&co, u, 10, 10.0, 0, &par);
+    test_create_castorder(&co, u, 10, 10.0, 0, par);
     CuAssertTrue(tc, !flying_ship(sh2));
     CuAssertIntEquals(tc, 0, sp_flying_ship(&co));
     CuAssertTrue(tc, !flying_ship(sh2));
-    co.par = 0;
+
     test_teardown();
 }
 
