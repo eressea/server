@@ -617,6 +617,12 @@ unit *read_unit(gamedata *data)
                     tp = &tr->next;
                 }
             }
+            else if (rc != rc_demon && u->irace) {
+                /* Gestaltwandlung, aber kein Timer */
+                log_error("%s was a %s disguised as %s without a timer",
+                    unitname(u), u->_race->_name, u->irace->_name);
+                u->irace = NULL;
+            }
         }
         if (rc_toad || rc_smurf) {
             /* bugfix 2732 */
