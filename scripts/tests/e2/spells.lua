@@ -47,9 +47,27 @@ function test_shapeshift()
     u1:add_spell("shapeshift")
     u1:add_order("ZAUBERE STUFE 1 Gestaltwandlung " .. itoa36(u2.id) .. " Goblin")
     process_orders()
-    assert_equal(f.race, u2.race)
+    assert_equal(f.race, u2.race) -- it's just an illusion
     s = u2:show()
     assert_equal("1 Goblin", string.sub(s, string.find(s, "1 Goblin")))
+end
+
+function test_shapeshift_bad_race()
+    local r = region.create(42, 0, "plain")
+    local f = faction.create("human", "noreply@eressea.de", "de")
+    local u1 = unit.create(f, r, 1)
+    local u2 = unit.create(f, r, 1)
+    u1:clear_orders()
+    u1.magic = "gray"
+    u1:set_skill("magic", 2)
+    u1.aura = 1
+    u1:add_spell("shapeshift")
+    u1:add_order("ZAUBERE STUFE 1 Gestaltwandlung " .. itoa36(u2.id) .. " Schlumpf")
+    process_orders()
+    assert_equal(f.race, u2.race) -- it's just an illusion
+    s = u2:show()
+    assert_equal("1 Mensch", string.sub(s, string.find(s, "1 Mensch")))
+    assert_nil(string.find(s, "Schlumpf"))
 end
 
 function test_raindance()

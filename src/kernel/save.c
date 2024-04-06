@@ -73,13 +73,13 @@
 #include <stb_ds.h>
 
 /* libc includes */
-#include <limits.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define xisdigit(c)     (((c) >= '0' && (c) <= '9') || (c) == '-')
 
@@ -583,22 +583,49 @@ unit *read_unit(gamedata *data)
             }
         }
     }
-    if (rc_toad || rc_smurf) {
-        if (rc == rc_toad || rc == rc_smurf) {
-            trigger **tp = get_triggers(u->attribs, "timer"), *t = NULL;
+    if (data->version < FIX_SHAPESHIFT_IRACE_VERSION) {
+        if (u->attribs) {
+            /* bugfix 2991 */
+            trigger** tp = get_triggers(u->attribs, "timer");
             if (tp) {
                 while (*tp) {
-                    trigger *tr = *tp;
+                    trigger* tr = *tp;
                     if (tr->type == &tt_timeout) {
-                        t = tr;
-                        break;
+                        timeout_data* td = (timeout_data*)tr->data.v;
+                        trigger* t;
+                        for (t = td->triggers; t; t = t->next) {
+                            if (t->type == &tt_changerace) {
+                                changerace_data* crd = (changerace_data*)t->data.v;
+                                if (u->irace != NULL) {
+                                    /* Einheit ist getarnt, Effekt ist von Gestaltwandlung? */
+                                    assert(crd->race);
+                                    crd->race = NULL;
+                                }
+                                else {
+                                    /* is currently a toad or smurf */
+                                    assert(u->_race == rc_toad || u->_race == rc_smurf);
+                                    /* Previously had no stealth race or is a demon */
+                                    assert(crd->irace == NULL || crd->race == rc_demon);
+                                    continue;
+                                }
+                                log_error("%s, a %s was a %s disguised as %s",
+                                    unitname(u), u->_race->_name, crd->race ? crd->race->_name : "unknown", crd->irace ? crd->irace->_name : "unknown"
+                                );
+                            }
+                        }
                     }
                     tp = &tr->next;
                 }
             }
-            if (t == NULL) {
-                log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
-                restore_race(u, u->faction->race);
+        }
+        if (rc_toad || rc_smurf) {
+            /* bugfix 2732 */
+            if (rc == rc_toad || rc == rc_smurf) {
+                trigger* t = get_timeout(u->attribs, "timer", &tt_changerace);
+                if (t == NULL) {
+                    log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
+                    restore_race(u, u->faction->race);
+                }
             }
         }
     }

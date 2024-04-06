@@ -1566,13 +1566,13 @@ void scale_number(unit * u, int n)
     if (u->number > 0) {
         if (n > 0) {
             u->hp = (long long)u->hp * n / u->number;
-            scale_effects(u->attribs, n, u->number);
         }
         else {
             a_removeall(&u->attribs, &at_effect);
             u->hp = 0;
         }
     }
+    scale_effects(u, n);
     if (u->number == 0 || n == 0) {
         remove_skills(u);
     }

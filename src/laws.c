@@ -172,7 +172,7 @@ static bool RemoveNMRNewbie(void)
     return value != 0;
 }
 
-static void dumbeffect(unit *u) {
+static void potion_effects(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
         int weeks = u->number;
@@ -223,7 +223,7 @@ static void age_unit(region * r, unit * u)
         rc->age_unit(u);
     }
     if (u->attribs) {
-        dumbeffect(u);
+        potion_effects(u);
     }
     if (u->items && u->region && is_astral(u->region)) {
         astral_crumble(u);
