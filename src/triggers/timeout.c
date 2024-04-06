@@ -87,16 +87,21 @@ trigger *trigger_timeout(int time, trigger * callbacks)
 
 trigger* get_timeout(attrib* alist, const char* event, trigger_type* action)
 {
-    trigger** tp = get_triggers(alist, event), * t = NULL;
+    trigger** tp = get_triggers(alist, event);
     if (tp) {
         while (*tp) {
             trigger* tr = *tp;
-            if (tr->type == action) {
-                t = tr;
-                break;
+            if (tr->type == &tt_timeout) {
+                timeout_data* td = (timeout_data*)tr->data.v;
+                trigger* t;
+                for (t = td->triggers; t; t = t->next) {
+                    if (t->type == action) {
+                        return t;
+                    }
+                }
             }
             tp = &tr->next;
         }
     }
-    return t;
+    return NULL;
 }

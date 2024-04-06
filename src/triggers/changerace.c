@@ -46,7 +46,8 @@ static int changerace_handle(trigger * t, void *data)
     if (td->u) {
         if (td->race != NULL)
             u_setrace(td->u, td->race);
-        td->u->irace = td->irace;
+        else
+            td->u->irace = td->irace;
     }
     else {
         log_error("could not perform changerace::handle()\n");
@@ -94,27 +95,44 @@ trigger *trigger_changerace(unit * u, const race * prace, const race * irace)
     return t;
 }
 
-struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace) {
+static struct trigger *change_race_i(struct unit *u, int duration, const struct race *rc, bool is_stealth) {
     trigger **texists = get_triggers(u->attribs, "timer");
     trigger *tr = NULL;
 
+    assert(rc);
     if (texists) {
         tr = *texists;
     }
     else {
-        trigger *trestore = trigger_changerace(u, u_race(u), u->irace);
+        trigger* trestore;
+        if (is_stealth) {
+            trestore = trigger_changerace(u, NULL, u->irace);
+        }
+        else {
+            trestore = trigger_changerace(u, u_race(u), u->irace);
+        }
         if (trestore) {
             tr = trigger_timeout(duration, trestore);
+        }
+        if (tr) {
             add_trigger(&u->attribs, "timer", tr);
         }
     }
     if (tr) {
-        u->irace = irace;
-        if (urace) {
-            u_setrace(u, urace);
+        if (is_stealth) {
+            u->irace = rc;
+        }
+        else {
+            u_setrace(u, rc);
+            u->irace = NULL;
         }
     }
     return tr;
+}
+
+struct trigger* change_race(struct unit* u, int duration, const struct race* urace, const struct race* irace) {
+    const struct race* rc = irace ? irace : urace;
+    return change_race_i(u, duration, rc, irace != NULL);
 }
 
 void restore_race(unit *u, const race *rc)

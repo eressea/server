@@ -2,11 +2,16 @@
 
 #include "guard.h"
 #include "laws.h"
+#include "items.h"
+
+#include <triggers/changerace.h>
+#include <triggers/timeout.h>
 
 #include <util/base36.h>
 #include <util/keyword.h>
 
 #include <kernel/attrib.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
 #include <kernel/order.h>
@@ -185,6 +190,53 @@ static void test_scale_effects(CuTest *tc) {
     test_teardown();
 }
 
+static void test_bloodpotion(CuTest* tc) {
+    unit* u;
+    struct item_type* itype;
+    struct race* rc_demon, * rc_toad;
+
+    test_setup();
+    itype = test_create_itemtype("bloodpotion");
+    rc_demon = test_create_race("demon");
+    rc_toad = test_create_race("toad");
+    CuAssertPtrEquals(tc, rc_demon, (race*)get_race(RC_DAEMON));
+    CuAssertPtrEquals(tc, rc_toad, (race*)get_race(RC_TOAD));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u_setrace(u, rc_demon);
+    use_bloodpotion(u, itype, 5, NULL);
+    CuAssertPtrEquals(tc, NULL, get_timeout(u->attribs, "timer", &tt_changerace));
+    CuAssertIntEquals(tc, 500, get_effect(u, itype));
+    CuAssertPtrEquals(tc, rc_demon, (race*)u_race(u));
+
+    test_teardown();
+}
+
+static void test_bloodpotion_fail(CuTest* tc) {
+    unit* u;
+    struct item_type* itype;
+    struct race* rc_demon, * rc_smurf;
+    const struct race* rc;
+    trigger* t;
+    changerace_data* crd;
+
+    test_setup();
+    itype = test_create_itemtype("bloodpotion");
+    rc_demon = test_create_race("demon");
+    rc_smurf = test_create_race("smurf");
+    CuAssertPtrEquals(tc, rc_demon, (race*)get_race(RC_DAEMON));
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    rc = u_race(u);
+    CuAssertTrue(tc, rc_demon != u_race(u));
+    use_bloodpotion(u, itype, 1, NULL);
+    CuAssertIntEquals(tc, 0, get_effect(u, itype));
+    CuAssertPtrEquals(tc, rc_smurf, (race*)u_race(u));
+    CuAssertPtrNotNull(tc, t = get_timeout(u->attribs, "timer", &tt_changerace));
+    CuAssertPtrNotNull(tc, crd = (changerace_data*)t->data.v);
+    CuAssertPtrEquals(tc, (race*)rc, (race *)crd->race);
+    CuAssertPtrEquals(tc, NULL, (race*)crd->irace);
+    test_teardown();
+}
+
 CuSuite *get_alchemy_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -192,5 +244,7 @@ CuSuite *get_alchemy_suite(void)
     SUITE_ADD_TEST(suite, test_scale_effects);
     SUITE_ADD_TEST(suite, test_foolpotion_effect);
     SUITE_ADD_TEST(suite, test_use_foolpotion);
+    SUITE_ADD_TEST(suite, test_bloodpotion);
+    SUITE_ADD_TEST(suite, test_bloodpotion_fail);
     return suite;
 }

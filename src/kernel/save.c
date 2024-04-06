@@ -73,13 +73,13 @@
 #include <stb_ds.h>
 
 /* libc includes */
-#include <limits.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
+#include <errno.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define xisdigit(c)     (((c) >= '0' && (c) <= '9') || (c) == '-')
 
@@ -584,12 +584,38 @@ unit *read_unit(gamedata *data)
         }
     }
     if (data->version < FIX_SHAPESHIFT_IRACE_VERSION) {
-        if (rc != rc_demon && u->irace) {
+        if (u->attribs) {
             /* bugfix 2991 */
-            trigger* t = get_timeout(u->attribs, "timer", &tt_changerace);
-            if (t == NULL) {
-                log_error("%s was %s disguised as %s", unitname(u), u->_race->_name, u->irace->_name);
-                u->irace = NULL;
+            trigger** tp = get_triggers(u->attribs, "timer");
+            if (tp) {
+                while (*tp) {
+                    trigger* tr = *tp;
+                    if (tr->type == &tt_timeout) {
+                        timeout_data* td = (timeout_data*)tr->data.v;
+                        trigger* t;
+                        for (t = td->triggers; t; t = t->next) {
+                            if (t->type == &tt_changerace) {
+                                changerace_data* crd = (changerace_data*)t->data.v;
+                                if (u->irace != NULL) {
+                                    /* Einheit ist getarnt, Effekt ist von Gestaltwandlung? */
+                                    assert(crd->race);
+                                    crd->race = NULL;
+                                }
+                                else {
+                                    /* is currently a toad or smurf */
+                                    assert(u->_race == rc_toad || u->_race == rc_smurf);
+                                    /* Previously had no stealth race or is a demon */
+                                    assert(crd->irace == NULL || crd->race == rc_demon);
+                                    continue;
+                                }
+                                log_error("%s, a %s was a %s disguised as %s",
+                                    unitname(u), u->_race->_name, crd->race ? crd->race->_name : "unknown", crd->irace ? crd->irace->_name : "unknown"
+                                );
+                            }
+                        }
+                    }
+                    tp = &tr->next;
+                }
             }
         }
         if (rc_toad || rc_smurf) {

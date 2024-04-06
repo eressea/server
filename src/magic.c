@@ -1259,6 +1259,38 @@ static void fumble_default(castorder * co)
     return;
 }
 
+/** fumble: turns into a toad.
+ * 
+ * when this ends, one or two things will happen: 
+ * the toad changes its race back,
+ * and may or may not get toadslime.
+ * The list of things to happen are attached to a timeout
+ * trigger and that's added to the triggerlist of the mage gone toad.
+ */
+void fumble_toad(unit* mage, const spell *sp, int level)
+{
+    static int rc_cache;
+    static const race* rc_toad = NULL;
+    region* r = mage->region;
+    int duration;
+    trigger* trestore;
+
+    if (rc_changed(&rc_cache)) {
+        rc_toad = get_race(RC_TOAD);
+    }
+    duration = 2 + (rng_int() % level) / 2;
+    trestore = change_race(mage, duration, rc_toad, NULL);
+    if (trestore) {
+        if (chance(0.7)) {
+            const resource_type* rtype = rt_find("toadslime");
+            if (rtype) {
+                t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
+            }
+        }
+        ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
+    }
+}
+
 /* Die normalen Spruchkosten muessen immer bezahlt werden, hier noch
  * alle weiteren Folgen eines Patzers
  */
@@ -1272,10 +1304,7 @@ static void do_fumble(castorder * co)
     const spell *sp = co->sp;
     int level = co->level;
     double effect;
-    static int rc_cache;
-    static const race *rc_toad = NULL;
     fumble_f fun;
-    trigger *trestore;
     int duration;
 
     ADDMSG(&caster->faction->msgs,
@@ -1292,26 +1321,8 @@ static void do_fumble(castorder * co)
         }
         break;
 
-    case 1: /* toad */
-        /* one or two things will happen: the toad changes its race back,
-         * and may or may not get toadslime.
-         * The list of things to happen are attached to a timeout
-         * trigger and that's added to the triggerlist of the mage gone toad.
-         */
-        if (rc_changed(&rc_cache)) {
-            rc_toad = get_race(RC_TOAD);
-        }
-        duration = 2 + (rng_int() % level) / 2;
-        trestore = change_race(mage, duration, rc_toad, NULL);
-        if (trestore) {
-            if (chance(0.7)) {
-                const resource_type *rtype = rt_find("toadslime");
-                if (rtype) {
-                    t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
-                }
-            }
-            ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
-        }
+    case 1:
+        fumble_toad(mage, sp, level);
         break;
 
     case 2:

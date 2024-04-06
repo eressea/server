@@ -2,9 +2,14 @@
 
 #include "contact.h"
 #include "teleport.h"
+#include "items.h"
+#include "alchemy.h"
 
-#include "util/keyword.h"      // for K_CAST
-#include "util/variant.h"      // for frac_make, frac_sub, frac_equal, variant
+#include <triggers/changerace.h>
+#include <triggers/timeout.h>
+
+#include <util/keyword.h>      // for K_CAST
+#include <util/variant.h>      // for frac_make, frac_sub, frac_equal, variant
 #include <util/language.h>
 
 #include "kernel/skill.h"      // for SK_MAGIC, enable_skill, SK_STAMINA
@@ -14,6 +19,7 @@
 #include <kernel/building.h>
 #include <kernel/callbacks.h>
 #include <kernel/equipment.h>
+#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
@@ -833,19 +839,32 @@ static void test_familiar_equip(CuTest *tc) {
     test_teardown();
 }
 
-CuSuite *get_familiar_suite(void)
-{
-    CuSuite *suite = CuSuiteNew();
-    SUITE_ADD_TEST(suite, test_familiar_equip);
-    SUITE_ADD_TEST(suite, test_familiar_skillmod);
-    SUITE_ADD_TEST(suite, test_familiar_set);
-    SUITE_ADD_TEST(suite, test_familiar_age);
-    return suite;
+static void test_fumble_toad(CuTest *tc) {
+    unit* u;
+    struct race* rc_toad;
+    const struct race* rc;
+    trigger* t;
+    changerace_data* crd;
+
+    test_setup();
+    rc_toad = test_create_race("toad");
+    CuAssertPtrEquals(tc, rc_toad, (race *)get_race(RC_TOAD));
+
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    rc = u_race(u);
+    fumble_toad(u, NULL, 6);
+    CuAssertPtrEquals(tc, rc_toad, (race*)u_race(u));
+    CuAssertPtrNotNull(tc, t = get_timeout(u->attribs, "timer", &tt_changerace));
+    CuAssertPtrNotNull(tc, crd = (changerace_data*)t->data.v);
+    CuAssertPtrEquals(tc, (race*)rc, (race*)crd->race);
+    CuAssertPtrEquals(tc, NULL, (race*)crd->irace);
+
+    test_teardown();
 }
 
 CuSuite *get_magic_suite(void)
 {
-    CuSuite *suite = CuSuiteNew();
+    CuSuite* suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_is_mage);
     SUITE_ADD_TEST(suite, test_get_mage);
     SUITE_ADD_TEST(suite, test_multi_cast);
@@ -868,6 +887,17 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_regenerate_aura);
     SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
     SUITE_ADD_TEST(suite, test_fix_fam_spells);
-    SUITE_ADD_TEST(suite, test_fix_fam_migrants);
+    SUITE_ADD_TEST(suite, test_fumble_toad);
     return suite;
 }
+
+CuSuite* get_familiar_suite(void)
+{
+    CuSuite* suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_familiar_equip);
+    SUITE_ADD_TEST(suite, test_familiar_skillmod);
+    SUITE_ADD_TEST(suite, test_familiar_set);
+    SUITE_ADD_TEST(suite, test_familiar_age);
+    return suite;
+}
+
