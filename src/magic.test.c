@@ -2,8 +2,6 @@
 
 #include "contact.h"
 #include "teleport.h"
-#include "items.h"
-#include "alchemy.h"
 
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
@@ -887,6 +885,7 @@ CuSuite *get_magic_suite(void)
     SUITE_ADD_TEST(suite, test_regenerate_aura);
     SUITE_ADD_TEST(suite, test_regenerate_aura_migrants);
     SUITE_ADD_TEST(suite, test_fix_fam_spells);
+    SUITE_ADD_TEST(suite, test_fix_fam_migrants);
     SUITE_ADD_TEST(suite, test_fumble_toad);
     return suite;
 }

@@ -9,6 +9,7 @@
 
 #include <util/base36.h>
 #include <util/keyword.h>
+#include <util/variant.h>
 
 #include <kernel/attrib.h>
 #include <kernel/event.h>

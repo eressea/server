@@ -2,6 +2,7 @@
 
 struct trigger_type;
 struct trigger;
+struct attrib;
 
 typedef struct timeout_data {
     struct trigger *triggers;
