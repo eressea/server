@@ -300,13 +300,20 @@ const struct item_type* effect_type(const struct attrib* a)
     return data->type;
 }
 
-void scale_effects(attrib* alist, int n, int size)
+void scale_effects(unit* u, int n)
 {
-    const attrib* a = a_find(alist, &at_effect);
+    const struct item_type* it_blood = it_find("peasantblood");
+    const struct race* rc_demon = get_race(RC_DAEMON);
+    const attrib* a = a_find(u->attribs, &at_effect);
 
     for (; a && a->type == &at_effect; a = a->next) {
         effect_data* data = (effect_data*)a->data.v;
-        data->value = (long long)data->value * n / size;
+        if (rc_demon != u_race(u) && u->number == 0 && data->type == it_blood) {
+            data->value = 0;
+        }
+        else if (u->number > 0) {
+            data->value = (long long)data->value * n / u->number;
+        }
     }
 }
 

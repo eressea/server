@@ -156,7 +156,8 @@ static void test_use_foolpotion(CuTest *tc) {
     test_teardown();
 }
 
-static void test_scale_effects(CuTest *tc) {
+static void test_scale_effects(CuTest *tc)
+{
     unit* u;
     const struct item_type* ptype;
 
@@ -164,10 +165,12 @@ static void test_scale_effects(CuTest *tc) {
     ptype = it_get_or_create(rt_get_or_create("hodor"));
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
+    set_number(u, 4);
     change_effect(u, ptype, 2);
-    scale_effects(u->attribs, 2, 4);
+    scale_effects(u, 2);
     CuAssertIntEquals(tc, 1, get_effect(u, ptype));
 
+    set_number(u, 1);
     u->hp = 35;
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertIntEquals(tc, 35, u->hp);
@@ -188,6 +191,22 @@ static void test_scale_effects(CuTest *tc) {
     scale_number(u, 0);
     CuAssertIntEquals(tc, 0, get_level(u, SK_ALCHEMY));
     test_teardown();
+}
+
+static void test_scale_bloodpotion(CuTest* tc)
+{
+    unit* u;
+    const struct item_type* it_blood;
+
+    test_setup();
+    test_create_race("demon");
+    it_blood = test_create_itemtype("peasantblood");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    set_number(u, 0);
+    change_effect(u, it_blood, 10);
+    CuAssertIntEquals(tc, 10, get_effect(u, it_blood));
+    scale_number(u, 1);
+    CuAssertIntEquals(tc, 0, get_effect(u, it_blood));
 }
 
 static void test_bloodpotion(CuTest* tc) {
@@ -242,6 +261,7 @@ CuSuite *get_alchemy_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_herbsearch);
     SUITE_ADD_TEST(suite, test_scale_effects);
+    SUITE_ADD_TEST(suite, test_scale_bloodpotion);
     SUITE_ADD_TEST(suite, test_foolpotion_effect);
     SUITE_ADD_TEST(suite, test_use_foolpotion);
     SUITE_ADD_TEST(suite, test_bloodpotion);
