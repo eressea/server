@@ -3728,10 +3728,12 @@ int sp_migranten(castorder * co)
         /* u ist von unserer Art, das Ritual waere verschwendete Aura. */
         ADDMSG(&mage->faction->msgs, msg_message("sp_migranten_fail1",
             "unit region command target", mage, mage->region, co->order, target));
+        return 0;
     }
     /* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
     if (target->faction == mage->faction) {
         cmistake(mage, co->order, 45, MSG_MAGIC);
+        return 0;
     }
 
     /* Keine Monstereinheiten */
