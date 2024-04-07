@@ -8,7 +8,7 @@ GAME=$1
 backup()
 {
     if [ -x "$BIN/backup-eressea" ] ; then
-        "$BIN/backup-eressea" "$1" "$2"
+        "$BIN/backup-eressea" "$@"
     fi
 }
 
