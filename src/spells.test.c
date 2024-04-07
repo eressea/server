@@ -1032,22 +1032,40 @@ static void test_migrants(CuTest *tc) {
     faction *f;
     castorder co;
     spellparameter param, * args = NULL;
+    const struct race* rc;
 
     test_setup();
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
-    param.flag = TARGET_RESISTS;
+    param.flag = 0;
     param.typ = SPP_UNIT;
-    param.data.u = u2 = test_create_unit(f = test_create_faction(), u->region);
+    param.data.u = u2 = test_create_unit(f, u->region);
     arrput(args, param);
     u2->orders = create_order(K_WORK, u2->faction->locale, NULL);
-    u_setrace(u2, test_create_race("hobgoblin"));
+    u_setrace(u2, rc = test_create_race("hobgoblin"));
     test_create_castorder(&co, u, 4, 5.0, 0, args);
+
+    /* bug 3019: no pay when accidentally used on own units: */
+    CuAssertIntEquals(tc, 0, sp_migranten(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error45"));
+    u_setfaction(u2, f = test_create_faction());
+    test_clear_messages(u->faction);
+
+    /* only migrants are allowed, not units of our own race: */
+    u_setrace(u2, u->faction->race);
+    CuAssertIntEquals(tc, 0, sp_migranten(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "sp_migranten_fail1"));
+    u_setrace(u2, rc);
+    test_clear_messages(u->faction);
+
+    co.a_params[0].flag = TARGET_RESISTS;
     CuAssertIntEquals(tc, u2->number, sp_migranten(&co));
     CuAssertPtrEquals(tc, f, u2->faction);
+    test_clear_messages(u->faction);
 
     co.a_params[0].flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_migranten(&co));
     CuAssertPtrEquals(tc, f, u2->faction);
+    test_clear_messages(u->faction);
 
     /* no contact, no cost: */
     co.a_params[0].flag = 0;
@@ -1060,7 +1078,10 @@ static void test_migrants(CuTest *tc) {
     CuAssertIntEquals(tc, u2->number, sp_migranten(&co));
     CuAssertPtrEquals(tc, u->faction, u2->faction);
     CuAssertPtrEquals(tc, NULL, u2->orders);
+    test_clear_messages(u->faction);
+
     test_teardown();
+
 }
 
 static void test_blessstonecircle(CuTest *tc) {
