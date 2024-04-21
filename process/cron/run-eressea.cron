@@ -29,31 +29,24 @@ backup_reports()
 
 backup()
 {
-<<<<<<< Updated upstream
-    if [ -x "$BIN/backup-eressea" ] ; then
-        "$BIN/backup-eressea" "$@"
-=======
-    GAME="$1"
-    TURN="$2"
+    local -n RESULT=$1
+    GAME="$2"
+    TURN="$3"
     cd "$ERESSEA/game-$GAME" || exit
     if [ ! -e "data/$TURN.dat" ]; then
-      echo "No data for turn $TURN in game $GAME."
       exit 2
     fi
     if [ ! -d backup ] ; then
-      echo "creating missing backup directory for game $GAME."
       mkdir -p "$HOME/backup/eressea/game-$GAME"
       ln -sf "$HOME/backup/eressea/game-$GAME" backup
->>>>>>> Stashed changes
     fi
 
     files=("data/$TURN.dat" parteien.full parteien)
     if [ -e "orders.$TURN" ]; then
       files+=("orders.$TURN")
     fi
-    echo "backup turn $TURN, game $GAME, files: ${files[*]}"
     tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-    echo "backup/$TURN.tar.bz2"
+    RESULT="backup/$TURN.tar.bz2"
 }
 
 export ERESSEA
@@ -89,7 +82,7 @@ if [ ! -s "orders.$TURN" ]; then
 fi
 
 ## pre-game backup, data and orders only:
-BACKUP=$(backup "$GAME" "$TURN")
+backup BACKUP "$GAME" "$TURN"
 upload "$BACKUP"
 rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
@@ -113,7 +106,7 @@ echo "sending reports for game $GAME, turn $TURN"
 "$BIN/compress.sh" "$GAME" "$TURN"
 "$BIN/sendreports.sh" "$GAME"
 ## post-game backup of new data:
-NEWFILE=$(backup "$GAME" "$TURN")
+backup NEWFILE "$GAME" "$TURN"
 upload "$NEWFILE"
 ## post-game backup of reports:
 backup_reports "$GAME" "$TURN"
