@@ -366,7 +366,7 @@ endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
 target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
-target_link_libraries(eressea ${CURSES_LIBRARIES})
+target_link_libraries(eressea ${CURSES_LIBRARY})
 target_compile_definitions(eressea PRIVATE USE_CURSES)
 endif(CURSES_FOUND)
 
