@@ -49,52 +49,67 @@ static void test_remove_empty_units(CuTest *tc) {
 }
 
 static void test_remove_empty_units_in_region(CuTest *tc) {
-    unit *u;
+    unit *u1, *u2;
+    faction* f;
+    region* r;
     int uid;
 
     test_setup();
 
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    u = test_create_unit(u->faction, u->region);
-    CuAssertPtrNotNull(tc, u->nextF);
-    uid = u->no;
-    remove_empty_units_in_region(u->region);
-    CuAssertPtrNotNull(tc, findunit(uid));
-    u->number = 0;
-    remove_empty_units_in_region(u->region);
+    u2 = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u1 = test_create_unit(f, r);
+    uid = u1->no;
+    CuAssertPtrEquals(tc, u1, f->units);
+    CuAssertPtrEquals(tc, u2, u1->nextF);
+    remove_empty_units_in_region(r);
+    CuAssertPtrEquals(tc, u1, findunit(uid));
+    u1->number = 0;
+    remove_empty_units_in_region(r);
     CuAssertPtrEquals(tc, NULL, findunit(uid));
-    CuAssertPtrEquals(tc, NULL, u->nextF);
-    CuAssertPtrEquals(tc, NULL, u->region);
+    CuAssertPtrEquals(tc, u2, f->units);
+    CuAssertPtrEquals(tc, NULL, u2->nextF);
+    CuAssertPtrEquals(tc, u2, r->units);
+    CuAssertPtrEquals(tc, NULL, u2->next);
     test_teardown();
 }
 
 static void test_remove_units_without_faction(CuTest *tc) {
     unit *u;
+    faction* f;
+    region* r;
     int uid;
 
     test_setup();
 
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     uid = u->no;
-    u_setfaction(u, 0);
-    remove_empty_units_in_region(u->region);
+    u_setfaction(u, NULL);
+    remove_empty_units_in_region(r);
+    /* unit is deleted: */
+    CuAssertPtrEquals(tc, NULL, r->units);
+    CuAssertPtrEquals(tc, NULL, f->units);
     CuAssertPtrEquals(tc, NULL, findunit(uid));
-    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertPtrEquals(tc, NULL, dfindhash(uid));
     test_teardown();
 }
 
 static void test_remove_units_with_dead_faction(CuTest *tc) {
     unit *u;
+    faction* f;
+    region* r;
     int uid;
 
     test_setup();
 
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
     uid = u->no;
-    u->faction->_alive = false;
-    remove_empty_units_in_region(u->region);
+    f->_alive = false;
+    remove_empty_units_in_region(r);
+    /* unit is deleted: */
+    CuAssertPtrEquals(tc, NULL, r->units);
+    CuAssertPtrEquals(tc, NULL, f->units);
     CuAssertPtrEquals(tc, NULL, findunit(uid));
-    CuAssertIntEquals(tc, 0, u->number);
+    CuAssertPtrEquals(tc, f, dfindhash(uid));
     test_teardown();
 }
 
@@ -520,25 +535,21 @@ static void test_remove_unit(CuTest *tc) {
     region_setresource(r, rtype, 0);
     i_change(&u1->items, rtype->itype, 100);
     remove_unit(&r->units, u1);
-    CuAssertIntEquals(tc, 0, u1->number);
-    CuAssertPtrEquals(tc, NULL, u1->region);
+
+    /* unit is deleted: */
+    CuAssertPtrEquals(tc, NULL, findunit(uno));
+    CuAssertPtrEquals(tc, f, dfindhash(uno));
+
     /* money is given to a survivor: */
-    CuAssertPtrEquals(tc, NULL, u1->items);
     CuAssertIntEquals(tc, 0, region_getresource(r, rtype));
     CuAssertIntEquals(tc, 100, i_get(u2->items, rtype->itype));
 
     /* unit is removed from f->units: */
-    CuAssertPtrEquals(tc, NULL, u1->nextF);
     CuAssertPtrEquals(tc, u2, f->units);
     CuAssertPtrEquals(tc, NULL, u2->nextF);
     CuAssertPtrEquals(tc, NULL, u2->prevF);
     /* unit is no longer in r->units: */
     CuAssertPtrEquals(tc, u2, r->units);
-    CuAssertPtrEquals(tc, NULL, u2->next);
-
-    /* unit is in deleted_units: */
-    CuAssertPtrEquals(tc, NULL, findunit(uno));
-    CuAssertPtrEquals(tc, f, dfindhash(uno));
 
     remove_unit(&r->units, u2);
     /* no survivor, give money to peasants: */
@@ -723,6 +734,7 @@ static void test_transfermen_peasants(CuTest *tc) {
 
     /* demons don't transfer to peasants */
     rc = test_create_race("undead");
+    rc->ec_flags |= ECF_REC_ETHEREAL;
     rc->ec_flags |= ECF_REC_ETHEREAL;
     u_setrace(u, rc);
     transfermen(u, NULL, 1);

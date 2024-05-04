@@ -420,8 +420,9 @@ function test_stonegolems()
 -- test that no server crash occurs
   u1:clear_orders()
   u1:add_order("Mache Burg")
+  local uid = u1.id
   process_orders()
-  assert_equal(0, u1.number, "There should be no more stone golems")
+  assert_nil(get_unit(uid), "There should be no more stone golems")
 -- end test server crash
 
 -- test that Stone Golems build for four stones

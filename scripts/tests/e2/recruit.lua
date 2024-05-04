@@ -160,9 +160,9 @@ function test_recruit_empty()
     u11:add_order("GIB 0 ALLES PERSONEN")
     u11:add_order("REKRUTIERE 1")
 
+    local uid = u11.id
     process_orders()
-
-    assert_equal(0, u11.number)
+    assert_nil(get_unit(uid));
 
     local count = 0
     local zero = 0

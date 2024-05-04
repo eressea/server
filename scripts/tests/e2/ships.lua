@@ -227,21 +227,22 @@ function test_give_ship_all_on_land()
     u1.ship.number = 2
     u1:add_order("GIB 0 2 SCHIFF")
     process_orders()
-    assert_equal(nil, u1.ship)
-    assert_not_equal(nil, r.ships())
+    assert_nil(u1.ship)
+    assert_not_nil(r.ships())
 end
 
 function test_give_ship_no_boat()
-    local r = region.create(1, 0, 'ocean')
+    local r = region.create(1, 0, 'plain')
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
     local u2 = unit.create(f, r, 1)
+    u2.name = 'Xolgrim'
     u1.ship = ship.create(r, 'boat')
     u1.ship.number = 1
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(1, u1.ship.number)
-    assert_equal(nil, u2.ship)
+    assert_nil(u2.ship)
 end
 
 function test_give_ship_away()
@@ -418,7 +419,7 @@ function test_give_ship_self_only()
     u1:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
     assert_equal(2, u1.ship.number)
-    assert_equal(nil, u2.ship)
+    assert_nil(u2.ship)
 end
 
 function test_give_ship_not_cursed()
@@ -436,7 +437,7 @@ function test_give_ship_not_cursed()
 
     u:add_order("GIB " .. itoa36(u2.id) .. " 1 SCHIFF")
     process_orders()
-    assert_equal(nil, u2.ship)
+    assert_nil(u2.ship)
 end
 
 function test_speedsail_on_ship()
@@ -461,7 +462,7 @@ function test_no_speedsail_on_convoy()
     u:add_item("speedsail", 2)
     u:add_order("BENUTZE 2 Sonnensegel")
     process_orders()
-    assert_equal(nil, sh:get_curse('shipspeedup'))
+    assert_nil(sh:get_curse('shipspeedup'))
 end
 
 function test_build_new_ship()

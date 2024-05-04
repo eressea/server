@@ -318,7 +318,12 @@ int gift_items(unit * u, int flags)
  * returns 0 on success, or -1 if unit could not be removed.
  */
 
-static unit *deleted_units = NULL;
+typedef struct dead_faction {
+    int key;
+    faction* value;
+} dead_faction;
+
+static dead_faction* dead_hash;
 
 typedef struct dead_faction {
     int key;
@@ -368,10 +373,11 @@ void erase_unit(unit** ulist, unit* u)
     u->nextF = 0;
     u->prevF = 0;
 
-    u->next = deleted_units;
-    deleted_units = u;
-
-    u->region = NULL;
+    if (u->faction) {
+        hmput(dead_hash, u->no, u->faction);
+    }
+    free_unit(u);
+    free(u);
 }
 
 int remove_unit(unit ** ulist, unit * u)
@@ -512,12 +518,6 @@ void usetprivate(unit * u, const char *str)
 void free_units(void)
 {
     hmfree(dead_hash);
-    while (deleted_units) {
-        unit *u = deleted_units;
-        deleted_units = deleted_units->next;
-        free_unit(u);
-        free(u);
-    }
 }
 
 void write_unit_reference(const unit * u, struct storage *store)

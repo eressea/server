@@ -26,6 +26,7 @@ function setup()
             "de": {
                 "attack" : "ATTACKIERE",
                 "guard" : "BEWACHE",
+                "steal" : "BEKLAUE",
                 "maketemp" : "MACHETEMP",
                 "steal" : "BEKLAUE",
                 "end" : "ENDE",
@@ -170,19 +171,18 @@ function test_give_and_forget()
     local r = region.create(0, 0, "plain")
     local f = faction.create("human")
     local u1 = unit.create(f, r, 1)
+    local uno = u1.id
     local u2 = unit.create(f, r, 1)
-    u1.name = 'Xolgrim'
     u1:set_skill('alchemy', 1)
     u1:set_skill('crossbow', 1)
     u2:set_skill('alchemy', 1)
     u1:set_orders("GIB " .. itoa36(u2.id) .. " 1 PERSON\nVERGISS Armbrust")
     process_orders()
-    assert_equal(0, u1.number)
+    assert_nil(get_unit(uno))
     assert_equal(2, u2.number)
     assert_equal(0, u2:get_skill('crossbow'))
     assert_equal(1, u2:get_skill('alchemy'))
 end
-
 
 -- u1 is poor, so we steal from u2
 function test_steal_from_pool()
