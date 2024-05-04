@@ -325,13 +325,6 @@ typedef struct dead_faction {
 
 static dead_faction* dead_hash;
 
-typedef struct dead_faction {
-    int key;
-    faction* value;
-} dead_faction;
-
-static dead_faction* dead_hash;
-
 struct faction *dfindhash(int no) {
     return hmget(dead_hash, no);
 }
