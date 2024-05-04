@@ -83,7 +83,7 @@ static void do_shock(unit * u, const char *reason)
 static int shock_handle(trigger * t, void *data)
 {
     /* destroy the unit */
-    unit *u = (unit *)t->data.v;
+    unit *u = findunit(t->data.i);
     if (u && u->number) {
         do_shock(u, "trigger");
     }
@@ -93,28 +93,24 @@ static int shock_handle(trigger * t, void *data)
 
 static void shock_write(const trigger * t, struct storage *store)
 {
-    unit *u = (unit *)t->data.v;
     trigger *next = t->next;
     while (next) {
         /* make sure it is unique! */
-        if (next->type == t->type && next->data.v == t->data.v)
+        if (next->type == t->type && next->data.i == t->data.i)
             break;
         next = next->next;
     }
-    if (next && u) {
-        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", itoa36(u->no));
-        write_unit_reference(NULL, store);
+    if (next && t->data.i) {
+        log_error("more than one shock-attribut for %s on a unit. FIXED.\n", itoa36(t->data.i));
+        WRITE_INT(store, 0);
     }
     else {
-        write_unit_reference(u, store);
+        WRITE_INT(store, t->data.i);
     }
 }
 
 static int shock_read(trigger * t, gamedata *data) {
-    if (read_unit_reference(data, (unit **)&t->data.v, NULL) <= 0) {
-        return AT_READ_FAIL;
-    }
-    return AT_READ_OK;
+    return READ_INT(data->store, &t->data.i);
 }
 
 trigger_type tt_shock = {
@@ -128,9 +124,9 @@ trigger_type tt_shock = {
 
 trigger *trigger_shock(unit * u)
 {
-    trigger *t = t_new(&tt_shock);
+    trigger * t = t_new(&tt_shock);
     if (t) {
-        t->data.v = (void *)u;
+        t->data.i = u->no;
     }
     return t;
 }
