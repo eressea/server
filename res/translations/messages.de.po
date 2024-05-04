@@ -173,7 +173,7 @@ msgid "victory_murder_cfulfilled"
 msgstr "\"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),\"einer Woche\",\"$int($remain) Wochen\") zum Sieger erklärt werden.\""
 
 msgid "hangover_effect_1"
-msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing....\""
+msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing ...\""
 
 msgid "feedback_no_contact"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen.\""
@@ -954,7 +954,7 @@ msgid "error_cannotmake"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht machen.\""
 
 msgid "meow"
-msgstr "\"Miiauuuuuu...\""
+msgstr "\"Miiauuuuuu ...\""
 
 msgid "spelltargetnotfound"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Ziel gefunden.\""
@@ -1735,7 +1735,7 @@ msgid "santa_m"
 msgstr "'Ho ho ho!' Ein dicker Gnom fliegt auf einem von 8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner Partei einen $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)')."
 
 msgid "error234"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt..\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt.\""
 
 msgid "spellfail::nolevel"
 msgstr "\"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden.\""

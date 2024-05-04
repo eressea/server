@@ -10,13 +10,14 @@ function setup()
     eressea.free_game()
     conf = [[{
         "races": {
-            "human" : { "flags" : [ "player", "giveperson" ] }
+            "human" : { "flags" : [ "player", "giveperson", "getitem" ] }
         },
         "terrains" : {
             "plain": { "flags" : [ "land", "walk", "sail" ] }
         },
         "parameters" : {
             "de" : {
+                "ALLES": "ALLES",
                 "EINHEIT": "EINHEIT",
                 "PERSONEN": "PERSONEN"
             }
@@ -26,6 +27,7 @@ function setup()
                 "attack" : "ATTACKIERE",
                 "guard" : "BEWACHE",
                 "maketemp" : "MACHETEMP",
+                "steal" : "BEKLAUE",
                 "end" : "ENDE",
                 "use" : "BENUTZEN",
                 "forget" : "VERGISS",
@@ -179,4 +181,50 @@ function test_give_and_forget()
     assert_equal(2, u2.number)
     assert_equal(0, u2:get_skill('crossbow'))
     assert_equal(1, u2:get_skill('alchemy'))
+end
+
+
+-- u1 is poor, so we steal from u2
+function test_steal_from_pool()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r)
+    local u2 = unit.create(f, r)
+    u2:add_item('money', 100)
+    local u = unit.create(faction.create("human"), r)
+    u:set_skill('stealth', 1)
+    u:set_orders("BEKLAUE " .. itoa36(u1.id))
+    u.name = 'Xolgrim'
+    process_orders()
+    assert_equal(50, u:get_item('money'))
+    assert_equal(50, u2:get_item('money'))
+end
+
+function test_thief_must_see_target()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r)
+    u1:set_skill('stealth', 1)
+    u1:add_item('money', 100)
+    local u = unit.create(faction.create("human"), r)
+    u:set_skill('stealth', 1)
+    u:set_orders("BEKLAUE " .. itoa36(u1.id))
+    process_orders()
+    assert_equal(0, u:get_item('money'))
+    assert_equal(100, u1:get_item('money'))
+end
+
+function test_temp_cannot_avoid_theft()
+    local r = region.create(0, 0, "plain")
+    local f = faction.create("human")
+    local u1 = unit.create(f, r)
+    u1:add_item('money', 100)
+    u1:set_orders("MACHETEMP 1\nENDE\nGIB TEMP 1 ALLES PERSON\nGIB TEMP 1 ALLES")
+    local u = unit.create(faction.create("human"), r)
+    u:set_skill('stealth', 1)
+    u:set_orders("BEKLAUE " .. itoa36(u1.id))
+    process_orders()
+    assert_equal(50, u:get_item('money'))
+    local u2 = f.units()
+    assert_equal(50, u2:get_item('money'))
 end
