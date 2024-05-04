@@ -320,15 +320,15 @@ int gift_items(unit * u, int flags)
 
 static unit *deleted_units = NULL;
 
-struct faction *dfindhash(int no) {
-    unit *u;
+typedef struct dead_faction {
+    int key;
+    faction* value;
+} dead_faction;
 
-    for (u = deleted_units; u; u = u->next) {
-        if (u->no == no) {
-            return u->faction;
-        }
-    }
-    return NULL;
+static dead_faction* dead_hash;
+
+struct faction *dfindhash(int no) {
+    return hmget(dead_hash, no);
 }
 
 void erase_unit(unit** ulist, unit* u)
@@ -351,6 +351,7 @@ void erase_unit(unit** ulist, unit* u)
     }
 
     if (u->faction) {
+        hmput(dead_hash, u->no, u->faction);
         if (count_unit(u)) {
             --u->faction->num_units;
         }
@@ -510,6 +511,7 @@ void usetprivate(unit * u, const char *str)
 
 void free_units(void)
 {
+    hmfree(dead_hash);
     while (deleted_units) {
         unit *u = deleted_units;
         deleted_units = deleted_units->next;
