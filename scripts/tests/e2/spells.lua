@@ -231,8 +231,9 @@ function test_bug_2480()
   u1.number = 30
   u1.hp = u1.hp_max * u1.number
   monster:add_order("ATTACK " .. itoa36(u1.id))
+  local uid = u1.id
   process_orders()
-  assert_equal(0, u1.number);
+  assert_nil(get_unit(uid));
 end
 
 function test_bug_2517()

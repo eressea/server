@@ -1735,7 +1735,7 @@ msgid "santa_m"
 msgstr "'Ho ho ho!' Ein dicker Gnom fliegt auf einem von 8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner Partei einen $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)')."
 
 msgid "error234"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt..\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt.\""
 
 msgid "spellfail::nolevel"
 msgstr "\"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden.\""
