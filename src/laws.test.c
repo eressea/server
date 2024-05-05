@@ -2310,6 +2310,7 @@ static void test_tree_growth_spring(CuTest* tc) {
 static void test_tree_growth_summer(CuTest* tc) {
     region* r;
     unit* u;
+    attrib* a;
     race* rc_elf;
     int week;
 
@@ -2328,6 +2329,17 @@ static void test_tree_growth_summer(CuTest* tc) {
     CuAssertIntEquals(tc, 100, rtrees(r, 1));
     CuAssertIntEquals(tc, 100, rtrees(r, 2));
     rsettrees(r, 0, 100);
+
+    a_add(&r->attribs, a = a_new(&at_germs));
+    a->data.sa[1] = 50;
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 400, rtrees(r, 0));
+    CuAssertIntEquals(tc, 50, rtrees(r, 1));
+    CuAssertIntEquals(tc, 150, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
 
     CuAssertIntEquals(tc, SEASON_SUMMER, calendar_season(week = 5));
     demographics_week(week);
