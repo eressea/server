@@ -2246,6 +2246,177 @@ static void test_peasant_migration(CuTest *tc) {
     test_teardown();
 }
 
+static void test_tree_growth_winter(CuTest* tc) {
+    region* r;
+    int week;
+
+    test_setup();
+    test_create_calendar();
+    r = test_create_plain(0, 0);
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(week = 0));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(week = 1));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    test_teardown();
+}
+
+static void test_tree_growth_spring(CuTest* tc) {
+    region* r;
+    attrib* a;
+    int week;
+
+    test_setup();
+    test_create_calendar();
+    r = test_create_plain(0, 0);
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+    CuAssertIntEquals(tc, SEASON_SPRING, calendar_season(week = 2));
+    demographics_week(week);
+    CuAssertPtrNotNull(tc, a = a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 12, a->data.sa[0]);
+    CuAssertIntEquals(tc, 12, a->data.sa[1]);
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 88, rtrees(r, 1));
+    CuAssertIntEquals(tc, 112, rtrees(r, 2));
+
+    a_removeall(&r->attribs, &at_germs);
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+    CuAssertIntEquals(tc, SEASON_SPRING, calendar_season(week = 3));
+    demographics_week(week);
+    CuAssertPtrNotNull(tc, a = a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 12, a->data.sa[0]);
+    CuAssertIntEquals(tc, 12, a->data.sa[1]);
+    CuAssertIntEquals(tc, 100, rtrees(r, 0));
+    CuAssertIntEquals(tc, 88, rtrees(r, 1));
+    CuAssertIntEquals(tc, 112, rtrees(r, 2));
+    test_teardown();
+}
+
+static void test_tree_growth_summer(CuTest* tc) {
+    region* r;
+    unit* u;
+    attrib* a;
+    race* rc_elf;
+    int week;
+
+    test_setup();
+    test_create_calendar();
+    rc_elf = test_create_race("elf");
+    config_set("rules.treeseeds.chance", "1.0");
+    r = test_create_plain(0, 0);
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+    CuAssertIntEquals(tc, SEASON_SUMMER, calendar_season(week = 4));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    a_add(&r->attribs, a = a_new(&at_germs));
+    a->data.sa[1] = 50;
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 400, rtrees(r, 0));
+    CuAssertIntEquals(tc, 50, rtrees(r, 1));
+    CuAssertIntEquals(tc, 150, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+
+    CuAssertIntEquals(tc, SEASON_SUMMER, calendar_season(week = 5));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    u = test_create_unit(test_create_faction(), r);
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 200, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    u_setrace(u, rc_elf);
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    test_teardown();
+}
+
+static void test_tree_growth_autumn(CuTest* tc) {
+    region* r;
+    unit* u;
+    race* rc_elf;
+    int week;
+
+    test_setup();
+    test_create_calendar();
+    rc_elf = test_create_race("elf");
+    config_set("rules.treeseeds.chance", "1.0");
+    r = test_create_plain(0, 0);
+    rsettrees(r, 0, 100);
+    rsettrees(r, 1, 100);
+    rsettrees(r, 2, 100);
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(week = 6));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(week = 7));
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    u = test_create_unit(test_create_faction(), r);
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 200, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    u_setrace(u, rc_elf);
+    demographics_week(week);
+    CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
+    CuAssertIntEquals(tc, 300, rtrees(r, 0));
+    CuAssertIntEquals(tc, 100, rtrees(r, 1));
+    CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    rsettrees(r, 0, 100);
+
+    test_teardown();
+}
+
 static void test_quit(CuTest *tc) {
     faction *f;
     unit *u;
@@ -2640,6 +2811,10 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
     SUITE_ADD_TEST(suite, test_quit);
     SUITE_ADD_TEST(suite, test_peasant_migration);
+    SUITE_ADD_TEST(suite, test_tree_growth_winter);
+    SUITE_ADD_TEST(suite, test_tree_growth_spring);
+    SUITE_ADD_TEST(suite, test_tree_growth_summer);
+    SUITE_ADD_TEST(suite, test_tree_growth_autumn);
 #ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_no_contact);
