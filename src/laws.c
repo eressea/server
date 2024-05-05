@@ -857,14 +857,14 @@ static void cb_increase_demand(struct demand *dmd, int n, void *data)
     }
 }
 
-void demographics(void)
+void demographics_week(int week)
 {
     region *r;
     int plant_rules = config_get_int("rules.grow.formula", 3);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
-    season_t current_season = calendar_season(turn + 1);
-    season_t last_weeks_season = calendar_season(turn);
+    season_t current_season = calendar_season(week);
+    season_t last_weeks_season = calendar_season(week + weeks_per_month * months_per_year - 1);
 
     for (r = regions; r; r = r->next) {
         /** Ageing of regions starts when they are first discovered.
@@ -886,7 +886,7 @@ void demographics(void)
 
                 if (r->age > 20) {
                     double mwp = fmax(region_production(r), 1);
-                    bool mourn = is_mourning(r, turn);
+                    bool mourn = is_mourning(r, week);
                     int p_wage = peasant_wage(r, mourn);
                     double prob =
                         pow(rpeasants(r) / (mwp * p_wage * 0.13), 4.0)
@@ -921,6 +921,11 @@ void demographics(void)
 
     remove_empty_units();
     immigration();
+}
+
+void demographics(void)
+{
+    demographics_week(turn);
 }
 
 int leave_cmd(unit * u, struct order *ord)

@@ -237,8 +237,37 @@ void test_log_stderr(int flags) {
 
 }
 
+static season_t test_months[4] = { SEASON_WINTER, SEASON_SPRING, SEASON_SUMMER, SEASON_AUTUMN };
+
+void test_create_calendar(void) {
+    months_per_year = 4;
+    weeks_per_month = 2;
+    month_season = test_months;
+}
+
+/*
+void test_create_calendar(void) {
+    config_set_int("game.start", 184);
+    months_per_year = 9;
+    month_season = malloc(sizeof(season_t) * months_per_year);
+    if (!month_season) abort();
+    month_season[0] = SEASON_SUMMER;
+    month_season[1] = SEASON_AUTUMN;
+    month_season[2] = SEASON_AUTUMN;
+    month_season[3] = SEASON_WINTER;
+    month_season[4] = SEASON_WINTER;
+    month_season[5] = SEASON_WINTER;
+    month_season[6] = SEASON_SPRING;
+    month_season[7] = SEASON_SPRING;
+    month_season[8] = SEASON_SUMMER;
+}
+*/
+
 void test_reset(void)
 {
+    if (month_season == test_months) {
+        month_season = NULL;
+    }
     free_gamedata();
 }
 
@@ -285,22 +314,6 @@ static void test_reset_full(void) {
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
-}
-
-void test_create_calendar(void) {
-    config_set_int("game.start", 184);
-    months_per_year = 9;
-    month_season = malloc(sizeof(season_t) * months_per_year);
-    if (!month_season) abort();
-    month_season[0] = SEASON_SUMMER;
-    month_season[1] = SEASON_AUTUMN;
-    month_season[2] = SEASON_AUTUMN;
-    month_season[3] = SEASON_WINTER;
-    month_season[4] = SEASON_WINTER;
-    month_season[5] = SEASON_WINTER;
-    month_season[6] = SEASON_SPRING;
-    month_season[7] = SEASON_SPRING;
-    month_season[8] = SEASON_SUMMER;
 }
 
 void test_use_astral(void)
