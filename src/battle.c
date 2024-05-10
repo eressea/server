@@ -2302,7 +2302,6 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
         ta->fighters = 0;
     }
     selist_push(&ta->fighters, fig);
-    selist_push(&fig->side->battle->leaders, fig);
     ta->value = value;
 }
 
@@ -3381,6 +3380,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     if (tactics > 0) {
         int bonus = tactics_bonus(fig->alive);
         tactics += bonus;
+        b->has_tactics_turn = true;
     }
 
     add_tactics(&fig->side->leader, fig, tactics);
@@ -3427,6 +3427,7 @@ battle *make_battle(region * r)
     for (bld = r->buildings; bld != NULL; bld = bld->next)
         bld->sizeleft = bld->size;
 
+    b->has_tactics_turn = false;
     b->region = r;
     b->plane = getplane(r);
     /* Finde alle Parteien, die den Kampf beobachten koennen: */
@@ -3503,7 +3504,6 @@ void free_battle(battle * b)
         free(bf);
     }
 
-    selist_free(b->leaders);
     selist_foreach(b->meffects, free);
     selist_free(b->meffects);
 
@@ -4066,13 +4066,11 @@ static void do_battle(region * r) {
         freset(sh, SF_DAMAGED);
 
     /* Gibt es eine Taktikrunde ? */
-    if (!selist_empty(b->leaders)) {
+    if (b->has_tactics_turn) {
         b->turn = 0;
-        b->has_tactics_turn = true;
     }
     else {
         b->turn = 1;
-        b->has_tactics_turn = false;
     }
 
     /* PRECOMBATSPELLS */

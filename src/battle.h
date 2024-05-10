@@ -79,7 +79,6 @@ typedef struct side {
 } side;
 
 typedef struct battle {
-    struct selist* leaders;
     struct region* region;
     struct plane* plane;
     bfaction* factions;
