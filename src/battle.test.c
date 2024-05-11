@@ -1155,6 +1155,87 @@ static void test_battle_fleeing(CuTest* tc) {
     test_teardown();
 }
 
+static void test_make_battle(CuTest* tc) {
+    region* r;
+    battle* b;
+    unit* u1, * u2;
+    test_setup();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
+    b = make_battle(r);
+    CuAssertPtrNotNull(tc, b);
+    CuAssertPtrEquals(tc, NULL, b->plane);
+    CuAssertIntEquals(tc, 0, b->max_tactics);
+    CuAssertIntEquals(tc, 1, b->turn);
+    CuAssertIntEquals(tc, 2, b->nfactions);
+    CuAssertIntEquals(tc, 0, b->nsides);
+    CuAssertIntEquals(tc, 0, b->nfighters);
+    CuAssertIntEquals(tc, 0, b->keeploot);
+    CuAssertTrue(tc, !b->has_tactics_turn);
+    CuAssertTrue(tc, !b->reelarrow);
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_start_battle(CuTest* tc) {
+    region* r;
+    unit* u1, * u2;
+    fighter* fig;
+    side* s;
+    battle* b = NULL;
+    test_setup();
+
+    random_source_inject_constants(0., 50);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
+    set_level(u2, SK_TACTICS, 3);
+    CuAssertTrue(tc, !start_battle(r, &b));
+    CuAssertPtrEquals(tc, NULL, b);
+
+    unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
+    CuAssertTrue(tc, start_battle(r, &b));
+    CuAssertPtrNotNull(tc, b);
+    CuAssertPtrEquals(tc, r, b->region);
+    CuAssertIntEquals(tc, 2, b->nsides);
+
+    s = b->sides;
+    CuAssertPtrNotNull(tc, s->fighters);
+    CuAssertPtrNotNull(tc, s->bf);
+    CuAssertPtrEquals(tc, s, s->bf->sides);
+    CuAssertPtrEquals(tc, u1->faction, s->bf->faction);
+    CuAssertPtrEquals(tc, u1->faction, s->faction);
+    CuAssertPtrEquals(tc, NULL, (faction*)s->stealthfaction);
+    CuAssertPtrEquals(tc, NULL, s->nextF);
+    CuAssertTrue(tc, s->bf->attacker);
+    CuAssertPtrEquals(tc, NULL, s->leader.fighters);
+    CuAssertIntEquals(tc, 0, s->leader.value);
+
+    CuAssertPtrEquals(tc, u2->faction, b->sides[1].faction);
+    s = b->sides + 1;
+    CuAssertPtrNotNull(tc, fig = s->fighters);
+    CuAssertPtrNotNull(tc, s->bf);
+    CuAssertPtrEquals(tc, s, s->bf->sides);
+    CuAssertPtrEquals(tc, u2->faction, s->bf->faction);
+    CuAssertPtrEquals(tc, u2->faction, s->faction);
+    CuAssertPtrEquals(tc, NULL, (faction *)s->stealthfaction);
+    CuAssertPtrEquals(tc, NULL, s->nextF);
+    CuAssertTrue(tc, !s->bf->attacker);
+    CuAssertPtrEquals(tc, NULL, fig->next);
+    CuAssertPtrEquals(tc, u2, fig->unit);
+    CuAssertIntEquals(tc, 3 + TACTICS_MODIFIER, b->sides[1].leader.value);
+
+    CuAssertIntEquals(tc, 2, b->nfighters);
+    CuAssertIntEquals(tc, 2, b->nfactions);
+    CuAssertIntEquals(tc, 0, b->max_tactics); /* gets set later */
+    CuAssertIntEquals(tc, 0, b->turn);
+    CuAssertTrue(tc, b->has_tactics_turn);
+    CuAssertTrue(tc, !b->reelarrow);
+    free_battle(b);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1186,5 +1267,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_loot_cursed_items_other);
     SUITE_ADD_TEST(suite, test_no_loot_from_fleeing);
     DISABLE_TEST(suite, test_drain_exp);
+    SUITE_ADD_TEST(suite, test_make_battle);
+    SUITE_ADD_TEST(suite, test_start_battle);
     return suite;
 }

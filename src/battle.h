@@ -1,5 +1,4 @@
-#ifndef H_KRNL_BATTLE
-#define H_KRNL_BATTLE
+#pragma once
 
 #include "kernel/status.h"
 #include <stdbool.h>
@@ -8,6 +7,9 @@ struct message;
 struct selist;
 struct weapon_type;
 union variant;
+
+#define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
+#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 /** more defines **/
 #define FS_ENEMY 1
@@ -199,6 +201,7 @@ troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
 troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
+int get_tactics(const struct side* as, const struct side* ds);
 
 int count_enemies(struct battle* b, const struct fighter* af,
     int minrow, int maxrow, int select);
@@ -232,6 +235,7 @@ void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
 bool is_attacker(const fighter* fig);
 struct battle* make_battle(struct region* r);
+bool start_battle(struct region* r, struct battle** bp);
 void free_battle(struct battle* b);
 struct fighter* make_fighter(struct battle* b, struct unit* u,
     struct side* s, bool attack);
@@ -250,5 +254,3 @@ int meffect_apply(struct meffect* me, int damage);
 
 void loot_items(fighter* corpse);
 void structural_damage(troop td, int damage_abs, int changce_pct);
-
-#endif

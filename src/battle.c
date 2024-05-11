@@ -71,9 +71,6 @@
 
 #include <stb_ds.h>
 
-#define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
-#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
-
 #define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
 #define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
@@ -177,6 +174,7 @@ const char *sidename(const side * s)
     static char sidename_buf[4][SIDENAMEBUFLEN];  /* STATIC_RESULT: used for return, not across calls */
 
     bufno = bufno % 4;
+    assert(s->faction == s->bf->faction);
     str_strlcpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
     return sidename_buf[bufno++];
 }
@@ -1490,7 +1488,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
 #endif
 }
 
-static int get_tactics(const side * as, const side * ds)
+int get_tactics(const side * as, const side * ds)
 {
     battle *b = as->battle;
     side *stac;
@@ -3367,20 +3365,23 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     }
 
     /* Schauen, wie gut wir in Taktik sind. */
-    if (tactics > 0 && u_race(u) == get_race(RC_INSECT))
-        tactics -= 1 - (int)log10(fig->side->size[SUM_ROW]);
-#ifdef TACTICS_MODIFIER
-    if (tactics > 0 && statusrow(fig->status) == FIGHT_ROW)
-        tactics += TACTICS_MODIFIER;
-    if (tactics > 0 && statusrow(fig->status) > BEHIND_ROW) {
-        tactics -= TACTICS_MODIFIER;
-    }
+    if (tactics > 0) {
+
+        if (u_race(u) == get_race(RC_INSECT))
+        {
+            tactics -= 1 - (int)log10(fig->side->size[SUM_ROW]);
+        }
+#if TACTICS_MODIFIER
+        if (statusrow(fig->status) == FIGHT_ROW)
+            tactics += TACTICS_MODIFIER;
+        if (statusrow(fig->status) > BEHIND_ROW) {
+            tactics -= TACTICS_MODIFIER;
+        }
 #endif
 
-    if (tactics > 0) {
-        int bonus = tactics_bonus(fig->alive);
-        tactics += bonus;
+        tactics += tactics_bonus(fig->alive);
         b->has_tactics_turn = true;
+        b->turn = 0;
     }
 
     add_tactics(&fig->side->leader, fig, tactics);
@@ -3413,49 +3414,6 @@ int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     }
     *cp = fc;
     return false;
-}
-
-battle *make_battle(region * r)
-{
-    unit *u;
-    bfaction *bf;
-    building * bld;
-    battle *b = (battle *)calloc(1, sizeof(battle));
-
-    assert(b);
-    /* Alle Mann raus aus der Burg! */
-    for (bld = r->buildings; bld != NULL; bld = bld->next)
-        bld->sizeleft = bld->size;
-
-    b->has_tactics_turn = false;
-    b->region = r;
-    b->plane = getplane(r);
-    /* Finde alle Parteien, die den Kampf beobachten koennen: */
-    for (u = r->units; u; u = u->next) {
-        if (u->number > 0) {
-            if (!fval(u->faction, FFL_MARK)) {
-                fset(u->faction, FFL_MARK);
-                for (bf = b->factions; bf; bf = bf->next) {
-                    if (bf->faction == u->faction)
-                        break;
-                }
-                if (!bf) {
-                    bf = (bfaction *)calloc(1, sizeof(bfaction));
-                    assert(bf);
-                    ++b->nfactions;
-                    bf->faction = u->faction;
-                    bf->next = b->factions;
-                    b->factions = bf;
-                }
-            }
-        }
-    }
-
-    for (bf = b->factions; bf; bf = bf->next) {
-        faction *f = bf->faction;
-        freset(f, FFL_MARK);
-    }
-    return b;
 }
 
 static void free_side(side * si)
@@ -3494,20 +3452,6 @@ static void battle_free(battle * b) {
         free_side(s);
     }
     free(b);
-}
-
-void free_battle(battle * b)
-{
-    while (b->factions) {
-        bfaction *bf = b->factions;
-        b->factions = bf->next;
-        free(bf);
-    }
-
-    selist_foreach(b->meffects, free);
-    selist_free(b->meffects);
-
-    battle_free(b);
 }
 
 static int *get_alive(side * s)
@@ -3727,7 +3671,51 @@ static bool is_calmed(const unit *u, const faction *f) {
     return false;
 }
 
-static bool start_battle(region * r, battle ** bp)
+battle* make_battle(region* r)
+{
+    unit* u;
+    bfaction* bf;
+    building* bld;
+    battle* b = (battle*)calloc(1, sizeof(battle));
+
+    assert(b);
+    /* Alle Mann raus aus der Burg! */
+    for (bld = r->buildings; bld != NULL; bld = bld->next)
+        bld->sizeleft = bld->size;
+
+    b->turn = 1;
+    b->has_tactics_turn = false;
+    b->region = r;
+    b->plane = getplane(r);
+    /* Finde alle Parteien, die den Kampf beobachten koennen: */
+    for (u = r->units; u; u = u->next) {
+        if (u->number > 0) {
+            if (!fval(u->faction, FFL_MARK)) {
+                fset(u->faction, FFL_MARK);
+                for (bf = b->factions; bf; bf = bf->next) {
+                    if (bf->faction == u->faction)
+                        break;
+                }
+                if (!bf) {
+                    bf = (bfaction*)calloc(1, sizeof(bfaction));
+                    assert(bf);
+                    ++b->nfactions;
+                    bf->faction = u->faction;
+                    bf->next = b->factions;
+                    b->factions = bf;
+                }
+            }
+        }
+    }
+
+    for (bf = b->factions; bf; bf = bf->next) {
+        faction* f = bf->faction;
+        freset(f, FFL_MARK);
+    }
+    return b;
+}
+
+bool start_battle(region * r, battle ** bp)
 {
     battle *b = NULL;
     unit *u;
@@ -3868,6 +3856,20 @@ static bool start_battle(region * r, battle ** bp)
     }
     *bp = b;
     return fighting;
+}
+
+void free_battle(battle* b)
+{
+    while (b->factions) {
+        bfaction* bf = b->factions;
+        b->factions = bf->next;
+        free(bf);
+    }
+
+    selist_foreach(b->meffects, free);
+    selist_free(b->meffects);
+
+    battle_free(b);
 }
 
 /** execute one round of attacks
@@ -4068,9 +4070,6 @@ static void do_battle(region * r) {
     /* Gibt es eine Taktikrunde ? */
     if (b->has_tactics_turn) {
         b->turn = 0;
-    }
-    else {
-        b->turn = 1;
     }
 
     /* PRECOMBATSPELLS */
