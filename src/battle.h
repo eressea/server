@@ -46,7 +46,7 @@ typedef struct bfaction {
 } bfaction;
 
 typedef struct tactics {
-    struct selist* fighters;
+    struct fighter** fighters;
     int value;
 } tactics;
 
@@ -61,7 +61,6 @@ typedef struct side {
     struct side* nextF;         /* next army of same faction */
     struct battle* battle;
     struct bfaction* bf;        /* battle info that goes with the faction */
-    struct faction* faction;    /* cache optimization for bf->faction */
     const struct group* group;
     struct tactics leader;      /* this army's best tactician */
     unsigned char relations[MAXSIDES];

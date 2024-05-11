@@ -1205,20 +1205,17 @@ static void test_start_battle(CuTest* tc) {
     CuAssertPtrNotNull(tc, s->bf);
     CuAssertPtrEquals(tc, s, s->bf->sides);
     CuAssertPtrEquals(tc, u1->faction, s->bf->faction);
-    CuAssertPtrEquals(tc, u1->faction, s->faction);
     CuAssertPtrEquals(tc, NULL, (faction*)s->stealthfaction);
     CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, s->bf->attacker);
     CuAssertPtrEquals(tc, NULL, s->leader.fighters);
     CuAssertIntEquals(tc, 0, s->leader.value);
 
-    CuAssertPtrEquals(tc, u2->faction, b->sides[1].faction);
     s = b->sides + 1;
     CuAssertPtrNotNull(tc, fig = s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
     CuAssertPtrEquals(tc, s, s->bf->sides);
     CuAssertPtrEquals(tc, u2->faction, s->bf->faction);
-    CuAssertPtrEquals(tc, u2->faction, s->faction);
     CuAssertPtrEquals(tc, NULL, (faction *)s->stealthfaction);
     CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, !s->bf->attacker);
