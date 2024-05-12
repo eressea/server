@@ -2944,6 +2944,8 @@ void init_tactics(battle* b)
                     msg_release(m);
                 }
             }
+            arrfree(s->leader.fighters);
+            s->leader.fighters = NULL;
         }
     }
 }

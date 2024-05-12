@@ -1277,8 +1277,8 @@ static void test_battle_leaders(CuTest* tc) {
     CuAssertPtrEquals(tc, f, s->bf->faction);
     CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, s->bf->attacker);
-    //CuAssertIntEquals(tc, 3, (int)arrlen(s->leader.fighters));
     CuAssertIntEquals(tc, 2 + TACTICS_BONUS, s->leader.value);
+    CuAssertIntEquals(tc, 2 + TACTICS_BONUS, b->max_tactics);
 
     CuAssertTrue(tc, b->has_tactics_turn);
     CuAssertTrue(tc, !b->reelarrow);
