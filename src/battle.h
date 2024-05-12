@@ -236,6 +236,7 @@ bool is_attacker(const fighter* fig);
 struct battle* make_battle(struct region* r);
 bool start_battle(struct region* r, struct battle** bp);
 void free_battle(struct battle* b);
+void init_tactics(struct battle* b);
 struct fighter* make_fighter(struct battle* b, struct unit* u,
     struct side* s, bool attack);
 int join_battle(struct battle* b, struct unit* u, bool attack, struct fighter** cp);

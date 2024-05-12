@@ -6,6 +6,7 @@
 
 #include "magic.h"
 #include "reports.h"
+#include "spy.h"
 
 #include "spells/buildingcurse.h"
 
@@ -1233,6 +1234,104 @@ static void test_start_battle(CuTest* tc) {
     test_teardown();
 }
 
+static void test_battle_leaders(CuTest* tc) {
+    region* r;
+    faction* f;
+    unit * u2, * u;
+    side* s;
+    battle* b = NULL;
+    test_setup();
+
+    random_source_inject_constants(0., 50);
+    r = test_create_plain(0, 0);
+    u2 = test_create_unit(test_create_faction(), r);
+    CuAssertTrue(tc, !start_battle(r, &b));
+    CuAssertPtrEquals(tc, NULL, b);
+
+    f = test_create_faction();
+
+    u = test_create_unit(f, r);
+    unit_addorder(u, create_order(K_ATTACK, f->locale, itoa36(u2->no)));
+    set_level(u, SK_TACTICS, 1);
+    unit_setstatus(u, ST_FIGHT);
+
+    u = test_create_unit(f, r);
+    unit_addorder(u, create_order(K_ATTACK, f->locale, itoa36(u2->no)));
+    set_level(u, SK_TACTICS, 1);
+    unit_setstatus(u, ST_BEHIND);
+
+    u = test_create_unit(f, r);
+    unit_addorder(u, create_order(K_ATTACK, f->locale, itoa36(u2->no)));
+    set_level(u, SK_TACTICS, 2);
+    unit_setstatus(u, ST_AGGRO);
+
+    CuAssertTrue(tc, start_battle(r, &b));
+    CuAssertPtrNotNull(tc, b);
+    CuAssertIntEquals(tc, 2, b->nsides);
+
+    init_tactics(b);
+    s = b->sides;
+    CuAssertPtrNotNull(tc, s->fighters);
+    CuAssertPtrNotNull(tc, s->bf);
+    CuAssertPtrEquals(tc, s, s->bf->sides);
+    CuAssertPtrEquals(tc, f, s->bf->faction);
+    CuAssertPtrEquals(tc, NULL, s->nextF);
+    CuAssertTrue(tc, s->bf->attacker);
+    //CuAssertIntEquals(tc, 3, (int)arrlen(s->leader.fighters));
+    CuAssertIntEquals(tc, 2 + TACTICS_BONUS, s->leader.value);
+
+    CuAssertTrue(tc, b->has_tactics_turn);
+    CuAssertTrue(tc, !b->reelarrow);
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_get_tactics(CuTest* tc) {
+    region* r;
+    faction* f;
+    unit* u1, * u2, * u3;
+    side* s1, * s2, * s3;
+    battle* b = NULL;
+    test_setup();
+
+    random_source_inject_constants(0., 50);
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(), r);
+    unit_setstatus(u1, ST_FIGHT); /* no bonus if you have no skill */
+
+    unit_setstatus(u2 = test_create_unit(f = test_create_faction(), r), ST_BEHIND); /* no bonus for tacticians in the rear */
+    set_level(u2, SK_TACTICS, 3);
+
+    unit_setstatus(u3 = test_create_unit(f, r), ST_FIGHT); /* +1 for fighting in front*/
+    set_factionstealth(u3, u1->faction); /* u3 and u2 are on different, but allied, sides */
+    set_level(u3, SK_TACTICS, 1);
+
+    unit_addorder(u2, create_order(K_ATTACK, u2->faction->locale, itoa36(u1->no)));
+    unit_addorder(u3, create_order(K_ATTACK, u3->faction->locale, itoa36(u1->no)));
+
+    CuAssertTrue(tc, start_battle(r, &b));
+    init_tactics(b);
+
+    s2 = b->sides;
+    s1 = b->sides + 1;
+    s3 = b->sides + 2;
+
+    CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
+    CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);
+    CuAssertPtrEquals(tc, u3->faction, s3->bf->faction);
+    CuAssertPtrEquals(tc, u1->faction, (struct faction *)s3->stealthfaction);
+    CuAssertIntEquals(tc, 0, s1->leader.value);
+    CuAssertIntEquals(tc, 3, s2->leader.value);
+    CuAssertIntEquals(tc, 1 + TACTICS_BONUS, s3->leader.value);
+
+    CuAssertIntEquals(tc, -3, get_tactics(s1, s2));
+    CuAssertIntEquals(tc, -3, get_tactics(s1, s3));
+    CuAssertIntEquals(tc, 3, get_tactics(s2, s1));
+    CuAssertIntEquals(tc, 3, get_tactics(s3, s1));
+    free_battle(b);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1266,5 +1365,7 @@ CuSuite *get_battle_suite(void)
     DISABLE_TEST(suite, test_drain_exp);
     SUITE_ADD_TEST(suite, test_make_battle);
     SUITE_ADD_TEST(suite, test_start_battle);
+    SUITE_ADD_TEST(suite, test_battle_leaders);
+    SUITE_ADD_TEST(suite, test_get_tactics);
     return suite;
 }

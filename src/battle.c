@@ -2908,6 +2908,46 @@ static struct message * army_message(const battle* b, const faction* f, const si
     return msg_message("para_army_index", "index name faction", army_index(s), sname, fv);
 }
 
+/*
+ * Besten Taktiker ermitteln
+ */
+void init_tactics(battle* b)
+{
+    side* s;
+
+    b->max_tactics = 0;
+
+    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        if (s->leader.fighters) {
+            if (s->leader.value > b->max_tactics) {
+                b->max_tactics = s->leader.value;
+            }
+        }
+    }
+
+    if (b->max_tactics > 0) {
+        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+            if (s->leader.value == b->max_tactics) {
+                size_t qi;
+
+                for (qi = arrlen(s->leader.fighters); qi > 0; qi--) {
+                    fighter* tf = s->leader.fighters[qi - 1];
+                    unit* u = tf->unit;
+                    message* m = NULL;
+                    if (!is_attacker(tf)) {
+                        m = msg_message("para_tactics_lost", "unit", u);
+                    }
+                    else {
+                        m = msg_message("para_tactics_won", "unit", u);
+                    }
+                    message_all(b, m);
+                    msg_release(m);
+                }
+            }
+        }
+    }
+}
+
 static void print_stats(battle * b)
 {
     side *s2;
@@ -2989,40 +3029,6 @@ static void print_stats(battle * b)
         }
 
         print_fighters(b, s);
-    }
-
-    /* Besten Taktiker ermitteln */
-
-    b->max_tactics = 0;
-
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
-        if (s->leader.fighters) {
-            if (s->leader.value > b->max_tactics) {
-                b->max_tactics = s->leader.value;
-            }
-        }
-    }
-
-    if (b->max_tactics > 0) {
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
-            if (s->leader.value == b->max_tactics) {
-                size_t qi;
-
-                for (qi = arrlen(s->leader.fighters); qi > 0; qi--) {
-                    fighter *tf = s->leader.fighters[qi-1];
-                    unit *u = tf->unit;
-                    message *m = NULL;
-                    if (!is_attacker(tf)) {
-                        m = msg_message("para_tactics_lost", "unit", u);
-                    }
-                    else {
-                        m = msg_message("para_tactics_won", "unit", u);
-                    }
-                    message_all(b, m);
-                    msg_release(m);
-                }
-            }
-        }
     }
 }
 
@@ -4073,6 +4079,7 @@ static void do_battle(region * r) {
     do_combatmagic(b, DO_PRECOMBATSPELL);
 
     print_stats(b);               /* gibt die Kampfaufstellung aus */
+    init_tactics(b);
     log_debug("battle in %s (%d, %d) : ", regionname(r, 0), r->x, r->y);
 
     for (; battle_report(b) && b->turn <= max_turns; ++b->turn) {
