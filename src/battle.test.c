@@ -1169,7 +1169,7 @@ static void test_make_battle(CuTest* tc) {
     CuAssertIntEquals(tc, 0, b->max_tactics);
     CuAssertIntEquals(tc, 1, b->turn);
     CuAssertIntEquals(tc, 2, b->nfactions);
-    CuAssertIntEquals(tc, 0, b->nsides);
+    CuAssertIntEquals(tc, 0, (int)arrlen(b->sides));
     CuAssertIntEquals(tc, 0, b->nfighters);
     CuAssertIntEquals(tc, 0, b->keeploot);
     CuAssertTrue(tc, !b->has_tactics_turn);
@@ -1198,15 +1198,13 @@ static void test_start_battle(CuTest* tc) {
     CuAssertTrue(tc, start_battle(r, &b));
     CuAssertPtrNotNull(tc, b);
     CuAssertPtrEquals(tc, r, b->region);
-    CuAssertIntEquals(tc, 2, b->nsides);
+    CuAssertIntEquals(tc, 2, (int)arrlen(b->sides));
 
     s = b->sides;
     CuAssertPtrNotNull(tc, s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
-    CuAssertPtrEquals(tc, s, s->bf->sides);
     CuAssertPtrEquals(tc, u1->faction, s->bf->faction);
     CuAssertPtrEquals(tc, NULL, (faction*)s->stealthfaction);
-    CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, s->bf->attacker);
     CuAssertPtrEquals(tc, NULL, s->leader.fighters);
     CuAssertIntEquals(tc, 0, s->leader.value);
@@ -1214,10 +1212,8 @@ static void test_start_battle(CuTest* tc) {
     s = b->sides + 1;
     CuAssertPtrNotNull(tc, fig = s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
-    CuAssertPtrEquals(tc, s, s->bf->sides);
     CuAssertPtrEquals(tc, u2->faction, s->bf->faction);
     CuAssertPtrEquals(tc, NULL, (faction *)s->stealthfaction);
-    CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, !s->bf->attacker);
     CuAssertPtrEquals(tc, NULL, fig->next);
     CuAssertPtrEquals(tc, u2, fig->unit);
@@ -1266,15 +1262,13 @@ static void test_battle_leaders(CuTest* tc) {
 
     CuAssertTrue(tc, start_battle(r, &b));
     CuAssertPtrNotNull(tc, b);
-    CuAssertIntEquals(tc, 2, b->nsides);
+    CuAssertIntEquals(tc, 2, (int)arrlen(b->sides));
 
     init_tactics(b);
     s = b->sides;
     CuAssertPtrNotNull(tc, s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
-    CuAssertPtrEquals(tc, s, s->bf->sides);
     CuAssertPtrEquals(tc, f, s->bf->faction);
-    CuAssertPtrEquals(tc, NULL, s->nextF);
     CuAssertTrue(tc, s->bf->attacker);
     CuAssertIntEquals(tc, 2 + TACTICS_BONUS, s->leader.value);
     CuAssertIntEquals(tc, 2 + TACTICS_BONUS, b->max_tactics);

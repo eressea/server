@@ -1290,10 +1290,11 @@ int sp_fumbleshield(struct castorder * co)
 
 static int count_healable(battle * b, fighter * df)
 {
-    side *s;
     int healable = 0;
+    size_t si;
 
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    for (si = arrlen(b->sides); si > 0; --si) {
+        side* s = b->sides + si - 1;
         if (helping(df->side, s)) {
             healable += s->casualties;
         }
