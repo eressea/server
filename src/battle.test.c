@@ -1159,11 +1159,10 @@ static void test_battle_fleeing(CuTest* tc) {
 static void test_make_battle(CuTest* tc) {
     region* r;
     battle* b;
-    unit* u1, * u2;
     test_setup();
     r = test_create_plain(0, 0);
-    u1 = test_create_unit(test_create_faction(), r);
-    u2 = test_create_unit(test_create_faction(), r);
+    test_create_unit(test_create_faction(), r);
+    test_create_unit(test_create_faction(), r);
     b = make_battle(r);
     CuAssertPtrNotNull(tc, b);
     CuAssertPtrEquals(tc, NULL, b->plane);
