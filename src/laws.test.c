@@ -2251,17 +2251,20 @@ static void test_tree_growth_winter(CuTest* tc) {
     int week;
 
     test_setup();
+    random_source_inject_constant(0); /* maximum herb growth */
     test_create_calendar();
     r = test_create_plain(0, 0);
     rsettrees(r, 0, 100);
     rsettrees(r, 1, 100);
     rsettrees(r, 2, 100);
+    rsetherbs(r, 50);
     CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(week = 0));
     demographics_week(week);
     CuAssertPtrEquals(tc, NULL, a_find(r->attribs, &at_germs));
     CuAssertIntEquals(tc, 100, rtrees(r, 0));
     CuAssertIntEquals(tc, 100, rtrees(r, 1));
     CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 50, rherbs(r));
 
     CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(week = 1));
     demographics_week(week);
@@ -2269,6 +2272,7 @@ static void test_tree_growth_winter(CuTest* tc) {
     CuAssertIntEquals(tc, 100, rtrees(r, 0));
     CuAssertIntEquals(tc, 100, rtrees(r, 1));
     CuAssertIntEquals(tc, 100, rtrees(r, 2));
+    CuAssertIntEquals(tc, 50, rherbs(r));
     test_teardown();
 }
 

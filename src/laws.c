@@ -747,13 +747,12 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 }
 
 static void
-growing_herbs(region * r, const int current_season, const season_t last_weeks_season)
+growing_herbs(region * r, const int current_season)
 {
     /* Jetzt die Kraeutervermehrung. Vermehrt wird logistisch:
      *
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
      * Kraeuter))% sich zu vermehren. */
-    UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
         int i, herbs = rherbs(r);
         for (i = herbs; i > 0; --i) {
@@ -905,7 +904,7 @@ void demographics_week(int week)
                 }
                 else if (plant_rules) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season, plant_rules);
-                    growing_herbs(r, current_season, last_weeks_season);
+                    growing_herbs(r, current_season);
                 }
             }
 
