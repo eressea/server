@@ -7,7 +7,7 @@
     <construction skill="weaponsmithing" minskill="5">
       <requirement type="mallorn" quantity="2"/>
     </construction>
-    <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.0">
+    <weapon pierce="true" missile="true" skill="bow" offmod="0" defmod="0" reload="0" magres="0.15">
       <damage type="rider" value="2d6+4"/>
       <damage type="footman" value="2d6+4"/>
       <modifier type="missile_target" value="2"/>
