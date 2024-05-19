@@ -2191,7 +2191,7 @@
       <arg name="target" type="region"/>
     </type>
   </message>
-  <message name="leavefail" section="errors">
+  <message name="enterfail" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>
@@ -6010,6 +6010,14 @@
   <message name="tidalwave" section="events">
     <type>
       <arg name="region" type="region"/>
+    </type>
+  </message>
+
+  <message name="warpgate" section="events">
+    <type>
+      <arg name="from" type="region"/>
+      <arg name="to" type="region"/>
+      <arg name="unit" type="unit"/>
     </type>
   </message>
 

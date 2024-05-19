@@ -172,7 +172,7 @@ static bool RemoveNMRNewbie(void)
     return value != 0;
 }
 
-static void dumbeffect(unit *u) {
+static void potion_effects(unit *u) {
     int effect = get_effect(u, oldpotiontype[P_FOOL]);
     if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
         int weeks = u->number;
@@ -188,7 +188,7 @@ static void dumbeffect(unit *u) {
         }
         /* bestes Talent raussuchen */
         if (sb != NULL) {
-            reduce_skill(u, sb, weeks);
+            reduce_skill_weeks(u, sb, weeks);
             ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                 "unit weeks skill", u, weeks, (skill_t)sb->id));
         }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
@@ -223,7 +223,7 @@ static void age_unit(region * r, unit * u)
         rc->age_unit(u);
     }
     if (u->attribs) {
-        dumbeffect(u);
+        potion_effects(u);
     }
     if (u->items && u->region && is_astral(u->region)) {
         astral_crumble(u);
@@ -628,8 +628,7 @@ increased_growth(const region* r, const struct race *rc_elf) {
 static void
 growing_trees(region * r, const season_t current_season, const season_t last_weeks_season, int rules)
 {
-    int grownup_trees, i, seeds, sprout;
-    attrib *a;
+    int grownup_trees, i, seeds;
     double seedchance = config_get_flt("rules.treeseeds.chance", 0.005F);
 
     if (current_season == SEASON_SUMMER || current_season == SEASON_AUTUMN) {
@@ -637,17 +636,19 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         int mp, elves = count_race(r, rc_elf);
         direction_t d;
 
-        a = a_find(r->attribs, &at_germs);
-        if (a && last_weeks_season == SEASON_SPRING) {
+        if (last_weeks_season == SEASON_SPRING) {
+            attrib * a = a_find(r->attribs, &at_germs);
             /* ungekeimte Samen bleiben erhalten, Sproesslinge wachsen */
-            sprout = rtrees(r, 1);
-            if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
-            /* aus dem gesamt Sproesslingepool abziehen */
-            rsettrees(r, 1, rtrees(r, 1) - sprout);
-            /* zu den Baeumen hinzufuegen */
-            rsettrees(r, 2, rtrees(r, 2) + sprout);
+            if (a) {
+                int sprout = rtrees(r, 1);
+                if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
+                /* aus dem gesamt Sproesslingepool abziehen */
+                rsettrees(r, 1, rtrees(r, 1) - sprout);
+                /* zu den Baeumen hinzufuegen */
+                rsettrees(r, 2, rtrees(r, 2) + sprout);
 
-            a_removeall(&r->attribs, &at_germs);
+                a_removeall(&r->attribs, &at_germs);
+            }
         }
 
         mp = max_production(r);
@@ -697,11 +698,11 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
                      * keimen koennen, haengt von der Bewuchsdichte und der
                      * verfuegbaren Flaeche ab. In Gletschern gibt es weniger
                      * Moeglichkeiten als in Ebenen. */
-                    sprout = 0;
+                    int sprout = 0;
                     seedchance = (1000.0 * region_production(r2)) / r2->terrain->size;
                     for (i = 0; i < seeds / MAXDIRECTIONS; i++) {
                         if (rng_int() % 10000 < seedchance)
-                            sprout++;
+                            ++sprout;
                     }
                     rsettrees(r2, 0, rtrees(r2, 0) + sprout);
                 }
@@ -712,7 +713,8 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         /* in at_germs merken uns die Zahl der Samen und Sproesslinge, die
          * dieses Jahr aelter werden duerfen, damit nicht ein Same im selben
          * Zyklus zum Baum werden kann */
-        a = a_find(r->attribs, &at_germs);
+        attrib * a = a_find(r->attribs, &at_germs);
+        int sprout = rtrees(r, 1);
         if (!a) {
             a = a_add(&r->attribs, a_new(&at_germs));
             a->data.sa[0] = (short)cap_int((8 + rtrees(r, 0)) / 9, 0, SHRT_MAX);
@@ -724,7 +726,6 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
         }
 
         /* Baumwachstum */
-        sprout = rtrees(r, 1);
         if (sprout > a->data.sa[1]) sprout = a->data.sa[1];
         grownup_trees = sprout;
         /* aus dem gesamt Sproesslingepool abziehen */
@@ -746,13 +747,12 @@ growing_trees(region * r, const season_t current_season, const season_t last_wee
 }
 
 static void
-growing_herbs(region * r, const int current_season, const season_t last_weeks_season)
+growing_herbs(region * r, const int current_season)
 {
     /* Jetzt die Kraeutervermehrung. Vermehrt wird logistisch:
      *
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
      * Kraeuter))% sich zu vermehren. */
-    UNUSED_ARG(last_weeks_season);
     if (current_season != SEASON_WINTER) {
         int i, herbs = rherbs(r);
         for (i = herbs; i > 0; --i) {
@@ -857,14 +857,14 @@ static void cb_increase_demand(struct demand *dmd, int n, void *data)
     }
 }
 
-void demographics(void)
+void demographics_week(int week)
 {
     region *r;
     int plant_rules = config_get_int("rules.grow.formula", 3);
     int horse_rules = config_get_int("rules.horses.growth", 1);
     int peasant_rules = config_get_int("rules.peasants.growth", 1);
-    season_t current_season = calendar_season(turn + 1);
-    season_t last_weeks_season = calendar_season(turn);
+    season_t current_season = calendar_season(week);
+    season_t last_weeks_season = calendar_season(week + weeks_per_month * months_per_year - 1);
 
     for (r = regions; r; r = r->next) {
         /** Ageing of regions starts when they are first discovered.
@@ -886,7 +886,7 @@ void demographics(void)
 
                 if (r->age > 20) {
                     double mwp = fmax(region_production(r), 1);
-                    bool mourn = is_mourning(r, turn);
+                    bool mourn = is_mourning(r, week);
                     int p_wage = peasant_wage(r, mourn);
                     double prob =
                         pow(rpeasants(r) / (mwp * p_wage * 0.13), 4.0)
@@ -904,7 +904,7 @@ void demographics(void)
                 }
                 else if (plant_rules) { /* E2 */
                     growing_trees(r, current_season, last_weeks_season, plant_rules);
-                    growing_herbs(r, current_season, last_weeks_season);
+                    growing_herbs(r, current_season);
                 }
             }
 
@@ -921,6 +921,11 @@ void demographics(void)
 
     remove_empty_units();
     immigration();
+}
+
+void demographics(void)
+{
+    demographics_week(turn);
 }
 
 int leave_cmd(unit * u, struct order *ord)

@@ -1277,8 +1277,9 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
         }
         else if (xml_strequal(el, "construction")) {
             assert(stage == NULL);
-            stage = (building_stage *)calloc(1, sizeof(building_stage));
+            stage = arraddnptr(btype->a_stages, 1);
             if (!stage) abort();
+            memset(stage, 0, sizeof(building_stage));
             parse_construction(&stage->construction, pi, el, attr);
         }
         else if (xml_strequal(el, "maintenance")) {
@@ -1477,8 +1478,6 @@ static void end_ships(parseinfo *pi, const XML_Char *el) {
 
 static void end_buildings(parseinfo *pi, const XML_Char *el) {
     /* stores the end of the building's stage list: */
-    static building_stage **stage_ptr;
-
     building_type *btype = (building_type *)pi->object;
     if (xml_strequal(el, "construction")) {
         assert(btype);
@@ -1491,18 +1490,11 @@ static void end_buildings(parseinfo *pi, const XML_Char *el) {
                 con->materials[nreqs].number = 0;
                 nreqs = 0;
             }
-            if (stage_ptr == NULL) {
-                /* at the first build stage, initialize stage_ptr: */
-                assert(btype->stages == NULL);
-                stage_ptr = &btype->stages;
-            }
-            *stage_ptr = stage;
-            stage_ptr = &stage->next;
             stage = NULL;
         }
     }
     else if (xml_strequal(el, "building")) {
-        stage_ptr = NULL;
+        stage = NULL;
         if (nupkeep > 0) {
             btype->maintenance = malloc((1 + (size_t)nupkeep) * sizeof(maintenance));
             if (!btype->maintenance) abort();

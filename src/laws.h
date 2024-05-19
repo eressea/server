@@ -26,6 +26,7 @@ extern "C" {
     extern int newbies[MAXNEWPLAYERS];
     extern int dropouts[2];
 
+    void demographics_week(int week);
     void demographics(void);
     void immigration(void);
     void update_guards(void);

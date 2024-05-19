@@ -25,9 +25,9 @@ end
 
 function test_migration_success()
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u:add_order('ZAUBERE STUFE 1 "Ritual der Aufnahme" ' .. itoa36(u2.id))
     u.aura = 9
@@ -40,9 +40,9 @@ end
 
 function test_migration_no_familiars()
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local f2 = faction.create('human')
+    local f2 = faction.create('dwarf')
     local u2 = setup_mage(f2, r)
     local u3 = unit.create(f2, r)
     u3.race = 'goblin'
@@ -60,9 +60,9 @@ end
 
 function test_migration_no_contact()
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u:add_order('ZAUBERE STUFE 1 "Ritual der Aufnahme" ' .. itoa36(u2.id))
     u.aura = 9
     u.aura_max = 9
@@ -74,9 +74,9 @@ end
 
 function test_migration_too_many()
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u2.number = 2
     u:add_order('ZAUBERE STUFE 1 "Ritual der Aufnahme" ' .. itoa36(u2.id))
@@ -90,9 +90,9 @@ end
 
 function test_migration_with_ring()
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u2.number = 2
     u:add_item('rop', 1)
@@ -109,9 +109,9 @@ end
 function test_migration_insufficient_aura()
     -- if unit cannot pay full costs, it casts at a lower level.
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u2.number = 2
     u:add_order('ZAUBERE STUFE 2 "Ritual der Aufnahme" ' .. itoa36(u2.id))
@@ -127,9 +127,9 @@ end
 function test_migration_insufficient_max_aura()
     -- if unit cannot pay full costs, it casts at a lower level.
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u2.number = 2
     u:add_order('ZAUBERE STUFE 2 "Ritual der Aufnahme" ' .. itoa36(u2.id))
@@ -145,9 +145,9 @@ end
 function test_migration_reduced_cost()
     -- if unit cannot pay full costs, it casts at a lower level.
     local r = region.create(0, 0, "plain")
-    local f = faction.create('human')
+    local f = faction.create('elf')
     local u = setup_mage(f, r)
-    local u2 = unit.create(faction.create('human'), r)
+    local u2 = unit.create(faction.create('dwarf'), r)
     u2:add_order('KONTAKTIERE ' .. itoa36(u.id))
     u:add_order('ZAUBERE STUFE 2 "Ritual der Aufnahme" ' .. itoa36(u2.id))
     u.aura = 3

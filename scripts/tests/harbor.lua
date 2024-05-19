@@ -1,4 +1,4 @@
-local tcname = 'tests.e2.harbor'
+local tcname = 'tests.harbor'
 local lunit = require('lunit')
 if _VERSION >= 'Lua 5.2' then
   _ENV = module(tcname, 'seeall')
@@ -9,6 +9,10 @@ end
 function setup()
     eressea.free_game()
     eressea.settings.set("rules.ship.damage.nocrewocean", "0")
+    eressea.settings.set("rules.ship.damage.nocrew", "0")
+    eressea.settings.set("nmr.timeout", "0")
+    eressea.settings.set("rules.ship.drifting", "0")
+    eressea.settings.set("rules.ship.storms", "0")
     eressea.config.parse([[
 {
     "keywords": {
@@ -42,13 +46,15 @@ function setup()
         }
     },
     "races": {
-        "human": {},
+        "human": {
+            "maintenance": 0
+        },
         "insect": {}
     },
     "buildings" : {
         "harbour" : {
             "maintenance": [
-                { "amount" : 500, "type": "money" }
+                { "amount" : 250, "type": "money" }
             ],
             "maxcapacity" : 25,
             "maxsize" : 25
@@ -188,6 +194,41 @@ function test_sail_into_harbor()
     assert_true(b.working)
     assert_equal(0, u.ship.damage)
     assert_equal(r, u.region)
+end
+
+function test_leave_harbour()
+    local f = faction.create('human')
+    local r1 = region.create(1, 0, 'ocean')
+    local r2 = region.create(-1, 0, 'ocean')
+    local r = region.create(0, 0, 'glacier')
+    local b = building.create(r, 'harbour', 25)
+    local sh = ship.create(r1, 'longboat')
+    local u = unit.create(f, r1, 1)
+    local u2 = unit.create(f, r, 1)
+    u2.building = b
+    u.name = 'Xolgrim'
+    u.ship = sh
+    u:set_skill('sailing', 10)
+
+    -- kein Hafenunterhalt, keine Einreise
+    u:set_orders('NACH W')
+    process_orders()
+    assert_false(b.working)
+    assert_equal(r1, sh.region)
+
+    -- Hafenunterhalt, Einreise erlaubt
+    u2:add_item('money', 250)
+    u:set_orders('NACH W')
+    process_orders()
+    assert_true(b.working)
+    assert_equal(r, sh.region)
+    assert_equal(0, u2:get_item('money'))
+
+    -- Kein Unterhalt, Abreise in "falsche" Richtung
+    u:set_orders('NACH W')
+    process_orders()
+    assert_false(b.working)
+    assert_equal(r2, sh.region)
 end
 
 function test_landing_insects()

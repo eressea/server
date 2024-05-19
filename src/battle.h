@@ -1,5 +1,4 @@
-#ifndef H_KRNL_BATTLE
-#define H_KRNL_BATTLE
+#pragma once
 
 #include "kernel/status.h"
 #include <stdbool.h>
@@ -8,6 +7,9 @@ struct message;
 struct selist;
 struct weapon_type;
 union variant;
+
+#define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
+#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 /** more defines **/
 #define FS_ENEMY 1
@@ -44,7 +46,7 @@ typedef struct bfaction {
 } bfaction;
 
 typedef struct tactics {
-    struct selist* fighters;
+    struct fighter** fighters;
     int value;
 } tactics;
 
@@ -59,7 +61,6 @@ typedef struct side {
     struct side* nextF;         /* next army of same faction */
     struct battle* battle;
     struct bfaction* bf;        /* battle info that goes with the faction */
-    struct faction* faction;    /* cache optimization for bf->faction */
     const struct group* group;
     struct tactics leader;      /* this army's best tactician */
     unsigned char relations[MAXSIDES];
@@ -79,7 +80,6 @@ typedef struct side {
 } side;
 
 typedef struct battle {
-    struct selist* leaders;
     struct region* region;
     struct plane* plane;
     bfaction* factions;
@@ -200,6 +200,7 @@ troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
 troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
+int get_tactics(const struct side* as, const struct side* ds);
 
 int count_enemies(struct battle* b, const struct fighter* af,
     int minrow, int maxrow, int select);
@@ -233,7 +234,9 @@ void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
 bool is_attacker(const fighter* fig);
 struct battle* make_battle(struct region* r);
+bool start_battle(struct region* r, struct battle** bp);
 void free_battle(struct battle* b);
+void init_tactics(struct battle* b);
 struct fighter* make_fighter(struct battle* b, struct unit* u,
     struct side* s, bool attack);
 int join_battle(struct battle* b, struct unit* u, bool attack, struct fighter** cp);
@@ -251,5 +254,3 @@ int meffect_apply(struct meffect* me, int damage);
 
 void loot_items(fighter* corpse);
 void structural_damage(troop td, int damage_abs, int changce_pct);
-
-#endif

@@ -41,7 +41,7 @@ int sp_flying_ship(castorder * co)
     unit *caster;
     int cast_level;
     double power;
-    spellparameter *pa;
+    spellparameter *param;
     message *m = NULL;
     int cno;
 
@@ -50,12 +50,12 @@ int sp_flying_ship(castorder * co)
     caster = co_get_caster(co);
     cast_level = co->level;
     power = co->force;
-    pa = co->par;
+    param = co->a_params;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (pa->param[0]->flag)
+    if (param->flag)
         return 0;
-    sh = pa->param[0]->data.sh;
+    sh = param->data.sh;
     if (sh->number > 1 || sh->type->construction->maxsize > 50) {
         ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
             "error_flying_ship_too_big", "ship", sh));

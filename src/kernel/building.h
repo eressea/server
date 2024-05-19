@@ -44,8 +44,6 @@ extern "C" {
         struct construction construction;  
         /* building stage name: */
         char * name;
-        /* next stage, if upgradable: */
-        struct building_stage * next; 
     } building_stage;
 
     typedef struct building_type {
@@ -62,7 +60,7 @@ extern "C" {
         double auraregen;           /* modifier for aura regeneration inside building */
         struct maintenance *maintenance;    /* array of requirements */
         struct resource_mod *modifiers; /* modify production skills */
-        struct building_stage *stages;
+        struct building_stage *a_stages;
     } building_type;
 
     extern struct selist *buildingtypes;
@@ -74,8 +72,6 @@ extern "C" {
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
     void free_buildingtypes(void);
-    int bt_effsize(const struct building_type *btype,
-        const struct building *b, int bsize);
 
     bool in_safe_building(struct unit *u1, struct unit *u2);
 

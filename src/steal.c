@@ -107,7 +107,7 @@ message * steal_message(const unit * u, struct order *ord) {
     if (pl && fval(pl, PFL_NOATTACK)) {
         return msg_feedback(u, ord, "error270", "");
     }
-    return 0;
+    return NULL;
 }
 
 void steal_cmd(unit * u, struct order *ord, econ_request ** stealorders)

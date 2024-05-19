@@ -173,7 +173,7 @@ msgid "victory_murder_cfulfilled"
 msgstr "\"Achtung: $faction($faction) hat die Siegbedingungen erfüllt und wird in $if($eq($remain,1),\"einer Woche\",\"$int($remain) Wochen\") zum Sieger erklärt werden.\""
 
 msgid "hangover_effect_1"
-msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing....\""
+msgstr "\"$unit($unit) hat höllische Kopfschmerzen und kann sich an die vergangene Woche nicht mehr erinnern. Nur noch daran, wie alles mit einer fröhlichen Feier in irgendeiner Taverne anfing ...\""
 
 msgid "feedback_no_contact"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - $unit($target) hat keinen Kontakt mit uns aufgenommen.\""
@@ -761,6 +761,9 @@ msgstr "\"$unit($mage) ruft $int($amount) $race($race, $amount) zu Hilfe.\""
 msgid "tidalwave"
 msgstr "\"Eine gewaltige Flutwelle verschlingt $region($region) und alle Bewohner.\""
 
+msgid "warpgate"
+msgstr "\"$unit($unit) wird von $region($from) nach $region($to) teleportiert.\""
+
 msgid "cast_hero_effect"
 msgstr "\"$unit($mage) zaubert $spell($spell): $int($amount) Krieger wurden moralisch gestärkt.\""
 
@@ -951,7 +954,7 @@ msgid "error_cannotmake"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - So etwas kann man nicht machen.\""
 
 msgid "meow"
-msgstr "\"Miiauuuuuu...\""
+msgstr "\"Miiauuuuuu ...\""
 
 msgid "spelltargetnotfound"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Es wurde kein Ziel gefunden.\""
@@ -1732,7 +1735,7 @@ msgid "santa_m"
 msgstr "'Ho ho ho!' Ein dicker Gnom fliegt auf einem von 8 Jungdrachen gezogenen Schlitten durch die Nacht und vermacht Deiner Partei einen $resource($item,1). (Um diesen Gegenstand einer Einheit zu geben, gib ihr den Befehl 'BEANSPRUCHE 1 $resource($item,1)')."
 
 msgid "error234"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt..\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit ist mit Ausschiffen beschäftigt.\""
 
 msgid "spellfail::nolevel"
 msgstr "\"$unit($mage) in $region($region): '$order($command)' - Dieser Zauber kann nicht mit Stufenangabe gezaubert werden.\""
@@ -2548,8 +2551,8 @@ msgctxt "curseinfo"
 msgid "maelstrom"
 msgstr "Der Mahlstrom in dieser Region wird alle Schiffe, die in seinen Sog geraten, schwer beschädigen. ($int36($id))"
 
-msgid "leavefail"
-msgstr "\"$unit($unit) konnte aus $region($region) nicht ausreisen.\""
+msgid "enterfail"
+msgstr "\"$unit($unit) konnte nach $region($region) nicht einreisen.\""
 
 msgid "reduced_production"
 msgstr "Die Region ist verwüstet, der Boden karg."

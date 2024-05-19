@@ -38,6 +38,11 @@ function move_all(from, to)
         local units = {}
         for u in s.units do
             table.insert(units, u)
+            local msg = message.create('warpgate')
+            msg:set_region('from', from)
+            msg:set_region('to', to)
+            msg:set_unit('unit', u)
+            msg:send_faction(u.faction)
         end
         s.region = to
         moved = true

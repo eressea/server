@@ -33,7 +33,7 @@ struct order;
 struct attrib;
 
 void transfer_effects(const struct unit* src, struct unit* dst, int n);
-void scale_effects(struct attrib* alist, int n, int size);
+void scale_effects(struct unit* u, int n);
 
 void new_potiontype(struct item_type* itype, int level);
 int potion_level(const struct item_type* itype);

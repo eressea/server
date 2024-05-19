@@ -1,17 +1,13 @@
-#ifndef H_KRNL_ITEMS
-#define H_KRNL_ITEMS
+#pragma once
 
 #include <stdbool.h>
 
 struct unit;
+struct order;
+struct item_type;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void register_itemfunctions(void);
 
-    void register_itemfunctions(void);
+int use_bloodpotion(struct unit* u, const struct item_type* itype,
+    int amount, struct order* ord);
 
-#ifdef __cplusplus
-}
-#endif
-#endif

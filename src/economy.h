@@ -11,8 +11,8 @@ extern "C" {
      * wiviel Silber ein Unterhalter pro Talentpunkt bekommt. */
 
     /* Wieviele Silbermuenzen jeweils auf einmal "getaxed" werden. */
-
-#define TAXFRACTION             10
+#define TAXFRACTION       10
+#define ENTERTAINFRACTION 20
 
     /* Wieviel Silber pro Talentpunkt geklaut wird. */
 

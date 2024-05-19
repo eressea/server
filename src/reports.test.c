@@ -974,24 +974,30 @@ static void test_stealth_modifier(CuTest *tc) {
 static void test_insect_warnings(CuTest *tc) {
     faction *f;
     gamedate gd;
+    int fall, winter = 0;
 
     test_setup();
     test_create_calendar();
+    fall = months_per_year * weeks_per_month - 1;
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(winter));
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(fall));
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(fall - 1));
+
     f = test_create_faction_ex(test_create_race("insect"), NULL);
 
-    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1083, &gd)->season);
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(fall, &gd)->season);
     report_warnings(f, gd.turn);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));
     test_clear_messages(f);
 
-    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(1082, &gd)->season);
+    CuAssertIntEquals(tc, SEASON_AUTUMN, get_gamedate(fall - 1, &gd)->season);
     report_warnings(f, gd.turn);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectfall"));
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectwinter"));
     test_clear_messages(f);
 
-    CuAssertIntEquals(tc, SEASON_WINTER, get_gamedate(1084, &gd)->season);
+    CuAssertIntEquals(tc, SEASON_WINTER, get_gamedate(winter, &gd)->season);
     report_warnings(f, gd.turn);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "nr_insectfall"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "nr_insectwinter"));

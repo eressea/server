@@ -255,9 +255,9 @@ struct order *ord)
     return 0;
 }
 
-static int
-use_bloodpotion(struct unit *u, const struct item_type *itype, int amount,
-struct order *ord)
+int
+use_bloodpotion(struct unit *u, const struct item_type *itype, 
+    int amount, struct order *ord)
 {
     if (u->number == 0 || u_race(u) == get_race(RC_DAEMON)) {
         change_effect(u, itype, 100 * amount);

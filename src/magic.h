@@ -34,6 +34,7 @@ extern "C" {
 
     /* siehe auch objtype_t in objtypes.h */
     typedef enum {
+        SPP_NONE,
         SPP_REGION,                 /* "r" : findregion(x,y) -> *region */
         SPP_UNIT,                   /*  -  : atoi36() -> int */
         SPP_TEMP,                   /*  -  : temp einheit */
@@ -43,7 +44,7 @@ extern "C" {
         SPP_INT                     /* "i" : atoi() -> int */
     } sppobj_t;
 
-    typedef struct spllprm {
+    typedef struct spellparameter {
         sppobj_t typ;
         int flag;
         union {
@@ -55,11 +56,6 @@ extern "C" {
             char *xs;
             int i;
         } data;
-    } spllprm;
-
-    typedef struct spellparameter {
-        int length;                 /* Anzahl der Elemente */
-        struct spllprm **param;
     } spellparameter;
 
     typedef struct strarray {
@@ -105,7 +101,7 @@ extern "C" {
         struct region *_rtarget;     /* Zielregion des Spruchs */
         int distance;               /* Entfernung zur Zielregion */
         struct order *order;        /* Befehl */
-        struct spellparameter *par; /* fuer weitere Parameter */
+        struct spellparameter *a_params;   /* fuer weitere Parameter */
     } castorder;
 
     struct unit * co_get_caster(const struct castorder * co);
@@ -246,13 +242,18 @@ extern "C" {
     int change_maxspellpoints(struct unit *u, int csp);
     /* veraendert die maximalen Magiepunkte einer Einheit */
 
-    /* Zaubern */
+    /** Zaubern **/
+
+    /* ermittelt die Staerke eines Spruchs: */
     double spellpower(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
-    /*      ermittelt die Staerke eines Spruchs */
+    
+    /* @return bool: did the spell succeed? */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
-    /*      true, wenn der Zauber misslingt, bei false gelingt der Zauber */
+
+    /* temporarily turns the caster into a toad: */
+    void fumble_toad(struct unit* mage, const struct spell* sp, int level);
 
     typedef struct spellrank {
         struct castorder *begin;
@@ -260,8 +261,8 @@ extern "C" {
     } spellrank;
 
     struct castorder *create_castorder(struct castorder * co, struct unit *caster,
-    struct unit * familiar, const struct spell * sp, struct region * r,
-        int lev, double force, int range, struct order * ord, struct spellparameter * p);
+        struct unit * familiar, const struct spell * sp, struct region * r,
+        int lev, double force, int range, struct order * ord, struct spellparameter * a_params);
     void free_castorder(struct castorder *co);
     /* Zwischenspreicher fuer Zauberbefehle, notwendig fuer Prioritaeten */
     void add_castorder(struct spellrank *cll, struct castorder *co);
@@ -331,7 +332,7 @@ extern "C" {
         const struct locale *lang);
 
     struct message *msg_unitnotfound(const struct unit *mage,
-    struct order *ord, const struct spllprm *spobj);
+    struct order *ord, const struct spellparameter *spobj);
     bool FactionSpells(void);
 
     struct spellbook * get_spellbook(const char * name);

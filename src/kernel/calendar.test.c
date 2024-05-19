@@ -27,13 +27,13 @@ static void test_calendar(CuTest * tc)
     get_gamedate(0, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
     CuAssertIntEquals(tc, 0, gd.season);
-    CuAssertIntEquals(tc, 0, gd.month);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
     get_gamedate(1, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
     CuAssertIntEquals(tc, 0, gd.season);
-    CuAssertIntEquals(tc, 0, gd.month);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.month);
     CuAssertIntEquals(tc, 1, gd.week);
 
     get_gamedate(weeks_per_month, &gd);
@@ -45,14 +45,14 @@ static void test_calendar(CuTest * tc)
     get_gamedate(weeks_per_month*months_per_year, &gd);
     CuAssertIntEquals(tc, 2, gd.year);
     CuAssertIntEquals(tc, 0, gd.season);
-    CuAssertIntEquals(tc, 0, gd.month);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
     config_set_int("game.start", 42);
     get_gamedate(42, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
     CuAssertIntEquals(tc, 0, gd.season);
-    CuAssertIntEquals(tc, 0, gd.month);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
     first_month = 2;
@@ -65,22 +65,10 @@ static void test_calendar(CuTest * tc)
     test_teardown();
 }
 
-static void setup_calendar(void) {
-    int i;
-
-    months_per_year = 4;
-    weeks_per_month = 2;
-    free(month_season);
-    month_season = calloc(months_per_year, sizeof(season_t));
-    for (i = 0; i != 4; ++i) {
-        month_season[i] = (season_t)i;
-    }
-}
-
 static void test_calendar_season(CuTest * tc)
 {
     test_setup();
-    setup_calendar();
+    test_create_calendar();
 
     CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(0));
     CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(1));
@@ -92,7 +80,6 @@ static void test_calendar_season(CuTest * tc)
     CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(7));
     CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(8));
 
-    free(month_season);
     month_season = NULL;
     test_teardown();
 }
@@ -102,12 +89,18 @@ static void test_gamedate(CuTest * tc)
     gamedate gd;
 
     test_setup();
-    setup_calendar();
+    test_create_calendar();
 
     get_gamedate(0, &gd);
     CuAssertIntEquals(tc, 1, gd.year);
     CuAssertIntEquals(tc, SEASON_WINTER, gd.season);
-    CuAssertIntEquals(tc, 0, gd.month);
+    CuAssertIntEquals(tc, SEASON_WINTER, gd.month);
+    CuAssertIntEquals(tc, 0, gd.week);
+
+    get_gamedate(weeks_per_month, &gd);
+    CuAssertIntEquals(tc, 1, gd.year);
+    CuAssertIntEquals(tc, SEASON_SPRING, gd.season);
+    CuAssertIntEquals(tc, 1, gd.month);
     CuAssertIntEquals(tc, 0, gd.week);
 
     get_gamedate(weeks_per_month + 1, &gd);
@@ -116,7 +109,6 @@ static void test_gamedate(CuTest * tc)
     CuAssertIntEquals(tc, 1, gd.month);
     CuAssertIntEquals(tc, 1, gd.week);
 
-    free(month_season);
     month_season = NULL;
     test_teardown();
 }

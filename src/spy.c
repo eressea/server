@@ -205,7 +205,7 @@ static void stealth_race(unit *u, const char *s) {
     if (trace) {
         /* demons can cloak as other player-races */
         if (u_race(u) == get_race(RC_DAEMON)) {
-            if (playerrace(trace)) {
+            if (stealthrace(trace)) {
                 u->irace = trace;
             }
         }

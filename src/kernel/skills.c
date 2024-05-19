@@ -95,7 +95,7 @@ static int progress_weeks(unsigned int level, bool random_progress)
     return level;
 }
 
-void skill_set(skill *sv, unsigned int level, unsigned int weeks)
+static void skill_set(skill *sv, unsigned int level, unsigned int weeks)
 {
     assert(weeks <= MAX_WEEKS_TO_NEXT_LEVEL(level));
     sv->level = level;
@@ -109,7 +109,7 @@ void sk_set_level(skill *sv, unsigned int level)
     skill_set(sv, level, weeks);
 }
 
-void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
+void increase_skill_weeks(unit * u, enum skill_t sk, unsigned int weeks)
 {
     skill *sv = unit_skill(u, sk);
     if (!sv) {
@@ -123,7 +123,7 @@ void increase_skill(unit * u, enum skill_t sk, unsigned int weeks)
     assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
 }
 
-void reduce_skill(unit * u, skill * sv, unsigned int weeks)
+void reduce_skill_weeks(unit * u, skill * sv, unsigned int weeks)
 {
     unsigned int max_weeks = MAX_WEEKS_TO_NEXT_LEVEL(sv->level);
 
@@ -196,4 +196,16 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
         result->weeks = weeks;
     }
     return result->level;
+}
+
+int skill_level(unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->level : 0;
+}
+
+int skill_weeks(unit *u, enum skill_t sk)
+{
+    const skill *sv = unit_skill(u, sk);
+    return sv ? sv->weeks : 1;
 }
