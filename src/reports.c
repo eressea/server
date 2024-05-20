@@ -2054,10 +2054,12 @@ void report_battle_start(battle * b)
         faction *f = bf->faction;
         const char *lastf = NULL;
         bool first = false;
-        side *s;
+        size_t si, sl = arrlen(b->sides);
 
         sbs_init(&sbs, zText, sizeof(zText));
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+
+        for (si = 0; si != sl; ++si) {
+            side* s = b->sides[si];
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {

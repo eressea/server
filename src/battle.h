@@ -40,7 +40,6 @@ union variant;
 
 typedef struct bfaction {
     struct bfaction* next;
-    struct side* sides;
     struct faction* faction;
     bool attacker;
 } bfaction;
@@ -58,7 +57,6 @@ typedef struct tactics {
 #define E_ATTACKING 4
 
 typedef struct side {
-    struct side* nextF;         /* next army of same faction */
     struct battle* battle;
     struct bfaction* bf;        /* battle info that goes with the faction */
     const struct group* group;
@@ -66,7 +64,7 @@ typedef struct side {
     unsigned char relations[MAXSIDES];
     struct side* enemies[MAXSIDES];
     struct fighter* fighters;
-    unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
+    unsigned int index;         /* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
     int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
     int alive;                  /* Die Partei hat den Kampf verlassen */
@@ -85,8 +83,7 @@ typedef struct battle {
     bfaction* factions;
     int nfactions;
     int nfighters;
-    side sides[MAXSIDES];
-    int nsides;
+    side ** sides;
     struct selist* meffects;
     int max_tactics;
     unsigned char turn;
