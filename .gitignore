@@ -46,3 +46,4 @@ tests/config.lua
 /.vs
 /.idea/
 .env
+/tests/data/test.dat

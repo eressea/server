@@ -1294,7 +1294,7 @@ static int count_healable(battle * b, fighter * df)
     size_t si;
 
     for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides + si - 1;
+        side* s = b->sides[si - 1];
         if (helping(df->side, s)) {
             healable += s->casualties;
         }

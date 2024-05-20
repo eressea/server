@@ -1200,7 +1200,7 @@ static void test_start_battle(CuTest* tc) {
     CuAssertPtrEquals(tc, r, b->region);
     CuAssertIntEquals(tc, 2, (int)arrlen(b->sides));
 
-    s = b->sides;
+    s = b->sides[0];
     CuAssertPtrNotNull(tc, s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
     CuAssertPtrEquals(tc, u1->faction, s->bf->faction);
@@ -1209,7 +1209,7 @@ static void test_start_battle(CuTest* tc) {
     CuAssertPtrEquals(tc, NULL, s->leader.fighters);
     CuAssertIntEquals(tc, 0, s->leader.value);
 
-    s = b->sides + 1;
+    s = b->sides[1];
     CuAssertPtrNotNull(tc, fig = s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
     CuAssertPtrEquals(tc, u2->faction, s->bf->faction);
@@ -1217,7 +1217,7 @@ static void test_start_battle(CuTest* tc) {
     CuAssertTrue(tc, !s->bf->attacker);
     CuAssertPtrEquals(tc, NULL, fig->next);
     CuAssertPtrEquals(tc, u2, fig->unit);
-    CuAssertIntEquals(tc, 3 + TACTICS_MODIFIER, b->sides[1].leader.value);
+    CuAssertIntEquals(tc, 3 + TACTICS_MODIFIER, s->leader.value);
 
     CuAssertIntEquals(tc, 2, b->nfighters);
     CuAssertIntEquals(tc, 2, b->nfactions);
@@ -1265,7 +1265,7 @@ static void test_battle_leaders(CuTest* tc) {
     CuAssertIntEquals(tc, 2, (int)arrlen(b->sides));
 
     init_tactics(b);
-    s = b->sides;
+    s = b->sides[0];
     CuAssertPtrNotNull(tc, s->fighters);
     CuAssertPtrNotNull(tc, s->bf);
     CuAssertPtrEquals(tc, f, s->bf->faction);
@@ -1305,9 +1305,9 @@ static void test_get_tactics(CuTest* tc) {
     CuAssertTrue(tc, start_battle(r, &b));
     init_tactics(b);
 
-    s2 = b->sides;
-    s1 = b->sides + 1;
-    s3 = b->sides + 2;
+    s2 = b->sides[0];
+    s1 = b->sides[1];
+    s3 = b->sides[2];
 
     CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
     CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);

@@ -83,7 +83,7 @@ typedef struct battle {
     bfaction* factions;
     int nfactions;
     int nfighters;
-    side * sides;
+    side ** sides;
     struct selist* meffects;
     int max_tactics;
     unsigned char turn;
