@@ -1129,8 +1129,8 @@ static void demon_dazzle(fighter *af, troop dt) {
 }
 
 static bool survives(fighter *af, troop dt, battle *b) {
-    const unit *du = af->unit;
     const fighter *df = dt.fighter;
+    const unit* du = df->unit;
 
     if (df->person[dt.index].hp > 0) {    /* Hat ueberlebt */
         demon_dazzle(af, dt);
