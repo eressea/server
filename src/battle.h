@@ -62,7 +62,6 @@ typedef struct side {
     const struct group* group;
     struct tactics leader;      /* this army's best tactician */
     unsigned char relations[MAXSIDES];
-    struct side* enemies[MAXSIDES];
     struct fighter* fighters;
     unsigned int index;         /* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
@@ -208,7 +207,8 @@ int calculate_armor(troop dt, const struct weapon_type* dwtype, const struct wea
 int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
 bool terminate(troop dt, troop at, int type, const char* damage,
     bool missile);
-void message_all(battle* b, struct message* m);
+void message_all(struct battle* b, struct message* m);
+bool set_enemy(struct side* as, struct side* ds, bool attacking);
 bool hits(troop at, troop dt, const struct weapon_type *awp);
 void damage_building(struct battle* b, struct building* bldg,
     int damage_abs);

@@ -221,30 +221,15 @@ static void fbattlerecord(battle * b, faction * f, const char *s)
 }
 
 /* being an enemy or a friend is (and must always be!) symmetrical */
-#define enemy_i(as, di) (as->relations[di]&E_ENEMY)
-#define friendly_i(as, di) (as->relations[di]&E_FRIEND)
 #define enemy(as, ds) (as->relations[ds->index]&E_ENEMY)
 #define friendly(as, ds) (as->relations[ds->index]&E_FRIEND)
 
-static bool set_enemy(side * as, side * ds, bool attacking)
+bool set_enemy(side * as, side * ds, bool attacking)
 {
-    int i;
     assert(as && ds);
-    for (i = 0; i != MAXSIDES; ++i) {
-        if (ds->enemies[i] == NULL)
-            ds->enemies[i] = as;
-        if (ds->enemies[i] == as)
-            break;
-    }
-    for (i = 0; i != MAXSIDES; ++i) {
-        if (as->enemies[i] == NULL)
-            as->enemies[i] = ds;
-        if (as->enemies[i] == ds)
-            break;
-    }
-    assert(i != MAXSIDES);
-    if (attacking)
+    if (attacking) {
         as->relations[ds->index] |= E_ATTACKING;
+    }
     if ((ds->relations[as->index] & E_ENEMY) == 0) {
         /* enemy-relation are always symmetrical */
         assert((as->relations[ds->index] & (E_ENEMY | E_FRIEND)) == 0);
@@ -291,7 +276,7 @@ fighter *select_corpse(battle * b, fighter * af)
 
     for (si = arrlen(b->sides); si > 0; --si) {
         side *s = b->sides[si - 1];
-        if (af == NULL || (!enemy_i(af->side, si) && alliedside(af->side, s->bf->faction, HELP_FIGHT))) {
+        if (af == NULL || (!enemy(af->side, s) && alliedside(af->side, s->bf->faction, HELP_FIGHT))) {
             maxcasualties += s->casualties;
         }
     }
@@ -378,29 +363,25 @@ static int get_row(const side * s, int row, const side * vs)
     memset(counted, 0, sizeof(counted));
     memset(size, 0, sizeof(size));
     for (line = FIRST_ROW; line != NUMROWS; ++line) {
-        int i;
         size_t si;
         /* how many enemies are there in this row? */
-        for (i = 0; s->enemies[i]; ++i) {
-            side *se = s->enemies[i];
-            if (se->size[line] > 0) {
-                enemyfront += se->size[line];
-                /* - s->nonblockers[line] (nicht, weil angreifer) */
-            }
-        }
-
         for (si = arrlen(b->sides); si > 0; --si) {
-            side* sa = b->sides[si - 1];
-            int sa_i = (int)si - 1;
+            side* se = b->sides[si - 1];
+            if (enemy(s, se)) {
+                if (se->size[line] > 0) {
+                    enemyfront += se->size[line];
+                    /* - s->nonblockers[line] (nicht, weil angreifer) */
+                }
+            }
             /* count people that like me, but don't like my enemy */
-            if (friendly_i(s, sa_i) && enemy_i(vs, sa_i)) {
-                if (!counted[sa_i]) {
+            if (friendly(s, se) && enemy(vs, se)) {
+                if (!counted[si - 1]) {
                     int i;
 
                     for (i = 0; i != NUMROWS; ++i) {
-                        size[i] += sa->size[i] - sa->nonblockers[i];
+                        size[i] += se->size[i] - se->nonblockers[i];
                     }
-                    counted[sa_i] = true;
+                    counted[si - 1] = true;
                 }
             }
         }
@@ -1427,8 +1408,8 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
 {
     side *as = af->side;
     battle *b = as->battle;
-    int si, selected;
-    int enemies;
+    int selected, enemies;
+    size_t si;
 #ifdef DEBUG_SELECT
     troop result = no_troop;
 #endif
@@ -1448,45 +1429,47 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         return no_troop;
 
     selected = (int)(rng_int() % enemies);
-    for (si = 0; as->enemies[si]; ++si) {
-        side *ds = as->enemies[si];
-        fighter *df;
-        int unitrow[NUMROWS] = { 0 };
-        int offset = 0;
-
-        if (select & SELECT_DISTANCE)
-            offset = get_unitrow(af, ds) - FIGHT_ROW;
-
-        for (df = ds->fighters; df; df = df->next) {
-            int dr;
-
-            dr = statusrow(df->status);
-            if (select & SELECT_ADVANCE) {
-                if (unitrow[dr] == 0) {
-                    unitrow[dr] = get_unitrow(df, as);
-                }
-                dr = unitrow[dr];
-            }
+    for (si = arrlen(b->sides); si > 0; --si) {
+        side* ds = b->sides[si - 1];
+        if (enemy(as, ds)) {
+            fighter* df;
+            int unitrow[NUMROWS] = { 0 };
+            int offset = 0;
 
             if (select & SELECT_DISTANCE)
-                dr += offset;
-            if (dr < minrow || dr > maxrow)
-                continue;
-            if (df->alive - df->removed > selected) {
-#ifdef DEBUG_SELECT
-                if (result.fighter == NULL) {
-                    result.index = selected;
-                    result.fighter = df;
+                offset = get_unitrow(af, ds) - FIGHT_ROW;
+
+            for (df = ds->fighters; df; df = df->next) {
+                int dr;
+
+                dr = statusrow(df->status);
+                if (select & SELECT_ADVANCE) {
+                    if (unitrow[dr] == 0) {
+                        unitrow[dr] = get_unitrow(df, as);
+                    }
+                    dr = unitrow[dr];
                 }
+
+                if (select & SELECT_DISTANCE)
+                    dr += offset;
+                if (dr < minrow || dr > maxrow)
+                    continue;
+                if (df->alive - df->removed > selected) {
+#ifdef DEBUG_SELECT
+                    if (result.fighter == NULL) {
+                        result.index = selected;
+                        result.fighter = df;
+                    }
 #else
-                troop dt;
-                dt.index = selected;
-                dt.fighter = df;
-                return dt;
+                    troop dt;
+                    dt.index = selected;
+                    dt.fighter = df;
+                    return dt;
 #endif
+                }
+                selected -= (df->alive - df->removed);
+                enemies -= (df->alive - df->removed);
             }
-            selected -= (df->alive - df->removed);
-            enemies -= (df->alive - df->removed);
         }
     }
     if (enemies != 0) {
@@ -1646,21 +1629,23 @@ static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
         if (s->bf->attacker && fval(s->bf->faction, FFL_CURSED)) {
             spell *sp = find_spell("igjarjuk");
             if (sp) {
-                int si;
-                for (si = 0; s->enemies[si]; ++si) {
-                    side *se = s->enemies[si];
-                    if (se && !fval(se->bf->faction, FFL_NPC)) {
-                        fighter *fi;
-                        for (fi = se->fighters; fi; fi = fi->next) {
-                            if (fi && (!fig || fig->unit->number > fi->unit->number)) {
-                                fig = fi;
-                                if (fig->unit->number == 1) {
-                                    break;
+                size_t si;
+                for (si = arrlen(b->sides); si > 0; --si) {
+                    side *se = b->sides[si - 1];
+                    if (enemy(s, se)) {
+                        if (!fval(se->bf->faction, FFL_NPC)) {
+                            fighter* fi;
+                            for (fi = se->fighters; fi; fi = fi->next) {
+                                if (fi && (!fig || fig->unit->number > fi->unit->number)) {
+                                    fig = fi;
+                                    if (fig->unit->number == 1) {
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (fig && fig->unit->number == 1) {
-                            break;
+                            if (fig && fig->unit->number == 1) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -3672,11 +3657,15 @@ static void join_allies(battle * b)
         /* Den Feinden meiner Feinde gebe ich Deckung (gegen gemeinsame Feinde): */
         for (sei = 0; sei != num_sides; ++sei) {
             side* se = b->sides[sei];
-            int ai;
-            for (ai = 0; se->enemies[ai]; ++ai) {
-                side *as = se->enemies[ai];
-                if (as == s || !enemy(as, s)) {
-                    set_friendly(as, s);
+            if (enemy(s, se)) {
+                size_t ai;
+                for (ai = arrlen(b->sides); ai > 0; --ai) {
+                    side* as = b->sides[ai - 1];
+                    if (enemy(se, as)) {
+                        if (as == s || !enemy(as, s)) {
+                            set_friendly(as, s);
+                        }
+                    }
                 }
             }
         }

@@ -223,6 +223,39 @@ static void test_select_armor(CuTest *tc) {
     test_teardown();
 }
 
+static void test_select_enemy(CuTest * tc)
+{
+    unit *du, *au;
+    region *r;
+    fighter *df, *af;
+    battle *b;
+    side *ds, *as;
+    troop dt, at;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+
+    du = test_create_unit(test_create_faction(), r);
+    au = test_create_unit(test_create_faction(), r);
+
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+    CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, as->relations[ds->index]);
+    CuAssertIntEquals(tc, E_ENEMY, ds->relations[as->index]);
+    dt.fighter = df;
+    dt.index = 0;
+
+    at = select_enemy(df, FIRST_ROW, LAST_ROW, SELECT_ADVANCE);
+    CuAssertPtrEquals(tc, af, at.fighter);
+
+    free_battle(b);
+    test_teardown();
+}
+
 static void test_defenders_get_building_bonus(CuTest * tc)
 {
     unit *du, *au;
@@ -713,11 +746,7 @@ static void test_loot_notlost_items(CuTest* tc)
 
     ta.fighter->alive = 0;
     ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
-    ta.fighter->side->enemies[0] = td.fighter->side;
-    ta.fighter->side->enemies[1] = NULL;
     td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
-    td.fighter->side->enemies[0] = ta.fighter->side;
-    td.fighter->side->enemies[1] = NULL;
 
     rtype = get_resourcetype(R_HORSE);
     rtype->itype->flags |= ITF_NOTLOST; /* must always be looted */
@@ -832,11 +861,7 @@ static void test_no_loot_from_fleeing(CuTest* tc)
     ta.index = 0;
 
     ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
-    ta.fighter->side->enemies[0] = td.fighter->side;
-    ta.fighter->side->enemies[1] = NULL;
     td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
-    td.fighter->side->enemies[0] = ta.fighter->side;
-    td.fighter->side->enemies[1] = NULL;
 
     flee_all(ta.fighter);
 
@@ -1209,8 +1234,6 @@ static void test_start_battle(CuTest* tc) {
     CuAssertIntEquals(tc, E_ENEMY | E_ATTACKING, s1->relations[s2->index]);
     CuAssertIntEquals(tc, E_ENEMY, s2->relations[s1->index]);
 
-    CuAssertPtrEquals(tc, s2, s1->enemies[0]);
-    CuAssertPtrEquals(tc, NULL, s1->enemies[1]);
     CuAssertPtrNotNull(tc, s1->fighters);
     CuAssertPtrNotNull(tc, s1->bf);
     CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
@@ -1219,8 +1242,6 @@ static void test_start_battle(CuTest* tc) {
     CuAssertPtrEquals(tc, NULL, s1->leader.fighters);
     CuAssertIntEquals(tc, 0, s1->leader.value);
 
-    CuAssertPtrEquals(tc, s1, s2->enemies[0]);
-    CuAssertPtrEquals(tc, NULL, s2->enemies[1]);
     CuAssertPtrNotNull(tc, fig = s2->fighters);
     CuAssertPtrEquals(tc, NULL, fig->next);
     CuAssertPtrEquals(tc, u2, fig->unit);
@@ -1410,6 +1431,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_battle_report_one);
     SUITE_ADD_TEST(suite, test_battle_report_two);
     SUITE_ADD_TEST(suite, test_battle_report_three);
+    SUITE_ADD_TEST(suite, test_select_enemy);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
