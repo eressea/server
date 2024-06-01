@@ -1835,27 +1835,109 @@ static void test_show_both(CuTest *tc) {
     test_teardown();
 }
 
-static void test_immigration(CuTest * tc)
+static void test_immigration(CuTest* tc)
 {
-    region *r;
+    region* r;
 
     test_setup();
     r = test_create_plain(0, 0);
+    config_set_int("rules.economy.repopulate_maximum", 0);
 
     rsetpeasants(r, 0);
-    config_set("rules.economy.repopulate_maximum", 0);
+    r->land->newpeasants = 50;
+    immigration();
+    CuAssertIntEquals(tc, 50, rpeasants(r));
+    CuAssertIntEquals(tc, 0, r->land->newpeasants);
 
-    random_source_inject_constant(0);
-
+    rsetpeasants(r, 40);
+    r->land->newpeasants = -50;
     immigration();
     CuAssertIntEquals(tc, 0, rpeasants(r));
+    CuAssertIntEquals(tc, 0, r->land->newpeasants);
 
-    random_source_inject_constant(1);
+    test_teardown();
+}
 
+static void test_repopulate(CuTest* tc)
+{
+    terrain_type* ter;
+    region* r;
+    int p, income;
+    test_setup();
+    ter = test_create_terrain("test", LAND_REGION);
+    ter->size = 10000;
+
+    r = test_create_region(0, 0, ter);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 2, 0);
+    income = peasant_wage(r, false) - maintenance_cost(NULL);
+
+    random_source_inject_constant(0.0F); /* max. unlucky dice rolls */
+    rsetpeasants(r, p = 89); /* default limit is 90 */
+    immigration();
+    CuAssertIntEquals(tc, p, rpeasants(r));
+
+    random_source_inject_constant(1.0F); /* max. lucky dice rolls */
+    immigration();
+    CuAssertIntEquals(tc, p + income + 1, rpeasants(r));
+    rsetpeasants(r, p = 90); /* works only when peasants < 90 */
+    immigration();
+    CuAssertIntEquals(tc, p, rpeasants(r));
+
+    /* Eressea repopulates regions with < 500 peasants */
+    config_set_int("rules.economy.repopulate_maximum", 500);
+    random_source_inject_constant(1.0F); /* max. lucky dice rolls */
+    rsetpeasants(r, p = 499);
+    immigration();
+    CuAssertIntEquals(tc, p + income + 1, rpeasants(r));
+    /* but do not repopulate if the region has insufficient space */
+    rsetpeasants(r, p = 499);
+    ter->size = (p + 30) * 2;
+    immigration();
+    /* limit check: */
+    CuAssertIntEquals(tc, p, rpeasants(r));
+    rsetpeasants(r, p = 500);
+    immigration();
+    CuAssertIntEquals(tc, p, rpeasants(r));
+
+    test_teardown();
+}
+
+static void test_repopulate_income_based(CuTest* tc)
+{
+    terrain_type* ter;
+    region* r;
+    building* b;
+    building_type* bt_castle;
+    test_setup();
+    ter = test_create_terrain("test", LAND_REGION);
+
+    r = test_create_region(0, 0, ter);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 2, 0);
+    random_source_inject_constant(1.0F); /* max. lucky dice rolls */
+
+    b = test_create_building(r, bt_castle = test_create_castle());
+    b->size = 1;
+    CuAssertIntEquals(tc, 11, peasant_wage(r, false));
+    rsetpeasants(r, 0);
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
 
-    config_set("rules.wage.function", "0");
+    b->size = 10;
+    CuAssertIntEquals(tc, 12, peasant_wage(r, false));
+    rsetpeasants(r, 0);
+    immigration();
+    CuAssertIntEquals(tc, 3, rpeasants(r));
+
+    b->size = 50;
+    CuAssertIntEquals(tc, 13, peasant_wage(r, false));
+    rsetpeasants(r, 0);
+    immigration();
+    CuAssertIntEquals(tc, 4, rpeasants(r));
+
+    random_source_inject_constant(0.5F); /* half the effect */
+    rsetpeasants(r, 0);
     immigration();
     CuAssertIntEquals(tc, 2, rpeasants(r));
 
@@ -2802,6 +2884,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_show_race);
     SUITE_ADD_TEST(suite, test_show_both);
     SUITE_ADD_TEST(suite, test_immigration);
+    SUITE_ADD_TEST(suite, test_repopulate);
+    SUITE_ADD_TEST(suite, test_repopulate_income_based);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
     SUITE_ADD_TEST(suite, test_cansee);

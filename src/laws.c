@@ -776,8 +776,8 @@ void immigration(void)
             rsetpeasants(r, rp);
             r->land->newpeasants = 0;
         }
-        /* Genereate some (0-6 depending on the income) peasants out of nothing */
-        /* if less than 50 are in the region and there is space and no monster or demon units in the region */
+        /* Generate some (0-6 depending on the income) peasants out of nothing */
+        /* if less than `repopulate` are in the region and there is space and no monster or demon units in the region */
         if (repopulate) {
             int peasants = rpeasants(r);
             bool mourn = is_mourning(r, turn);
