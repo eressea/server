@@ -1903,6 +1903,38 @@ static void test_repopulate(CuTest* tc)
     test_teardown();
 }
 
+static void test_repopulate_blocked(CuTest* tc)
+{
+    terrain_type* ter;
+    region* r;
+    unit* u;
+    const race* rc;
+
+    test_setup();
+    rc = test_create_race("demon");
+    CuAssertPtrEquals(tc, (void*)rc, (void*)get_race(RC_DAEMON));
+    ter = test_create_terrain("test", LAND_REGION);
+    ter->size = 10000;
+
+    r = test_create_region(0, 0, ter);
+    rsettrees(r, 1, 0);
+    rsettrees(r, 2, 0);
+
+    u = test_create_unit(test_create_faction(), r);
+    random_source_inject_constant(1.0F); /* max. unlucky dice rolls */
+
+    rsetpeasants(r, 0); /* default limit is 90 */
+    immigration();
+    CuAssertIntEquals(tc, 2, rpeasants(r));
+
+    u_setrace(u, rc); /* demons prevent repopulation */
+    rsetpeasants(r, 0); /* default limit is 90 */
+    immigration();
+    CuAssertIntEquals(tc, 0, rpeasants(r));
+
+    test_teardown();
+}
+
 static void test_repopulate_income_based(CuTest* tc)
 {
     terrain_type* ter;
@@ -2886,6 +2918,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_immigration);
     SUITE_ADD_TEST(suite, test_repopulate);
     SUITE_ADD_TEST(suite, test_repopulate_income_based);
+    SUITE_ADD_TEST(suite, test_repopulate_blocked);
     SUITE_ADD_TEST(suite, test_demon_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
     SUITE_ADD_TEST(suite, test_cansee);
