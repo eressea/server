@@ -1054,7 +1054,7 @@ void make_item(unit * u, const item_type * itype, int want)
         if (itype->flags & ITF_POTION) {
             create_potion(u, itype, want);
         }
-        else if (itype->construction && itype->construction->materials) {
+        else if (itype->construction && itype->construction->materials && itype->construction->minskill > 0) {
             manufacture(u, itype, want);
         }
         else {

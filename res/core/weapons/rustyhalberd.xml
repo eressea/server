@@ -3,7 +3,7 @@
 <resources>
 <resource name="rustyhalberd">
   <item weight="200" score="20">
-    <construction skill="weaponsmithing" minskill="3">
+    <construction skill="weaponsmithing">
       <requirement type="iron" quantity="1"/>
       <requirement type="log" quantity="2"/>
     </construction>
