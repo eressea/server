@@ -2,11 +2,7 @@
 <eressea>
 <resources>
 <resource name="rustyaxe">
-  <item weight="200">
-    <construction skill="weaponsmithing" minskill="3">
-      <requirement type="log" quantity="1"/>
-      <requirement type="iron" quantity="1"/>
-    </construction>
+  <item weight="200" score="20">
     <weapon cut="true" skill="melee" offmod="0" defmod="-3">
       <damage type="rider" value="2d6"/>
       <damage type="footman" value="2d6"/>
