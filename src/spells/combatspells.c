@@ -285,7 +285,7 @@ int sp_combatrosthauch(struct castorder * co)
         size_t len = arrlen(df->weapons);
 
         for (w = 0; w != len; ++w) {
-            weapon *wp = df->weapons;
+            weapon *wp = df->weapons + w;
             if (df->unit->items && force > 0) {
                 const item_type *itype = wp->item.type;
                 item ** itp = i_find(&df->unit->items, itype);
