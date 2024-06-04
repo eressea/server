@@ -12,6 +12,7 @@
 #include "spells/combatspells.h"
 
 #include "kernel/config.h"
+#include "kernel/build.h"          // for construction, requirement
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/curse.h"
@@ -32,6 +33,7 @@
 #include "util/rand.h"
 #include "util/variant.h"
 
+#include <stdlib.h>                // for abort, calloc
 #include <strings.h>
 
 #include <CuTest.h>
@@ -1379,9 +1381,9 @@ static void test_combat_rosthauch(CuTest *tc) {
     co.magician.fig = fig1;
 
     sp_combatrosthauch(&co);
-    CuAssertIntEquals(tc, 0, i_get(u2->items, it_rust1));
-    CuAssertIntEquals(tc, 0, i_get(u2->items, it_rust2));
-    CuAssertIntEquals(tc, 1, i_get(u2->items, it_other));
+    CuAssertIntEquals(tc, 0, i_get(fig2->unit->items, it_rust1));
+    CuAssertIntEquals(tc, 0, i_get(fig2->unit->items, it_rust2));
+    CuAssertIntEquals(tc, 1, i_get(fig2->unit->items, it_other));
     free_battle(b);
     test_teardown();
 }
