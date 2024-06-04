@@ -3,7 +3,7 @@
 <resources>
 <resource name="rustysword">
   <item weight="100" score="10">
-    <construction skill="weaponsmithing" minskill="3">
+    <construction skill="weaponsmithing">
       <requirement type="iron" quantity="1"/>
     </construction>
     <weapon cut="true" skill="melee" offmod="-1" defmod="-1">
