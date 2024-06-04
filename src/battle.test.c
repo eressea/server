@@ -9,6 +9,7 @@
 #include "spy.h"
 
 #include "spells/buildingcurse.h"
+#include "spells/combatspells.h"
 
 #include "kernel/config.h"
 #include "kernel/building.h"
@@ -1325,6 +1326,66 @@ static void test_get_tactics(CuTest* tc) {
     test_teardown();
 }
 
+static item_type *create_weapon(const char *name, const resource_type *rtype)
+{
+    item_type *itype = test_create_itemtype(name);
+    itype->construction = calloc(1, sizeof(construction));
+    if (!itype->construction) abort();
+    itype->construction->skill = SK_WEAPONSMITH;
+    itype->construction->minskill = 1;
+    itype->construction->maxsize = 1;
+    itype->construction->reqsize = 1;
+    itype->construction->materials = calloc(2, sizeof(requirement));
+    if (!itype->construction->materials) abort();
+    itype->construction->materials[0].rtype = rtype;
+    itype->construction->materials[0].number = 2;
+    itype->rtype->wtype = new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    return itype;
+}
+
+static void test_combat_rosthauch(CuTest *tc) {
+    region *r;
+    faction *f;
+    unit *u1, *u2;
+    fighter *fig1, *fig2;
+    battle *b = NULL;
+    item_type *it_rust1, *it_rust2, *it_other;
+    castorder co;
+    const resource_type *rtype;
+
+    test_setup();
+    init_resources();
+    rtype = rt_get_or_create("iron");
+    it_rust1 = create_weapon("sword", rtype);
+    it_rust2 = create_weapon("rustysword", rtype);
+    it_other = create_weapon("spear", rt_find("log"));
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(f = test_create_faction(), r);
+    i_change(&u2->items, it_rust1, 1);
+    i_change(&u2->items, it_rust2, 1);
+    i_change(&u2->items, it_other, 1);
+
+    unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
+
+    CuAssertTrue(tc, start_battle(r, &b));
+    CuAssertIntEquals(tc, 2, b->nfighters);
+    CuAssertIntEquals(tc, 2, b->nfactions);
+
+    fig1 = b->sides[0]->fighters;
+    fig2 = b->sides[1]->fighters;
+
+    test_create_castorder(&co, fig1->unit, 10, 10., 0, NULL);
+    co.magician.fig = fig1;
+
+    sp_combatrosthauch(&co);
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_rust1));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_rust2));
+    CuAssertIntEquals(tc, 1, i_get(u2->items, it_other));
+    free_battle(b);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1360,5 +1421,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_start_battle);
     SUITE_ADD_TEST(suite, test_battle_leaders);
     SUITE_ADD_TEST(suite, test_get_tactics);
+    SUITE_ADD_TEST(suite, test_combat_rosthauch);
     return suite;
 }
