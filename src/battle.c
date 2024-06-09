@@ -3431,7 +3431,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     return fig;
 }
 
-int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
+bool join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     fighter *fc = NULL;
     size_t si;
@@ -3452,11 +3452,10 @@ int join_battle(battle * b, unit * u, bool attack, fighter ** cp)
         }
     }
     if (!fc) {
-        *cp = make_fighter(b, u, NULL, attack);
-        return *cp != NULL;
+        fc = make_fighter(b, u, NULL, attack);
     }
     *cp = fc;
-    return false;
+    return fc != NULL;
 }
 
 static void free_side(side * si)

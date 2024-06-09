@@ -10,6 +10,7 @@ Release
 *.vpwhistu
 
 # Microsoft Visual Studio build artefacts
+enc_temp_folder
 src/Debug/
 src/Release/
 src/*.vcproj.*.user
