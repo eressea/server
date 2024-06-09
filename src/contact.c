@@ -1,5 +1,6 @@
 #include "contact.h"
 
+#include "kernel/ally.h"
 #include "kernel/attrib.h"
 #include "kernel/faction.h"
 #include "kernel/messages.h"
@@ -77,6 +78,12 @@ bool ucontact(const unit * u, const unit * u2)
         }
     }
     return false;
+}
+
+bool allied(const unit *u, const unit *u2, int mask)
+{
+    if (ucontact(u, u2)) return true;
+    return (mask == 0) || alliedunit(u, u2->faction, mask) != 0;
 }
 
 int contact_cmd(unit * u, order * ord)
