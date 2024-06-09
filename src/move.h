@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 struct attrib_type;
+struct building;
 struct building_type;
 struct locale;
 struct order;
