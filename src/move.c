@@ -1899,7 +1899,7 @@ static void sail(unit * u, order * ord, bool drifting)
     double damage_storm = storms_enabled ? config_get_flt("rules.ship.damage_storm", 0.02) : 0.0;
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
-    building *harbour;
+    building *harbour = NULL;
 
     error = movewhere(u, token, starting_point, &next_point);
     if (error) {
