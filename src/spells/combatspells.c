@@ -1392,9 +1392,13 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
 
     for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
-
         if (healhp <= 0)
             break;
+
+        /* do not heal temporary fighters */
+        if (a_find(df->unit->attribs, &at_unitdissolve)) {
+            continue;
+        }
 
         /* Untote kann man nicht heilen */
         if (df->unit->number == 0 || (u_race(df->unit)->flags & RCF_NOHEAL))

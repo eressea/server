@@ -1107,12 +1107,16 @@ static bool resurrect_troop(troop dt)
 {
     fighter *df = dt.fighter;
     unit *du = df->unit;
-    if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
-        if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
-            fset(&df->person[dt.index], FL_HEALING_USED);
-            i_change(&du->items, oldpotiontype[P_HEAL], -1);
-            df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
-            return true;
+
+    /* do not heal temporary fighters */
+    if (!a_find(du->attribs, &at_unitdissolve)) {
+        if (oldpotiontype[P_HEAL] && !fval(&df->person[dt.index], FL_HEALING_USED)) {
+            if (i_get(du->items, oldpotiontype[P_HEAL]) > 0) {
+                fset(&df->person[dt.index], FL_HEALING_USED);
+                i_change(&du->items, oldpotiontype[P_HEAL], -1);
+                df->person[dt.index].hp = u_race(du)->hitpoints * 5; /* give the person a buffer */
+                return true;
+            }
         }
     }
     return false;
