@@ -697,31 +697,13 @@ int sp_shadowknights(struct castorder * co)
     fighter * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
-    unit *u;
     battle *b = fi->side->battle;
     region *r = b->region;
     unit *mage = fi->unit;
-    attrib *a;
     int force = (int)fmax(1, get_force(power, 3));
     message *msg;
 
-    u =
-        create_unit(r, mage->faction, force, get_race(RC_SHADOWKNIGHT), 0, NULL,
-        mage);
-    unit_setstatus(u, ST_FIGHT);
-
-    u->hp = u->number * unit_max_hp(u);
-
-    if (mage->flags & UFL_ANON_FACTION) {
-        u->flags |= UFL_ANON_FACTION;
-    }
-
-    a = a_new(&at_unitdissolve);
-    a->data.ca[0] = 0;
-    a->data.ca[1] = 100;
-    a_add(&u->attribs, a);
-
-    make_fighter(b, u, fi->side, is_attacker(fi));
+    summon_allies(fi, get_race(RC_SHADOWKNIGHT), force);
 
     msg = msg_message("shadowknights_effect", "mage", mage);
     message_all(b, msg);
