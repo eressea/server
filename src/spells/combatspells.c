@@ -698,7 +698,6 @@ int sp_shadowknights(struct castorder * co)
     int level = co->level;
     double power = co->force;
     battle *b = fi->side->battle;
-    region *r = b->region;
     unit *mage = fi->unit;
     int force = (int)fmax(1, get_force(power, 3));
     message *msg;
