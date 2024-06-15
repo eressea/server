@@ -2397,7 +2397,6 @@ side *make_side(battle * b, const faction * f, const group * g,
     bfaction *bf;
 
     assert(s1);
-    assert(si <= MAXSIDES);
     b->sides[si] = s1;
 
     if (fval(b->region->terrain, SEA_REGION)) {
@@ -3547,7 +3546,7 @@ static int battle_report(battle * b)
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *fac = bf->faction;
-        gbString str = gb_make_string_length("", 0);
+        gbString str = gb_make_string_length(NULL, 0);
         message *m;
         size_t si;
         bool komma = false;

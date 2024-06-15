@@ -27,7 +27,6 @@ union variant;
 #define FLEE_ROW 4
 #define FIRST_ROW FIGHT_ROW
 #define LAST_ROW FLEE_ROW
-#define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
 /*** fighter::person::flags ***/
 #define FL_TIRED      1
