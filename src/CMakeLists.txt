@@ -317,7 +317,7 @@ target_link_libraries(test_eressea
   ${INIPARSER_LIBRARY}
   )
 
-set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
+set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 99)
 
 find_program(IWYU_PATH NAMES include-what-you-use iwyu)
 if (IWYU_PATH)
