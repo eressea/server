@@ -60,6 +60,8 @@
 #include <strings.h>
 #include <selist.h>
 
+#include <stb_ds.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -68,8 +70,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-
-#include <stb_ds.h>
 
 #define BASE_CHANCE    70       /* 70% Basis-Ueberlebenschance */
 #define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
@@ -220,31 +220,55 @@ static void fbattlerecord(battle * b, faction * f, const char *s)
     msg_release(m);
 }
 
-/* being an enemy or a friend is (and must always be!) symmetrical */
-#define enemy(as, ds) (as->relations[ds->index]&E_ENEMY)
-#define friendly(as, ds) (as->relations[ds->index]&E_FRIEND)
+#define HMKEY(as, ds) ((as)->index<<16) | ((ds)->index&0xFFFF)
 
-bool set_enemy(side * as, side * ds, bool attacking)
+static void set_relation_i(battle *b, relation_key_t key, relation_value_t mask)
+{
+    ptrdiff_t index = hmgeti(b->relations, key);
+    if (index >= 0) {
+        b->relations[index].value |= mask;
+    }
+    else {
+        hmput(b->relations, key, mask);
+    }
+}
+
+void set_relation(side *as, const side *ds, relation_value_t mask)
+{
+    battle *b = as->battle;
+    relation_key_t key = HMKEY(as, ds);
+    set_relation_i(b, key, mask);
+}
+
+relation_value_t get_relation(const side *as, const side *ds)
+{
+    battle *b = as->battle;
+    relation_key_t key = HMKEY(as, ds);
+    return hmget(b->relations, key);
+}
+
+/* being an enemy or a friend is (and must always be!) symmetrical */
+#define enemy(as, ds) (get_relation(as, ds)&E_ENEMY)
+#define friendly(as, ds) (get_relation(as, ds)&E_FRIEND)
+
+void set_enemy(side * as, side * ds, bool attacking)
 {
     assert(as && ds);
+    assert(as->index < 0x10000 && ds->index < 0x10000);
+
     if (attacking) {
-        as->relations[ds->index] |= E_ATTACKING;
+        set_relation(as, ds, E_ATTACKING | E_ENEMY);
     }
-    if ((ds->relations[as->index] & E_ENEMY) == 0) {
-        /* enemy-relation are always symmetrical */
-        assert((as->relations[ds->index] & (E_ENEMY | E_FRIEND)) == 0);
-        ds->relations[as->index] |= E_ENEMY;
-        as->relations[ds->index] |= E_ENEMY;
-        return true;
+    else {
+        set_relation(as, ds, E_ENEMY);
     }
-    return false;
+    set_relation(ds, as, E_ENEMY);
 }
 
 static void set_friendly(side * as, side * ds)
 {
-    assert((as->relations[ds->index] & E_ENEMY) == 0);
-    ds->relations[as->index] |= E_FRIEND;
-    as->relations[ds->index] |= E_FRIEND;
+    set_relation(as, ds, E_FRIEND);
+    set_relation(ds, as, E_FRIEND);
 }
 
 static bool alliedside(const side * s, const faction * f, int mode)
@@ -3036,7 +3060,7 @@ static void print_stats(battle * b)
 
             for (se = arrlen(b->sides); se > 0; --se) {
                 side* s2 = b->sides[se - 1];
-                if (s->relations[s2->index] & E_ATTACKING) {
+                if (get_relation(s, s2) & E_ATTACKING) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
                     rsize =
                         slprintf(bufp, size, "%s %s %d(%s)",
@@ -3731,6 +3755,9 @@ battle* make_battle(region* r)
     for (bld = r->buildings; bld != NULL; bld = bld->next)
         bld->sizeleft = bld->size;
 
+    b->relations = NULL;
+    hmdefault(b->relations, 0);
+
     b->turn = 1;
     b->has_tactics_turn = false;
     b->region = r;
@@ -3914,6 +3941,7 @@ void free_battle(battle* b)
         free(bf);
     }
 
+    hmfree(b->relations);
     selist_foreach(b->meffects, free);
     selist_free(b->meffects);
 

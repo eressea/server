@@ -244,8 +244,8 @@ static void test_select_enemy(CuTest * tc)
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, true);
     set_enemy(as, ds, true);
-    CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, as->relations[ds->index]);
-    CuAssertIntEquals(tc, E_ENEMY, ds->relations[as->index]);
+    CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, get_relation(as, ds));
+    CuAssertIntEquals(tc, E_ENEMY, get_relation(ds, as));
     dt.fighter = df;
     dt.index = 0;
 
@@ -745,8 +745,8 @@ static void test_loot_notlost_items(CuTest* tc)
     ta.index = 0;
 
     ta.fighter->alive = 0;
-    ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
-    td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
+    set_relation(ta.fighter->side, td.fighter->side, E_ENEMY);
+    set_relation(td.fighter->side, ta.fighter->side, E_ENEMY);
 
     rtype = get_resourcetype(R_HORSE);
     rtype->itype->flags |= ITF_NOTLOST; /* must always be looted */
@@ -860,8 +860,8 @@ static void test_no_loot_from_fleeing(CuTest* tc)
     ta.fighter = setup_fighter(&b, ua);
     ta.index = 0;
 
-    ta.fighter->side->relations[td.fighter->side->index] |= E_ENEMY;
-    td.fighter->side->relations[ta.fighter->side->index] |= E_ENEMY;
+    set_relation(ta.fighter->side, td.fighter->side, E_ENEMY);
+    set_relation(td.fighter->side, ta.fighter->side, E_ENEMY);
 
     flee_all(ta.fighter);
 
@@ -1231,8 +1231,8 @@ static void test_start_battle(CuTest* tc) {
     s1 = b->sides[0];
     s2 = b->sides[1];
     CuAssertIntEquals(tc, 1, s1->index + s2->index);
-    CuAssertIntEquals(tc, E_ENEMY | E_ATTACKING, s1->relations[s2->index]);
-    CuAssertIntEquals(tc, E_ENEMY, s2->relations[s1->index]);
+    CuAssertIntEquals(tc, E_ENEMY | E_ATTACKING, get_relation(s1, s2));
+    CuAssertIntEquals(tc, E_ENEMY, get_relation(s2, s1));
 
     CuAssertPtrNotNull(tc, s1->fighters);
     CuAssertPtrNotNull(tc, s1->bf);
