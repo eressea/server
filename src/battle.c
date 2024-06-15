@@ -60,6 +60,7 @@
 #include <strings.h>
 #include <selist.h>
 
+#include <gb_string.h>
 #include <stb_ds.h>
 
 /* libc includes */
@@ -3546,13 +3547,10 @@ static int battle_report(battle * b)
 
     for (bf = b->factions; bf; bf = bf->next) {
         faction *fac = bf->faction;
-        char buf[32 * MAXSIDES];
+        gbString str = gb_make_string_length("", 0);
         message *m;
-        sbstring sbs;
         size_t si;
         bool komma = false;
-
-        sbs_init(&sbs, buf, sizeof(buf));
 
         if (cont)
             m = msg_message("para_lineup_battle", "turn", b->turn);
@@ -3571,22 +3569,22 @@ static int battle_report(battle * b)
                 char buffer[32];
 
                 if (komma) {
-                    sbs_strcat(&sbs, ", ");
+                    str = gb_append_cstring(str, ", ");
                 }
                 snprintf(buffer, sizeof(buffer), "%s %2d(%s): ",
                     loc_army, army_index(s), abbrev);
-                sbs_strcat(&sbs, buffer);
+                str = gb_append_cstring(str, buffer);
 
                 for (r = FIGHT_ROW; r != NUMROWS; ++r) {
                     if (alive[r]) {
                         if (l != FIGHT_ROW) {
-                            sbs_strcat(&sbs, "+");
+                            str = gb_append_cstring(str, "+");
                         }
                         while (k--) {
-                            sbs_strcat(&sbs, "0+");
+                            str = gb_append_cstring(str, "0+");
                         }
                         sprintf(buffer, "%d", alive[r]);
-                        sbs_strcat(&sbs, buffer);
+                        str = gb_append_cstring(str, buffer);
 
                         k = 0;
                         l = r + 1;
@@ -3598,7 +3596,8 @@ static int battle_report(battle * b)
                 komma = true;
             }
         }
-        fbattlerecord(b, fac, buf);
+        fbattlerecord(b, fac, str);
+        gb_free_string(str);
     }
     return cont;
 }
