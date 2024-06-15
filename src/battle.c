@@ -377,20 +377,22 @@ static double hpflee(int status)
 
 static int get_row(const side * s, int row, const side * vs)
 {
-    bool counted[MAXSIDES];
     int enemyfront = 0;
     int line, result;
     int retreat = 0;
     int size[NUMROWS];
     battle *b = s->battle;
+    struct key_s {
+        size_t key;
+    } data, *counted = NULL;
 
-    memset(counted, 0, sizeof(counted));
     memset(size, 0, sizeof(size));
     for (line = FIRST_ROW; line != NUMROWS; ++line) {
         size_t si;
         /* how many enemies are there in this row? */
         for (si = arrlen(b->sides); si > 0; --si) {
-            side* se = b->sides[si - 1];
+            size_t index = si - 1;
+            side* se = b->sides[index];
             if (enemy(s, se)) {
                 if (se->size[line] > 0) {
                     enemyfront += se->size[line];
@@ -399,19 +401,21 @@ static int get_row(const side * s, int row, const side * vs)
             }
             /* count people that like me, but don't like my enemy */
             if (friendly(s, se) && enemy(vs, se)) {
-                if (!counted[si - 1]) {
+                data.key = index;
+                if (hmgeti(counted, data.key) < 0) {
                     int i;
 
                     for (i = 0; i != NUMROWS; ++i) {
                         size[i] += se->size[i] - se->nonblockers[i];
                     }
-                    counted[si - 1] = true;
+                    hmputs(counted, data);
                 }
             }
         }
         if (enemyfront)
             break;
     }
+    hmfree(counted);
     if (enemyfront) {
         int front = 0;
         for (line = FIRST_ROW; line != NUMROWS; ++line) {
