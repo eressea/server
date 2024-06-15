@@ -1355,6 +1355,39 @@ static void test_get_tactics(CuTest* tc) {
     test_teardown();
 }
 
+static void test_get_unitrow(CuTest* tc) {
+    region * r;
+    unit * u1, * u2, * u3;
+    side * s1, * s2;
+    battle * b = NULL;
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    unit_setstatus(u1 = test_create_unit(test_create_faction(), r), ST_FIGHT);
+    unit_setstatus(u2 = test_create_unit(test_create_faction(), r), ST_FIGHT);
+    unit_setstatus(u3 = test_create_unit(u2->faction, r), ST_BEHIND);
+
+    unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
+    unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u3->no)));
+
+    CuAssertTrue(tc, start_battle(r, &b));
+
+    s1 = b->sides[0];
+    s2 = b->sides[1];
+
+    CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
+    CuAssertPtrEquals(tc, u1, s1->fighters->unit);
+    CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);
+    CuAssertPtrEquals(tc, u3, s2->fighters->unit);
+    CuAssertPtrEquals(tc, u2, s2->fighters->next->unit);
+    CuAssertIntEquals(tc, FIGHT_ROW, get_unitrow(s1->fighters, s2));
+    CuAssertIntEquals(tc, BEHIND_ROW, get_unitrow(s2->fighters, s1));
+    CuAssertIntEquals(tc, FIGHT_ROW, get_unitrow(s2->fighters->next, s1));
+
+    free_battle(b);
+    test_teardown();
+}
+
 static item_type *create_weapon(const char *name, const resource_type *rtype)
 {
     item_type *itype = test_create_itemtype(name);
@@ -1451,6 +1484,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_start_battle);
     SUITE_ADD_TEST(suite, test_battle_leaders);
     SUITE_ADD_TEST(suite, test_get_tactics);
+    SUITE_ADD_TEST(suite, test_get_unitrow);
     SUITE_ADD_TEST(suite, test_combat_rosthauch);
     return suite;
 }

@@ -248,8 +248,8 @@ relation_value_t get_relation(const side *as, const side *ds)
 }
 
 /* being an enemy or a friend is (and must always be!) symmetrical */
-#define enemy(as, ds) (get_relation(as, ds)&E_ENEMY)
-#define friendly(as, ds) (get_relation(as, ds)&E_FRIEND)
+#define enemy(as, ds) ((as != ds) && (get_relation(as, ds)&E_ENEMY))
+#define friendly(as, ds) (as == ds || (get_relation(as, ds)&E_FRIEND))
 
 void set_enemy(side * as, side * ds, bool attacking)
 {
