@@ -230,7 +230,7 @@ static void test_select_enemy(CuTest * tc)
     fighter *df, *af;
     battle *b;
     side *ds, *as;
-    troop dt, at;
+    troop at;
 
     test_setup();
     r = test_create_plain(0, 0);
@@ -246,8 +246,6 @@ static void test_select_enemy(CuTest * tc)
     set_enemy(as, ds, true);
     CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, get_relation(as, ds));
     CuAssertIntEquals(tc, E_ENEMY, get_relation(ds, as));
-    dt.fighter = df;
-    dt.index = 0;
 
     at = select_enemy(df, FIRST_ROW, LAST_ROW, SELECT_ADVANCE);
     CuAssertPtrEquals(tc, af, at.fighter);
