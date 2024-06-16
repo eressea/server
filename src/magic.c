@@ -2004,7 +2004,7 @@ struct region * co_get_region(const struct castorder * co) {
 void create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
     int lev, double force, int range, struct order * ord, spellparameter * a_params)
 {
-    assert(co && a_params == NULL || arrlen(a_params) > 0);
+    assert(co && (a_params == NULL || arrlen(a_params) > 0));
     co->next = NULL;
     co->magician.u = caster;
     co->_familiar = familiar;
