@@ -1755,7 +1755,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
                     pay_spell(u, NULL, sp, level, 1);
                 }
                 else {
-                    co = create_castorder_combat(0, fig, sp, level, power);
+                    co = create_castorder_combat(malloc(sizeof(castorder)), fig, sp, level, power);
                     add_castorder(&spellranks[sp->rank], co);
                 }
             }

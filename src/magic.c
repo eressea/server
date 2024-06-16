@@ -1731,15 +1731,20 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 /* Hilfsstrukturen fuer ZAUBERE */
 /* ------------------------------------------------------------- */
 
-static void free_spellparameter(spellparameter * param)
+static void free_spellparameters(spellparameter * param)
 {
-    assert(param);
-    switch (param->typ) {
-    case SPP_STRING:
-        free(param->data.s);
-        break;
-    default:
-        break;
+    if (param) {
+        size_t i;
+        for (i = arrlen(param); i > 0; --i) {
+            switch (param[i - 1].typ) {
+            case SPP_STRING:
+                free(param[i - 1].data.s);
+                break;
+            default:
+                break;
+            }
+        }
+        arrfree(param);
     }
 }
 
@@ -1979,11 +1984,8 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
     if (err) {
         ADDMSG(&u->faction->msgs, err);
         if (par) {
-            size_t i;
-            for (i = arrlen(par); i > 0; --i) {
-                free_spellparameter(par + i - 1);
-            }
-            arrfree(par);
+            free_spellparameters(par);
+            par = NULL;
         }
     }
     return par;
@@ -2019,11 +2021,7 @@ void create_castorder(castorder * co, unit *caster, unit * familiar, const spell
 
 void free_castorder(struct castorder *co)
 {
-    size_t i;
-    for (i = arrlen(co->a_params); i > 0; --i) {
-        free_spellparameter(co->a_params + i - 1);
-    }
-    arrfree(co->a_params);
+    free_spellparameters(co->a_params);
     if (co->order) free_order(co->order);
 }
 
