@@ -583,7 +583,7 @@ static void spskill(struct skill* sv, const struct unit *u, const struct locale 
 
     if (sv->id == SK_MAGIC) {
         magic_t mtype = unit_get_magic(u);
-        if (mtype != M_GRAY && mtype != M_NONE) {
+        if (mtype != M_NONE && mtype != M_GRAY && mtype < MAXMAGIETYP) {
             sbs_strcat(sbp, magic_name(mtype, lang));
             sbs_strcat(sbp, " ");
         }

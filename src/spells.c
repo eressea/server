@@ -5020,7 +5020,7 @@ int sp_enterastral(castorder * co)
 
 /** Spell 'Astraler Ruf' / 'Astral Call'.
  */
-int sp_pullastral(castorder * co)
+int sp_pullastral(castorder *co)
 {
     region *rt, *ro;
     unit *u;
@@ -5029,7 +5029,7 @@ int sp_pullastral(castorder * co)
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
-    spellparameter* params = co->a_params;
+    spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
 
     switch (getplaneid(r)) {
@@ -5048,7 +5048,7 @@ int sp_pullastral(castorder * co)
         return 0;
     }
 
-    if (is_cursed(rt->attribs, &ct_astralblock)
+    if (!ro || is_cursed(rt->attribs, &ct_astralblock)
         || is_cursed(ro->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));

@@ -1643,7 +1643,7 @@ static void report_failed_spell(struct battle * b, struct unit * mage, const str
 }
 
 static castorder * create_castorder_combat(castorder *co, fighter *fig, const spell * sp, int level, double force) {
-    co = create_castorder(co, fig->unit, 0, sp, fig->unit->region, level, force, 0, 0, 0);
+    create_castorder(co, fig->unit, 0, sp, fig->unit->region, level, force, 0, 0, 0);
     co->magician.fig = fig;
     return co;
 }

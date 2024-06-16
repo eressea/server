@@ -1231,6 +1231,8 @@ static void show_help(void)
 
         if (!exit) ch = getch();
     }
+    delwin(pad);
+    delwin(wn);
 }
 
 static void handlekey(state * st, int c)

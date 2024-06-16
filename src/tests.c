@@ -469,7 +469,7 @@ building_type *test_create_castle(void) {
     }
 
     if (!btype->a_stages) {
-        building_stage *stages = arraddnptr(btype->a_stages, 7);
+        building_stage *stages = arrsetlen(btype->a_stages, 7);
         btype->flags |= BTF_FORTIFICATION;
         init_stage(stages + 0, 1, 2, "site", rtype);
         init_stage(stages + 1, 1, 8, "tradepost", rtype);

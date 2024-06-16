@@ -1979,8 +1979,11 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
     if (err) {
         ADDMSG(&u->faction->msgs, err);
         if (par) {
-            free_spellparameter(par);
-            par = NULL;
+            size_t i;
+            for (i = arrlen(par); i > 0; --i) {
+                free_spellparameter(par + i - 1);
+            }
+            arrfree(par);
         }
     }
     return par;
@@ -1998,13 +2001,10 @@ struct region * co_get_region(const struct castorder * co) {
     return co->_rtarget;
 }
 
-castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
+void create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
     int lev, double force, int range, struct order * ord, spellparameter * a_params)
 {
-    if (!co) co = malloc(sizeof(castorder));
-    if (!co) abort();
-
-    assert(a_params == NULL || arrlen(a_params) > 0);
+    assert(co && a_params == NULL || arrlen(a_params) > 0);
     co->next = NULL;
     co->magician.u = caster;
     co->_familiar = familiar;
@@ -2015,8 +2015,6 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->distance = range;
     co->order = copy_order(ord);
     co->a_params = a_params;
-
-    return co;
 }
 
 void free_castorder(struct castorder *co)
@@ -2472,16 +2470,17 @@ static castorder *cast_cmd(unit * u, order * ord)
     spellparameter *args = NULL;
     unit * mage = NULL;
     param_t param;
+    castorder *result = NULL;
 
     assert(u);
     if (LongHunger(u)) {
         cmistake(u, ord, 224, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
     pl = getplane(r);
     if (pl && fval(pl, PFL_NOMAGIC)) {
         cmistake(u, ord, 269, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     init_order(ord, NULL);
@@ -2505,7 +2504,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehler "Die Region konnte nicht verzaubert werden" */
             ADDMSG(&u->faction->msgs, msg_message("spellregionresists",
                 "unit region command", u, u->region, ord));
-            return 0;
+            return NULL;
         }
         s = gettoken(token, sizeof(token));
         param = get_param(s, u->faction->locale);
@@ -2518,7 +2517,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     if (!s || !s[0]) {
         /* Fehler "Es wurde kein Zauber angegeben" */
         cmistake(u, ord, 172, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     /**
@@ -2554,7 +2553,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 if (sp == NULL || sp->sptyp & NOTFAMILIARCAST) {
                     /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
                     cmistake(u, ord, 177, MSG_MAGIC);
-                    return 0;
+                    return NULL;
                 }
                 familiar = u;
             }
@@ -2564,13 +2563,13 @@ static castorder *cast_cmd(unit * u, order * ord)
     if (!sp || !mage) {
         /* Fehler 'Spell not found' */
         cmistake(u, ord, 173, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     if (sp->sptyp & ISCOMBATSPELL) {
         /* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
         cmistake(u, ord, 174, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     /* Auf dem Ozean Zaubern als quasi-langer Befehl koennen
@@ -2583,7 +2582,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehlermeldung */
             ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
                 "unit region command", u, u->region, ord));
-            return 0;
+            return NULL;
         }
         /* Auf bewegenden Schiffen kann man nur explizit als
          * ONSHIPCAST deklarierte Zauber sprechen */
@@ -2594,7 +2593,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 /* Fehler: "Diesen Spruch kann man nicht auf einem sich
                  * bewegenden Schiff stehend zaubern" */
                 cmistake(u, ord, 175, MSG_MAGIC);
-                return 0;
+                return NULL;
             }
         }
     }
@@ -2605,19 +2604,19 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehler "Diesen Spruch kann man nicht in die Ferne
              * richten" */
             cmistake(u, ord, 176, MSG_MAGIC);
-            return 0;
+            return NULL;
         }
         if (familiar) {
             /* Magier zaubert durch Vertrauten: keine Fernzauber erlaubt */
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
                 "mage", mage));
-            return 0;
+            return NULL;
         }
         if (range > 1024) {
             /* (2^10) weiter als 10 Regionen entfernt */
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
                 "target", target_r));
-            return 0;
+            return NULL;
         }
     }
     if (familiar) {
@@ -2644,7 +2643,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         if (level > skill) {
             /* die Einheit ist nicht erfahren genug fuer diesen Zauber */
             cmistake(u, ord, 169, MSG_MAGIC);
-            return 0;
+            return NULL;
         }
     }
     else if (!(sp->sptyp & SPELLLEVEL)) {
@@ -2684,11 +2683,14 @@ static castorder *cast_cmd(unit * u, order * ord)
         }
         if (args == NULL) {
             /* Syntax war falsch */
-            return 0;
+            return NULL;
         }
     }
-    return create_castorder(0, mage, familiar, sp, target_r, level, 0, range, ord,
-        args);
+    result = malloc(sizeof(castorder));
+    if (result) {
+        create_castorder(result, mage, familiar, sp, target_r, level, 0, range, ord, args);
+    }
+    return result;
 }
 
 /* ------------------------------------------------------------- */
