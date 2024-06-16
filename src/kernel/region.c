@@ -1213,6 +1213,7 @@ static void create_land(region *r) {
             setluxuries(r, nb[p].type);
         }
     }
+    arrfree(nb);
 }
 
 void terraform_region(region * r, const terrain_type * terrain)

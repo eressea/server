@@ -739,7 +739,6 @@ static void fix_resource_values(region* r)
 
 static void read_landregion(gamedata* data, region* r)
 {
-    char info[DISPLAYSIZE];
     char name[NAMESIZE];
     int n, i;
     r->land = calloc(1, sizeof(land_region));
@@ -752,9 +751,10 @@ static void read_landregion(gamedata* data, region* r)
     r->land->name = str_strdup(name);
 
     if (data->version >= LANDDISPLAY_VERSION) {
+        char info[DISPLAYSIZE];
         read_regioninfo(data, r, info, sizeof(info));
+        region_setinfo(r, info);
     }
-    region_setinfo(r, info);
     READ_INT(data->store, &i);
     if (i < 0) {
         log_error("number of trees in %s is %d.", regionname(r, NULL), i);

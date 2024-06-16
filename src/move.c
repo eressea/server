@@ -1395,13 +1395,20 @@ static bool roadto(const region * r, direction_t dir)
         }
     }
 
-    if (r->terrain->max_road <= 0)
+    if (r->terrain->max_road <= 0) {
         return false;
-    if (r2->terrain->max_road <= 0)
+    }
+    if (r2->terrain->max_road <= 0) {
         return false;
-    if (rroad(r, dir) < r->terrain->max_road)
+    }
+    if (rroad(r, dir) < r->terrain->max_road) {
         return false;
-    if (rroad(r2, dir_invert(dir)) < r2->terrain->max_road)
+    }
+    dir = dir_invert(dir);
+    if (dir >= MAXDIRECTIONS || dir == NODIRECTION) {
+        return false;
+    }
+    if (rroad(r2, dir) < r2->terrain->max_road)
         return false;
     return true;
 }
@@ -1874,8 +1881,8 @@ void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
     if (trans) {
         message *msg =
             msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
-                u->ship);
-        add_message(&u->faction->msgs, msg);
+                sh);
+        add_message(&captain->faction->msgs, msg);
         add_message(&harbourmaster->faction->msgs, msg);
         msg_release(msg);
         while (trans)

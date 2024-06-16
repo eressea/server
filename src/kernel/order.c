@@ -128,21 +128,7 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
         const char *str = (const char *)LOC(lang, keyword(kwd));
         assert(str);
         sbs_strcat(&sbs, str);
-        if (ord->id < 0) {
-            skill_t sk = (skill_t)(100+ord->id);
-            str = skillname(sk, lang);
-            if (str) {
-                if (strchr(str, ' ') == NULL) {
-                    sbs_strcat(&sbs, " ");
-                    sbs_strcat(&sbs, str);
-                } 
-                else {
-                    sbs_strcat(&sbs, " \"");
-                    sbs_strcat(&sbs, str);
-                    sbs_strcat(&sbs, "\"");
-                }
-            }
-        } else {
+        if (ord->id >= 0) {
             order_data *od = odata_load(ord->id);
             str = OD_STRING(od);
             if (str) {
@@ -150,6 +136,20 @@ char* get_command(const order *ord, const struct locale *lang, char *sbuffer, si
                 sbs_strcat(&sbs, str);
             }
             odata_release(od);
+        } else if (100 + ord->id < MAXSKILLS) {
+            skill_t sk = (skill_t)(100 + ord->id);
+            str = skillname(sk, lang);
+            if (str) {
+                if (strchr(str, ' ') == NULL) {
+                    sbs_strcat(&sbs, " ");
+                    sbs_strcat(&sbs, str);
+                }
+                else {
+                    sbs_strcat(&sbs, " \"");
+                    sbs_strcat(&sbs, str);
+                    sbs_strcat(&sbs, "\"");
+                }
+            }
         }
     }
     return sbuffer;

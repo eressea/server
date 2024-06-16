@@ -422,7 +422,9 @@ building_type * test_create_buildingtype(const char * name)
     if (btype->a_stages) {
         con = &btype->a_stages[0].construction;
     } else {
-        building_stage *stage = arraddnptr(btype->a_stages, 1);
+        building_stage *stage;
+        arrsetlen(btype->a_stages, 1);
+        stage = btype->a_stages;
         if (stage) {
             stage->name = NULL;
             con = &stage->construction;

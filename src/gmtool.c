@@ -1142,7 +1142,7 @@ static void show_help(void)
         "s: seed next player from newfactions at current region",
         "A: reset area (set region age to 0) for whole contiguos region",
         "c: clear (reset resources) region under cursor",
-        "C: clear rectangle under cursor (2 regions up and to the right)"
+        "C: clear rectangle under cursor (2 regions up and to the right)",
         "",
         "h: mark regions ... n: none,   i: island under cursor, t: terrain type, s: with ships,",
         "   u: with units, p: with player units, m: with monsters, f: with units of a faction,",
