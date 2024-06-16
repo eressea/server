@@ -469,15 +469,15 @@ building_type *test_create_castle(void) {
     }
 
     if (!btype->a_stages) {
-        building_stage *stages = arrsetlen(btype->a_stages, 7);
+        arrsetlen(btype->a_stages, 7);
         btype->flags |= BTF_FORTIFICATION;
-        init_stage(stages + 0, 1, 2, "site", rtype);
-        init_stage(stages + 1, 1, 8, "tradepost", rtype);
-        init_stage(stages + 2, 2, 40, "fortification", rtype);
-        init_stage(stages + 3, 3, 200, "tower", rtype);
-        init_stage(stages + 4, 4, 1000, "castle", rtype);
-        init_stage(stages + 5, 5, 5000, "fortress", rtype);
-        init_stage(stages + 6, 6, -1, "citadel", rtype);
+        init_stage(btype->a_stages, 1, 2, "site", rtype);
+        init_stage(btype->a_stages + 1, 1, 8, "tradepost", rtype);
+        init_stage(btype->a_stages + 2, 2, 40, "fortification", rtype);
+        init_stage(btype->a_stages + 3, 3, 200, "tower", rtype);
+        init_stage(btype->a_stages + 4, 4, 1000, "castle", rtype);
+        init_stage(btype->a_stages + 5, 5, 5000, "fortress", rtype);
+        init_stage(btype->a_stages + 6, 6, -1, "citadel", rtype);
     }
     return btype;
 }
