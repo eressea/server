@@ -25,6 +25,8 @@
 /* util includes */
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
+#include <kernel/messages.h>
+
 #include <util/lists.h>
 #include <util/log.h>
 #include <util/resolve.h>
@@ -1333,6 +1335,20 @@ struct message *msg)
         return add_message(&imsg->msgs, msg);
     }
     return add_message(&r->msgs, msg);
+}
+
+void r_add_warning(region *r, message *msg)
+{
+    unit *u;
+    add_message(&r->msgs, msg);
+    for (u = r->units; u; u = u->next)
+        freset(u->faction, FFL_SELECT);
+    for (u = r->units; u; u = u->next) {
+        if (fval(u->faction, FFL_SELECT))
+            continue;
+        fset(u->faction, FFL_SELECT);
+        add_message(&u->faction->msgs, msg);
+    }
 }
 
 struct faction *region_get_owner(const struct region *r)

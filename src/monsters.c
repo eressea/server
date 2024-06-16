@@ -941,6 +941,7 @@ void spawn_dragons(void)
             || r->terrain == newterrain(T_DESERT))
             && rng_int() % spawn_chance < 6)
         {
+            message *msg;
             if (chance(0.80)) {
                 u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
             }
@@ -958,8 +959,8 @@ void spawn_dragons(void)
             name_unit(u);
 
             /* add message to the region */
-            ADDMSG(&r->msgs,
-                msg_message("sighting", "region race number", r, u_race(u), u->number));
+            r_add_warning(r, msg = msg_message("sighting", "region race number", r, u_race(u), u->number));
+            msg_release(msg);
         }
     }
 }
@@ -1033,15 +1034,7 @@ void spawn_undead(void)
                 LOC(default_locale,
                 rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
           msg = msg_message("undeadrise", "region", r);
-          add_message(&r->msgs, msg);
-          for (u = r->units; u; u = u->next)
-              freset(u->faction, FFL_SELECT);
-          for (u = r->units; u; u = u->next) {
-              if (fval(u->faction, FFL_SELECT))
-                  continue;
-              fset(u->faction, FFL_SELECT);
-              add_message(&u->faction->msgs, msg);
-          }
+          r_add_warning(r, msg);
           msg_release(msg);
         }
         else {
