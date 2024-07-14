@@ -754,7 +754,7 @@ growing_herbs(region * r, const int current_season)
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
      * Kraeuter))% sich zu vermehren. */
     if (current_season != SEASON_WINTER) {
-        int i, herbs = rherbs(r);
+        int i, herbs = rherbs(r) + 1;
         for (i = herbs; i > 0; --i) {
             if (rng_int() % 100 < (100 - herbs)) {
                 ++herbs;
