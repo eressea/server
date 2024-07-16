@@ -159,7 +159,7 @@ static order *monster_attack(unit * u, const unit * target)
     if (target->faction->flags & FFL_NPC) {
         return NULL;
     }
-    if (is_paused(target->faction)) {
+    if (IS_PAUSED(target->faction)) {
         return NULL;
     }
     if (!cansee(u->faction, u->region, target, 0)) {

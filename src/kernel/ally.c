@@ -312,7 +312,7 @@ alliedgroup(const struct faction *f,
         return 0;
     }
     status = ally_get(all, f2) & mask;
-    if (is_paused(f)) {
+    if (IS_PAUSED(f)) {
         status &= HELP_GUARD;
     }
     return alliance_status(f, f2, status);

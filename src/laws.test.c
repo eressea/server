@@ -2135,6 +2135,25 @@ static void test_cansee_sphere(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_guard(CuTest* tc) {
+    unit* u, * u2;
+    race *rc;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), u->region);
+    rc = test_create_race("gnoll");
+    rc->flags |= RCF_UNARMEDGUARD;
+    u_setrace(u2, rc);
+    test_set_skill(u2, SK_STEALTH, 1, 1);
+    CuAssertTrue(tc, !cansee(u->faction, u->region, u2, 0));
+    setguard(u2, true);
+    CuAssertTrue(tc, is_guard(u2));
+    CuAssertTrue(tc, cansee(u->faction, u->region, u2, 0));
+
+    test_teardown();
+}
+
 static void test_cansee_temp(CuTest* tc) {
     unit* u, * u2;
 
@@ -2925,8 +2944,9 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_ring);
     SUITE_ADD_TEST(suite, test_cansee_sphere);
     SUITE_ADD_TEST(suite, test_cansee_monsters);
-    SUITE_ADD_TEST(suite, test_cansee_empty);
+    SUITE_ADD_TEST(suite, test_cansee_guard);
     SUITE_ADD_TEST(suite, test_cansee_temp);
+    SUITE_ADD_TEST(suite, test_cansee_empty);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);

@@ -386,7 +386,7 @@ void do_give(region * r)
     for (u = r->units; u; u = u->next) {
         order *ord;
 
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
 
         if (u->number > 0) {
             order* transfer = NULL;
@@ -587,7 +587,7 @@ void destroy(region *r) {
         order *ord = u->thisorder;
         keyword_t kwd = getkeyword(ord);
 
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
         if (kwd == K_DESTROY) {
             if (destroy_cmd(u, ord) == 0) {
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
@@ -2207,7 +2207,7 @@ static int work_cmd(unit * u, order * ord, econ_request ** io_req)
         *io_req = req;
         return u->number;
     }
-    else if (ord && !is_monsters(u->faction)) {
+    else if (ord && !IS_MONSTERS(u->faction)) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "race_cantwork", "race", u_race(u)));
     }
@@ -2292,7 +2292,7 @@ void tax_cmd(unit * u, struct order *ord, econ_request ** taxorders)
 
     init_order(ord, NULL);
 
-    if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
+    if (!humanoidrace(u_race(u)) && !IS_MONSTERS(u->faction)) {
         cmistake(u, ord, 228, MSG_INCOME);
         return;
     }
@@ -2356,11 +2356,11 @@ void loot_cmd(unit * u, struct order *ord, econ_request ** lootorders)
 
     init_order(ord, NULL);
 
-    if (config_get_int("rules.enable_loot", 0) == 0 && !is_monsters(u->faction)) {
+    if (config_get_int("rules.enable_loot", 0) == 0 && !IS_MONSTERS(u->faction)) {
         return;
     }
 
-    if (!humanoidrace(u_race(u)) && !is_monsters(u->faction)) {
+    if (!humanoidrace(u_race(u)) && !IS_MONSTERS(u->faction)) {
         cmistake(u, ord, 228, MSG_INCOME);
         return;
     }
@@ -2416,7 +2416,7 @@ void auto_work(region * r)
     long total = 0;
 
     for (u = r->units; u; u = u->next) {
-        if (long_order_allowed(u, false) && !is_monsters(u->faction)) {
+        if (long_order_allowed(u, false) && !IS_MONSTERS(u->faction)) {
             int work = work_cmd(u, NULL, &nextrequest);
             if (work) {
                 total += work;

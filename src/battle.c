@@ -2518,7 +2518,7 @@ void loot_items(fighter * corpse)
                     item_add(itm, -loot);
                     maxloot -= loot;
 
-                    if (is_monsters(u->faction) && (rule_loot & LOOT_MONSTERS)) {
+                    if (IS_MONSTERS(u->faction) && (rule_loot & LOOT_MONSTERS)) {
                         looting = 1;
                     }
                     else if (rule_loot & LOOT_OTHERS) {
@@ -3617,7 +3617,7 @@ static void join_allies(battle * b)
             faction *f = u->faction;
             fighter *c = NULL;
 
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
 
             for (si = 0; si != num_sides; ++si) {
                 side * s = b->sides[si];
@@ -4082,7 +4082,7 @@ void force_leave(region *r, battle *b) {
     for (u = r->units; u; u = u->next) {
         unit *uo = NULL;
 
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
 
         if (u->building) {
             uo = building_owner(u->building);

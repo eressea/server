@@ -396,7 +396,7 @@ summary *make_summary(void)
         if (f->units) {
             sum->factions++;
             /* Problem mit Monsterpartei ... */
-            if (!is_monsters(f)) {
+            if (!IS_MONSTERS(f)) {
                 int rc = old_race(f->race);
                 if (rc >= 0 && rc < MAXRACES) {
                     sum->factionrace[rc]++;
@@ -434,7 +434,7 @@ summary *make_summary(void)
             for (u = r->units; u; u = u->next) {
                 race_t orace;
                 f = u->faction;
-                if (!is_monsters(u->faction)) {
+                if (!IS_MONSTERS(u->faction)) {
                     size_t s, len;
                     item *itm;
 

@@ -24,7 +24,7 @@ static int age_chance(int a, int b, int p) {
 
 void age_skeleton(unit * u)
 {
-    if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
+    if (IS_MONSTERS(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
         int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         if (n < 1) n = 1;
@@ -37,7 +37,7 @@ void age_skeleton(unit * u)
 
 void age_zombie(unit * u)
 {
-    if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
+    if (IS_MONSTERS(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
         int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         if (n < 1) n = 1;
@@ -50,7 +50,7 @@ void age_zombie(unit * u)
 
 void age_ghoul(unit * u)
 {
-    if (is_monsters(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
+    if (IS_MONSTERS(u->faction) && rng_int() % 100 < age_chance(u->age, 27, 1)) {
         int n = u->number / 2;
         double q = (double)u->hp / (double)(unit_max_hp(u) * u->number);
         u_setrace(u, get_race(RC_GHOUL_LORD));

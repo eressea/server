@@ -515,7 +515,7 @@ static void reset_region(region *r) {
     a_removeall(&r->attribs, NULL);
     while (*up) {
         unit *u = *up;
-        if (is_monsters(u->faction)) {
+        if (IS_MONSTERS(u->faction)) {
             remove_unit(up, u);
         }
         else {

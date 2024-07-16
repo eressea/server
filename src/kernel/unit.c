@@ -1773,7 +1773,7 @@ int maintenance_cost(const struct unit *u)
     if (u == NULL) {
         return MAINTENANCE;
     }
-    if (is_paused(u->faction)) {
+    if (IS_PAUSED(u->faction)) {
         return 0;
     }
     return u_race(u)->maintenance * u->number;

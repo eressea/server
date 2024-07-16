@@ -3606,7 +3606,7 @@ static int sp_rallypeasantmob(castorder * co)
 
     while (u) {
         unit *un = u->next;
-        if (is_monsters(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
+        if (IS_MONSTERS(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
             rsetpeasants(r, rpeasants(r) + u->number);
             rsetmoney(r, rmoney(r) + get_money(u));
             set_money(u, 0);
@@ -4020,7 +4020,7 @@ static int sp_pump(castorder * co)
             "error_not_on_undead", ""));
         return 0;
     }
-    if (is_magic_resistant(mage, target, 0) || is_monsters(target->faction)) {
+    if (is_magic_resistant(mage, target, 0) || IS_MONSTERS(target->faction)) {
         report_failure(mage, co->order);
         return 0;
     }

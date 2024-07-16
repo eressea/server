@@ -410,7 +410,7 @@ static int canwalk(unit * u, const capacities *cap)
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
-    if (is_monsters(u->faction))
+    if (IS_MONSTERS(u->faction))
         return E_CANWALK_OK;
 
     maxpferde = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
@@ -1290,7 +1290,7 @@ bool is_transporting(const unit * ut, const unit * u)
 
 static bool can_move(const unit * u)
 {
-    if (is_paused(u->faction)) return false;
+    if (IS_PAUSED(u->faction)) return false;
     return (0 == (u_race(u)->flags & RCF_CANNOTMOVE));
 }
 
@@ -2488,7 +2488,7 @@ static void move_followers(void)
         while (*up != NULL) {
             unit *u = *up;
 
-            if (!fval(u, UFL_MOVED | UFL_NOTMOVING) && !is_paused(u->faction)) {
+            if (!fval(u, UFL_MOVED | UFL_NOTMOVING) && !IS_PAUSED(u->faction)) {
                 order *ord;
 
                 for (ord = u->orders; ord; ord = ord->next) {
@@ -2541,7 +2541,7 @@ static void move_pirates(void)
         while (*up) {
             unit *u = *up;
 
-            if (!fval(u, UFL_NOTMOVING) && !is_paused(u->faction) && getkeyword(u->thisorder) == K_PIRACY) {
+            if (!fval(u, UFL_NOTMOVING) && !IS_PAUSED(u->faction) && getkeyword(u->thisorder) == K_PIRACY) {
                 piracy_cmd(u);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
@@ -2572,7 +2572,7 @@ void move_units(void)
         while (*up) {
             unit* u = *up;
             up = &u->next;
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
             if (!u->ship || ship_owner(u->ship) != u) {
                 keyword_t kword = getkeyword(u->thisorder);
 
@@ -2626,7 +2626,7 @@ void move_ships(void) {
             unit* u = *up;
             up = &u->next;
 
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
             if (u->ship && !fval(u->ship, SF_DRIFTED)) {
                 keyword_t kword = getkeyword(u->thisorder);
 

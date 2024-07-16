@@ -24,7 +24,7 @@ guard_t can_start_guarding(const unit * u)
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
     /* Monster der Monsterpartei duerfen immer bewachen */
-    if (is_monsters(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
+    if (IS_MONSTERS(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
     if (!armedmen(u, true))
         return E_GUARD_UNARMED;
@@ -76,7 +76,7 @@ static bool is_guardian_u(const unit * guard, unit * u)
 
 static bool is_guardian_r(const unit * u)
 {
-    if (u->number == 0 || is_paused(u->faction))
+    if (u->number == 0 || IS_PAUSED(u->faction))
         return false;
 
     /* if region_owners exist then they may be guardians: */
@@ -92,7 +92,7 @@ static bool is_guardian_r(const unit * u)
 
     if ((u->flags & UFL_GUARD) == 0)
         return false;
-    return fval(u_race(u), RCF_UNARMEDGUARD) || is_monsters(u->faction) || (armedmen(u, true) > 0);
+    return fval(u_race(u), RCF_UNARMEDGUARD) || IS_MONSTERS(u->faction) || (armedmen(u, true) > 0);
 }
 
 bool is_guard(const struct unit * u)
