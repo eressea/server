@@ -184,12 +184,26 @@ static void test_skills_merge(CuTest* tc)
     CuAssertIntEquals(tc, 70, result.level);
     CuAssertIntEquals(tc, 61 * SKILL_DAYS_PER_WEEK / 2, result.days);
 
-    /* extreme values: (T99, 199) + (T1, 3) = (T69, 60) */
+    /* average values: (T99, 100) + (T1, 2) = (T69, 9.5) */
+    src.days = (src.level + 1) * SKILL_DAYS_PER_WEEK;
+    dst.days = (dst.level + 1) * SKILL_DAYS_PER_WEEK;
+    CuAssertIntEquals(tc, 69, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 69, result.level);
+    CuAssertIntEquals(tc, 95 * SKILL_DAYS_PER_WEEK / 10, result.days);
+
+    /* already made progress: (T99, 99) + (T1, 1) = (T69, 8.5) */
+    src.days = src.level * SKILL_DAYS_PER_WEEK;
+    dst.days = dst.level* SKILL_DAYS_PER_WEEK;
+    CuAssertIntEquals(tc, 69, merge_skill(&src, &dst, &result, 1, 1));
+    CuAssertIntEquals(tc, 69, result.level);
+    CuAssertIntEquals(tc, 85 * SKILL_DAYS_PER_WEEK / 10, result.days);
+
+    /* extreme values: (T99, 199) + (T1, 3) = (T69, 59.5) */
     src.days = (src.level * 2 + 1) * SKILL_DAYS_PER_WEEK;
     dst.days = (dst.level * 2 + 1) * SKILL_DAYS_PER_WEEK;
     CuAssertIntEquals(tc, 69, merge_skill(&src, &dst, &result, 1, 1));
     CuAssertIntEquals(tc, 69, result.level);
-    CuAssertIntEquals(tc, 60 * SKILL_DAYS_PER_WEEK, result.days);
+    CuAssertIntEquals(tc, (140 - 121 + 100) * SKILL_DAYS_PER_WEEK / 2, result.days);
 
     test_teardown();
 }

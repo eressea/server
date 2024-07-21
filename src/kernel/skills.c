@@ -186,7 +186,7 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
 {
     int total = add + n;
     /* number of person-weeks the units have already studied: */
-    int days, weeks = weeks_from_level(sn ? sn->level : 0) * n
+    int rd, days, weeks = weeks_from_level(sn ? sn->level : 0) * n
         + weeks_from_level(sv ? sv->level : 0) * add;
     /* level that combined unit should be at: */
     int level = level_from_weeks(weeks, total);
@@ -194,7 +194,7 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     /* minimum new level, based only on weeks spent towards current levels: */
     result->level = level;
     /* average time to the next level: */
-    result->days = (level + 1) * SKILL_DAYS_PER_WEEK;
+    rd = (level + 1) * SKILL_DAYS_PER_WEEK;
 
     /* add any remaining weeks to the already studied ones and convert to days: */
     weeks -= weeks_from_level(level) * total;
@@ -203,17 +203,20 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
     /* adjusted by how much we already studied: */
     if (sv) days += days_studied(sv) * add;
     if (sn) days += days_studied(sn) * n;
+    days /= total;
+
     if (days < 0) {
-        result->days -= days / total;
+        rd -= days;
     }
-    else if (days >= total) {
-        int pdays = total * result->days - days;
-        while (pdays < 0) {
+    else {
+        while (days - rd >= 0) {
             ++result->level;
-            pdays += total * (result->level + 1) * SKILL_DAYS_PER_WEEK;
+            days -= rd;
+            rd = (result->level + 1) * SKILL_DAYS_PER_WEEK;
         }
-        result->days = (pdays + total - 1 ) / total;
+        rd -= days;
     }
+    result->days = rd;
     return result->level;
 }
 
