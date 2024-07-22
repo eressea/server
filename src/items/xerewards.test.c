@@ -1,11 +1,9 @@
 #include "xerewards.h"
-#include "study.h"
 #include "magic.h"
 
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
-#include <kernel/skills.h>
 #include "kernel/skill.h"    // for SK_MAGIC, SK_ENTERTAINMENT, SK_STAMINA
 #include "kernel/types.h"    // for M_GWYRRD
 #include <kernel/unit.h>

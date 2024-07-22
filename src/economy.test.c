@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "give.h"
 #include "recruit.h"
-#include "study.h"
 
 #include <spells/buildingcurse.h>
 

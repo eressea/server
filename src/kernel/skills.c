@@ -99,7 +99,7 @@ static void skill_set(skill *sv, unsigned int level, unsigned int days)
     assert(sv->days == days && sv->level == level);
 }
 
-void sk_set_level(skill *sv, unsigned int level)
+void sk_set_level(skill *sv, int level)
 {
     int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
     skill_set(sv, level, weeks * SKILL_DAYS_PER_WEEK);
