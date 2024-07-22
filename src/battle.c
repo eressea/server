@@ -297,10 +297,10 @@ fighter *select_corpse(battle * b, fighter * af)
 {
     int maxcasualties = 0;
     fighter *df;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side *s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         if (af == NULL || (!enemy(af->side, s) && alliedside(af->side, s->bf->faction, HELP_FIGHT))) {
             maxcasualties += s->casualties;
         }
@@ -308,8 +308,8 @@ fighter *select_corpse(battle * b, fighter * af)
     if (maxcasualties > 0) {
         int di = (int)(rng_int() % maxcasualties);
 
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* s = b->sides[si - 1];
+        for (si = 0; si != sl; ++si) {
+            side *s = b->sides[si];
             for (df = s->fighters; df; df = df->next) {
                 /* Geflohene haben auch 0 hp, duerfen hier aber nicht ausgewaehlt
                  * werden! */
@@ -389,11 +389,10 @@ static int get_row(const side * s, int row, const side * vs)
 
     memset(size, 0, sizeof(size));
     for (line = FIRST_ROW; line != NUMROWS; ++line) {
-        size_t si;
+        size_t si, sl = arrlen(b->sides);
         /* how many enemies are there in this row? */
-        for (si = arrlen(b->sides); si > 0; --si) {
-            size_t index = si - 1;
-            side* se = b->sides[index];
+        for (si = 0; si != sl; ++si) {
+            side *se = b->sides[si];
             if (enemy(s, se)) {
                 if (se->size[line] > 0) {
                     enemyfront += se->size[line];
@@ -402,7 +401,7 @@ static int get_row(const side * s, int row, const side * vs)
             }
             /* count people that like me, but don't like my enemy */
             if (friendly(s, se) && enemy(vs, se)) {
-                data.key = index;
+                data.key = si;
                 if (hmgeti(counted, data.key) < 0) {
                     int i;
 
@@ -1385,10 +1384,10 @@ count_allies(const side * as, int minrow, int maxrow, int select, int allytype)
 {
     battle *b = as->battle;
     int count = 0;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* ds = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *ds = b->sides[si];
         if ((allytype == ALLY_ANY && helping(as, ds)) || (allytype == ALLY_SELF
             && as->bf->faction == ds->bf->faction)) {
             count += count_side(ds, NULL, minrow, maxrow, select);
@@ -1405,10 +1404,10 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
 {
     side *as = af->side;
     int i = 0;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* es = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *es = b->sides[si];
 
         if (as == NULL || enemy(es, as)) {
             int offset = 0;
@@ -1438,7 +1437,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     side *as = af->side;
     battle *b = as->battle;
     int selected, enemies;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 #ifdef DEBUG_SELECT
     troop result = no_troop;
 #endif
@@ -1458,8 +1457,9 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
         return no_troop;
 
     selected = (int)(rng_int() % enemies);
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* ds = b->sides[si - 1];
+
+    for (si = 0; si != sl; ++si) {
+        side *ds = b->sides[si];
         if (enemy(as, ds)) {
             fighter* df;
             int unitrow[NUMROWS] = { 0 };
@@ -1519,10 +1519,10 @@ int get_tactics(const side * as, const side * ds)
     int defense = 0;
 
     if (b->max_tactics > 0) {
-        size_t si;
+        size_t si, sl = arrlen(b->sides);
 
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* stac = b->sides[si - 1];
+        for (si = 0; si != sl; ++si) {
+            side *stac = b->sides[si];
             if (result < b->max_tactics && stac->leader.value > result && helping(stac, as)) {
                 if (ds == NULL || !helping(stac, ds)) {
                     result = stac->leader.value;
@@ -1587,12 +1587,13 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     selist *fightervp = NULL;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
     assert(vs != NULL);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
 
         if (mask == FS_ENEMY) {
@@ -1650,17 +1651,18 @@ static castorder * create_castorder_combat(castorder *co, fighter *fig, const sp
 
 static void summon_igjarjuk(battle *b, spellrank spellranks[]) {
     castorder *co;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig = NULL;
         if (s->bf->attacker && fval(s->bf->faction, FFL_CURSED)) {
             spell *sp = find_spell("igjarjuk");
             if (sp) {
-                size_t si;
-                for (si = arrlen(b->sides); si > 0; --si) {
-                    side *se = b->sides[si - 1];
+                size_t sx;
+
+                for (sx = 0; sx != sl; ++sx) {
+                    side *se = b->sides[sx];
                     if (enemy(s, se)) {
                         if (!fval(se->bf->faction, FFL_NPC)) {
                             fighter* fi;
@@ -1695,7 +1697,7 @@ void do_combatmagic(battle * b, combatmagic_t was)
     region *r = b->region;
     int level, rank, sl;
     spellrank spellranks[MAX_SPELLRANK];
-    size_t si;
+    size_t si, slen = arrlen(b->sides);
 
     memset(spellranks, 0, sizeof(spellranks));
 
@@ -1703,8 +1705,9 @@ void do_combatmagic(battle * b, combatmagic_t was)
         summon_igjarjuk(b, spellranks);
     }
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+
+    for (si = 0; si != slen; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
             unit *u = fig->unit;
@@ -2031,12 +2034,13 @@ void damage_building(battle * b, building * bldg, int damage_abs)
     /* Wenn Burg, dann gucken, ob die Leute alle noch in das Gebaeude passen. */
 
     if (bldg->type->flags & BTF_FORTIFICATION) {
-        size_t si;
+        size_t si, sl = arrlen(b->sides);
 
         bldg->sizeleft = bldg->size;
 
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* s = b->sides[si - 1];
+
+        for (si = 0; si != sl; ++si) {
+            side *s = b->sides[si];
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->building == bldg) {
@@ -2060,10 +2064,10 @@ static int attacks_per_round(troop t)
 
 static void make_heroes(battle * b)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
             unit *u = fig->unit;
@@ -2436,7 +2440,7 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
 {
     side *as = af->side;
     battle *b = as->battle;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
     int allies = count_allies(as, minrow, maxrow, SELECT_ADVANCE, allytype);
 
     if (!allies) {
@@ -2444,8 +2448,9 @@ troop select_ally(fighter * af, int minrow, int maxrow, int allytype)
     }
     allies = (int)(rng_int() % allies);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* ds = b->sides[si - 1];
+
+    for (si = 0; si != sl; ++si) {
+        side *ds = b->sides[si];
         if ((allytype == ALLY_ANY && helping(as, ds)) || (allytype == ALLY_SELF
             && as->bf->faction == ds->bf->faction)) {
             fighter *df;
@@ -2627,13 +2632,13 @@ static void reorder_fleeing(region * r)
 static void aftermath(battle * b)
 {
     region *r = b->region;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
     int dead_players = 0;
     bfaction *bf;
     bool ships_damaged = (b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side* s = b->sides[si];
         fighter *df;
         s->dead = 0;
 
@@ -2661,8 +2666,8 @@ static void aftermath(battle * b)
     /* POSTCOMBAT */
     do_combatmagic(b, DO_POSTCOMBATSPELL);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         int snumber = 0;
         fighter *df;
         bool relevant = false;   /* Kampf relevant fuer diese Partei? */
@@ -2782,8 +2787,8 @@ static void aftermath(battle * b)
 
     battle_effects(b, dead_players);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         message *seen = msg_message("army_report",
             "index abbrev dead fled survived",
             army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
@@ -2806,8 +2811,8 @@ static void aftermath(battle * b)
      * schonmal Schaden genommen hat. (moved und drifted
      * sollten in flags ueberfuehrt werden */
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *df;
 
         for (df = s->fighters; df; df = df->next) {
@@ -2955,12 +2960,12 @@ static struct message * army_message(const battle* b, const faction* f, const si
  */
 void init_tactics(battle* b)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
     b->max_tactics = 0;
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         if (s->leader.fighters) {
             if (s->leader.value > b->max_tactics) {
                 b->max_tactics = s->leader.value;
@@ -2969,8 +2974,8 @@ void init_tactics(battle* b)
     }
 
     if (b->max_tactics > 0) {
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* s = b->sides[si - 1];
+        for (si = 0; si != sl; ++si) {
+            side *s = b->sides[si];
             if (s->leader.value == b->max_tactics) {
                 size_t qi;
 
@@ -2996,10 +3001,10 @@ void init_tactics(battle* b)
 
 static void print_stats(battle * b)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         bfaction *bf;
 
         for (bf = b->factions; bf; bf = bf->next) {
@@ -3019,8 +3024,8 @@ static void print_stats(battle * b)
             loc_army = LOC(f->locale, "battle_army");
             header = LOC(f->locale, "battle_opponents");
 
-            for (se = arrlen(b->sides); se > 0; --se) {
-                side* s2 = b->sides[se - 1];
+            for (se = 0; se != sl; ++se) {
+                side *s2 = b->sides[se];
                 if (enemy(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
                     rsize = slprintf(bufp, size, "%s %s %d (%s)",
@@ -3041,8 +3046,8 @@ static void print_stats(battle * b)
             komma = 0;
             header = LOC(f->locale, "battle_helpers");
 
-            for (se = arrlen(b->sides); se > 0; --se) {
-                side* s2 = b->sides[se - 1];
+            for (se = 0; se != sl; ++se) {
+                side *s2 = b->sides[se];
                 if (s2 != s && friendly(s2, s)) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
                     rsize = slprintf(bufp, size, "%s %s %d(%s)",
@@ -3062,8 +3067,8 @@ static void print_stats(battle * b)
             komma = 0;
             header = LOC(f->locale, "battle_attack");
 
-            for (se = arrlen(b->sides); se > 0; --se) {
-                side* s2 = b->sides[se - 1];
+            for (se = 0; se != sl; ++se) {
+                side *s2 = b->sides[se];
                 if (get_relation(s, s2) & E_ATTACKING) {
                     const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
                     rsize =
@@ -3086,10 +3091,10 @@ static void print_stats(battle * b)
 
 side * get_side(battle * b, const struct unit * u)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side* s = b->sides[si];
         if (s->bf->faction == u->faction) {
             fighter * fig;
             for (fig = s->fighters; fig; fig = fig->next) {
@@ -3104,10 +3109,10 @@ side * get_side(battle * b, const struct unit * u)
 
 side * find_side(battle * b, const faction * f, const group * g, unsigned int flags, const faction * stealthfaction)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         if (s->bf->faction == f && s->group == g) {
             unsigned int s1flags = flags | SIDE_HASGUARDS;
             unsigned int s2flags = s->flags | SIDE_HASGUARDS;
@@ -3451,10 +3456,10 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
 bool join_battle(battle * b, unit * u, bool attack, fighter ** cp)
 {
     fighter *fc = NULL;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
         if (s->bf->faction == u->faction) {
             for (fig = s->fighters; fig; fig = fig->next) {
@@ -3495,12 +3500,12 @@ static void free_fighter(fighter * fig)
 }
 
 static void battle_free(battle * b) {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
     assert(b);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter **fp = &s->fighters;
         while (*fp) {
             fighter *fig = *fp;
@@ -3523,15 +3528,15 @@ static int battle_report(battle * b)
 {
     bool cont = false;
     bfaction *bf;
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         if (s->alive - s->removed > 0) {
             size_t j;
 
-            for (j = arrlen(b->sides); j > 0; --j) {
-                side* s2 = b->sides[j - 1];
+            for (j = 0; j != sl; ++j) {
+                side* s2 = b->sides[j];
                 if (s2->alive - s2->removed > 0 && enemy(s, s2)) {
                     cont = true;
                     break;
@@ -3558,8 +3563,8 @@ static int battle_report(battle * b)
         battle_message_faction(b, fac, m);
         msg_release(m);
 
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* s = b->sides[si - 1];
+        for (si = 0; si != sl; ++si) {
+            side *s = b->sides[si];
             if (s->alive) {
                 int r, k = 0, *alive = get_alive(s);
                 int l = FIGHT_ROW;
@@ -3685,8 +3690,8 @@ static void join_allies(battle * b)
             side* se = b->sides[sei];
             if (enemy(s, se)) {
                 size_t ai;
-                for (ai = arrlen(b->sides); ai > 0; --ai) {
-                    side* as = b->sides[ai - 1];
+                for (ai = 0; ai != num_sides; ++ai) {
+                    side* as = b->sides[ai];
                     if (enemy(se, as)) {
                         if (as == s || !enemy(as, s)) {
                             set_friendly(as, s);
@@ -3956,10 +3961,10 @@ void free_battle(battle* b)
  */
 static void battle_attacks(battle * b)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
 
         if (b->turn != 0 || (b->max_tactics > 0
@@ -3983,10 +3988,10 @@ static void battle_attacks(battle * b)
  * round they die. */
 static void battle_update(battle * b)
 {
-    size_t si;
+    size_t si, sl = arrlen(b->sides);
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+    for (si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         fighter *fig;
         for (fig = s->fighters; fig; fig = fig->next) {
             fig->fighting = fig->alive - fig->removed;
@@ -4005,10 +4010,10 @@ static void battle_flee(battle * b)
         flee_ops = 2;
 
     for (attempt = 1; attempt <= flee_ops; ++attempt) {
-        size_t si;
+        size_t si, sl = arrlen(b->sides);
 
-        for (si = arrlen(b->sides); si > 0; --si) {
-            side* s = b->sides[si - 1];
+        for (si = 0; si != sl; ++si) {
+            side *s = b->sides[si];
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 unit *u = fig->unit;
@@ -4057,13 +4062,13 @@ static void battle_flee(battle * b)
 static bool is_enemy(battle *b, unit *u1, unit *u2) {
     if (u1->faction != u2->faction) {
         if (b) {
-            size_t si;
             side *s1 = NULL, *s2 = NULL;
+            size_t si, sl = arrlen(b->sides);
 
-            for (si = arrlen(b->sides); si > 0; --si) {
-                side* es = b->sides[si - 1];
-                if (!s1 && es->bf->faction == u1->faction) s1 = es;
-                else if (!s2 && es->bf->faction == u2->faction) s2 = es;
+            for (si = 0; si != sl; ++si) {
+                side *s = b->sides[si];
+                if (!s1 && s->bf->faction == u1->faction) s1 = s;
+                else if (!s2 && s->bf->faction == u2->faction) s2 = s;
                 if (s1 && s2) {
                     return enemy(s1, s2);
                 }
@@ -4113,11 +4118,9 @@ void force_leave(region *r, battle *b) {
 
 static void do_battle(region * r) {
     battle *b = NULL;
-    bool fighting;
     ship *sh;
-    size_t si;
-
-    fighting = start_battle(r, &b);
+    bool fighting = start_battle(r, &b);
+    size_t si, sl;
 
     if (b == NULL)
         return;
@@ -4139,14 +4142,15 @@ static void do_battle(region * r) {
 
     /* statistics are fun */
 
-    for (si = arrlen(b->sides); si > 0; --si) {
-        side* s = b->sides[si - 1];
+
+    for (sl = arrlen(b->sides), si = 0; si != sl; ++si) {
+        side *s = b->sides[si];
         if (s->bf->faction->flags & FFL_NPC) {
             stats_count("battle.pve", 1);
             break;
         }
     }
-    if (si == 0) {
+    if (si == sl) {
         stats_count("battle.pvp", 1);
     }
 
