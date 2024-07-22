@@ -317,7 +317,7 @@ target_link_libraries(test_eressea
   ${INIPARSER_LIBRARY}
   )
 
-set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 90)
+set_target_properties(test_eressea eressea PROPERTIES C_STANDARD 99)
 
 find_program(IWYU_PATH NAMES include-what-you-use iwyu)
 if (IWYU_PATH)
@@ -366,7 +366,7 @@ endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
 target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
-target_link_libraries(eressea ${CURSES_LIBRARIES})
+target_link_libraries(eressea ${CURSES_LIBRARY})
 target_compile_definitions(eressea PRIVATE USE_CURSES)
 endif(CURSES_FOUND)
 

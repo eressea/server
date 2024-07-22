@@ -308,7 +308,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
-                    if (sk != NOSKILL
+                    if (sk != NOSKILL && sk < MAXSKILLS
                         && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk, NULL)) {
                         teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }

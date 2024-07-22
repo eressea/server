@@ -77,9 +77,6 @@ utf8_decode(wchar_t * ucs4_character, const char * utf8_string,
         return EILSEQ;
     }
     *length = (size_t)size;
-    if (codepoint < WCHAR_MIN || codepoint > WCHAR_MAX) {
-        return ENOMEM;
-    }
     *ucs4_character = (wchar_t)codepoint;
     return 0;
 }

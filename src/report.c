@@ -1686,7 +1686,7 @@ static void list_address(struct stream *out, const faction * uf, selist * seenfa
 
     while (flist != NULL) {
         const faction *f = (const faction *)selist_get(flist, qi);
-        if (!is_monsters(f)) {
+        if (!IS_MONSTERS(f)) {
             const char *str;
             char buf[8192];
             char label = '-';
@@ -2236,7 +2236,7 @@ report_plaintext(const char *filename, report_context * ctx,
         }
         ERRNO_CHECK();
     }
-    if (!is_monsters(f)) {
+    if (!IS_MONSTERS(f)) {
         if (!anyunits) {
             newline(out);
             paragraph(out, LOC(f->locale, "nr_youaredead"), 0, 2, 0);

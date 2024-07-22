@@ -1259,6 +1259,38 @@ static void fumble_default(castorder * co)
     return;
 }
 
+/** fumble: turns into a toad.
+ * 
+ * when this ends, one or two things will happen: 
+ * the toad changes its race back,
+ * and may or may not get toadslime.
+ * The list of things to happen are attached to a timeout
+ * trigger and that's added to the triggerlist of the mage gone toad.
+ */
+void fumble_toad(unit* mage, const spell *sp, int level)
+{
+    static int rc_cache;
+    static const race* rc_toad = NULL;
+    region* r = mage->region;
+    int duration;
+    trigger* trestore;
+
+    if (rc_changed(&rc_cache)) {
+        rc_toad = get_race(RC_TOAD);
+    }
+    duration = 2 + (rng_int() % level) / 2;
+    trestore = change_race(mage, duration, rc_toad, NULL);
+    if (trestore) {
+        if (chance(0.7)) {
+            const resource_type* rtype = rt_find("toadslime");
+            if (rtype) {
+                t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
+            }
+        }
+        ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
+    }
+}
+
 /* Die normalen Spruchkosten muessen immer bezahlt werden, hier noch
  * alle weiteren Folgen eines Patzers
  */
@@ -1272,10 +1304,7 @@ static void do_fumble(castorder * co)
     const spell *sp = co->sp;
     int level = co->level;
     double effect;
-    static int rc_cache;
-    static const race *rc_toad = NULL;
     fumble_f fun;
-    trigger *trestore;
     int duration;
 
     ADDMSG(&caster->faction->msgs,
@@ -1292,26 +1321,8 @@ static void do_fumble(castorder * co)
         }
         break;
 
-    case 1: /* toad */
-        /* one or two things will happen: the toad changes its race back,
-         * and may or may not get toadslime.
-         * The list of things to happen are attached to a timeout
-         * trigger and that's added to the triggerlist of the mage gone toad.
-         */
-        if (rc_changed(&rc_cache)) {
-            rc_toad = get_race(RC_TOAD);
-        }
-        duration = 2 + (rng_int() % level) / 2;
-        trestore = change_race(mage, duration, rc_toad, NULL);
-        if (trestore) {
-            if (chance(0.7)) {
-                const resource_type *rtype = rt_find("toadslime");
-                if (rtype) {
-                    t_add(&trestore, trigger_giveitem(mage, rtype->itype, 1));
-                }
-            }
-            ADDMSG(&r->msgs, msg_message("patzer6", "unit region spell", mage, r, sp));
-        }
+    case 1:
+        fumble_toad(mage, sp, level);
         break;
 
     case 2:
@@ -1720,15 +1731,20 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
 /* Hilfsstrukturen fuer ZAUBERE */
 /* ------------------------------------------------------------- */
 
-static void free_spellparameter(spellparameter * param)
+static void free_spellparameters(spellparameter * param)
 {
-    assert(param);
-    switch (param->typ) {
-    case SPP_STRING:
-        free(param->data.s);
-        break;
-    default:
-        break;
+    if (param) {
+        size_t i;
+        for (i = arrlen(param); i > 0; --i) {
+            switch (param[i - 1].typ) {
+            case SPP_STRING:
+                free(param[i - 1].data.s);
+                break;
+            default:
+                break;
+            }
+        }
+        arrfree(param);
     }
 }
 
@@ -1968,7 +1984,7 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
     if (err) {
         ADDMSG(&u->faction->msgs, err);
         if (par) {
-            free_spellparameter(par);
+            free_spellparameters(par);
             par = NULL;
         }
     }
@@ -1987,13 +2003,10 @@ struct region * co_get_region(const struct castorder * co) {
     return co->_rtarget;
 }
 
-castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
+void create_castorder(castorder * co, unit *caster, unit * familiar, const spell * sp, region * r,
     int lev, double force, int range, struct order * ord, spellparameter * a_params)
 {
-    if (!co) co = malloc(sizeof(castorder));
-    if (!co) abort();
-
-    assert(a_params == NULL || arrlen(a_params) > 0);
+    assert(co && (a_params == NULL || arrlen(a_params) > 0));
     co->next = NULL;
     co->magician.u = caster;
     co->_familiar = familiar;
@@ -2004,17 +2017,11 @@ castorder *create_castorder(castorder * co, unit *caster, unit * familiar, const
     co->distance = range;
     co->order = copy_order(ord);
     co->a_params = a_params;
-
-    return co;
 }
 
 void free_castorder(struct castorder *co)
 {
-    size_t i;
-    for (i = arrlen(co->a_params); i > 0; --i) {
-        free_spellparameter(co->a_params + i - 1);
-    }
-    arrfree(co->a_params);
+    free_spellparameters(co->a_params);
     if (co->order) free_order(co->order);
 }
 
@@ -2461,16 +2468,17 @@ static castorder *cast_cmd(unit * u, order * ord)
     spellparameter *args = NULL;
     unit * mage = NULL;
     param_t param;
+    castorder *result = NULL;
 
     assert(u);
     if (LongHunger(u)) {
         cmistake(u, ord, 224, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
     pl = getplane(r);
     if (pl && fval(pl, PFL_NOMAGIC)) {
         cmistake(u, ord, 269, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     init_order(ord, NULL);
@@ -2494,7 +2502,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehler "Die Region konnte nicht verzaubert werden" */
             ADDMSG(&u->faction->msgs, msg_message("spellregionresists",
                 "unit region command", u, u->region, ord));
-            return 0;
+            return NULL;
         }
         s = gettoken(token, sizeof(token));
         param = get_param(s, u->faction->locale);
@@ -2507,7 +2515,7 @@ static castorder *cast_cmd(unit * u, order * ord)
     if (!s || !s[0]) {
         /* Fehler "Es wurde kein Zauber angegeben" */
         cmistake(u, ord, 172, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     /**
@@ -2543,7 +2551,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 if (sp == NULL || sp->sptyp & NOTFAMILIARCAST) {
                     /* Fehler: "Diesen Spruch kann der Vertraute nicht zaubern" */
                     cmistake(u, ord, 177, MSG_MAGIC);
-                    return 0;
+                    return NULL;
                 }
                 familiar = u;
             }
@@ -2553,13 +2561,13 @@ static castorder *cast_cmd(unit * u, order * ord)
     if (!sp || !mage) {
         /* Fehler 'Spell not found' */
         cmistake(u, ord, 173, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     if (sp->sptyp & ISCOMBATSPELL) {
         /* Fehler: "Dieser Zauber ist nur im Kampf sinnvoll" */
         cmistake(u, ord, 174, MSG_MAGIC);
-        return 0;
+        return NULL;
     }
 
     /* Auf dem Ozean Zaubern als quasi-langer Befehl koennen
@@ -2572,7 +2580,7 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehlermeldung */
             ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
                 "unit region command", u, u->region, ord));
-            return 0;
+            return NULL;
         }
         /* Auf bewegenden Schiffen kann man nur explizit als
          * ONSHIPCAST deklarierte Zauber sprechen */
@@ -2583,7 +2591,7 @@ static castorder *cast_cmd(unit * u, order * ord)
                 /* Fehler: "Diesen Spruch kann man nicht auf einem sich
                  * bewegenden Schiff stehend zaubern" */
                 cmistake(u, ord, 175, MSG_MAGIC);
-                return 0;
+                return NULL;
             }
         }
     }
@@ -2594,19 +2602,19 @@ static castorder *cast_cmd(unit * u, order * ord)
             /* Fehler "Diesen Spruch kann man nicht in die Ferne
              * richten" */
             cmistake(u, ord, 176, MSG_MAGIC);
-            return 0;
+            return NULL;
         }
         if (familiar) {
             /* Magier zaubert durch Vertrauten: keine Fernzauber erlaubt */
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "familiar_farcast",
                 "mage", mage));
-            return 0;
+            return NULL;
         }
         if (range > 1024) {
             /* (2^10) weiter als 10 Regionen entfernt */
             ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "spellfail::nocontact",
                 "target", target_r));
-            return 0;
+            return NULL;
         }
     }
     if (familiar) {
@@ -2633,7 +2641,7 @@ static castorder *cast_cmd(unit * u, order * ord)
         if (level > skill) {
             /* die Einheit ist nicht erfahren genug fuer diesen Zauber */
             cmistake(u, ord, 169, MSG_MAGIC);
-            return 0;
+            return NULL;
         }
     }
     else if (!(sp->sptyp & SPELLLEVEL)) {
@@ -2673,11 +2681,14 @@ static castorder *cast_cmd(unit * u, order * ord)
         }
         if (args == NULL) {
             /* Syntax war falsch */
-            return 0;
+            return NULL;
         }
     }
-    return create_castorder(0, mage, familiar, sp, target_r, level, 0, range, ord,
-        args);
+    result = malloc(sizeof(castorder));
+    if (result) {
+        create_castorder(result, mage, familiar, sp, target_r, level, 0, range, ord, args);
+    }
+    return result;
 }
 
 /* ------------------------------------------------------------- */
@@ -2719,7 +2730,7 @@ void magic(void)
                 !is_cursed(u->attribs, &ct_insectfur))
                 continue;
 
-            if (fval(u, UFL_WERE | UFL_LONGACTION) || is_paused(u->faction)) {
+            if (fval(u, UFL_WERE | UFL_LONGACTION) || IS_PAUSED(u->faction)) {
                 continue;
             }
 

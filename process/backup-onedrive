@@ -7,7 +7,8 @@ fi
 GAME=$1
 
 upload() {
-  onedrive-cli cp "./$1" "Eressea/game-$GAME"
+  echo "uploading $1"
+  onedrive-cli cp "./$1" "Eressea/game-$GAME/"
 }
 
 if [ ! -d "$ERESSEA/game-$GAME" ]; then
@@ -35,10 +36,8 @@ if [ -e "orders.$TURN" ]; then
 fi
 echo "backup turn $TURN, game $GAME, files: ${files[*]}"
 tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-if [ -e reports/reports.txt ] ; then
-  upload "backup/$TURN.tar.bz2"
-  echo "backup reports $TURN, game $GAME"
-  tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
-  upload "backup/$TURN-reports.tar.bz2"
-fi
+upload "backup/$TURN.tar.bz2"
+echo "backup reports $TURN, game $GAME"
+tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+upload "backup/$TURN-reports.tar.bz2"
 

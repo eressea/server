@@ -242,20 +242,25 @@ extern "C" {
     int change_maxspellpoints(struct unit *u, int csp);
     /* veraendert die maximalen Magiepunkte einer Einheit */
 
-    /* Zaubern */
+    /** Zaubern **/
+
+    /* ermittelt die Staerke eines Spruchs: */
     double spellpower(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
-    /*      ermittelt die Staerke eines Spruchs */
+    
+    /* @return bool: did the spell succeed? */
     bool fumble(struct region *r, struct unit *u, const struct spell * sp,
         int cast_level);
-    /*      true, wenn der Zauber misslingt, bei false gelingt der Zauber */
+
+    /* temporarily turns the caster into a toad: */
+    void fumble_toad(struct unit* mage, const struct spell* sp, int level);
 
     typedef struct spellrank {
         struct castorder *begin;
         struct castorder **handle_end;
     } spellrank;
 
-    struct castorder *create_castorder(struct castorder * co, struct unit *caster,
+    void create_castorder(struct castorder * co, struct unit *caster,
         struct unit * familiar, const struct spell * sp, struct region * r,
         int lev, double force, int range, struct order * ord, struct spellparameter * a_params);
     void free_castorder(struct castorder *co);

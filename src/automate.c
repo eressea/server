@@ -202,7 +202,7 @@ void do_autostudy(region *r)
         assert(batchsize <= MAXSCHOLARS);
     }
     for (u = r->units; u; u = u->next) {
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
         if (!fval(u, UFL_MARK)) {
             unit *ulist = u;
             int sum_scholars = 0;

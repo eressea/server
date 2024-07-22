@@ -1262,28 +1262,32 @@ static void test_recruit_insect(CuTest *tc) {
     unit *u;
     faction *f;
     message * msg;
+    int fall, winter = 0;
 
     test_setup();
     test_create_calendar();
+    fall = months_per_year * weeks_per_month - 1;
+    CuAssertIntEquals(tc, SEASON_WINTER, calendar_season(winter));
+    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(fall));
+
     test_create_terrain("desert", -1);
     f = test_create_faction_ex(test_create_race("insect"), NULL);
     u = test_create_unit(f, test_create_plain(0, 0));
     u->thisorder = create_order(K_RECRUIT, f->locale, "%d", 1);
 
-    CuAssertIntEquals(tc, SEASON_AUTUMN, calendar_season(1083));
-    msg = can_recruit(u, f->race, u->thisorder, 1083); /* Autumn */
+    msg = can_recruit(u, f->race, u->thisorder, fall); /* Autumn */
     CuAssertPtrEquals(tc, NULL, msg);
 
-    msg = can_recruit(u, f->race, u->thisorder, 1084); /* Insects, Winter */
+    msg = can_recruit(u, f->race, u->thisorder, winter); /* Insects, Winter */
     CuAssertPtrNotNull(tc, msg);
     msg_release(msg);
 
     u->flags |= UFL_WARMTH;
-    msg = can_recruit(u, f->race, u->thisorder, 1084); /* Insects, potion, Winter */
+    msg = can_recruit(u, f->race, u->thisorder, winter); /* Insects, potion, Winter */
     CuAssertPtrEquals(tc, NULL, msg);
 
     u->flags = 0;
-    msg = can_recruit(u, NULL, u->thisorder, 1084); /* Other races, Winter */
+    msg = can_recruit(u, NULL, u->thisorder, winter); /* Other races, Winter */
     CuAssertPtrEquals(tc, NULL, msg);
 
     test_teardown();

@@ -3606,7 +3606,7 @@ static int sp_rallypeasantmob(castorder * co)
 
     while (u) {
         unit *un = u->next;
-        if (is_monsters(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
+        if (IS_MONSTERS(u->faction) && u_race(u) == get_race(RC_PEASANT)) {
             rsetpeasants(r, rpeasants(r) + u->number);
             rsetmoney(r, rmoney(r) + get_money(u));
             set_money(u, 0);
@@ -3728,10 +3728,12 @@ int sp_migranten(castorder * co)
         /* u ist von unserer Art, das Ritual waere verschwendete Aura. */
         ADDMSG(&mage->faction->msgs, msg_message("sp_migranten_fail1",
             "unit region command target", mage, mage->region, co->order, target));
+        return 0;
     }
     /* Auf eigene Einheiten versucht zu zaubern? Garantiert Tippfehler */
     if (target->faction == mage->faction) {
         cmistake(mage, co->order, 45, MSG_MAGIC);
+        return 0;
     }
 
     /* Keine Monstereinheiten */
@@ -4018,7 +4020,7 @@ static int sp_pump(castorder * co)
             "error_not_on_undead", ""));
         return 0;
     }
-    if (is_magic_resistant(mage, target, 0) || is_monsters(target->faction)) {
+    if (is_magic_resistant(mage, target, 0) || IS_MONSTERS(target->faction)) {
         report_failure(mage, co->order);
         return 0;
     }
@@ -4490,7 +4492,7 @@ int sp_illusionary_shapeshift(castorder * co)
     }
 
     /* aehnlich wie in laws.c:setealth() */
-    if (!playerrace(rc)) {
+    if (!stealthrace(rc)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_shapeshift_fail", "target race", u, rc));
         return 0;
@@ -5018,7 +5020,7 @@ int sp_enterastral(castorder * co)
 
 /** Spell 'Astraler Ruf' / 'Astral Call'.
  */
-int sp_pullastral(castorder * co)
+int sp_pullastral(castorder *co)
 {
     region *rt, *ro;
     unit *u;
@@ -5027,7 +5029,7 @@ int sp_pullastral(castorder * co)
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
-    spellparameter* params = co->a_params;
+    spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
 
     switch (getplaneid(r)) {
@@ -5046,7 +5048,7 @@ int sp_pullastral(castorder * co)
         return 0;
     }
 
-    if (is_cursed(rt->attribs, &ct_astralblock)
+    if (!ro || is_cursed(rt->attribs, &ct_astralblock)
         || is_cursed(ro->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", ""));

@@ -555,7 +555,7 @@ void faction_setpassword(faction * f, const char *pwhash)
 
 bool valid_race(const struct faction *f, const struct race *rc)
 {
-    if (is_monsters(f) || f->race == rc)
+    if (IS_MONSTERS(f) || f->race == rc)
         return true;
     else {
         return rc_otherrace(f->race) == rc;

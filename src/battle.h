@@ -1,13 +1,16 @@
-#ifndef H_KRNL_BATTLE
-#define H_KRNL_BATTLE
+#pragma once
 
 #include "kernel/status.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 struct message;
 struct selist;
 struct weapon_type;
 union variant;
+
+#define TACTICS_BONUS 1         /* when undefined, we have a tactics round. else this is the bonus tactics give */
+#define TACTICS_MODIFIER 1      /* modifier for generals in the front/rear */
 
 /** more defines **/
 #define FS_ENEMY 1
@@ -24,7 +27,6 @@ union variant;
 #define FLEE_ROW 4
 #define FIRST_ROW FIGHT_ROW
 #define LAST_ROW FLEE_ROW
-#define MAXSIDES 192            /* if there are ever more than this, we're fucked. */
 
 /*** fighter::person::flags ***/
 #define FL_TIRED      1
@@ -38,13 +40,12 @@ union variant;
 
 typedef struct bfaction {
     struct bfaction* next;
-    struct side* sides;
     struct faction* faction;
     bool attacker;
 } bfaction;
 
 typedef struct tactics {
-    struct selist* fighters;
+    struct fighter** fighters;
     int value;
 } tactics;
 
@@ -56,16 +57,12 @@ typedef struct tactics {
 #define E_ATTACKING 4
 
 typedef struct side {
-    struct side* nextF;         /* next army of same faction */
     struct battle* battle;
     struct bfaction* bf;        /* battle info that goes with the faction */
-    struct faction* faction;    /* cache optimization for bf->faction */
     const struct group* group;
     struct tactics leader;      /* this army's best tactician */
-    unsigned char relations[MAXSIDES];
-    struct side* enemies[MAXSIDES];
     struct fighter* fighters;
-    unsigned int index;                  /* Eintrag der Fraktion in b->matrix/b->enemies */
+    unsigned int index;         /* Eintrag der Fraktion in b->matrix/b->enemies */
     int size[NUMROWS];          /* Anzahl Personen in Reihe X. 0 = Summe */
     int nonblockers[NUMROWS];   /* Anzahl nichtblockierender Kaempfer, z.B. Schattenritter. */
     int alive;                  /* Die Partei hat den Kampf verlassen */
@@ -78,15 +75,21 @@ typedef struct side {
     const struct faction* stealthfaction;
 } side;
 
+typedef int32_t relation_key_t;
+typedef char relation_value_t;
+typedef struct relation {
+    relation_key_t key;
+    relation_value_t value;
+} relation;
+
 typedef struct battle {
-    struct selist* leaders;
     struct region* region;
     struct plane* plane;
     bfaction* factions;
+    struct relation *relations;
     int nfactions;
     int nfighters;
-    side sides[MAXSIDES];
-    int nsides;
+    side ** sides;
     struct selist* meffects;
     int max_tactics;
     unsigned char turn;
@@ -200,6 +203,7 @@ troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
 troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
+int get_tactics(const struct side* as, const struct side* ds);
 
 int count_enemies(struct battle* b, const struct fighter* af,
     int minrow, int maxrow, int select);
@@ -210,7 +214,8 @@ int calculate_armor(troop dt, const struct weapon_type* dwtype, const struct wea
 int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
 bool terminate(troop dt, troop at, int type, const char* damage,
     bool missile);
-void message_all(battle* b, struct message* m);
+void message_all(struct battle* b, struct message* m);
+void set_enemy(struct side* as, struct side* ds, bool attacking);
 bool hits(troop at, troop dt, const struct weapon_type *awp);
 void damage_building(struct battle* b, struct building* bldg,
     int damage_abs);
@@ -233,10 +238,12 @@ void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
 bool is_attacker(const fighter* fig);
 struct battle* make_battle(struct region* r);
+bool start_battle(struct region* r, struct battle** bp);
 void free_battle(struct battle* b);
+void init_tactics(struct battle* b);
 struct fighter* make_fighter(struct battle* b, struct unit* u,
     struct side* s, bool attack);
-int join_battle(struct battle* b, struct unit* u, bool attack, struct fighter** cp);
+bool join_battle(struct battle* b, struct unit* u, bool attack, struct fighter** cp);
 struct side* make_side(struct battle* b, const struct faction* f,
     const struct group* g, unsigned int flags,
     const struct faction* stealthfaction);
@@ -252,4 +259,5 @@ int meffect_apply(struct meffect* me, int damage);
 void loot_items(fighter* corpse);
 void structural_damage(troop td, int damage_abs, int changce_pct);
 
-#endif
+void set_relation(struct side *as, const struct side *ds, relation_value_t mask);
+relation_value_t get_relation(const struct side *as, const struct side *ds);

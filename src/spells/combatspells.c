@@ -285,7 +285,7 @@ int sp_combatrosthauch(struct castorder * co)
         size_t len = arrlen(df->weapons);
 
         for (w = 0; w != len; ++w) {
-            weapon *wp = df->weapons;
+            weapon *wp = df->weapons + w;
             if (df->unit->items && force > 0) {
                 const item_type *itype = wp->item.type;
                 item ** itp = i_find(&df->unit->items, itype);
@@ -697,31 +697,12 @@ int sp_shadowknights(struct castorder * co)
     fighter * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
-    unit *u;
     battle *b = fi->side->battle;
-    region *r = b->region;
     unit *mage = fi->unit;
-    attrib *a;
     int force = (int)fmax(1, get_force(power, 3));
     message *msg;
 
-    u =
-        create_unit(r, mage->faction, force, get_race(RC_SHADOWKNIGHT), 0, NULL,
-        mage);
-    unit_setstatus(u, ST_FIGHT);
-
-    u->hp = u->number * unit_max_hp(u);
-
-    if (mage->flags & UFL_ANON_FACTION) {
-        u->flags |= UFL_ANON_FACTION;
-    }
-
-    a = a_new(&at_unitdissolve);
-    a->data.ca[0] = 0;
-    a->data.ca[1] = 100;
-    a_add(&u->attribs, a);
-
-    make_fighter(b, u, fi->side, is_attacker(fi));
+    summon_allies(fi, get_race(RC_SHADOWKNIGHT), force);
 
     msg = msg_message("shadowknights_effect", "mage", mage);
     message_all(b, msg);
@@ -1290,10 +1271,11 @@ int sp_fumbleshield(struct castorder * co)
 
 static int count_healable(battle * b, fighter * df)
 {
-    side *s;
     int healable = 0;
+    size_t si;
 
-    for (s = b->sides; s != b->sides + b->nsides; ++s) {
+    for (si = arrlen(b->sides); si > 0; --si) {
+        side* s = b->sides[si - 1];
         if (helping(df->side, s)) {
             healable += s->casualties;
         }
@@ -1391,9 +1373,13 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
 
     for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
         fighter *df = (fighter *)selist_get(ql, qi);
-
         if (healhp <= 0)
             break;
+
+        /* do not heal temporary fighters */
+        if (a_find(df->unit->attribs, &at_unitdissolve)) {
+            continue;
+        }
 
         /* Untote kann man nicht heilen */
         if (df->unit->number == 0 || (u_race(df->unit)->flags & RCF_NOHEAL))

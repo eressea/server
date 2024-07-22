@@ -237,8 +237,37 @@ void test_log_stderr(int flags) {
 
 }
 
+static season_t test_months[4] = { SEASON_WINTER, SEASON_SPRING, SEASON_SUMMER, SEASON_AUTUMN };
+
+void test_create_calendar(void) {
+    months_per_year = 4;
+    weeks_per_month = 2;
+    month_season = test_months;
+}
+
+/*
+void test_create_calendar(void) {
+    config_set_int("game.start", 184);
+    months_per_year = 9;
+    month_season = malloc(sizeof(season_t) * months_per_year);
+    if (!month_season) abort();
+    month_season[0] = SEASON_SUMMER;
+    month_season[1] = SEASON_AUTUMN;
+    month_season[2] = SEASON_AUTUMN;
+    month_season[3] = SEASON_WINTER;
+    month_season[4] = SEASON_WINTER;
+    month_season[5] = SEASON_WINTER;
+    month_season[6] = SEASON_SPRING;
+    month_season[7] = SEASON_SPRING;
+    month_season[8] = SEASON_SUMMER;
+}
+*/
+
 void test_reset(void)
 {
+    if (month_season == test_months) {
+        month_season = NULL;
+    }
     free_gamedata();
 }
 
@@ -285,22 +314,6 @@ static void test_reset_full(void) {
         errno = 0;
         log_error("errno: %d (%s)", error, strerror(error));
     }
-}
-
-void test_create_calendar(void) {
-    config_set_int("game.start", 184);
-    months_per_year = 9;
-    month_season = malloc(sizeof(season_t) * months_per_year);
-    if (!month_season) abort();
-    month_season[0] = SEASON_SUMMER;
-    month_season[1] = SEASON_AUTUMN;
-    month_season[2] = SEASON_AUTUMN;
-    month_season[3] = SEASON_WINTER;
-    month_season[4] = SEASON_WINTER;
-    month_season[5] = SEASON_WINTER;
-    month_season[6] = SEASON_SPRING;
-    month_season[7] = SEASON_SPRING;
-    month_season[8] = SEASON_SUMMER;
 }
 
 void test_use_astral(void)
@@ -409,7 +422,9 @@ building_type * test_create_buildingtype(const char * name)
     if (btype->a_stages) {
         con = &btype->a_stages[0].construction;
     } else {
-        building_stage *stage = arraddnptr(btype->a_stages, 1);
+        building_stage *stage;
+        arrsetlen(btype->a_stages, 1);
+        stage = btype->a_stages;
         if (stage) {
             stage->name = NULL;
             con = &stage->construction;
@@ -454,15 +469,15 @@ building_type *test_create_castle(void) {
     }
 
     if (!btype->a_stages) {
-        building_stage *stages = arraddnptr(btype->a_stages, 7);
+        arrsetlen(btype->a_stages, 7);
         btype->flags |= BTF_FORTIFICATION;
-        init_stage(stages + 0, 1, 2, "site", rtype);
-        init_stage(stages + 1, 1, 8, "tradepost", rtype);
-        init_stage(stages + 2, 2, 40, "fortification", rtype);
-        init_stage(stages + 3, 3, 200, "tower", rtype);
-        init_stage(stages + 4, 4, 1000, "castle", rtype);
-        init_stage(stages + 5, 5, 5000, "fortress", rtype);
-        init_stage(stages + 6, 6, -1, "citadel", rtype);
+        init_stage(btype->a_stages, 1, 2, "site", rtype);
+        init_stage(btype->a_stages + 1, 1, 8, "tradepost", rtype);
+        init_stage(btype->a_stages + 2, 2, 40, "fortification", rtype);
+        init_stage(btype->a_stages + 3, 3, 200, "tower", rtype);
+        init_stage(btype->a_stages + 4, 4, 1000, "castle", rtype);
+        init_stage(btype->a_stages + 5, 5, 5000, "fortress", rtype);
+        init_stage(btype->a_stages + 6, 6, -1, "citadel", rtype);
     }
     return btype;
 }

@@ -40,7 +40,7 @@ void renumber_factions(void)
         int want;
         struct renum **rn;
 
-        if (is_paused(f)) continue;
+        if (IS_PAUSED(f)) continue;
 
         a = a_find(f->attribs, &at_number);
         if (!a) continue;

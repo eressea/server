@@ -5,11 +5,48 @@ GAME=$1
 [ "$ENABLED" == "no" ] && exit
 [ -z "$ERESSEA" ] && ERESSEA="$HOME/eressea"
 
+upload()
+{
+    FILEPATH=$(realpath "$1")
+    scp "$FILEPATH" "synology:Backup/Eressea/game-$GAME/"
+}
+
+backup_reports()
+{
+    GAME="$1"
+    TURN="$2"
+    files=("data/$TURN.dat" parteien.full parteien)
+    if [ -e "orders.$TURN" ]; then
+          files+=("orders.$TURN")
+    fi
+    echo "backup turn $TURN, game $GAME, files: ${files[*]}"
+    tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+    upload "backup/$TURN.tar.bz2"
+    echo "backup reports $TURN, game $GAME"
+    tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+    echo "backup/$TURN-reports.tar.bz2"
+}
+
 backup()
 {
-    if [ -x "$BIN/backup-eressea" ] ; then
-        "$BIN/backup-eressea" "$1" "$2"
+    local -n RESULT=$1
+    GAME="$2"
+    TURN="$3"
+    cd "$ERESSEA/game-$GAME" || exit
+    if [ ! -e "data/$TURN.dat" ]; then
+      exit 2
     fi
+    if [ ! -d backup ] ; then
+      mkdir -p "$HOME/backup/eressea/game-$GAME"
+      ln -sf "$HOME/backup/eressea/game-$GAME" backup
+    fi
+
+    files=("data/$TURN.dat" parteien.full parteien)
+    if [ -e "orders.$TURN" ]; then
+      files+=("orders.$TURN")
+    fi
+    tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+    RESULT="backup/$TURN.tar.bz2"
 }
 
 export ERESSEA
@@ -44,7 +81,9 @@ if [ ! -s "orders.$TURN" ]; then
   exit 2
 fi
 
-backup "$GAME" "$TURN"
+## pre-game backup, data and orders only:
+backup BACKUP "$GAME" "$TURN"
+upload "$BACKUP"
 rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
 touch execute.lock
@@ -58,21 +97,24 @@ if [ ! -s "$REPORTS/reports.txt" ]; then
   echo "server did not create reports.txt in game $GAME"
   exit 4
 fi
-backup "$GAME" "$TURN"
 TURN=$NEXTTURN
 if [ ! -s "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
   echo "server did not create data for turn $TURN in game $GAME"
   exit 3
 fi
+echo "sending reports for game $GAME, turn $TURN"
+"$BIN/compress.sh" "$GAME" "$TURN"
+"$BIN/sendreports.sh" "$GAME"
+## post-game backup of new data:
+backup NEWFILE "$GAME" "$TURN"
+upload "$NEWFILE"
+## post-game backup of reports:
+backup_reports "$GAME" "$TURN"
 if [ ! -f "express-$TURN.txt" ]; then
   if [ -f express.txt ]; then
     mv express.txt "express-$TURN.txt"
   fi
 fi
-echo "sending reports for game $GAME, turn $TURN"
-"$BIN/compress.sh" "$GAME" "$TURN"
-"$BIN/sendreports.sh" "$GAME"
-backup "$GAME" "$TURN"
 rm -f test/execute.lock
 ) | tee -a "$HOME/log/eressea.cron.log"
 

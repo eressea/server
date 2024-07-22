@@ -410,7 +410,7 @@ static int canwalk(unit * u, const capacities *cap)
     /* workaround: monsters are too stupid to drop items, therefore they have
      * infinite carrying capacity */
 
-    if (is_monsters(u->faction))
+    if (IS_MONSTERS(u->faction))
         return E_CANWALK_OK;
 
     maxpferde = walking_horse_limit(u, effskill(u, SK_RIDING, NULL));
@@ -741,14 +741,27 @@ void deny_ship_entry(unit *u, struct region* current_point, struct region* next_
     }
 }
 
-int check_ship_allowed(struct ship *sh, const region * r)
+static building *get_harbour(const region *r) {
+    if (r->land) {
+        static int changed = 0;
+        static const building_type *bt_harbour = NULL;
+        if (bt_changed(&changed)) {
+            bt_harbour = bt_find("harbour");
+        }
+        if (bt_harbour) {
+            return get_building_of_type(r, bt_harbour, false);
+        }
+    }
+    return NULL;
+}
+
+int check_ship_allowed(struct ship *sh, const region * r, const building *harbour)
 {
     if (fval(r->terrain, SEA_REGION)) {
         return SA_ALLOWED;
     }
     else {
         int reason = SA_DENIED;
-        const building_type* bt_harbour = bt_find("harbour");
         if (sh->type->coasts) {
             ptrdiff_t c, n = arrlen(sh->type->coasts);
             for (c = 0; c != n; ++c) {
@@ -758,18 +771,17 @@ int check_ship_allowed(struct ship *sh, const region * r)
                 }
             }
         }
-        if (reason != SA_ALLOWED && bt_harbour) {
-            building* b = get_building_of_type(r, bt_harbour, false);
-            if (b) {
-                if (fval(b, BLD_UNMAINTAINED)) {
+        if (reason != SA_ALLOWED) {
+            if (harbour) {
+                if (fval(harbour, BLD_UNMAINTAINED)) {
                     reason = SA_HARBOUR_DISABLED;
                 }
                 else {
-                    unit* harbourmaster = owner_buildingtyp(r, bt_harbour);
+                    unit* harbourmaster = building_owner(harbour);
                     if (!harbourmaster || !sh->_owner) {
                         reason = SA_HARBOUR_ALLOWED;
                     }
-                    else if ((sh->_owner->faction == harbourmaster->faction) || (ucontact(harbourmaster, sh->_owner)) || (alliedunit(harbourmaster, sh->_owner->faction, HELP_GUARD))) {
+                    else if (allied(harbourmaster, sh->_owner, HELP_GUARD)) {
                         reason = SA_HARBOUR_ALLOWED;
                     }
                     else {
@@ -869,7 +881,7 @@ direction_t drift_target(ship *sh) {
         region *rn;
         direction_t dn = (direction_t)((d + dir) % MAXDIRECTIONS);
         rn = rconnect(sh->region, dn);
-        if (rn != NULL && check_ship_allowed(sh, rn) >= 0) {
+        if (rn != NULL && check_ship_allowed(sh, rn, get_harbour(rn)) >= 0) {
             result = dn;
             if (!fval(rn->terrain, SEA_REGION)) {
                 /* prefer drifting towards non-ocean regions */
@@ -1049,19 +1061,23 @@ static unit *bewegung_blockiert_von(unit * reisender, region * r)
     for (u = r->units; u; u = u->next) {
         if (is_guard(u)) {
             int sk = effskill(u, SK_PERCEPTION, r);
-            if (invisible(reisender, u) >= reisender->number)
+            if (invisible(reisender, u) >= reisender->number) {
                 continue;
-            if (!(u_race(u)->flags & RCF_FLY) && u_race(reisender)->flags & RCF_FLY)
+            }
+            if (!(u_race(u)->flags & RCF_FLY) && u_race(reisender)->flags & RCF_FLY) {
                 continue;
-            if ((u->faction == reisender->faction) || (ucontact(u, reisender)) || (alliedunit(u, reisender->faction, HELP_GUARD)))
+            }
+            if (allied(u, reisender, HELP_GUARD)) {
                 guard_count = guard_count - u->number;
+            } 
             else if (sk >= stealth) {
                 double prob_u = skill_prob * ((double)sk - stealth);
                 guard_count += u->number;
                 /* amulet counts at most once */
                 prob_u += fmin(1, fmin(u->number, i_get(u->items, ramulet->itype))) * amulet_prob;
-                if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building))
-                    prob_u += castle_prob*buildingeffsize(u->building, 0);
+                if (u->building && (u->building->type == castle_bt) && u == building_owner(u->building)) {
+                    prob_u += castle_prob * buildingeffsize(u->building, 0);
+                }
                 if (prob_u >= prob) {
                     prob = prob_u;
                     guard = u;
@@ -1274,7 +1290,7 @@ bool is_transporting(const unit * ut, const unit * u)
 
 static bool can_move(const unit * u)
 {
-    if (is_paused(u->faction)) return false;
+    if (IS_PAUSED(u->faction)) return false;
     return (0 == (u_race(u)->flags & RCF_CANNOTMOVE));
 }
 
@@ -1379,13 +1395,20 @@ static bool roadto(const region * r, direction_t dir)
         }
     }
 
-    if (r->terrain->max_road <= 0)
+    if (r->terrain->max_road <= 0) {
         return false;
-    if (r2->terrain->max_road <= 0)
+    }
+    if (r2->terrain->max_road <= 0) {
         return false;
-    if (rroad(r, dir) < r->terrain->max_road)
+    }
+    if (rroad(r, dir) < r->terrain->max_road) {
         return false;
-    if (rroad(r2, dir_invert(dir)) < r2->terrain->max_road)
+    }
+    dir = dir_invert(dir);
+    if (dir >= MAXDIRECTIONS || dir == NODIRECTION) {
+        return false;
+    }
+    if (rroad(r2, dir) < r2->terrain->max_road)
         return false;
     return true;
 }
@@ -1828,6 +1851,45 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
+void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
+{
+    item *itm;
+    item *trans = NULL;
+    unit *u;
+    ship *sh = captain->ship;
+
+    for (u = r->units; u; u = u->next) {
+        if (u->ship == sh && !alliedunit(harbourmaster, captain->faction, HELP_GUARD)) {
+
+            if (effskill(harbourmaster, SK_PERCEPTION, NULL) > effskill(u, SK_STEALTH, NULL)) {
+                for (itm = u->items; itm; itm = itm->next) {
+                    const luxury_type *ltype = resource2luxury(itm->type->rtype);
+                    if (ltype != NULL && itm->number > 0) {
+                        int st = itm->number * effskill(harbourmaster, SK_TRADE, NULL) / 50;
+
+                        if (st > itm->number) st = itm->number;
+                        if (st > 0) {
+                            i_change(&u->items, itm->type, -st);
+                            i_change(&harbourmaster->items, itm->type, st);
+                            i_add(&trans, i_new(itm->type, st));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (trans) {
+        message *msg =
+            msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
+                sh);
+        add_message(&captain->faction->msgs, msg);
+        add_message(&harbourmaster->faction->msgs, msg);
+        msg_release(msg);
+        while (trans)
+            i_remove(&trans, trans);
+    }
+}
+
 static void sail(unit * u, order * ord, bool drifting)
 {
     region_list *route = NULL;
@@ -1844,6 +1906,7 @@ static void sail(unit * u, order * ord, bool drifting)
     double damage_storm = storms_enabled ? config_get_flt("rules.ship.damage_storm", 0.02) : 0.0;
     int lighthouse_div = config_get_int("rules.storm.lighthouse.divisor", 0);
     const char *token = getstrtoken();
+    building *harbour = NULL;
 
     error = movewhere(u, token, starting_point, &next_point);
     if (error) {
@@ -1978,7 +2041,8 @@ static void sail(unit * u, order * ord, bool drifting)
                 }
             }
 
-            reason = check_ship_allowed(sh, next_point);
+            harbour = get_harbour(next_point);
+            reason = check_ship_allowed(sh, next_point, harbour);
             if (reason < 0) {
                 /* for some reason or another, we aren't allowed in there. */
                 deny_ship_entry(u, current_point, next_point, reason);
@@ -2044,7 +2108,7 @@ static void sail(unit * u, order * ord, bool drifting)
      * Inland zu segeln versuchte */
 
     if (sh != NULL && fval(sh, SF_MOVED)) {
-        unit *harbourmaster;
+        unit *harbourmaster = harbour ? building_owner(harbour) : NULL;
         /* nachdem alle Richtungen abgearbeitet wurden, und alle Einheiten
          * transferiert wurden, kann der aktuelle Befehl geloescht werden. */
         if (getkeyword(ord) == K_ROUTE) {
@@ -2053,12 +2117,6 @@ static void sail(unit * u, order * ord, bool drifting)
             free_order(norder);
         }
         if (route) {
-	        if (reason != SA_HARBOUR_ALLOWED) {
-	            set_coast(sh, last_point, current_point);
-	        }
-	        else {
-	            sh->coast = NODIRECTION;
-	        }
             if (is_cursed(sh->attribs, &ct_flyingship)) {
                 ADDMSG(&f->msgs, msg_message("shipfly", "ship from to", sh,
                     starting_point, current_point));
@@ -2078,42 +2136,16 @@ static void sail(unit * u, order * ord, bool drifting)
             move_ship(sh, starting_point, current_point, route);
             /* Hafengebuehren ? */
 
-            harbourmaster = owner_buildingtyp(current_point, bt_find("harbour"));
-            if (harbourmaster != NULL) {
-                item *itm;
-                unit *u2;
-                item *trans = NULL;
-
-                for (u2 = current_point->units; u2; u2 = u2->next) {
-                    if (u2->ship == sh && !alliedunit(harbourmaster, u->faction, HELP_GUARD)) {
-
-                        if (effskill(harbourmaster, SK_PERCEPTION, NULL) > effskill(u2, SK_STEALTH, NULL)) {
-                            for (itm = u2->items; itm; itm = itm->next) {
-                                const luxury_type *ltype = resource2luxury(itm->type->rtype);
-                                if (ltype != NULL && itm->number > 0) {
-                                    int st = itm->number * effskill(harbourmaster, SK_TRADE, NULL) / 50;
-
-                                    if (st > itm->number) st = itm->number;
-                                    if (st > 0) {
-                                        i_change(&u2->items, itm->type, -st);
-                                        i_change(&harbourmaster->items, itm->type, st);
-                                        i_add(&trans, i_new(itm->type, st));
-                                    }
-                                }
-                            }
-                        }
-                    }
+            if (harbourmaster == NULL) {
+                set_coast(sh, last_point, current_point);
+            } else {
+                if (allied(harbourmaster, u, HELP_GUARD)) {
+                    sh->coast = NODIRECTION;
                 }
-                if (trans) {
-                    message *msg =
-                        msg_message("harbor_trade", "unit items ship", harbourmaster, trans,
-                            u->ship);
-                    add_message(&u->faction->msgs, msg);
-                    add_message(&harbourmaster->faction->msgs, msg);
-                    msg_release(msg);
-                    while (trans)
-                        i_remove(&trans, trans);
+                else {
+                    set_coast(sh, last_point, current_point);
                 }
+                harbour_taxes(current_point, u, harbourmaster);
             }
         }
     }
@@ -2456,7 +2488,7 @@ static void move_followers(void)
         while (*up != NULL) {
             unit *u = *up;
 
-            if (!fval(u, UFL_MOVED | UFL_NOTMOVING) && !is_paused(u->faction)) {
+            if (!fval(u, UFL_MOVED | UFL_NOTMOVING) && !IS_PAUSED(u->faction)) {
                 order *ord;
 
                 for (ord = u->orders; ord; ord = ord->next) {
@@ -2509,7 +2541,7 @@ static void move_pirates(void)
         while (*up) {
             unit *u = *up;
 
-            if (!fval(u, UFL_NOTMOVING) && !is_paused(u->faction) && getkeyword(u->thisorder) == K_PIRACY) {
+            if (!fval(u, UFL_NOTMOVING) && !IS_PAUSED(u->faction) && getkeyword(u->thisorder) == K_PIRACY) {
                 piracy_cmd(u);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING);
             }
@@ -2540,7 +2572,7 @@ void move_units(void)
         while (*up) {
             unit* u = *up;
             up = &u->next;
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
             if (!u->ship || ship_owner(u->ship) != u) {
                 keyword_t kword = getkeyword(u->thisorder);
 
@@ -2594,7 +2626,7 @@ void move_ships(void) {
             unit* u = *up;
             up = &u->next;
 
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
             if (u->ship && !fval(u->ship, SF_DRIFTED)) {
                 keyword_t kword = getkeyword(u->thisorder);
 

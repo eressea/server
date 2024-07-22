@@ -327,7 +327,7 @@ static void execute(keyword_t kwd)
         unit **up = &r->units;
         while (*up) {
             unit *u = *up;
-            if (u->number > 0 && !is_paused(u->faction)) {
+            if (u->number > 0 && !IS_PAUSED(u->faction)) {
                 const struct locale *lang = u->faction->locale;
                 order *ord;
                 for (ord = u->orders; ord; ord = ord->next) {

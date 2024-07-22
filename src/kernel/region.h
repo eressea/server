@@ -151,6 +151,7 @@ struct message_list* r_getmessages(const struct region* r,
     const struct faction* viewer);
 struct message* r_addmessage(struct region* r, const struct faction* viewer,
     struct message* msg);
+void r_add_warning(struct region *r, struct message *msg);
 
 int fix_demand(struct region *r);
 int distance(const struct region *, const struct region *);

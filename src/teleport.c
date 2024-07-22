@@ -213,7 +213,7 @@ void update_teleport_plane(const region* r, plane* aplane, const terrain_type* t
             if (ra->units) {
                 unit* u;
                 for (u = ra->units; u; u = u->next) {
-                    if (!is_monsters(u->faction)) {
+                    if (!IS_MONSTERS(u->faction)) {
                         log_warning("astral space above %s should be impassable, but there are units of %s here.", regionname(r, NULL), factionname(u->faction));
                         break;
                     }
