@@ -191,5 +191,5 @@ function test_mountainguards_cant_attack()
     local ug = unit.create(f, r, 1, "mountainguard")
     ug:add_order("ATTACKIERE " .. itoa36(u.id))
     process_orders()
-    assert_equal('race_no_attack', f.messages[1])
+    assert_equal(1, f:count_msg_type('race_no_attack'))
 end
