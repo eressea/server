@@ -280,7 +280,7 @@ static void test_monsters_learn_exp(CuTest * tc)
 
     test_setup();
     create_monsters(&u, &m);
-    config_set_int("study.produceexp", STUDYDAYS);
+    config_set_int("study.produceexp", SKILL_DAYS_PER_WEEK);
 
     u_setrace(u, u_race(m));
     produceexp(u, SK_MELEE);

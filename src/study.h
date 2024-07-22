@@ -11,7 +11,6 @@ struct order;
 enum skill_t;
 enum magic_t;
 
-#define STUDYDAYS 30
 #define TEACHNUMBER 10
 #define TEACHDIFFERENCE 2
 

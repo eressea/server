@@ -40,7 +40,7 @@ struct order *ord)
             for (s = 0; s != len; ++s) {
                 skill* sv = u->skills + s;
                 /* only one person learns for 3 weeks */
-                change_skill_days(u, (skill_t)sv->id, STUDYDAYS * 3);
+                change_skill_days(u, (skill_t)sv->id, SKILL_DAYS_PER_WEEK * 3);
             }
         }
     }
