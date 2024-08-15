@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <eressea>
 <spellbook name="illaun">
+  <entry spell="cold_protection" level="3" />
   <entry spell="bad_dreams" level="10" />
   <entry spell="gooddreams" level="8" />
   <entry spell="dreamreading" level="4" />
