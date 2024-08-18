@@ -44,7 +44,9 @@ static void handle_faction(void *userData, int no, const char *password) {
         else {
             parser_set_faction(state, NULL);
             log_debug("invalid password for faction %s", itoa36(no));
-            ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
+            if (password && password[0]) {
+                ADDMSG(&f->msgs, msg_message("wrongpasswd", "password", password));
+            }
         }
     }
 }
