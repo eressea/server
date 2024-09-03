@@ -458,6 +458,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
     if (err) {
         report_action(r, mage, seen, ACTION_CANNOTSEE);
     }
+    ADDMSG(&mage->faction->msgs, seen);
 }
 
 /* ------------------------------------------------------------- */
