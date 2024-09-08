@@ -389,13 +389,12 @@ unit *read_unit(gamedata *data)
     char obuf[DISPLAYSIZE];
     faction *f;
     char rname[32];
-    static const struct race *rc_demon, *rc_smurf, *rc_toad;
+    static const struct race *rc_demon, *rc_smurf;
     static int config;
 
     if (rc_changed(&config)) {
         rc_demon = get_race(RC_DAEMON);
         rc_smurf = rc_find("smurf");
-        rc_toad = rc_find("toad");
     }
 
     READ_INT(data->store, &n);
