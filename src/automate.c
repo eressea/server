@@ -202,7 +202,7 @@ void do_autostudy(region *r)
         assert(batchsize <= MAXSCHOLARS);
     }
     for (u = r->units; u; u = u->next) {
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
         if (!fval(u, UFL_MARK)) {
             unit *ulist = u;
             int sum_scholars = 0;
@@ -217,7 +217,7 @@ void do_autostudy(region *r)
                 }
                 autostudy_run(scholars, nscholars);
                 for (i = 0; i != nscholars; ++i) {
-                    int days = STUDYDAYS * scholars[i].learn;
+                    int days = SKILL_DAYS_PER_WEEK * scholars[i].learn;
                     int money = learn_skill(scholars[i].u, skill, days, 0);
                     if (money > 0) {
                         use_pooled(u, get_resourcetype(R_SILVER), GET_DEFAULT, money);

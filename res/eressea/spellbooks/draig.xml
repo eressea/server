@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <eressea>
 <spellbook name="draig">
+  <entry spell="cold_protection" level="3" />
   <entry spell="fireball" level="2" />
   <entry spell="combatrust" level="6" />
   <entry spell="plague" level="7" />

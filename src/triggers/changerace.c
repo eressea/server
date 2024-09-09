@@ -163,3 +163,24 @@ void restore_race(unit *u, const race *rc)
     u->_race = rc;
 }
 
+trigger *get_change_race_trigger(unit *u)
+{
+    trigger **tp = get_triggers(u->attribs, "timer");
+    if (tp) {
+        while (*tp) {
+            trigger *tr = *tp;
+            if (tr->type == &tt_timeout) {
+                timeout_data *td = (timeout_data *)tr->data.v;
+                trigger *t;
+                for (t = td->triggers; t; t = t->next) {
+                    if (t->type == &tt_changerace) {
+                        return t;
+                    }
+                }
+            }
+            tp = &tr->next;
+        }
+    }
+    return NULL;
+}
+

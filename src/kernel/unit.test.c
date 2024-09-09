@@ -399,7 +399,7 @@ static void test_skills(CuTest *tc) {
     CuAssertIntEquals(tc, 1, (int)arrlen(u->skills));
     CuAssertIntEquals(tc, SK_ALCHEMY, sv->id);
     CuAssertIntEquals(tc, 0, sv->level);
-    CuAssertIntEquals(tc, 1, sv->weeks);
+    CuAssertIntEquals(tc, MAX_DAYS_TO_NEXT_LEVEL(0), sv->days);
     CuAssertIntEquals(tc, 0, sv->old);
     sv = add_skill(u, SK_BUILDING);
     CuAssertPtrNotNull(tc, sv);
@@ -854,7 +854,7 @@ static void test_transfer_skills(CuTest *tc) {
     set_level(u1, SK_ALCHEMY, 2);
     sv = unit_skill(u1, SK_ALCHEMY);
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 3, sv->weeks);
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, sv->days);
     u2 = test_create_unit(f, r);
     scale_number(u2, 100);
     set_level(u2, SK_ALCHEMY, 2);
@@ -865,7 +865,7 @@ static void test_transfer_skills(CuTest *tc) {
     CuAssertIntEquals(tc, 2, effskill(u2, SK_ALCHEMY, NULL));
     sv = unit_skill(u2, SK_ALCHEMY);
     CuAssertIntEquals(tc, 2, sv->level);
-    CuAssertIntEquals(tc, 3, sv->weeks);
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, sv->days);
     test_teardown();
 }
 

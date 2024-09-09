@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <eressea>
 <spellbook name="cerddor">
+  <entry spell="cold_protection" level="3" />
   <entry spell="song_of_healing" level="2" />
   <entry spell="song_of_confusion" level="4" />
   <entry spell="song_of_fear" level="3" />

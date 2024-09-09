@@ -320,13 +320,13 @@ static void test_recruiting_dilutes_skills(CuTest* tc) {
     f = test_create_faction();
 
     u = test_create_unit(f, r);
-    set_level(u, SK_ALCHEMY, 4);
+    // FIXME: use test_set_skill
+    sv = test_set_skill(u, SK_ALCHEMY, 4, 5);
 
     add_recruits(u, 9, 9, 9);
     CuAssertIntEquals(tc, 10, u->number);
-    sv = unit_skill(u, SK_ALCHEMY);
     CuAssertIntEquals(tc, 1, sv->level);
-    CuAssertIntEquals(tc, 2, sv->weeks);
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, sv->days);
 
     scale_number(u, 1);
     add_recruits(u, 9, 9, 9);

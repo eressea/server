@@ -799,7 +799,7 @@ void transfermen(unit* u, unit* dst, int n)
                     sn = add_skill(dst, sk);
                 }
                 sn->level = result.level;
-                sn->weeks = result.weeks;
+                sn->days = result.days;
             }
             else if (sn) {
                 remove_skill(dst, sk);
@@ -962,7 +962,7 @@ void remove_skills(unit * u) {
 struct skill *add_skill(struct unit * u, enum skill_t sk)
 {
     skill* sv;
-    skill skins = { .id = sk, .level = 0, .weeks = 1, .old = 0 };
+    skill skins = { .id = sk, .level = 0, .days = SKILL_DAYS_PER_WEEK, .old = 0 };
     assert(u);
     if (u->skills) {
         ptrdiff_t s, len = arrlen(u->skills);
@@ -1773,7 +1773,7 @@ int maintenance_cost(const struct unit *u)
     if (u == NULL) {
         return MAINTENANCE;
     }
-    if (is_paused(u->faction)) {
+    if (IS_PAUSED(u->faction)) {
         return 0;
     }
     return u_race(u)->maintenance * u->number;

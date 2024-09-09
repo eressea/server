@@ -754,7 +754,7 @@ growing_herbs(region * r, const int current_season)
      * Jedes Kraut hat eine Wahrscheinlichkeit von (100-(vorhandene
      * Kraeuter))% sich zu vermehren. */
     if (current_season != SEASON_WINTER) {
-        int i, herbs = rherbs(r);
+        int i, herbs = rherbs(r) + 1;
         for (i = herbs; i > 0; --i) {
             if (rng_int() % 100 < (100 - herbs)) {
                 ++herbs;
@@ -776,8 +776,8 @@ void immigration(void)
             rsetpeasants(r, rp);
             r->land->newpeasants = 0;
         }
-        /* Genereate some (0-6 depending on the income) peasants out of nothing */
-        /* if less than 50 are in the region and there is space and no monster or demon units in the region */
+        /* Generate some (0-6 depending on the income) peasants out of nothing */
+        /* if less than `repopulate` are in the region and there is space and no monster or demon units in the region */
         if (repopulate) {
             int peasants = rpeasants(r);
             bool mourn = is_mourning(r, turn);
@@ -1227,7 +1227,7 @@ static void do_contact(region * r)
     for (u = r->units; u; u = u->next) {
         order *ord;
 
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
 
         for (ord = u->orders; ord; ord = ord->next) {
             keyword_t kwd = getkeyword(ord);
@@ -1246,7 +1246,7 @@ void do_enter(struct region *r, bool is_final_attempt)
         unit *u = *uptr;
         order **ordp = &u->orders;
 
-        if (is_paused(u->faction)) {
+        if (IS_PAUSED(u->faction)) {
             uptr = &u->next;
             continue;
         }
@@ -1370,7 +1370,7 @@ static void remove_idle_players(void)
     if (RemoveNMRNewbie()) {
         for (fp = &factions; *fp;) {
             faction* f = *fp;
-            if (!is_monsters(f)) {
+            if (!IS_MONSTERS(f)) {
                 if (!fval(f, FFL_PAUSED | FFL_NOIDLEOUT)) {
                     int age = faction_age(f);
                     if (age >= 0 && age < MAXNEWPLAYERS) {
@@ -1395,7 +1395,7 @@ void quit(void)
     faction **fptr = &factions;
     while (*fptr) {
         faction *f = *fptr;
-        if ((f->flags & FFL_QUIT) && !is_paused(f)) {
+        if ((f->flags & FFL_QUIT) && !IS_PAUSED(f)) {
             destroyfaction(fptr);
         }
         else {
@@ -1422,7 +1422,7 @@ int ally_cmd(unit * u, struct order *ord)
     init_order(ord, NULL);
     f = getfaction();
 
-    if (f == NULL || is_monsters(f)) {
+    if (f == NULL || IS_MONSTERS(f)) {
         cmistake(u, ord, 66, MSG_EVENT);
         return 0;
     }
@@ -2982,7 +2982,7 @@ void new_units(void)
         for (u = r->units; u; u = u->next) {
             order **ordp = &u->orders;
 
-            if (is_paused(u->faction)) continue;
+            if (IS_PAUSED(u->faction)) continue;
 
             /* this needs to happen very early in the game somewhere. since this is
              ** pretty much the first function called per turn, and I am lazy, I
@@ -3164,7 +3164,7 @@ static void update_spells(void)
     faction *f;
 
     for (f = factions; f; f = f->next) {
-        if (f->magiegebiet != M_NONE && !is_monsters(f)) {
+        if (f->magiegebiet != M_NONE && !IS_MONSTERS(f)) {
             unit *mages[MAXMAGES];
             int i;
             int maxlevel = faction_getmages(f, mages, MAXMAGES);
@@ -3446,7 +3446,7 @@ bool long_order_allowed(const unit *u, bool flags_only)
 {
     const region *r = u->region;
 
-    if (is_paused(u->faction)) return false;
+    if (IS_PAUSED(u->faction)) return false;
     if (fval(u, UFL_LONGACTION)) {
         /* this message was already given in update_long_orders();
         cmistake(u, ord, 52, MSG_PRODUCE);
@@ -3507,7 +3507,7 @@ void process(void)
                 for (u = r->units; u; u = u->next) {
                     processor *porder, *punit = pregion;
 
-                    if (is_paused(u->faction)) continue;
+                    if (IS_PAUSED(u->faction)) continue;
 
                     while (punit && punit->priority == prio && punit->type == PR_UNIT) {
                         punit->data.per_unit.process(u);

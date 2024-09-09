@@ -20,6 +20,7 @@ extern "C" {
 
     struct trigger *change_race(struct unit *u, int duration, const struct race *urace, const struct race *irace);
     void restore_race(struct unit *u, const struct race *rc);
+    struct trigger *get_change_race_trigger(struct unit *u);
 
 #ifdef __cplusplus
 }

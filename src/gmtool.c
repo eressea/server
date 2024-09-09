@@ -515,7 +515,7 @@ static void reset_region(region *r) {
     a_removeall(&r->attribs, NULL);
     while (*up) {
         unit *u = *up;
-        if (is_monsters(u->faction)) {
+        if (IS_MONSTERS(u->faction)) {
             remove_unit(up, u);
         }
         else {
@@ -1142,7 +1142,7 @@ static void show_help(void)
         "s: seed next player from newfactions at current region",
         "A: reset area (set region age to 0) for whole contiguos region",
         "c: clear (reset resources) region under cursor",
-        "C: clear rectangle under cursor (2 regions up and to the right)"
+        "C: clear rectangle under cursor (2 regions up and to the right)",
         "",
         "h: mark regions ... n: none,   i: island under cursor, t: terrain type, s: with ships,",
         "   u: with units, p: with player units, m: with monsters, f: with units of a faction,",
@@ -1231,6 +1231,8 @@ static void show_help(void)
 
         if (!exit) ch = getch();
     }
+    delwin(pad);
+    delwin(wn);
 }
 
 static void handlekey(state * st, int c)

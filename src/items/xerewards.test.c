@@ -1,11 +1,9 @@
 #include "xerewards.h"
-#include "study.h"
 #include "magic.h"
 
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/pool.h>
-#include <kernel/skills.h>
 #include "kernel/skill.h"    // for SK_MAGIC, SK_ENTERTAINMENT, SK_STAMINA
 #include "kernel/types.h"    // for M_GWYRRD
 #include <kernel/unit.h>
@@ -42,6 +40,7 @@ static void test_manacrystal(CuTest *tc) {
 }
 
 static void test_skillpotion(CuTest *tc) {
+#ifdef WITH_SKILL_TESTS
     unit *u;
     const struct item_type *itype;
     skill* pSkill;
@@ -54,17 +53,17 @@ static void test_skillpotion(CuTest *tc) {
     itype = test_create_itemtype("skillpotion");
     change_resource(u, itype->rtype, 2);
 
-    change_skill_days(u, SK_ENTERTAINMENT, STUDYDAYS * u->number);
+    change_skill_days(u, SK_ENTERTAINMENT, SKILL_DAYS_PER_WEEK * u->number);
     pSkill = unit_skill(u, SK_ENTERTAINMENT);
     sk_set_level(pSkill, 5);
     initialWeeks_Entertainment = pSkill->weeks = 4;
 
-    change_skill_days(u, SK_STAMINA, STUDYDAYS * u->number);
+    change_skill_days(u, SK_STAMINA, SKILL_DAYS_PER_WEEK * u->number);
     pSkill = unit_skill(u, SK_STAMINA);
     sk_set_level(pSkill, 5);
     initialWeeks_Stamina = pSkill->weeks = 4;
 
-    change_skill_days(u, SK_MAGIC, STUDYDAYS * u->number);
+    change_skill_days(u, SK_MAGIC, SKILL_DAYS_PER_WEEK * u->number);
     pSkill = unit_skill(u, SK_MAGIC);
     sk_set_level(pSkill, 5);
     initialWeeks_Magic = pSkill->weeks = 4;
@@ -81,8 +80,8 @@ static void test_skillpotion(CuTest *tc) {
     CuAssertIntEquals(tc, initialWeeks_Magic - 3, pSkill->weeks);
 
     test_teardown();
+#endif
 }
-
 CuSuite *get_xerewards_suite(void)
 {
     CuSuite *suite = CuSuiteNew();

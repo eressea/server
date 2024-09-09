@@ -166,8 +166,8 @@ extern "C" {
     struct faction *get_or_create_monsters(void);
     void save_special_items(struct unit *u);
 
-#define is_monsters(f) ((f)->no==MONSTER_ID)
-#define is_paused(f) ((f)->flags & FFL_PAUSED)
+#define IS_MONSTERS(f) ((f)->no==MONSTER_ID)
+#define IS_PAUSED(f) ((f)->flags & FFL_PAUSED)
 
 #ifdef __cplusplus
 }

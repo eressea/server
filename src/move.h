@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 struct attrib_type;
+struct building;
 struct building_type;
 struct locale;
 struct order;
@@ -67,7 +68,7 @@ int follow_ship(struct unit * u, struct order * ord);
 #define SA_HARBOUR_DENIED -3
 #define SA_HARBOUR_DISABLED -4
 
-int check_ship_allowed(struct ship *sh, const struct region * r);
+int check_ship_allowed(struct ship *sh, const struct region * r, const struct building *harbour);
 direction_t drift_target(struct ship *sh);
 struct order * cycle_route(struct order * ord, const struct locale *lang, int gereist);
 struct order * make_movement_order(const struct locale *lang, direction_t steps[], int length);

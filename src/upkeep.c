@@ -29,7 +29,7 @@ int lifestyle(const unit *u)
     int need;
     plane *pl;
 
-    if (is_monsters(u->faction)) {
+    if (IS_MONSTERS(u->faction)) {
         return 0;
     }
 
@@ -79,7 +79,7 @@ static bool hunger(int number, unit * u)
 
     while (number--) {
         int dam = 1;
-        if (!is_paused(u->faction)) {
+        if (!IS_PAUSED(u->faction)) {
             dam = dice_rand(damage);
         }
         if (dam >= hp) {

@@ -66,6 +66,7 @@
 #include <stream.h>
 #include <strings.h>
 
+#include <gb_string.h>
 #include <stb_ds.h>
 
 /* libc includes */
@@ -582,7 +583,7 @@ static void spskill(struct skill* sv, const struct unit *u, const struct locale 
 
     if (sv->id == SK_MAGIC) {
         magic_t mtype = unit_get_magic(u);
-        if (mtype != M_GRAY) {
+        if (mtype != M_NONE && mtype != M_GRAY && mtype < MAXMAGIETYP) {
             sbs_strcat(sbp, magic_name(mtype, lang));
             sbs_strcat(sbp, " ");
         }
@@ -2046,26 +2047,25 @@ static void eval_order(struct opstack **stack, const void *userdata)
 void report_battle_start(battle * b)
 {
     bfaction *bf;
-    char zText[32 * MAXSIDES];
-    sbstring sbs;
 
     for (bf = b->factions; bf; bf = bf->next) {
         message *m;
         faction *f = bf->faction;
         const char *lastf = NULL;
         bool first = false;
-        side *s;
+        size_t si, sl = arrlen(b->sides);
+        gbString str = gb_make_string_length(NULL, 0);
 
-        sbs_init(&sbs, zText, sizeof(zText));
-        for (s = b->sides; s != b->sides + b->nsides; ++s) {
+        for (si = 0; si != sl; ++si) {
+            side* s = b->sides[si];
             fighter *df;
             for (df = s->fighters; df; df = df->next) {
                 if (is_attacker(df)) {
                     if (first) {
-                        sbs_strcat(&sbs, ", ");
+                        str = gb_append_string_length(str, ", ", 2);
                     }
                     if (lastf) {
-                        sbs_strcat(&sbs, lastf);
+                        str = gb_append_cstring(str, lastf);
                         first = true;
                     }
                     if (seematrix(f, s))
@@ -2078,14 +2078,15 @@ void report_battle_start(battle * b)
         }
         if (lastf) {
             if (first) {
-                sbs_strcat(&sbs, " ");
-                sbs_strcat(&sbs, LOC(f->locale, "and"));
-                sbs_strcat(&sbs, " ");
+                str = gb_append_string_length(str, " ", 1);
+                str = gb_append_cstring(str, LOC(f->locale, "and"));
+                str = gb_append_string_length(str, " ", 1);
             }
-            sbs_strcat(&sbs, lastf);
+            str = gb_append_cstring(str, lastf);
         }
 
-        m = msg_message("start_battle", "factions", zText);
+        m = msg_message("start_battle", "factions", str);
+        gb_free_string(str);
         battle_message_faction(b, f, m);
         msg_release(m);
     }

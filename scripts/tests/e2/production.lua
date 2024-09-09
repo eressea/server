@@ -216,3 +216,29 @@ function test_smithy_bonus_mixed()
 
     turn_end()
 end
+
+function test_produce_rusty_weapon()
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
+    local u = unit.create(f, r, 1)
+
+    u:set_skill('weaponsmithing', 5)
+    u:add_item('iron', 100)
+    u:set_orders("MACHE 1 Schartiges~Schwert")
+    turn_process()
+    assert_equal(0, u:get_item('rustysword'))
+    assert_equal(1, u.faction:count_msg_type("error_cannotmake"))
+end
+
+function test_produce_rusty_armor()
+    local r = region.create(0, 0, 'mountain')
+    local f = faction.create('human')
+    local u = unit.create(f, r, 1)
+
+    u:set_skill('armorer', 5)
+    u:add_item('iron', 100)
+    u:set_orders("MACHE 1 Rostiger~Plattenpanzer")
+    turn_process()
+    assert_equal(0, u:get_item('rustyplate'))
+    assert_equal(1, u.faction:count_msg_type("error_cannotmake"))
+end

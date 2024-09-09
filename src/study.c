@@ -165,13 +165,13 @@ static int produceexp_days(void) {
 
 static int study_days(unit * u, skill_t sk)
 {
-    int speed = STUDYDAYS;
+    int speed = SKILL_DAYS_PER_WEEK;
     if (u_race(u)->study_speed) {
         speed += u_race(u)->study_speed[sk];
-        if (speed < STUDYDAYS) {
+        if (speed < SKILL_DAYS_PER_WEEK) {
             skill *sv = unit_skill(u, sk);
             if (sv == NULL) {
-                speed = STUDYDAYS;
+                speed = SKILL_DAYS_PER_WEEK;
             }
         }
     }
@@ -207,7 +207,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             teach = (teaching_info *)a->data.v;
         }
         selist_push(&teach->teachers, teacher);
-        teach->days += students * STUDYDAYS;
+        teach->days += students * SKILL_DAYS_PER_WEEK;
         teach->students += students; 
 
         if (student->building) {
@@ -308,7 +308,7 @@ int teach_cmd(unit * teacher, struct order *ord)
                     /* Input ist nun von student->thisorder !! */
                     init_order(student->thisorder, student->faction->locale);
                     sk = getskill(student->faction->locale);
-                    if (sk != NOSKILL
+                    if (sk != NOSKILL && sk < MAXSKILLS
                         && effskill_study(teacher, sk) - TEACHDIFFERENCE >= effskill(student, sk, NULL)) {
                         teaching -= teach_unit(teacher, student, teaching, sk, true, &academy_students);
                     }
@@ -701,7 +701,7 @@ void inject_learn(learn_fun fun) {
 static void increase_skill_days(unit *u, skill_t sk, int days) {
     assert(sk >= 0 && sk < MAXSKILLS && days >= 0);
     if (days > 0) {
-        int leveldays = STUDYDAYS * u->number;
+        int leveldays = SKILL_DAYS_PER_WEEK * u->number;
         int weeks = 0;
         if (inject_learn_fun) {
             inject_learn_fun(u, sk, days);
@@ -735,12 +735,12 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
         skill *sv = unit_skill(u, sk);
         if (sv) {
             while (days > 0) {
-                if (days >= STUDYDAYS * u->number) {
+                if (days >= SKILL_DAYS_PER_WEEK * u->number) {
                     reduce_skill_weeks(u, sv, 1);
-                    days -= STUDYDAYS;
+                    days -= SKILL_DAYS_PER_WEEK;
                 }
                 else {
-                    if (chance(days / ((double)STUDYDAYS * u->number))) /* (rng_int() % (30 * u->number) < days)*/
+                    if (chance(days / ((double)SKILL_DAYS_PER_WEEK * u->number))) /* (rng_int() % (30 * u->number) < days)*/
                         reduce_skill_weeks(u, sv, 1);
                     days = 0;
                 }
@@ -750,7 +750,7 @@ static void reduce_skill_days(unit *u, skill_t sk, int days) {
 }
 
 /** 
- * days should be scaled by u->number; STUDYDAYS * u->number is one week worth of learning
+ * days should be scaled by u->number; SKILL_DAYS_PER_WEEK * u->number is one week worth of learning
  * @return int
  *   The additional spend, i.e. from an academy.
  */
@@ -802,7 +802,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
         if (get_effect(u, oldpotiontype[P_FOOL])) {
             int effect = get_effect(u, oldpotiontype[P_FOOL]);
             if (effect > u->number) effect = u->number;
-            days -= effect * STUDYDAYS;
+            days -= effect * SKILL_DAYS_PER_WEEK;
             change_effect(u, oldpotiontype[P_FOOL], -effect);
         }
     }
@@ -876,7 +876,7 @@ void demon_skillchange(unit *u)
                 }
             }
             else {
-                change_skill_days(u, sv->id, STUDYDAYS * u->number * weeks);
+                change_skill_days(u, sv->id, SKILL_DAYS_PER_WEEK * u->number * weeks);
             }
         }
         ++sv;

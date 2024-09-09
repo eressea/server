@@ -59,7 +59,7 @@ struct skill *test_set_skill(unit *u, enum skill_t sk, int level, int weeks)
     set_level(u, sk, level);
     sv = unit_skill(u, sk);
     if (weeks > 0) {
-        sv->weeks = weeks;
+        sv->days = weeks * SKILL_DAYS_PER_WEEK;
     }
     return sv;
 }
@@ -422,7 +422,9 @@ building_type * test_create_buildingtype(const char * name)
     if (btype->a_stages) {
         con = &btype->a_stages[0].construction;
     } else {
-        building_stage *stage = arraddnptr(btype->a_stages, 1);
+        building_stage *stage;
+        arrsetlen(btype->a_stages, 1);
+        stage = btype->a_stages;
         if (stage) {
             stage->name = NULL;
             con = &stage->construction;
@@ -467,15 +469,15 @@ building_type *test_create_castle(void) {
     }
 
     if (!btype->a_stages) {
-        building_stage *stages = arraddnptr(btype->a_stages, 7);
+        arrsetlen(btype->a_stages, 7);
         btype->flags |= BTF_FORTIFICATION;
-        init_stage(stages + 0, 1, 2, "site", rtype);
-        init_stage(stages + 1, 1, 8, "tradepost", rtype);
-        init_stage(stages + 2, 2, 40, "fortification", rtype);
-        init_stage(stages + 3, 3, 200, "tower", rtype);
-        init_stage(stages + 4, 4, 1000, "castle", rtype);
-        init_stage(stages + 5, 5, 5000, "fortress", rtype);
-        init_stage(stages + 6, 6, -1, "citadel", rtype);
+        init_stage(btype->a_stages, 1, 2, "site", rtype);
+        init_stage(btype->a_stages + 1, 1, 8, "tradepost", rtype);
+        init_stage(btype->a_stages + 2, 2, 40, "fortification", rtype);
+        init_stage(btype->a_stages + 3, 3, 200, "tower", rtype);
+        init_stage(btype->a_stages + 4, 4, 1000, "castle", rtype);
+        init_stage(btype->a_stages + 5, 5, 5000, "fortress", rtype);
+        init_stage(btype->a_stages + 6, 6, -1, "citadel", rtype);
     }
     return btype;
 }

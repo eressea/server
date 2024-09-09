@@ -316,7 +316,10 @@ static void read_skill(gamedata *data, skill *sv) {
         sv->old = sv->level = val;
         READ_INT(data->store, &val);
         assert(val < CHAR_MAX);
-        sv->weeks = val;
+        sv->days = val;
+        if (data->version < SKILL_DAYS_VERSION) {
+            sv->days *= SKILL_DAYS_PER_WEEK;
+        }
     }
 }
 
@@ -369,11 +372,11 @@ static void write_skills(gamedata *data, const unit *u) {
 #ifndef NDEBUG
         assert(SK_SKILL(sv) > sk);
         sk = SK_SKILL(sv);
-        assert(sv->weeks <= MAX_WEEKS_TO_NEXT_LEVEL(sv->level));
+        assert(sv->days <= MAX_DAYS_TO_NEXT_LEVEL(sv->level));
 #endif
         WRITE_INT(data->store, sv->id);
         WRITE_INT(data->store, sv->level);
-        WRITE_INT(data->store, sv->weeks);
+        WRITE_INT(data->store, sv->days);
     }
 }
 
@@ -386,13 +389,12 @@ unit *read_unit(gamedata *data)
     char obuf[DISPLAYSIZE];
     faction *f;
     char rname[32];
-    static const struct race *rc_demon, *rc_smurf, *rc_toad;
+    static const struct race *rc_demon, *rc_smurf;
     static int config;
 
     if (rc_changed(&config)) {
         rc_demon = get_race(RC_DAEMON);
         rc_smurf = rc_find("smurf");
-        rc_toad = rc_find("toad");
     }
 
     READ_INT(data->store, &n);
@@ -559,78 +561,13 @@ unit *read_unit(gamedata *data)
                 }
             }
         }
-        else {
-            if (data->version < FIX_SHAPESHIFT_SPELL_VERSION) {
-                if (u->irace) {
-                    /* Einheit ist rassengetarnt, aber hat sie einen changerace timer? */
-                    trigger** trigs = get_triggers(u->attribs, "timer");
-                    if (trigs) {
-                        trigger* t = *trigs;
-                        while (t != NULL) {
-                            if (t->type == &tt_changerace) {
-                                break;
-                            }
-                            t = t->next;
-                        }
-                        if (t == NULL) {
-                            u->irace = NULL;
-                        }
-                    }
-                    else {
-                        u->irace = NULL;
-                    }
-                }
-            }
-        }
-    }
-    if (data->version < FIX_SHAPESHIFT_IRACE_VERSION) {
-        if (u->attribs) {
-            /* bugfix 2991 */
-            trigger** tp = get_triggers(u->attribs, "timer");
-            if (tp) {
-                while (*tp) {
-                    trigger* tr = *tp;
-                    if (tr->type == &tt_timeout) {
-                        timeout_data* td = (timeout_data*)tr->data.v;
-                        trigger* t;
-                        for (t = td->triggers; t; t = t->next) {
-                            if (t->type == &tt_changerace) {
-                                changerace_data* crd = (changerace_data*)t->data.v;
-                                if (u->irace != NULL) {
-                                    /* Einheit ist getarnt, Effekt ist von Gestaltwandlung? */
-                                    assert(crd->race);
-                                    crd->race = NULL;
-                                }
-                                else {
-                                    /* is currently a toad or smurf */
-                                    assert(u->_race == rc_toad || u->_race == rc_smurf);
-                                    /* Previously had no stealth race or is a demon */
-                                    assert(crd->irace == NULL || crd->race == rc_demon);
-                                    continue;
-                                }
-                                log_error("%s, a %s was a %s disguised as %s",
-                                    unitname(u), u->_race->_name, crd->race ? crd->race->_name : "unknown", crd->irace ? crd->irace->_name : "unknown"
-                                );
-                            }
-                        }
-                    }
-                    tp = &tr->next;
-                }
-            }
-            else if (rc != rc_demon && u->irace) {
-                /* Gestaltwandlung, aber kein Timer */
-                log_error("%s was a %s disguised as %s without a timer",
-                    unitname(u), u->_race->_name, u->irace->_name);
-                u->irace = NULL;
-            }
-        }
-        if (rc_toad || rc_smurf) {
-            /* bugfix 2732 */
-            if (rc == rc_toad || rc == rc_smurf) {
-                trigger* t = get_timeout(u->attribs, "timer", &tt_changerace);
+        else if (data->version <= FIX_SHAPESHIFT_IRACE_VERSION) {
+            if (u->irace) {
+                /* Einheit ist rassengetarnt, aber hat sie einen changerace timer? */
+                trigger *t = get_change_race_trigger(u);
                 if (t == NULL) {
-                    log_error("%s was a forever-%s in a %s faction", unitname(u), u->_race->_name, u->faction->race->_name);
-                    restore_race(u, u->faction->race);
+                    log_error("%s was a %s disguised as %s", unitname(u), u->_race->_name, u->irace->_name);
+                    u->irace = NULL;
                 }
             }
         }
@@ -739,7 +676,6 @@ static void fix_resource_values(region* r)
 
 static void read_landregion(gamedata* data, region* r)
 {
-    char info[DISPLAYSIZE];
     char name[NAMESIZE];
     int n, i;
     r->land = calloc(1, sizeof(land_region));
@@ -752,9 +688,10 @@ static void read_landregion(gamedata* data, region* r)
     r->land->name = str_strdup(name);
 
     if (data->version >= LANDDISPLAY_VERSION) {
+        char info[DISPLAYSIZE];
         read_regioninfo(data, r, info, sizeof(info));
+        region_setinfo(r, info);
     }
-    region_setinfo(r, info);
     READ_INT(data->store, &i);
     if (i < 0) {
         log_error("number of trees in %s is %d.", regionname(r, NULL), i);

@@ -143,6 +143,28 @@ static void test_faction_password_bad(CuTest *tc) {
     test_teardown();
 }
 
+static void test_faction_password_missing(CuTest *tc) {
+    faction *f;
+    FILE *F;
+
+    test_setup();
+    mt_create_va(mt_new("wrongpasswd", NULL), "password:string", MT_NEW_END);
+
+    f = test_create_faction();
+    renumber_faction(f, 1);
+    CuAssertIntEquals(tc, 1, f->no);
+    faction_setpassword(f, "patzword");
+    f->lastorders = turn - 1;
+    F = tmpfile();
+    fprintf(F, "ERESSEA 1\n");
+    rewind(F);
+    CuAssertIntEquals(tc, 0, parseorders(F));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f->msgs, "wrongpasswd"));
+    CuAssertIntEquals(tc, turn - 1, f->lastorders);
+    fclose(F);
+    test_teardown();
+}
+
 static void test_faction_no_bad(CuTest *tc) {
     FILE *F;
 
@@ -164,6 +186,7 @@ CuSuite *get_orderfile_suite(void)
     SUITE_ADD_TEST(suite, test_no_foreign_unit_orders);
     SUITE_ADD_TEST(suite, test_faction_password_okay);
     SUITE_ADD_TEST(suite, test_faction_password_bad);
+    SUITE_ADD_TEST(suite, test_faction_password_missing);
     SUITE_ADD_TEST(suite, test_faction_no_bad);
 
     return suite;

@@ -496,7 +496,7 @@ void recruit(region * r)
     for (u = r->units; u; u = u->next) {
         order *ord;
 
-        if (is_paused(u->faction)) continue;
+        if (IS_PAUSED(u->faction)) continue;
 
         if ((rules_recruit & RECRUIT_MERGE) || u->number == 0) {
             for (ord = u->orders; ord; ord = ord->next) {

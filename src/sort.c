@@ -30,7 +30,7 @@ void do_sort(region *r)
     bool sorted = false;
     while (*up) {
         unit *u = *up;
-        if (!fval(u, UFL_MARK) && !is_paused(u->faction)) {
+        if (!fval(u, UFL_MARK) && !IS_PAUSED(u->faction)) {
             struct order *ord;
             for (ord = u->orders; ord; ord = ord->next) {
                 if (getkeyword(ord) == K_SORT) {
@@ -52,7 +52,7 @@ void do_sort(region *r)
                     else if (!v || v->region != r) {
                         cmistake(u, ord, 258, MSG_EVENT);
                     }
-                    else if (v->faction != u->faction && !is_paused(v->faction)) {
+                    else if (v->faction != u->faction && !IS_PAUSED(v->faction)) {
                         cmistake(u, ord, 258, MSG_EVENT);
                     }
                     else if (v->building != u->building || v->ship != u->ship) {
@@ -75,7 +75,7 @@ void do_sort(region *r)
                             break;
                         case P_BEFORE:
                             if (v->ship && ship_owner(v->ship) == v) {
-                                if (is_paused(v->faction)) {
+                                if (IS_PAUSED(v->faction)) {
                                     sort_before(v, up);
                                     ship_set_owner(u);
                                 }
@@ -85,7 +85,7 @@ void do_sort(region *r)
                                 }
                             }
                             else if (v->building && building_owner(v->building) == v) {
-                                if (is_paused(v->faction)) {
+                                if (IS_PAUSED(v->faction)) {
                                     sort_before(v, up);
                                     building_set_owner(u);
                                 }

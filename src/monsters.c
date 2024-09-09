@@ -18,6 +18,7 @@
 #include "kernel/equipment.h"
 #include "kernel/event.h"
 #include "kernel/faction.h"
+#include "kernel/group.h"
 #include "kernel/item.h"
 #include "kernel/messages.h"
 #include "kernel/order.h"
@@ -158,7 +159,7 @@ static order *monster_attack(unit * u, const unit * target)
     if (target->faction->flags & FFL_NPC) {
         return NULL;
     }
-    if (is_paused(target->faction)) {
+    if (IS_PAUSED(target->faction)) {
         return NULL;
     }
     if (!cansee(u->faction, u->region, target, 0)) {
@@ -181,7 +182,8 @@ bool join_monsters(unit *u, faction *monsters) {
     u_setfaction(u, monsters);
     u->status = ST_FIGHT;
     a_removeall(&u->attribs, &at_otherfaction);
-    u->flags &= ~UFL_ANON_FACTION;
+    set_group(u, NULL);
+    u->flags &= ~(UFL_NOAID | UFL_HERO | UFL_ANON_FACTION);
     u_seteffstealth(u, -1);
     u_freeorders(u);
     return true;
@@ -939,6 +941,7 @@ void spawn_dragons(void)
             || r->terrain == newterrain(T_DESERT))
             && rng_int() % spawn_chance < 6)
         {
+            message *msg;
             if (chance(0.80)) {
                 u = create_unit(r, monsters, nrand(60, 20) + 1, get_race(RC_FIREDRAGON), 0, NULL, NULL);
             }
@@ -956,8 +959,8 @@ void spawn_dragons(void)
             name_unit(u);
 
             /* add message to the region */
-            ADDMSG(&r->msgs,
-                msg_message("sighting", "region race number", r, u_race(u), u->number));
+            r_add_warning(r, msg = msg_message("sighting", "region race number", r, u_race(u), u->number));
+            msg_release(msg);
         }
     }
 }
@@ -1031,15 +1034,7 @@ void spawn_undead(void)
                 LOC(default_locale,
                 rc_name_s(u_race(u), (u->number == 1) ? NAME_SINGULAR : NAME_PLURAL)), regionname(r, NULL));
           msg = msg_message("undeadrise", "region", r);
-          add_message(&r->msgs, msg);
-          for (u = r->units; u; u = u->next)
-              freset(u->faction, FFL_SELECT);
-          for (u = r->units; u; u = u->next) {
-              if (fval(u->faction, FFL_SELECT))
-                  continue;
-              fset(u->faction, FFL_SELECT);
-              add_message(&u->faction->msgs, msg);
-          }
+          r_add_warning(r, msg);
           msg_release(msg);
         }
         else {
