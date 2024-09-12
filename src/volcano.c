@@ -156,25 +156,25 @@ static region *rrandneighbour(region * r)
 static void
 volcano_destruction(region * volcano, region * r, const char *damage)
 {
-    attrib *a;
     unit **up;
     int percent = 25, time = 6 + rng_int() % 12;
 
-    rsettrees(r, 2, 0);
-    rsettrees(r, 1, 0);
-    rsettrees(r, 0, 0);
-
-    a = a_find(r->attribs, &at_reduceproduction);
-    if (!a) {
-        a = a_add(&r->attribs, make_reduceproduction(percent, time));
+    if (r->land) {
+        attrib *a;
+        a = a_find(r->attribs, &at_reduceproduction);
+        if (!a) {
+            a = a_add(&r->attribs, make_reduceproduction(percent, time));
+        }
+        else {
+            /* Produktion vierteln ... */
+            a->data.sa[0] = (short)percent;
+            /* Fuer 6-17 Runden */
+            a->data.sa[1] = (short)(a->data.sa[1] + time);
+        }
+        rsettrees(r, 2, 0);
+        rsettrees(r, 1, 0);
+        rsettrees(r, 0, 0);
     }
-    else {
-        /* Produktion vierteln ... */
-        a->data.sa[0] = (short)percent;
-        /* Fuer 6-17 Runden */
-        a->data.sa[1] = (short)(a->data.sa[1] + time);
-    }
-
     /* Personen bekommen 4W10 Punkte Schaden. */
 
     for (up = &r->units; *up;) {
