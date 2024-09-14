@@ -1739,9 +1739,8 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-static bool can_rename_building(unit *u, building *b, order *ord) {
+static bool can_rename_building(unit *u, building *b, order *ord, bool foreign) {
     unit *owner = b ? building_owner(b) : NULL;
-    bool foreign = !(owner && owner->faction == u->faction);
 
     if (!b) {
         cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
@@ -1754,16 +1753,19 @@ static bool can_rename_building(unit *u, building *b, order *ord) {
     }
 
     if (foreign) {
+        message *seen;
         if (renamed_building(b)) {
             cmistake(u, ord, 246, MSG_EVENT);
             return false;
         }
 
-        if (owner) {
+        seen = msg_message("renamed_building_seen",
+            "building renamer region", b, u, u->region);
+        add_message(&u->faction->msgs, seen);
+
+        if (owner && owner->faction != u->faction) {
             if (cansee(owner->faction, u->region, u, 0)) {
-                ADDMSG(&owner->faction->msgs,
-                    msg_message("renamed_building_seen",
-                        "building renamer region", b, u, u->region));
+                add_message(&owner->faction->msgs, seen);
             }
             else {
                 ADDMSG(&owner->faction->msgs,
@@ -1771,8 +1773,9 @@ static bool can_rename_building(unit *u, building *b, order *ord) {
                         "building region", b, u->region));
             }
         }
+        msg_release(seen);
     }
-    if (owner && owner->faction != u->faction) {
+    else if (owner && owner->faction != u->faction) {
         cmistake(u, ord, 148, MSG_PRODUCE);
         return false;
     }
@@ -1814,8 +1817,12 @@ int name_cmd(struct unit *u, struct order *ord)
     case P_GEBAEUDE:
         if (foreign) {
             b = getbuilding(u->region);
+            if (!b) {
+                cmistake(u, ord, 31, MSG_EVENT);
+                break;
+            }
         }
-        if (can_rename_building(u, b, ord)) {
+        if (can_rename_building(u, b, ord, foreign)) {
             s = &b->name;
         }
         break;
