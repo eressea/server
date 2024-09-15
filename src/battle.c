@@ -3606,6 +3606,25 @@ static int battle_report(battle * b)
     return cont;
 }
 
+static void join_ally(battle *b, const side *s, unit *u, fighter **cp)
+{
+    size_t si, num_sides;
+    if (*cp == NULL) {
+        if (!join_battle(b, u, false, cp)) {
+            return;
+        }
+    }
+
+    num_sides = arrlen(b->sides);
+    /* the enemy of my friend is my enemy: */
+    for (si = 0; si != num_sides; ++si) {
+        side *se = b->sides[si];
+        if (se->bf->faction != u->faction && enemy(s, se)) {
+            set_enemy(se, (*cp)->side, false);
+        }
+    }
+}
+
 static void join_allies(battle * b)
 {
     region *r = b->region;
@@ -3656,24 +3675,9 @@ static void join_allies(battle * b)
                     if (alliedunit(u, se->bf->faction, HELP_FIGHT) && !se->bf->attacker) {
                         continue;
                     }
-                    if (enemy(s, se))
-                        break;
-                }
-                if (sei != num_sides)
-                    continue;
-                /* keine Einwaende, also soll er mitmachen: */
-                if (c == NULL) {
-                    if (!join_battle(b, u, false, &c)) {
-                        continue;
-                    }
-                    num_sides = arrlen(b->sides);
-                }
-
-                /* the enemy of my friend is my enemy: */
-                for (sei = 0; sei != num_sides; ++sei) {
-                    side* se = b->sides[sei];
-                    if (se->bf->faction != u->faction && enemy(s, se)) {
-                        set_enemy(se, c->side, false);
+                    if (enemy(s, se)) {
+                        /* keine Einwaende, also soll er mitmachen: */
+                        join_ally(b, s, u, &c);
                     }
                 }
             }

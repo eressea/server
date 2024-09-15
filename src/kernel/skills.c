@@ -216,6 +216,7 @@ int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add)
         }
         rd -= days;
     }
+    assert(rd > 0);
     result->days = rd;
     return result->level;
 }
