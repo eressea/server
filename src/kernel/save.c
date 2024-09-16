@@ -315,7 +315,6 @@ static void read_skill(gamedata *data, skill *sv) {
         assert(val < CHAR_MAX);
         sv->old = sv->level = val;
         READ_INT(data->store, &val);
-        assert(val < CHAR_MAX);
         sv->days = val;
         if (data->version < SKILL_DAYS_VERSION) {
             /** fix for bug 3041 */
@@ -324,6 +323,9 @@ static void read_skill(gamedata *data, skill *sv) {
                 sv->days = sv->level + 1;
             }
             sv->days *= SKILL_DAYS_PER_WEEK;
+        }
+        else {
+            assert(val > 0);
         }
     }
 }
