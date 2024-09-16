@@ -239,6 +239,7 @@ void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 bool is_attacker(const fighter* fig);
 struct battle* make_battle(struct region* r);
 bool start_battle(struct region* r, struct battle** bp);
+void join_allies(struct battle *b);
 void free_battle(struct battle* b);
 void init_tactics(struct battle* b);
 struct fighter* make_fighter(struct battle* b, struct unit* u,
