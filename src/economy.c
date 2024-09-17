@@ -117,21 +117,6 @@ int income(const unit * u)
     return rc->income * u->number;
 }
 
-static void scramble(void *data, unsigned int n, size_t width)
-{
-    unsigned int j;
-    char temp[64];
-    assert(width <= sizeof(temp));
-    for (j = 0; j != n; ++j) {
-        unsigned int k = rng_uint() % n;
-        if (k != j) {
-            memcpy(temp, (char*)data + j * width, width);
-            memcpy((char*)data + j * width, (char*)data + k * width, width);
-            memcpy((char*)data + k * width, temp, width);
-        }
-    }
-}
-
 int expand_production(region * r, econ_request * requests, econ_request ***results)
 {
     unit *u;
@@ -166,7 +151,7 @@ int expand_production(region * r, econ_request * requests, econ_request ***resul
                 }
             }
         }
-        scramble(split, norders, sizeof(econ_request *));
+        scramble_array(split, norders, sizeof(econ_request *));
         *results = split;
     }
     else {

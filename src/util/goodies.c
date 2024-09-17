@@ -1,6 +1,8 @@
 #include "goodies.h"
+#include "rng.h"
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,3 +105,19 @@ int check_email(const char *newmail)
     }
     return 0;
 }
+
+void scramble_array(void *data, size_t n, size_t width)
+{
+    size_t j;
+    char temp[64];
+    assert(width <= sizeof(temp));
+    for (j = 0; j != n; ++j) {
+        unsigned int k = rng_uint() % n;
+        if (k != j) {
+            memcpy(temp, (char *)data + j * width, width);
+            memcpy((char *)data + j * width, (char *)data + k * width, width);
+            memcpy((char *)data + k * width, temp, width);
+        }
+    }
+}
+

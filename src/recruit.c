@@ -512,6 +512,7 @@ void recruit(region * r)
     }
 
     if (recruitorders) {
+        scramble_array(recruitorders, arrlen(recruitorders), sizeof(recruit_request *));
         expandrecruit(r, recruitorders);
         free_requests(recruitorders);
     }

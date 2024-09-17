@@ -1283,6 +1283,7 @@ static void test_join_allies(CuTest *tc) {
     battle *b = NULL;
     unit *u1, *u2, *u3;
     region *r;
+    fighter *fig;
 
     test_setup();
     r = test_create_plain(0, 0);
@@ -1294,11 +1295,16 @@ static void test_join_allies(CuTest *tc) {
     unit_setstatus(u3, ST_FIGHT);
     unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
     CuAssertTrue(tc, start_battle(r, &b));
-    CuAssertPtrNotNull(tc, test_find_fighter(b, u1));
-    CuAssertPtrNotNull(tc, test_find_fighter(b, u2));
+    CuAssertPtrNotNull(tc, fig = test_find_fighter(b, u1));
+    CuAssertIntEquals(tc, FIG_ATTACKER, fig->flags & FIG_ATTACKER);
+    CuAssertIntEquals(tc, u1->number, fig->alive);
+    CuAssertPtrNotNull(tc, fig = test_find_fighter(b, u2));
+    CuAssertIntEquals(tc, 0, fig->flags & FIG_ATTACKER);
+    CuAssertIntEquals(tc, u2->number, fig->alive);
     CuAssertPtrEquals(tc, NULL, test_find_fighter(b, u3));
     join_allies(b);
-    CuAssertPtrNotNull(tc, test_find_fighter(b, u3));
+    CuAssertPtrNotNull(tc, fig = test_find_fighter(b, u3));
+    CuAssertIntEquals(tc, 0, fig->flags & FIG_ATTACKER);
 
     free_battle(b);
     test_teardown();
