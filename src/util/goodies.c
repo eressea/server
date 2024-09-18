@@ -106,17 +106,20 @@ int check_email(const char *newmail)
     return 0;
 }
 
+/**
+ * Fisher–Yates shuffle (Knuthy, TAOCP, Algorithm P)
+ */
 void scramble_array(void *data, size_t n, size_t width)
 {
-    size_t j;
+    size_t i;
     char temp[64];
     assert(width <= sizeof(temp));
-    for (j = 0; j != n; ++j) {
-        unsigned int k = rng_uint() % n;
-        if (k != j) {
-            memcpy(temp, (char *)data + j * width, width);
-            memcpy((char *)data + j * width, (char *)data + k * width, width);
-            memcpy((char *)data + k * width, temp, width);
+    for (i = 0; i != n; ++i) {
+        size_t j = i + rng_uint() % (n - i);
+        if (i != j) {
+            memcpy(temp, (char *)data + i * width, width);
+            memcpy((char *)data + i * width, (char *)data + j * width, width);
+            memcpy((char *)data + j * width, temp, width);
         }
     }
 }
