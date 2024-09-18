@@ -107,7 +107,7 @@ int check_email(const char *newmail)
 }
 
 /**
- * Fisher–Yates shuffle (Knuthy, TAOCP, Algorithm P)
+ * Fisher–Yates shuffle (Knuth, TAOCP, Algorithm P)
  */
 void scramble_array(void *data, size_t n, size_t width)
 {
