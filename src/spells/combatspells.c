@@ -2,7 +2,11 @@
 
 #include <spells/buildingcurse.h>
 
- /* kernel includes */
+#include <guard.h>
+#include <battle.h>
+#include <move.h>
+
+/* kernel includes */
 #include <kernel/build.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -17,13 +21,10 @@
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
-#include <guard.h>
-#include <battle.h>
-#include <move.h>
-
 /* util includes */
 #include <kernel/attrib.h>
 #include <util/base36.h>
+#include <util/goodies.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/message.h>
@@ -1369,13 +1370,13 @@ int sp_keeploot(struct castorder * co)
     return level;
 }
 
-static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
+static int heal_fighters(fighter ** arr, int *power, bool heal_monsters)
 {
-    int healhp = *power, healed = 0, qi;
-    selist *ql;
+    int healhp = *power, healed = 0;
+    size_t qi, ql = arrlen(arr);
 
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)selist_get(ql, qi);
+    for (qi = 0; qi != ql; ++qi) {
+        fighter *df = arr[qi];
         if (healhp <= 0)
             break;
 
@@ -1421,13 +1422,12 @@ static int heal_fighters(selist * fgs, int *power, bool heal_monsters)
 
 int sp_healing(struct castorder * co)
 {
-    fighter * fi = co->magician.fig;
+    fighter ** arr, * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
     int healhp = (int)power * 200;
-    selist *fgs;
     message *msg;
     bool use_item = has_ao_healing(mage);
     int j = 0;
@@ -1442,12 +1442,12 @@ int sp_healing(struct castorder * co)
     /* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
      * bis zu verteilende HP aufgebraucht sind */
 
-    fgs = fighter_list(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
-    if (fgs) {
-        scramble_fighters(fgs);
-        j += heal_fighters(fgs, &healhp, false);
-        j += heal_fighters(fgs, &healhp, true);
-        selist_free(fgs);
+    arr = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
+    if (arr) {
+        scramble_array(arr, arrlen(arr), sizeof(fighter *));
+        j += heal_fighters(arr, &healhp, false);
+        j += heal_fighters(arr, &healhp, true);
+        arrfree(arr);
         if (j <= 0) {
             level = j;
         }
