@@ -762,16 +762,15 @@ static bool select_alive(const side *vs, const fighter *fig, void *cbdata)
  */
 int sp_chaosrow(struct castorder * co)
 {
-    fighter * fi = co->magician.fig;
+    fighter ** arr, * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    selist *fgs, *ql;
     message *m;
     const char *mtype;
-    int qi, k = 0;
+    int k = 0;
     bool chaosrow = sp && (strcmp(sp->sname, "chaosrow") == 0);
 
     if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
@@ -783,55 +782,55 @@ int sp_chaosrow(struct castorder * co)
 
     power = chaosrow ? (power * 40) : get_force(power, 5);
 
-    fgs = select_fighter_list(b, fi->side, FS_ENEMY, select_alive, NULL);
-    scramble_fighter_list(fgs);
+    arr = select_fighters(b, fi->side, FS_ENEMY, select_alive, NULL);
+    if (arr) {
+        size_t qi, ql = arrlen(arr);
+        scramble_fighters(arr, ql);
 
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)selist_get(ql, qi);
-        int n = df->unit->number;
+        for (qi = 0; power > .0 && qi != ql; ++qi) {
+            fighter *df = arr[qi];
+            int n = df->unit->number;
 
-        if (df->alive == 0)
-            continue;
-        if (power <= 0.0)
-            break;
+            if (df->alive == 0)
+                continue;
 
-        if (is_magic_resistant(mage, df->unit, 0))
-            continue;
+            if (is_magic_resistant(mage, df->unit, 0))
+                continue;
 
-        if (chance(power / n)) {
-            int row = statusrow(df->status);
-            df->side->size[row] -= df->alive;
-            if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
-                df->side->nonblockers[row] -= df->alive;
+            if (chance(power / n)) {
+                int row = statusrow(df->status);
+                df->side->size[row] -= df->alive;
+                if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
+                    df->side->nonblockers[row] -= df->alive;
+                }
+                row = FIRST_ROW + (rng_int() % (NUMROWS - FIRST_ROW));
+                switch (row) {
+                case FIGHT_ROW:
+                    df->status = ST_FIGHT;
+                    break;
+                case BEHIND_ROW:
+                    df->status = ST_CHICKEN;
+                    break;
+                case AVOID_ROW:
+                    df->status = ST_AVOID;
+                    break;
+                case FLEE_ROW:
+                    df->status = ST_FLEE;
+                    break;
+                default:
+                    assert(!"unknown combatrow");
+                }
+                assert(statusrow(df->status) == row);
+                df->side->size[row] += df->alive;
+                if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
+                    df->side->nonblockers[row] += df->alive;
+                }
+                k += df->alive;
             }
-            row = FIRST_ROW + (rng_int() % (NUMROWS - FIRST_ROW));
-            switch (row) {
-            case FIGHT_ROW:
-                df->status = ST_FIGHT;
-                break;
-            case BEHIND_ROW:
-                df->status = ST_CHICKEN;
-                break;
-            case AVOID_ROW:
-                df->status = ST_AVOID;
-                break;
-            case FLEE_ROW:
-                df->status = ST_FLEE;
-                break;
-            default:
-                assert(!"unknown combatrow");
-            }
-            assert(statusrow(df->status) == row);
-            df->side->size[row] += df->alive;
-            if (u_race(df->unit)->battle_flags & BF_NOBLOCK) {
-                df->side->nonblockers[row] += df->alive;
-            }
-            k += df->alive;
+            power = fmax(0, power - n);
         }
-        power = fmax(0, power - n);
+        arrfree(arr);
     }
-    selist_free(fgs);
-
     if (chaosrow) {
         mtype = (k > 0) ? "chaosrow_effect_1" : "chaosrow_effect_0";
     }
