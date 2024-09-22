@@ -247,9 +247,9 @@ static void scramble_fighter_list(selist * ql)
     }
 }
 
-static void scramble_fighters(fighter **arr)
+static void scramble_fighters(fighter **arr, size_t len)
 {
-    scramble_array(arr, arrlen(arr), sizeof(fighter *));
+    scramble_array(arr, len, sizeof(fighter *));
 }
 
 
@@ -267,13 +267,12 @@ static bool select_armed(const side *vs, const fighter *fig, void *cbdata)
 /* Rosthauch */
 int sp_combatrosthauch(struct castorder * co)
 {
-    fighter * fi = co->magician.fig;
+    fighter ** arr, * fi = co->magician.fig;
     int level = co->level;
     double power = co->force;
     battle *b = fi->side->battle;
-    selist *ql, *fgs;
     int force = lovar(power * 15);
-    int qi, k = 0;
+    int k = 0;
 
     if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1,
         SELECT_ADVANCE | SELECT_FIND)) {
@@ -283,52 +282,55 @@ int sp_combatrosthauch(struct castorder * co)
         return 0;
     }
 
-    fgs = select_fighter_list(b, fi->side, FS_ENEMY, select_armed, NULL);
-    scramble_fighter_list(fgs);
+    arr = select_fighters(b, fi->side, FS_ENEMY, select_armed, NULL);
+    if (arr) {
+        size_t qi, ql = arrlen(arr);
+        scramble_fighters(arr, ql);
 
-    for (qi = 0, ql = fgs; force>0 && ql; selist_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)selist_get(ql, qi);
-        unsigned int w;
-        size_t len = arrlen(df->weapons);
+        for (qi = 0; force > 0 && qi != ql; ++qi) {
+            fighter *df = arr[qi];
+            unsigned int w;
+            size_t len = arrlen(df->weapons);
 
-        for (w = 0; w != len; ++w) {
-            weapon *wp = df->weapons + w;
-            if (df->unit->items && force > 0) {
-                const item_type *itype = wp->item.type;
-                item ** itp = i_find(&df->unit->items, itype);
-                if (*itp) {
-                    item *it = *itp;
-                    requirement *mat = itype->construction->materials;
-                    int n = force;
-                    if (it->number < n) n = it->number;
+            for (w = 0; w != len; ++w) {
+                weapon *wp = df->weapons + w;
+                if (df->unit->items && force > 0) {
+                    const item_type *itype = wp->item.type;
+                    item **itp = i_find(&df->unit->items, itype);
+                    if (*itp) {
+                        item *it = *itp;
+                        requirement *mat = itype->construction->materials;
+                        int n = force;
+                        if (it->number < n) n = it->number;
 
-                    while (mat && mat->number > 0) {
-                        if (mat->rtype == get_resourcetype(R_IRON)) {
-                            int p;
-                            force -= n;
-                            k += n;
-                            i_change(itp, itype, -n);
-                            for (p = 0; n && p != df->unit->number; ++p) {
-                                if (df->person[p].melee == wp) {
-                                    df->person[p].melee = NULL;
-                                    --n;
+                        while (mat && mat->number > 0) {
+                            if (mat->rtype == get_resourcetype(R_IRON)) {
+                                int p;
+                                force -= n;
+                                k += n;
+                                i_change(itp, itype, -n);
+                                for (p = 0; n && p != df->unit->number; ++p) {
+                                    if (df->person[p].melee == wp) {
+                                        df->person[p].melee = NULL;
+                                        --n;
+                                    }
                                 }
-                            }
-                            for (p = 0; n && p != df->unit->number; ++p) {
-                                if (df->person[p].missile == wp) {
-                                    df->person[p].missile = NULL;
-                                    --n;
+                                for (p = 0; n && p != df->unit->number; ++p) {
+                                    if (df->person[p].missile == wp) {
+                                        df->person[p].missile = NULL;
+                                        --n;
+                                    }
                                 }
+                                break;
                             }
-                            break;
+                            mat++;
                         }
-                        mat++;
                     }
                 }
             }
         }
+        arrfree(arr);
     }
-    selist_free(fgs);
 
     if (k == 0) {
         /* keine Waffen mehr da, die zerstoert werden koennten */
@@ -1450,7 +1452,7 @@ int sp_healing(struct castorder * co)
 
     arr = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
     if (arr) {
-        scramble_fighters(arr);
+        scramble_fighters(arr, arrlen(arr));
         j += heal_fighters(arr, &healhp, false);
         j += heal_fighters(arr, &healhp, true);
         arrfree(arr);
@@ -1502,7 +1504,7 @@ int sp_undeadhero(struct castorder * co)
     arr = select_fighters(b, fi->side, FS_ENEMY | FS_HELP, select_hero, NULL);
     if (arr) {
         size_t qi, ql = arrlen(arr);
-        scramble_fighters(arr);
+        scramble_fighters(arr, ql);
 
         for (qi = 0; qi != ql && force > 0; ++qi) {
             fighter *df = arr[qi];

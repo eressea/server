@@ -1592,6 +1592,7 @@ fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, vo
         int qi, i = 0;
         selist *ql;
         arrsetlen(arr, selist_length(fgs));
+        assert(arr);
         for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
             fighter *df = (fighter *)selist_get(ql, qi);
             arr[i++] = df;
