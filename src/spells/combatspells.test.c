@@ -41,7 +41,7 @@ static void test_immolation(CuTest *tc)
     test_create_castorder(&co, au, 10, 10.0, 0, NULL);
     co.magician.fig = af;
 
-    CuAssertIntEquals(tc, 10, sp_immolation(&co));
+    CuAssertIntEquals(tc, co.level, sp_immolation(&co));
     // up to 2d4 lost (we injected 4)
     CuAssertIntEquals(tc, du->hp - 8, df->person[0].hp);
     CuAssertIntEquals(tc, au->hp, af->person[0].hp);
@@ -80,7 +80,7 @@ static void test_healing(CuTest *tc)
     uf->person[0].hp = 1;
     df->person[0].hp = 1;
     af->person[0].hp = 1;
-    CuAssertIntEquals(tc, 10, sp_healing(&co));
+    CuAssertIntEquals(tc, co.level, sp_healing(&co));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->battles->msgs, "healing_effect_0"));
     CuAssertPtrNotNull(tc, test_find_messagetype(au->faction->battles->msgs, "healing_effect_0"));
     CuAssertPtrNotNull(tc, test_find_messagetype(du->faction->battles->msgs, "healing_effect_0"));
@@ -90,12 +90,53 @@ static void test_healing(CuTest *tc)
     test_teardown();
 }
 
+static void test_undeadhero(CuTest *tc)
+{
+    castorder co;
+    unit *du, *au, * u;
+    region *r;
+    battle *b;
+    side *ds, *as;
+    struct race *rc;
+    fighter *df, *af;
+
+    test_setup();
+    rc = test_create_race("undead");
+    random_source_inject_constant(1.0);
+    r = test_create_plain(0, 0);
+    du = test_create_unit(test_create_faction(), r);
+    unit_setstatus(du, ST_FIGHT);
+    scale_number(du, 50);
+    au = test_create_unit(test_create_faction(), r);
+    unit_setstatus(au, ST_BEHIND);
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+    test_create_castorder(&co, au, 9, 10.0, 0, NULL); /* force 10 = 40 undead */
+    co.magician.fig = af;
+
+    df->alive = 5; // max 45 undead
+    df->side->casualties = du->number - df->alive;
+    CuAssertIntEquals(tc, co.level, sp_undeadhero(&co));
+    CuAssertPtrNotNull(tc, u = au->next);
+    CuAssertPtrNotNull(tc, test_find_messagetype(au->faction->battles->msgs, "summonundead_effect_1"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(du->faction->battles->msgs, "summonundead_effect_1"));
+    CuAssertIntEquals(tc, 40, u->number);
+    CuAssertIntEquals(tc, 5, df->side->casualties);
+    CuAssertPtrEquals(tc, rc, (struct race *)u_race(u));
+    test_teardown();
+}
+
 CuSuite *get_combatspells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
 
     SUITE_ADD_TEST(suite, test_immolation);
     SUITE_ADD_TEST(suite, test_healing);
+    SUITE_ADD_TEST(suite, test_undeadhero);
 
     return suite;
 }
