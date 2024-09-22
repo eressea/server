@@ -772,7 +772,7 @@ int sp_chaosrow(struct castorder * co)
     message *m;
     const char *mtype;
     int qi, k = 0;
-    bool chaosrow = strcmp(sp->sname, "chaosrow") == 0;
+    bool chaosrow = sp && (strcmp(sp->sname, "chaosrow") == 0);
 
     if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);

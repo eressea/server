@@ -130,6 +130,36 @@ static void test_undeadhero(CuTest *tc)
     test_teardown();
 }
 
+static void test_confusion(CuTest *tc)
+{
+    castorder co;
+    unit *du, *au;
+    region *r;
+    battle *b;
+    side *ds, *as;
+    fighter *df, *af;
+
+    test_setup();
+    random_source_inject_constants(.0, 1);
+    r = test_create_plain(0, 0);
+    du = test_create_unit(test_create_faction(), r);
+    au = test_create_unit(test_create_faction(), r);
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+    test_create_castorder(&co, au, 9, 10.0, 0, NULL);
+    co.magician.fig = af;
+
+    CuAssertIntEquals(tc, co.level, sp_chaosrow(&co));
+    CuAssertPtrNotNull(tc, test_find_messagetype(au->faction->battles->msgs, "confusion_effect_1"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(du->faction->battles->msgs, "confusion_effect_1"));
+    CuAssertIntEquals(tc, ST_CHICKEN, df->status);
+    test_teardown();
+}
+
 CuSuite *get_combatspells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -137,6 +167,7 @@ CuSuite *get_combatspells_suite(void)
     SUITE_ADD_TEST(suite, test_immolation);
     SUITE_ADD_TEST(suite, test_healing);
     SUITE_ADD_TEST(suite, test_undeadhero);
+    SUITE_ADD_TEST(suite, test_confusion);
 
     return suite;
 }
