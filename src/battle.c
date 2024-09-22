@@ -1584,7 +1584,25 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
     return dt;
 }
 
-selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
+fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, void *cbdata)
+{
+    selist *fgs = select_fighter_list(b, vs, mask, cb, cbdata);
+    if (fgs) {
+        fighter **arr = NULL;
+        int qi, i = 0;
+        selist *ql;
+        arrsetlen(arr, selist_length(fgs));
+        for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
+            fighter *df = (fighter *)selist_get(ql, qi);
+            arr[i] = df;
+        }
+        selist_free(fgs);
+        return arr;
+    }
+    return NULL;
+}
+
+selist *select_fighter_list(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
 {
     selist *fightervp = NULL;
     size_t si, sl = arrlen(b->sides);
@@ -1609,7 +1627,7 @@ selist *select_fighters(battle * b, const side * vs, int mask, select_fun cb, vo
             assert(mask == (FS_HELP | FS_ENEMY) || !"invalid alliance state");
         }
         for (fig = s->fighters; fig; fig = fig->next) {
-            if (cb(vs, fig, cbdata)) {
+            if (cb == NULL || cb(vs, fig, cbdata)) {
                 selist_push(&fightervp, fig);
             }
         }
@@ -1630,10 +1648,16 @@ static bool select_row(const side *vs, const fighter *fig, void *cbdata)
     return (row >= sel->minrow && row <= sel->maxrow);
 }
 
-selist *fighters(battle * b, const side * vs, int minrow, int maxrow, int mask)
+fighter **fighters(battle *b, const side *vs, int minrow, int maxrow, int mask)
 {
     struct selector sel = { .maxrow = maxrow, .minrow = minrow };
     return select_fighters(b, vs, mask, select_row, &sel);
+}
+
+selist *fighter_list(battle *b, const side *vs, int minrow, int maxrow, int mask)
+{
+    struct selector sel = { .maxrow = maxrow, .minrow = minrow };
+    return select_fighter_list(b, vs, mask, select_row, &sel);
 }
 
 static void report_failed_spell(struct battle * b, struct unit * mage, const struct spell *sp)

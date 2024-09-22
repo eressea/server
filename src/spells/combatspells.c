@@ -276,7 +276,7 @@ int sp_combatrosthauch(struct castorder * co)
         return 0;
     }
 
-    fgs = select_fighters(b, fi->side, FS_ENEMY, select_armed, NULL);
+    fgs = select_fighter_list(b, fi->side, FS_ENEMY, select_armed, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; force>0 && ql; selist_advance(&ql, &qi, 1)) {
@@ -583,9 +583,9 @@ int sp_immolation(struct castorder * co)
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     troop at;
-    int force, qi, killed = 0;
+    int force, killed = 0;
     const char *damage;
-    selist *fgs, *ql;
+    fighter **fgs;
     message *m;
 
     /* 2d4 HP */
@@ -604,22 +604,25 @@ int sp_immolation(struct castorder * co)
     at.index = 0;
 
     fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_ENEMY);
-    for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)selist_get(ql, qi);
-        int n = df->alive - df->removed;
-        troop dt;
+    if (fgs) {
+        size_t qi, ql = arrlen(fgs);
+        for (qi = 0; qi != ql; ++qi) {
+            fighter *df = fgs[qi];
+            int n = df->alive - df->removed;
+            troop dt;
 
-        dt.fighter = df;
-        while (n != 0) {
-            dt.index = --n;
-            killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-            if (--force == 0)
+            dt.fighter = df;
+            while (n != 0) {
+                dt.index = --n;
+                killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+                if (--force == 0)
+                    break;
+            }
+            if (force == 0)
                 break;
         }
-        if (force == 0)
-            break;
+        arrfree(fgs);
     }
-    selist_free(fgs);
 
     m =
         msg_message("cast_combatspell", "mage spell killed", fi->unit, sp,
@@ -771,7 +774,7 @@ int sp_chaosrow(struct castorder * co)
 
     power = chaosrow ? (power * 40) : get_force(power, 5);
 
-    fgs = select_fighters(b, fi->side, FS_ENEMY, select_alive, NULL);
+    fgs = select_fighter_list(b, fi->side, FS_ENEMY, select_alive, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
@@ -865,7 +868,7 @@ int flee_spell(struct castorder * co, int strength)
         return 0;
     }
 
-    fgs = select_fighters(b, fi->side, FS_ENEMY, (co->sp->sptyp & PRECOMBATSPELL) ? select_afraid : select_alive, NULL);
+    fgs = select_fighter_list(b, fi->side, FS_ENEMY, (co->sp->sptyp & PRECOMBATSPELL) ? select_afraid : select_alive, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; force > 0 && ql; selist_advance(&ql, &qi, 1)) {
@@ -1439,7 +1442,7 @@ int sp_healing(struct castorder * co)
     /* gehe alle denen wir helfen der reihe nach durch, heile verwundete,
      * bis zu verteilende HP aufgebraucht sind */
 
-    fgs = fighters(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
+    fgs = fighter_list(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
     scramble_fighters(fgs);
     j += heal_fighters(fgs, &healhp, false);
     j += heal_fighters(fgs, &healhp, true);
@@ -1490,7 +1493,7 @@ int sp_undeadhero(struct castorder * co)
     double c = 0.50 + 0.02 * power;
 
     /* Liste aus allen Kaempfern */
-    fgs = select_fighters(b, fi->side, FS_ENEMY | FS_HELP, select_hero, NULL);
+    fgs = select_fighter_list(b, fi->side, FS_ENEMY | FS_HELP, select_hero, NULL);
     scramble_fighters(fgs);
 
     for (qi = 0, ql = fgs; ql && force>0; selist_advance(&ql, &qi, 1)) {
