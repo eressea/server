@@ -1426,11 +1426,11 @@ int sp_healing(struct castorder * co)
     double power = co->force;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    int j = 0;
     int healhp = (int)power * 200;
     selist *fgs;
     message *msg;
     bool use_item = has_ao_healing(mage);
+    int j = 0;
 
     /* bis zu 11 Personen pro Stufe (einen HP muessen sie ja noch
      * haben, sonst waeren sie tot) koennen geheilt werden */
@@ -1443,13 +1443,14 @@ int sp_healing(struct castorder * co)
      * bis zu verteilende HP aufgebraucht sind */
 
     fgs = fighter_list(b, fi->side, FIGHT_ROW, AVOID_ROW, FS_HELP);
-    scramble_fighters(fgs);
-    j += heal_fighters(fgs, &healhp, false);
-    j += heal_fighters(fgs, &healhp, true);
-    selist_free(fgs);
-
-    if (j <= 0) {
-        level = j;
+    if (fgs) {
+        scramble_fighters(fgs);
+        j += heal_fighters(fgs, &healhp, false);
+        j += heal_fighters(fgs, &healhp, true);
+        selist_free(fgs);
+        if (j <= 0) {
+            level = j;
+        }
     }
     if (use_item) {
         msg =
