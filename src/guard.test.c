@@ -248,6 +248,35 @@ static void test_guard_on(CuTest * tc)
     test_teardown();
 }
 
+static void test_guard_checks_allowed_weapon(CuTest *tc)
+{
+    unit *ug;
+    region *r;
+    item_type *itype;
+    const struct terrain_type *t_ocean, *t_plain;
+
+    test_setup();
+    t_ocean = test_create_terrain("ocean", SEA_REGION);
+    t_plain = test_create_terrain("packice", ARCTIC_REGION);
+    itype = it_get_or_create(rt_get_or_create("sword"));
+    itype->mask_deny = 0xFFFF;
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    r = test_create_region(0, 0, t_plain);
+    ug = test_create_unit(test_create_faction(), r);
+    i_change(&ug->items, itype, 1);
+    set_level(ug, SK_MELEE, 1);
+    CuAssertTrue(tc, !rc_can_use(u_race(ug), itype));
+    setguard(ug, true);
+    CuAssertIntEquals(tc, 0, armedmen(ug, false));
+    CuAssertTrue(tc, !is_guard(ug));
+
+    terraform_region(r, t_ocean);
+    update_guards();
+    CuAssertTrue(tc, !is_guard(ug));
+
+    test_teardown();
+}
+
 CuSuite *get_guard_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -255,6 +284,7 @@ CuSuite *get_guard_suite(void)
     SUITE_ADD_TEST(suite, test_is_guard);
     SUITE_ADD_TEST(suite, test_guard_unskilled);
     SUITE_ADD_TEST(suite, test_guard_on);
+    SUITE_ADD_TEST(suite, test_guard_checks_allowed_weapon);
     SUITE_ADD_TEST(suite, test_guard_armed);
     SUITE_ADD_TEST(suite, test_guard_unarmed);
     SUITE_ADD_TEST(suite, test_guard_monsters);

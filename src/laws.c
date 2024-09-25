@@ -3603,7 +3603,8 @@ int armedmen(const unit * u, bool siege_weapons)
 {
     item *itm;
     int n = 0;
-    if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
+    const race *rc = u_race(u);
+    if (!(rc->flags & RCF_NOWEAPONS)) {
         if (effskill(u, SK_WEAPONLESS, NULL) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
@@ -3612,13 +3613,15 @@ int armedmen(const unit * u, bool siege_weapons)
             /* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
             * Personen minimiert */
             for (itm = u->items; itm; itm = itm->next) {
-                const weapon_type *wtype = resource2weapon(itm->type->rtype);
-                if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
-                    continue;
-                if (effskill(u, wtype->skill, NULL) >= 1)
-                    n += itm->number;
-                if (n >= u->number)
-                    break;
+                if (rc_can_use(rc, itm->type)) {
+                    const weapon_type *wtype = resource2weapon(itm->type->rtype);
+                    if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
+                        continue;
+                    if (effskill(u, wtype->skill, NULL) >= 1)
+                        n += itm->number;
+                    if (n >= u->number)
+                        break;
+                }
             }
             if (n > u->number) n = u->number;
         }
