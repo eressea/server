@@ -857,13 +857,12 @@ static bool select_afraid(const side *vs, const fighter *fig, void *cbdata)
 /* Panik (Praekampfzauber) */
 int flee_spell(struct castorder * co, int strength, bool pre_combat)
 {
-    fighter * fi = co->magician.fig;
+    fighter ** arr, * fi = co->magician.fig;
     int level = co->level;
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
     unit *mage = fi->unit;
-    selist *fgs, *ql;
-    int n, qi, panik = 0;
+    int n, panik = 0;
     message *msg;
     double power = co->force;
     int force;
@@ -876,30 +875,32 @@ int flee_spell(struct castorder * co, int strength, bool pre_combat)
         return 0;
     }
 
-    fgs = select_fighter_list(b, fi->side, FS_ENEMY, pre_combat ? select_afraid : select_alive, NULL);
-    scramble_fighter_list(fgs);
+    arr = select_fighters(b, fi->side, FS_ENEMY, pre_combat ? select_afraid : select_alive, NULL);
+    if (arr) {
+        size_t qi, ql = arrlen(arr);
+        scramble_fighters(arr, ql);
 
-    for (qi = 0, ql = fgs; force > 0 && ql; selist_advance(&ql, &qi, 1)) {
-        fighter *df = (fighter *)selist_get(ql, qi);
+        for (qi = 0; force > 0 && qi != ql; ++qi) {
+            fighter *df = arr[qi];
 
-        for (n = 0; force > 0 && n != df->alive; ++n) {
-            if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR moeglich */
-                df->person[n].attack -= 1;
-                --force;
-                ++panik;
-            }
-            else if (!(df->person[n].flags & FL_COURAGE)
-                && !(u_race(df->unit)->flags & RCF_UNDEAD)) {
-                if (!is_magic_resistant(mage, df->unit, 0)) {
-                    df->person[n].flags |= FL_PANICED;
+            for (n = 0; force > 0 && n != df->alive; ++n) {
+                if (df->person[n].flags & FL_PANICED) {   /* bei SPL_SONG_OF_FEAR moeglich */
+                    df->person[n].attack -= 1;
+                    --force;
                     ++panik;
                 }
-                --force;
+                else if (!(df->person[n].flags & FL_COURAGE)
+                    && !(u_race(df->unit)->flags & RCF_UNDEAD)) {
+                    if (!is_magic_resistant(mage, df->unit, 0)) {
+                        df->person[n].flags |= FL_PANICED;
+                        ++panik;
+                    }
+                    --force;
+                }
             }
         }
+        arrfree(arr);
     }
-    selist_free(fgs);
-
     msg = msg_message("flee_effect_1", "mage spell amount", mage, sp, panik);
     message_all(b, msg);
     msg_release(msg);
