@@ -1586,30 +1586,8 @@ static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
 
 fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, void *cbdata)
 {
-    selist *fgs = select_fighter_list(b, vs, mask, cb, cbdata);
-    if (fgs) {
-        fighter **arr = NULL;
-        int qi, i = 0;
-        selist *ql;
-        arrsetlen(arr, selist_length(fgs));
-        assert(arr);
-        for (qi = 0, ql = fgs; ql; selist_advance(&ql, &qi, 1)) {
-            fighter *df = (fighter *)selist_get(ql, qi);
-            arr[i++] = df;
-        }
-        selist_free(fgs);
-        return arr;
-    }
-    return NULL;
-}
-
-selist *select_fighter_list(battle * b, const side * vs, int mask, select_fun cb, void *cbdata)
-{
-    selist *fightervp = NULL;
     size_t si, sl = arrlen(b->sides);
-
-    assert(vs != NULL);
-
+    fighter **arr = NULL;
 
     for (si = 0; si != sl; ++si) {
         side *s = b->sides[si];
@@ -1629,12 +1607,11 @@ selist *select_fighter_list(battle * b, const side * vs, int mask, select_fun cb
         }
         for (fig = s->fighters; fig; fig = fig->next) {
             if (cb == NULL || cb(vs, fig, cbdata)) {
-                selist_push(&fightervp, fig);
+                arrpush(arr, fig);
             }
         }
     }
-
-    return fightervp;
+    return arr;
 }
 
 struct selector {
@@ -1653,12 +1630,6 @@ fighter **fighters(battle *b, const side *vs, int minrow, int maxrow, int mask)
 {
     struct selector sel = { .maxrow = maxrow, .minrow = minrow };
     return select_fighters(b, vs, mask, select_row, &sel);
-}
-
-selist *fighter_list(battle *b, const side *vs, int minrow, int maxrow, int mask)
-{
-    struct selector sel = { .maxrow = maxrow, .minrow = minrow };
-    return select_fighter_list(b, vs, mask, select_row, &sel);
 }
 
 static void report_failed_spell(struct battle * b, struct unit * mage, const struct spell *sp)

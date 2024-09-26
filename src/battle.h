@@ -222,9 +222,7 @@ void damage_building(struct battle* b, struct building* bldg,
 
 typedef bool(*select_fun)(const struct side* vs, const struct fighter* fig, void* cbdata);
 struct fighter **select_fighters(struct battle *b, const struct side *vs, int mask, select_fun cb, void *cbdata);
-struct selist* select_fighter_list(struct battle* b, const struct side* vs, int mask, select_fun cb, void* cbdata);
 struct fighter **fighters(struct battle* b, const struct side* vs, int minrow, int maxrow, int mask);
-struct selist* fighter_list(struct battle* b, const struct side* vs, int minrow, int maxrow, int mask);
 void flee_all(struct fighter *fig);
 
 int count_allies(const struct side* as, int minrow, int maxrow,

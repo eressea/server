@@ -261,7 +261,6 @@ static void test_select_fighters(CuTest *tc)
     battle *b;
     side *ds, *as;
     fighter *df, *af;
-    selist *sl;
     fighter **arr;
 
     test_setup();
@@ -273,25 +272,13 @@ static void test_select_fighters(CuTest *tc)
     b = make_battle(r);
     ds = make_side(b, du->faction, 0, 0, 0);
     df = make_fighter(b, du, ds, false);
-    CuAssertPtrEquals(tc, NULL, select_fighter_list(b, ds, FS_ENEMY, NULL, NULL));
     CuAssertPtrEquals(tc, NULL, select_fighters(b, ds, FS_ENEMY, NULL, NULL));
-    CuAssertPtrEquals(tc, NULL, fighter_list(b, ds, ST_BEHIND, ST_AVOID, FS_ENEMY));
     CuAssertPtrEquals(tc, NULL, fighters(b, ds, ST_BEHIND, ST_AVOID, FS_ENEMY));
-
-    CuAssertPtrNotNull(tc, sl = select_fighter_list(b, ds, FS_HELP, NULL, NULL));
-    CuAssertIntEquals(tc, 1, selist_length(sl));
-    CuAssertPtrEquals(tc, df, selist_get(sl, 0));
-    selist_free(sl);
 
     CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_HELP, NULL, NULL));
     CuAssertIntEquals(tc, 1, (int) arrlen(arr));
     CuAssertPtrEquals(tc, df, arr[0]);
     arrfree(arr);
-
-    CuAssertPtrNotNull(tc, sl = fighter_list(b, ds, ST_FIGHT, ST_AVOID, FS_HELP));
-    CuAssertIntEquals(tc, 1, selist_length(sl));
-    CuAssertPtrEquals(tc, df, selist_get(sl, 0));
-    selist_free(sl);
 
     CuAssertPtrNotNull(tc, arr = fighters(b, ds, ST_FIGHT, ST_AVOID, FS_HELP));
     CuAssertIntEquals(tc, 1, (int)arrlen(arr));
@@ -301,11 +288,6 @@ static void test_select_fighters(CuTest *tc)
     as = make_side(b, au->faction, 0, 0, 0);
     af = make_fighter(b, au, as, true);
     set_enemy(as, ds, true);
-
-    CuAssertPtrNotNull(tc, sl = select_fighter_list(b, ds, FS_ENEMY, NULL, NULL));
-    CuAssertIntEquals(tc, 1, selist_length(sl));
-    CuAssertPtrEquals(tc, af, selist_get(sl, 0));
-    selist_free(sl);
 
     CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_ENEMY, NULL, NULL));
     CuAssertIntEquals(tc, 1, (int)arrlen(arr));
