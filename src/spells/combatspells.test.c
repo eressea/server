@@ -6,6 +6,7 @@
 #include <magic.h>
 
 #include <kernel/ally.h>
+#include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -160,6 +161,59 @@ static void test_confusion(CuTest *tc)
     test_teardown();
 }
 
+static void test_flee_spell(CuTest *tc)
+{
+    castorder co;
+    unit *du, *au;
+    region *r;
+    battle *b;
+    side *ds, *as;
+    fighter *df, *af;
+    int i, n;
+
+    test_setup();
+    config_set("magic.resist.enable", "0");
+    r = test_create_plain(0, 0);
+    du = test_create_unit(test_create_faction(), r);
+    scale_number(du, 50);
+    au = test_create_unit(test_create_faction(), r);
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+    test_create_castorder(&co, au, 9, 10.0, 0, NULL);
+    co.magician.fig = af;
+
+    for (i = 0, n = 0; i != df->alive; ++i) {
+        df->person[i].attack = i;
+    }
+    /* affect 40 people in combat with panic */
+    CuAssertIntEquals(tc, co.level, flee_spell(&co, 0, false));
+    CuAssertPtrNotNull(tc, test_find_messagetype(au->faction->battles->msgs, "flee_effect_1"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(du->faction->battles->msgs, "flee_effect_1"));
+    for (i = 0, n = 0; i != df->alive; ++i) {
+        if (df->person[i].flags & FL_PANICED) {
+            ++n;
+        }
+        CuAssertIntEquals(tc, i, df->person[i].attack);
+    }
+    CuAssertIntEquals(tc, 40, n);
+
+    /* units that are already panicked get -1 to attack */
+    CuAssertIntEquals(tc, co.level, flee_spell(&co, 0, false));
+    for (i = 0; i != df->alive; ++i) {
+        if (df->person[i].flags & FL_PANICED) {
+            CuAssertIntEquals(tc, i - 1, df->person[i].attack);
+        }
+        else {
+            CuAssertIntEquals(tc, i, df->person[i].attack);
+        }
+    }
+    test_teardown();
+}
+
 CuSuite *get_combatspells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -168,6 +222,7 @@ CuSuite *get_combatspells_suite(void)
     SUITE_ADD_TEST(suite, test_healing);
     SUITE_ADD_TEST(suite, test_undeadhero);
     SUITE_ADD_TEST(suite, test_confusion);
+    SUITE_ADD_TEST(suite, test_flee_spell);
 
     return suite;
 }
