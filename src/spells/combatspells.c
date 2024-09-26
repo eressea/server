@@ -235,18 +235,6 @@ int sp_stun(struct castorder * co)
 /** randomly shuffle an array
  * for correctness, see Donald E. Knuth, The Art of Computer Programming
  */
-static void scramble_fighter_list(selist * ql)
-{
-    int qi, qlen = selist_length(ql);
-
-    for (qi = 0; qi != qlen; ++qi) {
-        int qj = qi + (rng_int() % (qlen - qi));
-        void *a = selist_get(ql, qi);
-        void *b = selist_replace(ql, qj, a);
-        selist_replace(ql, qi, b);
-    }
-}
-
 static void scramble_fighters(fighter **arr, size_t len)
 {
     scramble_array(arr, len, sizeof(fighter *));
