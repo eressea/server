@@ -58,7 +58,6 @@
 #include "util/rng.h"
 
 #include <strings.h>
-#include <selist.h>
 
 #include <gb_string.h>
 #include <stb_ds.h>
@@ -1245,22 +1244,33 @@ static int apply_race_resistance(int reduced_damage, fighter *df,
 static int apply_magicshield(int damage, fighter *df,
     const weapon_type *awtype, battle *b, bool magic) {
     side *ds = df->side;
-    selist *ql;
-    int qi;
 
     if (damage <= 0) {
         return 0;
     }
 
     /* Schilde */
-    for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
-        meffect *me = (meffect *)selist_get(ql, qi);
-        if (meffect_protection(b, me, ds) != 0) {
-            damage = meffect_apply(me, damage);
+    if (b->meffects) {
+        size_t qi, ql = arrlen(b->meffects);
+        for (qi = 0, qi != ql; ql; ++qi) {
+            meffect *me = b->meffects + qi;
+            if (meffect_protection(b, me, ds) != 0) {
+                damage = meffect_apply(me, damage);
+            }
         }
     }
-    
+
     return damage;
+}
+
+void battle_add_effect(fighter *af, int typ, int effect, int duration)
+{
+    battle *b = af->side->battle;
+    meffect *me = stbds_arraddnptr(b->meffects, 1);
+    me->magician = af;
+    me->typ = typ;
+    me->effect = effect;
+    me->duration = duration;
 }
 
 bool
@@ -1607,7 +1617,7 @@ fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, vo
         }
         for (fig = s->fighters; fig; fig = fig->next) {
             if (cb == NULL || cb(vs, fig, cbdata)) {
-                arrpush(arr, fig);
+                arrput(arr, fig);
             }
         }
     }
@@ -1796,8 +1806,7 @@ static void do_combatspell(troop at)
     unit *u = fi->unit;
     battle *b = fi->side->battle;
     region *r = b->region;
-    selist *ql;
-    int level, qi, sl;
+    int level, sl;
     double power;
     int fumblechance = 0;
     struct sc_mage *mage = get_mage(u);
@@ -1825,12 +1834,15 @@ static void do_combatspell(troop at)
         return;
     }
 
-    for (qi = 0, ql = b->meffects; ql; selist_advance(&ql, &qi, 1)) {
-        meffect *mblock = (meffect *)selist_get(ql, qi);
-        if (mblock->typ == SHIELD_BLOCK) {
-            if (meffect_blocked(b, mblock, fi->side) != 0) {
-                fumblechance += mblock->duration;
-                mblock->duration -= mblock->effect;
+    if (b->meffects) {
+        size_t qi, ql = arrlen(b->meffects);
+        for (qi = 0; qi != ql; ++qi) {
+            meffect *mblock = b->meffects + qi;
+            if (mblock->typ == SHIELD_BLOCK) {
+                if (meffect_blocked(b, mblock, fi->side) != 0) {
+                    fumblechance += mblock->duration;
+                    mblock->duration -= mblock->effect;
+                }
             }
         }
     }
@@ -2334,7 +2346,7 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
         arrfree(ta->fighters);
         ta->fighters = NULL;
     }
-    arrpush(ta->fighters, fig);
+    arrput(ta->fighters, fig);
     ta->value = value;
 }
 
@@ -3949,8 +3961,7 @@ void free_battle(battle* b)
     }
 
     hmfree(b->relations);
-    selist_foreach(b->meffects, free);
-    selist_free(b->meffects);
+    arrfree(b->meffects);
 
     battle_free(b);
 }

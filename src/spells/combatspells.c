@@ -1187,18 +1187,6 @@ int sp_appeasement(struct castorder * co)
     return level;
 }
 
-static void do_meffect(fighter * af, int typ, int effect, int duration)
-{
-    battle *b = af->side->battle;
-    meffect *me = (meffect *)malloc(sizeof(struct meffect));
-    if (!me) abort();
-    selist_push(&b->meffects, me);
-    me->magician = af;
-    me->typ = typ;
-    me->effect = effect;
-    me->duration = duration;
-}
-
 int armor_spell(struct castorder * co, int per_level, int time_multi)
 {
     fighter * fi = co->magician.fig;
@@ -1217,7 +1205,7 @@ int armor_spell(struct castorder * co, int per_level, int time_multi)
 
     effect = level / per_level;
     duration = (int)(time_multi * power * power);
-    do_meffect(fi, SHIELD_ARMOR, effect, duration);
+    battle_add_effect(fi, SHIELD_ARMOR, effect, duration);
     return level;
 }
 
@@ -1240,7 +1228,7 @@ int sp_reduceshield(struct castorder * co)
     effect = 50;
     duration = (int)(50 * power * power);
 
-    do_meffect(fi, SHIELD_REDUCE, effect, duration);
+    battle_add_effect(fi, SHIELD_REDUCE, effect, duration);
     return level;
 }
 
@@ -1262,7 +1250,7 @@ int sp_fumbleshield(struct castorder * co)
     effect = 25 - level;
     if (effect < 1) effect = 1;
 
-    do_meffect(fi, SHIELD_BLOCK, effect, duration);
+    battle_add_effect(fi, SHIELD_BLOCK, effect, duration);
     return level;
 }
 

@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 struct message;
-struct selist;
 struct weapon_type;
 union variant;
 
@@ -90,7 +89,7 @@ typedef struct battle {
     int nfactions;
     int nfighters;
     side ** sides;
-    struct selist* meffects;
+    struct meffect* meffects;
     int max_tactics;
     unsigned char turn;
     signed char keeploot; /* keep (50 + keeploot) percent of items as loot */
@@ -214,6 +213,7 @@ int calculate_armor(troop dt, const struct weapon_type* dwtype, const struct wea
 int apply_resistance(int damage, struct troop dt, const struct weapon_type* dwtype, const struct armor_type* armor, const struct armor_type* shield, bool magic);
 bool terminate(troop dt, troop at, int type, const char* damage,
     bool missile);
+void battle_add_effect(fighter *af, int typ, int effect, int duration);
 void message_all(struct battle* b, struct message* m);
 void set_enemy(struct side* as, struct side* ds, bool attacking);
 bool hits(troop at, troop dt, const struct weapon_type *awp);

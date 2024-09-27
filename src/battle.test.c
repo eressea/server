@@ -34,7 +34,6 @@
 #include "util/variant.h"
 
 #include <CuTest.h>
-#include <selist.h>
 
 #include <stb_ds.h>
 
