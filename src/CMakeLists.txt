@@ -297,6 +297,7 @@ set(TESTS_SRC
   volcano.test.c
   vortex.test.c
   wormhole.test.c
+  spells/combatspells.test.c
   spells/flyingship.test.c
   spells/regioncurse.test.c
   triggers/shock.test.c

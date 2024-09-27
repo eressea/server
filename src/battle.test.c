@@ -33,15 +33,14 @@
 #include "util/rand.h"
 #include "util/variant.h"
 
-#include <stdlib.h>                // for abort, calloc
-#include <strings.h>
-
 #include <CuTest.h>
 
 #include <stb_ds.h>
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>                // for abort, calloc
+#include <strings.h>
 
 #include "tests.h"
 
@@ -227,9 +226,9 @@ static void test_select_enemy(CuTest * tc)
 {
     unit *du, *au;
     region *r;
-    fighter *df, *af;
     battle *b;
     side *ds, *as;
+    fighter *df, *af;
     troop at;
 
     test_setup();
@@ -254,7 +253,51 @@ static void test_select_enemy(CuTest * tc)
     test_teardown();
 }
 
-static void test_defenders_get_building_bonus(CuTest * tc)
+static void test_select_fighters(CuTest *tc)
+{
+    unit *du, *au;
+    region *r;
+    battle *b;
+    side *ds, *as;
+    fighter *df, *af;
+    fighter **arr;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    du = test_create_unit(test_create_faction(), r);
+    unit_setstatus(du, ST_FIGHT);
+    au = test_create_unit(test_create_faction(), r);
+    unit_setstatus(au, ST_BEHIND);
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    CuAssertPtrEquals(tc, NULL, select_fighters(b, ds, FS_ENEMY, NULL, NULL));
+    CuAssertPtrEquals(tc, NULL, fighters(b, ds, ST_BEHIND, ST_AVOID, FS_ENEMY));
+
+    CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_HELP, NULL, NULL));
+    CuAssertIntEquals(tc, 1, (int) arrlen(arr));
+    CuAssertPtrEquals(tc, df, arr[0]);
+    arrfree(arr);
+
+    CuAssertPtrNotNull(tc, arr = fighters(b, ds, ST_FIGHT, ST_AVOID, FS_HELP));
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, df, arr[0]);
+    arrfree(arr);
+
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+
+    CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_ENEMY, NULL, NULL));
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, af, arr[0]);
+    arrfree(arr);
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_defenders_get_building_bonus(CuTest *tc)
 {
     unit *du, *au;
     region *r;
@@ -1514,6 +1557,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_battle_report_two);
     SUITE_ADD_TEST(suite, test_battle_report_three);
     SUITE_ADD_TEST(suite, test_select_enemy);
+    SUITE_ADD_TEST(suite, test_select_fighters);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);

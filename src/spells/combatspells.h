@@ -1,45 +1,37 @@
-#ifndef H_GC_COMBATSPELLS
-#define H_GC_COMBATSPELLS
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdbool.h>
 
-    struct castorder;
+struct castorder;
 
-    /* Kampfzauber */
-    int sp_fumbleshield(struct castorder * co);
-    int sp_shadowknights(struct castorder * co);
-    int sp_combatrosthauch(struct castorder * co);
-    int sp_healing(struct castorder * co);
-    int sp_keeploot(struct castorder * co);
-    int sp_reanimate(struct castorder * co);
-    int sp_chaosrow(struct castorder * co);
-    int sp_berserk(struct castorder * co);
-    int sp_tiredsoldiers(struct castorder * co);
-    int sp_reeling_arrows(struct castorder * co);
-    int sp_appeasement(struct castorder * co);
-    int sp_sleep(struct castorder * co);
-    int sp_windshield(struct castorder * co);
-    int sp_strong_wall(struct castorder * co);
-    int sp_petrify(struct castorder * co);
-    int sp_hero(struct castorder * co);
-    int sp_frighten(struct castorder * co);
-    int sp_mindblast(struct castorder * co);
-    int sp_speed(struct castorder * co);
-    int sp_wolfhowl(struct castorder * co);
-    int sp_igjarjuk(struct castorder * co);
-    int sp_dragonodem(struct castorder * co);
-    int sp_reduceshield(struct castorder * co);
-    int sp_stun(struct castorder * co);
-    int sp_undeadhero(struct castorder * co);
-    int sp_immolation(struct castorder * co);
+/* Kampfzauber */
+int sp_fumbleshield(struct castorder * co);
+int sp_shadowknights(struct castorder * co);
+int sp_combatrosthauch(struct castorder * co);
+int sp_healing(struct castorder * co);
+int sp_keeploot(struct castorder * co);
+int sp_reanimate(struct castorder * co);
+int sp_chaosrow(struct castorder * co);
+int sp_berserk(struct castorder * co);
+int sp_tiredsoldiers(struct castorder * co);
+int sp_reeling_arrows(struct castorder * co);
+int sp_appeasement(struct castorder * co);
+int sp_sleep(struct castorder * co);
+int sp_windshield(struct castorder * co);
+int sp_strong_wall(struct castorder * co);
+int sp_petrify(struct castorder * co);
+int sp_hero(struct castorder * co);
+int sp_frighten(struct castorder * co);
+int sp_mindblast(struct castorder * co);
+int sp_speed(struct castorder * co);
+int sp_wolfhowl(struct castorder * co);
+int sp_igjarjuk(struct castorder * co);
+int sp_dragonodem(struct castorder * co);
+int sp_reduceshield(struct castorder * co);
+int sp_stun(struct castorder * co);
+int sp_undeadhero(struct castorder * co);
+int sp_immolation(struct castorder * co);
 
-    int flee_spell(struct castorder * co, int strength);
-    int damage_spell(struct castorder * co, int dmg, int strength);
-    int armor_spell(struct castorder * co, int per_level, int time_multi);
-
-#ifdef __cplusplus
-}
-#endif
-#endif
+int flee_spell(struct castorder * co, int strength, bool pre_combat);
+int damage_spell(struct castorder * co, int dmg, int strength);
+int armor_spell(struct castorder * co, int per_level, int time_multi);
