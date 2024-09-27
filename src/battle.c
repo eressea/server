@@ -1252,7 +1252,7 @@ static int apply_magicshield(int damage, fighter *df,
     /* Schilde */
     if (b->meffects) {
         size_t qi, ql = arrlen(b->meffects);
-        for (qi = 0, qi != ql; ql; ++qi) {
+        for (qi = 0; qi != ql; ++qi) {
             meffect *me = b->meffects + qi;
             if (meffect_protection(b, me, ds) != 0) {
                 damage = meffect_apply(me, damage);
