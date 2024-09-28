@@ -76,6 +76,8 @@
 #include <stream.h>
 #include <strings.h>
 
+#include <gb_string.h>
+
 /* libc includes */
 #include <assert.h>
 #include <ctype.h>
@@ -1586,30 +1588,6 @@ static void rpline(struct stream *out)
     swrite(line, sizeof(line), 1, out);
 }
 
-static void allies(struct stream *out, const faction * f)
-{
-    const group *g = f->groups;
-    char prefix[64];
-
-    rpline(out);
-    newline(out);
-    centre(out, LOC(f->locale, "nr_alliances"), false);
-    newline(out);
-
-    if (f->allies) {
-        snprintf(prefix, sizeof(prefix), "%s ", LOC(f->locale, "faction_help"));
-        report_allies(out, REPORTWIDTH, f, f->allies, prefix);
-    }
-
-    while (g) {
-        if (g->allies) {
-            snprintf(prefix, sizeof(prefix), "%s %s ", g->name, LOC(f->locale, "group_help"));
-            report_allies(out, REPORTWIDTH, f, g->allies, prefix);
-        }
-        g = g->next;
-    }
-}
-
 static void report_guards(struct stream *out, const region * r, const faction * see)
 {
     /* die Partei  see  sieht dies; wegen
@@ -1941,6 +1919,35 @@ static void report_market(stream * out, const region *r, const faction *f) {
     if (m) {
         newline(out);
         nr_paragraph(out, m, f);
+    }
+}
+
+static void allies(struct stream *out, const faction *f)
+{
+    const group *g = f->groups;
+    char prefix[64];
+
+    rpline(out);
+    newline(out);
+    centre(out, LOC(f->locale, "nr_alliances"), false);
+    newline(out);
+
+    if (f->allies) {
+        snprintf(prefix, sizeof(prefix), "%s ", LOC(f->locale, "faction_help"));
+        report_allies(out, REPORTWIDTH, f, f->allies, prefix);
+    }
+
+    while (g) {
+        if (g->allies) {
+            snprintf(prefix, sizeof(prefix), "%s %s ", g->name, LOC(f->locale, "group_help"));
+            report_allies(out, REPORTWIDTH, f, g->allies, prefix);
+        }
+        else {
+            message *m = msg_message("group_without_allies", "group", g->name);
+            nr_paragraph(out, m, f);
+            newline(out);
+        }
+        g = g->next;
     }
 }
 
