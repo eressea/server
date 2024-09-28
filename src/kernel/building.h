@@ -63,7 +63,6 @@ extern "C" {
         struct building_stage *a_stages;
     } building_type;
 
-    extern struct selist *buildingtypes;
     extern struct attrib_type at_building_generic_type;
 
     int cmp_castle_size(const struct building *b, const struct building *a);
@@ -72,7 +71,7 @@ extern "C" {
     bool bt_changed(int *cache);
     const building_type *bt_find(const char *name);
     void free_buildingtypes(void);
-
+    int bt_foreach(int (*callback)(struct building_type *, void *), void *udata);
     bool in_safe_building(struct unit *u1, struct unit *u2);
 
 #define BFL_NONE           0x00

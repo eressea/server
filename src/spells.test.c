@@ -1407,6 +1407,7 @@ static void test_summon_familiar(CuTest *tc) {
     CuAssertTrue(tc, is_familiar(u2));
     CuAssertPtrEquals(tc, u, get_familiar_mage(u2));
     CuAssertPtrEquals(tc, rc_special, (race *)u_race(u2));
+    test_teardown();
 }
 
 static void test_shadowdemons(CuTest *tc) {
@@ -1435,6 +1436,7 @@ static void test_shadowdemons(CuTest *tc) {
     CuAssertIntEquals(tc, 8, get_level(u2, SK_STEALTH));
     CuAssertIntEquals(tc, 1, get_level(u2, SK_PERCEPTION));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "summonshadow_effect"));
+    test_teardown();
 }
 
 static void test_shadowlords(CuTest *tc) {
@@ -1463,6 +1465,30 @@ static void test_shadowlords(CuTest *tc) {
     CuAssertIntEquals(tc, 9, get_level(u2, SK_STEALTH));
     CuAssertIntEquals(tc, 5, get_level(u2, SK_PERCEPTION));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "summon_effect"));
+    test_teardown();
+}
+
+static void test_analysemagic(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+
+    param.flag = 0;
+    param.typ = SPP_UNIT;
+    param.data.u = u2;
+    arrput(args, param);
+    test_create_castorder(&co, u, 3, 10., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    test_teardown();
 }
 
 CuSuite *get_spells_suite(void)
@@ -1506,6 +1532,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_summon_familiar);
     SUITE_ADD_TEST(suite, test_shadowdemons);
     SUITE_ADD_TEST(suite, test_shadowlords);
+    SUITE_ADD_TEST(suite, test_analysemagic);
 
     return suite;
 }

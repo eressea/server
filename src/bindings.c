@@ -598,16 +598,25 @@ static int config_get_ships(lua_State * L)
     return 1;
 }
 
+struct settable_data {
+    lua_State *L;
+    int index;
+};
+
+static int push_building_cb(building_type *btype, void *udata)
+{
+    struct settable_data *capture = (struct settable_data *)udata;
+    lua_State *L = capture->L;
+    tolua_pushstring(L, btype->_name);
+    lua_rawseti(L, -2, ++capture->index);
+    return 0;
+}
+
 static int config_get_buildings(lua_State * L)
 {
-    selist *ql;
-    int qi, i = 0;
-    lua_createtable(L, selist_length(buildingtypes), 0);
-    for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
-        building_type *btype = (building_type *)selist_get(ql, qi);
-        tolua_pushstring(L, btype->_name);
-        lua_rawseti(L, -2, ++i);
-    }
+    struct settable_data capture = { L, 0 };
+    lua_newtable(L);
+    bt_foreach(push_building_cb, &capture);
     return 1;
 }
 

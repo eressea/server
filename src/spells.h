@@ -46,3 +46,4 @@ int sp_summon_familiar(struct castorder *co);
 
 int sp_shadowdemons(struct castorder *co);
 int sp_shadowlords(struct castorder *co);
+int sp_analysemagic(struct castorder *co);

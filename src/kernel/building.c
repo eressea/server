@@ -34,7 +34,6 @@
 #include <util/umlaut.h>
 
 #include <critbit.h>
-#include <selist.h>
 #include <storage.h>
 #include <strings.h>
 
@@ -52,7 +51,6 @@ typedef struct building_typelist {
     building_type *type;
 } building_typelist;
 
-selist *buildingtypes = NULL;
 static critbit_tree cb_bldgtypes;
 
 /* Returns a building type for the (internal) name */
@@ -94,7 +92,6 @@ static void bt_register(building_type * btype)
     size_t len;
     char data[64];
 
-    selist_push(&buildingtypes, (void *)btype);
     len = cb_new_kv(btype->_name, strlen(btype->_name), &btype, sizeof(btype), data);
     assert(len <= sizeof(data));
     cb_insert(&cb_bldgtypes, data, len);
@@ -257,6 +254,21 @@ static void free_bnames(void) {
     }
 }
 
+static int get_bname_cb(building_type *btype, void *udata)
+{
+    local_names *bn = (local_names  *)udata;
+    const char *n = LOC(bn->lang, btype->_name);
+    if (!n) {
+        log_error("building type %s has no translation in %s",
+            btype->_name, locale_name(bn->lang));
+    }
+    else {
+        variant type = { .v = (void *)btype };
+        addtoken((struct tnode **)&bn->names, n, type);
+    }
+    return 0;
+}
+
 static local_names *get_bnames(const struct locale *lang)
 {
     static int config;
@@ -273,27 +285,12 @@ static local_names *get_bnames(const struct locale *lang)
         bn = bn->next;
     }
     if (!bn) {
-        selist *ql = buildingtypes;
-        int qi;
-
         bn = (local_names *)calloc(1, sizeof(local_names));
         if (!bn) abort();
         bn->next = bnames;
         bn->lang = lang;
 
-        for (qi = 0, ql = buildingtypes; ql; selist_advance(&ql, &qi, 1)) {
-            building_type *btype = (building_type *)selist_get(ql, qi);
-
-            const char *n = LOC(lang, btype->_name);
-            if (!n) {
-                log_error("building type %s has no translation in %s",
-                    btype->_name, locale_name(lang));
-            }
-            else {
-                variant type = { .v = (void *)btype };
-                addtoken((struct tnode **)&bn->names, n, type);
-            }
-        }
+        bt_foreach(get_bname_cb, bn);
         bnames = bn;
     }
     return bn;
@@ -1154,11 +1151,36 @@ int cmp_current_owner(const building * b, const building * a)
     return 0;
 }
 
+static int free_buildingtype_cb(building_type *btype, void *udata)
+{
+    free_buildingtype(btype);
+    return 0;
+}
+
 void free_buildingtypes(void) {
     free_bnames();
+    bt_foreach(free_buildingtype_cb, NULL);
     cb_clear(&cb_bldgtypes);
-    selist_foreach(buildingtypes, free_buildingtype);
-    selist_free(buildingtypes);
-    buildingtypes = 0;
     ++bt_changes;
+}
+
+struct bt_foreach_data {
+    void *udata;
+    int (*callback)(building_type *, void *);
+};
+
+static int bt_foreach_cb(void *match, const void *key, size_t keylen, void *udata)
+{
+    struct bt_foreach_data * proxy = (struct bt_foreach_data *)udata;
+    building_type *btype;
+    cb_get_kv(match, &btype, sizeof(building_type *));
+    return proxy->callback(btype, proxy->udata);
+}
+
+int bt_foreach(int (*callback)(building_type *, void *), void *udata)
+{
+    struct bt_foreach_data data;
+    data.callback = callback;
+    data.udata = udata;
+    return cb_foreach(&cb_bldgtypes, "", 0, bt_foreach_cb, &data);
 }

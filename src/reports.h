@@ -56,7 +56,7 @@ extern "C" {
 
     typedef struct report_context {
         struct faction *f;
-        struct selist *addresses;
+        struct selist *addresses; /* used as a set<faction *> */
         struct region *first, *last;
         void *userdata;
         time_t report_time;
