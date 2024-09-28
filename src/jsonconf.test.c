@@ -371,6 +371,11 @@ static void test_ships(CuTest * tc)
     test_teardown();
 }
 
+static int has_btypes_cb(building_type *btype, void *udata)
+{
+    return 1;
+}
+
 static void test_castles(CuTest *tc) {
     const char * data = "{\"buildings\": { \"castle\" : { "
         "\"stages\" : ["
@@ -386,13 +391,13 @@ static void test_castles(CuTest *tc) {
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, NULL, buildingtypes);
+    CuAssertIntEquals(tc, 0, bt_foreach(has_btypes_cb, NULL));
+
     json_config(json);
 
     bt = bt_find("castle");
     CuAssertPtrNotNull(tc, bt);
     CuAssertIntEquals(tc, 3, (int)arrlen(bt->a_stages));
-    CuAssertPtrNotNull(tc, buildingtypes);
 
     stage = bt->a_stages;
     CuAssertStrEquals(tc, "site", stage->name);
@@ -465,10 +470,9 @@ static void test_buildings(CuTest * tc)
     test_setup();
 
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, NULL, buildingtypes);
+    CuAssertPtrEquals(tc, NULL, (void *)bt_find("shed"));
     json_config(json);
 
-    CuAssertPtrNotNull(tc, buildingtypes);
     bt = bt_find("shed");
     CuAssertPtrNotNull(tc, bt);
     CuAssertPtrNotNull(tc, bt->maintenance);
@@ -559,7 +563,7 @@ static void test_ships_default(CuTest * tc)
     test_teardown();
 }
 
-static void test_configs(CuTest * tc)
+static void test_includes(CuTest * tc)
 {
     const char * data = "{\"include\": [ \"test.json\" ] }";
     FILE *F;
@@ -572,9 +576,9 @@ static void test_configs(CuTest * tc)
     fwrite(building_data, 1, strlen(building_data), F);
     fclose(F);
     CuAssertPtrNotNull(tc, json);
-    CuAssertPtrEquals(tc, NULL, buildingtypes);
+    CuAssertPtrEquals(tc, NULL, (void *) bt_find("house"));
     json_config(json);
-    CuAssertPtrNotNull(tc, buildingtypes);
+    CuAssertPtrNotNull(tc, bt_find("house"));
     if (remove("test.json")!=0 && errno==ENOENT) {
         errno = 0;
     }
@@ -773,7 +777,7 @@ CuSuite *get_jsonconf_suite(void)
     SUITE_ADD_TEST(suite, test_ships);
     SUITE_ADD_TEST(suite, test_buildings);
     SUITE_ADD_TEST(suite, test_buildings_default);
-    SUITE_ADD_TEST(suite, test_configs);
+    SUITE_ADD_TEST(suite, test_includes);
     SUITE_ADD_TEST(suite, test_castles);
     SUITE_ADD_TEST(suite, test_terrains);
     SUITE_ADD_TEST(suite, test_races);
