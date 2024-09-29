@@ -10,7 +10,6 @@
 #include "unit.h"
 
 /* util includes */
-#include <selist.h>
 #include <critbit.h>
 #include <util/log.h>
 #include <util/rand.h>

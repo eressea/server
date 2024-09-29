@@ -13,7 +13,7 @@
 #include "util/rng.h"
 #include "util/message.h"
 
-#include <selist.h>
+#include <stb_ds.h>
 
 #include <assert.h>
 
@@ -65,7 +65,7 @@ bool markets_module(void)
 
 void do_markets(void)
 {
-    selist *traders = NULL;
+    unit **traders = NULL;
     unit *markets[MAX_MARKETS];
     region *r;
     for (r = regions; r; r = r->next) {
@@ -97,7 +97,7 @@ void do_markets(void)
                         attrib *a = a_find(u->attribs, &at_market);
                         if (a == NULL) {
                             a = a_add(&u->attribs, a_new(&at_market));
-                            selist_push(&traders, u);
+                            arrput(traders, u);
                         }
                         items = (item *)a->data.v;
                         i_change(&items, lux, 1);
@@ -111,7 +111,7 @@ void do_markets(void)
                         attrib *a = a_find(u->attribs, &at_market);
                         if (a == NULL) {
                             a = a_add(&u->attribs, a_new(&at_market));
-                            selist_push(&traders, u);
+                            arrput(traders, u);
                         }
                         items = (item *)a->data.v;
                         i_change(&items, herb, 1);
@@ -124,10 +124,9 @@ void do_markets(void)
     }
 
     if (traders) {
-        selist *qliter = traders;
-        int qli = 0;
-        for (qli = 0; qliter; selist_advance(&qliter, &qli, 1)) {
-            unit *u = (unit *)selist_get(qliter, qli);
+        size_t qi, ql = arrlen(traders);
+        for (qi = 0; qi != ql; ++qi) {
+            unit *u = traders[qi];
             attrib *a = a_find(u->attribs, &at_market);
             item *items = (item *)a->data.v;
 
@@ -149,6 +148,6 @@ void do_markets(void)
 
             a_remove(&u->attribs, a);
         }
-        selist_free(traders);
+        arrfree(traders);
     }
 }

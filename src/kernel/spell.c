@@ -60,7 +60,7 @@ fumble_f get_fumble(const char *sname)
 }
 
 static critbit_tree cb_spells;
-selist * spells;
+selist * spells; /* FIXME: selist duplicates cb_spells */
 
 static void free_spell(spell *sp) {
     free(sp->syntax);

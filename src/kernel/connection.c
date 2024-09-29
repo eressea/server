@@ -301,6 +301,7 @@ attrib_type at_countdown = {
 
 void age_borders(void)
 {
+    /* FIXME: selist used only for push, only in this function, use stb arrary<border *> */
     selist *deleted = NULL, *ql;
     int i;
 

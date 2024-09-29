@@ -260,7 +260,7 @@ attrib_type at_curse = {
 #include <selist.h>
 
 #define MAXCTHASH 128
-static selist *cursetypes[MAXCTHASH];
+static selist *cursetypes[MAXCTHASH]; /* FIXME: selist[] should a stb_sh<curse_type *> */
 
 void ct_register(const curse_type * ct)
 {

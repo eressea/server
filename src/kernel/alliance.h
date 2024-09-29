@@ -32,7 +32,7 @@ extern "C" {
     typedef struct alliance {
         struct alliance *next;
         struct faction *_leader;
-        struct selist *members;
+        struct selist *members; /* selist for efficient deletes */
         int flags;
         int id;
         char *name;
