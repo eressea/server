@@ -9,6 +9,7 @@
 #include <kernel/config.h>
 #include <kernel/faction.h>
 #include <kernel/region.h>
+#include <kernel/status.h>
 #include <kernel/unit.h>
 
 #include <util/rand.h>
@@ -16,7 +17,7 @@
 #include <CuTest.h>
 
 #include <stddef.h>          // for NULL
-
+#include <stdbool.h>
 static void test_immolation(CuTest *tc)
 {
     castorder co;
