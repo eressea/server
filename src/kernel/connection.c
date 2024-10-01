@@ -13,7 +13,7 @@
 #include <util/macros.h>
 #include <util/rng.h>
 
-#include <selist.h>
+#include <stb_ds.h>
 #include <storage.h>
 #include <strings.h>
 
@@ -301,8 +301,7 @@ attrib_type at_countdown = {
 
 void age_borders(void)
 {
-    /* FIXME: selist used only for push, only in this function, use stb arrary<border *> */
-    selist *deleted = NULL, *ql;
+    connection **deleted = NULL;
     int i;
 
     for (i = 0; i != BORDER_MAXHASH; ++i) {
@@ -312,17 +311,19 @@ void age_borders(void)
             for (; b; b = b->next) {
                 if (b->type->age) {
                     if (b->type->age(b) == AT_AGE_REMOVE) {
-                        selist_push(&deleted, b);
+                        arrput(deleted, b);
                     }
                 }
             }
         }
     }
-    for (ql = deleted, i = 0; ql; selist_advance(&ql, &i, 1)) {
-        connection *b = (connection *)selist_get(ql, i);
-        erase_border(b);
+    if (deleted) {
+        size_t qi, ql;
+        for (ql = arrlen(deleted), qi = 0; qi != ql; ++qi) {
+            erase_border(deleted[qi]);
+        }
+        arrfree(deleted);
     }
-    selist_free(deleted);
 }
 
 /********
