@@ -480,7 +480,6 @@ static void test_shipspeed_stormwind(CuTest *tc) {
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
-    register_shipcurse();
     assert(sh && cap && crew);
 
     create_curse(cap, &sh->attribs, &ct_stormwind, 1, 1, 1, 0);
@@ -498,7 +497,6 @@ static void test_shipspeed_nodrift(CuTest *tc) {
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
-    register_shipcurse();
     assert(sh && cap && crew);
 
     create_curse(cap, &sh->attribs, &ct_nodrift, 1, 1, 1, 0);
@@ -513,7 +511,6 @@ static void test_shipspeed_shipspeedup(CuTest *tc) {
     test_setup();
     sh = setup_ship();
     setup_crew(sh, NULL, &cap, &crew);
-    register_shipcurse();
     assert(sh && cap && crew);
 
     create_curse(cap, &sh->attribs, &ct_shipspeedup, 1, 1, 3, 0);

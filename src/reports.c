@@ -1586,15 +1586,10 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
-static void check_messages_exist(void) {
-    ct_checknames();
-}
-
 int init_reports(void)
 {
     region *r;
     bool update = true;
-    check_messages_exist();
     create_directories();
     for (r = regions; r; r = r->next) {
         if (update) {

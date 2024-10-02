@@ -44,7 +44,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-selist *shiptypes = NULL; /* FIXME: selist, do not use for searching*/
+selist *shiptypes = NULL; /* FIXME: selist, do not use for searching (OBS: change to bindings.c)*/
 static critbit_tree cb_shiptypes; /* use this trie instead */
 
 static local_names *snames;
