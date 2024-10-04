@@ -29,6 +29,7 @@
 #include <util/umlaut.h>
 
 #include <storage.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 
@@ -259,13 +260,12 @@ attrib_type at_curse = {
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-#define CTHASHSEED 0
 #define MAXCTHASH 128
 static curse_type * cursetypes[MAXCTHASH]; /* FIXME: selist to hastable with open addressing */
 
 void ct_register(const curse_type * ct)
 {
-    size_t hash = stbds_hash_string((char *) ct->cname, CTHASHSEED);
+    size_t hash = str_hash(ct->cname);
     size_t n = hash % MAXCTHASH, k = n;
     assert(ct->age == NULL || (ct->flags&CURSE_NOAGE) == 0);
     assert((ct->flags&CURSE_ISNEW) == 0);
@@ -280,7 +280,7 @@ void ct_register(const curse_type * ct)
 
 const curse_type *ct_find(const char *c)
 {
-    size_t hash = stbds_hash_string((char *)c, CTHASHSEED);
+    size_t hash = str_hash(c);
     size_t n = hash % MAXCTHASH, k = n;
     while (cursetypes[k]) {
         const curse_type *type = cursetypes[k];
