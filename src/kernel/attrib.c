@@ -8,6 +8,8 @@
 #include <storage.h>
 #include <strings.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -112,8 +114,10 @@ void a_finalizestring(variant * var)
     free(var->v);
 }
 
-#define MAXATHASH 61
-static attrib_type *at_hash[MAXATHASH];
+static struct at_hash_t {
+    unsigned int key;
+    attrib_type *value;
+} *at_hash;
 
 static unsigned int __at_hashkey(const char *s)
 {
@@ -128,46 +132,42 @@ static unsigned int __at_hashkey(const char *s)
 
 void at_register(attrib_type * at)
 {
-    attrib_type *find;
-
+    unsigned int hash = __at_hashkey(at->name);
+#ifndef NDEBUG
+    ptrdiff_t i = hmgeti(at_hash, hash);
+    if (i >= 0) {
+        if (at == at_hash[i].value) {
+            log_error("attribute %s is already registered", at->name);
+            return;
+        }
+        else {
+            log_fatal("attributes %s and %s hash to the same key", at->name, at_hash[i].value->name);
+        }
+    }
+#endif
     if (at->read == NULL) {
-        log_warning("registering non-persistent attribute %s.\n", at->name);
+        log_error("registering non-persistent attribute %s.\n", at->name);
     }
-    at->hashkey = __at_hashkey(at->name);
-    find = at_hash[at->hashkey % MAXATHASH];
-    while (find && at->hashkey != find->hashkey) {
-        find = find->nexthash;
-    }
-    if (find && find == at) {
-        log_warning("attribute '%s' was registered more than once\n", at->name);
-        return;
-    }
-    else {
-        assert(!find || !"hashkey is already in use");
-    }
-    at->nexthash = at_hash[at->hashkey % MAXATHASH];
-    at_hash[at->hashkey % MAXATHASH] = at;
+    hmput(at_hash, hash, at);
 }
 
 static attrib_type *at_find_key(unsigned int hk)
 {
-    attrib_type *find = at_hash[hk % MAXATHASH];
-    while (find && hk != find->hashkey)
-        find = find->nexthash;
-    if (!find) {
-        const char *translate[3][2] = {
-            { "zielregion", "targetregion" },     /* remapping: from 'zielregion, heute targetregion */
-            { "verzaubert", "curse" },    /* remapping: frueher verzaubert, jetzt curse */
+    ptrdiff_t i = hmgeti(at_hash, hk);
+    if (i < 0) {
+        int k;
+        const char *aliases[3][2] = {
+            { "zielregion", "targetregion" }, /* remapping: from 'zielregion, heute targetregion */
+            { "verzaubert", "curse" },        /* remapping: frueher verzaubert, jetzt curse */
             { NULL, NULL }
         };
-        int i = 0;
-        while (translate[i][0]) {
-            if (__at_hashkey(translate[i][0]) == hk)
-                return at_find_key(__at_hashkey(translate[i][1]));
-            ++i;
+        for (k = 0; aliases[k][0]; ++k) {
+            if (__at_hashkey(aliases[k][0]) == hk)
+                return at_find_key(__at_hashkey(aliases[k][1]));
         }
+        return NULL;
     }
-    return find;
+    return at_hash[i].value;
 }
 
 struct attrib_type *at_find(const char *name) {
@@ -482,8 +482,8 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner) {
 
     while (na) {
         if (na->type->write) {
-            assert(na->type->hashkey || !"attribute not registered");
-            WRITE_INT(store, na->type->hashkey);
+            unsigned int hashkey = __at_hashkey(na->type->name);
+            WRITE_INT(store, hashkey);
             na->type->write(&na->data, owner, store);
             na = na->next;
         }
@@ -496,5 +496,5 @@ void a_write(struct storage *store, const attrib * attribs, const void *owner) {
 
 void attrib_done(void) {
     cb_clear(&cb_deprecated);
-    memset(at_hash, 0, sizeof(at_hash[0]) * MAXATHASH);
+    hmfree(at_hash);
 }
