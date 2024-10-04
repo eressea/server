@@ -75,6 +75,7 @@ void game_done(void)
     free_config();
     free_locales();
 #endif
+    free_spells();
     free_aliases();
     free_prefixes();
     free_special_directions();

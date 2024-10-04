@@ -1,13 +1,14 @@
 #include <kernel/config.h>
-#include <selist.h>
 #include "pathfinder.h"
 
 #include "region.h"
 #include "terrain.h"
 
+#include <stb_ds.h>
+
+#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #define MAXDEPTH 1024
 
@@ -78,10 +79,10 @@ static void free_nodes(node * root)
     }
 }
 
-struct selist *path_regions_in_range(struct region *handle_start, int maxdist,
+region **path_regions_in_range(struct region *handle_start, int maxdist,
     bool(*allowed) (const struct region *, const struct region *))
 {
-    selist * rlist = NULL;
+    region ** rlist = NULL;
     node *root = new_node(handle_start, 0, NULL);
     node **handle_end = &root->next;
     node *n = root;
@@ -103,7 +104,7 @@ struct selist *path_regions_in_range(struct region *handle_start, int maxdist,
                 continue;               /* can't go there */
 
             /* add the region to the list of available ones. */
-            selist_push(&rlist, rn);
+            arrput(rlist, rn);
 
             /* make sure we don't go here again, and put the region into the set for
                further BFS'ing */

@@ -82,7 +82,7 @@ extern "C" {
             struct message_list *msgs;
         } *battles;
         struct item *items;         /* items this faction can claim */
-        struct selist *seen_factions;
+        struct selist *seen_factions; /* selist used as a set<faction *> */
         bool _alive;              /* enno: sollte ein flag werden */
     } faction;
 

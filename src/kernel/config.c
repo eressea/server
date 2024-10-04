@@ -215,7 +215,6 @@ void kernel_done(void)
     item_done();
     message_done();
     reports_done();
-    curses_done();
     crmessage_done();
     translation_done();
     mt_clear();

@@ -25,8 +25,8 @@
 
 #include <tests.h>
 
+#include <stb_ds.h>
 #include <CuTest.h>
-#include <selist.h>
 
 #include <assert.h>
 #include <stddef.h>           // for NULL
@@ -832,9 +832,9 @@ static void test_teach_message(CuTest *tc) {
     teach = (teaching_info *)a->data.v;
     CuAssertPtrNotNull(tc, teach->teachers);
     CuAssertIntEquals(tc, 600, teach->days);
-    CuAssertIntEquals(tc, 2, selist_length(teach->teachers));
-    CuAssertPtrEquals(tc, u1, selist_get(teach->teachers, 0));
-    CuAssertPtrEquals(tc, u2, selist_get(teach->teachers, 1));
+    CuAssertIntEquals(tc, 2, (int)arrlen(teach->teachers));
+    CuAssertPtrEquals(tc, u1, teach->teachers[0]);
+    CuAssertPtrEquals(tc, u2, teach->teachers[1]);
     study_cmd(u, u->thisorder);
     CuAssertPtrEquals(tc, NULL, test_find_messagetype(u1->faction->msgs, "teach_teacher"));
     CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "teach_teacher"));

@@ -14,7 +14,7 @@ typedef struct unresolved {
     /* information on how to resolve the missing object */
     resolve_fun resolve;
     /* function to resolve the unknown object */
-    selist *addrs;
+    selist *addrs; /* FIXME: selist used as unsorted array */
     /* address to pass to the resolve-function */
 } unresolved;
 

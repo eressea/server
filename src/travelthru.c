@@ -13,13 +13,13 @@
 #include <util/language.h>
 
 #include <stream.h>
-#include <selist.h>
+#include <stb_ds.h>
 
 #include <assert.h>
 #include <string.h>
 
 static void travel_done(variant *var) {
-    selist_free((selist *)var->v);
+    arrfree(var->v);
 }
 
 /*********************/
@@ -46,7 +46,7 @@ void travelthru_add(region * r, unit * u)
     region *next[MAXDIRECTIONS];
     int d;
     attrib *a;
-    selist *ql;
+    unit **travelers;
 
     assert(r);
     assert(u);
@@ -55,11 +55,10 @@ void travelthru_add(region * r, unit * u)
     if (!a) {
         a = a_add(&r->attribs, a_new(&at_travelunit));
     }
-    ql = (selist *)a->data.v;
-
     fset(r, RF_TRAVELUNIT);
-    selist_push(&ql, u);
-    a->data.v = ql;
+    travelers = (unit **)a->data.v;
+    arrput(travelers, u);
+    a->data.v = travelers;
 
     /* the first and last region of the faction gets reset, because travelthrough
     * could be in regions that are located before the [first, last] interval,
@@ -78,31 +77,20 @@ bool travelthru_cansee(const struct region *r, const struct faction *f, const st
     return false;
 }
 
-struct cb_map_data {
-    void(*call)(region *, const struct unit *, void *);
-    void *data;
-    struct region *r;
-};
-
-static bool cb_map(void *data, void *ex) {
-    struct cb_map_data*cb = (struct cb_map_data*)ex;
-    struct unit *u = (struct unit *)data;
-    cb->call(cb->r, u, cb->data);
-    return true;
-}
-
 void travelthru_map(region * r, void(*cb)(region *, const struct unit *, void *), void *data)
 {
     attrib *a;
-    struct cb_map_data cbdata;
     
     assert(r);
-    cbdata.call = cb;
-    cbdata.data = data;
-    cbdata.r = r;
     a = a_find(r->attribs, &at_travelunit);
     if (a) {
-        selist *ql = (selist *)a->data.v;
-        selist_foreach_ex(ql, cb_map, &cbdata);
+        unit **travelers = (unit **)a->data.v;
+        if (travelers) {
+            size_t qi, ql;
+            for (qi = 0, ql = arrlen(travelers); qi != ql; ++qi) {
+                unit *u = travelers[qi];
+                cb(r, u, data);
+            }
+        }
     }
 }

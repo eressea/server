@@ -392,17 +392,18 @@ function test_speedsail()
     local u = unit.create(f, r, 1)
     
     turn_begin()
+    u.name = 'Xolgrim'
     u.ship = ship.create(r, "boat")
     u:add_item("speedsail", 2)
     u:clear_orders()
     u:add_order("BENUTZEN 1 Sonnensegel")
-    assert_equal(nil, u.ship:get_curse('shipspeed'))
+    assert_equal(nil, u.ship:get_curse('shipspeedup'))
     turn_process()
-    assert_equal(1, u.ship:get_curse('shipspeed'))
+    assert_equal(1, u.ship:get_curse('shipspeedup'))
     assert_equal(1, u:get_item("speedsail"))
     assert_equal(1, f:count_msg_type('use_speedsail'))
     turn_end()
-    assert_equal(1, u.ship:get_curse('shipspeed')) -- effect stays forever
+    assert_equal(1, u.ship:get_curse('shipspeedup')) -- effect stays forever
 end
 
 function test_use_foolpotion()

@@ -27,11 +27,12 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <selist.h>
 #include <util/rng.h>
 #include <util/unicode.h>
 
 #include <strings.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <limits.h>
@@ -213,17 +214,17 @@ static bool virgin_region(const region * r)
     return true;
 }
 
-static selist * get_island(region * root)
+static region ** get_island(region * root)
 {
-    selist * ql, *result = NULL;
-    int qi = 0;
+    region **result = NULL;
+    size_t qi, ql;
 
     fset(root, RF_MARK);
-    selist_push(&result, root);
+    arrput(result, root);
 
-    for (ql = result, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = 1; qi != ql; ++qi) {
         int dir;
-        region *r = (region *)selist_get(ql, qi);
+        region *r = result[qi];
         region * next[MAXDIRECTIONS];
 
         get_neighbours(r, next);
@@ -232,14 +233,14 @@ static selist * get_island(region * root)
             region *rn = next[dir];
             if (rn != NULL && rn->land && !fval(rn, RF_MARK)) {
                 fset(rn, RF_MARK);
-                selist_push(&result, rn);
+                arrput(result, rn);
+                ++ql;
             }
         }
     }
 
-    for (ql = result, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-        region *r = (region *)selist_get(ql, qi);
-        freset(r, RF_MARK);
+    for (qi = 0; ql; ++ql) {
+        freset(result[qi], RF_MARK);
     }
     return result;
 }
@@ -247,15 +248,15 @@ static selist * get_island(region * root)
 static void
 get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
 {
-    int qi, size = 0, maxage = 0, inhabited = 0;
-    selist *ql, *island = NULL;
-
-    selist_push(&island, root);
+    int size = 0, maxage = 0, inhabited = 0;
+    region **island = NULL;
+    size_t qi, ql;
+    arrput(island, root);
     fset(root, RF_MARK);
 
-    for (ql = island, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
+    for (qi = 0, ql = 1; qi != ql; ++qi) {
         int d;
-        region *r = (region *)selist_get(ql, qi);
+        region *r = island[qi];
         if (r->units) {
             unit *u;
             for (u = r->units; u; u = u->next) {
@@ -270,16 +271,16 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             region *rn = rconnect(r, d);
             if (rn && !fval(rn, RF_MARK) && rn->land) {
-                selist_push(&island, rn);
+                arrput(island, rn);
                 fset(rn, RF_MARK);
+                ++ql;
             }
         }
     }
-    for (ql = island, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-        region *r = (region *)selist_get(ql, qi);
-        freset(r, RF_MARK);
+    for (ql = arrlen(island), qi = 0; qi != ql; ++qi) {
+        freset(island[qi], RF_MARK);
     }
-    selist_free(island);
+    arrfree(island);
     if (size_p)
         *size_p = size;
     if (inhabited_p)
@@ -421,11 +422,11 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
         }
         if (rmin != NULL) {
             faction *f;
-            selist *ql, *rlist = get_island(rmin);
-            int qi;
+            region **island = get_island(rmin);
+            size_t qi, ql;
 
-            for (ql = rlist, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-                region *r = (region *)selist_get(ql, qi);
+            for (qi = 0, ql = arrlen(island); qi != ql; ++qi) {
+                region *r = island[qi];
                 unit *u;
                 for (u = r->units; u; u = u->next) {
                     f = u->faction;
@@ -435,7 +436,7 @@ int autoseed(newfaction ** players, int nsize, int max_agediff)
                     }
                 }
             }
-            selist_free(rlist);
+            arrfree(island);
             if (psize > 0) {
                 for (f = factions; f; f = f->next) {
                     freset(f, FFL_MARK);

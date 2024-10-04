@@ -31,7 +31,6 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <selist.h>
 #include <stb_ds.h>
 
 /* libc includes */

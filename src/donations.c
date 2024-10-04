@@ -17,7 +17,7 @@ typedef struct transfer {
     int amount;
 } transfer;
 
-static selist *transfers = NULL;
+static selist *transfers = NULL; /* selist used as a set<transfer *> in case of several donations */
 
 int cmp_transfer(const void *v1, const void *v2) {
     const transfer *t1 = (const transfer *)v1;

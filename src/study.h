@@ -15,7 +15,7 @@ enum magic_t;
 #define TEACHDIFFERENCE 2
 
 typedef struct teaching_info {
-    struct selist *teachers;
+    struct unit **teachers; /* stb_ds array */
     int students;
     int days;
 } teaching_info;

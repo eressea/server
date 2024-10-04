@@ -64,7 +64,6 @@
 #include <spells/unitcurse.h>
 
 #include <iniparser.h>
-#include <selist.h>
 #include <strings.h>
 
 #include <stb_ds.h>
