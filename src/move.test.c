@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "lighthouse.h"
 #include "attributes/follow.h"
-#include "spells/regioncurse.h"
 
 #include "kernel/attrib.h"
 #include "kernel/ally.h"

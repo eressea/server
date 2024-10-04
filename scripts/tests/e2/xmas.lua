@@ -81,8 +81,14 @@ function test_xmastree()
     assert_equal(0, r:get_resource("tree"))
     eressea.free_game()
     r = use_tree("plain")
-    assert_equal(get_turn(), r:get_key("xm06")) 
     assert_equal(10, r:get_resource("tree"))
+	-- intermittent?
+	local k = r:get_key("xm06")
+	local t = get_turn()
+	if (t ~= k) then
+		print("turn " .. t .. ", xm06 " .. k)
+	end
+    assert_equal(t, k) 
 end
 
 function test_stardust()
