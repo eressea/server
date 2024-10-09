@@ -864,7 +864,7 @@ int sp_goodwinds(castorder * co)
         return co->level;
     
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     sh = param->data.sh;
@@ -1020,7 +1020,7 @@ int sp_blessstonecircle(castorder * co)
         return cast_level;
     
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     b = param->data.b;
@@ -1366,7 +1366,7 @@ int sp_rosthauch(castorder * co)
         if (param->flag == TARGET_NOTFOUND)
             continue;
         success = true;
-        if (param->flag)
+        if (param->flag == TARGET_RESISTS)
             continue;
 
         for (i = 0; force > 0 && ironweapons[i].weapon.type; ++i) {
@@ -1508,7 +1508,7 @@ int sp_sparkle(castorder * co)
         return co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     u = param->data.u;
@@ -1839,11 +1839,13 @@ int sp_treewalkenter(castorder * co)
         const spellparameter* param = params + n;
         unit *u = param->data.u;
 
-        if (param->flag) {
+        if (param->flag == TARGET_RESISTS) {
+            erfolg = cast_level;
+        }
+        else if (param->flag == TARGET_NOTFOUND) {
             continue;
         }
-
-        if (!ucontact(u, caster)) {
+        else if (!ucontact(u, caster)) {
             ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                 "feedback_no_contact", "target", u));
         }
@@ -1902,6 +1904,7 @@ int sp_treewalkexit(castorder * co)
     const spellparameter* params = co->a_params;
     size_t n, len = arrlen(params);
 
+
     if (!is_astral(r)) {
         ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
             "spellfail_astralonly", ""));
@@ -1915,7 +1918,7 @@ int sp_treewalkexit(castorder * co)
 
     remaining_cap = (int)(co->force * 500);
 
-    if (params->typ != SPP_REGION) {
+    if (!params || params->typ != SPP_REGION) {
         report_failure(caster, co->order);
         return 0;
     }
@@ -2466,7 +2469,7 @@ int sp_fumblecurse(castorder * co)
         return co->level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     target = param->data.u;
@@ -2702,7 +2705,7 @@ static int sp_unholypower(castorder * co)
         const race *target_race;
         unit *u;
 
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
 
         u = param->data.u;
@@ -3373,7 +3376,7 @@ static int sp_analysesong_unit(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     u = param->data.u;
@@ -3461,7 +3464,7 @@ static int sp_charmingsong(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     target = param->data.u;
@@ -3721,7 +3724,7 @@ int sp_migranten(castorder * co)
         return target->number;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
@@ -4078,7 +4081,7 @@ static int sp_seduce(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag) {
+    if (param->flag == TARGET_NOTFOUND) {
         return 0;
     }
 
@@ -4174,8 +4177,9 @@ static int sp_calm_monster(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND) {
         return 0;
+    }
 
     target = param->data.u;        /* Zieleinheit */
 
@@ -4234,7 +4238,7 @@ static int sp_headache(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (target->number == 0 || param->flag)
+    if (target->number == 0 || param->flag == TARGET_NOTFOUND)
         return 0;
 
     /* finde das groesste Talent: */
@@ -4539,7 +4543,7 @@ int sp_analysedream(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     u = param->data.u;
@@ -4667,7 +4671,7 @@ int sp_dreamreading(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     u = param->data.u;
@@ -4721,7 +4725,7 @@ int sp_sweetdreams(castorder * co)
         if (opfer < 1)
             break;
 
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
 
         /* Zieleinheit */
@@ -4853,7 +4857,7 @@ int sp_itemcloak(castorder * co)
         return cast_level;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     /* Zieleinheit */
@@ -4903,7 +4907,7 @@ int sp_resist_magic_bonus(castorder * co)
         if (victims < 1)
             break;
 
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
 
         u = param->data.u;
@@ -4977,7 +4981,7 @@ int sp_enterastral(castorder * co)
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 0; n < len; ++n) {
         const spellparameter* param = params + n;
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
         u = param->data.u;
 
@@ -5157,7 +5161,7 @@ int sp_leaveastral(castorder * co)
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < len; ++n) {
         const spellparameter* param = params + n;
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
 
         u = param->data.u;
@@ -5225,7 +5229,7 @@ int sp_fetchastral(castorder * co)
         unit * u = param->data.u;
         int w;
 
-        if (param->flag)
+        if (param->flag != TARGET_OK)
             continue;
 
         if (u->region != ro) {
@@ -5494,7 +5498,7 @@ static int sp_eternizewall(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag != TARGET_OK)
         return 0;
 
     b = param->data.b;
@@ -5702,7 +5706,7 @@ int sp_stealaura(castorder * co)
     struct sc_mage *scm;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag != TARGET_OK)
         return 0;
 
     /* Zieleinheit */
@@ -5899,7 +5903,7 @@ int sp_speed2(castorder * co)
         if (maxmen < 1)
             break;
 
-        if (param->flag) {
+        if (param->flag != TARGET_OK) {
             if (param->flag == TARGET_RESISTS) {
                 cost = co->level;
             }
@@ -6107,7 +6111,7 @@ static int sp_babbler(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag != TARGET_OK)
         return 0;
 
     target = param->data.u;
@@ -6153,7 +6157,7 @@ static int sp_readmind(castorder * co)
     spellparameter *param = co->a_params;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag)
+    if (param->flag != TARGET_OK)
         return 0;
 
     target = param->data.u;

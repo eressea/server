@@ -592,7 +592,7 @@ static void test_treewalkenter(CuTest *tc) {
     param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
     arrput(args, param);
     test_create_castorder(&co, u, 4, 5.0, 0, args);
-    CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
+    CuAssertIntEquals(tc, co.level, sp_treewalkenter(&co));
     CuAssertPtrEquals(tc, r, u2->region);
 
     co.a_params[0].flag = 0;
