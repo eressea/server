@@ -6101,7 +6101,7 @@ int sp_becomewyrm(castorder * co)
 * Flag:
 *  (UNITSPELL | TESTCANSEE)
 */
-static int sp_babbler(castorder * co)
+int sp_babbler(castorder * co)
 {
     unit *target;
     region *r = co_get_region(co);
@@ -6111,7 +6111,7 @@ static int sp_babbler(castorder * co)
     message *msg;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag != TARGET_OK)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     target = param->data.u;
@@ -6119,10 +6119,10 @@ static int sp_babbler(castorder * co)
     if (target->faction == mage->faction) {
         /* Die Einheit ist eine der unsrigen */
         cmistake(mage, co->order, 45, MSG_MAGIC);
+        return 0;
     }
-
     /* Magieresistenz Unit */
-    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
+    if (param->flag == TARGET_RESISTS) {
         spy_message(5, mage, target);
         msg = msg_message("babbler_resist", "unit mage", target, mage);
     }

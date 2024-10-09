@@ -1,6 +1,7 @@
 # 29.4
 
 	- Weg der Bäume kostet auch bei resistenten Zielen [Bug 3051]
+	- Plappermaul testet nicht doppelt auf Resistenz [Bug 3051]
 
 # 28.3
 
