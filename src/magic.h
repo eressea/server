@@ -44,9 +44,15 @@ extern "C" {
         SPP_INT                     /* "i" : atoi() -> int */
     } sppobj_t;
 
+    typedef enum {
+        TARGET_OK,
+        TARGET_RESISTS,
+        TARGET_NOTFOUND
+    } target_t;
+
     typedef struct spellparameter {
         sppobj_t typ;
-        int flag;
+        target_t flag;
         union {
             struct region *r;
             struct unit *u;
@@ -62,9 +68,6 @@ extern "C" {
         int length;                 /* Anzahl der Elemente */
         char **strings;
     } strarray;
-
-#define TARGET_RESISTS (1<<0)
-#define TARGET_NOTFOUND (1<<1)
 
     /* ------------------------------------------------------------- */
     /* Magier:
