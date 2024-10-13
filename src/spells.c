@@ -1812,7 +1812,7 @@ int sp_treewalkenter(castorder * co)
     region *rt;
     int remaining_cap;
     size_t n, len = arrlen(params);
-    int erfolg = 0;
+    int cost = 0;
 
     if (getplane(r) != 0) {
         cmistake(caster, co->order, 190, MSG_MAGIC);
@@ -1839,10 +1839,11 @@ int sp_treewalkenter(castorder * co)
         const spellparameter* param = params + n;
         unit *u = param->data.u;
 
-        if (param->flag == TARGET_RESISTS) {
-            erfolg = cast_level;
+        if (param->flag == TARGET_NOTFOUND) {
+            continue;
         }
-        else if (param->flag == TARGET_NOTFOUND) {
+        else if (param->flag == TARGET_RESISTS) {
+            cost = cast_level;
             continue;
         }
         else if (!ucontact(u, caster)) {
@@ -1865,7 +1866,7 @@ int sp_treewalkenter(castorder * co)
             }
             remaining_cap = remaining_cap - w;
             move_unit(u, rt, NULL);
-            erfolg = cast_level;
+            cost = cast_level;
 
             /* Meldungen in der Ausgangsregion */
             astral_disappear(r, u);
@@ -1874,7 +1875,7 @@ int sp_treewalkenter(castorder * co)
             astral_appear(rt, u, caster->faction);
         }
     }
-    return erfolg;
+    return cost;
 }
 
 /* ------------------------------------------------------------- */
@@ -1896,7 +1897,6 @@ int sp_treewalkenter(castorder * co)
 int sp_treewalkexit(castorder * co)
 {
     region *rt;
-    unit *u;
     int remaining_cap, cost = 0;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
@@ -1925,7 +1925,7 @@ int sp_treewalkexit(castorder * co)
 
     /* Koordinaten setzen und Region loeschen fuer Ueberpruefung auf
      * Gueltigkeit */
-    rt = params->data.r;
+    rt = (params->flag == TARGET_NOTFOUND) ? NULL : params->data.r;
     if (!rt || !inhabitable(rt) || r_standard_to_astral(rt) != r) {
         cmistake(caster, co->order, 195, MSG_MAGIC);
         return 0;
@@ -1943,39 +1943,40 @@ int sp_treewalkexit(castorder * co)
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < len; ++n) {
+        unit *u;
         const spellparameter* param = params + n;
         if (param->flag == TARGET_NOTFOUND) {
             continue;
         }
-        u = param->data.u;
-
-        if (!can_survive(u, rt)) {
+        if (!can_survive(u = param->data.u, rt)) {
             cmistake(caster, co->order, 231, MSG_MAGIC);
         }
         else {
-            int w = weight(u);
-
             if (param->flag == TARGET_RESISTS) {
                 cost = cast_level;
+                continue;
             }
             else if (!ucontact(u, caster)) {
                 ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
                     "feedback_no_contact", "target", u));
             }
-            else if (remaining_cap - w < 0) {
-                ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
-                    "fail_tooheavy", "target", u));
-            }
             else {
-                remaining_cap = remaining_cap - w;
-                move_unit(u, rt, NULL);
-                cost = cast_level;
+                int w = weight(u);
+                if (remaining_cap - w < 0) {
+                    ADDMSG(&caster->faction->msgs, msg_feedback(caster, co->order,
+                        "fail_tooheavy", "target", u));
+                }
+                else {
+                    remaining_cap = remaining_cap - w;
+                    move_unit(u, rt, NULL);
+                    cost = cast_level;
 
-                /* Meldungen in der Ausgangsregion */
-                astral_disappear(r, u);
+                    /* Meldungen in der Ausgangsregion */
+                    astral_disappear(r, u);
 
-                /* Meldungen in der Zielregion */
-                astral_appear(rt, u, caster->faction);
+                    /* Meldungen in der Zielregion */
+                    astral_appear(rt, u, caster->faction);
+                }
             }
         }
     }
@@ -3446,7 +3447,7 @@ static bool can_charm(const unit * u, int maxlevel)
  * Flags:
  *   (UNITSPELL | TESTCANSEE)
  */
-static int sp_charmingsong(castorder * co)
+int sp_charmingsong(castorder * co)
 {
     unit *target;
     int duration;
