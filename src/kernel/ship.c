@@ -478,8 +478,18 @@ bool ship_crewed(const ship *sh, const unit *cap) {
 
 void scale_ship(ship *sh, int n)
 {
-    sh->size = sh->size * n / sh->number;
-    sh->damage = sh->damage * n / sh->number;
+    long long size = sh->size;
+    size *= n;
+    size /= sh->number;
+    assert(size <= INT_MAX);
+    sh->size = (int) size;
+    assert(sh->size >= 0);
+    size = sh->damage;
+    size *= n;
+    size /= sh->number;
+    assert(size <= INT_MAX);
+    sh->damage = (int)size;
+    assert(sh->damage >= 0);
     sh->number = n;
 }
 
