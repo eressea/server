@@ -1533,8 +1533,15 @@ static void test_charmingsong(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, f->msgs);
     co.a_params[0].flag = TARGET_OK;
 
+    // fail because target has a limited skill:
+    set_level(u2, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_noexpensives"));
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
+    test_clear_messages(f);
+    remove_skill(u2, SK_ALCHEMY);
+
     // fail because target has expensive skills > force / 2:
-    remove_skill(u2, SK_ENTERTAINMENT);
     set_level(u2, SK_TACTICS, 1 + (int)(co.force / 2));
     CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_noexpensives"));
