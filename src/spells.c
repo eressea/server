@@ -3476,10 +3476,10 @@ int sp_charmingsong(castorder * co)
         cmistake(mage, co->order, 45, MSG_MAGIC);
     }
     /* niemand mit teurem Talent */
-    if (!can_charm(target, cast_level / 2)) {
+    if (!can_charm(target, (int)(force / 2))) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_noexpensives", "target", target));
-        return 0;
+        return co->level;
     }
 
     /* Magieresistensbonus fuer mehr als Stufe Personen */
@@ -3492,14 +3492,25 @@ int sp_charmingsong(castorder * co)
         if (tb < sk)
             tb = sk;
     }
-    tb -= effskill(mage, SK_MAGIC, NULL);
     if (tb > 0) {
-        resist_bonus += tb * 15;
+        tb -= effskill(mage, SK_MAGIC, NULL);
+        if (tb > 0) {
+            resist_bonus += tb * 15;
+        }
     }
-    /* Magieresistenz */
-    if (target_resists_magic(mage, target, TYP_UNIT, resist_bonus)) {
-        report_failure(mage, co->order);
-        return 0;
+    /* Increased chance for magical resistence */
+    if (resist_bonus > 0) {
+        variant p_regular = resist_chance(mage, target, TYP_UNIT, 0);
+        variant p_modified = resist_chance(mage, target, TYP_UNIT, resist_bonus);
+        variant prob = frac_div(p_regular, p_modified);
+        if (prob.sa[0] > 0) {
+            if (rng_int() % prob.sa[1] < prob.sa[0]) {
+                /* target resists after all, because of bonus */
+                ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
+                    "unit region command target", mage, mage->region, co->order, target));
+                return cast_level;
+            }
+        }
     }
 
     duration = 3 + rng_int() % (int)force;
