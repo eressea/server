@@ -106,7 +106,7 @@ typedef struct region {
     unsigned short age;
     struct message_list *msgs;
     struct individual_message {
-        struct individual_message *next;
+        struct individual_message *next; /* FIXME: stb_ds array, not list */
         const struct faction *viewer;
         struct message_list *msgs;
     } *individual_messages;

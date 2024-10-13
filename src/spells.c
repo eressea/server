@@ -4011,7 +4011,7 @@ static int sp_bigrecruit(castorder * co)
  */
 
  /* restistenz der einheit pruefen */
-static int sp_pump(castorder * co)
+int sp_pump(castorder * co)
 {
     unit *u, *target;
     region *rt;
@@ -4020,28 +4020,28 @@ static int sp_pump(castorder * co)
     const spellparameter* params = co->a_params;
     int cast_level = co->level;
 
-    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
-     * abbrechen aber kosten lassen */
-    if (params[0].flag == TARGET_RESISTS)
-        return cast_level;
+    target = params[0].data.u;        /* Zieleinheit */
+    rt = params[1].data.r;  /* Zielregion */
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (params[0].flag)
+    /* Einheit oder Region nicht gefunden? Dann keine Kosten */
+    if (!target || !rt || params[0].flag == TARGET_NOTFOUND || params[1].flag == TARGET_NOTFOUND)
         return 0;
 
-    target = params[0].data.u;        /* Zieleinheit */
+    /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
+     * abbrechen aber kosten lassen */
+    if (params[0].flag == TARGET_RESISTS) {
+        return cast_level;
+    }
 
     if (fval(u_race(target), RCF_UNDEAD)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "error_not_on_undead", ""));
         return 0;
     }
-    if (is_magic_resistant(mage, target, 0) || IS_MONSTERS(target->faction)) {
+    if (IS_MONSTERS(target->faction)) {
         report_failure(mage, co->order);
         return 0;
     }
-
-    rt = params[1].data.r;
 
     for (u = rt->units; u; u = u->next) {
         if (u->faction == target->faction)

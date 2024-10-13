@@ -1572,6 +1572,58 @@ static void test_charmingsong(CuTest *tc) {
     test_teardown();
 }
 
+static void test_pump(CuTest *tc) {
+    struct region *r, *r2;
+    struct faction *f, *f2;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    u = test_create_unit(f = test_create_faction(), r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f2 = test_create_faction(), r);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    param.flag = TARGET_NOTFOUND; /* does not matter */
+    arrput(args, param);
+    set_level(u2, SK_PERCEPTION, 4);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    /* fail spell if any additional resistance checks are made: */
+    random_source_inject_constants(.0, 0);
+
+    /* spell fails because target unit not found: */
+    CuAssertIntEquals(tc, 0, sp_pump(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    co.a_params[0].flag = TARGET_OK;
+
+    /* spell fails because target region not found: */
+    CuAssertIntEquals(tc, 0, sp_pump(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    co.a_params[1].flag = TARGET_RESISTS; /* ignored as long as not TARGET_NOTFOUND */
+
+    /* success: */
+    CuAssertIntEquals(tc, co.level, sp_pump(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "pump_effect"));
+    CuAssertIntEquals(tc, 4, get_observer(r, f));
+    /* TODO: observer duration 2 */
+
+    co.a_params[1].data.r = r2; /* no unit of f2 in the region, no effect, half price */
+    CuAssertIntEquals(tc, co.level / 2, sp_pump(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_pump"));
+
+    /* TODO: fails against undead */
+    /* TODO: fails against monsters */
+
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
+}
+
 static void test_summon_familiar(CuTest *tc) {
     struct region *r;
     struct faction *f;
@@ -1723,6 +1775,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_babbler);
     SUITE_ADD_TEST(suite, test_sparkle);
     SUITE_ADD_TEST(suite, test_charmingsong);
+    SUITE_ADD_TEST(suite, test_pump);
     SUITE_ADD_TEST(suite, test_summon_familiar);
     SUITE_ADD_TEST(suite, test_shadowdemons);
     SUITE_ADD_TEST(suite, test_shadowlords);
