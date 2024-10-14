@@ -40,6 +40,7 @@
 
 /* libc includes */
 #include <assert.h>
+#include <limits.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
