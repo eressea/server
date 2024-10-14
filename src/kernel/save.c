@@ -1456,8 +1456,20 @@ ship *read_ship(gamedata *data)
     else {
         READ_INT(store, &sh->number);
     }
+    if (sh->number <= 0) {
+        log_error("fleet %s has %d ships", sh->name, sh->number);
+        sh->number = sh->size / sh->type->construction->maxsize;
+    }
     READ_INT(store, &sh->size);
+    if (sh->size <= 0) {
+        log_error("fleet %s has %d size", sh->name, sh->size);
+        sh->size = sh->type->construction->maxsize * sh->number;
+    }
     READ_INT(store, &sh->damage);
+    if (sh->damage < 0) {
+        log_error("fleet %s has %d damage", sh->name, sh->damage);
+        sh->damage = 0;
+    }
 
     if (data->version < FIX_SHIP_DAMAGE_VERSION) {
         if (sh->size > 0 && sh->number > 1) {

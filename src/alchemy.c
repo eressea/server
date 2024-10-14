@@ -24,6 +24,8 @@
 #include <storage.h>
 
 /* libc includes */
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -312,7 +314,10 @@ void scale_effects(unit* u, int n)
             data->value = 0;
         }
         else if (u->number > 0) {
-            data->value = (long long)data->value * n / u->number;
+            uint64_t scale = (uint64_t)data->value * n / u->number;
+            assert(scale <= INT_MAX);
+            assert(scale > 0);
+            data->value = scale;
         }
     }
 }

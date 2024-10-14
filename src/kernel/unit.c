@@ -54,6 +54,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <limits.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
@@ -815,7 +816,7 @@ void transfermen(unit* u, unit* dst, int n)
             transfer_curse(u, dst, n);
             transfer_effects(u, dst, n);
         }
-        delta = (long long)u->hp * n / u->number;
+        delta = (uint64_t)u->hp * n / u->number;
         dst->hp += delta;
         u->hp -= delta;
         /* cannot use scale_number here, because it changes hp+effects: */
@@ -1567,7 +1568,7 @@ void scale_number(unit * u, int n)
     }
     if (u->number > 0) {
         if (n > 0) {
-            u->hp = (long long)u->hp * n / u->number;
+            u->hp = (uint64_t)u->hp * n / u->number;
         }
         else {
             a_removeall(&u->attribs, &at_effect);

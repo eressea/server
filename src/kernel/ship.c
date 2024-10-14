@@ -41,6 +41,7 @@
 /* libc includes */
 #include <assert.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -478,17 +479,14 @@ bool ship_crewed(const ship *sh, const unit *cap) {
 
 void scale_ship(ship *sh, int n)
 {
-    long long size = sh->size;
-    size *= n;
-    size /= sh->number;
-    assert(size <= INT_MAX);
-    sh->size = (int) size;
-    assert(sh->size >= 0);
-    size = sh->damage;
-    size *= n;
-    size /= sh->number;
-    assert(size <= INT_MAX);
-    sh->damage = (int)size;
+    uint64_t scale = (uint64_t)sh->size * n / sh->number;
+    assert(scale <= INT_MAX);
+    sh->size = (int) scale;
+    assert(sh->size > 0);
+
+    scale = (uint64_t)sh->damage * n / sh->number;
+    assert(scale <= INT_MAX);
+    sh->damage = (int)scale;
     assert(sh->damage >= 0);
     sh->number = n;
 }
