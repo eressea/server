@@ -483,7 +483,7 @@ void scale_ship(ship *sh, int n)
     uint64_t scale = (uint64_t)sh->size * n / sh->number;
     assert(scale <= INT_MAX);
     sh->size = (int) scale;
-    assert(sh->size > 0);
+    assert(sh->size >= 0);
 
     scale = (uint64_t)sh->damage * n / sh->number;
     assert(scale <= INT_MAX);
