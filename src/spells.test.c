@@ -31,6 +31,7 @@
 #include <spells/shipcurse.h>
 #include <spells/flyingship.h>
 #include <attributes/attributes.h>
+#include <attributes/otherfaction.h>
 
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
@@ -177,7 +178,7 @@ static void test_speed2(CuTest *tc) {
     u2 = test_create_unit(f, r);
     scale_number(u2, 30);
 
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_UNIT;
     param.data.u = u2;
     arrput(args, param);
@@ -230,7 +231,7 @@ static void test_goodwinds(CuTest *tc) {
     u = test_create_unit(f, r);
     sh = test_create_ship(r, NULL);
 
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_SHIP;
     param.data.sh = sh;
     arrput(args, param);
@@ -313,7 +314,7 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "spell_astral_only"));
 
-    test_clear_messagelist(&f->msgs);
+    test_clear_messages(f);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
     ra->_plane = get_astralplane();
     move_unit(u, ra, NULL);
@@ -324,10 +325,10 @@ static void test_view_reality(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(rx, f));
 
-    test_clear_messagelist(&f->msgs);
+    test_clear_messages(f);
     r = test_create_plain(0, 0);
 
-    test_clear_messagelist(&f->msgs);
+    test_clear_messages(f);
 
     /* units exist, r can be seen, but rx is out of range */
     test_create_castorder(&co, u, 9, 10.0, 0, NULL);
@@ -383,7 +384,7 @@ static void test_show_astral(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_showastral(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "spell_astral_forbidden"));
 
-    test_clear_messagelist(&f->msgs);
+    test_clear_messages(f);
     move_unit(u, r, NULL);
 
     /* error: no target region */
@@ -586,16 +587,21 @@ static void test_treewalkenter(CuTest *tc) {
     rsettrees(r, 2, r->terrain->size / 2);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
     ra->_plane = get_astralplane();
-
-    param.flag = TARGET_RESISTS;
+    param.flag = TARGET_NOTFOUND;
     param.typ = SPP_UNIT;
     param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
     arrput(args, param);
     test_create_castorder(&co, u, 4, 5.0, 0, args);
+
+    /* spell fails because target is not found */
     CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
+
+    /* spell fails because target units resist it, but is paid in full */
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_treewalkenter(&co));
     CuAssertPtrEquals(tc, r, u2->region);
 
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, 0, sp_treewalkenter(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "feedback_no_contact"));
     test_clear_messages(u->faction);
@@ -611,38 +617,99 @@ static void test_treewalkenter(CuTest *tc) {
 static void test_treewalkexit(CuTest *tc) {
     unit *u, *u2;
     region *r, *ra;
+    race *rc;
     castorder co;
     spellparameter param, * args = NULL;
+    const struct item_type *it_silver;
+    curse *c;
 
     test_setup();
+    rc = test_create_race("undead");
+    rc->flags |= RCF_UNDEAD;
+    init_resources();
+    it_silver = get_resourcetype(R_SILVER)->itype;
     test_use_astral();
     r = test_create_plain(0, 0);
-    rsettrees(r, 2, r->terrain->size / 2);
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
     ra->_plane = get_astralplane();
     u = test_create_unit(test_create_faction(), ra);
-    param.flag = TARGET_RESISTS;
+    param.flag = TARGET_OK;
     param.typ = SPP_REGION;
     param.data.r = r;
     arrput(args, param);
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_UNIT;
-    param.data.u = u2 = test_create_unit(test_create_faction(), u->region);
+    param.data.u = u2 = test_create_unit(test_create_faction_ex(rc, NULL), u->region);
     arrput(args, param);
-
     test_create_castorder(&co, u, 4, 5.0, 0, args);
-    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
 
+    /* target region is not a forest */
+    rsettrees(r, 2, 0);
+    CuAssertTrue(tc, !r_isforest(r));
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error196"));
+    test_clear_messages(u->faction);
+    rsettrees(r, 2, r->terrain->size / 2);
+    CuAssertTrue(tc, r_isforest(r));
+
+    /* spell fails because the region resisted it: */
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+
+    /* spell fails because the region was not found: */
     co.a_params[0].flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error195"));
+    test_clear_messages(u->faction);
+    co.a_params[0].flag = TARGET_OK;
 
-    co.a_params[0].flag = 0;
-    co.a_params[1].flag = TARGET_RESISTS;
-    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
-
-    co.a_params[0].flag = 0;
+    /* spell fails because target unit was not found*/
     co.a_params[1].flag = TARGET_NOTFOUND;
     CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+
+    /* spell fails because target units resist it, but is paid in full */
+    co.a_params[1].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+
+    /* no contact */
+    co.a_params[1].flag = TARGET_OK;
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "feedback_no_contact"));
+    test_clear_messages(u->faction);
+
+    contact_unit(u2, u);
+    /* target unit is too heavy */
+    /* at level 5, weight is capped at 2500: */
+    i_change(&u2->items, it_silver, 1501);
+    CuAssertIntEquals(tc, 2501, weight(u2));
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "fail_tooheavy"));
+    test_clear_messages(u->faction);
+    i_change(&u2->items, it_silver, -1);
+    CuAssertIntEquals(tc, 2500, weight(u2));
+
+    /* target region is inhospitable */
+    c = create_curse(u, &r->attribs, &ct_holyground, 1.0, 1, 1.0, 0);
+    CuAssertTrue(tc, !can_survive(u2, r));
+    CuAssertIntEquals(tc, 0, sp_treewalkexit(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error231"));
+    test_clear_messages(u->faction);
+    remove_curse(&r->attribs, c);
+    CuAssertTrue(tc, can_survive(u2, r));
+
+    /* success */
+    CuAssertIntEquals(tc, co.level, sp_treewalkexit(&co));
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrEquals(tc, NULL, u->faction->msgs);
+    CuAssertPtrEquals(tc, NULL, u->region->msgs);
+    CuAssertPtrNotNull(tc, u->region->individual_messages);
+    CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "astral_appear"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(ra->individual_messages->msgs, "astral_disappear"));
 
     test_teardown();
 }
@@ -916,7 +983,7 @@ static void test_stormwinds(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "stormwinds_reduced"));
     test_clear_messages(u->faction);
 
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_stormwinds(&co));
     CuAssertPtrNotNull(tc, c = get_curse(sh->attribs, &ct_stormwind));
     CuAssertIntEquals(tc, 1, c->duration);
@@ -961,7 +1028,7 @@ static void test_fumblecurse(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_fumblecurse(&co));
     CuAssertPtrEquals(tc, NULL, get_curse(u2->attribs, &ct_fumble));
 
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_fumblecurse(&co));
     CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_fumble));
     CuAssertIntEquals(tc, co.level, c->duration);
@@ -1036,7 +1103,7 @@ static void test_migrants(CuTest *tc) {
 
     test_setup();
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_UNIT;
     param.data.u = u2 = test_create_unit(f, u->region);
     arrput(args, param);
@@ -1068,7 +1135,7 @@ static void test_migrants(CuTest *tc) {
     test_clear_messages(u->faction);
 
     /* no contact, no cost: */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, 0, sp_migranten(&co));
     CuAssertPtrEquals(tc, f, u2->faction);
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail::contact"));
@@ -1100,7 +1167,7 @@ static void test_blessstonecircle(CuTest *tc) {
     b = test_create_building(r, test_create_buildingtype("stonecircle"));
     btype = test_create_buildingtype("blessedstonecircle");
 
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_BUILDING;
     param.data.b = b;
     arrput(args, param);
@@ -1150,7 +1217,7 @@ static void test_destroy_magic_region(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
     /* even without a curse to destroy, we still have to pay */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
@@ -1203,7 +1270,7 @@ static void test_destroy_magic_unit(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
     /* even without a curse to destroy, we still have to pay */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
@@ -1239,7 +1306,7 @@ static void test_destroy_magic_building(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
     /* even without a curse to destroy, we still have to pay */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
@@ -1276,7 +1343,7 @@ static void test_destroy_magic_ship(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
 
     /* even without a curse to destroy, we still have to pay */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_destroy_magic(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "destroy_magic_noeffect"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "destroy_magic_effect"));
@@ -1321,7 +1388,7 @@ static void test_rosthauch(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
 
     /* target found, pay even if nothing happened: */
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
 
     /* at level 4, destroy up to 24 swords: */
@@ -1334,7 +1401,7 @@ static void test_rosthauch(CuTest *tc) {
      * only 50% can be rusted.
      * force of 24 = 16 sword, 4 shields
      */
-    co.a_params[1].flag = 0;
+    co.a_params[1].flag = TARGET_OK;
     i_change(&u2->items, it_shield, 2);
     i_change(&u3->items, it_shield, 12);
     CuAssertIntEquals(tc, co.level, sp_rosthauch(&co));
@@ -1347,6 +1414,51 @@ static void test_rosthauch(CuTest *tc) {
 }
 
 
+static void test_babbler(CuTest *tc) {
+    struct region *r;
+    struct faction *f, *f2;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, * args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f2 = test_create_faction(), r);
+    set_otherfaction(u2, f);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    create_mage(u2, M_GWYRRD);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    CuAssertIntEquals(tc, 0, sp_babbler(&co));
+
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_babbler(&co));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "babbler_resist", f2));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport_faction"));
+    test_clear_messages(f2);
+
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_babbler(&co));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "babbler_effect", f2));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport_mage"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport_faction"));
+    test_clear_messages(f);
+
+    co.a_params[0].data.u = test_create_unit(f, r);
+    CuAssertIntEquals(tc, 0, sp_babbler(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error45"));
+    test_clear_messages(f);
+
+    test_teardown();
+}
+
 static void test_sparkle(CuTest *tc) {
     struct region *r;
     struct faction *f;
@@ -1356,6 +1468,7 @@ static void test_sparkle(CuTest *tc) {
     spellparameter param, * args = NULL;
 
     test_setup();
+    random_source_inject_constants(.0, 0); /** should make all magic resistance succeed */
 
     r = test_create_plain(0, 0);
     f = test_create_faction();
@@ -1371,7 +1484,7 @@ static void test_sparkle(CuTest *tc) {
     co.a_params[0].flag = TARGET_RESISTS;
     CuAssertIntEquals(tc, co.level, sp_sparkle(&co));
 
-    co.a_params[0].flag = 0;
+    co.a_params[0].flag = TARGET_OK;
     CuAssertIntEquals(tc, co.level, sp_sparkle(&co));
     CuAssertPtrNotNull(tc, c = get_curse(u2->attribs, &ct_sparkle));
     CuAssertIntEquals(tc, co.level + 1, c->duration);
@@ -1379,6 +1492,183 @@ static void test_sparkle(CuTest *tc) {
     CuAssertDblEquals(tc, 0.0, c->effect - (int)c->effect, 0.01);
 
     test_teardown();
+}
+
+static void test_readmind(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), r);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    // target not found:
+    CuAssertIntEquals(tc, 0, sp_readmind(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    // target resistts and notices:
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_readmind(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u2->faction, "stealdetect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport"));
+    test_clear_messages(u2->faction);
+
+    // success:
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_readmind(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport_faction"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+    test_clear_messages(f);
+
+    // not on your own units:
+    u_setfaction(u2, f);
+    CuAssertIntEquals(tc, 0, sp_readmind(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error45"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport"));
+
+    test_teardown();
+}
+
+static void test_charmingsong(CuTest *tc) {
+    struct region *r;
+    struct faction *f, *f2;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, * args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    u = test_create_unit(f = test_create_faction(), r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f2 = test_create_faction(), r);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    /* fail spell if any additional resistance checks are made: */
+    random_source_inject_constants(.0, 0);
+    /* maximum unit size is force, beyond that, increased magic resistance: */
+    scale_number(u2, (int)co.force);
+    /* target's best skills is not greater than magician's magic skill, beyond that, increased magic resistance: */
+    set_level(u, SK_MAGIC, 8);
+    set_level(u2, SK_ENTERTAINMENT, 8);
+    /* if target's pais skills exceed force / 2, they get a magic resistance bonus */
+    set_level(u2, SK_TACTICS, (int)(co.force / 2));
+
+    /* spell fails, unit not found: */
+    CuAssertIntEquals(tc, 0, sp_charmingsong(&co));
+    CuAssertPtrEquals(tc, f2, u2->faction);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrEquals(tc, f2, u2->faction);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    co.a_params[0].flag = TARGET_OK;
+
+    // fail because target has a limited skill:
+    set_level(u2, SK_ALCHEMY, 1);
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_noexpensives"));
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
+    test_clear_messages(f);
+    remove_skill(u2, SK_ALCHEMY);
+
+    // fail because target has expensive skills > force / 2:
+    set_level(u2, SK_TACTICS, 1 + (int)(co.force / 2));
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_noexpensives"));
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
+    test_clear_messages(f);
+    set_level(u2, SK_TACTICS, (int)(co.force / 2));
+
+    // unit has a skill that's higher than magician's magic skill, gets a resistance bonus:
+    set_level(u2, SK_ENTERTAINMENT, 9);
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellunitresists"));
+    test_clear_messages(f);
+    set_level(u2, SK_ENTERTAINMENT, 1);
+
+    // big unit, gets a resistance bonus and spell fails:
+    scale_number(u2, 1 + (int)co.force);
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellunitresists"));
+    scale_number(u2, (int)co.force);
+    test_clear_messages(f);
+
+    // success:
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrEquals(tc, u->faction, u2->faction);
+
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
+
+    test_teardown();
+}
+
+static void test_pump(CuTest *tc) {
+    struct region *r, *r2;
+    struct faction *f, *f2;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    u = test_create_unit(f = test_create_faction(), r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f2 = test_create_faction(), r);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    param.flag = TARGET_NOTFOUND; /* does not matter */
+    arrput(args, param);
+    set_level(u2, SK_PERCEPTION, 4);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    /* fail spell if any additional resistance checks are made: */
+    random_source_inject_constants(.0, 0);
+
+    /* spell fails because target unit not found: */
+    CuAssertIntEquals(tc, 0, sp_pump(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    co.a_params[0].flag = TARGET_OK;
+
+    /* spell fails because target region not found: */
+    CuAssertIntEquals(tc, 0, sp_pump(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    co.a_params[1].flag = TARGET_RESISTS; /* ignored as long as not TARGET_NOTFOUND */
+
+    /* success: */
+    CuAssertIntEquals(tc, co.level, sp_pump(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "pump_effect"));
+    CuAssertIntEquals(tc, 4, get_observer(r, f));
+    /* TODO: observer duration 2 */
+
+    co.a_params[1].data.r = r2; /* no unit of f2 in the region, no effect, half price */
+    CuAssertIntEquals(tc, co.level / 2, sp_pump(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellfail_pump"));
+
+    /* TODO: fails against undead */
+    /* TODO: fails against monsters */
+
+    CuAssertPtrEquals(tc, NULL, f2->msgs);
 }
 
 static void test_summon_familiar(CuTest *tc) {
@@ -1465,6 +1755,7 @@ static void test_shadowlords(CuTest *tc) {
     CuAssertIntEquals(tc, 9, get_level(u2, SK_STEALTH));
     CuAssertIntEquals(tc, 5, get_level(u2, SK_PERCEPTION));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "summon_effect"));
+    test_clear_messages(f);
     test_teardown();
 }
 
@@ -1482,7 +1773,7 @@ static void test_analysemagic(CuTest *tc) {
     u = test_create_unit(f, r);
     u2 = test_create_unit(f, r);
 
-    param.flag = 0;
+    param.flag = TARGET_OK;
     param.typ = SPP_UNIT;
     param.data.u = u2;
     arrput(args, param);
@@ -1528,7 +1819,11 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_magic_building);
     SUITE_ADD_TEST(suite, test_destroy_magic_ship);
     SUITE_ADD_TEST(suite, test_rosthauch);
+    SUITE_ADD_TEST(suite, test_babbler);
     SUITE_ADD_TEST(suite, test_sparkle);
+    SUITE_ADD_TEST(suite, test_readmind);
+    SUITE_ADD_TEST(suite, test_charmingsong);
+    SUITE_ADD_TEST(suite, test_pump);
     SUITE_ADD_TEST(suite, test_summon_familiar);
     SUITE_ADD_TEST(suite, test_shadowdemons);
     SUITE_ADD_TEST(suite, test_shadowlords);
