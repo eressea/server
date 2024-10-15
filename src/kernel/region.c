@@ -936,14 +936,17 @@ void free_region(region * r)
         r->msgs = 0;
     }
 
-    while (r->individual_messages) {
-        struct individual_message *msg = r->individual_messages;
-        r->individual_messages = msg->next;
-        if (msg->msgs) {
-            free_messagelist(msg->msgs->begin);
-            free(msg->msgs);
+    if (r->individual_messages) {
+        ptrdiff_t i, l = arrlen(r->individual_messages);
+        for (i = 0; i != l; ++i) {
+            faction_messages *msg = r->individual_messages + i;
+            if (msg->msgs) {
+                free_messagelist(msg->msgs->begin);
+                free(msg->msgs);
+            }
         }
-        free(msg);
+        arrfree(r->individual_messages);
+        r->individual_messages = NULL;
     }
 
     a_removeall(&r->attribs, NULL);
@@ -1307,32 +1310,40 @@ void write_region_reference(const region * r, struct storage *store)
 struct message_list *r_getmessages(const struct region *r,
     const struct faction *viewer)
 {
-    struct individual_message *imsg = r->individual_messages;
-    while (imsg && (imsg)->viewer != viewer)
-        imsg = imsg->next;
-    if (imsg)
-        return imsg->msgs;
+    if (r->individual_messages) {
+        ptrdiff_t i, l = arrlen(r->individual_messages);
+        for (i = 0; i != l; ++i) {
+            faction_messages *imsg = r->individual_messages + i;
+            if (imsg->viewer == viewer) {
+                return imsg->msgs;
+            }
+        }
+    }
     return NULL;
 }
 
 struct message *r_addmessage(struct region *r, const struct faction *viewer,
-struct message *msg)
+    struct message *msg)
 {
     assert(r);
     if (viewer) {
-        struct individual_message *imsg;
-        imsg = r->individual_messages;
-        while (imsg && imsg->viewer != viewer)
-            imsg = imsg->next;
-        if (imsg == NULL) {
-            imsg = malloc(sizeof(struct individual_message));
-            if (!imsg) abort();
-            imsg->next = r->individual_messages;
-            imsg->msgs = NULL;
-            r->individual_messages = imsg;
-            imsg->viewer = viewer;
+        faction_messages *vmsg = NULL;
+        if (r->individual_messages) {
+            ptrdiff_t i, l = arrlen(r->individual_messages);
+            for (i = 0; i != l; ++i) {
+                faction_messages *imsg = r->individual_messages + i;
+                if (imsg->viewer == viewer) {
+                    vmsg = imsg;
+                    break;
+                }
+            }
         }
-        return add_message(&imsg->msgs, msg);
+        if (!vmsg) {
+            vmsg = stbds_arraddnptr(r->individual_messages, 1);
+            vmsg->viewer = viewer;
+            vmsg->msgs = NULL;
+        }
+        return add_message(&vmsg->msgs, msg);
     }
     return add_message(&r->msgs, msg);
 }

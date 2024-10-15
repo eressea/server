@@ -89,6 +89,11 @@ typedef enum seen_mode {
     seen_battle
 } seen_mode;
 
+typedef struct faction_messages {
+    const struct faction *viewer;
+    struct message_list *msgs;
+} faction_messages;
+
 typedef struct region {
     struct region *next;
     struct land_region *land;
@@ -105,11 +110,7 @@ typedef struct region {
     int flags;
     unsigned short age;
     struct message_list *msgs;
-    struct individual_message {
-        struct individual_message *next; /* FIXME: stb_ds array, not list */
-        const struct faction *viewer;
-        struct message_list *msgs;
-    } *individual_messages;
+    struct faction_messages *individual_messages;
     struct attrib *attribs;
     const struct terrain_type *terrain;
     struct rawmaterial *resources;
