@@ -6161,7 +6161,7 @@ int sp_babbler(castorder * co)
 * Flag:
 * (UNITSPELL)
 */
-static int sp_readmind(castorder * co)
+int sp_readmind(castorder * co)
 {
     unit *target;
     unit *mage = co_get_caster(co);
@@ -6169,7 +6169,7 @@ static int sp_readmind(castorder * co)
     spellparameter *param = co->a_params;
 
     /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (param->flag != TARGET_OK)
+    if (param->flag == TARGET_NOTFOUND)
         return 0;
 
     target = param->data.u;
@@ -6177,16 +6177,17 @@ static int sp_readmind(castorder * co)
     if (target->faction == mage->faction) {
         /* Die Einheit ist eine der unsrigen */
         cmistake(mage, co->order, 45, MSG_MAGIC);
+        return 0;
     }
 
     /* Magieresistenz Unit */
-    if (target_resists_magic(mage, target, TYP_UNIT, 0)) {
-        cmistake(mage, co->order, 180, MSG_MAGIC);
+    if (param->flag == TARGET_RESISTS) {
         /* "Fuehlt sich beobachtet" */
         ADDMSG(&target->faction->msgs, msg_message("stealdetect", "unit", target));
-        return 0;
     }
-    spy_message(2, mage, target);
+    else {
+        spy_message(2, mage, target);
+    }
 
     return cast_level;
 }

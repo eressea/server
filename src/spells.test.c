@@ -1440,7 +1440,6 @@ static void test_babbler(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_babbler(&co));
     CuAssertPtrNotNull(tc, test_find_region_message(r, "babbler_resist", f2));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport"));
-    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport_mage"));
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport_faction"));
     test_clear_messages(f2);
 
@@ -1491,6 +1490,54 @@ static void test_sparkle(CuTest *tc) {
     CuAssertIntEquals(tc, co.level + 1, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     CuAssertDblEquals(tc, 0.0, c->effect - (int)c->effect, 0.01);
+
+    test_teardown();
+}
+
+static void test_readmind(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), r);
+    param.flag = TARGET_NOTFOUND;
+    arrput(args, param);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+
+    // target not found:
+    CuAssertIntEquals(tc, 0, sp_readmind(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    // target resistts and notices:
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_readmind(&co));
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u2->faction, "stealdetect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport"));
+    test_clear_messages(u2->faction);
+
+    // success:
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_readmind(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spyreport"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport_faction"));
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+    test_clear_messages(f);
+
+    // not on your own units:
+    u_setfaction(u2, f);
+    CuAssertIntEquals(tc, 0, sp_readmind(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error45"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "spyreport"));
 
     test_teardown();
 }
@@ -1774,6 +1821,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_rosthauch);
     SUITE_ADD_TEST(suite, test_babbler);
     SUITE_ADD_TEST(suite, test_sparkle);
+    SUITE_ADD_TEST(suite, test_readmind);
     SUITE_ADD_TEST(suite, test_charmingsong);
     SUITE_ADD_TEST(suite, test_pump);
     SUITE_ADD_TEST(suite, test_summon_familiar);
