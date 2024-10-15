@@ -578,6 +578,15 @@ static void test_scale_ship(CuTest* tc) {
     CuAssertIntEquals(tc, 1, sh->number);
     CuAssertIntEquals(tc, DAMAGE_SCALE, sh->damage);
     CuAssertIntEquals(tc, sh->type->construction->maxsize, sh->size);
+
+    // Bug 3052:
+    sh->number = 7000;
+    sh->size = 7000 * 2000;
+    sh->damage = 7000 * 1999;
+    scale_ship(sh, 6999);
+    CuAssertIntEquals(tc, 6999, sh->number);
+    CuAssertIntEquals(tc, 6999 * 2000, sh->size);
+    CuAssertIntEquals(tc, 6999 * 1999, sh->damage);
 }
 
 static void test_ship_damage(CuTest *tc) {

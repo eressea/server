@@ -6,9 +6,9 @@
 #include "race.h"
 #include "item.h"
 
+#include <attributes/raceprefix.h>
 #include <util/language.h>
 #include <util/variant.h>
-#include <attributes/raceprefix.h>
 
 #include <tests.h>
 #include <CuTest.h>
