@@ -624,8 +624,7 @@ int test_count_messagetype(struct message_list *msgs, const char *name)
 
 void test_clear_messagelist(message_list **msgs) {
     if (*msgs) {
-        free_messagelist((*msgs)->begin);
-        free(*msgs);
+        free_messagelist(*msgs);
         *msgs = NULL;
     }
 }

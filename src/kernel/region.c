@@ -931,9 +931,8 @@ void free_region(region * r)
         free_land(r->land);
 
     if (r->msgs) {
-        free_messagelist(r->msgs->begin);
-        free(r->msgs);
-        r->msgs = 0;
+        free_messagelist(r->msgs);
+        r->msgs = NULL;
     }
 
     if (r->individual_messages) {
@@ -941,8 +940,7 @@ void free_region(region * r)
         for (i = 0; i != l; ++i) {
             faction_messages *msg = r->individual_messages + i;
             if (msg->msgs) {
-                free_messagelist(msg->msgs->begin);
-                free(msg->msgs);
+                free_messagelist(msg->msgs);
             }
         }
         arrfree(r->individual_messages);
