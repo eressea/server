@@ -3253,7 +3253,7 @@ int sp_summonundead(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Astraler Sog
+/* Name:       Astraler Riss
  * Stufe:      9
  * Gebiet:     Draig
  * Kategorie:  Region, negativ
@@ -3267,17 +3267,16 @@ int sp_summonundead(castorder * co)
  *   (REGIONSPELL | TESTRESISTANCE)
  */
 
-static int sp_auraleak(castorder * co)
+int sp_auraleak(castorder * co)
 {
     int lost_aura;
     double lost;
     unit *u;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     message *msg;
 
-    lost = fmin(0.95, cast_level * 0.05);
+    lost = fmin(0.95, co->force * 0.05);
 
     for (u = r->units; u; u = u->next) {
         if (is_mage(u)) {
@@ -3291,7 +3290,7 @@ static int sp_auraleak(castorder * co)
     msg = msg_message("cast_auraleak_effect", "mage region", mage, r);
     r_addmessage(r, NULL, msg);
     msg_release(msg);
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
@@ -5628,27 +5627,27 @@ int sp_movecastle(castorder * co)
     unit *u, *unext;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     spellparameter *params = co->a_params;
     message *msg;
 
-    /* wenn kein Ziel gefunden, Zauber abbrechen */
-    if (params[0].flag)
-        return 0;
-
-    b = params[0].data.b;
     dir = get_direction(params[1].data.xs, mage->faction->locale);
-
     if (dir == NODIRECTION) {
         /* Die Richtung wurde nicht erkannt */
         cmistake(mage, co->order, 71, MSG_PRODUCE);
         return 0;
     }
 
-    if (b->size > (cast_level - 12) * 250) {
+    /* wenn kein Ziel gefunden, Zauber abbrechen */
+    if (params[0].flag == TARGET_RESISTS)
+        return co->level;
+    if (params[0].flag == TARGET_NOTFOUND)
+        return 0;
+    b = params[0].data.b;
+
+    if (b->size > (int)((co->force - 12) * 250)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_movecastle_fail_0", ""));
-        return cast_level;
+        return co->level;
     }
 
     target_region = rconnect(r, dir);
@@ -5656,7 +5655,7 @@ int sp_movecastle(castorder * co)
     if (!target_region || !target_region->land) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "sp_movecastle_fail_1", "direction", dir));
-        return cast_level;
+        return co->level;
     }
 
     bunhash(b);
@@ -5689,7 +5688,7 @@ int sp_movecastle(castorder * co)
     r_addmessage(r, NULL, msg);
     msg_release(msg);
 
-    return cast_level;
+    return co->level;
 }
 
 

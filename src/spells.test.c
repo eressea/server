@@ -22,6 +22,7 @@
 #include <kernel/unit.h>
 
 #include "util/keyword.h"
+#include <util/language.h>
 #include "util/message.h"
 #include "util/rand.h"
 #include "util/variant.h"  // for variant
@@ -36,6 +37,7 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
+#include <strings.h>
 #include <tests.h>
 
 #include <CuTest.h>
@@ -354,6 +356,89 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
+
+    test_teardown();
+}
+
+static void test_movecastle(CuTest *tc) {
+    unit *u;
+    region *r, *r2;
+    building *b;
+    faction *f;
+    castorder co;
+    spellparameter param, *args = NULL;
+    struct locale *lang;
+
+    test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "dir_e", "E");
+    init_directions(lang);
+    u = test_create_unit(f = test_create_faction_ex(NULL, lang), r = test_create_plain(0, 0));
+    r2 = test_create_plain(1, 0);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_BUILDING;
+    param.data.b = b = test_create_building(r, test_create_castle());
+    arrput(args, param);
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup("E");
+    arrput(args, param);
+    test_create_castorder(&co, u, 5, 12.0, 0, args);
+
+    /* target not found, no cost */
+    co.a_params[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_movecastle(&co));
+    CuAssertPtrEquals(tc, r, b->region);
+
+    /* target resists */
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_movecastle(&co));
+    CuAssertPtrEquals(tc, r, b->region);
+
+    /* target is okay, but not enough force was used */
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_movecastle(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "sp_movecastle_fail_0"));
+    CuAssertPtrEquals(tc, r, b->region);
+    test_clear_messages(f);
+
+    /* target is okay, and force is big enough */
+    co.force = 12.1;
+    CuAssertIntEquals(tc, co.level, sp_movecastle(&co));
+    CuAssertPtrEquals(tc, r2, b->region);
+    CuAssertPtrEquals(tc, NULL, r->buildings);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "movecastle_effect", NULL));
+
+    /** TODO: invalid target regions (ocean, firewall) */
+    /** TODO: special buildings (dam, caravan, tunnel) destroy roads */
+
+    test_teardown();
+}
+
+static void test_auraleak(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    faction *f;
+    castorder co;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(f = test_create_faction(), r);
+
+    mage_set_spellpoints(create_mage(u, M_DRAIG), 100);
+    mage_set_spellpoints(create_mage(u2, M_GWYRRD), 100);
+    test_create_castorder(&co, u, 5, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_auraleak(&co));
+    CuAssertIntEquals(tc, 50, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, 50, mage_get_spellpoints(get_mage(u2)));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "cast_auraleak_effect", NULL));
+
+    mage_set_spellpoints(create_mage(u, M_DRAIG), 100);
+    mage_set_spellpoints(create_mage(u2, M_GWYRRD), 100);
+    co.force = 20.0;
+    CuAssertIntEquals(tc, co.level, sp_auraleak(&co));
+    CuAssertIntEquals(tc, 5, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, 5, mage_get_spellpoints(get_mage(u2)));
 
     test_teardown();
 }
@@ -1787,6 +1872,8 @@ CuSuite *get_spells_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
+    SUITE_ADD_TEST(suite, test_movecastle);
+    SUITE_ADD_TEST(suite, test_auraleak);
     SUITE_ADD_TEST(suite, test_show_astral);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
