@@ -3253,7 +3253,7 @@ int sp_summonundead(castorder * co)
 }
 
 /* ------------------------------------------------------------- */
-/* Name:       Astraler Sog
+/* Name:       Astraler Riss
  * Stufe:      9
  * Gebiet:     Draig
  * Kategorie:  Region, negativ
@@ -3267,17 +3267,16 @@ int sp_summonundead(castorder * co)
  *   (REGIONSPELL | TESTRESISTANCE)
  */
 
-static int sp_auraleak(castorder * co)
+int sp_auraleak(castorder * co)
 {
     int lost_aura;
     double lost;
     unit *u;
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
-    int cast_level = co->level;
     message *msg;
 
-    lost = fmin(0.95, cast_level * 0.05);
+    lost = fmin(0.95, co->force * 0.05);
 
     for (u = r->units; u; u = u->next) {
         if (is_mage(u)) {
@@ -3291,7 +3290,7 @@ static int sp_auraleak(castorder * co)
     msg = msg_message("cast_auraleak_effect", "mage region", mage, r);
     r_addmessage(r, NULL, msg);
     msg_release(msg);
-    return cast_level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */

@@ -358,6 +358,34 @@ static void test_view_reality(CuTest *tc) {
     test_teardown();
 }
 
+static void test_auraleak(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    faction *f;
+    castorder co;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(f = test_create_faction(), r);
+
+    mage_set_spellpoints(create_mage(u, M_DRAIG), 100);
+    mage_set_spellpoints(create_mage(u2, M_GWYRRD), 100);
+    test_create_castorder(&co, u, 5, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, co.level, sp_auraleak(&co));
+    CuAssertIntEquals(tc, 50, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, 50, mage_get_spellpoints(get_mage(u2)));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "cast_auraleak_effect", NULL));
+
+    mage_set_spellpoints(create_mage(u, M_DRAIG), 100);
+    mage_set_spellpoints(create_mage(u2, M_GWYRRD), 100);
+    co.force = 20.0;
+    CuAssertIntEquals(tc, co.level, sp_auraleak(&co));
+    CuAssertIntEquals(tc, 5, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, 5, mage_get_spellpoints(get_mage(u2)));
+
+    test_teardown();
+}
+
 static void test_show_astral(CuTest *tc) {
     region *r, *ra, *rx;
     faction *f;
@@ -1787,6 +1815,7 @@ CuSuite *get_spells_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
+    SUITE_ADD_TEST(suite, test_auraleak);
     SUITE_ADD_TEST(suite, test_show_astral);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
