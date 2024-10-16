@@ -370,6 +370,7 @@ static void test_movecastle(CuTest *tc) {
     struct locale *lang;
 
     test_setup();
+    random_source_inject_constants(0.0, 0);
     lang = test_create_locale();
     locale_setstring(lang, "dir_e", "E");
     init_directions(lang);
@@ -379,6 +380,7 @@ static void test_movecastle(CuTest *tc) {
     param.flag = TARGET_OK;
     param.typ = SPP_BUILDING;
     param.data.b = b = test_create_building(r, test_create_castle());
+    b->size = 24;
     arrput(args, param);
     param.typ = SPP_STRING;
     param.data.xs = str_strdup("E");
@@ -407,10 +409,12 @@ static void test_movecastle(CuTest *tc) {
     CuAssertIntEquals(tc, co.level, sp_movecastle(&co));
     CuAssertPtrEquals(tc, r2, b->region);
     CuAssertPtrEquals(tc, NULL, r->buildings);
+    CuAssertIntEquals(tc, 22, b->size);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "movecastle_effect", NULL));
 
     /** TODO: invalid target regions (ocean, firewall) */
     /** TODO: special buildings (dam, caravan, tunnel) destroy roads */
+    /** TODO: Insassen reisen mit */
 
     test_teardown();
 }
