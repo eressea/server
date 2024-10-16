@@ -1542,6 +1542,45 @@ static void test_combat_rosthauch(CuTest *tc) {
     test_teardown();
 }
 
+static void test_fumbleshield(CuTest *tc) {
+    region *r;
+    faction *f;
+    unit *u;
+    fighter *fig;
+    battle *b = NULL;
+    castorder co;
+    side *s;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    b = make_battle(r);
+    s = make_side(b, f, NULL, 0, NULL);
+    fig = make_fighter(b, u, s, true);
+    test_create_castorder(&co, u, 2, 5., 0, NULL);
+    co.magician.fig = fig;
+
+    CuAssertIntEquals(tc, co.level, sp_fumbleshield(&co));
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f->battles->msgs, "cast_spell_effect"));
+    CuAssertIntEquals(tc, 1, (int) arrlen(b->meffects));
+    CuAssertIntEquals(tc, 100, b->meffects[0].duration);
+    CuAssertIntEquals(tc, 20, b->meffects[0].effect); /* 25 - force */
+    CuAssertPtrEquals(tc, fig, b->meffects[0].magician);
+    CuAssertIntEquals(tc, SHIELD_BLOCK, b->meffects[0].typ);
+
+    /* cast again, with more force */
+    co.force = 30.0;
+    CuAssertIntEquals(tc, co.level, sp_fumbleshield(&co));
+    CuAssertIntEquals(tc, 2, test_count_messagetype(f->battles->msgs, "cast_spell_effect"));
+    CuAssertIntEquals(tc, 2, (int)arrlen(b->meffects));
+    CuAssertIntEquals(tc, 100, b->meffects[1].duration);
+    CuAssertIntEquals(tc, 1, b->meffects[1].effect); /* never less than 1 */
+    CuAssertPtrEquals(tc, fig, b->meffects[1].magician);
+    CuAssertIntEquals(tc, SHIELD_BLOCK, b->meffects[1].typ);
+
+    free_battle(b);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1582,5 +1621,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_get_tactics);
     SUITE_ADD_TEST(suite, test_get_unitrow);
     SUITE_ADD_TEST(suite, test_combat_rosthauch);
+    SUITE_ADD_TEST(suite, test_fumbleshield);
     return suite;
 }

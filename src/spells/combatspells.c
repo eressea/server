@@ -1234,7 +1234,6 @@ int sp_reduceshield(struct castorder * co)
 int sp_fumbleshield(struct castorder * co)
 {
     fighter * fi = co->magician.fig;
-    int level = co->level;
     const spell * sp = co->sp;
     int effect;
     int duration;
@@ -1246,11 +1245,11 @@ int sp_fumbleshield(struct castorder * co)
 
     /* der erste Zauber schlaegt mit 100% fehl  */
     duration = 100;
-    effect = 25 - level;
+    effect = (int)(25 - co->force);
     if (effect < 1) effect = 1;
 
     battle_add_effect(fi, SHIELD_BLOCK, effect, duration);
-    return level;
+    return co->level;
 }
 
 /* ------------------------------------------------------------- */
