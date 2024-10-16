@@ -52,3 +52,4 @@ int sp_charmingsong(struct castorder *co);
 int sp_pump(struct castorder *co);
 int sp_readmind(struct castorder *co);
 int sp_auraleak(struct castorder *co);
+int sp_movecastle(struct castorder *co);
