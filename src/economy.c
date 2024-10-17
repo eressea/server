@@ -1584,18 +1584,20 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
             if (income > 0) {
                 if (hafenowner) {
                     if (hafenowner->faction != u->faction) {
-                        int abgezogenhafen = income / 10;
-                        hafencollected += abgezogenhafen;
-                        income -= abgezogenhafen;
-                        money -= abgezogenhafen;
+                        int taxes = income / 10;
+                        hafencollected += taxes;
+                        income -= taxes;
+                        money -= taxes;
+                        t->price -= taxes;
                     }
                 }
                 if (maxb) {
                     if (maxowner->faction != u->faction) {
-                        int abgezogensteuer = income * tax_per_size[maxeffsize] / 100;
-                        taxcollected += abgezogensteuer;
-                        income -= abgezogensteuer;
-                        money -= abgezogensteuer;
+                        int taxes = income * tax_per_size[maxeffsize] / 100;
+                        taxcollected += taxes;
+                        income -= taxes;
+                        money -= taxes;
+                        t->price -= taxes;
                     }
                 }
                 change_money(u, income);
@@ -1626,17 +1628,14 @@ static void expandselling(region * r, econ_request * sellorders, int limit)
         attrib *a = a_find(u->attribs, &at_luxuries);
         if (a) {
             item* itm;
-            struct trade* t = NULL;
-            int income;
-            t = (struct trade*)a->data.v;
+            struct trade* t = (struct trade*)a->data.v;
             for (itm = t->items; itm; itm = itm->next) {
                 if (itm->number) {
                     ADDMSG(&u->faction->msgs, msg_message("sellamount",
                         "unit amount resource", u, itm->number, itm->type->rtype));
                 }
             }
-            income = t->price - hafencollected - taxcollected;
-            add_income(u, IC_TRADE, income, income);
+            add_income(u, IC_TRADE, t->price, t->price);
         }
     }
 }
