@@ -1286,11 +1286,15 @@ void fix_shadows(void)
             const race *rc = u_race(u);
             if (rc == rc_demon) {
                 int level = get_level(u, SK_STEALTH);
-                set_level(u, SK_STEALTH, level / 2);
+                if (level > 0) {
+                    set_level(u, SK_STEALTH, level / 2);
+                }
             } 
             else if (rc == rc_lord) {
                 int level = get_level(u, SK_STEALTH);
-                set_level(u, SK_STEALTH, level - 1);
+                if (level > 0) {
+                    set_level(u, SK_STEALTH, level - 1);
+                }
             }
         }
     }
