@@ -69,7 +69,7 @@ void walk_connections(region *r, void(*cb)(connection *, void *), void *data) {
 
     walk_i(r, borders[key], cb, data);
     for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *rn = r_connect(r, d);
+        region *rn = rconnect(r, d);
         if (rn) {
             int k = reg_hashkey(rn);
             if (k < key) {

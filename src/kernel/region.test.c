@@ -95,6 +95,18 @@ static void test_region_getset_resource(CuTest *tc) {
     test_teardown();
 }
 
+static void test_roads(CuTest *tc) {
+    region *r, *r2;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    rsetroad(r, D_EAST, 100);
+    CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
+    CuAssertIntEquals(tc, 0, rroad(r2, D_WEST));
+    test_teardown();
+}
+
 static void test_trees(CuTest *tc) {
     region *r;
 
@@ -138,6 +150,7 @@ CuSuite *get_region_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_newterrain);
     SUITE_ADD_TEST(suite, test_terraform);
+    SUITE_ADD_TEST(suite, test_roads);
     SUITE_ADD_TEST(suite, test_trees);
     SUITE_ADD_TEST(suite, test_mourning);
     SUITE_ADD_TEST(suite, test_region_getset_resource);

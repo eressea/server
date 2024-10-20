@@ -328,11 +328,10 @@ void runhash(region * r)
     regionhash[key] = DELMARKER;
 }
 
-region *r_connect(const region * r, direction_t dir)
+region *rconnect(const region * r, direction_t dir)
 {
     region *result;
     int x, y;
-    region *rmodify = (region *)r;
     if (dir < 0 || dir >= MAXDIRECTIONS) {
         return NULL;
     }
@@ -344,6 +343,7 @@ region *r_connect(const region * r, direction_t dir)
     pnormalize(&x, &y, rplane(r));
     result = rfindhash(x, y);
     if (result) {
+        region *rmodify = (region *)r;
         rmodify->connect[dir] = result;
         result->connect[back[dir]] = rmodify;
     }
