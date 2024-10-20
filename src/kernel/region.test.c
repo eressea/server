@@ -5,6 +5,7 @@
 #include "building.h"
 #include "calendar.h"
 #include "config.h"
+#include "connection.h"
 #include "resources.h"
 #include "unit.h"
 #include "terrain.h"
@@ -102,8 +103,23 @@ static void test_roads(CuTest *tc) {
     r = test_create_plain(0, 0);
     r2 = test_create_plain(1, 0);
     rsetroad(r, D_EAST, 100);
+    rsetroad(r2, D_WEST, 50);
     CuAssertIntEquals(tc, 100, rroad(r, D_EAST));
-    CuAssertIntEquals(tc, 0, rroad(r2, D_WEST));
+    CuAssertIntEquals(tc, 50, rroad(r2, D_WEST));
+    test_teardown();
+}
+
+static void test_borders(CuTest *tc) {
+    region *r, *r2;
+    connection *c;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    r2 = test_create_plain(1, 0);
+    CuAssertPtrEquals(tc, NULL, get_borders(r, r2));
+    c = create_border(&bt_road, r, r2);
+    CuAssertPtrEquals(tc, c, get_borders(r, r2));
+    CuAssertPtrEquals(tc, c, get_borders(r2, r));
     test_teardown();
 }
 
@@ -151,6 +167,7 @@ CuSuite *get_region_suite(void)
     SUITE_ADD_TEST(suite, test_newterrain);
     SUITE_ADD_TEST(suite, test_terraform);
     SUITE_ADD_TEST(suite, test_roads);
+    SUITE_ADD_TEST(suite, test_borders);
     SUITE_ADD_TEST(suite, test_trees);
     SUITE_ADD_TEST(suite, test_mourning);
     SUITE_ADD_TEST(suite, test_region_getset_resource);

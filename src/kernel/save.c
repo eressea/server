@@ -1790,9 +1790,10 @@ int read_game(gamedata *data)
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
     rng_init(turn + config_get_int("game.seed", 0));
-    READ_INT(store, NULL);          /* max_unique_id = ignore */
-    READ_INT(store, &nextborder);
-
+    if (data->version < BORDER_ID_VERSION) {
+        READ_INT(store, NULL); /* max_unique_id = ignore */
+        READ_INT(store, NULL); /* nextborder, legacy */
+    }
     read_planes(data);
     read_alliances(data);
 
@@ -1889,9 +1890,10 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
 
     WRITE_INT(store, turn);
+#if RELEASE_VERSION < BORDER_ID_VERSION
     WRITE_INT(store, 0 /* max_unique_id */);
-    WRITE_INT(store, nextborder);
-
+    WRITE_INT(store, 0 /* nextborder */);
+#endif
     write_planes(store);
     write_alliances(data);
     n = listlen(factions);

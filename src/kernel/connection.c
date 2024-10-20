@@ -24,8 +24,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int nextborder = 0;
-
 #define BORDER_MAXHASH 8191
 connection *borders[BORDER_MAXHASH];
 border_type *bordertypes;
@@ -103,7 +101,7 @@ connection *get_borders(const region * r1, const region * r2)
     return *bp;
 }
 
-connection *new_border(border_type * type, region * from, region * to, int id)
+connection *create_border(border_type * type, region * from, region * to)
 {
     connection *b, **bp;
 
@@ -117,7 +115,6 @@ connection *new_border(border_type * type, region * from, region * to, int id)
     b->type = type;
     b->from = from;
     b->to = to;
-    b->id = (id > 0) ? id : ++nextborder;
 
     if (type->init) {
         type->init(b);
@@ -547,7 +544,6 @@ void write_borders(struct storage *store)
                 if (b->type->valid && !b->type->valid(b))
                     continue;
                 WRITE_TOK(store, b->type->_name);
-                WRITE_INT(store, b->id);
                 WRITE_INT(store, b->from->uid);
                 WRITE_INT(store, b->to->uid);
 
@@ -612,8 +608,7 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-                b = new_border(type, from, to, bid);
-                assert(bid <= nextborder);
+                b = create_border(type, from, to);
             }
             type->read(b, data);
             if (!type->write) {
