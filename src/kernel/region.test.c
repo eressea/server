@@ -109,9 +109,15 @@ static void test_roads(CuTest *tc) {
     test_teardown();
 }
 
+static void cb_connection(struct connection *c, void *data)
+{
+    ++*(int *)data;
+}
+
 static void test_borders(CuTest *tc) {
     region *r, *r2;
     connection *c;
+    int n = 0;
 
     test_setup();
     r = test_create_plain(0, 0);
@@ -120,6 +126,10 @@ static void test_borders(CuTest *tc) {
     c = create_border(&bt_road, r, r2);
     CuAssertPtrEquals(tc, c, get_borders(r, r2));
     CuAssertPtrEquals(tc, c, get_borders(r2, r));
+
+    create_border(&bt_road, r, test_create_plain(-1, 0));
+    walk_connections(r, cb_connection, &n);
+    CuAssertIntEquals(tc, 2, n);
     test_teardown();
 }
 
