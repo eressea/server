@@ -392,7 +392,6 @@ function test_speedsail()
     local u = unit.create(f, r, 1)
     
     turn_begin()
-    u.name = 'Xolgrim'
     u.ship = ship.create(r, "boat")
     u:add_item("speedsail", 2)
     u:clear_orders()
