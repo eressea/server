@@ -9,6 +9,7 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
+#include "kernel/connection.h"
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include "kernel/direction.h"         // for D_EAST, directions
@@ -1698,6 +1699,30 @@ static void test_destroy_cmd(CuTest* tc) {
     test_teardown();
 }
 
+static void test_make_road(CuTest *tc) {
+    region *r, *r2;
+    unit *u;
+    faction *f;
+    struct item_type *itype;
+    terrain_type *t_plain;
+
+    test_setup();
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    t_plain->max_road = 100;
+    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, t_plain));
+    r2 = test_create_region(1, 0, t_plain);
+    set_level(u, SK_ROAD_BUILDING, 10);
+    scale_number(u, 10);
+    i_change(&u->items, itype = test_create_itemtype("stone"), 100);
+    u->thisorder = create_order(K_MAKE, f->locale, 
+        "50 %s %s", param_name(P_ROAD, f->locale), LOC(f->locale, directions[D_EAST]));
+    make_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 50, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 50, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, get_borders(r, r2));
+    test_teardown();
+}
+
 static void test_make_zero(CuTest* tc) {
     unit* u;
     faction* f;
@@ -1784,6 +1809,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_road);
     SUITE_ADD_TEST(suite, test_destroy_road_limit);
     SUITE_ADD_TEST(suite, test_destroy_road_guard);
+    SUITE_ADD_TEST(suite, test_make_road);
     SUITE_ADD_TEST(suite, test_make_zero);
     SUITE_ADD_TEST(suite, test_entertain_fair);
     return suite;

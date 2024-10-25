@@ -322,7 +322,7 @@ static int tolua_region_get_next(lua_State * L)
     direction_t dir = (direction_t)tolua_tonumber(L, 2, 0);
 
     if (dir >= 0 && dir < MAXDIRECTIONS) {
-        tolua_pushusertype(L, (void *)r_connect(self, dir), "region");
+        tolua_pushusertype(L, (void *)rconnect(self, dir), "region");
         return 1;
     }
     return 0;

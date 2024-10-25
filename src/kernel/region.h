@@ -231,8 +231,7 @@ void region_set_owner(struct region *r, struct faction *owner, int turn);
 struct faction *region_get_owner(const struct region *r);
 struct alliance *region_get_alliance(const struct region *r);
 
-struct region *r_connect(const struct region *, direction_t dir);
-#define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, (direction_t)dir))
+struct region *rconnect(const struct region *, direction_t dir);
 
 void free_regions(void);
 void free_land(struct land_region * lr);

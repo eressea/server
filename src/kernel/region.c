@@ -328,11 +328,10 @@ void runhash(region * r)
     regionhash[key] = DELMARKER;
 }
 
-region *r_connect(const region * r, direction_t dir)
+region *rconnect(const region * r, direction_t dir)
 {
     region *result;
     int x, y;
-    region *rmodify = (region *)r;
     if (dir < 0 || dir >= MAXDIRECTIONS) {
         return NULL;
     }
@@ -344,6 +343,7 @@ region *r_connect(const region * r, direction_t dir)
     pnormalize(&x, &y, rplane(r));
     result = rfindhash(x, y);
     if (result) {
+        region *rmodify = (region *)r;
         rmodify->connect[dir] = result;
         result->connect[back[dir]] = rmodify;
     }
@@ -544,7 +544,7 @@ void rsetroad(region * r, direction_t d, int val)
     }
     if (!b) {
         if (!val) return;
-        b = new_border(&bt_road, r, r2, 0);
+        b = create_border(&bt_road, r, r2);
     }
     if (r == b->from) {
         b->data.sa[0] = (short)val;

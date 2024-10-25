@@ -15,15 +15,12 @@ extern "C" {
     struct gamedata;
     struct unit;
 
-    extern int nextborder;
-
     typedef struct connection {
         struct border_type *type;   /* the type of this connection */
         struct connection *next;    /* next connection between these regions */
         struct connection *nexthash;        /* next connection between these regions */
         struct region *from, *to;   /* borders can be directed edges */
         variant data;
-        int id;            /* unique id */
     } connection;
 
     typedef struct border_type {
@@ -86,7 +83,7 @@ extern "C" {
     connection *get_borders(const struct region *r1,
         const struct region *r2);
     /* returns the list of borders between r1 and r2 or r2 and r1 */
-    connection *new_border(border_type *type, struct region *from, struct region *to, int id);
+    connection *create_border(border_type *type, struct region *from, struct region *to);
     /* creates a connection of the specified type */
     void erase_border(connection * b);
     /* remove the connection from memory */

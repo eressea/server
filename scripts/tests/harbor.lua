@@ -206,7 +206,6 @@ function test_leave_harbour()
     local u = unit.create(f, r1, 1)
     local u2 = unit.create(f, r, 1)
     u2.building = b
-    u.name = 'Xolgrim'
     u.ship = sh
     u:set_skill('sailing', 10)
 

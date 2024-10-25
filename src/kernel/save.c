@@ -305,10 +305,10 @@ static void writeorder(gamedata *data, const struct order *ord,
         WRITE_STR(data->store, obuf);
 }
 
-static void read_skill(gamedata *data, skill *sv) {
+static bool read_skill(gamedata *data, skill *sv) {
     int val;
     READ_INT(data->store, &val);
-    assert(val < MAXSKILLS);
+    if (val < 0) return false;
     sv->id = (skill_t)val;
     if (sv->id != NOSKILL) {
         READ_INT(data->store, &val);
@@ -328,6 +328,7 @@ static void read_skill(gamedata *data, skill *sv) {
             assert(val > 0);
         }
     }
+    return true;
 }
 
 static int skill_cmp(const void *a, const void *b) {
@@ -343,8 +344,9 @@ static void read_skills(gamedata *data, unit *u)
         size_t skill_size = 0;
 
         for (;;) {
-            read_skill(data, sv);
-            if (sv->id == NOSKILL) break;
+            if (!read_skill(data, sv)) {
+                break;
+            }
             if (sv->level > 0) {
                 ++sv;
                 ++skill_size;
@@ -1284,11 +1286,15 @@ void fix_shadows(void)
             const race *rc = u_race(u);
             if (rc == rc_demon) {
                 int level = get_level(u, SK_STEALTH);
-                set_level(u, SK_STEALTH, level / 2);
+                if (level > 0) {
+                    set_level(u, SK_STEALTH, level / 2);
+                }
             } 
             else if (rc == rc_lord) {
                 int level = get_level(u, SK_STEALTH);
-                set_level(u, SK_STEALTH, level - 1);
+                if (level > 0) {
+                    set_level(u, SK_STEALTH, level - 1);
+                }
             }
         }
     }
@@ -1784,9 +1790,10 @@ int read_game(gamedata *data)
     READ_INT(store, &turn);
     log_debug(" - reading turn %d", turn);
     rng_init(turn + config_get_int("game.seed", 0));
-    READ_INT(store, NULL);          /* max_unique_id = ignore */
-    READ_INT(store, &nextborder);
-
+    if (data->version < BORDER_ID_VERSION) {
+        READ_INT(store, NULL); /* max_unique_id = ignore */
+        READ_INT(store, NULL); /* nextborder, legacy */
+    }
     read_planes(data);
     read_alliances(data);
 
@@ -1883,9 +1890,10 @@ int write_game(gamedata *data) {
     WRITE_SECTION(store);
 
     WRITE_INT(store, turn);
+#if RELEASE_VERSION < BORDER_ID_VERSION
     WRITE_INT(store, 0 /* max_unique_id */);
-    WRITE_INT(store, nextborder);
-
+    WRITE_INT(store, 0 /* nextborder */);
+#endif
     write_planes(store);
     write_alliances(data);
     n = listlen(factions);
