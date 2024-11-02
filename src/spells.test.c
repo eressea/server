@@ -30,6 +30,7 @@
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
 #include <spells/shipcurse.h>
+#include <spells/buildingcurse.h>
 #include <spells/flyingship.h>
 #include <attributes/attributes.h>
 #include <attributes/otherfaction.h>
@@ -1945,6 +1946,61 @@ static void test_analysemagic_ship(CuTest *tc)
     test_teardown();
 }
 
+static void test_analysemagic_building(CuTest *tc)
+{
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter param, *args = NULL;
+    message *m;
+    curse *c, *c2;
+
+    test_setup();
+    random_source_inject_constants(0.0, 0);
+    mt_create_va(mt_new("analyse_building_age", NULL), "mage:unit", "building:building", "curse:curse", "months:int", MT_NEW_END);
+    mt_create_va(mt_new("analyse_building_noage", NULL), "mage:unit", "building:building", "curse:curse", MT_NEW_END);
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    u->building = test_create_building(r, NULL);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_BUILDING;
+    param.data.b = u->building;
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "analyse_building_nospell"));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, "analyse_building_age"));
+    test_clear_messages(f);
+
+    c = create_curse(u, &u->building->attribs, &ct_strongwall, 5.0, 20, 1, 0);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, "analyse_building_nospell"));
+    /* curse is too strong, analysis fails */
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "analyse_building_fail"));
+    test_clear_messages(f);
+
+    c->vigour = co.force;
+    c2 = create_curse(u, &u->building->attribs, &ct_magicwalls, co.force, 20, 1, 0);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, "analyse_building_nospell"));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(f, "analyse_building_age"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u->building, m->parameters[1].v);
+    CuAssertPtrEquals(tc, (void *)c->type, m->parameters[2].v);
+    CuAssertIntEquals(tc, 15, m->parameters[3].i);
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(f, "analyse_building_noage"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u->building, m->parameters[1].v);
+    CuAssertPtrEquals(tc, (void *)c2->type, m->parameters[2].v);
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1995,7 +2051,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_analysemagic_unit);
     //SUITE_ADD_TEST(suite, test_analysemagic_temp);
     SUITE_ADD_TEST(suite, test_analysemagic_ship);
-    //SUITE_ADD_TEST(suite, test_analysemagic_building);
+    SUITE_ADD_TEST(suite, test_analysemagic_building);
     //SUITE_ADD_TEST(suite, test_analysemagic_region);
 
     return suite;
