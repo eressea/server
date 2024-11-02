@@ -197,7 +197,6 @@ static void magicanalyse_region(region * r, unit * mage, double force)
     for (a = r->attribs; a; a = a->next) {
         curse *c = (curse *)a->data.v;
         double probability;
-        int mon;
 
         if (a->type != &at_curse)
             continue;
@@ -205,8 +204,6 @@ static void magicanalyse_region(region * r, unit * mage, double force)
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
         found = true;
 
         if (chance(probability)) {  /* Analyse geglueckt */
@@ -215,6 +212,8 @@ static void magicanalyse_region(region * r, unit * mage, double force)
                     "mage region curse", mage, r, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_region_age",
                     "mage region curse months", mage, r, c->type, mon));
             }
