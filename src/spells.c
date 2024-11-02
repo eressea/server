@@ -320,16 +320,14 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
     for (a = sh->attribs; a; a = a->next) {
         curse *c;
         double probability;
-        int mon;
         if (a->type != &at_curse)
             continue;
 
+        found = true;
         c = (curse *)a->data.v;
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
 
         if (chance(probability)) {  /* Analyse geglueckt */
             if (c_flags(c) & CURSE_NOAGE) {
@@ -337,6 +335,8 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
                     "mage ship curse", mage, sh, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_ship_age",
                     "mage ship curse months", mage, sh, c->type, mon));
             }

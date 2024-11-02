@@ -1889,7 +1889,7 @@ static void test_analysemagic_unit(CuTest *tc)
     CuAssertPtrNotNull(tc, m = test_find_faction_message(f, "analyse_unit_age"));
     CuAssertPtrEquals(tc, u, m->parameters[0].v);
     CuAssertPtrEquals(tc, u2, m->parameters[1].v);
-    CuAssertPtrEquals(tc, (void *) & ct_astralblock, m->parameters[2].v);
+    CuAssertPtrEquals(tc, (void *)c->type, m->parameters[2].v);
     CuAssertIntEquals(tc, 15, m->parameters[3].i);
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_unit_nospell"));
 
@@ -1903,8 +1903,12 @@ static void test_analysemagic_ship(CuTest *tc)
     unit *u;
     castorder co;
     spellparameter param, *args = NULL;
+    message *m;
+    curse *c;
 
     test_setup();
+    random_source_inject_constants(0.0, 0);
+    mt_create_va(mt_new("analyse_ship_age", NULL), "mage:unit", "ship:ship", "curse:curse", "months:int", MT_NEW_END);
     r = test_create_plain(0, 0);
     f = test_create_faction();
     f->magiegebiet = M_DRAIG;
@@ -1915,8 +1919,29 @@ static void test_analysemagic_ship(CuTest *tc)
     param.typ = SPP_SHIP;
     param.data.sh = u->ship;
     arrput(args, param);
-    test_create_castorder(&co, u, 3, 10., 0, args);
+
+    test_create_castorder(&co, u, 3, 4., 0, args);
     CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_ship_age"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "analyse_ship_nospell"));
+    test_clear_messages(f);
+
+    c = create_curse(u, &u->ship->attribs, &ct_flyingship, 5.0, 20, 5, 0);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    /* curse is too strong, analysis fails */
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "analyse_ship_fail"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_ship_nospell"));
+    test_clear_messages(f);
+
+    c->vigour = co.force;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(f, "analyse_ship_age"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u->ship, m->parameters[1].v);
+    CuAssertPtrEquals(tc, (void *)c->type, m->parameters[2].v);
+    CuAssertIntEquals(tc, 15, m->parameters[3].i);
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_ship_nospell"));
+
     test_teardown();
 }
 
