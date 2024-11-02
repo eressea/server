@@ -1848,14 +1848,19 @@ static void test_shadowlords(CuTest *tc) {
     test_teardown();
 }
 
-static void test_analysemagic(CuTest *tc) {
+static void test_analysemagic_unit(CuTest *tc)
+{
     struct region *r;
     struct faction *f;
     unit *u, *u2;
     castorder co;
     spellparameter param, *args = NULL;
+    message *m;
+    curse *c;
 
     test_setup();
+    random_source_inject_constants(0.0, 0);
+    mt_create_va(mt_new("analyse_unit_age", NULL), "mage:unit", "unit:unit", "curse:curse", "months:int", MT_NEW_END);
     r = test_create_plain(0, 0);
     f = test_create_faction();
     f->magiegebiet = M_DRAIG;
@@ -1865,6 +1870,50 @@ static void test_analysemagic(CuTest *tc) {
     param.flag = TARGET_OK;
     param.typ = SPP_UNIT;
     param.data.u = u2;
+    arrput(args, param);
+    test_create_castorder(&co, u, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_unit_age"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "analyse_unit_nospell"));
+    test_clear_messages(f);
+
+    c = create_curse(u, &u2->attribs, &ct_astralblock, 5.0, 20, 5, 0);
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    /* curse is too strong, analysis fails */
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "analyse_unit_fail"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_unit_nospell"));
+    test_clear_messages(f);
+
+    c->vigour = co.force;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(f, "analyse_unit_age"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u2, m->parameters[1].v);
+    CuAssertPtrEquals(tc, (void *) & ct_astralblock, m->parameters[2].v);
+    CuAssertIntEquals(tc, 15, m->parameters[3].i);
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_unit_nospell"));
+
+    test_teardown();
+}
+
+static void test_analysemagic_ship(CuTest *tc)
+{
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    f->magiegebiet = M_DRAIG;
+    u = test_create_unit(f, r);
+    u->ship = test_create_ship(r, NULL);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_SHIP;
+    param.data.sh = u->ship;
     arrput(args, param);
     test_create_castorder(&co, u, 3, 10., 0, args);
     CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
@@ -1918,7 +1967,11 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_summon_familiar);
     SUITE_ADD_TEST(suite, test_shadowdemons);
     SUITE_ADD_TEST(suite, test_shadowlords);
-    SUITE_ADD_TEST(suite, test_analysemagic);
+    SUITE_ADD_TEST(suite, test_analysemagic_unit);
+    //SUITE_ADD_TEST(suite, test_analysemagic_temp);
+    SUITE_ADD_TEST(suite, test_analysemagic_ship);
+    //SUITE_ADD_TEST(suite, test_analysemagic_building);
+    //SUITE_ADD_TEST(suite, test_analysemagic_region);
 
     return suite;
 }
