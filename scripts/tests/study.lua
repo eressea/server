@@ -67,9 +67,7 @@ function test_unit_spells()
     u:add_spell("toast")
     assert_equal(nil, u.spells)
     u:add_spell("fireball", 2)
-    local sp = u.spells()
-    assert_equal("fireball", sp.name)
-    assert_equal(2, sp.level)
+    assert_equal(2, u:get_spell("fireball"))
 end
 
 local function make_teacher(student, f, skill)

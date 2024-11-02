@@ -727,11 +727,11 @@ static void cr_output_spells(stream *out, const unit * u, int maxlevel)
 
     if (book) {
         const faction * f = u->faction;
-        selist *ql;
-        int qi, header = 0;
+        int header = 0;
+        ptrdiff_t qi, ql = arrlen(book->spells);
 
-        for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             if (sbe->level <= maxlevel) {
                 const spell *sp = spellref_get(&sbe->spref);
                 const char * spname = mkname("spell", sp->sname);

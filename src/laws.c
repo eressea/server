@@ -3137,10 +3137,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 {
     assert(dst);
     if (src && src->spells) {
-        selist *ql;
-        int qi;
-        for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
+        ptrdiff_t qi, ql = arrlen(src->spells);
+
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)src->spells + qi;
             if (sbe->level <= maxlevel) {
                 spell *sp = spellref_get(&sbe->spref);
                 if (!spellbook_get(dst, sp)) {
@@ -3154,11 +3154,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 static void show_new_spells(faction * f, int level, const spellbook *book)
 {
     if (book) {
-        selist *ql = book->spells;
-        int qi;
+        ptrdiff_t qi, ql = arrlen(book->spells);
 
-        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             if (sbe->level <= level) {
                 show_spell(f, sbe);
             }

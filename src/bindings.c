@@ -405,8 +405,7 @@ static int tolua_turn_begin(lua_State * L)
     UNUSED_ARG(L);
     for (f = factions; f; f = f->next) {
         if (f->msgs) {
-            free_messagelist(f->msgs->begin);
-            free(f->msgs);
+            free_messagelist(f->msgs);
             f->msgs = NULL;
         }
     }

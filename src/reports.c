@@ -806,12 +806,12 @@ static void bufunit_spells(const unit* u, struct sbstring* sbp)
     spellbook* book = unit_get_spellbook(u);
 
     if (book) {
-        selist* ql = book->spells;
-        int i, qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
+        int i, header = 0, maxlevel = effskill(u, SK_MAGIC, NULL);
+        ptrdiff_t qi, ql;
         sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
 
-        for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry* sbe = (spellbook_entry*)selist_get(ql, qi);
+        for (ql = arrlen(book->spells), qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             const spell* sp = spellref_get(&sbe->spref);
             if (sbe->level <= maxlevel) {
                 if (!header) {

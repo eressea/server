@@ -34,9 +34,6 @@ extern "C" {
         int(*read) (union variant *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
         void(*upgrade) (struct attrib **alist, struct attrib *a);
         unsigned int flags;
-        /* ---- internal data, do not modify: ---- */
-        struct attrib_type *nexthash;
-        unsigned int hashkey;
     } attrib_type;
 
     void at_register(attrib_type * at);
@@ -48,7 +45,6 @@ extern "C" {
 
     attrib *a_select(attrib * a, const void *data, bool(*compare) (const attrib *, const void *));
     attrib *a_find(attrib * a, const attrib_type * at);
-    attrib** a_find_it(attrib** ap, const attrib_type* at);
     attrib *a_add(attrib ** pa, attrib * at);
     int a_remove(attrib ** pa, attrib * at);
     void a_removeall(attrib ** a, const attrib_type * at);
