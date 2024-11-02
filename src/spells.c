@@ -197,7 +197,6 @@ static void magicanalyse_region(region * r, unit * mage, double force)
     for (a = r->attribs; a; a = a->next) {
         curse *c = (curse *)a->data.v;
         double probability;
-        int mon;
 
         if (a->type != &at_curse)
             continue;
@@ -205,8 +204,6 @@ static void magicanalyse_region(region * r, unit * mage, double force)
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
         found = true;
 
         if (chance(probability)) {  /* Analyse geglueckt */
@@ -215,6 +212,8 @@ static void magicanalyse_region(region * r, unit * mage, double force)
                     "mage region curse", mage, r, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_region_age",
                     "mage region curse months", mage, r, c->type, mon));
             }
@@ -238,7 +237,6 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
     for (a = u->attribs; a; a = a->next) {
         curse *c;
         double probability;
-        int mon;
         if (a->type != &at_curse)
             continue;
 
@@ -246,15 +244,16 @@ static void magicanalyse_unit(unit * u, unit * mage, double force)
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
-
+        found = true;
+ 
         if (chance(probability)) {  /* Analyse geglueckt */
             if (c_flags(c) & CURSE_NOAGE) {
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_unit_noage",
                     "mage unit curse", mage, u, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_unit_age",
                     "mage unit curse months", mage, u, c->type, mon));
             }
@@ -278,24 +277,24 @@ static void magicanalyse_building(building * b, unit * mage, double force)
     for (a = b->attribs; a; a = a->next) {
         curse *c;
         double probability;
-        int mon;
 
         if (a->type != &at_curse)
             continue;
 
+        found = true;
         c = (curse *)a->data.v;
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
 
         if (chance(probability)) {  /* Analyse geglueckt */
             if (c_flags(c) & CURSE_NOAGE) {
-                ADDMSG(&mage->faction->msgs, msg_message("analyse_building_age",
+                ADDMSG(&mage->faction->msgs, msg_message("analyse_building_noage",
                     "mage building curse", mage, b, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_building_age",
                     "mage building curse months", mage, b, c->type, mon));
             }
@@ -320,16 +319,14 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
     for (a = sh->attribs; a; a = a->next) {
         curse *c;
         double probability;
-        int mon;
         if (a->type != &at_curse)
             continue;
 
+        found = true;
         c = (curse *)a->data.v;
         /* ist der curse schwaecher als der Analysezauber, so ergibt sich
          * mehr als 100% probability und damit immer ein Erfolg. */
         probability = curse_chance(c, force);
-        mon = c->duration + (rng_int() % 10) - 5;
-        if (mon < 1) mon = 1;
 
         if (chance(probability)) {  /* Analyse geglueckt */
             if (c_flags(c) & CURSE_NOAGE) {
@@ -337,6 +334,8 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
                     "mage ship curse", mage, sh, c->type));
             }
             else {
+                int mon = c->duration + (rng_int() % 10) - 5;
+                if (mon < 1) mon = 1;
                 ADDMSG(&mage->faction->msgs, msg_message("analyse_ship_age",
                     "mage ship curse months", mage, sh, c->type, mon));
             }
@@ -4558,7 +4557,7 @@ int sp_analysedream(castorder * co)
         return 0;
 
     u = param->data.u;
-    magicanalyse_unit(u, mage, cast_level);
+    magicanalyse_unit(u, mage, co->force);
 
     return cast_level;
 }
@@ -4818,7 +4817,7 @@ int sp_analysemagic(castorder * co)
     case SPP_REGION:
     {
         region *tr = param->data.r;
-        magicanalyse_region(tr, mage, cast_level);
+        magicanalyse_region(tr, mage, co->force);
         break;
     }
     case SPP_TEMP:
@@ -4826,21 +4825,21 @@ int sp_analysemagic(castorder * co)
     {
         unit *u;
         u = param->data.u;
-        magicanalyse_unit(u, mage, cast_level);
+        magicanalyse_unit(u, mage, co->force);
         break;
     }
     case SPP_BUILDING:
     {
         building *b;
         b = param->data.b;
-        magicanalyse_building(b, mage, cast_level);
+        magicanalyse_building(b, mage, co->force);
         break;
     }
     case SPP_SHIP:
     {
         ship *sh;
         sh = param->data.sh;
-        magicanalyse_ship(sh, mage, cast_level);
+        magicanalyse_ship(sh, mage, co->force);
         break;
     }
     default:
