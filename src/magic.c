@@ -425,15 +425,15 @@ struct spellbook * unit_get_spellbook(const struct unit * u)
 void pick_random_spells(faction * f, int level, spellbook * book, int num_spells)
 {
     spellbook_entry *commonspells[MAXSPELLS];
-    int qi, numspells = 0;
-    selist *ql;
+    int numspells = 0;
+    ptrdiff_t qi, ql = arrlen(book->spells);
 
     if (level <= f->max_spelllevel) {
         return;
     }
 
-    for (qi = 0, ql = book->spells; ql; selist_advance(&ql, &qi, 1)) {
-        spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
+    for (qi = 0; qi != ql; ++qi) {
+        spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
         if (sbe && sbe->level <= level) {
             commonspells[numspells++] = sbe;
         }
@@ -2878,14 +2878,12 @@ const char *curse_name(const curse_type * ctype, const struct locale *lang)
 }
 
 static void select_spellbook(void **tokens, spellbook *sb, const struct locale * lang) {
-    selist * ql;
-    int qi;
+    ptrdiff_t qi, ql;
 
-    assert(sb);
     assert(lang);
 
-    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+    for (ql = arrlen(sb->spells), qi = 0; qi != ql; ++qi) {
+        spellbook_entry *sbe = (spellbook_entry *)sb->spells + qi;
         const spell *sp = spellref_get(&sbe->spref);
         const char *spname = mkname("spell", sp->sname);
         const char *n = spell_name(spname, lang);
