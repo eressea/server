@@ -3995,7 +3995,7 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
-    if (stealth <= 0 && rings < u->number) return true;
+    if (stealth < 0 && rings < u->number) return true;
     result = bsm = big_sea_monster(u, r);
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == f) {

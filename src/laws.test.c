@@ -2255,10 +2255,10 @@ static void test_cansee_skillmod(CuTest *tc) {
     f = test_create_faction();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
-    CuAssertTrue(tc, cansee(f, u->region, u, 0)); /* can see even if using spell with no modifier */
-    set_level(u, SK_STEALTH, 1);
     CuAssertTrue(tc, !cansee(f, u->region, u, 0));
-    CuAssertTrue(tc, cansee(f, u->region, u, 1));
+    set_level(u, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u->region, u, 1));
+    CuAssertTrue(tc, cansee(f, u->region, u, 2));
 
     test_teardown();
 }
