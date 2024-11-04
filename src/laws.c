@@ -3889,7 +3889,7 @@ typedef enum cansee_t {
 static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
 {
     enum cansee_t result = CANSEE_HIDDEN;
-    if (rings > 0 && rings >= target->number) {
+    if (rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (rtype) {
             int amulet = i_get(u->items, rtype->itype);
@@ -3995,11 +3995,7 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
-
-    if (rings > 0 && rings < u->number && stealth <= 0) {
-        return true;
-    }
-
+    if (stealth < 0 && rings < u->number) return true;
     result = bsm = big_sea_monster(u, r);
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == f) {
