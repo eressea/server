@@ -4042,8 +4042,10 @@ int sp_pump(castorder * co)
     }
 
     for (u = rt->units; u; u = u->next) {
-        if (u->faction == target->faction)
+        if (u->faction == target->faction) {
             see = true;
+            break;
+        }
     }
 
     if (see) {

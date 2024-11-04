@@ -2247,6 +2247,22 @@ static void test_cansee_empty(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_skillmod(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertTrue(tc, cansee(f, u->region, u, 0)); /* can see even if using spell with no modifier */
+    set_level(u, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u->region, u, 0));
+    CuAssertTrue(tc, cansee(f, u->region, u, 1));
+
+    test_teardown();
+}
+
 
 /**
  * Hidden monsters are seen in oceans if they are big enough.
@@ -3008,6 +3024,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_guard);
     SUITE_ADD_TEST(suite, test_cansee_temp);
     SUITE_ADD_TEST(suite, test_cansee_empty);
+    SUITE_ADD_TEST(suite, test_cansee_skillmod);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);
