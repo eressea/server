@@ -3692,7 +3692,7 @@ void join_allies(battle * b)
         }
     }
 
-    for (si = 0; si != num_sides; ++si) {
+    for (num_sides = arrlen(b->sides), si = 0; si != num_sides; ++si) {
         side* s = b->sides[si];
         size_t sei;
         faction *f = s->bf->faction;
