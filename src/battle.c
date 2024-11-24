@@ -3625,7 +3625,7 @@ static void join_ally(battle *b, const side *s, unit *u, fighter **cp)
     }
 }
 
-static void join_allies(battle * b)
+void join_allies(battle * b)
 {
     region *r = b->region;
     unit *u;
@@ -3684,7 +3684,7 @@ static void join_allies(battle * b)
         }
     }
 
-    for (si = 0; si != num_sides; ++si) {
+    for (num_sides = arrlen(b->sides), si = 0; si != num_sides; ++si) {
         side* s = b->sides[si];
         size_t sei;
         faction *f = s->bf->faction;
@@ -4118,7 +4118,6 @@ void force_leave(region *r, battle *b) {
         }
     }
 }
-
 
 static void do_battle(region * r) {
     battle *b = NULL;

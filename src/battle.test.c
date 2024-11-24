@@ -16,6 +16,7 @@
 #include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/curse.h"
+#include "kernel/group.h"
 #include "kernel/item.h"
 #include "kernel/order.h"
 #include "kernel/race.h"
@@ -1261,6 +1262,61 @@ static void test_start_battle(CuTest* tc) {
     test_teardown();
 }
 
+static fighter *test_find_fighter(const battle *b, const unit *u)
+{
+    size_t si, num_sides = arrlen(b->sides);
+
+    for (si = 0; si != num_sides; ++si) {
+        side *s = b->sides[si];
+        if (s->bf->faction == u->faction) {
+            fighter *fig;
+            for (fig = s->fighters; fig; fig = fig->next) {
+                if (fig->unit == u) {
+                    return fig;
+                }
+            }
+        }
+    }
+    return NULL;
+}
+
+static void test_join_allies(CuTest *tc) {
+    battle *b = NULL;
+    unit *u1, *u2, *u3;
+    region *r;
+    fighter *f1, *f2, *f3;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    u1 = test_create_unit(test_create_faction(), r);
+    u2 = test_create_unit(test_create_faction(), r);
+    u3 = test_create_unit(u2->faction, r);
+    join_group(u3, "Fools");
+
+    unit_setstatus(u1, ST_FIGHT);
+    unit_setstatus(u2, ST_FLEE);
+    unit_setstatus(u3, ST_FIGHT);
+    unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
+    CuAssertTrue(tc, start_battle(r, &b));
+    CuAssertPtrNotNull(tc, f1 = test_find_fighter(b, u1));
+    CuAssertPtrNotNull(tc, f2 = test_find_fighter(b, u2));
+    CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, get_relation(f1->side, f2->side));
+    CuAssertIntEquals(tc, E_ENEMY, get_relation(f2->side, f1->side));
+    CuAssertTrue(tc, f1->side != f2->side);
+    CuAssertPtrEquals(tc, NULL, test_find_fighter(b, u3));
+    join_allies(b);
+    CuAssertPtrNotNull(tc, f3 = test_find_fighter(b, u3));
+    CuAssertTrue(tc, f3->side != f2->side);
+    CuAssertTrue(tc, f3->side != f1->side);
+    CuAssertIntEquals(tc, E_FRIEND, get_relation(f3->side, f2->side));
+    CuAssertIntEquals(tc, E_FRIEND, get_relation(f2->side, f3->side));
+    CuAssertIntEquals(tc, E_ENEMY, get_relation(f3->side, f1->side));
+    CuAssertIntEquals(tc, E_ENEMY, get_relation(f1->side, f3->side));
+
+    free_battle(b);
+    test_teardown();
+}
+
 static void test_battle_leaders(CuTest* tc) {
     region* r;
     faction* f;
@@ -1484,6 +1540,7 @@ CuSuite *get_battle_suite(void)
     DISABLE_TEST(suite, test_drain_exp);
     SUITE_ADD_TEST(suite, test_make_battle);
     SUITE_ADD_TEST(suite, test_start_battle);
+    SUITE_ADD_TEST(suite, test_join_allies);
     SUITE_ADD_TEST(suite, test_battle_leaders);
     SUITE_ADD_TEST(suite, test_get_tactics);
     SUITE_ADD_TEST(suite, test_get_unitrow);
