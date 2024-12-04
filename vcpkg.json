@@ -1,0 +1,11 @@
+{
+  "dependencies": [
+    "cjson",
+    "expat",
+    "iniparser",
+    "pdcurses",
+    "sqlite3",
+    "tolua",
+    "utf8proc"
+  ]
+}
