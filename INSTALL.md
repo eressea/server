@@ -4,7 +4,7 @@ run luarocks install lunitx
 
 set environment variables:
 LUA_PATH C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?.lua
-ERESSEA_ROOT <where the orders and data files are>_
+ERESSEA_ROOT <where the orders and data files are>
 
 Visual Studio:
 - File -> Open -> CMake ...
@@ -27,9 +27,11 @@ Visual Studio:
         "-ce2",
         "-re2",
         "-D",
+        "-i",
+        "${workspaceRoot}",
         "-t",
         "1349",
-        "${workspaceRoot}\\scripts\\run-turn.lua"
+        "${workspaceRoot}\\scripts\\run-turn.lua"  
       ],
       "currentDir": "${env.ERESSEA_ROOT}",
       "env": {
