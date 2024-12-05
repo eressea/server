@@ -837,6 +837,26 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     int i;
     const char *arg;
     size_t len = strlen(section);
+    
+    /* defaults */
+    arg = config_get("config.install");
+    if (arg) {
+        lua_pushstring(L, "install");
+        lua_pushstring(L, arg);
+        lua_rawset(L, -3);
+    }
+    lua_pushstring(L, "basepath");
+    lua_pushstring(L, basepath());
+    lua_rawset(L, -3);
+    lua_pushstring(L, "reportpath");
+    lua_pushstring(L, reportpath());
+    lua_rawset(L, -3);
+    arg = config_get("config.rules");
+    if (arg) {
+        lua_pushstring(L, "rules");
+        lua_pushstring(L, arg);
+        lua_rawset(L, -3);
+    }
 
     for (i = 0; d && i != d->n; ++i) {
         const char *key = d->key[i];
@@ -855,19 +875,6 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
         }
     }
 
-    /* special case */
-    lua_pushstring(L, "basepath");
-    lua_pushstring(L, basepath());
-    lua_rawset(L, -3);
-    lua_pushstring(L, "reportpath");
-    lua_pushstring(L, reportpath());
-    lua_rawset(L, -3);
-    arg = config_get("config.rules");
-    if (arg) {
-        lua_pushstring(L, "rules");
-        lua_pushstring(L, arg);
-        lua_rawset(L, -3);
-    }
 }
 
 static int lua_rng_default(lua_State *L) {
