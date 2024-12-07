@@ -199,6 +199,10 @@ static int parse_args(int argc, char **argv)
             case 'D':
                 config_set("config.debug", "1");
                 break;
+            case 'i':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                config_set("config.install", arg);
+                break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.path", arg);

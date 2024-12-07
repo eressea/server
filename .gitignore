@@ -2,6 +2,7 @@ out/
 .vscode/
 *.orig
 eressea.ini
+CMakeUserPresets.json
 Debug
 Release
 
