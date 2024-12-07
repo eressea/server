@@ -948,13 +948,17 @@ attrib_allocation(const resource_type * rtype, region * r, allocation * alist)
     for (al = alist; al; al = al->next) {
         if (avail > 0) {
             int want = required(al->want, al->save);
-            int x = avail * want / nreq;
-            int rx = (avail * want) % nreq;
+            long long dx = (long long)avail * want / nreq;
+            int x, rx = (avail * want) % nreq;
+
+            assert(dx < INT_MAX && dx >= 0);
+            x = (int)dx;
             /* Wenn Rest, dann wuerfeln, ob ich was bekomme: */
             if (rx > 0 && rng_int() % nreq < rx) ++x;
             avail -= x;
             nreq -= want;
             al->get = x * al->save.sa[1] / al->save.sa[0];
+            assert(al->get >= 0);
             if (al->want < al->get) al->get = al->want;
             if (!rtype->raw) {
                 int use = required(al->get, al->save);
