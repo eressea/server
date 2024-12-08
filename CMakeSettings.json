@@ -5,7 +5,7 @@
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
       "installRoot": "${env.USERPROFILE}\\CMakeBuilds\\${workspaceHash}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "-v",
@@ -16,42 +16,65 @@
           "value": "${workspaceRoot}/cmake/Modules",
           "type": "STRING"
         }
-      ]
+      ],
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
     },
     {
       "name": "x86-Debug",
       "generator": "Ninja",
       "configurationType": "Debug",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
         {
-          "name": "CMAKE_TOOLCHAIN_FILE",
-          "value": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake",
+          "name": "CMAKE_MODULE_PATH",
+          "value": "${workspaceRoot}/cmake/Modules",
           "type": "STRING"
-        },
+        }
+      ],
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
+    },
+    {
+      "name": "x64-Development",
+      "generator": "Ninja",
+      "configurationType": "RelWithDebInfo",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "variables": [
         {
           "name": "CMAKE_MODULE_PATH",
           "value": "${workspaceRoot}/cmake/Modules",
           "type": "STRING"
         }
-      ]
+      ],
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
     },
     {
       "name": "x64-Release",
       "generator": "Ninja",
-      "configurationType": "RelWithDebInfo",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\build\\${name}",
+      "installRoot": "${projectDir}\\install\\${name}",
       "cmakeCommandArgs": "",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "variables": [
+        {
+          "name": "CMAKE_MODULE_PATH",
+          "value": "${workspaceRoot}/cmake/Modules",
+          "type": "STRING"
+        }
+      ],
+      "cmakeToolchain": "${env.VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake"
     }
   ]
 }

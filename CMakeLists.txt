@@ -13,6 +13,9 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/"
 
 if (MSVC)
   find_package (PDCurses)
+  if (NOT PDCURSES_FOUND)
+    message("Could not find PDCurses package, will try Curses")
+  endif (NOT PDCURSES_FOUND)
   set (CURSES_FOUND ${PDCURSES_FOUND})
   set (CURSES_LIBRARY ${PDCURSES_LIBRARY})
   set (CURSES_LIBRARIES ${PDCURSES_LIBRARIES})
