@@ -560,7 +560,7 @@ int read_borders(gamedata *data)
 {
     struct storage *store = data->store;
     for (;;) {
-        int fid, tid, bid;
+        int fid, tid;
         char zText[32];
         region *from, *to;
         border_type *type;
@@ -570,10 +570,12 @@ int read_borders(gamedata *data)
         if (!strcmp(zText, "end")) {
             break;
         }
-        READ_INT(store, &bid);
+        if (data->version < BORDER_ID_VERSION) {
+            READ_INT(store, NULL);
+        }
         type = find_bordertype(zText);
         if (type == NULL) {
-            log_error("[read_borders] connection %d type %s is not registered", bid, zText);
+            log_error("[read_borders] connection type %s is not registered", zText);
             assert(type || !"connection type not registered");
         }
 
@@ -582,7 +584,7 @@ int read_borders(gamedata *data)
         from = findregionbyid(fid);
         to = findregionbyid(tid);
         if (!to || !from) {
-            log_error("%s connection %d has missing regions", zText, bid);
+            log_error("%s connection from %d to %d has missing regions", zText, fid, tid);
             if (type->read) {
                 /* skip ahead */
                 type->read(&dummy, data);
