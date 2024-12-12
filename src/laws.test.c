@@ -1083,17 +1083,76 @@ static void test_luck_message(CuTest *tc) {
 }
 
 static unit * setup_name_cmd(void) {
-    faction *f;
-
+    struct locale *lang;
     test_setup();
+    lang = test_create_locale();
+    locale_setstring(lang, "castle", param_name(P_GEBAEUDE, NULL));
     mt_create_error(84);
     mt_create_error(148);
     mt_create_error(332);
     mt_create_error(12);
     mt_create_va(mt_new("renamed_building_seen", NULL), "renamer:unit", "region:region", "building:building", MT_NEW_END);
     mt_create_va(mt_new("renamed_building_notseen", NULL), "region:region", "building:building", MT_NEW_END);
-    f = test_create_faction();
-    return test_create_unit(f, test_create_plain(0, 0));
+    return test_create_unit(test_create_faction(), test_create_plain(0, 0));
+}
+
+static void test_name_foreign_building(CuTest* tc) {
+    unit* u1, * u2;
+    order* ord;
+    faction* f;
+    building *b;
+
+    u1 = setup_name_cmd();
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1,1));
+    b = u2->building = test_create_building(u2->region, test_create_castle());
+    CuAssertTrue(tc, !renamed_building(b));
+
+    f = u1->faction;
+    ord = create_order(K_NAME, f->locale, "%s %s %i Dopefish",
+        param_name(P_FOREIGN, f->locale),
+        param_name(P_BUILDING, f->locale), b->no);
+
+    name_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error31")); // building not found
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    test_clear_messages(f);
+    move_unit(u1, u2->region, NULL);
+    name_cmd(u1, ord);
+    CuAssertStrEquals(tc, "Dopefish", b->name);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "renamed_building_seen"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "renamed_building_seen"));
+    test_teardown();
+}
+
+static void test_name_foreign_building_stealth(CuTest *tc) {
+    unit *u1, *u2;
+    order *ord;
+    faction *f;
+    building *b;
+
+    u1 = setup_name_cmd();
+    set_level(u1, SK_STEALTH, 1);
+    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    b = u2->building = test_create_building(u2->region, test_create_castle());
+    CuAssertTrue(tc, !renamed_building(b));
+
+    f = u1->faction;
+    ord = create_order(K_NAME, f->locale, "%s %s %i Dopefish",
+        param_name(P_FOREIGN, f->locale),
+        param_name(P_BUILDING, f->locale), b->no);
+
+    name_cmd(u1, ord);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error31")); // building not found
+    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
+
+    test_clear_messages(f);
+    move_unit(u1, u2->region, NULL);
+    name_cmd(u1, ord);
+    CuAssertStrEquals(tc, "Dopefish", b->name);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u1->faction->msgs, "renamed_building_seen"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "renamed_building_notseen"));
+    test_teardown();
 }
 
 static void test_name_foreign_unit(CuTest* tc) {
@@ -1378,8 +1437,8 @@ static void test_name_cmd(CuTest *tc) {
     alliance *al;
     order *ord;
 
-    test_setup();
-    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    u = setup_name_cmd();
+    f = u->faction;
     setalliance(f, al = makealliance(42, ""));
 
     ord = create_order(K_NAME, f->locale, "%s '  Ho\tdor  '", param_name(P_UNIT, f->locale));
@@ -2188,6 +2247,22 @@ static void test_cansee_empty(CuTest *tc) {
     test_teardown();
 }
 
+static void test_cansee_skillmod(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    CuAssertTrue(tc, !cansee(f, u->region, u, 0));
+    set_level(u, SK_STEALTH, 1);
+    CuAssertTrue(tc, !cansee(f, u->region, u, 1));
+    CuAssertTrue(tc, cansee(f, u->region, u, 2));
+
+    test_teardown();
+}
+
 
 /**
  * Hidden monsters are seen in oceans if they are big enough.
@@ -2882,6 +2957,8 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_banner_cmd);
     SUITE_ADD_TEST(suite, test_email_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd_2274);
+    SUITE_ADD_TEST(suite, test_name_foreign_building);
+    SUITE_ADD_TEST(suite, test_name_foreign_building_stealth);
     SUITE_ADD_TEST(suite, test_name_foreign_unit);
     SUITE_ADD_TEST(suite, test_name_unit);
     SUITE_ADD_TEST(suite, test_name_region);
@@ -2947,6 +3024,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_cansee_guard);
     SUITE_ADD_TEST(suite, test_cansee_temp);
     SUITE_ADD_TEST(suite, test_cansee_empty);
+    SUITE_ADD_TEST(suite, test_cansee_skillmod);
     SUITE_ADD_TEST(suite, test_nmr_timeout);
     SUITE_ADD_TEST(suite, test_long_orders);
     SUITE_ADD_TEST(suite, test_long_order_on_ocean);

@@ -89,6 +89,11 @@ typedef enum seen_mode {
     seen_battle
 } seen_mode;
 
+typedef struct faction_messages {
+    const struct faction *viewer;
+    struct message_list *msgs;
+} faction_messages;
+
 typedef struct region {
     struct region *next;
     struct land_region *land;
@@ -105,11 +110,7 @@ typedef struct region {
     int flags;
     unsigned short age;
     struct message_list *msgs;
-    struct individual_message {
-        struct individual_message *next;
-        const struct faction *viewer;
-        struct message_list *msgs;
-    } *individual_messages;
+    struct faction_messages *individual_messages;
     struct attrib *attribs;
     const struct terrain_type *terrain;
     struct rawmaterial *resources;
@@ -231,8 +232,7 @@ void region_set_owner(struct region *r, struct faction *owner, int turn);
 struct faction *region_get_owner(const struct region *r);
 struct alliance *region_get_alliance(const struct region *r);
 
-struct region *r_connect(const struct region *, direction_t dir);
-#define rconnect(r, dir) ((r)->connect[dir]?(r)->connect[dir]:r_connect(r, (direction_t)dir))
+struct region *rconnect(const struct region *, direction_t dir);
 
 void free_regions(void);
 void free_land(struct land_region * lr);

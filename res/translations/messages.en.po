@@ -1104,6 +1104,9 @@ msgstr "\"A haunting melody fills the air, and $unit($unit) dances until late in
 msgid "dragon_growl"
 msgstr "\"$unit($dragon): \\\"$localize($growl) $if($eq($number,1), \"I smell\", \"We smell\") something in $region($target)\\\".\""
 
+msgid "group_without_allies"
+msgstr "\$group has no allies.\""
+
 msgid "produce"
 msgstr "\"$unit($unit) in $region($region) produces $int($amount)$if($eq($wanted,$amount),\"\",\" of $int($wanted)\") $resource($resource,$amount).\""
 

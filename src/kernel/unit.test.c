@@ -664,7 +664,7 @@ static void test_transfermen_bug_2886(CuTest *tc) {
     f = test_create_faction();
     u1 = test_create_unit(f, r);
     scale_number(u1, 2);
-    set_level(u1, SK_ALCHEMY, 1);
+    test_set_skill(u1, SK_ALCHEMY, 1, SKILL_DAYS_PER_WEEK * 2);
     u2 = test_create_unit(f, r);
     transfermen(u1, u2, 1);
     CuAssertIntEquals(tc, 1, u1->number);

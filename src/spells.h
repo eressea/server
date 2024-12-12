@@ -46,3 +46,10 @@ int sp_summon_familiar(struct castorder *co);
 
 int sp_shadowdemons(struct castorder *co);
 int sp_shadowlords(struct castorder *co);
+int sp_analysemagic(struct castorder *co);
+int sp_babbler(struct castorder *co);
+int sp_charmingsong(struct castorder *co);
+int sp_pump(struct castorder *co);
+int sp_readmind(struct castorder *co);
+int sp_auraleak(struct castorder *co);
+int sp_movecastle(struct castorder *co);

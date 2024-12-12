@@ -6406,5 +6406,10 @@
     </type>
   </message>
 
+  <message name="group_without_allies">
+    <type>
+      <arg name="group" type="string"/>
+    </type>
+  </message>
 </messages>
 </eressea>

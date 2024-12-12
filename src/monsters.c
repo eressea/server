@@ -50,7 +50,6 @@
 
 #include "spells/regioncurse.h"
 
-#include <selist.h>
 #include <strings.h>
 
 #include <stb_ds.h>
@@ -496,11 +495,11 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
 {
     int max_affinity = 0;
     region *max_region = NULL;
-    selist *ql, *rlist = path_regions_in_range(r, range, allowed_dragon);
-    int qi;
+    region **rlist = path_regions_in_range(r, range, allowed_dragon);
+    size_t qi, ql;
 
-    for (qi = 0, ql = rlist; ql; selist_advance(&ql, &qi, 1)) {
-        region *r2 = (region *)selist_get(ql, qi);
+    for (qi = 0, ql = arrlen(rlist); qi != ql; ++qi) {
+        region *r2 = rlist[qi];
         int affinity = dragon_affinity_value(r2, u);
         if (affinity > max_affinity) {
             max_affinity = affinity;
@@ -508,7 +507,7 @@ static attrib *set_new_dragon_target(unit * u, region * r, int range)
         }
     }
 
-    selist_free(rlist);
+    arrfree(rlist);
 
     if (max_region && max_region != r) {
         attrib *a = a_find(u->attribs, &at_targetregion);

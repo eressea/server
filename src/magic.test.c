@@ -32,6 +32,7 @@
 
 #include <strings.h>
 #include <selist.h>
+#include <stb_ds.h>
 
 #include <tests.h>
 
@@ -60,7 +61,7 @@ void test_updatespells(CuTest * tc)
     CuAssertPtrEquals(tc, NULL, f->spellbook);
     pick_random_spells(f, 1, book, 1);
     CuAssertPtrNotNull(tc, f->spellbook);
-    CuAssertIntEquals(tc, 1, selist_length(f->spellbook->spells));
+    CuAssertIntEquals(tc, 1, (int) arrlen(f->spellbook->spells));
     CuAssertPtrNotNull(tc, spellbook_get(f->spellbook, sp));
     free_spellbook(book);
     test_teardown();

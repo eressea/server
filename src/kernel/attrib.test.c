@@ -13,6 +13,15 @@
 
 #include <string.h>
 
+static void test_at_register(CuTest *tc)
+{
+    attrib_type at_test = { "test" };
+    test_setup();
+    at_register(&at_test);
+    CuAssertPtrEquals(tc, &at_test, at_find("test"));
+    test_teardown();
+}
+
 static void test_attrib_new(CuTest * tc)
 {
     attrib_type at_test = { "test" };
@@ -201,6 +210,7 @@ static void test_attrib_rwshorts(CuTest *tc) {
 CuSuite *get_attrib_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_at_register);
     SUITE_ADD_TEST(suite, test_attrib_new);
     SUITE_ADD_TEST(suite, test_attrib_add);
     SUITE_ADD_TEST(suite, test_attrib_remove);

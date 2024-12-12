@@ -160,7 +160,7 @@ extern "C" {
         int duration;               /* Dauer der Verzauberung. Wird jede Runde vermindert */
     } curse;
 
-    void curses_done(void); /* de-register all curse-types */
+    void free_curses(void); /* de-register all curse-types */
 
     void curse_write(const union variant *v, const void *owner,
         struct storage *store);
@@ -224,8 +224,6 @@ extern "C" {
 
     const curse_type *ct_find(const char *c);
     void ct_register(const curse_type *);
-    void ct_remove(const char *c);
-    void ct_checknames(void);
 
     curse *findcurse(int curseid);
 

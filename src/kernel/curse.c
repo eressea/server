@@ -26,8 +26,12 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/variant.h>
+#include <util/umlaut.h>
 
 #include <storage.h>
+#include <strings.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <stdio.h>
@@ -256,61 +260,37 @@ attrib_type at_curse = {
 /* ------------------------------------------------------------- */
 /* Spruch identifizieren */
 
-#include <util/umlaut.h>
-#include <selist.h>
-
 #define MAXCTHASH 128
-static selist *cursetypes[MAXCTHASH];
+static curse_type * cursetypes[MAXCTHASH]; /* FIXME: selist to hastable with open addressing */
 
 void ct_register(const curse_type * ct)
 {
-    unsigned int hash = tolower(ct->cname[0]) & 0xFF;
-    selist **ctlp = cursetypes + hash;
-
+    size_t hash = str_hash(ct->cname);
+    size_t n = hash % MAXCTHASH, k = n;
     assert(ct->age == NULL || (ct->flags&CURSE_NOAGE) == 0);
     assert((ct->flags&CURSE_ISNEW) == 0);
-    selist_set_insert(ctlp, (void *)ct, NULL);
+    while (cursetypes[k]) {
+        assert(cursetypes[k] != ct); // no duplicates allowed
+        k = (k + 1) % MAXCTHASH;
+        assert(k != n); // hashtable is full!
+    }
+    assert(cursetypes[k] == NULL);
+    cursetypes[k] = (curse_type *)ct;
 }
 
 const curse_type *ct_find(const char *c)
 {
-    unsigned int hash = tolower(c[0]);
-    selist *ctl = cursetypes[hash];
-
-    if (ctl) {
-        size_t c_len = strlen(c);
-        int qi;
-
-        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)selist_get(ctl, qi);
-
-            if (strcmp(c, type->cname) == 0) {
-                return type;
-            }
-            else {
-                size_t k = strlen(type->cname);
-                if (k > c_len) k = c_len;
-                if (!memcmp(c, type->cname, k)) {
-                    return type;
-                }
-            }
+    size_t hash = str_hash(c);
+    size_t n = hash % MAXCTHASH, k = n;
+    while (cursetypes[k]) {
+        const curse_type *type = cursetypes[k];
+        if (strcmp(c, type->cname) == 0) {
+            return type;
         }
+        k = (k + 1) % MAXCTHASH;
+        if (k == n) break;
     }
     return NULL;
-}
-
-void ct_checknames(void) {
-    int i, qi;
-    selist *ctl;
-
-    for (i = 0; i < MAXCTHASH; ++i) {
-        ctl = cursetypes[i];
-        for (qi = 0; ctl; selist_advance(&ctl, &qi, 1)) {
-            curse_type *type = (curse_type *)selist_get(ctl, qi);
-            curse_name(type, default_locale);
-
-        }
-    }
 }
 
 /* ------------------------------------------------------------- */
@@ -719,10 +699,6 @@ double destr_curse(curse * c, int cast_level, double force)
     return force;
 }
 
-void curses_done(void) {
-    int i;
-    for (i = 0; i != MAXCTHASH; ++i) {
-        selist_free(cursetypes[i]);
-        cursetypes[i] = 0;
-    }
+void free_curses(void) {
+    memset(cursetypes, 0, sizeof(cursetypes));
 }

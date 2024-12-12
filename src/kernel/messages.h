@@ -46,7 +46,8 @@ struct message;
 enum msg_t;
 
 void message_handle_missing(int mode);
-void free_messagelist(struct mlist *msgs);
+void free_mlist(struct mlist *msgs);
+void free_messagelist(struct message_list *msgs);
 
 struct message *msg_message(const char *name, const char *sig, ...);
 struct message *msg_feedback(const struct unit *, struct order *cmd,

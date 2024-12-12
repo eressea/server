@@ -32,13 +32,13 @@ static void test_stb(CuTest* tc)
 {
     void** varr;
     int* arr = NULL;
-    arrpush(arr, 42);
+    arrput(arr, 42);
     CuAssertIntEquals(tc, 1, (int)arrlen(arr));
-    arrpush(arr, 47);
+    arrput(arr, 47);
     CuAssertIntEquals(tc, 42, arr[0]);
     CuAssertIntEquals(tc, 47, arr[1]);
     varr = NULL;
-    arrpush(varr, NULL);
+    arrput(varr, NULL);
     CuAssertIntEquals(tc, 1, (int)arrlen(varr));
 }
 

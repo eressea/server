@@ -975,7 +975,7 @@ struct skill *add_skill(struct unit * u, enum skill_t sk)
         sv = u->skills + s;
     }
     else {
-        arrpush(u->skills, skins);
+        arrput(u->skills, skins);
         sv = u->skills;
     }
     if (sk == SK_MAGIC && u->faction && !fval(u->faction, FFL_NPC)) {

@@ -167,6 +167,17 @@ static void test_volcano_damage_healing_potions(CuTest* tc) {
     test_teardown();
 }
 
+static void test_volcano_outbreak_ocean(CuTest *tc) {
+    region *r, *rn;
+    test_setup();
+    r = test_create_plain(0, 0);
+    rn = test_create_ocean(0, 1);
+    volcano_outbreak(r, rn);
+    CuAssertPtrNotNull(tc, a_find(r->attribs, &at_reduceproduction));
+    CuAssertPtrEquals(tc, NULL, a_find(rn->attribs, &at_reduceproduction));
+    test_teardown();
+}
+
 static void test_volcano_outbreak(CuTest *tc) {
     region *r, *rn;
     unit *u1, *u2;
@@ -226,6 +237,7 @@ CuSuite *get_volcano_suite(void)
     SUITE_ADD_TEST(suite, test_volcano_damage_armor);
     SUITE_ADD_TEST(suite, test_volcano_damage_buildings);
     SUITE_ADD_TEST(suite, test_volcano_damage_cats);
+    SUITE_ADD_TEST(suite, test_volcano_outbreak_ocean);
     SUITE_ADD_TEST(suite, test_volcano_outbreak);
     return suite;
 }

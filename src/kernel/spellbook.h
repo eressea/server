@@ -19,7 +19,7 @@ extern "C" {
     typedef struct spellbook
     {
         char * name;
-        struct selist * spells;
+        struct spellbook_entry * spells; /* FIXME: selist only ever adds with push, could use stb array<spell *> */
     } spellbook;
 
     spellbook * create_spellbook(const char * name);

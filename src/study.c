@@ -39,7 +39,6 @@
 #include <util/rng.h>
 #include <util/umlaut.h>
 
-#include <selist.h>
 #include <strings.h>
 
 #include <stb_ds.h>
@@ -145,7 +144,7 @@ static void init_learning(variant *var)
 static void done_learning(variant *var)
 {
     teaching_info *teach = (teaching_info *)var->v;
-    selist_free(teach->teachers);
+    arrfree(teach->teachers);
     free(teach);
 }
 
@@ -206,7 +205,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             a = a_add(&student->attribs, a_new(&at_learning));
             teach = (teaching_info *)a->data.v;
         }
-        selist_push(&teach->teachers, teacher);
+        arrput(teach->teachers, teacher);
         teach->days += students * SKILL_DAYS_PER_WEEK;
         teach->students += students; 
 
@@ -449,27 +448,21 @@ struct teach_data {
     skill_t sk;
 };
 
-static bool cb_msg_teach(void *el, void *arg) {
-    struct teach_data *td = (struct teach_data *)arg;
-    unit *ut = (unit *)el;
-    unit * u = td->u;
-    skill_t sk = td->sk;
-    if (ut->faction != u->faction) {
-        bool feedback = alliedunit(u, ut->faction, HELP_GUARD);
-        if (feedback) {
-            ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
-                "teacher student skill level", ut, u, sk,
-                effskill(u, sk, NULL)));
+static void msg_teachers(struct unit **teachers, struct unit *u, skill_t sk) {
+    size_t qi, ql;
+    for (qi = 0, ql = arrlen(teachers); qi != ql; ++qi) {
+        unit *ut = teachers[qi];
+        if (ut->faction != u->faction) {
+            bool feedback = alliedunit(u, ut->faction, HELP_GUARD);
+            if (feedback) {
+                ADDMSG(&ut->faction->msgs, msg_message("teach_teacher",
+                    "teacher student skill level", ut, u, sk,
+                    effskill(u, sk, NULL)));
+            }
+            ADDMSG(&u->faction->msgs, msg_message("teach_student",
+                "teacher student skill", ut, u, sk));
         }
-        ADDMSG(&u->faction->msgs, msg_message("teach_student",
-            "teacher student skill", ut, u, sk));
     }
-    return true;
-}
-
-static void msg_teachers(struct selist *teachers, struct unit *u, skill_t sk) {
-    struct teach_data cbdata = { .sk = sk, .u = u };
-    selist_foreach_ex(teachers, cb_msg_teach, &cbdata);
 }
 
 bool check_student(const struct unit *u, struct order *ord, enum skill_t sk) {

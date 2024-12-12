@@ -1,0 +1,13 @@
+{
+  "name": "tolua",
+  "version-string": "5.2.5",
+  "description": "tolua is a tool that greatly simplifies the integration of C/C++ code with Lua.",
+  "homepage": "http://webserver2.tecgraf.puc-rio.br/~celes/tolua/",
+  "dependencies": [
+    "lua",
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    }
+  ]
+}

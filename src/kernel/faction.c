@@ -59,23 +59,19 @@
 faction *factions;
 
 /** remove the faction from memory.
- * this frees all memory that's only accessible through the faction,
- * but you should still call funhash and remove the faction from the
- * global list.
+ * this frees all memory that's only accessible through the faction.
  */
 static void free_faction(faction * f)
 {
     funhash(f);
     if (f->msgs) {
-        free_messagelist(f->msgs->begin);
-        free(f->msgs);
+        free_messagelist(f->msgs);
     }
     while (f->battles) {
         struct bmsg *bm = f->battles;
         f->battles = bm->next;
         if (bm->msgs) {
-            free_messagelist(bm->msgs->begin);
-            free(bm->msgs);
+            free_messagelist(bm->msgs);
         }
         free(bm);
     }
@@ -95,7 +91,6 @@ static void free_faction(faction * f)
     free(f->name);
     if (f->seen_factions) {
         selist_free(f->seen_factions);
-        f->seen_factions = 0;
     }
 
     while (f->attribs) {
@@ -105,6 +100,7 @@ static void free_faction(faction * f)
     i_freeall(&f->items);
 
     freelist(f->origin);
+    free(f);
 }
 
 #define FMAXHASH 2039
@@ -335,7 +331,6 @@ void free_flist(faction **fp) {
         faction *f = flist;
         flist = f->next;
         free_faction(f);
-        free(f);
     }
     *fp = NULL;
 }

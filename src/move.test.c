@@ -3,7 +3,6 @@
 #include "contact.h"
 #include "lighthouse.h"
 #include "attributes/follow.h"
-#include "spells/regioncurse.h"
 
 #include "kernel/attrib.h"
 #include "kernel/ally.h"
@@ -1375,7 +1374,6 @@ static void test_move_blocked_by_fogtrap(CuTest* tc) {
 
     test_setup();
     setup_move();
-    register_regioncurse();
     rt = test_create_region(1, 0, NULL);
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
@@ -1402,7 +1400,6 @@ static void test_holyground_blocks_undead_moves(CuTest* tc) {
 
     test_setup();
     setup_move();
-    register_regioncurse();
     rt = test_create_region(1, 0, NULL);
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();
@@ -1433,7 +1430,6 @@ static void test_holyground_blocks_undead_follow(CuTest* tc) {
 
     test_setup();
     setup_move();
-    register_regioncurse();
     rt = test_create_region(1, 0, NULL);
     r = test_create_region(2, 0, NULL);
     lang = test_create_locale();

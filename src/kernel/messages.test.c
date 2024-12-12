@@ -92,11 +92,9 @@ static void test_merge_split(CuTest *tc) {
     CuAssertPtrEquals(tc, append->begin, mlist->begin->next);
     split_messages(mlist, split);
     CuAssertPtrEquals(tc, NULL, mlist->begin->next);
-    free_messagelist(*split);
-    free_messagelist(mlist->begin);
-    free(mlist);
-    free_messagelist(append->begin);
-    free(append);
+    free_mlist(*split);
+    free_messagelist(mlist);
+    free_messagelist(append);
     test_teardown();
 }
 

@@ -174,7 +174,7 @@ void make_wormholes(region **match, int count, const building_type *bt_wormhole)
 void wormholes_update(void)
 {
     const building_type *bt_wormhole = bt_find("wormhole");
-    selist *rlist = 0;
+    selist *rlist = 0; /* FIXME: selist used as unsorted array */
     int count = 0;
     region **match;
 

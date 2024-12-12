@@ -13,7 +13,7 @@
 #include <util/macros.h>
 #include <util/rng.h>
 
-#include <selist.h>
+#include <stb_ds.h>
 #include <storage.h>
 #include <strings.h>
 
@@ -23,8 +23,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-int nextborder = 0;
 
 #define BORDER_MAXHASH 8191
 connection *borders[BORDER_MAXHASH];
@@ -69,7 +67,7 @@ void walk_connections(region *r, void(*cb)(connection *, void *), void *data) {
 
     walk_i(r, borders[key], cb, data);
     for (d = 0; d != MAXDIRECTIONS; ++d) {
-        region *rn = r_connect(r, d);
+        region *rn = rconnect(r, d);
         if (rn) {
             int k = reg_hashkey(rn);
             if (k < key) {
@@ -103,7 +101,7 @@ connection *get_borders(const region * r1, const region * r2)
     return *bp;
 }
 
-connection *new_border(border_type * type, region * from, region * to, int id)
+connection *create_border(border_type * type, region * from, region * to)
 {
     connection *b, **bp;
 
@@ -117,7 +115,6 @@ connection *new_border(border_type * type, region * from, region * to, int id)
     b->type = type;
     b->from = from;
     b->to = to;
-    b->id = (id > 0) ? id : ++nextborder;
 
     if (type->init) {
         type->init(b);
@@ -301,7 +298,7 @@ attrib_type at_countdown = {
 
 void age_borders(void)
 {
-    selist *deleted = NULL, *ql;
+    connection **deleted = NULL;
     int i;
 
     for (i = 0; i != BORDER_MAXHASH; ++i) {
@@ -311,17 +308,19 @@ void age_borders(void)
             for (; b; b = b->next) {
                 if (b->type->age) {
                     if (b->type->age(b) == AT_AGE_REMOVE) {
-                        selist_push(&deleted, b);
+                        arrput(deleted, b);
                     }
                 }
             }
         }
     }
-    for (ql = deleted, i = 0; ql; selist_advance(&ql, &i, 1)) {
-        connection *b = (connection *)selist_get(ql, i);
-        erase_border(b);
+    if (deleted) {
+        size_t qi, ql;
+        for (ql = arrlen(deleted), qi = 0; qi != ql; ++qi) {
+            erase_border(deleted[qi]);
+        }
+        arrfree(deleted);
     }
-    selist_free(deleted);
 }
 
 /********
@@ -545,7 +544,6 @@ void write_borders(struct storage *store)
                 if (b->type->valid && !b->type->valid(b))
                     continue;
                 WRITE_TOK(store, b->type->_name);
-                WRITE_INT(store, b->id);
                 WRITE_INT(store, b->from->uid);
                 WRITE_INT(store, b->to->uid);
 
@@ -610,8 +608,7 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-                b = new_border(type, from, to, bid);
-                assert(bid <= nextborder);
+                b = create_border(type, from, to);
             }
             type->read(b, data);
             if (!type->write) {

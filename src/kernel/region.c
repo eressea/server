@@ -328,11 +328,10 @@ void runhash(region * r)
     regionhash[key] = DELMARKER;
 }
 
-region *r_connect(const region * r, direction_t dir)
+region *rconnect(const region * r, direction_t dir)
 {
     region *result;
     int x, y;
-    region *rmodify = (region *)r;
     if (dir < 0 || dir >= MAXDIRECTIONS) {
         return NULL;
     }
@@ -344,6 +343,7 @@ region *r_connect(const region * r, direction_t dir)
     pnormalize(&x, &y, rplane(r));
     result = rfindhash(x, y);
     if (result) {
+        region *rmodify = (region *)r;
         rmodify->connect[dir] = result;
         result->connect[back[dir]] = rmodify;
     }
@@ -544,7 +544,7 @@ void rsetroad(region * r, direction_t d, int val)
     }
     if (!b) {
         if (!val) return;
-        b = new_border(&bt_road, r, r2, 0);
+        b = create_border(&bt_road, r, r2);
     }
     if (r == b->from) {
         b->data.sa[0] = (short)val;
@@ -931,19 +931,20 @@ void free_region(region * r)
         free_land(r->land);
 
     if (r->msgs) {
-        free_messagelist(r->msgs->begin);
-        free(r->msgs);
-        r->msgs = 0;
+        free_messagelist(r->msgs);
+        r->msgs = NULL;
     }
 
-    while (r->individual_messages) {
-        struct individual_message *msg = r->individual_messages;
-        r->individual_messages = msg->next;
-        if (msg->msgs) {
-            free_messagelist(msg->msgs->begin);
-            free(msg->msgs);
+    if (r->individual_messages) {
+        ptrdiff_t i, l = arrlen(r->individual_messages);
+        for (i = 0; i != l; ++i) {
+            faction_messages *msg = r->individual_messages + i;
+            if (msg->msgs) {
+                free_messagelist(msg->msgs);
+            }
         }
-        free(msg);
+        arrfree(r->individual_messages);
+        r->individual_messages = NULL;
     }
 
     a_removeall(&r->attribs, NULL);
@@ -1307,32 +1308,40 @@ void write_region_reference(const region * r, struct storage *store)
 struct message_list *r_getmessages(const struct region *r,
     const struct faction *viewer)
 {
-    struct individual_message *imsg = r->individual_messages;
-    while (imsg && (imsg)->viewer != viewer)
-        imsg = imsg->next;
-    if (imsg)
-        return imsg->msgs;
+    if (r->individual_messages) {
+        ptrdiff_t i, l = arrlen(r->individual_messages);
+        for (i = 0; i != l; ++i) {
+            faction_messages *imsg = r->individual_messages + i;
+            if (imsg->viewer == viewer) {
+                return imsg->msgs;
+            }
+        }
+    }
     return NULL;
 }
 
 struct message *r_addmessage(struct region *r, const struct faction *viewer,
-struct message *msg)
+    struct message *msg)
 {
     assert(r);
     if (viewer) {
-        struct individual_message *imsg;
-        imsg = r->individual_messages;
-        while (imsg && imsg->viewer != viewer)
-            imsg = imsg->next;
-        if (imsg == NULL) {
-            imsg = malloc(sizeof(struct individual_message));
-            if (!imsg) abort();
-            imsg->next = r->individual_messages;
-            imsg->msgs = NULL;
-            r->individual_messages = imsg;
-            imsg->viewer = viewer;
+        faction_messages *vmsg = NULL;
+        if (r->individual_messages) {
+            ptrdiff_t i, l = arrlen(r->individual_messages);
+            for (i = 0; i != l; ++i) {
+                faction_messages *imsg = r->individual_messages + i;
+                if (imsg->viewer == viewer) {
+                    vmsg = imsg;
+                    break;
+                }
+            }
         }
-        return add_message(&imsg->msgs, msg);
+        if (!vmsg) {
+            vmsg = stbds_arraddnptr(r->individual_messages, 1);
+            vmsg->viewer = viewer;
+            vmsg->msgs = NULL;
+        }
+        return add_message(&vmsg->msgs, msg);
     }
     return add_message(&r->msgs, msg);
 }

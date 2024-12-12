@@ -281,7 +281,7 @@ void syntax_error(const struct unit *u, struct order *ord)
     }
 }
 
-void free_messagelist(mlist *msgs)
+void free_mlist(mlist *msgs)
 {
     struct mlist **mlistptr;
     for (mlistptr = &msgs; *mlistptr;) {
@@ -290,6 +290,14 @@ void free_messagelist(mlist *msgs)
         msg_release(ml->msg);
         free(ml);
     }
+}
+
+void free_messagelist(message_list *msgs)
+{
+    free_mlist(msgs->begin);
+    msgs->begin = NULL;
+    msgs->end = NULL;
+    free(msgs);
 }
 
 message *add_message(message_list ** pm, message * m)

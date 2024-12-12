@@ -34,15 +34,14 @@
 #include "util/rand.h"
 #include "util/variant.h"
 
-#include <stdlib.h>                // for abort, calloc
-#include <strings.h>
-
 #include <CuTest.h>
 
 #include <stb_ds.h>
 
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>                // for abort, calloc
+#include <strings.h>
 
 #include "tests.h"
 
@@ -228,9 +227,9 @@ static void test_select_enemy(CuTest * tc)
 {
     unit *du, *au;
     region *r;
-    fighter *df, *af;
     battle *b;
     side *ds, *as;
+    fighter *df, *af;
     troop at;
 
     test_setup();
@@ -255,7 +254,51 @@ static void test_select_enemy(CuTest * tc)
     test_teardown();
 }
 
-static void test_defenders_get_building_bonus(CuTest * tc)
+static void test_select_fighters(CuTest *tc)
+{
+    unit *du, *au;
+    region *r;
+    battle *b;
+    side *ds, *as;
+    fighter *df, *af;
+    fighter **arr;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    du = test_create_unit(test_create_faction(), r);
+    unit_setstatus(du, ST_FIGHT);
+    au = test_create_unit(test_create_faction(), r);
+    unit_setstatus(au, ST_BEHIND);
+    b = make_battle(r);
+    ds = make_side(b, du->faction, 0, 0, 0);
+    df = make_fighter(b, du, ds, false);
+    CuAssertPtrEquals(tc, NULL, select_fighters(b, ds, FS_ENEMY, NULL, NULL));
+    CuAssertPtrEquals(tc, NULL, fighters(b, ds, ST_BEHIND, ST_AVOID, FS_ENEMY));
+
+    CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_HELP, NULL, NULL));
+    CuAssertIntEquals(tc, 1, (int) arrlen(arr));
+    CuAssertPtrEquals(tc, df, arr[0]);
+    arrfree(arr);
+
+    CuAssertPtrNotNull(tc, arr = fighters(b, ds, ST_FIGHT, ST_AVOID, FS_HELP));
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, df, arr[0]);
+    arrfree(arr);
+
+    as = make_side(b, au->faction, 0, 0, 0);
+    af = make_fighter(b, au, as, true);
+    set_enemy(as, ds, true);
+
+    CuAssertPtrNotNull(tc, arr = select_fighters(b, ds, FS_ENEMY, NULL, NULL));
+    CuAssertIntEquals(tc, 1, (int)arrlen(arr));
+    CuAssertPtrEquals(tc, af, arr[0]);
+    arrfree(arr);
+
+    free_battle(b);
+    test_teardown();
+}
+
+static void test_defenders_get_building_bonus(CuTest *tc)
 {
     unit *du, *au;
     region *r;
@@ -1299,13 +1342,19 @@ static void test_join_allies(CuTest *tc) {
     unit_addorder(u1, create_order(K_ATTACK, u1->faction->locale, itoa36(u2->no)));
     CuAssertTrue(tc, start_battle(r, &b));
     CuAssertPtrNotNull(tc, f1 = test_find_fighter(b, u1));
+    CuAssertIntEquals(tc, FIG_ATTACKER, f1->flags & FIG_ATTACKER);
+    CuAssertIntEquals(tc, u1->number, f1->alive);
     CuAssertPtrNotNull(tc, f2 = test_find_fighter(b, u2));
     CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, get_relation(f1->side, f2->side));
     CuAssertIntEquals(tc, E_ENEMY, get_relation(f2->side, f1->side));
     CuAssertTrue(tc, f1->side != f2->side);
+    CuAssertIntEquals(tc, 0, f2->flags & FIG_ATTACKER);
+    CuAssertIntEquals(tc, u2->number, f2->alive);
     CuAssertPtrEquals(tc, NULL, test_find_fighter(b, u3));
     join_allies(b);
     CuAssertPtrNotNull(tc, f3 = test_find_fighter(b, u3));
+    CuAssertIntEquals(tc, 0, f3->flags & FIG_ATTACKER);
+    CuAssertIntEquals(tc, u3->number, f3->alive);
     CuAssertTrue(tc, f3->side != f2->side);
     CuAssertTrue(tc, f3->side != f1->side);
     CuAssertIntEquals(tc, E_FRIEND, get_relation(f3->side, f2->side));
@@ -1506,6 +1555,45 @@ static void test_combat_rosthauch(CuTest *tc) {
     test_teardown();
 }
 
+static void test_fumbleshield(CuTest *tc) {
+    region *r;
+    faction *f;
+    unit *u;
+    fighter *fig;
+    battle *b = NULL;
+    castorder co;
+    side *s;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    b = make_battle(r);
+    s = make_side(b, f, NULL, 0, NULL);
+    fig = make_fighter(b, u, s, true);
+    test_create_castorder(&co, u, 2, 5., 0, NULL);
+    co.magician.fig = fig;
+
+    CuAssertIntEquals(tc, co.level, sp_fumbleshield(&co));
+    CuAssertIntEquals(tc, 1, test_count_messagetype(f->battles->msgs, "cast_spell_effect"));
+    CuAssertIntEquals(tc, 1, (int) arrlen(b->meffects));
+    CuAssertIntEquals(tc, 100, b->meffects[0].duration);
+    CuAssertIntEquals(tc, 20, b->meffects[0].effect); /* 25 - force */
+    CuAssertPtrEquals(tc, fig, b->meffects[0].magician);
+    CuAssertIntEquals(tc, SHIELD_BLOCK, b->meffects[0].typ);
+
+    /* cast again, with more force */
+    co.force = 30.0;
+    CuAssertIntEquals(tc, co.level, sp_fumbleshield(&co));
+    CuAssertIntEquals(tc, 2, test_count_messagetype(f->battles->msgs, "cast_spell_effect"));
+    CuAssertIntEquals(tc, 2, (int)arrlen(b->meffects));
+    CuAssertIntEquals(tc, 100, b->meffects[1].duration);
+    CuAssertIntEquals(tc, 1, b->meffects[1].effect); /* never less than 1 */
+    CuAssertPtrEquals(tc, fig, b->meffects[1].magician);
+    CuAssertIntEquals(tc, SHIELD_BLOCK, b->meffects[1].typ);
+
+    free_battle(b);
+    test_teardown();
+}
+
 CuSuite *get_battle_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1521,6 +1609,7 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_battle_report_two);
     SUITE_ADD_TEST(suite, test_battle_report_three);
     SUITE_ADD_TEST(suite, test_select_enemy);
+    SUITE_ADD_TEST(suite, test_select_fighters);
     SUITE_ADD_TEST(suite, test_defenders_get_building_bonus);
     SUITE_ADD_TEST(suite, test_attackers_get_no_building_bonus);
     SUITE_ADD_TEST(suite, test_building_bonus_respects_size);
@@ -1545,5 +1634,6 @@ CuSuite *get_battle_suite(void)
     SUITE_ADD_TEST(suite, test_get_tactics);
     SUITE_ADD_TEST(suite, test_get_unitrow);
     SUITE_ADD_TEST(suite, test_combat_rosthauch);
+    SUITE_ADD_TEST(suite, test_fumbleshield);
     return suite;
 }

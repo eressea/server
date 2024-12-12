@@ -9,6 +9,7 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
+#include "kernel/connection.h"
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include "kernel/direction.h"         // for D_EAST, directions
@@ -396,7 +397,7 @@ static void test_sell_all(CuTest* tc) {
 
 static void test_sales_taxes(CuTest *tc) {
     region *r;
-    unit *u, *ub;
+    unit *u1, *u2, *ub;
     building *b;
     const item_type *it_luxury, *it_money;
     const luxury_type *ltype;
@@ -419,23 +420,33 @@ static void test_sales_taxes(CuTest *tc) {
     ub = test_create_unit(test_create_faction(), r);
     u_set_building(ub, b);
 
-    u = test_create_unit(test_create_faction(), r);
-    set_level(u, SK_TRADE, 10);
-    i_change(&u->items, it_luxury, max_products);
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, "%d %s",
-        max_products,
-        LOC(u->faction->locale, resourcename(it_luxury->rtype, 0))));
+    u1 = test_create_unit(test_create_faction(), r);
+    set_level(u1, SK_TRADE, 10);
+    i_change(&u1->items, it_luxury, max_products / 2);
+    unit_addorder(u1, create_order(K_SELL, u1->faction->locale, "%d %s",
+        max_products / 2,
+        LOC(u1->faction->locale, resourcename(it_luxury->rtype, 0))));
+    u2 = test_create_unit(test_create_faction(), r);
+    set_level(u2, SK_TRADE, 10);
+    i_change(&u2->items, it_luxury, max_products / 2);
+    unit_addorder(u2, create_order(K_SELL, u2->faction->locale, "%d %s",
+        max_products / 2,
+        LOC(u2->faction->locale, resourcename(it_luxury->rtype, 0))));
 
     produce(r);
-    CuAssertIntEquals(tc, 0, i_get(u->items, it_luxury));
+    CuAssertIntEquals(tc, 0, i_get(u1->items, it_luxury));
+    CuAssertIntEquals(tc, 0, i_get(u2->items, it_luxury));
     CuAssertIntEquals(tc, 2, r_demand(r, ltype));
-    revenue = max_products * 2 * ltype->price;
-    CuAssertIntEquals(tc, revenue * 88 / 100, i_get(u->items, it_money));
-    CuAssertPtrNotNull(tc, m = test_find_faction_message(u->faction, "income"));
+    revenue = max_products * ltype->price;
+    CuAssertIntEquals(tc, revenue * 88 / 100, i_get(u1->items, it_money));
+    CuAssertIntEquals(tc, revenue * 88 / 100, i_get(u2->items, it_money));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(u1->faction, "income"));
     CuAssertIntEquals(tc, revenue * 88 / 100, m->parameters[2].i);
-    CuAssertIntEquals(tc, revenue * 12 / 100, i_get(ub->items, it_money));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(u2->faction, "income"));
+    CuAssertIntEquals(tc, revenue * 88 / 100, m->parameters[2].i);
+    CuAssertIntEquals(tc, revenue * 24 / 100, i_get(ub->items, it_money));
     CuAssertPtrNotNull(tc, m = test_find_faction_message(ub->faction, "income"));
-    CuAssertIntEquals(tc, revenue * 12 / 100, m->parameters[2].i);
+    CuAssertIntEquals(tc, revenue * 24 / 100, m->parameters[2].i);
     test_teardown();
 }
 
@@ -1688,6 +1699,30 @@ static void test_destroy_cmd(CuTest* tc) {
     test_teardown();
 }
 
+static void test_make_road(CuTest *tc) {
+    region *r, *r2;
+    unit *u;
+    faction *f;
+    struct item_type *itype;
+    terrain_type *t_plain;
+
+    test_setup();
+    t_plain = test_create_terrain("plain", LAND_REGION);
+    t_plain->max_road = 100;
+    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, t_plain));
+    r2 = test_create_region(1, 0, t_plain);
+    set_level(u, SK_ROAD_BUILDING, 10);
+    scale_number(u, 10);
+    i_change(&u->items, itype = test_create_itemtype("stone"), 100);
+    u->thisorder = create_order(K_MAKE, f->locale, 
+        "50 %s %s", param_name(P_ROAD, f->locale), LOC(f->locale, directions[D_EAST]));
+    make_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 50, i_get(u->items, itype));
+    CuAssertIntEquals(tc, 50, rroad(r, D_EAST));
+    CuAssertPtrNotNull(tc, get_borders(r, r2));
+    test_teardown();
+}
+
 static void test_make_zero(CuTest* tc) {
     unit* u;
     faction* f;
@@ -1774,6 +1809,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_destroy_road);
     SUITE_ADD_TEST(suite, test_destroy_road_limit);
     SUITE_ADD_TEST(suite, test_destroy_road_guard);
+    SUITE_ADD_TEST(suite, test_make_road);
     SUITE_ADD_TEST(suite, test_make_zero);
     SUITE_ADD_TEST(suite, test_entertain_fair);
     return suite;

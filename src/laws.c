@@ -1739,9 +1739,8 @@ static int rename_cmd(unit * u, order * ord, char **s, const char *s2)
     return 0;
 }
 
-static bool can_rename_building(unit *u, building *b, order *ord) {
+static bool can_rename_building(unit *u, building *b, order *ord, bool foreign) {
     unit *owner = b ? building_owner(b) : NULL;
-    bool foreign = !(owner && owner->faction == u->faction);
 
     if (!b) {
         cmistake(u, ord, u->building ? 6 : 145, MSG_EVENT);
@@ -1754,16 +1753,19 @@ static bool can_rename_building(unit *u, building *b, order *ord) {
     }
 
     if (foreign) {
+        message *seen;
         if (renamed_building(b)) {
             cmistake(u, ord, 246, MSG_EVENT);
             return false;
         }
 
-        if (owner) {
+        seen = msg_message("renamed_building_seen",
+            "building renamer region", b, u, u->region);
+        add_message(&u->faction->msgs, seen);
+
+        if (owner && owner->faction != u->faction) {
             if (cansee(owner->faction, u->region, u, 0)) {
-                ADDMSG(&owner->faction->msgs,
-                    msg_message("renamed_building_seen",
-                        "building renamer region", b, u, u->region));
+                add_message(&owner->faction->msgs, seen);
             }
             else {
                 ADDMSG(&owner->faction->msgs,
@@ -1771,8 +1773,9 @@ static bool can_rename_building(unit *u, building *b, order *ord) {
                         "building region", b, u->region));
             }
         }
+        msg_release(seen);
     }
-    if (owner && owner->faction != u->faction) {
+    else if (owner && owner->faction != u->faction) {
         cmistake(u, ord, 148, MSG_PRODUCE);
         return false;
     }
@@ -1814,8 +1817,12 @@ int name_cmd(struct unit *u, struct order *ord)
     case P_GEBAEUDE:
         if (foreign) {
             b = getbuilding(u->region);
+            if (!b) {
+                cmistake(u, ord, 31, MSG_EVENT);
+                break;
+            }
         }
-        if (can_rename_building(u, b, ord)) {
+        if (can_rename_building(u, b, ord, foreign)) {
             s = &b->name;
         }
         break;
@@ -3130,10 +3137,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 {
     assert(dst);
     if (src && src->spells) {
-        selist *ql;
-        int qi;
-        for (qi = 0, ql = src->spells; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry * sbe = (spellbook_entry *)selist_get(ql, qi);
+        ptrdiff_t qi, ql = arrlen(src->spells);
+
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)src->spells + qi;
             if (sbe->level <= maxlevel) {
                 spell *sp = spellref_get(&sbe->spref);
                 if (!spellbook_get(dst, sp)) {
@@ -3147,11 +3154,10 @@ static void copy_spells(const spellbook * src, spellbook * dst, int maxlevel)
 static void show_new_spells(faction * f, int level, const spellbook *book)
 {
     if (book) {
-        selist *ql = book->spells;
-        int qi;
+        ptrdiff_t qi, ql = arrlen(book->spells);
 
-        for (qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             if (sbe->level <= level) {
                 show_spell(f, sbe);
             }
@@ -3596,7 +3602,8 @@ int armedmen(const unit * u, bool siege_weapons)
 {
     item *itm;
     int n = 0;
-    if (!(u_race(u)->flags & RCF_NOWEAPONS)) {
+    const race *rc = u_race(u);
+    if (!(rc->flags & RCF_NOWEAPONS)) {
         if (effskill(u, SK_WEAPONLESS, NULL) >= 1) {
             /* kann ohne waffen bewachen: fuer drachen */
             n = u->number;
@@ -3605,13 +3612,15 @@ int armedmen(const unit * u, bool siege_weapons)
             /* alle Waffen werden gezaehlt, und dann wird auf die Anzahl
             * Personen minimiert */
             for (itm = u->items; itm; itm = itm->next) {
-                const weapon_type *wtype = resource2weapon(itm->type->rtype);
-                if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
-                    continue;
-                if (effskill(u, wtype->skill, NULL) >= 1)
-                    n += itm->number;
-                if (n >= u->number)
-                    break;
+                if (rc_can_use(rc, itm->type)) {
+                    const weapon_type *wtype = resource2weapon(itm->type->rtype);
+                    if (wtype == NULL || (!siege_weapons && (wtype->flags & WTF_SIEGE)))
+                        continue;
+                    if (effskill(u, wtype->skill, NULL) >= 1)
+                        n += itm->number;
+                    if (n >= u->number)
+                        break;
+                }
             }
             if (n > u->number) n = u->number;
         }
@@ -3880,7 +3889,7 @@ typedef enum cansee_t {
 static enum cansee_t cansee_ex(const unit *u, const region *r, const unit *target, int stealth, int rings)
 {
     enum cansee_t result = CANSEE_HIDDEN;
-    if (rings > 0 && rings >= target->number) {
+    if (rings >= target->number) {
         const resource_type *rtype = get_resourcetype(R_AMULET_OF_TRUE_SEEING);
         if (rtype) {
             int amulet = i_get(u->items, rtype->itype);
@@ -3986,11 +3995,7 @@ bool cansee(const faction *f, const region *r, const unit *u, int modifier)
 
     rings = invisible(u, NULL);
     stealth = eff_stealth(u, r) - modifier;
-
-    if (rings > 0 && rings < u->number && stealth <= 0) {
-        return true;
-    }
-
+    if (stealth < 0 && rings < u->number) return true;
     result = bsm = big_sea_monster(u, r);
     for (u2 = r->units; u2; u2 = u2->next) {
         if (u2->faction == f) {

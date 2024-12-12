@@ -250,6 +250,19 @@ static int tolua_region_get_adj(lua_State * L)
     return 1;
 }
 
+static int tolua_region_get_roads(lua_State * L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    int d, idx;
+
+    lua_createtable(L, MAXDIRECTIONS, 0);
+    for (d = 0, idx = 0; d != MAXDIRECTIONS; ++d) {
+        lua_pushinteger(L, rroad(r, d));
+        lua_rawseti(L, -2, ++idx);
+    }
+    return 1;
+}
+
 static int tolua_region_get_luxury(lua_State * L)
 {
     region *r = (region *)tolua_tousertype(L, 1, NULL);
@@ -309,7 +322,7 @@ static int tolua_region_get_next(lua_State * L)
     direction_t dir = (direction_t)tolua_tonumber(L, 2, 0);
 
     if (dir >= 0 && dir < MAXDIRECTIONS) {
-        tolua_pushusertype(L, (void *)r_connect(self, dir), "region");
+        tolua_pushusertype(L, (void *)rconnect(self, dir), "region");
         return 1;
     }
     return 0;
@@ -815,6 +828,7 @@ void tolua_region_open(lua_State * L)
             tolua_function(L, "set_flag", tolua_region_set_flag);
             tolua_function(L, "next", tolua_region_get_next);
             tolua_variable(L, "adj", tolua_region_get_adj, NULL);
+            tolua_variable(L, "roads", tolua_region_get_roads, NULL);
 
             tolua_variable(L, "luxury", &tolua_region_get_luxury,
                 &tolua_region_set_luxury);

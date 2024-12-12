@@ -140,14 +140,14 @@ static recruitment **select_recruitment(recruit_request ** requests,
                     rec->total = 0;
                     rec->assigned = 0;
                     rec->requests = NULL;
-                    arrpush(recruits, rec);
+                    arrput(recruits, rec);
                 }
                 else {
                     assert(rec->requests);
                 }
                 *total += qty;
                 rec->total += qty;
-                arrpush(rec->requests, ro);
+                arrput(rec->requests, ro);
                 requests[ui] = NULL;
             }
         }
@@ -503,7 +503,7 @@ void recruit(region * r)
                 if (getkeyword(ord) == K_RECRUIT) {
                     recruit_request *o = recruit_cmd(u, ord);
                     if (o) {
-                        arrpush(recruitorders, o);
+                        arrput(recruitorders, o);
                     }
                     break;
                 }
@@ -512,6 +512,7 @@ void recruit(region * r)
     }
 
     if (recruitorders) {
+        scramble_array(recruitorders, arrlen(recruitorders), sizeof(recruit_request *));
         expandrecruit(r, recruitorders);
         free_requests(recruitorders);
     }

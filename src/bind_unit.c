@@ -40,7 +40,6 @@
 #include <util/order_parser.h>        // for OP_Parser, OrderParserStruct
 #include <util/variant.h>
 
-#include <selist.h>
 #include <strings.h>
 
 #include <stb_ds.h>
@@ -507,6 +506,27 @@ static int tolua_unit_castspell(lua_State * L)
     return 0;
 }
 
+static int tolua_unit_getspell(lua_State *L)
+{
+    unit *u = (unit *)tolua_tousertype(L, 1, NULL);
+    const char *str = tolua_tostring(L, 2, NULL);
+    spellbook *sb;
+    spellbook_entry *sbe = NULL;
+
+    sb = unit_get_spellbook(u);
+    if (sb) {
+        spell *sp = find_spell(str);
+        if (!sp) {
+            log_warning("spell %s could not be found\n", str);
+        }
+        else {
+            sbe = spellbook_get(sb, sp);
+        }
+    }
+    lua_pushinteger(L, sbe->level);
+    return 1;
+}
+
 static int tolua_unit_addspell(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
@@ -798,19 +818,6 @@ static int tolua_unit_get_items(lua_State * L)
     lua_pushcclosure(L, tolua_itemlist_next, 1);
 
     return 1;
-}
-
-static int tolua_unit_get_spells(lua_State * L)
-{
-    unit *u = (unit *) tolua_tousertype(L, 1, NULL);
-    struct sc_mage *mage = u ? get_mage(u) : NULL;
-    spellbook *sb = mage_get_spellbook(mage);
-    selist *slist = NULL;
-    if (sb) {
-        selist **slist_ptr = &sb->spells;
-        slist = *slist_ptr;
-    }
-    return tolua_selist_push(L, "spellbook", "spell_entry", slist);
 }
 
 static int tolua_unit_get_curse(lua_State *L) {
@@ -1118,7 +1125,7 @@ void tolua_unit_open(lua_State * L)
             tolua_variable(L, "race_name", tolua_unit_get_racename,
                 tolua_unit_set_racename);
             tolua_function(L, "add_spell", tolua_unit_addspell);
-            tolua_variable(L, "spells", tolua_unit_get_spells, 0);
+            tolua_function(L, "get_spell", tolua_unit_getspell);
             tolua_function(L, "cast_spell", tolua_unit_castspell);
             tolua_function(L, "effect", bind_unit_effect);
 

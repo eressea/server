@@ -1,6 +1,8 @@
 #include "goodies.h"
+#include "rng.h"
 
 /* libc includes */
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -103,3 +105,22 @@ int check_email(const char *newmail)
     }
     return 0;
 }
+
+/**
+ * Fisher–Yates shuffle (Knuth, TAOCP, Algorithm P)
+ */
+void scramble_array(void *data, size_t n, size_t width)
+{
+    size_t i;
+    char temp[64];
+    assert(width <= sizeof(temp));
+    for (i = 0; i != n; ++i) {
+        size_t j = i + rng_uint() % (n - i);
+        if (i != j) {
+            memcpy(temp, (char *)data + i * width, width);
+            memcpy((char *)data + i * width, (char *)data + j * width, width);
+            memcpy((char *)data + j * width, temp, width);
+        }
+    }
+}
+

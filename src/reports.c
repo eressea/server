@@ -806,12 +806,12 @@ static void bufunit_spells(const unit* u, struct sbstring* sbp)
     spellbook* book = unit_get_spellbook(u);
 
     if (book) {
-        selist* ql = book->spells;
-        int i, qi, header, maxlevel = effskill(u, SK_MAGIC, NULL);
+        int i, header = 0, maxlevel = effskill(u, SK_MAGIC, NULL);
+        ptrdiff_t qi, ql;
         sbs_printf(sbp, ". Aura %d/%d", get_spellpoints(u), max_spellpoints(u, NULL));
 
-        for (header = 0, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry* sbe = (spellbook_entry*)selist_get(ql, qi);
+        for (ql = arrlen(book->spells), qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             const spell* sp = spellref_get(&sbe->spref);
             if (sbe->level <= maxlevel) {
                 if (!header) {
@@ -1261,7 +1261,7 @@ region **get_regions_distance(region * root, int radius)
     region** arr = NULL;
     ptrdiff_t qi;
 
-    arrpush(arr, root);
+    arrput(arr, root);
     fset(root, RF_MARK);
 
     for (qi = 0; qi != arrlen(arr); ++qi) {
@@ -1273,7 +1273,7 @@ region **get_regions_distance(region * root, int radius)
         for (d = 0; d != MAXDIRECTIONS; ++d) {
             if (next[d] && !fval(next[d], RF_MARK) && distance(next[d], root) <= radius) {
                 r = next[d];
-                arrpush(arr, r);
+                arrput(arr, r);
                 fset(r, RF_MARK);
             }
         }
@@ -1586,15 +1586,10 @@ static void write_script(FILE * F, const faction * f)
     fputc('\n', F);
 }
 
-static void check_messages_exist(void) {
-    ct_checknames();
-}
-
 int init_reports(void)
 {
     region *r;
     bool update = true;
-    check_messages_exist();
     create_directories();
     for (r = regions; r; r = r->next) {
         if (update) {

@@ -1,17 +1,11 @@
-#ifndef GOODIES_H
-#define GOODIES_H
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stddef.h>
 
-    int check_email(const char *newmail);
+int check_email(const char *newmail);
 
-    int *intlist_init(void);
-    int *intlist_add(int *i_p, int i);
-    int *intlist_find(int *i_p, int i);
+int *intlist_init(void);
+int *intlist_add(int *i_p, int i);
+int *intlist_find(int *i_p, int i);
 
-#ifdef __cplusplus
-}
-#endif
-#endif                          /* GOODIES_H */
+void scramble_array(void *data, size_t n, size_t width);

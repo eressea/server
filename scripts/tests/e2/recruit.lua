@@ -130,7 +130,7 @@ function test_guarded_temp_cannot_recruit()
       count = count + 1
     end
     assert_equal(0, zero)
-    assert_equal(1, count)
+    assert_equal(2, count)
 end
 
 function test_recruit_empty()
@@ -171,5 +171,5 @@ function test_recruit_empty()
       count = count +1
     end
     assert_equal(0, zero)
-    assert_equal(1, count)
+    assert_equal(2, count)
 end

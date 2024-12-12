@@ -5,7 +5,7 @@
 
 #include "spellbook.h"
 
-#include <selist.h>
+#include <stb_ds.h>
 #include <storage.h>
 #include <strings.h>
 
@@ -18,7 +18,7 @@ spellbook * create_spellbook(const char * name)
     spellbook *result = (spellbook *)malloc(sizeof(spellbook));
     if (!result) abort();
     result->name = name ? str_strdup(name) : 0;
-    result->spells = 0;
+    result->spells = NULL;
     return result;
 }
 
@@ -59,12 +59,11 @@ void read_spellbook(spellbook **bookp, gamedata *data, int(*get_level)(const spe
 
 void write_spellbook(const struct spellbook *book, struct storage *store)
 {
-    selist *ql;
-    int qi;
-
     if (book) {
-        for (ql = book->spells, qi = 0; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        ptrdiff_t qi, ql = arrlen(book->spells);
+
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)book->spells + qi;
             WRITE_TOK(store, spellref_name(&sbe->spref));
             WRITE_INT(store, sbe->level);
         }
@@ -76,11 +75,9 @@ void spellbook_addref(spellbook *sb, const char *name, int level) {
     spellbook_entry * sbe;
 
     assert(sb && name && level > 0);
-    sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
-    if (!sbe) abort();
+    sbe = arraddnptr(sb->spells, 1);
     spellref_init(&sbe->spref, NULL, name);
     sbe->level = level;
-    selist_push(&sb->spells, sbe);
 }
 
 void spellbook_add(spellbook *sb, spell *sp, int level)
@@ -93,35 +90,29 @@ void spellbook_add(spellbook *sb, spell *sp, int level)
         log_error("duplicate spell in spellbook '%s': '%s'\n", sb->name, sp->sname);
     }
 #endif  
-    sbe = (spellbook_entry *)malloc(sizeof(spellbook_entry));
-    if (!sbe) abort();
+    sbe = arraddnptr(sb->spells, 1);
     spellref_init(&sbe->spref, sp, NULL);
     sbe->level = level;
-    selist_push(&sb->spells, sbe);
 }
 
 void spellbook_clear(spellbook *sb)
 {
-    selist *ql;
-    int qi;
+    ptrdiff_t qi, ql = arrlen(sb->spells);
 
-    assert(sb);
-    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+    for (qi = 0; qi != ql; ++qi) {
+        spellbook_entry *sbe = (spellbook_entry *)sb->spells + qi;
         spellref_done(&sbe->spref);
-        free(sbe);
     }
-    selist_free(sb->spells);
+    arrfree(sb->spells);
     free(sb->name);
 }
 
 int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), void * data)
 {
-    selist *ql;
-    int qi;
+    ptrdiff_t qi, ql = arrlen(sb->spells);
 
-    for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
-        spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+    for (qi = 0; qi != ql; ++qi) {
+        spellbook_entry *sbe = (spellbook_entry *)sb->spells + qi;
         int result = callback(sbe, data);
         if (result) {
             return result;
@@ -133,11 +124,10 @@ int spellbook_foreach(spellbook *sb, int(*callback)(spellbook_entry *, void *), 
 spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp)
 {
     if (sb) {
-        selist *ql;
-        int qi;
+        ptrdiff_t qi, ql = arrlen(sb->spells);
 
-        for (qi = 0, ql = sb->spells; ql; selist_advance(&ql, &qi, 1)) {
-            spellbook_entry *sbe = (spellbook_entry *)selist_get(ql, qi);
+        for (qi = 0; qi != ql; ++qi) {
+            spellbook_entry *sbe = (spellbook_entry *)sb->spells + qi;
             if (spellref_get(&sbe->spref) == sp) {
                 return sbe;
             }
