@@ -1,5 +1,6 @@
 #!/bin/sh
 
+WITHOUT_LUA=OFF
 ERESSEA_DB=memory
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 
@@ -41,6 +42,8 @@ elif [ "$1" = "--with-sqlite" ] ; then
 ERESSEA_DB=sqlite
 elif [ "$1" = "--with-memory" ] ; then
 ERESSEA_DB=memory
+elif [ "$1" = "--no-lua" ] ; then
+WITHOUT_LUA=ON
 fi
 shift 1
 done
@@ -77,6 +80,7 @@ SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
 SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
+SET (WITHOUT_LUA "$PREFIX_PATH" CACHE BOOL $WITHOUT_LUA)
 HEREDOC
 
 set -e

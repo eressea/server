@@ -27,8 +27,9 @@
 #include <iniparser.h>
 #include <dictionary.h>
 
+#ifdef HAVE_LUA
 #include <lua.h>
-
+#endif
 #include <limits.h>
 #include <locale.h>
 #include <stdio.h>

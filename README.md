@@ -14,8 +14,8 @@ install all of them:
         libcjson-dev libiniparser-dev libexpat1-dev libutf8proc-dev
 
 If your system for some reason doesn't have Lua or the tolua library,
-you can run cmake with -DWITHOUT_LUA=1 to build the server without the
-Lua extensions. This is very much untested, and it breaks any items 
+you can run configure with the --no-lua option to build the code
+without Lua extensions. This is very much untested, and it breaks any items 
 or spells that have their actions implemented as Lua scripts, as well
 as the Lua integration tests.
 
