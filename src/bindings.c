@@ -1050,7 +1050,7 @@ lua_State *lua_init(const dictionary *inifile) {
     tolua_unit_open(L);
     tolua_message_open(L);
     tolua_order_open(L);
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
     tolua_gmtool_open(L);
 #endif
     tolua_storage_open(L);

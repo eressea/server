@@ -2,7 +2,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <curses.h>
-#ifdef USE_LUA
+#ifdef HAVE_LUA
 #include <lua.h>
 #include "console.h"
 #endif
@@ -1099,7 +1099,7 @@ static bool confirm(WINDOW * win, const char *q) {
 
 static int exec_key_binding(int keycode)
 {
-#ifdef USE_LUA
+#ifdef HAVE_LUA
     struct lua_State* L = global.vm_state;
     lua_getglobal(L, "gmtool_on_keypressed");
     if (lua_isfunction(L, -1)) {
@@ -1478,7 +1478,7 @@ static void handlekey(state * st, int c)
         } while (c == 0);
         break;
     case 'L':
-#ifdef USE_LUA
+#ifdef HAVE_LUA
         if (global.vm_state) {
             move(0, 0);
             refresh();
@@ -1750,7 +1750,7 @@ void run_mapper(void)
 
     init_curses();
     curs_set(1);
-#ifdef USE_LUA
+#ifdef HAVE_LUA
     set_readline(curses_readline);
 #endif
     assert(stdscr);
@@ -1835,7 +1835,7 @@ void run_mapper(void)
         handlekey(st, c);
     }
     g_quit = 0;
-#ifdef USE_LUA
+#ifdef HAVE_LUA
     set_readline(NULL);
 #endif
     curs_set(1);
@@ -1849,7 +1849,7 @@ void run_mapper(void)
 
 }
 
-#ifdef USE_LUA
+#ifdef HAVE_LUA
 int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
     const char *prompt)

@@ -5,20 +5,21 @@
 #include "alchemy.h"
 #include "magic.h"
 
-#include <kernel/attrib.h>
-#include <kernel/event.h>
-#include <kernel/gamedata.h>
+#include <util/functions.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/parser.h>
 #include <util/variant.h>
 
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/callbacks.h>
-#include <kernel/spell.h>
-#include <kernel/unit.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/spell.h>
+#include <kernel/unit.h>
 
 #include <storage.h>
 
@@ -261,7 +262,7 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 
 /** callback for an item-use function written in lua. */
 static int
-lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, struct order *ord)
+lua_use_item(unit *u, const item_type *itype, int amount, struct order *ord)
 {
     int len;
     char fname[64];

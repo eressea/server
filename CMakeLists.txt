@@ -11,9 +11,9 @@ endif (WIN32)
 project (server C)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-SET (USE_LUA TRUE)
+SET (USING_LUA TRUE)
 if (WITHOUT_LUA)
-SET (USE_LUA FALSE)
+SET (USING_LUA FALSE)
 endif (WITHOUT_LUA)
 
 if (MSVC)
@@ -40,9 +40,9 @@ endif (NOT CURSES_FOUND)
 find_package (EXPAT REQUIRED)
 find_package (Utf8Proc REQUIRED)
 
-if (USE_LUA)
+if (USING_LUA)
 find_package (Lua 5.2 REQUIRED)
-endif(USE_LUA)
+endif(USING_LUA)
 
 if (LUA_FOUND)
 find_program(TOLUA_EXECUTABLE tolua REQUIRED)
