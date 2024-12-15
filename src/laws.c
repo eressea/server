@@ -34,11 +34,13 @@
 /* kernel includes */
 #include "kernel/alliance.h"
 #include "kernel/ally.h"
+#include <kernel/attrib.h>
+#include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
 #include "kernel/connection.h"
 #include "kernel/curse.h"
-#include "kernel/building.h"
+#include <kernel/event.h>
 #include "kernel/faction.h"
 #include "kernel/group.h"
 #include "kernel/item.h"
@@ -58,9 +60,8 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
+#include <util/functions.h>
 #include <util/goodies.h>
 #include "util/keyword.h"
 #include <util/language.h>
@@ -3011,6 +3012,36 @@ void new_units(void)
     }
 }
 
+static int callback_use(unit *u, const item_type *itype, int amount, struct order *ord)
+{
+    int len;
+    char fname[64];
+
+    /* if the item is a potion, try use_potion,
+     * the generic function for potions that add an effect:
+     */
+    if (itype->flags & ITF_POTION) {
+        return use_potion(u, itype, amount, ord);
+    }
+
+    len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        int(*callout)(unit *, const item_type *, int, struct order *);
+
+        /* check if we have a register_item_use function */
+        callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
+        if (callout) {
+            return callout(u, itype, amount, ord);
+        }
+    }
+    /* finally, check if we have a matching lua function */
+    if (callbacks.use_item) {
+        return callbacks.use_item(u, itype, amount, ord);
+    }
+
+    return EUNUSABLE;
+}
+
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
@@ -3025,7 +3056,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 
     if (itype->flags & ITF_CANUSE) {
-        int result = callbacks.use_item(u, itype, amount, ord);
+        int result = callback_use(u, itype, amount, ord);
         if (result > 0) {
             use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }

@@ -2,8 +2,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <curses.h>
+#ifdef USE_LUA
 #include <lua.h>
-
+#include "console.h"
+#endif
 #include "gmtool.h"
 
 #include <modules/autoseed.h>
@@ -30,7 +32,6 @@
 #include "util/rng.h"
 
 #include "gmtool_structs.h"
-#include "console.h"
 #include "listbox.h"
 #include "teleport.h"
 
@@ -1098,12 +1099,14 @@ static bool confirm(WINDOW * win, const char *q) {
 
 static int exec_key_binding(int keycode)
 {
+#ifdef USE_LUA
     struct lua_State* L = global.vm_state;
     lua_getglobal(L, "gmtool_on_keypressed");
     if (lua_isfunction(L, -1)) {
         lua_pushinteger(L, keycode);
         return lua_pcall(L, 1, 1, 0);
     }
+#endif
     return -1;
 }
 
@@ -1475,6 +1478,7 @@ static void handlekey(state * st, int c)
         } while (c == 0);
         break;
     case 'L':
+#ifdef USE_LUA
         if (global.vm_state) {
             move(0, 0);
             refresh();
@@ -1485,6 +1489,9 @@ static void handlekey(state * st, int c)
             st->wnd_status->update |= 1;
             st->wnd_map->update |= 3;
         }
+#else
+        beep();
+#endif
         break;
     case 12:                   /* Ctrl-L */
         clear();
@@ -1743,7 +1750,9 @@ void run_mapper(void)
 
     init_curses();
     curs_set(1);
+#ifdef USE_LUA
     set_readline(curses_readline);
+#endif
     assert(stdscr);
     getbegyx(stdscr, x, y);
     width = getmaxx(stdscr);
@@ -1826,7 +1835,9 @@ void run_mapper(void)
         handlekey(st, c);
     }
     g_quit = 0;
+#ifdef USE_LUA
     set_readline(NULL);
+#endif
     curs_set(1);
     endwin();
     /* FIXME: reset logging
@@ -1838,6 +1849,7 @@ void run_mapper(void)
 
 }
 
+#ifdef USE_LUA
 int
 curses_readline(struct lua_State *L, char *buffer, size_t size,
     const char *prompt)
@@ -1846,6 +1858,7 @@ curses_readline(struct lua_State *L, char *buffer, size_t size,
     askstring(hstatus, prompt, buffer, size);
     return buffer[0] != 0;
 }
+#endif
 
 void seed_players(newfaction **players, bool new_island)
 {

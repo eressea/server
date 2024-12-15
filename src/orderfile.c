@@ -1,3 +1,8 @@
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
 #include "orderfile.h"
 
 #include "kernel/calendar.h"
@@ -194,4 +199,22 @@ int parseorders(FILE *F)
     }
     parser_free(parser);
     return err;
+}
+
+int readorders(const char *filename)
+{
+    if (filename) {
+        FILE *F = fopen(filename, "r");
+        int result;
+
+        if (!F) {
+            perror(filename);
+            return -1;
+        }
+        log_info("reading orders from %s", filename);
+        result = parseorders(F);
+        fclose(F);
+        return result;
+    }
+    return -1;
 }

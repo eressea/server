@@ -17,10 +17,13 @@
 #ifdef USE_CURSES
 #include "gmtool.h"
 #endif
+#ifdef USE_LUA
+#include "bindings.h"
+#else
+#include "processing.h"
+#endif
 
 #include "signals.h"
-#include "bindings.h"
-
 #include <iniparser.h>
 #include <dictionary.h>
 
@@ -273,8 +276,10 @@ void locale_init(void)
 
 int main(int argc, char **argv)
 {
-    int err = 0;
+#ifdef USE_LUA
     lua_State *L;
+#endif
+    int err = 0;
     dictionary *d = NULL;
     setup_signal_handler();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
@@ -290,16 +295,24 @@ int main(int argc, char **argv)
 
     locale_init();
 
+#ifdef USE_LUA
     L = lua_init(d);
+#endif
     game_init();
+#ifdef USE_LUA
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {
         log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
+#else
+    run_turn();
+#endif
     game_done();
+#ifdef USE_LUA
     lua_done(L);
+#endif
     log_close();
     stats_write(stdout, "");
     stats_close();
