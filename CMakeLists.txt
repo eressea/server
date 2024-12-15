@@ -11,9 +11,9 @@ endif (WIN32)
 project (server C)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
-SET (USING_LUA TRUE)
+set (USING_LUA TRUE)
 if (WITHOUT_LUA)
-SET (USING_LUA FALSE)
+  SET (USING_LUA FALSE)
 endif (WITHOUT_LUA)
 
 if (MSVC)
