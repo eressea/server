@@ -2,7 +2,6 @@
 
 #include "helpers.h"
 #include "vortex.h"
-#include "alchemy.h"
 #include "magic.h"
 
 #include <util/functions.h>

@@ -12,7 +12,6 @@
 #include <kernel/save.h>
 
 #include <util/language.h>
-#include <util/log.h>
 
 #include <stream.h>
 #include <stdio.h>
