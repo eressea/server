@@ -209,13 +209,13 @@ static int parse_args(int argc, char **argv)
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.install", arg);
                 break;
-            case 'C':
+            case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 inifile = arg;
                 break;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.rules", arg);
+                config_set("game.rules", arg);
                 break;
             case 'f':
                 i = get_arg(argc, argv, 2, i, &luafile, 0);
