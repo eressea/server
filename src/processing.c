@@ -21,7 +21,7 @@ void run_turn(void)
 {
     char path[PATH_MAX];
     const char *install_path = config_get("config.install");
-    const char *rules = config_get("config.rules");
+    const char *config_path = config_get("game.rules");
     int lastturn;
     /*
      * TODO:
@@ -30,9 +30,12 @@ void run_turn(void)
      * replace the lua callbacks in helpers.c (see callbacks.h)
      * spells that have lua-only implmentations (see spells.lua)
      */
+    if (!config_path) {
+        log_fatal("game.rules is null");
+    }
 
     if (0 != config_read(
-        path_join(path_join("conf", rules, path, sizeof(path)), "config.json", path, sizeof(path)),
+        path_join(path_join("conf", config_path, path, sizeof(path)), "config.json", path, sizeof(path)),
         install_path))
     {
         log_fatal("could not read JSON data");
