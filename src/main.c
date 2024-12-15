@@ -74,6 +74,7 @@ static const char * valid_keys[] = {
     "game.locale",
     "game.verbose",
     "game.report",
+    "game.rules",
     "game.memcheck",
     "game.email",
     "game.mailcmd",
@@ -89,24 +90,29 @@ static const char * valid_keys[] = {
     NULL
 };
 
+static dictionary * load_config(const char *path)
+{
+    log_debug("reading from configuration file %s\n", path);
+    return iniparser_load(path);
+}
+
 static dictionary *parse_config(const char *filename)
 {
-    dictionary *d;
-    const char *str, *cfgpath = config_get("config.path");
+    char path[PATH_MAX];
+    dictionary *d = NULL;
+    const char *str;
 
-    if (cfgpath) {
-        char path[PATH_MAX];
-        path_join(cfgpath, filename, path, sizeof(path));
-        log_debug("reading from configuration file %s\n", path);
-        d = iniparser_load(path);
-    }
-    else {
-        log_debug("reading from configuration file %s\n", filename);
-        d = iniparser_load(filename);
+    d = load_config(filename);
+    if (!d) {
+        path_join(basepath(), filename, path, sizeof(path));
+        d = load_config(path);
     }
     if (d) {
         config_set_from(d, valid_keys);
         load_inifile();
+    }
+    else {
+        log_fatal("could not find eressea.ini");
     }
     str = config_get("game.locales");
     make_locales(str ? str : "de,en");
@@ -205,7 +211,7 @@ static int parse_args(int argc, char **argv)
                 break;
             case 'C':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.path", arg);
+                inifile = arg;
                 break;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);

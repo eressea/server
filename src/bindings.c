@@ -851,7 +851,7 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     lua_pushstring(L, "reportpath");
     lua_pushstring(L, reportpath());
     lua_rawset(L, -3);
-    arg = config_get("config.rules");
+    arg = config_get("game.rules");
     if (arg) {
         lua_pushstring(L, "rules");
         lua_pushstring(L, arg);
