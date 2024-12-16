@@ -3,6 +3,7 @@
 #include "bind_config.h"
 #include "eressea.h"
 #include "laws.h"
+#include "monsters.h"
 #include "orderfile.h"
 
 #include <kernel/calendar.h>
@@ -54,7 +55,7 @@ void run_turn(void)
         log_fatal("could not read game data %s", path);
     }
     turn_begin();
-    // plan_monsters();
+    plan_monsters(get_monsters());
 
     snprintf(path, sizeof(path), "orders.%d", turn);
     if (0 != readorders(path)) {
