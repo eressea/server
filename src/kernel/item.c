@@ -77,16 +77,27 @@ static int res_changepermaura(unit * u, const resource_type * rtype, int delta)
 
 static int res_changehp(unit * u, const resource_type * rtype, int delta)
 {
+    int hp = u->hp + delta;
     assert(rtype != NULL);
-    u->hp += delta;
-    return u->hp;
+    if (hp < u->number) {
+        if (hp <= 0) {
+            set_number(u, 0);
+            hp = 0;
+        }
+        else {
+            scale_number(u, hp);
+        }
+    }
+    return u->hp = hp;
 }
 
 static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
+    int p = rpeasants(u->region) + delta;
     assert(rtype != NULL && u->region->land);
-    rsetpeasants(u->region, rpeasants(u->region) + delta);
-    return rpeasants(u->region);
+
+    if (p < 0) p = 0;
+    return rsetpeasants(u->region, p);
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {
@@ -606,7 +617,7 @@ struct order *), const char *name)
     register_function((pf_generic)foo, name);
 }
 
-static void init_oldpotions(void)
+void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
         "p0", "goliathwater", "lifepotion", "p3", "ointment", "peasantblood", "p6",
@@ -629,17 +640,18 @@ void init_resources(void)
     /* there are resources that are special and must be hard-coded.
      * these are not items, but things like trees or hitpoints
      * which can be used in a construction recipe or as a spell ingredient.
+     * 
+     * These default behaviors can still be modified from configuration files,
+     * for example to add a constructon skill, or modify the default flags.
      */
 
     /* special resources needed in report_region */
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
-    rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->weight = 1;
 
     rtype = rt_get_or_create(resourcenames[R_HORSE]);
-    rtype->flags |= RTF_ITEM | RTF_LIMITED;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
     rtype->itype->weight = 5000;
@@ -660,9 +672,6 @@ void init_resources(void)
     rt_get_or_create(resourcenames[R_TREE]);
     rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
     rt_get_or_create(resourcenames[R_MALLORN_TREE]);
-
-    /* alte typen registrieren: */
-    init_oldpotions();
 }
 
 int get_money(const unit * u)

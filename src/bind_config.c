@@ -29,11 +29,14 @@ void config_reset(void) {
 int config_parse(const char *json)
 {
     cJSON * conf = cJSON_Parse(json);
+    reset_locales();
+    /* create default resources: */
+    init_resources();
     if (conf) {
-        reset_locales();
         json_config(conf);
         cJSON_Delete(conf);
-        init_resources();
+        /* alte typen registrieren: */
+        init_oldpotions();
         init_spells();
         return 0;
     }

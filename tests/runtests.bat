@@ -1,5 +1,5 @@
 @ECHO OFF
-IF EXIST ..\out\build\x64-Debug\eressea.exe SET BUILD=..\out\build\x64-Debug
+IF EXIST ..\build\x64-Debug\eressea.exe SET BUILD=..\build\x64-Debug
 
 SET SERVER=%BUILD%\eressea.exe
 %BUILD%\test_eressea.exe

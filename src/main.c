@@ -203,7 +203,7 @@ static int parse_args(int argc, char **argv)
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.install", arg);
                 break;
-            case 'c':
+            case 'C':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 config_set("config.path", arg);
                 break;

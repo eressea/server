@@ -278,7 +278,7 @@ extern "C" {
 
     void register_resources(void);
     void init_resources(void);
-
+    void init_oldpotions(void);
     void register_item_give(int(*foo) (struct unit *, struct unit *,
         const struct item_type *, int, struct order *), const char *name);
     void register_item_use(int(*foo) (struct unit *,
