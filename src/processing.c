@@ -11,6 +11,7 @@
 #include <kernel/calendar.h>
 #include <kernel/callbacks.h>
 #include <kernel/config.h>
+#include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
@@ -25,7 +26,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static void equip_first_unit(unit *u)
+static void equip_first_unit(unit *u, int mask)
 {
     /** mirrors the E2 defaults as of 12/2024 */
     const struct equip_t {
@@ -37,9 +38,11 @@ static void equip_first_unit(unit *u)
         { 4, "stone" },
         { 0, NULL },
     };
-    int i;
-    for (i = 0; equipment[i].count; ++i) {
-        i_change(&u->items, it_find(equipment[i].name), equipment[i].count);
+    if (mask & EQUIP_ITEMS) {
+        int i;
+        for (i = 0; equipment[i].count; ++i) {
+            i_change(&u->items, it_find(equipment[i].name), equipment[i].count);
+        }
     }
     terraform_region(u->region, get_terrain("plain"));
     freset(u->region, RF_MALLORN);
@@ -51,14 +54,30 @@ static void equip_first_unit(unit *u)
     rsethorses(u->region, 50);
 }
 
-static void equip_default(unit *u, const char *name)
+static bool equip_default(unit *u, const char *name, int mask)
 {
-    if (strcmp("first_unit", name) == 0) {
-        equip_first_unit(u);
+    if (strncmp("new_", name, 4) == 0) {
+        // TODO: new unit, i.e. new_orc, see init.lua
+        return true;
+    }
+    else if (strncmp("spo_", name, 4) == 0) {
+        // TODO: spoils, see init.lua
+        return true;
     }
     else if (strncmp("seed_", name, 5) == 0) {
         equip_newunits(u);
+        return true;
     }
+    else if (strcmp("first_unit", name) == 0) {
+        equip_first_unit(u, mask);
+        return true;
+    }
+    else if (strcmp("rising_undead", name) == 0) {
+        // TODO: rusty items, see init.lua
+        // equip_undead(u, mask);
+        return true;
+    }
+    return false;
 }
 
 void run_turn(void)
