@@ -26,17 +26,14 @@ void age_ghoul(struct unit *u);
 void equip_newunits(struct unit *u)
 {
     struct region *r = u->region;
-    const struct resource_type *rtype;
+    const item *itm;
+    ship *sh;
+
     switch (old_race(u_race(u))) {
-    case RC_ELF:
-        rtype = rt_find("fairyboot");
-        set_show_item(u->faction, rtype->itype);
-        break;
     case RC_GOBLIN:
-        rtype = rt_find("roi");
-        set_show_item(u->faction, rtype->itype);
         set_number(u, 10);
         break;
+
     case RC_HUMAN:
         if (u->building == NULL) {
             const building_type *btype = bt_find("castle");
@@ -47,19 +44,21 @@ void equip_newunits(struct unit *u)
             }
         }
         break;
-    case RC_CAT:
-        rtype = rt_find("roi");
-        set_show_item(u->faction, rtype->itype);
-        break;
+
     case RC_AQUARIAN:
-    {
-        ship *sh = new_ship(st_find("boat"), r, u->faction->locale);
+        sh = new_ship(st_find("boat"), r, u->faction->locale);
         sh->size = sh->type->construction->maxsize;
         u_set_ship(u, sh);
-    }
-    break;
+        break;
+
     default:
         break;
+    }
+    for (itm = u->items; itm; itm = itm->next) {
+        set_show_item(u->faction, itm->type);
+    }
+    for (itm = u->faction->items; itm; itm = itm->next) {
+        set_show_item(u->faction, itm->type);
     }
 }
 
