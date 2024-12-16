@@ -583,13 +583,6 @@ int get_item(const unit * u, const item_type *itype)
 #include "move.h"
 
 void
-register_item_give(int(*foo) (struct unit *, struct unit *,
-const struct item_type *, int, struct order *), const char *name)
-{
-    register_function((pf_generic)foo, name);
-}
-
-void
 register_item_use(int(*foo) (struct unit *, const struct item_type *, int,
 struct order *), const char *name)
 {

@@ -26,9 +26,7 @@ void run_turn(void)
     int lastturn;
     /*
      * TODO:
-     * lua_changeresource replacement (see resources.lua)
      * default equipment sets (see equipment.lua)
-     * replace the lua callbacks in helpers.c (see callbacks.h)
      * spells that have lua-only implmentations (see spells.lua)
      */
     if (!config_path) {

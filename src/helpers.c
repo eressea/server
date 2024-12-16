@@ -32,43 +32,6 @@
 
 struct order;
 
-static int
-lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    char fname[64];
-    int result = -1, len;
-    const char *iname = itype->rtype->_name;
-
-    UNUSED_ARG(ord);
-    assert(s != NULL);
-    len = snprintf(fname, sizeof(fname), "%s_give", iname);
-    if (len > 0 && (size_t)len < sizeof(fname)) {
-        lua_getglobal(L, fname);
-        if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, s, "unit");
-            tolua_pushusertype(L, d, "unit");
-            tolua_pushstring(L, iname);
-            lua_pushinteger(L, n);
-
-            if (lua_pcall(L, 4, 1, 0) != 0) {
-                const char *error = lua_tostring(L, -1);
-                log_error("unit %s calling '%s': %s.\n", unitname(s), fname, error);
-                lua_pop(L, 1);
-            }
-            else {
-                result = (int)lua_tonumber(L, -1);
-                lua_pop(L, 1);
-            }
-        }
-        else {
-            log_error("unit %s trying to call '%s' : not a function.\n", unitname(s), fname);
-            lua_pop(L, 1);
-        }
-    }
-    return result;
-}
-
 static int limit_resource_lua(const region * r, const resource_type * rtype)
 {
     char fname[64];
@@ -337,5 +300,4 @@ void register_tolua_helpers(void)
     callbacks.limit_resource = limit_resource_lua;
 
     register_function((pf_generic)lua_changeresource, "lua_changeresource");
-    register_item_give(lua_giveitem, "lua_giveitem");
 }
