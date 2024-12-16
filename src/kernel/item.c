@@ -57,18 +57,6 @@ static int res_changeaura(unit * u, const resource_type * rtype, int delta)
     return change_spellpoints(u, delta);
 }
 
-static int res_changeperson(unit * u, const resource_type * rtype, int delta)
-{
-    assert(rtype != NULL || !"not implemented");
-    if (u->number + delta >= 0) {
-        scale_number(u, u->number + delta);
-    }
-    else {
-        scale_number(u, 0);
-    }
-    return u->number;
-}
-
 static int res_changepermaura(unit * u, const resource_type * rtype, int delta)
 {
     assert(rtype != NULL);
@@ -594,15 +582,6 @@ int get_item(const unit * u, const item_type *itype)
 
 #include "move.h"
 
-static int
-mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
-{
-    if (u_race(u) == get_race(RC_ELF))
-        return value;
-    UNUSED_ARG(r);
-    return -118;
-}
-
 void
 register_item_give(int(*foo) (struct unit *, struct unit *,
 const struct item_type *, int, struct order *), const char *name)
@@ -969,9 +948,7 @@ void register_resources(void)
     if (registered) return;
     registered = true;
 
-    register_function((pf_generic)mod_elves_only, "mod_elves_only");
     register_function((pf_generic)res_changeitem, "changeitem");
-    register_function((pf_generic)res_changeperson, "changeperson");
     register_function((pf_generic)res_changepeasants, "changepeasants");
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");
