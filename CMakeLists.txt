@@ -42,6 +42,8 @@ find_package (Utf8Proc REQUIRED)
 
 if (USING_LUA)
 find_package (Lua 5.2 REQUIRED)
+else(USING_LUA)
+message("Building without Lua")
 endif(USING_LUA)
 
 if (LUA_FOUND)
