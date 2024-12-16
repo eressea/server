@@ -308,6 +308,9 @@ int main(int argc, char **argv)
         return err;
     }
 #else
+    if (luafile) {
+        log_error("Lua is disabled, cannot execute %s", luafile);
+    }
     run_turn();
 #endif
     game_done();
