@@ -13,6 +13,12 @@ install all of them:
         liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
         libcjson-dev libiniparser-dev libexpat1-dev libutf8proc-dev
 
+If your system for some reason doesn't have Lua or the tolua library,
+you can run configure with the --no-lua option to build the code
+without Lua extensions. This is very much untested, and it breaks any items 
+or spells that have their actions implemented as Lua scripts, as well
+as the Lua integration tests.
+
 ## How to check out and build the Eressea server
 
 This repository relies heavily on the use of submodules, and it pulls in

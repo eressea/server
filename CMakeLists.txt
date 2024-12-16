@@ -11,6 +11,11 @@ endif (WIN32)
 project (server C)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+set (USING_LUA TRUE)
+if (WITHOUT_LUA)
+  SET (USING_LUA FALSE)
+endif (WITHOUT_LUA)
+
 if (MSVC)
   find_package (PDCurses)
   if (NOT PDCURSES_FOUND)
@@ -33,8 +38,19 @@ if (NOT CURSES_FOUND)
 endif (NOT CURSES_FOUND)
 
 find_package (EXPAT REQUIRED)
-find_package (Lua 5.2 REQUIRED)
 find_package (Utf8Proc REQUIRED)
+
+if (USING_LUA)
+find_package (Lua 5.2 REQUIRED)
+else(USING_LUA)
+message("Building without Lua")
+endif(USING_LUA)
+
+if (LUA_FOUND)
+find_program(TOLUA_EXECUTABLE tolua REQUIRED)
+find_library(TOLUA_LIBRARY tolua REQUIRED)
+find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
+endif (LUA_FOUND)
 
 find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
 find_path(SQLITE3_INCLUDE_DIR NAMES sqlite3.h REQUIRED)
@@ -44,10 +60,6 @@ find_path(CJSON_INCLUDE_DIR NAMES cJSON.h PATH_SUFFIXES cjson REQUIRED)
 
 find_library(INIPARSER_LIBRARY iniparser REQUIRED)
 find_path(INIPARSER_INCLUDE_DIR NAMES iniparser.h PATH_SUFFIXES iniparser REQUIRED)
-
-find_program(TOLUA_EXECUTABLE tolua REQUIRED)
-find_library(TOLUA_LIBRARY tolua REQUIRED)
-find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
 
 if (MSVC)
 set (HAVE_STRDUP 0)

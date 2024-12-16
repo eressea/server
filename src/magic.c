@@ -2942,11 +2942,14 @@ int cast_spell(struct castorder *co)
     }
 
     fun = get_spellcast(sp->sname);
-    if (!fun) {
-        log_debug("no spell function for %s, try callback", sp->sname);
+    if (fun) {
+        return fun(co);
+    }
+    log_debug("no spell function for %s, try callback", sp->sname);
+    if (callbacks.cast_spell) {
         return callbacks.cast_spell(co, fname);
     }
-    return fun(co);
+    return -1;
 }
 
 const char *magic_name(magic_t mtype, const struct locale *lang)

@@ -28,3 +28,4 @@ void parser_set_unit(parser_state *state, struct unit *u);
 void parser_set_faction(parser_state *state, struct faction *f);
 
 int parseorders(FILE* F);
+int readorders(const char *filename);

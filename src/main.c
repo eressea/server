@@ -14,18 +14,22 @@
 #include <util/password.h>
 
 #include "eressea.h"
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
 #include "gmtool.h"
+#endif
+#ifdef HAVE_LUA
+#include "bindings.h"
+#else
+#include "processing.h"
 #endif
 
 #include "signals.h"
-#include "bindings.h"
-
 #include <iniparser.h>
 #include <dictionary.h>
 
+#ifdef HAVE_LUA
 #include <lua.h>
-
+#endif
 #include <limits.h>
 #include <locale.h>
 #include <stdio.h>
@@ -58,7 +62,7 @@ static void load_inifile(void)
 
     verbosity = config_get_int("game.verbose", 2);
     memdebug = config_get_int("game.memcheck", memdebug);
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
     /* only one value in the [editor] section */
     force_color = config_get_int("editor.color", force_color);
 #endif
@@ -185,7 +189,7 @@ static int parse_args(int argc, char **argv)
                     "Copyright (C) 2023 Enno Rehling et al.\n",
                     eressea_version());
                 return 1;
-#ifdef USE_CURSES          
+#ifdef HAVE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
                 /* force the editor to have colors */
@@ -273,8 +277,10 @@ void locale_init(void)
 
 int main(int argc, char **argv)
 {
-    int err = 0;
+#ifdef HAVE_LUA
     lua_State *L;
+#endif
+    int err = 0;
     dictionary *d = NULL;
     setup_signal_handler();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
@@ -290,16 +296,27 @@ int main(int argc, char **argv)
 
     locale_init();
 
+#ifdef HAVE_LUA
     L = lua_init(d);
+#endif
     game_init();
+#ifdef HAVE_LUA
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {
         log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
+#else
+    if (luafile) {
+        log_error("Lua is disabled, cannot execute %s", luafile);
+    }
+    run_turn();
+#endif
     game_done();
+#ifdef HAVE_LUA
     lua_done(L);
+#endif
     log_close();
     stats_write(stdout, "");
     stats_close();

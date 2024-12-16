@@ -1,48 +1,33 @@
 #!/bin/sh
 
+WITHOUT_LUA=OFF
 ERESSEA_DB=memory
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 
-GETOPT=getopt
-GETOPT_LONG=1
-
-if [ "Darwin" = "$(uname)" ] ; then
-  if [ -x "/usr/local/opt/gnu-getopt/bin/getopt" ] ; then
-    GETOPT="/usr/local/opt/gnu-getopt/bin/getopt"
-  else
-    GETOPT_LONG=0
-  fi
-fi
-
-if [ $GETOPT_LONG -eq 1 ]; then
-  options=$(${GETOPT} -o d: -l db: -- "$@")
-else # assume GNU getopt (long arguments)
-  options=$(${GETOPT} d: "$@")
-fi
-
-# Parse command line arguments
+usage()
+{
+    echo "usage: $0 --help --db=DB"
+}
+options=$(getopt -a -l help,no-lua,db: 'hd:' "$@")
+if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$options"
-until [ -z "$1" ] ; do
-  case $1 in
-    -d|--db)
-      ERESSEA_DB=$2
-      shift
-    ;;
-    --) shift; break;;
-    (-*) echo "$0: error - unrecognized option $1" 1>&2; exit 1;;
-    (*) break;;
-  esac
-  shift
-done
-while [ ! -z "$1" ] ; do
-if [ "$1" = "--with-db" ] ; then
-ERESSEA_DB=db
-elif [ "$1" = "--with-sqlite" ] ; then
-ERESSEA_DB=sqlite
-elif [ "$1" = "--with-memory" ] ; then
-ERESSEA_DB=memory
-fi
-shift 1
+
+while true; do
+    case "$1" in
+        --no-lua)
+            WITHOUT_LUA=ON ;;
+        --help | -h)
+            usage
+            ;;
+        --db | -d)
+            ERESSEA_DB="$2"
+            shift
+            ;;
+        --)
+            break
+            ;;
+    esac
+    shift
 done
 
 git submodule update --init
@@ -77,11 +62,12 @@ SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
 SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
+SET (WITHOUT_LUA $WITHOUT_LUA CACHE BOOL "")
 HEREDOC
 
 set -e
 
 cd $BIN_DIR
-cmake -C config.cmake .. $*
+cmake -C config.cmake ..
 cd $OLDPWD
 
