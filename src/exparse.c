@@ -805,7 +805,11 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
                     name = attr[i + 1];
                 }
                 else if (xml_strequal(attr[i], "value")) {
-                    fun = get_function(attr[i + 1]);
+                    const char *value = attr[i + 1];
+                    fun = get_function(value);
+                    if (!fun) {
+                        log_warning("no such resource function: %s", value);
+                    }
                 }
                 else {
                     handle_bad_input(pi, el, attr[i]);

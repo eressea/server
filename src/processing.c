@@ -35,6 +35,7 @@ void run_turn(void)
         log_fatal("game.rules is null");
     }
 
+    init_resources();
     if (0 != config_read(
         path_join(path_join("conf", config_path, path, sizeof(path)), "config.json", path, sizeof(path)),
         install_path))
@@ -42,7 +43,6 @@ void run_turn(void)
         log_fatal("could not read JSON data");
     }
     free_gamedata();
-    init_resources();
     init_locales(init_locale);
 
     lastturn = turn;
