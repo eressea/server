@@ -906,17 +906,20 @@ void kill_troop(troop dt)
 {
     fighter *df = dt.fighter;
     unit *du = df->unit;
+    const race *rc = u_race(du);
 
     rmtroop(dt);
     if (!df->alive) {
         char eqname[64];
-        const race *rc = u_race(du);
         item *drops = item_spoil(rc, du->number - df->run.number);
         if (drops != NULL) {
             i_merge(&du->items, &drops);
         }
-        sprintf(eqname, "spo_%s", rc->_name);
-        equip_unit_mask(du, eqname, EQUIP_ITEMS);
+        else if (du->faction->flags & FFL_NPC)
+        {
+            sprintf(eqname, "spo_%s", rc->_name);
+            equip_unit_mask(du, eqname, EQUIP_ITEMS);
+        }
     }
 }
 

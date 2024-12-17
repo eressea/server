@@ -14,6 +14,7 @@
 #include <kernel/equipment.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/save.h>
 #include <kernel/terrain.h>
@@ -26,23 +27,30 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef struct equip_t {
+    int count;
+    const char *name;
+} equip_t;
+
+static void equip_items(unit *u, const struct equip_t equipment[])
+{
+    int i;
+    for (i = 0; equipment[i].count; ++i) {
+        i_change(&u->items, it_find(equipment[i].name), equipment[i].count);
+    }
+}
+
 static void equip_first_unit(unit *u, int mask)
 {
     /** mirrors the E2 defaults as of 12/2024 */
-    const struct equip_t {
-        int count;
-        const char *name;
-    } equipment[] = {
+    const equip_t equipment[] = {
         { 10, "log" },
         { 2500, "money" },
         { 4, "stone" },
-        { 0, NULL },
+        { 0, NULL }
     };
     if (mask & EQUIP_ITEMS) {
-        int i;
-        for (i = 0; equipment[i].count; ++i) {
-            i_change(&u->items, it_find(equipment[i].name), equipment[i].count);
-        }
+        equip_items(u, equipment);
     }
     terraform_region(u->region, get_terrain("plain"));
     freset(u->region, RF_MALLORN);
@@ -54,6 +62,56 @@ static void equip_first_unit(unit *u, int mask)
     rsethorses(u->region, 50);
 }
 
+static bool equip_monster_spoils(unit *u, const char *rcname, int mask)
+{
+    const struct monster_t
+    {
+        const char *rcname;
+        equip_t items[3];
+    } spoils[] = {
+        {
+            "seaserpent", {
+                { 6, "dragonblood" },
+                { 1, "dragonhead" },
+                { 0, NULL }
+            }
+        },
+        {
+            "youngdragon", {
+                { 1, "dragonhead" },
+                { 0, NULL }
+            },
+        },
+        {
+            "dragon", {
+                { 4, "dragonblood" },
+                { 1, "dragonhead" },
+                { 0, NULL }
+            },
+        },
+        {
+            "wyrm", {
+                { 10, "dragonblood" },
+                { 1, "dragonhead" },
+                { 0, NULL }
+            },
+        },
+        {
+            NULL,
+        }
+    };
+    const race *rc = rc_find(rcname);
+    if (rcname) {
+        int i;
+        for (i = 0; spoils[i].rcname; ++i) {
+            if (0 == strcmp(rcname, spoils[i].rcname)) {
+                equip_items(u, spoils[i].items);
+            }
+        }
+    }
+    return false;
+}
+
 static bool equip_default(unit *u, const char *name, int mask)
 {
     if (strncmp("new_", name, 4) == 0) {
@@ -61,8 +119,8 @@ static bool equip_default(unit *u, const char *name, int mask)
         return true;
     }
     else if (strncmp("spo_", name, 4) == 0) {
-        // TODO: spoils, see init.lua
-        return true;
+        // TODO: monster spoils, see init.lua
+        return equip_monster_spoils(u, name + 4, mask);
     }
     else if (strncmp("seed_", name, 5) == 0) {
         equip_newunits(u);
