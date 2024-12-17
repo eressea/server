@@ -23,6 +23,7 @@
 #include <util/language.h>
 #include <util/log.h>
 #include <util/path.h>
+#include <util/rng.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -60,6 +61,18 @@ static void equip_first_unit(unit *u, int mask)
     rsetpeasants(u->region, 4000);
     rsetmoney(u->region, 80000);
     rsethorses(u->region, 50);
+}
+
+static bool equip_undead(unit *u, int mask)
+{
+    i_change(&u->items, it_find("rustysword"), u->number);
+    if (0 == (rng_int() % 2)) {
+        i_change(&u->items, it_find("rustychainmail"), u->number);
+    }
+    if (0 == (rng_int() % 3)) {
+        i_change(&u->items, it_find("rustyshield"), u->number);
+    }
+    return false;
 }
 
 static bool equip_monster_spoils(unit *u, const char *rcname, int mask)
@@ -131,9 +144,7 @@ static bool equip_default(unit *u, const char *name, int mask)
         return true;
     }
     else if (strcmp("rising_undead", name) == 0) {
-        // TODO: rusty items, see init.lua
-        // equip_undead(u, mask);
-        return true;
+        return equip_undead(u, mask);
     }
     return false;
 }
