@@ -125,14 +125,42 @@ static bool equip_monster_spoils(unit *u, const char *rcname, int mask)
     return false;
 }
 
+static bool equip_new_unit(unit *u, int mask)
+{
+    if (get_race(RC_ORC) == u_race(u)) {
+        set_level(u, SK_MELEE, 1);
+        set_level(u, SK_SPEAR, 1);
+    }
+    else if (get_race(RC_DRACOID) == u_race(u)) {
+        int level = rng_int() % 4 + 3;
+        switch (rng_int() % 3) {
+        case 0:
+            set_level(u, SK_MELEE, level);
+            i_change(&u->items, it_find("sword"), u->number);
+            unit_setstatus(u, ST_FIGHT);
+            break;
+        case 1:
+            set_level(u, SK_SPEAR, level);
+            i_change(&u->items, it_find("spear"), u->number);
+            unit_setstatus(u, ST_FIGHT);
+            break;
+        default:
+            set_level(u, SK_LONGBOW, level);
+            i_change(&u->items, it_find("bow"), u->number);
+            unit_setstatus(u, ST_BEHIND);
+            break;
+        }
+    }
+    return false;
+}
+
 static bool equip_default(unit *u, const char *name, int mask)
 {
     if (strncmp("new_", name, 4) == 0) {
         // TODO: new unit, i.e. new_orc, see init.lua
-        return true;
+        return equip_new_unit(u, mask);
     }
     else if (strncmp("spo_", name, 4) == 0) {
-        // TODO: monster spoils, see init.lua
         return equip_monster_spoils(u, name + 4, mask);
     }
     else if (strncmp("seed_", name, 5) == 0) {
