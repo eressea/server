@@ -807,7 +807,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    increase_skill_days(u, sk, days);
+    change_skill_days(u, sk, days);
     return cost;
 }
 
