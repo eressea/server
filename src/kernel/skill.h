@@ -45,9 +45,9 @@ struct locale;
 
 extern const char *skillnames[];
 
-skill_t get_skill(const char *s, const struct locale *lang);
+skill_t findskill(const char *s, const struct locale *lang);
 const char *skillname(skill_t, const struct locale *);
-skill_t findskill(const char *name);
+skill_t find_skill(const char *name);
 void init_skills(const struct locale *lang);
 void init_skill(const struct locale *lang, skill_t kwd, const char *str);
 void enable_skill(skill_t sk, bool enabled);
