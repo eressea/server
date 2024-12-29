@@ -12,6 +12,7 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -551,7 +552,7 @@ int crimport(const char *filename)
 {
     CR_Parser cp;
     context ctx = { BLOCK_OTHER, NULL };
-    bool done = false;
+    int done = 0;
     int err = 0;
     char buf[2048];
 
