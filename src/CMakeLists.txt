@@ -163,6 +163,7 @@ set(SERVER_SRC
   bind_tolua.c
   bind_unit.c
   bindings.c
+  crimport.c
   console.c
   helpers.c
 )
@@ -217,12 +218,14 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${CRPAT_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   game
   ${STORAGE_LIBRARIES}
+  ${CRPAT_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
 )

@@ -406,3 +406,15 @@ void free_locales(void) {
     }
     memset(lstrs, 0, sizeof(lstrs)); /* TODO: does this data need to be free'd? */
 }
+
+const struct terrain_type *findterrain(const char *s, const struct locale *lang)
+{
+    void **tokens = get_translations(lang, UT_TERRAINS);
+    variant token;
+
+    assert(lang);
+    if (tokens && findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
+        return (const struct terrain_type *)token.v;
+    }
+    return NULL;
+}
