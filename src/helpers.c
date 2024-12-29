@@ -26,7 +26,6 @@
 #include <tolua.h>
 #include <lua.h>
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
