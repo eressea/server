@@ -47,27 +47,41 @@ typedef enum key_t {
     KEY_TERRAIN,
 } key_t;
 
-static struct critbit_tree cb_keys = CRITBIT_TREE();
+typedef enum special_t {
+    SPECIAL_UNKNOWN,
+    SPECIAL_FOREST,
+    SPECIAL_MONEYBAG,
+    SPECIAL_MONEYCHEST,
+    SPECIAL_DRAGONHOARD
+} special_t;
 
-static void add_key(const char *str, key_t key)
+static struct critbit_tree cb_keys = CRITBIT_TREE();
+static struct critbit_tree cb_special = CRITBIT_TREE();
+
+static void cb_add(critbit_tree *cb, const char *str, int key)
 {
     char buffer[32];
     size_t len = strlen(str);
-    len = cb_new_kv(str, len, &key, sizeof(key_t), buffer);
-    cb_insert(&cb_keys, buffer, len);
+    len = cb_new_kv(str, len, &key, sizeof(key), buffer);
+    cb_insert(cb, buffer, len);
 }
 
-static key_t get_key(const char *name)
+static int cb_get(critbit_tree *cb, const char *str, int def)
 {
-    key_t result = KEY_UNKNOWN;
     void *match = NULL;
-    int err = cb_find_prefix(&cb_keys, name, strlen(name) + 1, &match, 1, 0);
-    if (CB_EXISTS == err) {
-        cb_get_kv(match, &result, sizeof(key_t));
+    int count = cb_find_prefix(cb, str, strlen(str) + 1, &match, 1, 0);
+    if (count > 0) {
+        int result;
+        cb_get_kv(match, &result, sizeof(result));
+        return result;
     }
-    return result;
+    return def;
 }
 
+static void add_key(const char *str, key_t key)
+{
+    cb_add(&cb_keys, str, (int)key);
+}
 
 static void init_keys()
 {
@@ -79,6 +93,31 @@ static void init_keys()
     add_key("number", KEY_NUMBER);
     add_key("Partei", KEY_FACTION);
     add_key("Terrain", KEY_TERRAIN);
+}
+
+static key_t get_key(const char *name)
+{
+    if (!cb_keys.root) init_keys();
+    return (key_t)cb_get(&cb_keys, name, KEY_UNKNOWN);
+}
+
+static void add_special(const char *str, special_t key)
+{
+    cb_add(&cb_special, str, (int)key);
+}
+
+static void init_specials()
+{
+    add_special("Wald", SPECIAL_FOREST);
+    add_special("Silberbeutel", SPECIAL_MONEYBAG);
+    add_special("Silberkassette", SPECIAL_MONEYCHEST);
+    add_special("Drachenhort", SPECIAL_DRAGONHOARD);
+}
+
+static special_t get_special(const char *name)
+{
+    if (!cb_special.root) init_specials();
+    return (special_t)cb_get(&cb_special, name, SPECIAL_UNKNOWN);
 }
 
 typedef struct context {
@@ -213,7 +252,7 @@ static enum CR_Error handle_region(context *ctx, key_t key, const char *value)
     case KEY_TERRAIN: {
         const struct terrain_type *ter = findterrain(value, default_locale);
         if (!ter) {
-            if (forest_terrain(value)) {
+            if (get_special(value) == SPECIAL_FOREST) {
                 ter = get_terrain("plain");
             }
         }
@@ -236,8 +275,23 @@ static enum CR_Error handle_item(context *ctx, int number, const char *name)
     item **itm, **items = NULL;
     const struct item_type *itype = finditemtype(name, default_locale);
     if (!itype) {
-        log_error("unknown item: %s", name);
-        return CR_ERROR_NONE;
+        special_t spec = get_special(name);
+        if (spec == SPECIAL_DRAGONHOARD) {
+            itype = it_find("money");
+            number = 50001;
+        }
+        else if (spec == SPECIAL_MONEYCHEST) {
+            itype = it_find("money");
+            number = 5001;
+        }
+        else if (spec == SPECIAL_MONEYBAG) {
+            itype = it_find("money");
+            number = 501;
+        }
+        else {
+            log_error("unknown item: %s", name);
+            return CR_ERROR_NONE;
+        }
     }
     if (ctx->unit) {
         items = &ctx->unit->items;
@@ -313,8 +367,6 @@ int crimport(const char *filename)
     CR_SetElementHandler(cp, handle_element);
     CR_SetPropertyHandler(cp, handle_property);
     //CR_SetTextHandler(cp, handle_text);
-
-    if (!cb_keys.root) init_keys();
 
     while (!done) {
         size_t len = (int)fread(buf, 1, sizeof(buf), F);
