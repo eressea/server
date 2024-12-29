@@ -49,28 +49,28 @@ typedef enum block_t {
     BLOCK_EFFECTS
 } block_t;
 
-typedef enum key_t {
-    KEY_UNKNOWN,
-    KEY_ID,
-    KEY_TYPE,
-    KEY_NUMBER,
-    KEY_NAME,
-    KEY_FACTION,
-    KEY_OTHER_FACTION,
-    KEY_STATUS,
-    KEY_LOCALE,
-    KEY_AGE,
-    KEY_OPTIONS,
-    KEY_SCHOOL,
-    KEY_NMR,
-    KEY_EMAIL,
-    KEY_PREFIX,
-    KEY_DESCRIPTION,
-    KEY_MEMO,
-    KEY_BUILDING,
-    KEY_SHIP,
-    KEY_TERRAIN,
-} key_t;
+typedef enum tag_t {
+    TAG_UNKNOWN,
+    TAG_ID,
+    TAG_TYPE,
+    TAG_NUMBER,
+    TAG_NAME,
+    TAG_FACTION,
+    TAG_OTHER_FACTION,
+    TAG_STATUS,
+    TAG_LOCALE,
+    TAG_AGE,
+    TAG_OPTIONS,
+    TAG_SCHOOL,
+    TAG_NMR,
+    TAG_EMAIL,
+    TAG_PREFIX,
+    TAG_DESCRIPTION,
+    TAG_MEMO,
+    TAG_BUILDING,
+    TAG_SHIP,
+    TAG_TERRAIN,
+} tag_t;
 
 typedef enum special_t {
     SPECIAL_UNKNOWN,
@@ -105,43 +105,43 @@ static int cb_get(critbit_tree *cb, const char *str, int def)
     return def;
 }
 
-static void add_key(const char *str, key_t key)
+static void add_key(const char *str, tag_t key)
 {
     cb_add(&cb_keys, str, (int)key);
 }
 
 static void init_keys(void)
 {
-    add_key("id", KEY_ID);
-    add_key("Typ", KEY_TYPE);
-    add_key("type", KEY_TYPE);
-    add_key("Name", KEY_NAME);
-    add_key("Parteiname", KEY_NAME);
-    add_key("Anzahl", KEY_NUMBER);
-    add_key("number", KEY_NUMBER);
-    add_key("Partei", KEY_FACTION);
-    add_key("locale", KEY_LOCALE);
-    add_key("age", KEY_AGE);
-    add_key("Optionen", KEY_OPTIONS);
-    add_key("Magiegebiet", KEY_SCHOOL);
-    add_key("nmr", KEY_NMR);
-    add_key("email", KEY_EMAIL);
-    add_key("typprefix", KEY_PREFIX);
-    add_key("Anderepartei", KEY_OTHER_FACTION);
-    add_key("banner", KEY_DESCRIPTION);
-    add_key("Beschr", KEY_DESCRIPTION);
-    add_key("Terrain", KEY_TERRAIN);
-    add_key("Kampfstatus", KEY_STATUS);
-    add_key("Status", KEY_STATUS);
-    add_key("privat", KEY_MEMO);
-    add_key("Burg", KEY_BUILDING);
-    add_key("Schiff", KEY_SHIP);
+    add_key("id", TAG_ID);
+    add_key("Typ", TAG_TYPE);
+    add_key("type", TAG_TYPE);
+    add_key("Name", TAG_NAME);
+    add_key("Parteiname", TAG_NAME);
+    add_key("Anzahl", TAG_NUMBER);
+    add_key("number", TAG_NUMBER);
+    add_key("Partei", TAG_FACTION);
+    add_key("locale", TAG_LOCALE);
+    add_key("age", TAG_AGE);
+    add_key("Optionen", TAG_OPTIONS);
+    add_key("Magiegebiet", TAG_SCHOOL);
+    add_key("nmr", TAG_NMR);
+    add_key("email", TAG_EMAIL);
+    add_key("typprefix", TAG_PREFIX);
+    add_key("Anderepartei", TAG_OTHER_FACTION);
+    add_key("banner", TAG_DESCRIPTION);
+    add_key("Beschr", TAG_DESCRIPTION);
+    add_key("Terrain", TAG_TERRAIN);
+    add_key("Kampfstatus", TAG_STATUS);
+    add_key("Status", TAG_STATUS);
+    add_key("privat", TAG_MEMO);
+    add_key("Burg", TAG_BUILDING);
+    add_key("Schiff", TAG_SHIP);
 }
 
-static key_t get_key(const char *name)
+static tag_t get_key(const char *name)
 {
     if (!cb_keys.root) init_keys();
-    return (key_t)cb_get(&cb_keys, name, KEY_UNKNOWN);
+    return (tag_t)cb_get(&cb_keys, name, TAG_UNKNOWN);
 }
 
 static void add_special(const char *str, special_t key)
@@ -265,34 +265,34 @@ static enum CR_Error handle_element(void *udata, const char *name,
     return CR_ERROR_NONE;
 }
 
-static enum CR_Error handle_unit(context *ctx, key_t key, const char *value)
+static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
 {
     unit *u = ctx->unit;
     switch (key) {
-    case KEY_BUILDING:
-    case KEY_SHIP:
-    case KEY_OTHER_FACTION:
-    case KEY_PREFIX:
+    case TAG_BUILDING:
+    case TAG_SHIP:
+    case TAG_OTHER_FACTION:
+    case TAG_PREFIX:
         break;
-    case KEY_TYPE:
+    case TAG_TYPE:
         u_setrace(u, findrace(value, default_locale));
         break;
-    case KEY_STATUS:
+    case TAG_STATUS:
         unit_setstatus(u, atoi(value));
         break;
-    case KEY_NAME:
+    case TAG_NAME:
         unit_setname(u, value);
         break;
-    case KEY_NUMBER:
+    case TAG_NUMBER:
         scale_number(u, atoi(value));
         break;
-    case KEY_FACTION:
+    case TAG_FACTION:
         u_setfaction(u, findfaction(atoi(value)));
         break;
-    case KEY_DESCRIPTION:
+    case TAG_DESCRIPTION:
         unit_setinfo(u, value);
         break;
-    case KEY_MEMO:
+    case TAG_MEMO:
         usetprivate(u, value);
         break;
     default:
@@ -301,14 +301,14 @@ static enum CR_Error handle_unit(context *ctx, key_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
-static enum CR_Error handle_resource(context *ctx, key_t key, const char *value)
+static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
 {
     region *r = ctx->region;
     if (!r) {
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
-    case KEY_NUMBER:
+    case TAG_NUMBER:
         if (ctx->stack) {
             const resource_type *rtype = rt_find(ctx->stack);
             region_setresource(r, rtype, atoi(value));
@@ -317,7 +317,7 @@ static enum CR_Error handle_resource(context *ctx, key_t key, const char *value)
             ctx->stack = value;
         }
         break;
-    case KEY_TYPE:
+    case TAG_TYPE:
         if (ctx->stack) {
             const resource_type *rtype = rt_find(value);
             region_setresource(r, rtype, atoi(ctx->stack));
@@ -331,28 +331,28 @@ static enum CR_Error handle_resource(context *ctx, key_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
-static enum CR_Error handle_faction(context *ctx, key_t key, const char *value)
+static enum CR_Error handle_faction(context *ctx, tag_t key, const char *value)
 {
     faction *f = ctx->faction;
     if (!f) {
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
-    case KEY_AGE:
-    case KEY_OPTIONS:
-    case KEY_SCHOOL:
-    case KEY_NMR:
+    case TAG_AGE:
+    case TAG_OPTIONS:
+    case TAG_SCHOOL:
+    case TAG_NMR:
         break;
-    case KEY_LOCALE:
+    case TAG_LOCALE:
         f->locale = get_locale(value);
         break;
-    case KEY_NAME:
+    case TAG_NAME:
         faction_setname(f, value);
         break;
-    case KEY_DESCRIPTION:
+    case TAG_DESCRIPTION:
         faction_setbanner(f, value);
         break;
-    case KEY_EMAIL:
+    case TAG_EMAIL:
         faction_setemail(f, value);
         break;
     default:
@@ -361,17 +361,17 @@ static enum CR_Error handle_faction(context *ctx, key_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
-static enum CR_Error handle_region(context *ctx, key_t key, const char *value)
+static enum CR_Error handle_region(context *ctx, tag_t key, const char *value)
 {
     region *r = ctx->region;
     if (!r) {
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
-    case KEY_NAME:
+    case TAG_NAME:
         region_setname(r, value);
         break;
-    case KEY_ID: {
+    case TAG_ID: {
         int uid = atoi(value);
         if (uid != r->uid) {
             runhash(r);
@@ -380,7 +380,7 @@ static enum CR_Error handle_region(context *ctx, key_t key, const char *value)
         }
         break;
     }
-    case KEY_TERRAIN: {
+    case TAG_TERRAIN: {
         const struct terrain_type *ter = findterrain(value, default_locale);
         if (!ter) {
             if (get_special(value) == SPECIAL_FOREST) {
