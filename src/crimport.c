@@ -110,7 +110,7 @@ static void add_key(const char *str, key_t key)
     cb_add(&cb_keys, str, (int)key);
 }
 
-static void init_keys()
+static void init_keys(void)
 {
     add_key("id", KEY_ID);
     add_key("Typ", KEY_TYPE);
@@ -149,7 +149,7 @@ static void add_special(const char *str, special_t key)
     cb_add(&cb_special, str, (int)key);
 }
 
-static void init_specials()
+static void init_specials(void)
 {
     add_special("Wald", SPECIAL_FOREST);
     add_special("Phiole", SPECIAL_VIAL);
@@ -263,13 +263,6 @@ static enum CR_Error handle_element(void *udata, const char *name,
         }
     }
     return CR_ERROR_NONE;
-}
-
-static bool forest_terrain(const char * value)
-{
-    static const char *forest_name = NULL;
-    if (!forest_name) forest_name = LOC(default_locale, "forest");
-    return (0 == strcmp(value, forest_name));
 }
 
 static enum CR_Error handle_unit(context *ctx, key_t key, const char *value)
