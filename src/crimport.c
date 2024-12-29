@@ -8,6 +8,7 @@
 
 #include <kernel/faction.h>
 #include <kernel/item.h>
+#include <kernel/order.h>
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
@@ -28,14 +29,24 @@
 
 typedef enum block_t {
     BLOCK_OTHER,
+    BLOCK_VERSION,
+    BLOCK_OPTIONS,
+    BLOCK_ALLIANCE,
+    BLOCK_GROUP,
     BLOCK_REGION,
+    BLOCK_PRICES,
+    BLOCK_BORDER,
     BLOCK_RESOURCE,
     BLOCK_FACTION,
-    BLOCK_ITEMS,
-    BLOCK_SKILLS,
     BLOCK_UNIT,
+    BLOCK_COMMANDS,
+    BLOCK_SPELLS,
+    BLOCK_COMBATSPELLS,
+    BLOCK_SKILLS,
+    BLOCK_ITEMS,
     BLOCK_SHIP,
-    BLOCK_BUILDING
+    BLOCK_BUILDING,
+    BLOCK_EFFECTS
 } block_t;
 
 typedef enum key_t {
@@ -45,12 +56,27 @@ typedef enum key_t {
     KEY_NUMBER,
     KEY_NAME,
     KEY_FACTION,
+    KEY_OTHER_FACTION,
+    KEY_STATUS,
+    KEY_LOCALE,
+    KEY_AGE,
+    KEY_OPTIONS,
+    KEY_SCHOOL,
+    KEY_NMR,
+    KEY_EMAIL,
+    KEY_PREFIX,
+    KEY_DESCRIPTION,
+    KEY_MEMO,
+    KEY_BUILDING,
+    KEY_SHIP,
     KEY_TERRAIN,
 } key_t;
 
 typedef enum special_t {
     SPECIAL_UNKNOWN,
     SPECIAL_FOREST,
+    SPECIAL_VIAL,
+    SPECIAL_HERBS,
     SPECIAL_MONEYBAG,
     SPECIAL_MONEYCHEST,
     SPECIAL_DRAGONHOARD
@@ -94,7 +120,22 @@ static void init_keys()
     add_key("Anzahl", KEY_NUMBER);
     add_key("number", KEY_NUMBER);
     add_key("Partei", KEY_FACTION);
+    add_key("locale", KEY_LOCALE);
+    add_key("age", KEY_AGE);
+    add_key("Optionen", KEY_OPTIONS);
+    add_key("Magiegebiet", KEY_SCHOOL);
+    add_key("nmr", KEY_NMR);
+    add_key("email", KEY_EMAIL);
+    add_key("typprefix", KEY_PREFIX);
+    add_key("Anderepartei", KEY_OTHER_FACTION);
+    add_key("banner", KEY_DESCRIPTION);
+    add_key("Beschr", KEY_DESCRIPTION);
     add_key("Terrain", KEY_TERRAIN);
+    add_key("Kampfstatus", KEY_STATUS);
+    add_key("Status", KEY_STATUS);
+    add_key("privat", KEY_MEMO);
+    add_key("Burg", KEY_BUILDING);
+    add_key("Schiff", KEY_SHIP);
 }
 
 static key_t get_key(const char *name)
@@ -111,6 +152,9 @@ static void add_special(const char *str, special_t key)
 static void init_specials()
 {
     add_special("Wald", SPECIAL_FOREST);
+    add_special("Phiole", SPECIAL_VIAL);
+    // FIXME: NON-ASCII characters in the source are ugly af.
+    add_special("Kräuterbeutel", SPECIAL_HERBS);
     add_special("Silberbeutel", SPECIAL_MONEYBAG);
     add_special("Silberkassette", SPECIAL_MONEYCHEST);
     add_special("Drachenhort", SPECIAL_DRAGONHOARD);
@@ -138,13 +182,16 @@ static enum CR_Error handle_element(void *udata, const char *name,
 
     ctx->block = BLOCK_OTHER;
     if (keyc >= 2) {
-        if (0 == strcmp("REGION", name)) {
+        if (0 == strcmp("SCHEMEN", name) || 0 == strcmp("REGION", name)) {
             int x = keyv[0];
             int y = keyv[1];
             plane *pl = (keyc < 3) ? NULL : getplanebyid(keyv[2]);
             memset(ctx, 0, sizeof(context));
             ctx->region = new_region(x, y, pl, 0);
             ctx->block = BLOCK_REGION;
+        }
+        else {
+            log_info("unsupported block %s", name);
         }
     }
     else if (keyc == 1) {
@@ -164,6 +211,30 @@ static enum CR_Error handle_element(void *udata, const char *name,
             ctx->block = BLOCK_RESOURCE;
             ctx->stack = NULL;
         }
+        else if (0 == strcmp("BURG", name)) {
+            ctx->block = BLOCK_BUILDING;
+        }
+        else if (0 == strcmp("SCHIFF", name)) {
+            ctx->block = BLOCK_SHIP;
+        }
+        else if (0 == strcmp("ALLIANZ", name)) {
+            ctx->block = BLOCK_ALLIANCE;
+        }
+        else if (0 == strcmp("VERSION", name)) {
+            ctx->block = BLOCK_VERSION;
+        }
+        else if (0 == strcmp("GRUPPE", name)) {
+            ctx->block = BLOCK_GROUP;
+        }
+        else if (0 == strcmp("GRENZE", name)) {
+            ctx->block = BLOCK_BORDER;
+        }
+        else if (0 == strcmp("KAMPFZAUBER", name)) {
+            ctx->block = BLOCK_COMBATSPELLS;
+        }
+        else {
+            log_info("unsupported block %s", name);
+        }
     }
     else if (keyc == 0) {
         if (0 == strcmp("GEGENSTAENDE", name)) {
@@ -171,6 +242,24 @@ static enum CR_Error handle_element(void *udata, const char *name,
         }
         else if (0 == strcmp("TALENTE", name)) {
             ctx->block = BLOCK_SKILLS;
+        }
+        else if (0 == strcmp("OPTIONEN", name)) {
+            ctx->block = BLOCK_OPTIONS;
+        }
+        else if (0 == strcmp("PREISE", name)) {
+            ctx->block = BLOCK_PRICES;
+        }
+        else if (0 == strcmp("EFFECTS", name)) {
+            ctx->block = BLOCK_EFFECTS;
+        }
+        else if (0 == strcmp("COMMANDS", name)) {
+            ctx->block = BLOCK_COMMANDS;
+        }
+        else if (0 == strcmp("SPRUECHE", name)) {
+            ctx->block = BLOCK_SPELLS;
+        }
+        else {
+            log_info("unsupported block %s", name);
         }
     }
     return CR_ERROR_NONE;
@@ -187,8 +276,16 @@ static enum CR_Error handle_unit(context *ctx, key_t key, const char *value)
 {
     unit *u = ctx->unit;
     switch (key) {
+    case KEY_BUILDING:
+    case KEY_SHIP:
+    case KEY_OTHER_FACTION:
+    case KEY_PREFIX:
+        break;
     case KEY_TYPE:
         u_setrace(u, findrace(value, default_locale));
+        break;
+    case KEY_STATUS:
+        unit_setstatus(u, atoi(value));
         break;
     case KEY_NAME:
         unit_setname(u, value);
@@ -198,6 +295,12 @@ static enum CR_Error handle_unit(context *ctx, key_t key, const char *value)
         break;
     case KEY_FACTION:
         u_setfaction(u, findfaction(atoi(value)));
+        break;
+    case KEY_DESCRIPTION:
+        unit_setinfo(u, value);
+        break;
+    case KEY_MEMO:
+        usetprivate(u, value);
         break;
     default:
         break;
@@ -242,8 +345,22 @@ static enum CR_Error handle_faction(context *ctx, key_t key, const char *value)
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
+    case KEY_AGE:
+    case KEY_OPTIONS:
+    case KEY_SCHOOL:
+    case KEY_NMR:
+        break;
+    case KEY_LOCALE:
+        f->locale = get_locale(value);
+        break;
     case KEY_NAME:
         faction_setname(f, value);
+        break;
+    case KEY_DESCRIPTION:
+        faction_setbanner(f, value);
+        break;
+    case KEY_EMAIL:
+        faction_setemail(f, value);
         break;
     default:
         break;
@@ -328,8 +445,12 @@ static enum CR_Error handle_item(context *ctx, int number, const char *name)
             itype = it_find("money");
             number = 501;
         }
-        else {
+        else if (spec == SPECIAL_UNKNOWN) {
             log_error("unknown item: %s", name);
+            return CR_ERROR_NONE;
+        }
+        else {
+            log_warning("unhandled special item: %s", name);
             return CR_ERROR_NONE;
         }
     }
@@ -356,6 +477,17 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     context *ctx = (context *)udata;
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
+    case BLOCK_EFFECTS:
+    case BLOCK_OPTIONS:
+    case BLOCK_ALLIANCE:
+    case BLOCK_GROUP:
+    case BLOCK_SHIP:
+    case BLOCK_BUILDING:
+    case BLOCK_SPELLS:
+    case BLOCK_COMBATSPELLS:
+    case BLOCK_BORDER:
+    case BLOCK_PRICES:
+        break;
     case BLOCK_SKILLS:
         err = handle_skill(ctx, value, name);
         if (err != CR_ERROR_NONE) {
@@ -404,6 +536,24 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     return err;
 }
 
+static enum CR_Error handle_text(void *udata, const char *value) {
+    context *ctx = (context *)udata;
+    enum CR_Error err = CR_ERROR_NONE;
+    switch (ctx->block) {
+    case BLOCK_COMMANDS: {
+        unit *u = ctx->unit;
+        if (!u) {
+            return CR_ERROR_GRAMMAR;
+        }
+        unit_addorder(u, parse_order(value, u->faction->locale));
+        break;
+    }
+    default:
+        break;
+    }
+    return err;
+}
+
 int crimport(const char *filename)
 {
     CR_Parser cp;
@@ -420,7 +570,7 @@ int crimport(const char *filename)
     CR_SetUserData(cp, (void *)&ctx);
     CR_SetElementHandler(cp, handle_element);
     CR_SetPropertyHandler(cp, handle_property);
-    //CR_SetTextHandler(cp, handle_text);
+    CR_SetTextHandler(cp, handle_text);
 
     while (!done) {
         size_t len = (int)fread(buf, 1, sizeof(buf), F);
