@@ -32,6 +32,7 @@ typedef enum block_t {
     BLOCK_RESOURCE,
     BLOCK_FACTION,
     BLOCK_ITEMS,
+    BLOCK_SKILLS,
     BLOCK_UNIT,
     BLOCK_SHIP,
     BLOCK_BUILDING
@@ -89,6 +90,7 @@ static void init_keys()
     add_key("Typ", KEY_TYPE);
     add_key("type", KEY_TYPE);
     add_key("Name", KEY_NAME);
+    add_key("Parteiname", KEY_NAME);
     add_key("Anzahl", KEY_NUMBER);
     add_key("number", KEY_NUMBER);
     add_key("Partei", KEY_FACTION);
@@ -167,6 +169,9 @@ static enum CR_Error handle_element(void *udata, const char *name,
         if (0 == strcmp("GEGENSTAENDE", name)) {
             ctx->block = BLOCK_ITEMS;
         }
+        else if (0 == strcmp("TALENTE", name)) {
+            ctx->block = BLOCK_SKILLS;
+        }
     }
     return CR_ERROR_NONE;
 }
@@ -230,6 +235,22 @@ static enum CR_Error handle_resource(context *ctx, key_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
+static enum CR_Error handle_faction(context *ctx, key_t key, const char *value)
+{
+    faction *f = ctx->faction;
+    if (!f) {
+        return CR_ERROR_GRAMMAR;
+    }
+    switch (key) {
+    case KEY_NAME:
+        faction_setname(f, value);
+        break;
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error handle_region(context *ctx, key_t key, const char *value)
 {
     region *r = ctx->region;
@@ -266,6 +287,25 @@ static enum CR_Error handle_region(context *ctx, key_t key, const char *value)
     }
     default:
         break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_skill(context *ctx, const char *value, const char *name)
+{
+    unit *u = ctx->unit;
+    skill_t sk;
+    if (!u) {
+        return CR_ERROR_GRAMMAR;
+    }
+    sk = findskill(name, default_locale);
+    if (sk == NOSKILL) {
+        log_error("import_cr: unknown skill %s", name);
+    }
+    else {
+        char *val = strchr(value, ' ');
+        int level = atoi(val + 1);
+        set_level(u, sk, level);
     }
     return CR_ERROR_NONE;
 }
@@ -316,11 +356,25 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     context *ctx = (context *)udata;
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
+    case BLOCK_SKILLS:
+        err = handle_skill(ctx, value, name);
+        if (err != CR_ERROR_NONE) {
+            log_warning("parse error in skill for unit %u. %s = %s",
+                itoa36(ctx->unit->no), name, value);
+        }
+        break;
     case BLOCK_ITEMS:
         err = handle_item(ctx, atoi(value), name);
         if (err != CR_ERROR_NONE) {
             log_warning("parse error in item. %s = %s",
                 name, value);
+        }
+        break;
+    case BLOCK_FACTION:
+        err = handle_faction(ctx, get_key(name), value);
+        if (err != CR_ERROR_NONE) {
+            log_warning("parse error in region %d,%d. %s = %s",
+                ctx->region->x, ctx->region->y, name, value);
         }
         break;
     case BLOCK_REGION:

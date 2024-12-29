@@ -660,13 +660,13 @@ static void test_skills(CuTest * tc)
     test_setup();
     lang = get_or_create_locale("de");
     CuAssertPtrNotNull(tc, json);
-    CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
+    CuAssertIntEquals(tc, NOSKILL, findskill("potato", lang));
 
     json_config(json);
-    CuAssertIntEquals(tc, NOSKILL, get_skill("potato", lang));
-    CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("armbrust", lang));
-    CuAssertIntEquals(tc, SK_CROSSBOW, get_skill("kreuz", lang));
-    CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
+    CuAssertIntEquals(tc, NOSKILL, findskill("potato", lang));
+    CuAssertIntEquals(tc, SK_CROSSBOW, findskill("armbrust", lang));
+    CuAssertIntEquals(tc, SK_CROSSBOW, findskill("kreuz", lang));
+    CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemie", lang));
 
     CuAssertStrEquals(tc, "ALCHEMIE", LOC(lang, "skill::alchemy"));
     CuAssertStrEquals(tc, "ARMBRUST", LOC(lang, "skill::crossbow"));

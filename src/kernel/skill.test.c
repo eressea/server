@@ -12,7 +12,7 @@ static void test_init_skills(CuTest *tc) {
     lang = get_or_create_locale("de");
 
     init_skill(lang, SK_ALCHEMY, "Alchemie");
-    CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
+    CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemie", lang));
     test_teardown();
 }
 
@@ -23,18 +23,18 @@ static void test_init_skill(CuTest *tc) {
     lang = get_or_create_locale("de");
 
     init_skill(lang, SK_ALCHEMY, "Alchemie");
-    CuAssertIntEquals(tc, SK_ALCHEMY, get_skill("alchemie", lang));
-    CuAssertIntEquals(tc, NOSKILL, get_skill("east", lang));
+    CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemie", lang));
+    CuAssertIntEquals(tc, NOSKILL, findskill("east", lang));
     test_teardown();
 }
 
 static void test_get_skill(CuTest *tc) {
     test_setup();
-    CuAssertIntEquals(tc, SK_ALCHEMY, findskill("alchemy"));
-    CuAssertIntEquals(tc, SK_MAGIC, findskill("magic"));
-    CuAssertIntEquals(tc, SK_CROSSBOW, findskill("crossbow"));
-    CuAssertIntEquals(tc, NOSKILL, findskill(""));
-    CuAssertIntEquals(tc, NOSKILL, findskill("potato"));
+    CuAssertIntEquals(tc, SK_ALCHEMY, find_skill("alchemy"));
+    CuAssertIntEquals(tc, SK_MAGIC, find_skill("magic"));
+    CuAssertIntEquals(tc, SK_CROSSBOW, find_skill("crossbow"));
+    CuAssertIntEquals(tc, NOSKILL, find_skill(""));
+    CuAssertIntEquals(tc, NOSKILL, find_skill("potato"));
     test_teardown();
 }
 

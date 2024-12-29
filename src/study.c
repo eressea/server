@@ -58,7 +58,7 @@ skill_t getskill(const struct locale *lang)
 {
     char token[128];
     const char * s = gettoken(token, sizeof(token));
-    return s ? get_skill(s, lang) : NOSKILL;
+    return s ? findskill(s, lang) : NOSKILL;
 }
 
 magic_t getmagicskill(const struct locale * lang)
