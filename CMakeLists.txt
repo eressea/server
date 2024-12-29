@@ -92,6 +92,7 @@ enable_testing()
 add_subdirectory (tools)
 add_subdirectory (storage)
 add_subdirectory (clibs)
+add_subdirectory (crpat)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 

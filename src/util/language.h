@@ -1,16 +1,12 @@
-#ifndef MY_LOCALE_H
-#define MY_LOCALE_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define MAXLOCALES 3
 
     struct locale;
+    struct terrain_type;
     struct critbit_tree;
 
     extern const char *localenames[];
@@ -64,7 +60,4 @@ extern "C" {
     void init_translations(const struct locale *lang, int ut, const char * (*string_cb)(int i), int maxstrings);
     void add_translation(struct critbit_tree **cb, const char *str, int i);
 
-#ifdef __cplusplus
-}
-#endif
-#endif
+    const struct terrain_type *findterrain(const char *s, const struct locale *lang);

@@ -3,6 +3,7 @@
 #endif
 #include "bind_eressea.h"
 
+#include "crimport.h"
 #include "eressea.h"
 #include "json.h"
 #include "orderfile.h"
@@ -73,4 +74,9 @@ int eressea_import_json(const char * filename) {
         perror(filename);
     }
     return -1;
+}
+
+int eressea_import_cr(const char *filename)
+{
+    return crimport(filename);
 }
