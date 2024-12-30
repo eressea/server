@@ -6,6 +6,7 @@
 
 #include "crimport.h"
 
+#include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
@@ -340,9 +341,13 @@ static enum CR_Error handle_faction(context *ctx, tag_t key, const char *value)
     }
     switch (key) {
     case TAG_AGE:
+        faction_set_age(f, atoi(value));
+        break;
     case TAG_OPTIONS:
     case TAG_SCHOOL:
+        break;
     case TAG_NMR:
+        f->lastorders= turn - atoi(value);
         break;
     case TAG_LOCALE:
         f->locale = get_locale(value);
