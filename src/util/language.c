@@ -418,3 +418,14 @@ const struct terrain_type *findterrain(const char *s, const struct locale *lang)
     }
     return NULL;
 }
+
+int findoption(const char *s, const struct locale *lang)
+{
+    void **tokens = get_translations(lang, UT_OPTIONS);
+    variant token;
+
+    if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
+        return token.i;
+    }
+    return -1;
+}

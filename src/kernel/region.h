@@ -258,7 +258,7 @@ int region_getresource_level(const struct region * r,
     const struct resource_type * rtype);
 int region_getresource(const struct region *r,
     const struct resource_type *rtype);
-void region_setresource(struct region *r, const struct resource_type *rtype,
+struct rawmaterial *region_setresource(struct region *r, const struct resource_type *rtype,
     int value);
 int owner_change(const region * r);
 bool is_mourning(const region * r, int in_turn);

@@ -61,3 +61,4 @@
     void add_translation(struct critbit_tree **cb, const char *str, int i);
 
     const struct terrain_type *findterrain(const char *s, const struct locale *lang);
+    int findoption(const char *s, const struct locale *lang);
