@@ -825,7 +825,7 @@ void free_land(land_region * lr)
     free(lr);
 }
 
-void region_setresource(region * r, const struct resource_type *rtype, int value)
+struct rawmaterial *region_setresource(region * r, const struct resource_type *rtype, int value)
 {
     rawmaterial *rm = rm_get(r, rtype);
     if (rm) {
@@ -838,14 +838,37 @@ void region_setresource(region * r, const struct resource_type *rtype, int value
             rsetpeasants(r, value);
         else if (rtype == get_resourcetype(R_HORSE))
             rsethorses(r, value);
+        else if (rtype == get_resourcetype(R_TREE)) {
+            rsettrees(r, TREE_TREE, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_SAPLING)) {
+            rsettrees(r, TREE_SAPLING, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_SEED)) {
+            rsettrees(r, TREE_SEED, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_TREE)) {
+            rsettrees(r, TREE_TREE, value);
+            fset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_SAPLING)) {
+            rsettrees(r, TREE_SAPLING, value);
+            fset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_SEED)) {
+            rsettrees(r, TREE_SEED, value);
+            fset(r, RF_MALLORN);
+        }
         else {
             if (r->terrain->production) {
                 int i;
                 for (i = 0; r->terrain->production[i].type; ++i) {
                     const terrain_production *production = r->terrain->production + i;
                     if (production->type == rtype) {
-                        add_resource(r, 1, value, dice_rand(production->divisor), rtype);
-                        return;
+                        return add_resource(r, 1, value, dice_rand(production->divisor), rtype);
                     }
                 }
             }
@@ -855,10 +878,11 @@ void region_setresource(region * r, const struct resource_type *rtype, int value
                 rm->amount = value;
             }
             else {
-                add_resource(r, 1, value, 150, rtype);
+                return add_resource(r, 1, value, 150, rtype);
             }
         }
     }
+    return rm;
 }
 
 int region_getresource_level(const struct region * r, const struct resource_type * rtype)

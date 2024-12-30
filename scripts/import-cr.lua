@@ -10,4 +10,5 @@ else
 end
 
 eressea.import_cr("import.cr")
+write_reports()
 gmtool.editor()

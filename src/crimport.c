@@ -5,6 +5,7 @@
 #endif
 
 #include "crimport.h"
+#include "reports.h"
 
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
@@ -13,6 +14,7 @@
 #include <kernel/plane.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
+#include <kernel/resources.h>
 #include <kernel/skill.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
@@ -23,6 +25,8 @@
 
 #include <crpat.h>
 #include <critbit.h>
+
+#include <stb_ds.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -53,9 +57,11 @@ typedef enum block_t {
 
 typedef enum tag_t {
     TAG_UNKNOWN,
+    TAG_TURN,
     TAG_ID,
     TAG_TYPE,
     TAG_NUMBER,
+    TAG_SKILL,
     TAG_NAME,
     TAG_FACTION,
     TAG_OTHER_FACTION,
@@ -115,12 +121,14 @@ static void add_key(const char *str, tag_t key)
 static void init_keys(void)
 {
     add_key("id", TAG_ID);
+    add_key("Runde", TAG_TURN);
     add_key("Typ", TAG_TYPE);
     add_key("type", TAG_TYPE);
     add_key("Name", TAG_NAME);
     add_key("Parteiname", TAG_NAME);
     add_key("Anzahl", TAG_NUMBER);
     add_key("number", TAG_NUMBER);
+    add_key("skill", TAG_SKILL);
     add_key("Partei", TAG_FACTION);
     add_key("locale", TAG_LOCALE);
     add_key("age", TAG_AGE);
@@ -175,16 +183,60 @@ typedef struct context {
     struct unit *unit;
     struct ship *ship;
     struct building *building;
-    const char *stack;
+
+    struct {
+        const struct resource_type *type;
+        int number;
+        int level;
+    } resource;
 } context;
 
+static enum CR_Error finish_resource(struct context *ctx, region *r)
+{
+    if (ctx->resource.type && ctx->resource.number) {
+        rawmaterial *rm = region_setresource(r, ctx->resource.type, ctx->resource.number);
+        if (rm) {
+            if (ctx->resource.level > 0) {
+                rm->level = ctx->resource.level;
+            }
+            else {
+                return CR_ERROR_GRAMMAR;
+            }
+        }
+        else if (ctx->resource.level > 0) {
+            return CR_ERROR_GRAMMAR;
+        }
+        return CR_ERROR_NONE;
+    }
+    return CR_ERROR_GRAMMAR;
+}
+
+static enum CR_Error finish_element(struct context *ctx)
+{
+    if (ctx->block == BLOCK_RESOURCE) {
+        region *r = ctx->region;
+        int err;
+        if (!r) {
+            return CR_ERROR_GRAMMAR;
+        }
+        err = finish_resource(ctx, r);
+        if (err != CR_ERROR_NONE) {
+            return err;
+        }
+    }
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error handle_element(void *udata, const char *name,
-    unsigned int keyc, int keyv[]) {
-    context *ctx = (context *)udata;
+    unsigned int keyc, int keyv[])
+{
+    struct context *ctx = (struct context *)udata;
+
+    finish_element(ctx);
 
     ctx->block = BLOCK_OTHER;
     if (keyc >= 2) {
-        if (0 == strcmp("SCHEMEN", name) || 0 == strcmp("REGION", name)) {
+        if (0 == strcmp("REGION", name)) {
             int x = keyv[0];
             int y = keyv[1];
             plane *pl = (keyc < 3) ? NULL : getplanebyid(keyv[2]);
@@ -205,13 +257,18 @@ static enum CR_Error handle_element(void *udata, const char *name,
             ctx->block = BLOCK_UNIT;
         }
         else if (0 == strcmp("PARTEI", name)) {
+            faction *f;
             memset(ctx, 0, sizeof(context));
-            ctx->faction = faction_create(keyv[0]);
+            f = ctx->faction = faction_create(keyv[0]);
+            f->lastorders = turn - 1;
+            f->start_turn = 0;
+            f->next = factions;
+            factions = f;
             ctx->block = BLOCK_FACTION;
         }
         else if (0 == strcmp("RESOURCE", name)) {
             ctx->block = BLOCK_RESOURCE;
-            ctx->stack = NULL;
+            memset(&ctx->resource, 0, sizeof(ctx->resource));
         }
         else if (0 == strcmp("BURG", name)) {
             ctx->block = BLOCK_BUILDING;
@@ -267,6 +324,44 @@ static enum CR_Error handle_element(void *udata, const char *name,
     return CR_ERROR_NONE;
 }
 
+static enum CR_Error handle_version(struct context *ctx, tag_t key, const char *value)
+{
+    switch (key) {
+    case TAG_TURN:
+        turn = atoi(value);
+        break;
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_options(struct context *ctx, const char *key, const char *value)
+{
+    if (value[0] == '1') {
+        int option = findoption(key, default_locale);
+        if (option < 0) {
+            int i;
+            for (i = 0; i != MAXOPTIONS; ++i) {
+                if (options[i] && 0 == strcmp(key, options[i])) {
+                    option = i;
+                    break;
+                }
+            }
+        }
+        if (option >= 0) {
+            faction *f = ctx->faction;
+            if (!f) {
+                return CR_ERROR_GRAMMAR;
+            }
+            f->options |= (1 << option);
+        }
+        else {
+            log_error("unknown option %s", key);
+        }
+    }
+    return CR_ERROR_NONE;
+}
 static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
 {
     unit *u = ctx->unit;
@@ -310,23 +405,15 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
+    case TAG_SKILL:
+        ctx->resource.level = atoi(value);
+        break;
     case TAG_NUMBER:
-        if (ctx->stack) {
-            const resource_type *rtype = rt_find(ctx->stack);
-            region_setresource(r, rtype, atoi(value));
-        }
-        else {
-            ctx->stack = value;
-        }
+        ctx->resource.number = atoi(value);
         break;
     case TAG_TYPE:
-        if (ctx->stack) {
-            const resource_type *rtype = rt_find(value);
-            region_setresource(r, rtype, atoi(ctx->stack));
-        }
-        else {
-            ctx->stack = value;
-        }
+        ctx->resource.type = findresourcetype(value, default_locale);
+        break;
     default:
         break;
     }
@@ -340,6 +427,9 @@ static enum CR_Error handle_faction(context *ctx, tag_t key, const char *value)
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
+    case TAG_TYPE:
+        f->race = findrace(value, default_locale);
+        break;
     case TAG_AGE:
         faction_set_age(f, atoi(value));
         break;
@@ -347,7 +437,7 @@ static enum CR_Error handle_faction(context *ctx, tag_t key, const char *value)
     case TAG_SCHOOL:
         break;
     case TAG_NMR:
-        f->lastorders= turn - atoi(value);
+        f->lastorders = turn - atoi(value) - 1;
         break;
     case TAG_LOCALE:
         f->locale = get_locale(value);
@@ -395,6 +485,7 @@ static enum CR_Error handle_region(context *ctx, tag_t key, const char *value)
         }
         if (ter) {
             terraform_region(r, ter);
+            arrfree(r->resources);
         }
         else {
             log_error("import_cr: unknown terrain %s", value);
@@ -477,7 +568,6 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
     case BLOCK_EFFECTS:
-    case BLOCK_OPTIONS:
     case BLOCK_ALLIANCE:
     case BLOCK_GROUP:
     case BLOCK_SHIP:
@@ -486,6 +576,12 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     case BLOCK_COMBATSPELLS:
     case BLOCK_BORDER:
     case BLOCK_PRICES:
+        break;
+    case BLOCK_OPTIONS:
+        err = handle_options(ctx, name, value);
+        break;
+    case BLOCK_VERSION:
+        err = handle_version(ctx, get_key(name), value);
         break;
     case BLOCK_SKILLS:
         err = handle_skill(ctx, value, name);
@@ -592,6 +688,8 @@ int crimport(const char *filename)
             break;
         }
     }
+
+    finish_element(&ctx);
     CR_ParserFree(cp);
     fclose(F);
     return err;
