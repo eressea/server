@@ -2,6 +2,7 @@
 
 /* kernel includes */
 #include "alliance.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
 #include "config.h"
@@ -9,10 +10,10 @@
 #include "curse.h"
 #include "equipment.h"
 #include "faction.h"
+#include "gamedata.h"
 #include "item.h"
 #include "messages.h"
 #include "plane.h"
-#include "region.h"
 #include "resources.h"
 #include "ship.h"
 #include "teleport.h"
@@ -23,22 +24,18 @@
 #include <spells/regioncurse.h>
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
-#include <kernel/messages.h>
-
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/resolve.h>
-#include <util/umlaut.h>
-#include <util/language.h>
 #include <util/rand.h>
+#include <util/resolve.h>
 #include <util/rng.h>
+#include <util/umlaut.h>
+
+#include <modules/autoseed.h>
 
 #include <storage.h>
 #include <strings.h>
-
-#include <modules/autoseed.h>
 
 #include <stb_ds.h>
 
