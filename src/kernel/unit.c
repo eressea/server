@@ -581,6 +581,7 @@ void set_level(struct unit * u, enum skill_t sk, unsigned int value)
         skill* sv = u->skills + s;
         if (sv->id == sk) {
             sk_set_level(sv, value);
+            sv->old = sv->level;
             return;
         }
         ++sv;
@@ -984,7 +985,7 @@ struct skill *add_skill(struct unit * u, enum skill_t sk)
     return sv;
 }
 
-skill *unit_skill(const unit * u, enum skill_t sk)
+struct skill *unit_skill(const struct unit * u, enum skill_t sk)
 {
     assert(u && sk != NOSKILL);
 
@@ -1070,7 +1071,7 @@ static int att_modification(const unit * u, enum skill_t sk)
     return (int)result;
 }
 
-static int terrain_mod(const race * rc, enum skill_t sk, const region *r)
+int terrain_mod(const race * rc, enum skill_t sk, const region *r)
 {
     static int rc_cache, t_cache;
     static const race *rc_dwarf, *rc_insect, *rc_elf;
@@ -1113,14 +1114,6 @@ static int terrain_mod(const race * rc, enum skill_t sk, const region *r)
         }
     }
     return 0;
-}
-
-static int rc_skillmod(const struct race *rc, enum skill_t sk)
-{
-    if (!skill_enabled(sk)) {
-        return 0;
-    }
-    return rc->bonus[sk];
 }
 
 int get_modifier(const unit * u, enum skill_t sk, int level, const region * r, bool noitem)
@@ -1598,21 +1591,23 @@ const struct race *u_race(const struct unit *u)
 void u_setrace(struct unit *u, const struct race *rc)
 {
     assert(rc);
-    if (!u->faction) {
-        u->_race = rc;
-    }
-    else {
-        int n = 0;
-        if (count_unit(u)) {
-            --n;
+    if (u->_race != rc) {
+        if (!u->faction) {
+            u->_race = rc;
         }
-        u->_race = rc;
-        if (count_unit(u)) {
-            ++n;
-        }
-        if (n != 0) {
-            u->faction->num_units += n;
-            u->faction->num_people += n * u->number;
+        else {
+            int n = 0;
+            if (count_unit(u)) {
+                --n;
+            }
+            u->_race = rc;
+            if (count_unit(u)) {
+                ++n;
+            }
+            if (n != 0) {
+                u->faction->num_units += n;
+                u->faction->num_people += n * u->number;
+            }
         }
     }
 }

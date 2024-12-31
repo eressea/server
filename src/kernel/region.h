@@ -220,6 +220,7 @@ const char *write_regionname(const struct region *r, const struct faction *f,
 struct region *region_create(int uid);
 void add_region(region *r, int x, int y);
 struct region *new_region(int x, int y, struct plane *pl, int uid);
+void create_land(struct region *r);
 void remove_region(region ** rlist, region * r);
 void terraform_region(struct region *r, const struct terrain_type *terrain);
 void init_region(struct region *r);

@@ -140,6 +140,7 @@ void transfermen(struct unit* src, struct unit* dst, int n);
 int eff_skill(const struct unit* u, const struct skill* sv, const struct region* r);
 int effskill_study(const struct unit* u, enum skill_t sk);
 
+int terrain_mod(const struct race *rc, enum skill_t sk, const struct region *r);
 int get_modifier(const struct unit* u, enum skill_t sk, int level,
     const struct region* r, bool noitem);
 int remove_unit(struct unit** ulist, struct unit* u);

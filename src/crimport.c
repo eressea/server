@@ -16,6 +16,7 @@
 #include <kernel/region.h>
 #include <kernel/resources.h>
 #include <kernel/skill.h>
+#include <kernel/skills.h>
 #include <kernel/terrain.h>
 #include <kernel/unit.h>
 
@@ -362,6 +363,20 @@ static enum CR_Error handle_options(struct context *ctx, const char *key, const 
     }
     return CR_ERROR_NONE;
 }
+
+static void update_unit(unit *u, const struct race *rc, int number)
+{
+    if (rc) {
+        u_setrace(u, rc);
+    }
+    if (number > u->number) {
+        scale_number(u, number);
+    }
+    if (rc && number > 0) {
+        u->hp = unit_max_hp(u) * u->number;
+    }
+}
+
 static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
 {
     unit *u = ctx->unit;
@@ -371,17 +386,17 @@ static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
     case TAG_OTHER_FACTION:
     case TAG_PREFIX:
         break;
-    case TAG_TYPE:
-        u_setrace(u, findrace(value, default_locale));
-        break;
     case TAG_STATUS:
         unit_setstatus(u, atoi(value));
         break;
     case TAG_NAME:
         unit_setname(u, value);
         break;
+    case TAG_TYPE:
+        update_unit(u, findrace(value, default_locale), u->number);
+        break;
     case TAG_NUMBER:
-        scale_number(u, atoi(value));
+        update_unit(u, u_race(u), atoi(value));
         break;
     case TAG_FACTION:
         u_setfaction(u, findfaction(atoi(value)));
@@ -465,7 +480,16 @@ static enum CR_Error handle_region(context *ctx, tag_t key, const char *value)
     }
     switch (key) {
     case TAG_NAME:
+        if (!r->land) {
+            create_land(r);
+        }
         region_setname(r, value);
+        break;
+    case TAG_DESCRIPTION:
+        if (!r->land) {
+            create_land(r);
+        }
+        region_setinfo(r, value);
         break;
     case TAG_ID: {
         int uid = atoi(value);
@@ -510,9 +534,17 @@ static enum CR_Error handle_skill(context *ctx, const char *value, const char *n
         log_error("import_cr: unknown skill %s", name);
     }
     else {
+        const struct race *rc = u_race(u);
         char *val = strchr(value, ' ');
-        int level = atoi(val + 1);
-        set_level(u, sk, level);
+        int level = atoi(val + 1) - rc_skillmod(rc, sk) - terrain_mod(rc, sk, u->region);
+        if (level > 0) {
+            struct skill *sv = add_skill(u, sk);
+            sk_set_level(sv, level);
+            sv->old = sv->level;
+        }
+        if (sk == SK_STAMINA) {
+            update_unit(u, rc, u->number);
+        }
     }
     return CR_ERROR_NONE;
 }
