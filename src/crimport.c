@@ -471,9 +471,17 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
     case TAG_NUMBER:
         ctx->extra.resource.number = atoi(value);
         break;
-    case TAG_TYPE:
-        ctx->extra.resource.type = findresourcetype(value, default_locale);
+    case TAG_TYPE: {
+        const resource_type *rtype;
+        if (value[0] == 'M' && 0 == strcmp("Mallorn", value)) {
+            rtype = rt_find("mallorntree");
+        }
+        else {
+            rtype = findresourcetype(value, default_locale);
+        }
+        ctx->extra.resource.type = rtype;
         break;
+    }
     default:
         break;
     }
