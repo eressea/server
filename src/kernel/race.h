@@ -178,6 +178,7 @@ variant rc_magres(const struct race *rc);
 double rc_maxaura(const struct race *rc);
 int rc_armor_bonus(const struct race *rc);
 int rc_scare(const struct race *rc);
+int rc_skillmod(const struct race *rc, enum skill_t sk);
 const char * rc_hungerdamage(const race *rc);
 const race *rc_otherrace(const race *rc);
 

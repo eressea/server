@@ -413,6 +413,14 @@ int rc_scare(const struct race *rc)
     return v ? v->i : 0;
 }
 
+int rc_skillmod(const struct race *rc, enum skill_t sk)
+{
+    if (!skill_enabled(sk)) {
+        return 0;
+    }
+    return rc->bonus[sk];
+}
+
 int rc_luxury_trade(const struct race *rc)
 {
     if (rc) {

@@ -1133,7 +1133,13 @@ static void reset_herbs(region *r) {
     }
 }
 
-static void create_land(region *r) {
+void create_land(region *r) {
+    if (!r->land) {
+        r->land = calloc(1, sizeof(land_region));
+    }
+}
+
+static void init_land(region *r) {
     struct surround {
         const luxury_type *type;
         int value;
@@ -1231,8 +1237,8 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
     else {
         if (!r->land) {
-            r->land = calloc(1, sizeof(land_region));
             create_land(r);
+            init_land(r);
         }
         else {
             reset_herbs(r);
