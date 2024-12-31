@@ -7,6 +7,8 @@
 #include "crimport.h"
 #include "reports.h"
 
+#include <attributes/raceprefix.h>
+
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -26,10 +28,12 @@
 
 #include <crpat.h>
 #include <critbit.h>
+#include <strings.h>
 
 #include <stb_ds.h>
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,6 +80,7 @@ typedef enum tag_t {
     TAG_PREFIX,
     TAG_DESCRIPTION,
     TAG_MEMO,
+    TAG_GUARD,
     TAG_BUILDING,
     TAG_SHIP,
     TAG_TERRAIN,
@@ -145,6 +150,7 @@ static void init_keys(void)
     add_key("Kampfstatus", TAG_STATUS);
     add_key("Status", TAG_STATUS);
     add_key("privat", TAG_MEMO);
+    add_key("bewacht", TAG_GUARD);
     add_key("Burg", TAG_BUILDING);
     add_key("Schiff", TAG_SHIP);
 }
@@ -185,26 +191,31 @@ typedef struct context {
     struct ship *ship;
     struct building *building;
 
-    struct {
-        const struct resource_type *type;
-        int number;
-        int level;
-    } resource;
+    union {
+        struct {
+            const struct resource_type *type;
+            int number;
+            int level;
+        } resource;
+        struct {
+            char *prefix;
+        } unit;
+    } extra;
 } context;
 
 static enum CR_Error finish_resource(struct context *ctx, region *r)
 {
-    if (ctx->resource.type && ctx->resource.number) {
-        rawmaterial *rm = region_setresource(r, ctx->resource.type, ctx->resource.number);
+    if (ctx->extra.resource.type && ctx->extra.resource.number) {
+        rawmaterial *rm = region_setresource(r, ctx->extra.resource.type, ctx->extra.resource.number);
         if (rm) {
-            if (ctx->resource.level > 0) {
-                rm->level = ctx->resource.level;
+            if (ctx->extra.resource.level > 0) {
+                rm->level = ctx->extra.resource.level;
             }
             else {
                 return CR_ERROR_GRAMMAR;
             }
         }
-        else if (ctx->resource.level > 0) {
+        else if (ctx->extra.resource.level > 0) {
             return CR_ERROR_GRAMMAR;
         }
         return CR_ERROR_NONE;
@@ -212,11 +223,35 @@ static enum CR_Error finish_resource(struct context *ctx, region *r)
     return CR_ERROR_GRAMMAR;
 }
 
+static enum CR_Error finish_unit(struct context *ctx, unit *u)
+{
+    char *prefix = ctx->extra.unit.prefix;
+    if (prefix) {
+        if (!u->faction) {
+            return CR_ERROR_GRAMMAR;
+        }
+        set_prefix(&u->faction->attribs, prefix);
+        free(prefix);
+    }
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error finish_element(struct context *ctx)
 {
     if (ctx->block == BLOCK_RESOURCE) {
-        region *r = ctx->region;
         int err;
+        unit *u = ctx->unit;
+        if (!u) {
+            return CR_ERROR_GRAMMAR;
+        }
+        err = finish_unit(ctx, u);
+        if (err != CR_ERROR_NONE) {
+            return err;
+        }
+    }
+    else if (ctx->block == BLOCK_RESOURCE) {
+        int err;
+        region *r = ctx->region;
         if (!r) {
             return CR_ERROR_GRAMMAR;
         }
@@ -269,7 +304,7 @@ static enum CR_Error handle_element(void *udata, const char *name,
         }
         else if (0 == strcmp("RESOURCE", name)) {
             ctx->block = BLOCK_RESOURCE;
-            memset(&ctx->resource, 0, sizeof(ctx->resource));
+            memset(&ctx->extra.resource, 0, sizeof(ctx->extra.resource));
         }
         else if (0 == strcmp("BURG", name)) {
             ctx->block = BLOCK_BUILDING;
@@ -384,7 +419,17 @@ static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
     case TAG_BUILDING:
     case TAG_SHIP:
     case TAG_OTHER_FACTION:
+        break;
     case TAG_PREFIX:
+        if (u->faction) {
+            set_prefix(&u->faction->attribs, value);
+        }
+        else {
+            ctx->extra.unit.prefix = str_strdup(value);
+        }
+        break;
+    case TAG_GUARD:
+        setguard(u, true);
         break;
     case TAG_STATUS:
         unit_setstatus(u, atoi(value));
@@ -421,13 +466,13 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
     }
     switch (key) {
     case TAG_SKILL:
-        ctx->resource.level = atoi(value);
+        ctx->extra.resource.level = atoi(value);
         break;
     case TAG_NUMBER:
-        ctx->resource.number = atoi(value);
+        ctx->extra.resource.number = atoi(value);
         break;
     case TAG_TYPE:
-        ctx->resource.type = findresourcetype(value, default_locale);
+        ctx->extra.resource.type = findresourcetype(value, default_locale);
         break;
     default:
         break;
