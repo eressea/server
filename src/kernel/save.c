@@ -1430,10 +1430,8 @@ ship *read_ship(gamedata *data)
     int n;
     storage *store = data->store;
 
-    sh = (ship *)calloc(1, sizeof(ship));
-    if (!sh) abort();
-    READ_INT(store, &sh->no);
-    shash(sh);
+    READ_INT(store, &n);
+    sh = ship_create(n);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
         if (utf8_trim(name) != 0) {

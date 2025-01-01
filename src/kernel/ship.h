@@ -113,6 +113,7 @@ void free_ship(ship *s);
 void free_ships(void);
 
 const char *ship_getname(const ship *sh);
+void ship_setinfo(ship *self, const char *info);
 void ship_setname(ship *self, const char *name);
 int shipspeed(const ship *sh, const struct unit *u);
 
@@ -123,6 +124,7 @@ int ship_captain_minskill(const ship *sh);
 int ship_damage_percent(const ship *sh);
 void scale_ship(ship *sh, int n);
 
+struct ship *ship_create(int id);
 void create_ship(struct unit* u, const ship_type* newtype,
     int size, struct order* ord);
 void continue_ship(struct unit* u, int size);

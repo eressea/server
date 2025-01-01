@@ -134,8 +134,7 @@ static int tolua_ship_set_size(lua_State * L)
 static int tolua_ship_set_display(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
-    free(sh->display);
-    sh->display = str_strdup(tolua_tostring(L, 2, NULL));
+    ship_setinfo(sh, tolua_tostring(L, 2, NULL));
     return 0;
 }
 
