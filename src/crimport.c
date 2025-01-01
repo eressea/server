@@ -14,6 +14,7 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
+#include <kernel/group.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/plane.h>
@@ -48,7 +49,7 @@ typedef enum block_t {
     BLOCK_OTHER,
     BLOCK_VERSION,
     BLOCK_OPTIONS,
-    BLOCK_ALLIANCE,
+    BLOCK_ALLY,
     BLOCK_GROUP,
     BLOCK_REGION,
     BLOCK_PRICES,
@@ -148,6 +149,7 @@ static void init_tags(void)
     add_tag("Typ", TAG_TYPE);
     add_tag("type", TAG_TYPE);
     add_tag("Name", TAG_NAME);
+    add_tag("name", TAG_NAME);
     add_tag("Parteiname", TAG_NAME);
     add_tag("Anzahl", TAG_NUMBER);
     add_tag("number", TAG_NUMBER);
@@ -206,7 +208,8 @@ typedef struct context {
     block_t block;
     struct region *region;
     struct faction *faction;
-    struct ally *allies;
+    struct group *group;
+    struct ally *ally;
     struct unit *unit;
     struct ship *ship;
     struct building *building;
@@ -320,6 +323,7 @@ static enum CR_Error handle_element(void *udata, const char *name,
             f->start_turn = 0;
             f->next = factions;
             factions = f;
+            ctx->ally = NULL;
             ctx->block = BLOCK_FACTION;
         }
         else if (0 == strcmp("RESOURCE", name)) {
@@ -355,17 +359,29 @@ static enum CR_Error handle_element(void *udata, const char *name,
         else if (0 == strcmp("ALLIANZ", name)) {
             int no = keyv[0];
             faction *f = get_faction(no);
-            if (!ctx->faction) {
+            if (ctx->group) {
+                ctx->ally = ally_set(&ctx->group->allies, f, HELP_ALL);
+            }
+            else if (ctx->faction) {
+                ctx->ally = ally_set(&ctx->faction->allies, f, HELP_ALL);
+            }
+            else {
                 return CR_ERROR_GRAMMAR;
             }
-            ally_set(&ctx->faction->allies, f, HELP_ALL);
-            ctx->block = BLOCK_ALLIANCE;
+            ctx->block = BLOCK_ALLY;
         }
         else if (0 == strcmp("VERSION", name)) {
             ctx->block = BLOCK_VERSION;
         }
         else if (0 == strcmp("GRUPPE", name)) {
-            ctx->block = BLOCK_GROUP;
+            if (ctx->faction) {
+                ctx->group = group_create(ctx->faction, keyv[0]);
+                ctx->ally = NULL;
+                ctx->block = BLOCK_GROUP;
+            }
+            else {
+                return CR_ERROR_GRAMMAR;
+            }
         }
         else if (0 == strcmp("GRENZE", name)) {
             ctx->block = BLOCK_BORDER;
@@ -611,16 +627,37 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
-static enum CR_Error handle_alliance(context *ctx, tag_t key, const char *value)
+static enum CR_Error handle_group(context *ctx, tag_t key, const char *value)
+{
+    group *g = ctx->group;
+    if (!g) {
+        return CR_ERROR_GRAMMAR;
+    }
+    switch (key) {
+    case TAG_NAME:
+        g->name = str_strdup(value);
+        break;
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_ally(context *ctx, tag_t key, const char *value)
 {
     faction *f = ctx->faction;
-    struct ally *al = ctx->allies;
+    struct ally *al = ctx->ally;
     if (!f) {
         return CR_ERROR_GRAMMAR;
     }
     switch (key) {
     case TAG_NAME:
-        (void)al;        
+        faction_setname(al->faction, value);
+        break;
+    case TAG_STATUS:
+        al->status = atoi(value);
+        break;
+    default:
         break;
     }
     return CR_ERROR_NONE;
@@ -791,13 +828,15 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
     case BLOCK_EFFECTS:
-    case BLOCK_GROUP:
     case BLOCK_SPELLS:
     case BLOCK_COMBATSPELLS:
     case BLOCK_BORDER:
         break;
-    case BLOCK_ALLIANCE:
-        err = handle_alliance(ctx, get_tag(name), value);
+    case BLOCK_GROUP:
+        err = handle_group(ctx, get_tag(name), value);
+        break;
+    case BLOCK_ALLY:
+        err = handle_ally(ctx, get_tag(name), value);
         break;
     case BLOCK_SHIP:
         err = handle_ship(ctx, get_tag(name), value);

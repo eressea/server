@@ -22,11 +22,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef struct ally {
-    struct faction *faction;
-    int status;
-} ally;
-
 int allies_walk(struct ally *a_allies, cb_allies_walk callback, void *udata)
 {
     size_t i, len = arrlen(a_allies);

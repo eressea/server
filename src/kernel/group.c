@@ -11,11 +11,13 @@
 #include <attributes/raceprefix.h>
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/gamedata.h>
+#include <util/lists.h>
 #include <util/resolve.h>
 #include <util/unicode.h>
+
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 
 #include <storage.h>
 #include <strings.h>
@@ -30,24 +32,27 @@
 static group *ghash[GMAXHASH];
 static int maxgid;
 
-group *create_group(faction * f, const char *name, int gid)
+group *group_create(faction *f, int gid)
 {
-    group **gp = &f->groups;
     int index = gid % GMAXHASH;
     group *g = calloc(1, sizeof(group));
 
     if (!g) abort();
-    while (*gp)
-        gp = &(*gp)->next;
-    *gp = g;
-
+    addlist(&f->groups, g);
     if (gid > maxgid) maxgid = gid;
-    g->name = str_strdup(name);
-    g->gid = gid;
     g->f = f;
-
+    g->gid = gid;
     g->nexthash = ghash[index];
     return ghash[index] = g;
+}
+
+group *create_group(faction * f, const char *name, int gid)
+{
+    group *g = group_create(f, gid);
+
+    g->name = str_strdup(name);
+    return g;
+
 }
 
 static void init_group(faction * f, group * g)

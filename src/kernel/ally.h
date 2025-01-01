@@ -22,7 +22,11 @@ struct faction;
 struct group;
 struct gamedata;
 struct unit;
-struct ally;
+
+typedef struct ally {
+	struct faction *faction;
+	int status;
+} ally;
 
 int ally_status(const char *s);
 int ally_get(struct ally *a_allies, const struct faction *f);
