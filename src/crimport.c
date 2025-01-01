@@ -9,6 +9,7 @@
 
 #include <attributes/raceprefix.h>
 
+#include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
@@ -17,6 +18,7 @@
 #include <kernel/race.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
+#include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/skills.h>
 #include <kernel/terrain.h>
@@ -24,6 +26,7 @@
 
 #include <util/base36.h>
 #include <util/language.h>
+#include <util/lists.h>
 #include <util/log.h>
 
 #include <crpat.h>
@@ -83,6 +86,8 @@ typedef enum tag_t {
     TAG_GUARD,
     TAG_BUILDING,
     TAG_SHIP,
+    TAG_SIZE,
+    TAG_DAMAGE,
     TAG_TERRAIN,
 } tag_t;
 
@@ -153,6 +158,8 @@ static void init_keys(void)
     add_key("bewacht", TAG_GUARD);
     add_key("Burg", TAG_BUILDING);
     add_key("Schiff", TAG_SHIP);
+    add_key("Groesse", TAG_SIZE);
+    add_key("Schaden", TAG_DAMAGE);
 }
 
 static tag_t get_key(const char *name)
@@ -307,9 +314,29 @@ static enum CR_Error handle_element(void *udata, const char *name,
             memset(&ctx->extra.resource, 0, sizeof(ctx->extra.resource));
         }
         else if (0 == strcmp("BURG", name)) {
+            region *r = ctx->region;
+            building *b;
+            if (!r) {
+                return CR_ERROR_GRAMMAR;
+            }
+            b = ctx->building = building_create(keyv[0]);
+            b->region = r;
+            addlist(&r->buildings, b);
+            ctx->ship = NULL;
+            ctx->unit = NULL;
             ctx->block = BLOCK_BUILDING;
         }
         else if (0 == strcmp("SCHIFF", name)) {
+            region *r = ctx->region;
+            ship *sh;
+            if (!r) {
+                return CR_ERROR_GRAMMAR;
+            }
+            ctx->ship = sh = ship_create(keyv[0]);
+            sh->region = r;
+            addlist(&r->ships, sh);
+            ctx->building = NULL;
+            ctx->unit = NULL;
             ctx->block = BLOCK_SHIP;
         }
         else if (0 == strcmp("ALLIANZ", name)) {
@@ -372,6 +399,75 @@ static enum CR_Error handle_version(struct context *ctx, tag_t key, const char *
     return CR_ERROR_NONE;
 }
 
+static enum CR_Error handle_building(struct context *ctx, tag_t key, const char *value)
+{
+    building *b = ctx->building;
+    if (!b) {
+        return CR_ERROR_GRAMMAR;
+    }
+    switch (key) {
+    case TAG_SIZE:
+        b->size = atoi(value);
+        break;
+    case TAG_NAME:
+        building_setname(b, value);
+        break;
+    case TAG_DESCRIPTION:
+        building_setinfo(b, value);
+        break;
+    case TAG_TYPE: {
+        b->type = findbuildingtype(value, default_locale);
+        if (!b->type) {
+            b->type = bt_find("castle");
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_ship(struct context *ctx, tag_t key, const char *value)
+{
+    ship *sh = ctx->ship;
+    if (!sh) {
+        return CR_ERROR_GRAMMAR;
+    }
+    switch (key) {
+    case TAG_NUMBER:
+        sh->number = atoi(value);
+        break;
+    case TAG_SIZE:
+        sh->size = atoi(value);
+        break;
+    case TAG_DAMAGE:
+        sh->damage = atoi(value);
+        break;
+    case TAG_NAME:
+        ship_setname(sh, value);
+        break;
+    case TAG_DESCRIPTION:
+        ship_setinfo(sh, value);
+        break;
+    case TAG_TYPE: {
+        sh->type = findshiptype(value, default_locale);
+        if (!sh->type) {
+            sh->type = st_find("boat");
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_prices(struct context *ctx, const char *key, const char *value)
+{
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error handle_options(struct context *ctx, const char *key, const char *value)
 {
     if (value[0] == '1') {
@@ -416,9 +512,13 @@ static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
 {
     unit *u = ctx->unit;
     switch (key) {
-    case TAG_BUILDING:
-    case TAG_SHIP:
     case TAG_OTHER_FACTION:
+        break;
+    case TAG_BUILDING:
+        u_set_building(u, findbuilding(atoi(value)));
+        break;
+    case TAG_SHIP:
+        u_set_ship(u, findship(atoi(value)));
         break;
     case TAG_PREFIX:
         if (u->faction) {
@@ -655,12 +755,18 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     case BLOCK_EFFECTS:
     case BLOCK_ALLIANCE:
     case BLOCK_GROUP:
-    case BLOCK_SHIP:
-    case BLOCK_BUILDING:
     case BLOCK_SPELLS:
     case BLOCK_COMBATSPELLS:
     case BLOCK_BORDER:
+        break;
+    case BLOCK_SHIP:
+        err = handle_ship(ctx, get_key(name), value);
+        break;
+    case BLOCK_BUILDING:
+        err = handle_building(ctx, get_key(name), value);
+        break;
     case BLOCK_PRICES:
+        err = handle_prices(ctx, name, value);
         break;
     case BLOCK_OPTIONS:
         err = handle_options(ctx, name, value);
