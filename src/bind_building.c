@@ -8,8 +8,6 @@
 #include <util/log.h>
 #include <util/language.h>
 
-#include <strings.h>
-
 #include <lua.h>
 #include <lauxlib.h>
 #include <tolua.h>

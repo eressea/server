@@ -14,8 +14,6 @@
 #include <util/language.h>
 #include <util/log.h>
 
-#include <strings.h>
-
 #include <tolua.h>
 #include <lauxlib.h>
 #include <lua.h>
