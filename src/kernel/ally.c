@@ -16,118 +16,89 @@
 #include <storage.h>
 #include <strings.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
-#define BLOCKSIZE 15
-typedef struct allies {
-    struct allies *next;
-    int num;
-    struct faction *factions[BLOCKSIZE];
-    int status[BLOCKSIZE];
-} allies;
+typedef struct ally {
+    struct faction *faction;
+    int status;
+} ally;
 
-static void block_insert(allies *al, struct faction *f, int status) {
-    int i = al->num++;
-    assert(status > 0);
-    al->status[i] = status;
-    al->factions[i] = f;
-    /* TODO: heapify */
-}
-
-static int block_search(allies *al, const struct faction *f) {
-    int i;
-    /* TODO: binary search */
-    for (i = 0; i != al->num; ++i) {
-        if (al->factions[i] == f) {
-            return i;
-        }
-    }
-    return BLOCKSIZE;
-}
-
-int allies_walk(struct allies *all, cb_allies_walk callback, void *udata)
+int allies_walk(struct ally *a_allies, cb_allies_walk callback, void *udata)
 {
-    allies *al;
-    for (al = all; al; al = al->next) {
-        int i;
-        for (i = 0; i != al->num; ++i) {
-            int e = callback(all, al->factions[i], al->status[i], udata);
-            if (e != 0) {
-                return e;
-            }
+    size_t i, len = arrlen(a_allies);
+    for (i = 0; i != len; ++i) {
+        ally *al = a_allies + i;
+        int e = callback(al->faction, al->status, udata);
+        if (e != 0) {
+            return e;
         }
     }
     return 0;
 }
 
-int ally_get(allies *al, const struct faction *f)
+int ally_get(ally *a_allies, const struct faction *f)
 {
-    for (; al; al =  al->next) {
-        int i = block_search(al, f);
-        if (i != BLOCKSIZE) {
-            return al->status[i];
+    size_t i, len = arrlen(a_allies);
+    for (i = 0; i != len; ++i) {
+        ally *al = a_allies + i;
+        if (al->faction == f) {
+            return al->status;
         }
     }
     return 0;
 }
 
-void ally_set(allies **p_al, struct faction *f, int status)
+struct ally *ally_set(ally **p_allies, struct faction *f, int status)
 {
-    while (*p_al) {
-        allies *al = *p_al;
-        int i = block_search(al, f);
-        if (i != BLOCKSIZE) {
+    ally *a_allies = *p_allies;
+    size_t i, len = arrlen(a_allies);
+    for (i = 0; i != len; ++i) {
+        ally *al = a_allies + i;
+        if (al->faction == f) {
             if (status == 0) {
-                if (--al->num != i) {
-                    al->factions[i] = al->factions[al->num];
-                    al->status[i] = al->status[al->num];
-                    /* TODO: repair heap up or down */
+                if (len == 1) {
+                    arrfree(*p_allies);
                 }
-                else if (al->num == 0) {
-                    *p_al = al->next;
-                    free(al);
-                    return;
+                else {
+                    arrdelswap(*p_allies, i);
                 }
+                return NULL;
             }
             else {
-                al->status[i] = status;
+                al->status = status;
             }
-            return;
+            return al;
         }
-        if (al->num < BLOCKSIZE) {
-            if (status > 0) {
-                block_insert(al, f, status);
-            }
-            return;
-        }
-        p_al = &al->next;
     }
     if (status > 0) {
-        *p_al = calloc(1, sizeof(allies));
-        block_insert(*p_al, f, status);
+        ally *al = arraddnptr(*p_allies, 1);
+        al->faction = f;
+        al->status = status;
+        return al;
     }
+    return NULL;
 }
 
-void write_allies(gamedata * data, const allies *alist)
+void write_allies(struct gamedata * data, const struct ally *a_allies)
 {
-    const allies *al;
-    for (al = alist; al; al = al->next) {
-        int i;
-        for (i = 0; i != al->num; ++i) {
-            const faction * f = al->factions[i];
-            if (f && faction_alive(f)) {
-                write_faction_reference(f, data->store);
-                assert(al->status[i] > 0);
-                WRITE_INT(data->store, al->status[i]);
-            }
+    size_t i, len = arrlen(a_allies);
+    for (i = 0; i != len; ++i) {
+        const ally *al = a_allies + i;
+        const faction * f = al->faction;
+        if (f && faction_alive(f)) {
+            write_faction_reference(f, data->store);
+            assert(al->status > 0);
+            WRITE_INT(data->store, al->status);
         }
     }
     write_faction_reference(NULL, data->store);
 }
 
-void read_allies(gamedata * data, allies **p_al)
+void read_allies(gamedata * data, ally **p_allies)
 {
     for (;;) {
         faction *f;
@@ -142,32 +113,28 @@ void read_allies(gamedata * data, allies **p_al)
         READ_INT(data->store, &status);
         /* NB: some data files have allies with status=0 */
         if (status > 0) {
-            ally_set(p_al, f, status);
+            ally_set(p_allies, f, status);
         }
     }
 }
 
-void allies_free(allies *al)
+void allies_free(ally *al)
 {
-    while (al) {
-        allies * an = al->next;
-        free(al);
-        al = an;
-    }
+    arrfree(al);
 }
 
-allies *allies_clone(const allies *al) {
-    allies *al_clone = NULL, **al_end = &al_clone;
+ally *allies_clone(const ally *al) {
+    if (al) {
+        ally *al_clone = NULL;
+        size_t len = arrlen(al);
 
-    for (; al; al = al->next) {
-        allies *al_new = calloc(1, sizeof(allies));
-        if (!al_new) abort();
-        memcpy(al_new, al, sizeof(allies));
-        *al_end = al_new;
-        al_end = &al_new->next;
+        arraddnptr(al_clone, len);
+        if (al_clone) {
+            memcpy(al_clone, al, len * sizeof(ally));
+            return al_clone;
+        }
     }
-    *al_end = NULL;
-    return al_clone;
+    return NULL;
 }
 
 static int ally_flag(const char *s, int help_mask)
@@ -305,7 +272,7 @@ int
 alliedgroup(const struct faction *f,
     const struct faction *f2, const struct group *g, int mask)
 {
-    allies *all = g ? g->allies : f->allies;
+    ally *all = g ? g->allies : f->allies;
     int status;
 
     if (!(faction_alive(f) && faction_alive(f2))) {

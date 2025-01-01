@@ -85,7 +85,7 @@ static void free_faction(faction * f)
         f->groups = g->next;
         free_group(g);
     }
-    freelist(f->allies);
+    allies_free(f->allies);
 
     free(f->email);
     free(f->name);

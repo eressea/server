@@ -68,7 +68,7 @@ extern "C" {
         int num_people;             /* Anzahl Personen ohne Monster */
         int num_units;
         int options;
-        struct allies *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
+        struct ally *allies; /* alliedgroup and others should check sf.faction.alive before using a faction from f.allies */
         struct group *groups; /* alliedgroup and others should check sf.faction.alive before using a faction from f.groups */
         score_t score;
         struct alliance *alliance;

@@ -994,8 +994,7 @@ struct print_ally_s {
     FILE *F;
 };
 
-static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
-    UNUSED_ARG(al);
+static int print_ally_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         struct print_ally_s *data = (struct print_ally_s *)udata;
         int mode = alliance_status(data->f, af, status);
@@ -1010,7 +1009,7 @@ static void show_allies_cr(FILE * F, const faction * f, const group *g)
     struct print_ally_s data;
     data.F = F;
     data.f = f;
-    struct allies *sf = g ? g->allies : f->allies;
+    struct ally *sf = g ? g->allies : f->allies;
     allies_walk(sf, print_ally_cb, &data);
 }
 

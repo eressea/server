@@ -8,7 +8,7 @@ typedef struct group {
     struct faction *f;
     struct attrib *attribs;
     char *name;
-    struct allies *allies;
+    struct ally *allies;
     int gid;
     int members;
 } group;

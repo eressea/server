@@ -22,18 +22,18 @@ struct faction;
 struct group;
 struct gamedata;
 struct unit;
-struct allies;
+struct ally;
 
 int ally_status(const char *s);
-int ally_get(struct allies *al, const struct faction *f);
-void ally_set(struct allies **p_al, struct faction *f, int status);
-void write_allies(struct gamedata * data, const struct allies *alist);
-void read_allies(struct gamedata * data, struct allies **sfp);
-typedef int (*cb_allies_walk)(struct allies *, struct faction *, int, void *);
-int allies_walk(struct allies *allies, cb_allies_walk callback, void *udata);
-struct allies *allies_clone(const struct allies *al);
+int ally_get(struct ally *a_allies, const struct faction *f);
+struct ally *ally_set(struct ally **p_allies, struct faction *f, int status);
+void write_allies(struct gamedata *data, const struct ally *a_allies);
+void read_allies(struct gamedata * data, struct ally **sfp);
+typedef int (*cb_allies_walk)(struct faction *, int, void *);
+int allies_walk(struct ally *a_allies, cb_allies_walk callback, void *udata);
+struct ally *allies_clone(const struct ally *al);
 
-void allies_free(struct allies *al);
+void allies_free(struct ally *al);
 
     int AllianceAuto(void);        /* flags that allied factions get automatically */
     int HelpMask(void);    /* flags restricted to allied factions */

@@ -1414,7 +1414,7 @@ void quit(void)
 int ally_cmd(unit * u, struct order *ord)
 {
     char token[128];
-    struct allies **sfp;
+    struct ally **sfp;
     faction *f;
     int keyword, not_kw;
     const char *s;

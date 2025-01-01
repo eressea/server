@@ -1408,8 +1408,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
     return 0;
 }
 
-static int count_allies_cb(struct allies *al, faction *af, int status, void *udata) {
-    (void)al;
+static int count_allies_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         int *num = (int *)udata;
         if (status > 0) {
@@ -1485,8 +1484,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
     }
 }
 
-static int show_allies_cb(struct allies *al, faction *af, int status, void *udata) {
-    (void)al;
+static int show_allies_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         struct show_s *show = (struct show_s *)udata;
         const faction *f = show->f;
@@ -1556,7 +1554,7 @@ static int show_allies_cb(struct allies *al, faction *af, int status, void *udat
     return 0;
 }
 
-void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct allies * allies, const char *prefix)
+void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct ally * allies, const char *prefix)
 {
     int num_allies = 0;
 
