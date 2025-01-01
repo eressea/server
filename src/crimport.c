@@ -24,6 +24,7 @@
 #include <kernel/skill.h>
 #include <kernel/skills.h>
 #include <kernel/terrain.h>
+#include <kernel/types.h>
 #include <kernel/unit.h>
 
 #include <util/base36.h>
@@ -619,7 +620,7 @@ static enum CR_Error handle_alliance(context *ctx, tag_t key, const char *value)
     }
     switch (key) {
     case TAG_NAME:
-        
+        (void)al;        
         break;
     }
     return CR_ERROR_NONE;
