@@ -8,7 +8,9 @@
 #include "reports.h"
 
 #include <attributes/raceprefix.h>
+#include <attributes/otherfaction.h>
 
+#include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/faction.h>
@@ -101,6 +103,15 @@ typedef enum special_t {
     SPECIAL_DRAGONHOARD
 } special_t;
 
+static faction *get_faction(int no)
+{
+    faction *f = findfaction(no);
+    if (!f) {
+        if (!f) f = faction_create(no);
+    }
+    return f;
+}
+
 static struct critbit_tree cb_keys = CRITBIT_TREE();
 static struct critbit_tree cb_special = CRITBIT_TREE();
 
@@ -124,47 +135,47 @@ static int cb_get(critbit_tree *cb, const char *str, int def)
     return def;
 }
 
-static void add_key(const char *str, tag_t key)
+static void add_tag(const char *str, tag_t key)
 {
     cb_add(&cb_keys, str, (int)key);
 }
 
-static void init_keys(void)
+static void init_tags(void)
 {
-    add_key("id", TAG_ID);
-    add_key("Runde", TAG_TURN);
-    add_key("Typ", TAG_TYPE);
-    add_key("type", TAG_TYPE);
-    add_key("Name", TAG_NAME);
-    add_key("Parteiname", TAG_NAME);
-    add_key("Anzahl", TAG_NUMBER);
-    add_key("number", TAG_NUMBER);
-    add_key("skill", TAG_SKILL);
-    add_key("Partei", TAG_FACTION);
-    add_key("locale", TAG_LOCALE);
-    add_key("age", TAG_AGE);
-    add_key("Optionen", TAG_OPTIONS);
-    add_key("Magiegebiet", TAG_SCHOOL);
-    add_key("nmr", TAG_NMR);
-    add_key("email", TAG_EMAIL);
-    add_key("typprefix", TAG_PREFIX);
-    add_key("Anderepartei", TAG_OTHER_FACTION);
-    add_key("banner", TAG_DESCRIPTION);
-    add_key("Beschr", TAG_DESCRIPTION);
-    add_key("Terrain", TAG_TERRAIN);
-    add_key("Kampfstatus", TAG_STATUS);
-    add_key("Status", TAG_STATUS);
-    add_key("privat", TAG_MEMO);
-    add_key("bewacht", TAG_GUARD);
-    add_key("Burg", TAG_BUILDING);
-    add_key("Schiff", TAG_SHIP);
-    add_key("Groesse", TAG_SIZE);
-    add_key("Schaden", TAG_DAMAGE);
+    add_tag("id", TAG_ID);
+    add_tag("Runde", TAG_TURN);
+    add_tag("Typ", TAG_TYPE);
+    add_tag("type", TAG_TYPE);
+    add_tag("Name", TAG_NAME);
+    add_tag("Parteiname", TAG_NAME);
+    add_tag("Anzahl", TAG_NUMBER);
+    add_tag("number", TAG_NUMBER);
+    add_tag("skill", TAG_SKILL);
+    add_tag("Partei", TAG_FACTION);
+    add_tag("locale", TAG_LOCALE);
+    add_tag("age", TAG_AGE);
+    add_tag("Optionen", TAG_OPTIONS);
+    add_tag("Magiegebiet", TAG_SCHOOL);
+    add_tag("nmr", TAG_NMR);
+    add_tag("email", TAG_EMAIL);
+    add_tag("typprefix", TAG_PREFIX);
+    add_tag("Anderepartei", TAG_OTHER_FACTION);
+    add_tag("banner", TAG_DESCRIPTION);
+    add_tag("Beschr", TAG_DESCRIPTION);
+    add_tag("Terrain", TAG_TERRAIN);
+    add_tag("Kampfstatus", TAG_STATUS);
+    add_tag("Status", TAG_STATUS);
+    add_tag("privat", TAG_MEMO);
+    add_tag("bewacht", TAG_GUARD);
+    add_tag("Burg", TAG_BUILDING);
+    add_tag("Schiff", TAG_SHIP);
+    add_tag("Groesse", TAG_SIZE);
+    add_tag("Schaden", TAG_DAMAGE);
 }
 
-static tag_t get_key(const char *name)
+static tag_t get_tag(const char *name)
 {
-    if (!cb_keys.root) init_keys();
+    if (!cb_keys.root) init_tags();
     return (tag_t)cb_get(&cb_keys, name, TAG_UNKNOWN);
 }
 
@@ -194,6 +205,7 @@ typedef struct context {
     block_t block;
     struct region *region;
     struct faction *faction;
+    struct ally *allies;
     struct unit *unit;
     struct ship *ship;
     struct building *building;
@@ -302,7 +314,7 @@ static enum CR_Error handle_element(void *udata, const char *name,
         else if (0 == strcmp("PARTEI", name)) {
             faction *f;
             memset(ctx, 0, sizeof(context));
-            f = ctx->faction = faction_create(keyv[0]);
+            f = ctx->faction = get_faction(keyv[0]);
             f->lastorders = turn - 1;
             f->start_turn = 0;
             f->next = factions;
@@ -340,6 +352,12 @@ static enum CR_Error handle_element(void *udata, const char *name,
             ctx->block = BLOCK_SHIP;
         }
         else if (0 == strcmp("ALLIANZ", name)) {
+            int no = keyv[0];
+            faction *f = get_faction(no);
+            if (!ctx->faction) {
+                return CR_ERROR_GRAMMAR;
+            }
+            ally_set(&ctx->faction->allies, f, HELP_ALL);
             ctx->block = BLOCK_ALLIANCE;
         }
         else if (0 == strcmp("VERSION", name)) {
@@ -512,8 +530,12 @@ static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
 {
     unit *u = ctx->unit;
     switch (key) {
-    case TAG_OTHER_FACTION:
+    case TAG_OTHER_FACTION: {
+        int no = atoi(value);
+        faction *f = get_faction(no);
+        set_otherfaction(u, f);
         break;
+    }
     case TAG_BUILDING:
         u_set_building(u, findbuilding(atoi(value)));
         break;
@@ -583,6 +605,21 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
         break;
     }
     default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
+static enum CR_Error handle_alliance(context *ctx, tag_t key, const char *value)
+{
+    faction *f = ctx->faction;
+    struct ally *al = ctx->allies;
+    if (!f) {
+        return CR_ERROR_GRAMMAR;
+    }
+    switch (key) {
+    case TAG_NAME:
+        
         break;
     }
     return CR_ERROR_NONE;
@@ -753,17 +790,19 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
     case BLOCK_EFFECTS:
-    case BLOCK_ALLIANCE:
     case BLOCK_GROUP:
     case BLOCK_SPELLS:
     case BLOCK_COMBATSPELLS:
     case BLOCK_BORDER:
         break;
+    case BLOCK_ALLIANCE:
+        err = handle_alliance(ctx, get_tag(name), value);
+        break;
     case BLOCK_SHIP:
-        err = handle_ship(ctx, get_key(name), value);
+        err = handle_ship(ctx, get_tag(name), value);
         break;
     case BLOCK_BUILDING:
-        err = handle_building(ctx, get_key(name), value);
+        err = handle_building(ctx, get_tag(name), value);
         break;
     case BLOCK_PRICES:
         err = handle_prices(ctx, name, value);
@@ -772,7 +811,7 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
         err = handle_options(ctx, name, value);
         break;
     case BLOCK_VERSION:
-        err = handle_version(ctx, get_key(name), value);
+        err = handle_version(ctx, get_tag(name), value);
         break;
     case BLOCK_SKILLS:
         err = handle_skill(ctx, value, name);
@@ -789,28 +828,28 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
         }
         break;
     case BLOCK_FACTION:
-        err = handle_faction(ctx, get_key(name), value);
+        err = handle_faction(ctx, get_tag(name), value);
         if (err != CR_ERROR_NONE) {
             log_warning("parse error in region %d,%d. %s = %s",
                 ctx->region->x, ctx->region->y, name, value);
         }
         break;
     case BLOCK_REGION:
-        err = handle_region(ctx, get_key(name), value);
+        err = handle_region(ctx, get_tag(name), value);
         if (err != CR_ERROR_NONE) {
             log_warning("parse error in region %d,%d. %s = %s",
                 ctx->region->x, ctx->region->y, name, value);
         }
         break;
     case BLOCK_RESOURCE:
-        err = handle_resource(ctx, get_key(name), value);
+        err = handle_resource(ctx, get_tag(name), value);
         if (err != CR_ERROR_NONE) {
             log_warning("parse error in resource for region %d,%d. %s = %s",
                 ctx->region->x, ctx->region->y, name, value);
         }
         break;
     case BLOCK_UNIT:
-        err = handle_unit(ctx, get_key(name), value);
+        err = handle_unit(ctx, get_tag(name), value);
         if (err != CR_ERROR_NONE) {
             log_warning("parse error in unit %s. %s = %s",
                 itoa36(ctx->unit->no), name, value);
