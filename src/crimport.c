@@ -13,6 +13,7 @@
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
+#include <kernel/connection.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
@@ -93,11 +94,14 @@ typedef enum tag_t {
     TAG_SIZE,
     TAG_DAMAGE,
     TAG_TERRAIN,
+    TAG_PERCENT,
+    TAG_DIRECTION,
 } tag_t;
 
 typedef enum special_t {
     SPECIAL_UNKNOWN,
     SPECIAL_FOREST,
+    SPECIAL_MAELSTROM,
     SPECIAL_VIAL,
     SPECIAL_HERBS,
     SPECIAL_MONEYBAG,
@@ -112,6 +116,15 @@ static faction *get_faction(int no)
         if (!f) f = faction_create(no);
     }
     return f;
+}
+
+static region *get_region(int x, int y, struct plane *pl)
+{
+    region *r = findregion(x, y);
+    if (!r) {
+        if (!r) r = new_region(x, y, pl, 0);
+    }
+    return r;
 }
 
 static struct critbit_tree cb_keys = CRITBIT_TREE();
@@ -166,6 +179,8 @@ static void init_tags(void)
     add_tag("banner", TAG_DESCRIPTION);
     add_tag("Beschr", TAG_DESCRIPTION);
     add_tag("Terrain", TAG_TERRAIN);
+    add_tag("prozent", TAG_PERCENT);
+    add_tag("richtung", TAG_DIRECTION);
     add_tag("Kampfstatus", TAG_STATUS);
     add_tag("Status", TAG_STATUS);
     add_tag("privat", TAG_MEMO);
@@ -190,6 +205,7 @@ static void add_special(const char *str, special_t key)
 static void init_specials(void)
 {
     add_special("Wald", SPECIAL_FOREST);
+    add_special("Mahlstrom", SPECIAL_MAELSTROM);
     add_special("Phiole", SPECIAL_VIAL);
     // FIXME: NON-ASCII characters in the source are ugly af.
     add_special("Kräuterbeutel", SPECIAL_HERBS);
@@ -209,6 +225,7 @@ typedef struct context {
     struct region *region;
     struct faction *faction;
     struct group *group;
+    struct connection *border;
     struct ally *ally;
     struct unit *unit;
     struct ship *ship;
@@ -300,7 +317,7 @@ static enum CR_Error handle_element(void *udata, const char *name,
             int y = keyv[1];
             plane *pl = (keyc < 3) ? NULL : getplanebyid(keyv[2]);
             memset(ctx, 0, sizeof(context));
-            ctx->region = new_region(x, y, pl, 0);
+            ctx->region = get_region(x, y, pl);
             ctx->block = BLOCK_REGION;
         }
         else {
@@ -338,6 +355,7 @@ static enum CR_Error handle_element(void *udata, const char *name,
             }
             b = ctx->building = building_create(keyv[0]);
             b->region = r;
+            b->size = 1;
             addlist(&r->buildings, b);
             ctx->ship = NULL;
             ctx->unit = NULL;
@@ -384,6 +402,11 @@ static enum CR_Error handle_element(void *udata, const char *name,
             }
         }
         else if (0 == strcmp("GRENZE", name)) {
+            region *r = ctx->region;
+            if (!r) {
+                return CR_ERROR_GRAMMAR;
+            }
+            ctx->border = border_create(r);
             ctx->block = BLOCK_BORDER;
         }
         else if (0 == strcmp("KAMPFZAUBER", name)) {
@@ -627,6 +650,21 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
     return CR_ERROR_NONE;
 }
 
+static enum CR_Error handle_border(context *ctx, tag_t key, const char *value)
+{
+    switch (key) {
+    case TAG_TYPE:
+        break;
+    case TAG_DIRECTION:
+        break;
+    case TAG_PERCENT:
+        break;
+    default:
+        break;
+    }
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error handle_group(context *ctx, tag_t key, const char *value)
 {
     group *g = ctx->group;
@@ -731,8 +769,12 @@ static enum CR_Error handle_region(context *ctx, tag_t key, const char *value)
     case TAG_TERRAIN: {
         const struct terrain_type *ter = findterrain(value, default_locale);
         if (!ter) {
-            if (get_special(value) == SPECIAL_FOREST) {
+            special_t spec = get_special(value);
+            if (spec == SPECIAL_FOREST) {
                 ter = get_terrain("plain");
+            }
+            else if (spec == SPECIAL_MAELSTROM) {
+                ter = get_terrain("ocean");
             }
         }
         if (ter) {
@@ -831,6 +873,7 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     case BLOCK_SPELLS:
     case BLOCK_COMBATSPELLS:
     case BLOCK_BORDER:
+        err = handle_border(ctx, get_tag(name), value);
         break;
     case BLOCK_GROUP:
         err = handle_group(ctx, get_tag(name), value);
@@ -963,4 +1006,21 @@ int crimport(const char *filename)
     CR_ParserFree(cp);
     fclose(F);
     return err;
+}
+
+int crimport_fixup(void)
+{
+    faction *f = get_monsters();
+    f->flags |= (FFL_NPC | FFL_NOIDLEOUT);
+    for (f = factions; f; f = f->next) {
+        if (!f->race) {
+            if (f->units) {
+                f->race = u_race(f->units);
+            }
+            else {
+                f->race = get_race(RC_HUMAN);
+            }
+        }
+    }
+    return 0;
 }

@@ -9,3 +9,4 @@ int eressea_export_json(const char * filename, int flags);
 int eressea_import_json(const char * filename);
 
 int eressea_import_cr(const char *filename);
+int eressea_fixup_import(void);
