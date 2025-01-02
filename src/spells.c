@@ -1715,7 +1715,6 @@ static void drought(unit *u, region *r, double vigour, int duration)
 int sp_great_drought(castorder * co)
 {
     unit *u;
-    bool terraform = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     const char *mtype = "drought_no_terraform";
@@ -1731,10 +1730,8 @@ int sp_great_drought(castorder * co)
 
     /* 25% chance of terraforming */
     if (roll_d200 < 50) {
-        terraform = false;
 
         if (rterrain(r) == T_GLACIER) {
-            terraform = true;
             /* 50% chance of becoming either ocean or swamp */
             if (roll_d200 < 25) {
                 rsetterrain(r, T_SWAMP);
@@ -1742,6 +1739,7 @@ int sp_great_drought(castorder * co)
             }
             else {                /* Ozean */
                 rsetterrain(r, T_OCEAN);
+                destroy_all_roads(r);
                 mtype = "drought_glacier_to_ocean";
                 /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
                 for (u = r->units; u; u = u->next) {
@@ -1753,9 +1751,6 @@ int sp_great_drought(castorder * co)
                     remove_building(&r->buildings, r->buildings);
                 }
             }
-        }
-        if (terraform) {
-            destroy_all_roads(r);
         }
     }
     if (!fval(r->terrain, SEA_REGION)) {
