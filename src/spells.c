@@ -1715,7 +1715,6 @@ static void drought(unit *u, region *r, double vigour, int duration)
 int sp_great_drought(castorder * co)
 {
     unit *u;
-    bool terraform = false;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     const char *mtype = "drought_no_terraform";
@@ -1731,10 +1730,8 @@ int sp_great_drought(castorder * co)
 
     /* 25% chance of terraforming */
     if (roll_d200 < 50) {
-        terraform = false;
 
         if (rterrain(r) == T_GLACIER) {
-            terraform = true;
             /* 50% chance of becoming either ocean or swamp */
             if (roll_d200 < 25) {
                 rsetterrain(r, T_SWAMP);
