@@ -75,6 +75,7 @@ typedef struct land_region {
     int trees[3];               /* 0 -> seeds, 1 -> shoots, 2 -> trees */
     int money;
     struct region_owner *ownership;
+    int roads[MAXDIRECTIONS];
 } land_region;
 
 /* seen_mode: visibility in the report */

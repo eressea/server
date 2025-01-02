@@ -1719,7 +1719,6 @@ static void test_make_road(CuTest *tc) {
     make_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, 50, i_get(u->items, itype));
     CuAssertIntEquals(tc, 50, rroad(r, D_EAST));
-    CuAssertPtrNotNull(tc, get_borders(r, r2));
     test_teardown();
 }
 
