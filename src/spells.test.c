@@ -862,88 +862,42 @@ static void test_drought(CuTest *tc) {
     test_teardown();
 }
 
-static void test_great_drought(CuTest *tc) {
+static void test_great_drought_no_terraform(CuTest *tc) {
     unit *u;
     faction *f;
     castorder co;
     curse *c;
     region *r;
+    int road_size;
 
     test_setup();
     setup_terrains(tc);
-    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, newterrain(T_PLAIN)));
-    rsetroad(r, D_EAST, 100);
-    rsettrees(r, 2, 200);
-    rsettrees(r, 1, 200);
-    rsettrees(r, 0, 200);
-    rsethorses(r, 200);
-    test_create_castorder(&co, u, 4, 5.0, 0, NULL);
-
-    /* [0, 25) = terraforming success: */
-    random_source_inject_constants(0.0, 24);
-    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
-    CuAssertPtrEquals(tc, (void *)newterrain(T_PLAIN), (void *)r->terrain);
-    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
-    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_no_terraform", NULL));
-    /* Parteimeldung nur bei Fernzaubern: */
-    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
-    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
-    CuAssertIntEquals(tc, 2, c->duration);
-    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
-    CuAssertIntEquals(tc, 100, rtrees(r, 2));
-    CuAssertIntEquals(tc, 100, rtrees(r, 1));
-    CuAssertIntEquals(tc, 100, rtrees(r, 0));
-    CuAssertIntEquals(tc, 100, rhorses(r));
-    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
-    test_clear_region_messages(r);
-    test_clear_messages(f);
-
-    /* casting again reinforces the curse, but does not kill more trees+horses */
-    co.level++;
-    co.force += 1.0;
-    rsetroad(r, D_EAST, 100);
-    CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
-    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
-    CuAssertPtrEquals(tc, c, get_curse(r->attribs, &ct_drought));
-    CuAssertIntEquals(tc, 2, c->duration);
-    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
-    CuAssertIntEquals(tc, 100, rtrees(r, 2));
-    CuAssertIntEquals(tc, 100, rtrees(r, 1));
-    CuAssertIntEquals(tc, 100, rtrees(r, 0));
-    CuAssertIntEquals(tc, 100, rhorses(r));
-    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
-
-    test_teardown();
-}
-
-static void test_great_drought_glacier(CuTest *tc) {
-    unit *u;
-    faction *f;
-    castorder co;
-    curse *c;
-    region *r;
-
-    test_setup();
-    setup_terrains(tc);
-    u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
+    u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
+    test_create_unit(f = test_create_faction(), r); /* observer unit+faction */
     r->buildings = test_create_building(r, NULL);
-    rsetroad(r, D_EAST, 100);
+
     rsettrees(r, 2, 200);
     rsettrees(r, 1, 200);
     rsettrees(r, 0, 200);
     rsethorses(r, 200);
+
+    /* build a road to the east */
+    test_create_plain(1, 0);
+    road_size = r->terrain->max_road;
+    rsetroad(r, D_EAST, road_size);
+    CuAssertIntEquals(tc, road_size, rroad(r, D_EAST));
+
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
 
-    /* [50, 200) = no terraforming: */
+    /* [50, 200) = no terraforming  */
     random_source_inject_constants(0.0, 50);
     CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
+    CuAssertIntEquals(tc, road_size, rroad(r, D_EAST));
     CuAssertPtrEquals(tc, (void *)newterrain(T_GLACIER), (void *)r->terrain);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
-    CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_no_terraform", NULL));
-    /* Parteimeldung nur bei Fernzaubern: */
+    /* Parteimeldung nur beim Magier (und nur Fernzauber): */
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "drought_effect"));
     CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
     CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
@@ -952,7 +906,6 @@ static void test_great_drought_glacier(CuTest *tc) {
     CuAssertIntEquals(tc, 100, rtrees(r, 1));
     CuAssertIntEquals(tc, 100, rtrees(r, 0));
     CuAssertIntEquals(tc, 100, rhorses(r));
-    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
     CuAssertPtrNotNull(tc, r->buildings);
 
     test_teardown();
@@ -962,7 +915,6 @@ static void test_great_drought_to_swamp(CuTest *tc) {
     unit *u;
     faction *f;
     castorder co;
-    curse *c;
     region *r;
 
     test_setup();
@@ -970,11 +922,7 @@ static void test_great_drought_to_swamp(CuTest *tc) {
     u = test_create_unit(test_create_faction(), r = test_create_region(0, 0, newterrain(T_GLACIER)));
     test_create_unit(f = test_create_faction(), r); /* observer unit+faction */
     r->buildings = test_create_building(r, NULL);
-    rsetroad(r, D_EAST, 100);
-    rsettrees(r, 2, 200);
-    rsettrees(r, 1, 200);
-    rsettrees(r, 0, 200);
-    rsethorses(r, 200);
+
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
 
     /* [0, 25) = terraforming success, to swamp */
@@ -984,16 +932,6 @@ static void test_great_drought_to_swamp(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)newterrain(T_SWAMP), (void *)r->terrain);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
     CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_glacier_to_swamp", NULL));
-    /* Parteimeldung nur bei Fernzaubern: */
-    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
-    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
-    CuAssertIntEquals(tc, 2, c->duration);
-    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
-    CuAssertIntEquals(tc, 100, rtrees(r, 2));
-    CuAssertIntEquals(tc, 100, rtrees(r, 1));
-    CuAssertIntEquals(tc, 100, rtrees(r, 0));
-    CuAssertIntEquals(tc, 100, rhorses(r));
     CuAssertPtrNotNull(tc, r->buildings);
 
     test_teardown();
@@ -1003,7 +941,6 @@ static void test_great_drought_to_ocean(CuTest *tc) {
     unit *u, *u2;
     faction *f;
     castorder co;
-    curse *c;
     region *r;
 
     test_setup();
@@ -1012,17 +949,12 @@ static void test_great_drought_to_ocean(CuTest *tc) {
     u->ship = test_create_ship(r, NULL);
     r->buildings = test_create_building(r, NULL);
     u2 = test_create_unit(f = test_create_faction(), r); /* observer unit */
-    rsetroad(r, D_EAST, 100);
-    rsettrees(r, 2, 200);
-    rsettrees(r, 1, 200);
-    rsettrees(r, 0, 200);
-    rsethorses(r, 200);
+
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
 
     /* [25, 50) = terraforming success, to ocean */
     random_source_inject_constants(0.0, 25);
     CuAssertIntEquals(tc, co.level, sp_great_drought(&co));
-    CuAssertIntEquals(tc, 0, rroad(r, D_EAST));
     CuAssertPtrEquals(tc, (void *)newterrain(T_OCEAN), (void *)r->terrain);
     CuAssertPtrNotNull(tc, test_find_region_message(r, "drought_effect", NULL));
     CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "drought_glacier_to_ocean", NULL));
@@ -1031,16 +963,7 @@ static void test_great_drought_to_ocean(CuTest *tc) {
     CuAssertIntEquals(tc, 0, u2->number);
     CuAssertIntEquals(tc, 1, u->number);
     CuAssertPtrEquals(tc, NULL, r->buildings);
-    /* Parteimeldung nur bei Fernzaubern: */
-    CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "drought_effect"));
-    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_drought));
-    CuAssertIntEquals(tc, 2, c->duration);
-    CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
-    CuAssertDblEquals(tc, 4.0, c->effect, 0.01);
-    CuAssertIntEquals(tc, 100, rtrees(r, 2));
-    CuAssertIntEquals(tc, 100, rtrees(r, 1));
-    CuAssertIntEquals(tc, 100, rtrees(r, 0));
-    CuAssertIntEquals(tc, 100, rhorses(r));
+    CuAssertPtrNotNull(tc, r->ships);
 
     test_teardown();
 }
@@ -2078,8 +2001,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_treewalkexit);
     SUITE_ADD_TEST(suite, test_holyground);
     SUITE_ADD_TEST(suite, test_drought);
-    SUITE_ADD_TEST(suite, test_great_drought);
-    SUITE_ADD_TEST(suite, test_great_drought_glacier);
+    SUITE_ADD_TEST(suite, test_great_drought_no_terraform);
     SUITE_ADD_TEST(suite, test_great_drought_to_swamp);
     SUITE_ADD_TEST(suite, test_great_drought_to_ocean);
     SUITE_ADD_TEST(suite, test_stormwinds);

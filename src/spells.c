@@ -1742,6 +1742,7 @@ int sp_great_drought(castorder * co)
             }
             else {                /* Ozean */
                 rsetterrain(r, T_OCEAN);
+                destroy_all_roads(r);
                 mtype = "drought_glacier_to_ocean";
                 /* Einheiten duerfen hier auf keinen Fall geloescht werden! */
                 for (u = r->units; u; u = u->next) {
@@ -1753,9 +1754,6 @@ int sp_great_drought(castorder * co)
                     remove_building(&r->buildings, r->buildings);
                 }
             }
-        }
-        if (terraform) {
-            destroy_all_roads(r);
         }
     }
     if (!fval(r->terrain, SEA_REGION)) {

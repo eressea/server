@@ -356,6 +356,7 @@ test_create_terrain(const char * name, int flags)
     }
     if (flags & LAND_REGION) {
         t->size = 1000;
+        t->max_road = 50;
     }
     t->flags = flags;
     return t;
