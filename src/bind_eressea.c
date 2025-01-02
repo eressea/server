@@ -80,3 +80,9 @@ int eressea_import_cr(const char *filename)
 {
     return crimport(filename);
 }
+
+int eressea_fixup_import(void)
+{
+    crimport_fixup();
+    return 0;
+}

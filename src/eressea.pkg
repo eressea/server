@@ -10,4 +10,5 @@ module eressea {
     int eressea_export_json @ export_json(const char * filename, unsigned int flags);
     int eressea_import_json @ import_json(const char * filename);
     int eressea_import_cr @ import_cr(const char * filename);
+    int eressea_fixup_import @ fixup_import(void);
 }
