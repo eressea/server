@@ -101,6 +101,7 @@ typedef enum tag_t {
 typedef enum special_t {
     SPECIAL_UNKNOWN,
     SPECIAL_FOREST,
+    SPECIAL_ROAD,
     SPECIAL_MAELSTROM,
     SPECIAL_VIAL,
     SPECIAL_HERBS,
@@ -207,11 +208,12 @@ static void init_specials(void)
     add_special("Wald", SPECIAL_FOREST);
     add_special("Mahlstrom", SPECIAL_MAELSTROM);
     add_special("Phiole", SPECIAL_VIAL);
-    // FIXME: NON-ASCII characters in the source are ugly af.
-    add_special("Kräuterbeutel", SPECIAL_HERBS);
     add_special("Silberbeutel", SPECIAL_MONEYBAG);
     add_special("Silberkassette", SPECIAL_MONEYCHEST);
     add_special("Drachenhort", SPECIAL_DRAGONHOARD);
+    // FIXME: NON-ASCII characters in the source are ugly af.
+    add_special("Kräuterbeutel", SPECIAL_HERBS);
+    add_special("Straße", SPECIAL_ROAD);
 }
 
 static special_t get_special(const char *name)
@@ -225,7 +227,6 @@ typedef struct context {
     struct region *region;
     struct faction *faction;
     struct group *group;
-    struct connection *border;
     struct ally *ally;
     struct unit *unit;
     struct ship *ship;
@@ -240,12 +241,17 @@ typedef struct context {
         struct {
             char *prefix;
         } unit;
+        struct {
+            direction_t dir;
+            int completed_percent;
+        } road;
     } extra;
 } context;
 
-static enum CR_Error finish_resource(struct context *ctx, region *r)
+static enum CR_Error finish_resource(struct context *ctx)
 {
     if (ctx->extra.resource.type && ctx->extra.resource.number) {
+        region *r = ctx->region;
         rawmaterial *rm = region_setresource(r, ctx->extra.resource.type, ctx->extra.resource.number);
         if (rm) {
             if (ctx->extra.resource.level > 0) {
@@ -263,6 +269,17 @@ static enum CR_Error finish_resource(struct context *ctx, region *r)
     return CR_ERROR_GRAMMAR;
 }
 
+static enum CR_Error finish_border(struct context *ctx)
+{
+    // if not a road, we don't know what to do:
+    if (ctx->extra.road.dir != NODIRECTION) {
+        region *r = ctx->region;
+        int road = r->terrain->max_road * ctx->extra.road.completed_percent / 100;
+        rsetroad(r, ctx->extra.road.dir, road);
+    }
+    return CR_ERROR_NONE;
+}
+
 static enum CR_Error finish_unit(struct context *ctx, unit *u)
 {
     char *prefix = ctx->extra.unit.prefix;
@@ -278,13 +295,14 @@ static enum CR_Error finish_unit(struct context *ctx, unit *u)
 
 static enum CR_Error finish_element(struct context *ctx)
 {
-    if (ctx->block == BLOCK_RESOURCE) {
+    if (ctx->block == BLOCK_UNIT) {
         int err;
         unit *u = ctx->unit;
         if (!u) {
             return CR_ERROR_GRAMMAR;
         }
         err = finish_unit(ctx, u);
+        memset(&ctx->extra.unit, 0, sizeof(ctx->extra.unit));
         if (err != CR_ERROR_NONE) {
             return err;
         }
@@ -295,7 +313,20 @@ static enum CR_Error finish_element(struct context *ctx)
         if (!r) {
             return CR_ERROR_GRAMMAR;
         }
-        err = finish_resource(ctx, r);
+        err = finish_resource(ctx);
+        memset(&ctx->extra.resource, 0, sizeof(ctx->extra.resource));
+        if (err != CR_ERROR_NONE) {
+            return err;
+        }
+    }
+    else if (ctx->block == BLOCK_BORDER) {
+        int err;
+        region *r = ctx->region;
+        if (!r) {
+            return CR_ERROR_GRAMMAR;
+        }
+        err = finish_border(ctx);
+        memset(&ctx->extra.road, 0, sizeof(ctx->extra.road));
         if (err != CR_ERROR_NONE) {
             return err;
         }
@@ -345,7 +376,6 @@ static enum CR_Error handle_element(void *udata, const char *name,
         }
         else if (0 == strcmp("RESOURCE", name)) {
             ctx->block = BLOCK_RESOURCE;
-            memset(&ctx->extra.resource, 0, sizeof(ctx->extra.resource));
         }
         else if (0 == strcmp("BURG", name)) {
             region *r = ctx->region;
@@ -406,7 +436,6 @@ static enum CR_Error handle_element(void *udata, const char *name,
             if (!r) {
                 return CR_ERROR_GRAMMAR;
             }
-            ctx->border = border_create(r);
             ctx->block = BLOCK_BORDER;
         }
         else if (0 == strcmp("KAMPFZAUBER", name)) {
@@ -653,11 +682,23 @@ static enum CR_Error handle_resource(context *ctx, tag_t key, const char *value)
 static enum CR_Error handle_border(context *ctx, tag_t key, const char *value)
 {
     switch (key) {
-    case TAG_TYPE:
+    case TAG_TYPE: {
+        special_t spec = get_special(value);
+        if (!ctx->region) {
+            return CR_ERROR_GRAMMAR;
+        }
+        if (spec != SPECIAL_ROAD) {
+            ctx->extra.road.dir = NODIRECTION;
+        }
         break;
+    }
     case TAG_DIRECTION:
+        if (ctx->extra.road.dir != NODIRECTION) {
+            ctx->extra.road.dir = (direction_t)atoi(value);
+        }
         break;
     case TAG_PERCENT:
+        ctx->extra.road.completed_percent = atoi(value);
         break;
     default:
         break;
