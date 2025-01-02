@@ -5,6 +5,7 @@
 #include "building.h"
 #include "calendar.h"
 #include "config.h"
+#include "connection.h"
 #include "curse.h"
 #include "equipment.h"
 #include "faction.h"
