@@ -6,8 +6,11 @@ SET SERVER=%BUILD%\eressea.exe
 SET LUA_PATH=..\scripts\?.lua;%LUA_PATH%
 
 %SERVER% -v1 ..\scripts\run-tests.lua
+if %ERRORLEVEL% NEQ 0 echo Error %ERRORLEVEL%
 %SERVER% -v1 -re2 ..\scripts\run-tests-e2.lua
+if %ERRORLEVEL% NEQ 0 echo Error %ERRORLEVEL%
 %SERVER% -v1 -re3 ..\scripts\run-tests-e3.lua
+if %ERRORLEVEL% NEQ 0 echo Error %ERRORLEVEL%
 %SERVER% --version
 PAUSE
 RMDIR /s /q reports

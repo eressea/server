@@ -529,48 +529,15 @@ attrib_type at_woodcount = {
     ATF_UNIQUE
 };
 
-void rsetroad(region * r, direction_t d, int val)
+void rsetroad(region * r, direction_t d, short val)
 {
-    connection *b;
-    region *r2 = rconnect(r, d);
-
-    assert(val>=SHRT_MIN && val<=SHRT_MAX);
-    if (!r2) {
-        return;
-    }
-    b = get_borders(r, r2);
-    while (b && b->type != &bt_road) {
-        b = b->next;
-    }
-    if (!b) {
-        if (!val) return;
-        b = create_border(&bt_road, r, r2);
-    }
-    if (r == b->from) {
-        b->data.sa[0] = (short)val;
-    }
-    else {
-        b->data.sa[1] = (short)val;
-    }
+    if (!r->land) return;
+    r->land->roads[d] = val;
 }
 
-int rroad(const region * r, direction_t d)
+short rroad(const region * r, direction_t d)
 {
-    connection *b;
-    region *r2 = rconnect(r, d);
-
-    if (!r2) {
-        return 0;
-    }
-    b = get_borders(r, r2);
-    while (b && b->type != &bt_road) {
-        b = b->next;
-    }
-    if (!b) {
-        return 0;
-    }
-
-    return (r == b->from) ? b->data.sa[0] : b->data.sa[1];
+    return r->land ? r->land->roads[d] : 0;
 }
 
 void r_foreach_demand(const struct region *r, void (*callback)(struct demand *, int, void *), void *data)

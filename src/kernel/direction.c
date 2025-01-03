@@ -80,6 +80,11 @@ direction_t finddirection(const char *str) {
     return NODIRECTION;
 }
 
+direction_t d_reverse(direction_t d)
+{
+    return (d + MAXDIRECTIONS / 2) % MAXDIRECTIONS;
+}
+
 const char * directions[MAXDIRECTIONS + 2] = {
     "northwest", "northeast", "east", "southeast", "southwest", "west", 0, "pause"
 };

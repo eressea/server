@@ -75,6 +75,7 @@ typedef struct land_region {
     int trees[3];               /* 0 -> seeds, 1 -> shoots, 2 -> trees */
     int money;
     struct region_owner *ownership;
+    short roads[MAXDIRECTIONS];
 } land_region;
 
 /* seen_mode: visibility in the report */
@@ -172,8 +173,8 @@ void deathcounts(struct region *r, int delta);
 void setluxuries(struct region *r, const struct luxury_type *sale);
 int get_maxluxuries(void);
 
-int rroad(const struct region *r, direction_t d);
-void rsetroad(struct region *r, direction_t d, int value);
+short rroad(const struct region *r, direction_t d);
+void rsetroad(struct region *r, direction_t d, short value);
 
 bool is_coastregion(struct region *r);
 

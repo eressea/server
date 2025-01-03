@@ -123,11 +123,11 @@ static void test_borders(CuTest *tc) {
     r = test_create_plain(0, 0);
     r2 = test_create_plain(1, 0);
     CuAssertPtrEquals(tc, NULL, get_borders(r, r2));
-    c = create_border(&bt_road, r, r2);
+    c = create_border(&bt_wall, r, r2);
     CuAssertPtrEquals(tc, c, get_borders(r, r2));
     CuAssertPtrEquals(tc, c, get_borders(r2, r));
 
-    create_border(&bt_road, r, test_create_plain(-1, 0));
+    create_border(&bt_wall, r, test_create_plain(-1, 0));
     walk_connections(r, cb_connection, &n);
     CuAssertIntEquals(tc, 2, n);
     test_teardown();

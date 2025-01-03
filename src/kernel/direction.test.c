@@ -47,12 +47,24 @@ static void test_finddirection(CuTest *tc) {
     test_teardown();
 }
 
+static void test_direction_reverse(CuTest *tc) {
+    test_setup();
+    CuAssertIntEquals(tc, D_SOUTHWEST, d_reverse(D_NORTHEAST));
+    CuAssertIntEquals(tc, D_SOUTHEAST, d_reverse(D_NORTHWEST));
+    CuAssertIntEquals(tc, D_NORTHEAST, d_reverse(D_SOUTHWEST));
+    CuAssertIntEquals(tc, D_NORTHWEST, d_reverse(D_SOUTHEAST));
+    CuAssertIntEquals(tc, D_EAST, d_reverse(D_WEST));
+    CuAssertIntEquals(tc, D_WEST, d_reverse(D_EAST));
+    test_teardown();
+}
+
 CuSuite *get_direction_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_init_direction);
     SUITE_ADD_TEST(suite, test_init_directions);
     SUITE_ADD_TEST(suite, test_finddirection);
+    SUITE_ADD_TEST(suite, test_direction_reverse);
     return suite;
 }
 
