@@ -61,7 +61,9 @@ function ponnuki.init()
         eressea.log.info("Ponnuki is in " .. tostring(u.region))
         u.status = 5 -- FLIEHE
     end
-    ponnuki_brain(u)
+    if u then
+        ponnuki_brain(u)
+    end
 end
 
 return ponnuki
