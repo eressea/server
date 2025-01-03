@@ -472,29 +472,6 @@ static void b_readroad(connection * b, gamedata * data)
 	rsetroad(b->to, dir, n);
 }
 
-static void b_writeroad(const connection * b, storage * store)
-{
-    WRITE_INT(store, b->data.sa[0]);
-    WRITE_INT(store, b->data.sa[1]);
-}
-
-static bool b_validroad(const connection * b)
-{
-    return (b->data.sa[0] != SHRT_MAX);
-}
-
-static bool b_rvisibleroad(const connection * b, const region * r)
-{
-    int x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
-    if (x == 0) {
-        return false;
-    }
-    if (b->to != r && b->from != r) {
-        return false;
-    }
-    return true;
-}
-
 border_type bt_road = {
     "road", VAR_NONE, LAND_REGION,
     NULL,
@@ -615,4 +592,5 @@ void register_connections(void)
     register_bordertype(&bt_noway);
     register_bordertype(&bt_fogwall);
     register_bordertype(&bt_wall);
+    register_bordertype(&bt_road);
 }
