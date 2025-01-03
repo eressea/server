@@ -105,6 +105,7 @@ void game_init(void)
     register_weapons();
     register_xerewards();
     register_attributes();
+    register_connections();
     register_gmcmd();
 
 }

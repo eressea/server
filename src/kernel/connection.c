@@ -1,13 +1,16 @@
 #include <kernel/config.h>
 #include "connection.h"
 
+#include "move.h"
 #include "region.h"
 #include "terrain.h"
 #include "unit.h"
 
 #include <kernel/attrib.h>
-#include <util/base36.h>
+#include <kernel/connection.h>
 #include <kernel/gamedata.h>
+
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -410,36 +413,6 @@ border_type bt_fogwall = {
     b_uvisible,                   /* uvisible */
 };
 
-static const char *b_nameillusionwall(const connection * b, const region * r,
-    const struct faction *f, int gflags)
-{
-    int fno = b->data.i;
-    UNUSED_ARG(b);
-    UNUSED_ARG(r);
-    if (gflags & GF_PURE)
-        return (f && fno == f->no) ? "illusionwall" : "wall";
-    if (gflags & GF_ARTICLE) {
-        return LOC(f->locale, mkname("border", (f
-            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
-    }
-    return LOC(f->locale, mkname("border", (f
-        && fno == f->no) ? "illusionwall" : "wall"));
-}
-
-border_type bt_illusionwall = {
-    "illusionwall", VAR_INT, 0,
-    b_opaque,
-    NULL,                         /* init */
-    NULL,                         /* destroy */
-    b_read,                       /* read */
-    b_write,                      /* write */
-    b_blocknone,                  /* block */
-    b_nameillusionwall,           /* name */
-    b_rvisible,                   /* rvisible */
-    b_fvisible,                   /* fvisible */
-    b_uvisible,                   /* uvisible */
-};
-
 /***
  * roads. meant to replace the old at_road or r->road attribute
  ***/
@@ -489,10 +462,14 @@ static void b_readroad(connection * b, gamedata * data)
 {
     storage * store = data->store;
     int n;
+    direction_t dir;
+    assert(b->from && b->to);
     READ_INT(store, &n);
-    b->data.sa[0] = (short)n;
+	dir = reldirection(b->from, b->to);
+	rsetroad(b->from, dir, n);
     READ_INT(store, &n);
-    b->data.sa[1] = (short)n;
+	dir = reldirection(b->to, b->from);
+	rsetroad(b->to, dir, n);
 }
 
 static void b_writeroad(const connection * b, storage * store)
@@ -519,18 +496,11 @@ static bool b_rvisibleroad(const connection * b, const region * r)
 }
 
 border_type bt_road = {
-    "road", VAR_INT, LAND_REGION,
-    b_transparent,
+    "road", VAR_NONE, LAND_REGION,
+    NULL,
     NULL,                         /* init */
     NULL,                         /* destroy */
     b_readroad,                   /* read */
-    b_writeroad,                  /* write */
-    b_blocknone,                  /* block */
-    b_nameroad,                   /* name */
-    b_rvisibleroad,               /* rvisible */
-    b_finvisible,                 /* fvisible */
-    b_uinvisible,                 /* uvisible */
-    b_validroad                   /* valid */
 };
 
 void write_borders(struct storage *store)
@@ -581,8 +551,8 @@ int read_borders(gamedata *data)
 
         READ_INT(store, &fid);
         READ_INT(store, &tid);
-        from = findregionbyid(fid);
-        to = findregionbyid(tid);
+        from = dummy.from = findregionbyid(fid);
+        to = dummy.to = findregionbyid(tid);
         if (!to || !from) {
             log_error("%s connection from %d to %d has missing regions", zText, fid, tid);
             if (type->read) {
@@ -610,10 +580,16 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-                b = create_border(type, from, to);
+				if (type == &bt_road) {
+					/* delete old bt_road instances */
+					b = &dummy;
+				}
+				else {
+					b = create_border(type, from, to);
+				}
             }
             type->read(b, data);
-            if (!type->write) {
+            if (type->datatype != VAR_NONE && !type->write) {
                 log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
             }
         }
@@ -631,4 +607,13 @@ const char * border_name(const connection *co, const struct region * r, const st
         }
     }
     return bname;
+}
+
+void register_connections(void)
+{
+    /* connection-typen */
+    register_bordertype(&bt_noway);
+    register_bordertype(&bt_fogwall);
+    register_bordertype(&bt_wall);
+    register_bordertype(&bt_road);
 }

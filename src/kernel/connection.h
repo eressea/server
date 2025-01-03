@@ -116,7 +116,6 @@ extern "C" {
     extern border_type bt_fogwall;
     extern border_type bt_noway;
     extern border_type bt_wall;
-    extern border_type bt_illusionwall;
     extern border_type bt_road;
     extern border_type bt_questportal;
 
@@ -128,6 +127,7 @@ extern "C" {
     const char * border_name(const struct connection *co, const struct region * r,
         const struct faction * f, int flags, const struct locale* lang);
 
+    void register_connections(void);
 #ifdef __cplusplus
 }
 #endif

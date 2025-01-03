@@ -1263,10 +1263,6 @@ msgstr "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der eig
 msgid "section_newpotions"
 msgstr "Neue Tränke"
 
-msgctxt "border"
-msgid "an_illusionwall"
-msgstr "eine Illusionswand"
-
 msgctxt "race"
 msgid "apepsnake"
 msgstr "Apepschlange"
@@ -2894,10 +2890,6 @@ msgstr "REKRUTIERE"
 msgctxt "race"
 msgid "songdragon_x"
 msgstr "Singdrachen"
-
-msgctxt "border"
-msgid "illusionwall"
-msgstr "Illusionswand"
 
 msgctxt "spellinfo"
 msgid "summonshadowlords"
