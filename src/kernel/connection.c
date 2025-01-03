@@ -496,11 +496,18 @@ static bool b_rvisibleroad(const connection * b, const region * r)
 }
 
 border_type bt_road = {
-    "road", VAR_NONE, LAND_REGION,
-    NULL,
+    "road", VAR_INT, LAND_REGION,
+    b_transparent,
     NULL,                         /* init */
     NULL,                         /* destroy */
     b_readroad,                   /* read */
+    b_writeroad,                  /* write */
+    b_blocknone,                  /* block */
+    b_nameroad,                   /* name */
+    b_rvisibleroad,               /* rvisible */
+    b_finvisible,                 /* fvisible */
+    b_uinvisible,                 /* uvisible */
+    b_validroad                   /* valid */
 };
 
 void write_borders(struct storage *store)
@@ -580,16 +587,10 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-				if (type == &bt_road) {
-					/* delete old bt_road instances */
-					b = &dummy;
-				}
-				else {
-					b = create_border(type, from, to);
-				}
+				b = create_border(type, from, to);
             }
             type->read(b, data);
-            if (type->datatype != VAR_NONE && !type->write) {
+            if (!type->write) {
                 log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
             }
         }

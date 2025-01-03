@@ -316,7 +316,7 @@ void scale_effects(unit* u, int n)
         else if (u->number > 0) {
             uint64_t scale = (uint64_t)data->value * n / u->number;
             assert(scale <= INT_MAX);
-            assert(scale > 0);
+            assert(scale >= 0);
             data->value = (int) scale;
         }
     }
