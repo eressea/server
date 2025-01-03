@@ -9,7 +9,6 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
-#include "kernel/connection.h"
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include "kernel/direction.h"         // for D_EAST, directions
@@ -1700,7 +1699,7 @@ static void test_destroy_cmd(CuTest* tc) {
 }
 
 static void test_make_road(CuTest *tc) {
-    region *r, *r2;
+    region *r;
     unit *u;
     faction *f;
     struct item_type *itype;
@@ -1710,7 +1709,7 @@ static void test_make_road(CuTest *tc) {
     t_plain = test_create_terrain("plain", LAND_REGION);
     t_plain->max_road = 100;
     u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, t_plain));
-    r2 = test_create_region(1, 0, t_plain);
+    test_create_region(1, 0, t_plain);
     set_level(u, SK_ROAD_BUILDING, 10);
     scale_number(u, 10);
     i_change(&u->items, itype = test_create_itemtype("stone"), 100);

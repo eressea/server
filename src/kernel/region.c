@@ -529,13 +529,13 @@ attrib_type at_woodcount = {
     ATF_UNIQUE
 };
 
-void rsetroad(region * r, direction_t d, int val)
+void rsetroad(region * r, direction_t d, short val)
 {
     if (!r->land) return;
     r->land->roads[d] = val;
 }
 
-int rroad(const region * r, direction_t d)
+short rroad(const region * r, direction_t d)
 {
     return r->land ? r->land->roads[d] : 0;
 }
