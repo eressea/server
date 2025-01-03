@@ -265,6 +265,15 @@ static int get_bname_cb(building_type *btype, void *udata)
     else {
         variant type = { .v = (void *)btype };
         addtoken((struct tnode **)&bn->names, n, type);
+        if (btype->a_stages) {
+            size_t i, len = arrlen(btype->a_stages);
+            for (i = 0; i != len; ++i) {
+                if (btype->a_stages[i].name) {
+                    n = LOC(bn->lang, btype->a_stages[i].name);
+                    addtoken((struct tnode **)&bn->names, n, type);
+                }
+            }
+        }
     }
     return 0;
 }
@@ -865,6 +874,15 @@ void building_setname(building * self, const char *name)
         self->name = str_strdup(name);
     else
         self->name = NULL;
+}
+
+void building_setinfo(building * self, const char *info)
+{
+    free(self->display);
+    if (info)
+        self->display = str_strdup(info);
+    else
+        self->display = NULL;
 }
 
 region *building_getregion(const building * b)

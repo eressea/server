@@ -8,8 +8,6 @@
 #include <util/log.h>
 #include <util/language.h>
 
-#include <strings.h>
-
 #include <lua.h>
 #include <lauxlib.h>
 #include <tolua.h>
@@ -73,11 +71,7 @@ static int tolua_building_set_info(lua_State * L)
 {
     building *self = (building *)tolua_tousertype(L, 1, 0);
     const char *info = tolua_tostring(L, 2, 0);
-    free(self->display);
-    if (info)
-        self->display = str_strdup(info);
-    else
-        self->display = NULL;
+    building_setinfo(self, info);
     return 0;
 }
 

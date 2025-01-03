@@ -158,6 +158,7 @@ static void use_default(rawmaterial * res, const region * r, int amount)
 struct rawmaterial *rm_get(region * r, const struct resource_type *rtype)
 {
     ptrdiff_t i, len = arrlen(r->resources);
+    assert(rtype);
     for (i = 0; i != len; ++i) {
         rawmaterial *rm = r->resources + i;
         if (rm->rtype == rtype) {

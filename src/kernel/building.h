@@ -168,6 +168,7 @@ extern "C" {
 
     const char *building_getname(const struct building *b);
     void building_setname(struct building *self, const char *name);
+    void building_setinfo(building *self, const char *info);
 
     struct region *building_getregion(const struct building *b);
     void building_setregion(struct building *bld, struct region *r);

@@ -23,6 +23,7 @@ struct group *join_group(struct unit *u, const char *name);
 void set_group(struct unit *u, struct group *g);
 struct group * get_group(const struct unit *u);
 void free_group(struct group *g);
+struct group *group_create(struct faction *f, int gid);
 struct group *create_group(struct faction * f, const char *name, int gid);
 struct group* find_groupbyname(struct faction* f, const char* name);
 

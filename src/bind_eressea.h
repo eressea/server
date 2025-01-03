@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BIND_ERESSEA_H
-#define BIND_ERESSEA_H
 
 void eressea_free_game(void);
 int eressea_read_game(const char * filename);
@@ -10,4 +8,5 @@ int eressea_read_orders(const char * filename);
 int eressea_export_json(const char * filename, int flags);
 int eressea_import_json(const char * filename);
 
-#endif
+int eressea_import_cr(const char *filename);
+int eressea_fixup_import(void);

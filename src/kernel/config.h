@@ -26,8 +26,6 @@ extern "C" {
 #define fset(u, i) ((u)->flags |= (i))
 #define freset(u, i) ((u)->flags &= ~(i))
 
-    int findoption(const char *s, const struct locale *lang);
-
     const char * game_name(void);
     const char * game_mailcmd(void);
     int game_id(void);

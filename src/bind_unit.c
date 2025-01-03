@@ -421,7 +421,7 @@ static int tolua_unit_getskill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *skname = tolua_tostring(L, 2, NULL);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
     int value = -1;
     if (sk != NOSKILL) {
         skill *sv = unit_skill(u, sk);
@@ -439,7 +439,7 @@ static int tolua_unit_effskill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *skname = tolua_tostring(L, 2, NULL);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
     int value = (sk == NOSKILL) ? -1 : effskill(u, sk, NULL);
     lua_pushinteger(L, value);
     return 1;
@@ -573,7 +573,7 @@ static int tolua_unit_setskill(lua_State * L)
     const char *skname = tolua_tostring(L, 2, NULL);
     int level = (int)tolua_tonumber(L, 3, 0);
     bool rcmod = tolua_toboolean(L, 4, 0);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
 
     if (sk != NOSKILL) {
         if (rcmod) level -= u_race(u)->bonus[sk];

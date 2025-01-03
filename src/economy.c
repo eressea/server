@@ -264,7 +264,7 @@ int forget_cmd(unit * u, order * ord)
     (void)init_order(ord, u->faction->locale);
     s = gettoken(token, sizeof(token));
 
-    sk = get_skill(s, u->faction->locale);
+    sk = findskill(s, u->faction->locale);
     if (sk != NOSKILL) {
         if (sk == SK_MAGIC) {
             if (is_familiar(u)) {

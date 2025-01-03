@@ -104,6 +104,14 @@ connection *get_borders(const region * r1, const region * r2)
     return *bp;
 }
 
+connection *border_create(region *from)
+{
+    connection * b = calloc(1, sizeof(connection));
+    if (!b) abort();
+    b->from = from;
+    return b;
+}
+
 connection *create_border(border_type * type, region * from, region * to)
 {
     connection *b, **bp;
@@ -113,10 +121,8 @@ connection *create_border(border_type * type, region * from, region * to)
     while (*bp) {
         bp = &(*bp)->next;
     }
-    *bp = b = calloc(1, sizeof(connection));
-    if (!b) abort();
+    *bp = b = border_create(from);
     b->type = type;
-    b->from = from;
     b->to = to;
 
     if (type->init) {

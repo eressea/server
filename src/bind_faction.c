@@ -32,8 +32,6 @@
 #include <stdbool.h>          // for bool
 #include <stdio.h>            // for puts
 
-struct ally;
-
 int tolua_factionlist_next(lua_State * L)
 {
     faction **faction_ptr = (faction **)lua_touserdata(L, lua_upvalueindex(1));
