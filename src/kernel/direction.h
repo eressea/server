@@ -28,6 +28,7 @@ extern "C"
     void init_direction(const struct locale *lang, direction_t dir, const char *str);
 
     direction_t finddirection(const char *str);
+    direction_t d_reverse(direction_t d);
 
     extern const char * directions[];
 

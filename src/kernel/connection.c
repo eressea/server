@@ -413,51 +413,6 @@ border_type bt_fogwall = {
     b_uvisible,                   /* uvisible */
 };
 
-/***
- * roads. meant to replace the old at_road or r->road attribute
- ***/
-
-static const char *b_nameroad(const connection * b, const region * r,
-    const struct faction *f, int gflags)
-{
-    region *r2 = (r == b->to) ? b->from : b->to;
-    int local = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
-    static char buffer[64];
-
-    UNUSED_ARG(f);
-    if (gflags & GF_PURE)
-        return "road";
-    if (gflags & GF_ARTICLE) {
-        if (!(gflags & GF_DETAILED))
-            return LOC(f->locale, mkname("border", "a_road"));
-        else if (r->terrain->max_road <= local) {
-            int remote = (r2 == b->from) ? b->data.sa[0] : b->data.sa[1];
-            if (r2->terrain->max_road <= remote) {
-                return LOC(f->locale, mkname("border", "a_road"));
-            }
-            else {
-                return LOC(f->locale, mkname("border", "an_incomplete_road"));
-            }
-        }
-        else {
-            if (local) {
-                const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
-                int percent = 100 * local / r->terrain->max_road;
-                if (percent < 1) percent = 1;
-                str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
-            }
-            else {
-                return LOC(f->locale, mkname("border", "a_road_connection"));
-            }
-        }
-    }
-    else if (gflags & GF_PLURAL)
-        return LOC(f->locale, mkname("border", "roads"));
-    else
-        return LOC(f->locale, mkname("border", "road"));
-    return buffer;
-}
-
 static void b_readroad(connection * b, gamedata * data)
 {
     storage * store = data->store;
