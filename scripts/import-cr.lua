@@ -9,6 +9,7 @@ else
   eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end
 
-eressea.import_cr("import.cr")
+local crfile = config.import or "import.cr"
+eressea.import_cr(crfile)
 write_reports()
 gmtool.editor()

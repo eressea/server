@@ -292,6 +292,13 @@ static region *rfindhash(int x, int y)
     return regionhash[key];
 }
 
+void region_set_uid(region *r, int uid)
+{
+    unhash_uid(r);
+    r->uid = uid;
+    rhash_uid(r);
+}
+
 void rhash(region * r)
 {
     unsigned int rid = coor_hashkey(r->x, r->y);
@@ -347,9 +354,17 @@ region *rconnect(const region * r, direction_t dir)
     return result;
 }
 
-region *findregion(int x, int y)
+struct region *findregion_ex(int x, int y, const struct plane *pl)
 {
+    if (pl) {
+        pnormalize(&x, &y, pl);
+    }
     return rfindhash(x, y);
+}
+
+struct region *findregion(int x, int y)
+{
+    return findregion_ex(x, y, NULL);
 }
 
 /* Contributed by Hubert Mackenberg. Thanks.

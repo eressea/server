@@ -158,9 +158,11 @@ void r_add_warning(struct region *r, struct message *msg);
 int fix_demand(struct region *r);
 int distance(const struct region *, const struct region *);
 int koor_distance(int ax, int ay, int bx, int by);
+struct region *findregion_ex(int x, int y, const struct plane *pl);
 struct region *findregion(int x, int y);
 struct region *findregionbyid(int uid);
 
+void region_set_uid(struct region *r, int uid);
 void rhash(struct region *r);
 void runhash(struct region *r);
 

@@ -121,7 +121,7 @@ static faction *get_faction(int no)
 
 static region *get_region(int x, int y, struct plane *pl)
 {
-    region *r = findregion(x, y);
+    region *r = findregion_ex(x, y, pl);
     if (!r) {
         if (!r) r = new_region(x, y, pl, 0);
     }
@@ -821,9 +821,7 @@ static enum CR_Error handle_region(context *ctx, tag_t key, const char *value)
     case TAG_ID: {
         int uid = atoi(value);
         if (uid != r->uid) {
-            runhash(r);
-            r->uid = uid;
-            rhash(r);
+            region_set_uid(r, uid);
         }
         break;
     }
