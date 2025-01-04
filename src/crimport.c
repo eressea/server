@@ -552,6 +552,26 @@ static enum CR_Error handle_ship(struct context *ctx, tag_t key, const char *val
 
 static enum CR_Error handle_prices(struct context *ctx, const char *key, const char *value)
 {
+    region *r = ctx->region;
+    const struct item_type *itype = NULL;
+    if (!r) {
+        return CR_ERROR_GRAMMAR;
+    }
+    itype = finditemtype(key, default_locale);
+    if (itype && itype->rtype && itype->rtype->ltype) {
+        int demand = atoi(value);
+        if (demand > 0) {
+            demand = demand / itype->rtype->ltype->price;
+        }
+        else {
+            demand = 0;
+        }
+        r_setdemand(r, itype->rtype->ltype, demand);
+    }
+    else {
+        log_error("unknown luxury good %s", key);
+        return CR_ERROR_GRAMMAR;
+    }
     return CR_ERROR_NONE;
 }
 
