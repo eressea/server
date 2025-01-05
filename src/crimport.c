@@ -13,7 +13,7 @@
 #include <kernel/ally.h>
 #include <kernel/building.h>
 #include <kernel/calendar.h>
-#include <kernel/connection.h>
+#include <kernel/direction.h>
 #include <kernel/faction.h>
 #include <kernel/group.h>
 #include <kernel/item.h>
