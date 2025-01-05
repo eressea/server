@@ -158,9 +158,11 @@ void r_add_warning(struct region *r, struct message *msg);
 int fix_demand(struct region *r);
 int distance(const struct region *, const struct region *);
 int koor_distance(int ax, int ay, int bx, int by);
+struct region *findregion_ex(int x, int y, const struct plane *pl);
 struct region *findregion(int x, int y);
 struct region *findregionbyid(int uid);
 
+void region_set_uid(struct region *r, int uid);
 void rhash(struct region *r);
 void runhash(struct region *r);
 
@@ -220,6 +222,7 @@ const char *write_regionname(const struct region *r, const struct faction *f,
 struct region *region_create(int uid);
 void add_region(region *r, int x, int y);
 struct region *new_region(int x, int y, struct plane *pl, int uid);
+void create_land(struct region *r);
 void remove_region(region ** rlist, region * r);
 void terraform_region(struct region *r, const struct terrain_type *terrain);
 void init_region(struct region *r);
@@ -258,7 +261,7 @@ int region_getresource_level(const struct region * r,
     const struct resource_type * rtype);
 int region_getresource(const struct region *r,
     const struct resource_type *rtype);
-void region_setresource(struct region *r, const struct resource_type *rtype,
+struct rawmaterial *region_setresource(struct region *r, const struct resource_type *rtype,
     int value);
 int owner_change(const region * r);
 bool is_mourning(const region * r, int in_turn);

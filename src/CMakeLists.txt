@@ -7,7 +7,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
 endif()
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
+  add_compile_options(-Wsign-compare -Wall -Werror -Wno-switch -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
 elseif(MSVC)
   add_compile_options(/WX /MP /FC)
 #  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
@@ -26,7 +26,7 @@ elseif(CMAKE_COMPILER_IS_GCC)
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
         OUTPUT_VARIABLE GCC_VERSION)
     if (GCC_VERSION VERSION_GREATER 4.9)
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
     endif()
 endif(CMAKE_COMPILER_IS_CLANG)
 
@@ -163,6 +163,7 @@ set(SERVER_SRC
   bind_tolua.c
   bind_unit.c
   bindings.c
+  crimport.c
   console.c
   helpers.c
 )
@@ -217,12 +218,14 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${CRPAT_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   game
   ${STORAGE_LIBRARIES}
+  ${CRPAT_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
 )

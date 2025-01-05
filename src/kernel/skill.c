@@ -80,7 +80,7 @@ void enable_skill(skill_t sk, bool value)
     skill_disabled[sk] = !value;
 }
 
-skill_t findskill(const char *name)
+skill_t find_skill(const char *name)
 {
     skill_t i;
     if (name == NULL) return NOSKILL;
@@ -93,7 +93,7 @@ skill_t findskill(const char *name)
     return NOSKILL;
 }
 
-skill_t get_skill(const char *s, const struct locale * lang)
+skill_t findskill(const char *s, const struct locale * lang)
 {
     skill_t result = NOSKILL;
 

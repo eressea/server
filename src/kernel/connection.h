@@ -83,6 +83,7 @@ extern "C" {
     connection *get_borders(const struct region *r1,
         const struct region *r2);
     /* returns the list of borders between r1 and r2 or r2 and r1 */
+    connection *border_create(struct region *from);
     connection *create_border(border_type *type, struct region *from, struct region *to);
     /* creates a connection of the specified type */
     void erase_border(connection * b);

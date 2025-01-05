@@ -227,18 +227,28 @@ static int newshipid(void) {
     return random_no;
 }
 
-ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
+ship *ship_create(int id)
 {
     ship *sh = (ship *)calloc(1, sizeof(ship));
+    if (!sh) abort();
+    sh->coast = NODIRECTION;
+    sh->number = 1;
+    sh->no = id;
+    shash(sh);
+    return sh;
+}
+
+ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
+{
+    ship *sh = ship_create(newshipid());
     const char* sname;
 
-    if (!sh) abort();
-    assert(stype);
-    sh->no = newshipid();
-    sh->coast = NODIRECTION;
-    sh->type = stype;
     sh->region = r;
-    sh->number = 1;
+    if (r) {
+        addlist(&r->ships, sh);
+    }
+    assert(stype);
+    sh->type = stype;
 
     if (lang) {
         sname = LOC(lang, stype->_name);
@@ -251,10 +261,6 @@ ship *new_ship(const ship_type * stype, region * r, const struct locale *lang)
     }
     assert(sname);
     sh->name = str_strdup(sname);
-    shash(sh);
-    if (r) {
-        addlist(&r->ships, sh);
-    }
     return sh;
 }
 
@@ -587,6 +593,12 @@ unit *ship_owner(const ship * sh)
 void write_ship_reference(const struct ship *sh, struct storage *store)
 {
     WRITE_INT(store, (sh && sh->region) ? sh->no : 0);
+}
+
+void ship_setinfo(ship * sh, const char *info)
+{
+    free(sh->display);
+    sh->display = info ? str_strdup(info) : 0;
 }
 
 void ship_setname(ship * sh, const char *name)

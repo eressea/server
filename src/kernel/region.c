@@ -2,6 +2,7 @@
 
 /* kernel includes */
 #include "alliance.h"
+#include "attrib.h"
 #include "building.h"
 #include "calendar.h"
 #include "config.h"
@@ -9,10 +10,10 @@
 #include "curse.h"
 #include "equipment.h"
 #include "faction.h"
+#include "gamedata.h"
 #include "item.h"
 #include "messages.h"
 #include "plane.h"
-#include "region.h"
 #include "resources.h"
 #include "ship.h"
 #include "teleport.h"
@@ -23,22 +24,18 @@
 #include <spells/regioncurse.h>
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
-#include <kernel/messages.h>
-
+#include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
-#include <util/resolve.h>
-#include <util/umlaut.h>
-#include <util/language.h>
 #include <util/rand.h>
+#include <util/resolve.h>
 #include <util/rng.h>
+#include <util/umlaut.h>
+
+#include <modules/autoseed.h>
 
 #include <storage.h>
 #include <strings.h>
-
-#include <modules/autoseed.h>
 
 #include <stb_ds.h>
 
@@ -295,6 +292,13 @@ static region *rfindhash(int x, int y)
     return regionhash[key];
 }
 
+void region_set_uid(region *r, int uid)
+{
+    unhash_uid(r);
+    r->uid = uid;
+    rhash_uid(r);
+}
+
 void rhash(region * r)
 {
     unsigned int rid = coor_hashkey(r->x, r->y);
@@ -350,9 +354,17 @@ region *rconnect(const region * r, direction_t dir)
     return result;
 }
 
-region *findregion(int x, int y)
+struct region *findregion_ex(int x, int y, const struct plane *pl)
 {
+    if (pl) {
+        pnormalize(&x, &y, pl);
+    }
     return rfindhash(x, y);
+}
+
+struct region *findregion(int x, int y)
+{
+    return findregion_ex(x, y, NULL);
 }
 
 /* Contributed by Hubert Mackenberg. Thanks.
@@ -828,7 +840,7 @@ void free_land(land_region * lr)
     free(lr);
 }
 
-void region_setresource(region * r, const struct resource_type *rtype, int value)
+struct rawmaterial *region_setresource(region * r, const struct resource_type *rtype, int value)
 {
     rawmaterial *rm = rm_get(r, rtype);
     if (rm) {
@@ -841,14 +853,37 @@ void region_setresource(region * r, const struct resource_type *rtype, int value
             rsetpeasants(r, value);
         else if (rtype == get_resourcetype(R_HORSE))
             rsethorses(r, value);
+        else if (rtype == get_resourcetype(R_TREE)) {
+            rsettrees(r, TREE_TREE, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_SAPLING)) {
+            rsettrees(r, TREE_SAPLING, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_SEED)) {
+            rsettrees(r, TREE_SEED, value);
+            freset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_TREE)) {
+            rsettrees(r, TREE_TREE, value);
+            fset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_SAPLING)) {
+            rsettrees(r, TREE_SAPLING, value);
+            fset(r, RF_MALLORN);
+        }
+        else if (rtype == get_resourcetype(R_MALLORN_SEED)) {
+            rsettrees(r, TREE_SEED, value);
+            fset(r, RF_MALLORN);
+        }
         else {
             if (r->terrain->production) {
                 int i;
                 for (i = 0; r->terrain->production[i].type; ++i) {
                     const terrain_production *production = r->terrain->production + i;
                     if (production->type == rtype) {
-                        add_resource(r, 1, value, dice_rand(production->divisor), rtype);
-                        return;
+                        return add_resource(r, 1, value, dice_rand(production->divisor), rtype);
                     }
                 }
             }
@@ -858,10 +893,11 @@ void region_setresource(region * r, const struct resource_type *rtype, int value
                 rm->amount = value;
             }
             else {
-                add_resource(r, 1, value, 150, rtype);
+                return add_resource(r, 1, value, 150, rtype);
             }
         }
     }
+    return rm;
 }
 
 int region_getresource_level(const struct region * r, const struct resource_type * rtype)
@@ -1112,7 +1148,13 @@ static void reset_herbs(region *r) {
     }
 }
 
-static void create_land(region *r) {
+void create_land(region *r) {
+    if (!r->land) {
+        r->land = calloc(1, sizeof(land_region));
+    }
+}
+
+static void init_land(region *r) {
     struct surround {
         const luxury_type *type;
         int value;
@@ -1210,8 +1252,8 @@ void terraform_region(region * r, const terrain_type * terrain)
     }
     else {
         if (!r->land) {
-            r->land = calloc(1, sizeof(land_region));
             create_land(r);
+            init_land(r);
         }
         else {
             reset_herbs(r);

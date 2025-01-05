@@ -200,7 +200,7 @@ static void json_construction(cJSON *json, construction *cons) {
             break;
         case cJSON_String:
             if (strcmp(child->string, "skill") == 0) {
-                cons->skill = findskill(child->valuestring);
+                cons->skill = find_skill(child->valuestring);
             }
             break;
         case cJSON_Number:
@@ -477,7 +477,7 @@ static void json_weapon(cJSON* json, weapon_type* wtype) {
             break;
         case cJSON_String:
             if (strcmp(child->string, "skill") == 0) {
-                wtype->skill = findskill(child->valuestring);
+                wtype->skill = find_skill(child->valuestring);
             }
             else if (strcmp(child->string, "damage") == 0) {
                 wtype->damage[0] = str_strdup(child->valuestring);
@@ -763,7 +763,7 @@ static void disable_feature(const char *str) {
     skill_t sk;
     size_t len;
 
-    sk = findskill(str);
+    sk = find_skill(str);
     if (sk != NOSKILL) {
         enable_skill(sk, false);
         return;
@@ -1048,7 +1048,7 @@ static void json_skill(cJSON *json, struct locale *lang) {
         return;
     }
     for (child = json->child; child; child = child->next) {
-        skill_t sk = findskill(child->string);
+        skill_t sk = find_skill(child->string);
         if (sk != NOSKILL) {
             if (child->type == cJSON_String) {
                 init_skill(lang, sk, child->valuestring);

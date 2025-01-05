@@ -265,7 +265,7 @@ static int create_data(keyword_t kwd, const char *s,
     }
     if (kwd == K_STUDY || kwd == K_AUTOSTUDY || kwd == K_FORGET) {
         const char * sptr = s;
-        skill_t sk = get_skill(parse_token_depr(&sptr), lang);
+        skill_t sk = findskill(parse_token_depr(&sptr), lang);
         if (sk != SK_MAGIC && sk != NOSKILL) {
             return ((int)sk)-100;
         }
@@ -380,7 +380,7 @@ order *parse_order(const char *s, const struct locale * lang)
                 skill_t sk;
                 sptr = sp;
                 p = parse_token(&sp, token, sizeof(token));
-                sk = get_skill(p, lang);
+                sk = findskill(p, lang);
                 if (sk == NOSKILL || !expensive_skill(sk)) {
                     kwd = K_AUTOSTUDY;
                 }
