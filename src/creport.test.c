@@ -14,6 +14,7 @@
 #include <kernel/item.h>
 #include <kernel/region.h>
 #include <kernel/resources.h>
+#include <kernel/terrain.h>
 #include <kernel/unit.h>
 
 #include <stream.h>
@@ -523,13 +524,14 @@ static void test_cr_factionstealth(CuTest *tc) {
 static void test_cr_borders(CuTest* tc) {
     stream strm;
     faction* f;
-    region* r;
+    region* r, *r2;
 
     test_setup();
-    test_create_plain(0, 0);
+    r2 = test_create_plain(0, 0);
+    r2->seen.mode = seen_neighbour;
     f = test_create_faction();
     r = test_create_plain(1, 0);
-    rsetroad(r, D_WEST, 100);
+    rsetroad(r, D_WEST, r->terrain->max_road);
     
     mstream_init(&strm);
     cr_output_region(&strm, f, r, seen_unit);
@@ -541,6 +543,20 @@ static void test_cr_borders(CuTest* tc) {
     CuAssertTrue(tc, cr_find_text(&strm, "GRENZE"));
     mstream_done(&strm);
 
+    rsetroad(r2, D_EAST, r2->terrain->max_road);
+    mstream_init(&strm);
+    cr_output_region(&strm, f, r, seen_neighbour);
+    CuAssertTrue(tc, !cr_find_text(&strm, "GRENZE"));
+    mstream_done(&strm);
+
+    r2->seen.mode = seen_lighthouse_land;
+    mstream_init(&strm);
+    cr_output_region(&strm, f, r, seen_neighbour);
+    CuAssertTrue(tc, cr_find_text(&strm, "GRENZE"));
+    mstream_done(&strm);
+
+    rsetroad(r2, D_WEST, r2->terrain->max_road);
+    rsetroad(r2, D_EAST, 0);
     mstream_init(&strm);
     cr_output_region(&strm, f, r, seen_neighbour);
     CuAssertTrue(tc, !cr_find_text(&strm, "GRENZE"));
