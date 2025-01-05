@@ -81,7 +81,6 @@ typedef enum tag_t {
     TAG_STATUS,
     TAG_LOCALE,
     TAG_AGE,
-    TAG_OPTIONS,
     TAG_SCHOOL,
     TAG_NMR,
     TAG_EMAIL,
@@ -171,7 +170,6 @@ static void init_tags(void)
     add_tag("Partei", TAG_FACTION);
     add_tag("locale", TAG_LOCALE);
     add_tag("age", TAG_AGE);
-    add_tag("Optionen", TAG_OPTIONS);
     add_tag("Magiegebiet", TAG_SCHOOL);
     add_tag("nmr", TAG_NMR);
     add_tag("email", TAG_EMAIL);
@@ -418,9 +416,6 @@ static enum CR_Error handle_element(void *udata, const char *name,
             }
             ctx->block = BLOCK_ALLY;
         }
-        else if (0 == strcmp("VERSION", name)) {
-            ctx->block = BLOCK_VERSION;
-        }
         else if (0 == strcmp("GRUPPE", name)) {
             if (ctx->faction) {
                 ctx->group = group_create(ctx->faction, keyv[0]);
@@ -440,6 +435,9 @@ static enum CR_Error handle_element(void *udata, const char *name,
         }
         else if (0 == strcmp("KAMPFZAUBER", name)) {
             ctx->block = BLOCK_COMBATSPELLS;
+        }
+        else if (0 == strcmp("VERSION", name)) {
+            ctx->block = BLOCK_VERSION;
         }
         else {
             log_info("unsupported block %s", name);
@@ -775,9 +773,17 @@ static enum CR_Error handle_faction(context *ctx, tag_t key, const char *value)
     case TAG_AGE:
         faction_set_age(f, atoi(value));
         break;
-    case TAG_OPTIONS:
-    case TAG_SCHOOL:
+    case TAG_SCHOOL: {
+        enum magic_t m;
+        for (m = 0; m != MAXMAGIETYP; ++m)
+        {
+            if (0 == strcmp(magic_school[m], value)) {
+                f->magiegebiet = m;
+                break;
+            }
+        }
         break;
+    }
     case TAG_NMR:
         f->lastorders = turn - atoi(value) - 1;
         break;
