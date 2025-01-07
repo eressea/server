@@ -25,6 +25,7 @@
 #include <kernel/ship.h>
 #include <kernel/skill.h>
 #include <kernel/skills.h>
+#include <kernel/spellbook.h>
 #include <kernel/terrain.h>
 #include <kernel/types.h>
 #include <kernel/unit.h>
@@ -88,6 +89,8 @@ typedef enum tag_t {
     TAG_DESCRIPTION,
     TAG_MEMO,
     TAG_GUARD,
+    TAG_AURA,
+    TAG_FAMILIAR,
     TAG_BUILDING,
     TAG_SHIP,
     TAG_SIZE,
@@ -184,6 +187,8 @@ static void init_tags(void)
     add_tag("Status", TAG_STATUS);
     add_tag("privat", TAG_MEMO);
     add_tag("bewacht", TAG_GUARD);
+    add_tag("Aura", TAG_AURA);
+    add_tag("familiarmage", TAG_FAMILIAR);
     add_tag("Burg", TAG_BUILDING);
     add_tag("Schiff", TAG_SHIP);
     add_tag("Groesse", TAG_SIZE);
@@ -640,6 +645,23 @@ static enum CR_Error handle_unit(context *ctx, tag_t key, const char *value)
     case TAG_GUARD:
         setguard(u, true);
         break;
+    case TAG_AURA: {
+        struct sc_mage *scm = get_mage(u);
+        if (!scm) scm = create_mage(u, u->faction->magiegebiet);
+        mage_set_spellpoints(scm, atoi(value));
+        break;
+    }
+    case TAG_FAMILIAR: {
+        int no = atoi(value);
+        unit * magician = findunit(no);
+        struct sc_mage *scm = get_mage(u);
+        if (!scm) scm = create_mage(u, M_GRAY);
+        if (!magician) {
+            log_warning("cannot set familiar mage for %s", itoa36(u->no));
+        }
+        set_familiar(magician, u);
+        break;
+    }
     case TAG_STATUS:
         unit_setstatus(u, atoi(value));
         break;
@@ -934,9 +956,8 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     context *ctx = (context *)udata;
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
-    case BLOCK_EFFECTS:
-    case BLOCK_SPELLS:
     case BLOCK_COMBATSPELLS:
+        break;
     case BLOCK_BORDER:
         err = handle_border(ctx, get_tag(name), value);
         break;
@@ -1009,10 +1030,40 @@ static enum CR_Error handle_property(void *udata, const char *name, const char *
     return err;
 }
 
+
+struct spell *findspell(unit *u, const char *name)
+{
+    magic_t m;
+    for (m = M_GRAY; m != MAXMAGIETYP; ++m) {
+        spellbook *sb = get_spellbook(magic_school[m]);
+        struct spell * sp = spellbook_getspell(sb, name, default_locale);
+        if (sp) {
+            return sp;
+        }
+    }
+    return NULL;
+}
+
 static enum CR_Error handle_text(void *udata, const char *value) {
     context *ctx = (context *)udata;
     enum CR_Error err = CR_ERROR_NONE;
     switch (ctx->block) {
+    case BLOCK_EFFECTS:
+        break;
+    case BLOCK_SPELLS: {
+        struct spell *sp;
+        unit *u = ctx->unit;
+        if (!u) {
+            return CR_ERROR_GRAMMAR;
+        }
+        if (NULL != (sp = findspell(u, value))) {
+            unit_add_spell(u, sp, 1);
+        }
+        else {
+            log_error("unknown spell %s", value);
+        }
+        break;
+    }
     case BLOCK_COMMANDS: {
         unit *u = ctx->unit;
         if (!u) {

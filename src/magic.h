@@ -310,6 +310,8 @@ extern "C" {
         int bonus_percent);
     /*      gibt false zurueck, wenn der Zauber gelingt, true, wenn das Ziel
      *      widersteht */
+
+    struct spell *spellbook_getspell(struct spellbook *sb, const char *name, const struct locale *lang);
     struct spell * unit_getspell(struct unit *u, const char *s,
         const struct locale *lang);
     const char *magic_name(magic_t mtype, const struct locale *lang);

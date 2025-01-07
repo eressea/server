@@ -60,6 +60,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <util/variant.h>
 
 #include <critbit.h>
 #include <selist.h>
@@ -156,7 +157,7 @@ void unit_add_spell(unit * u, struct spell * sp, int level)
     sc_mage *mage = get_mage(u);
 
     if (!mage) {
-        log_error("adding new spell %s to a previously non-magical unit %s\n", sp->sname, unitname(u));
+        log_warning("adding new spell %s to a previously non-magical unit %s\n", sp->sname, unitname(u));
         mage = create_mage(u, M_GRAY);
     }
     if (!mage->spellbook) {
@@ -2086,35 +2087,38 @@ static int sm_familiar(const unit * u, const region * r, skill_t sk, int value)
 void set_familiar(unit * mage, unit * familiar)
 {
     /* if the skill modifier for the mage does not yet exist, add it */
-    attrib *a = a_find(mage->attribs, &at_skillmod);
-    while (a && a->type == &at_skillmod) {
-        skillmod_data *smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
-            break;
-        a = a->next;
-    }
-    if (a == NULL) {
-        a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
-        a_add(&mage->attribs, a);
-    }
+    if (mage) {
+        attrib *a = a_find(mage->attribs, &at_skillmod);
+        while (a && a->type == &at_skillmod) {
+            skillmod_data *smd = (skillmod_data *)a->data.v;
+            if (smd->special == sm_familiar)
+                break;
+            a = a->next;
+        }
+        if (a == NULL) {
+            a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
+            a_add(&mage->attribs, a);
+        }
 
-    a = a_find(mage->attribs, &at_familiar);
-    if (a == NULL) {
-        a = a_add(&mage->attribs, a_new(&at_familiar));
-        a->data.v = familiar;
+        a = a_find(mage->attribs, &at_familiar);
+        if (a == NULL) {
+            a = a_add(&mage->attribs, a_new(&at_familiar));
+            a->data.v = familiar;
+        }
+        else {
+            assert(!a->data.v || a->data.v == familiar);
+        }
     }
-    else {
-        assert(!a->data.v || a->data.v == familiar);
-    }
-
-    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
-    a = a_find(familiar->attribs, &at_familiarmage);
-    if (a == NULL) {
-        a = a_add(&familiar->attribs, a_new(&at_familiarmage));
-        a->data.v = mage;
-    }
-    else {
-        assert(!a->data.v || a->data.v == mage);
+    if (familiar) {
+        /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+        attrib *a = a_find(familiar->attribs, &at_familiarmage);
+        if (a == NULL) {
+            a = a_add(&familiar->attribs, a_new(&at_familiarmage));
+            a->data.v = mage;
+        }
+        else {
+            assert(!a->data.v || a->data.v == mage);
+        }
     }
 }
 
@@ -2905,13 +2909,10 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
     }
 }
 
-spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
+spell *spellbook_getspell(spellbook *sb, const char *name, const struct locale *lang)
 {
-    spellbook *sb;
-
-    sb = unit_get_spellbook(u);
     if (sb) {
-        void * tokens = NULL;
+        void *tokens = NULL;
         select_spellbook(&tokens, sb, lang);
         if (tokens) {
             variant token;
@@ -2923,6 +2924,14 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
         }
     }
     return NULL;
+}
+
+spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
+{
+    spellbook *sb;
+
+    sb = unit_get_spellbook(u);
+    return spellbook_getspell(sb, name, lang);
 }
 
 int cast_spell(struct castorder *co)

@@ -1,9 +1,13 @@
-#include <kernel/spell.h>
-
-#include <util/log.h>
-#include <kernel/gamedata.h>
-
 #include "spellbook.h"
+
+#include "gamedata.h"
+#include "spell.h"
+
+#include <util/aliases.h>
+#include <util/language.h>
+#include <util/log.h>
+#include <util/umlaut.h>
+#include <util/variant.h>
 
 #include <stb_ds.h>
 #include <storage.h>
@@ -135,3 +139,4 @@ spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp)
     }
     return 0;
 }
+

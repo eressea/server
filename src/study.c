@@ -93,6 +93,8 @@ bool is_migrant(unit * u)
 
     if (u_race(u) == u->faction->race)
         return false;
+    if (is_familiar(u))
+        return false;
 
     if (fval(u_race(u), RCF_UNDEAD | RCF_ILLUSIONARY))
         return false;
