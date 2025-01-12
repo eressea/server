@@ -523,8 +523,11 @@ static int tolua_unit_getspell(lua_State *L)
             sbe = spellbook_get(sb, sp);
         }
     }
-    lua_pushinteger(L, sbe->level);
-    return 1;
+    if (sbe) {
+        lua_pushinteger(L, sbe->level);
+        return 1;
+    }
+    return 0;
 }
 
 static int tolua_unit_addspell(lua_State * L)
