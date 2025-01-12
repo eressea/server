@@ -5,6 +5,7 @@ BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
 VERSION=$(git describe --tags --match 'v*.*.*')
 echo "submitting version $BRANCH-$VERSION"
 cd build 
+rm -rf cov-int
 make clean
 cov-build --dir cov-int make
 tar czf eressea.tgz cov-int
