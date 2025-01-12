@@ -776,6 +776,7 @@ void parse_construction(construction *con, parseinfo *pi, const XML_Char *el, co
         }
         else if (stage != NULL && xml_strequal(attr[i], "name")) {
             /* only building stages have names */
+            if (stage->name) free(stage->name);
             stage->name = str_strdup(attr[i + 1]);
         }
         else {
