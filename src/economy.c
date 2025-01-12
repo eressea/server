@@ -2458,6 +2458,19 @@ static void peasant_taxes(region * r)
     }
 }
 
+static void marked_produceexp(const econ_request *requests)
+{
+    size_t s, len = arrlen(requests);
+    for (s = 0; s != len; ++s) {
+        const econ_request *o = requests + s;
+        unit *u = o->unit;
+        if (fval(u, UFL_MARK)) {
+            produceexp(u, SK_TRADE);
+            freset(u, UFL_MARK);
+        }
+    }
+}
+
 void produce(struct region *r)
 {
     bool limited = true;
@@ -2531,8 +2544,7 @@ void produce(struct region *r)
                 }
             }
             if (trader) {
-                produceexp(u, SK_TRADE);
-                fset(u, UFL_LONGACTION | UFL_NOTMOVING);
+                fset(u, UFL_LONGACTION | UFL_NOTMOVING | UFL_MARK);
             }
         }
         todo = getkeyword(u->thisorder);
@@ -2614,7 +2626,6 @@ void produce(struct region *r)
 
     if (buyorders) {
         expandbuying(r, buyorders);
-        arrfree(buyorders);
     }
 
     if (sellorders) {
@@ -2623,8 +2634,12 @@ void produce(struct region *r)
             && buildingtype_exists(r, caravan_bt, true))
             limit *= 2;
         expandselling(r, sellorders, limited ? limit : INT_MAX);
+        marked_produceexp(sellorders);
         arrfree(sellorders);
     }
+
+    marked_produceexp(buyorders);
+    arrfree(buyorders);
 
     /* Die Spieler sollen alles Geld verdienen, bevor sie beklaut werden
      * (expandstealing). */
