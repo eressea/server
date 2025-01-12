@@ -565,7 +565,7 @@ static const race *select_familiar(const race * magerace, int level, magic_t mag
         if (maxlen > 0) {
             race_list *rclist = familiarraces;
             unsigned int index = rng_uint() % maxlen;
-            while (index-- > 0) {
+            for (; index > 0; --index) {
                 rclist = rclist->next;
             }
             retval = rclist->data;
