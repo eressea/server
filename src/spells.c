@@ -3002,12 +3002,14 @@ int sp_shadowlords(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     int amount = (int)(force * force);
-
+    int level = get_level(caster, SK_MAGIC);
     u = create_unit(r, caster->faction, amount, get_race(RC_SHADOWLORD), 0,
         NULL, caster);
 
     /* Bekommen Tarnung = Magie und Wahrnehmung 5. */
-    set_level(u, SK_STEALTH, get_level(caster, SK_MAGIC) - 1);
+    if (level > 1) {
+        set_level(u, SK_STEALTH, level - 1);
+    }
     set_level(u, SK_PERCEPTION, 5);
 
     ADDMSG(&caster->faction->msgs, msg_message("summon_effect", "mage amount race",
