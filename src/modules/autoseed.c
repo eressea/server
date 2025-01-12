@@ -133,13 +133,14 @@ newfaction *read_newfactions(const char *filename)
             free(nf);
             continue;
         }
-        nf->password = str_strdup(password);
         nf->race = rc_find(race);
         if (nf->race == NULL) {
             log_error("new faction has unknown race '%s'.\n", race);
+            free(nf->email);
             free(nf);
             continue;
         }
+        nf->password = str_strdup(password);
         if (alliances != NULL) {
             struct alliance *al = findalliance(alliance);
             if (al == NULL) {
