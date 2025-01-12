@@ -238,10 +238,10 @@ function test_repeated_create_n_building()
     assert_equal("ARBEITE", u.orders[1])
 end
 
--- MACHE n SCHIFF countdown
+-- MACHE n SCHIFF has no countdown
 function test_repeated_create_n_ship()
     local r = region.create(0,0, "plain")
-    local f = faction.create("human")
+    local f = faction.create("insect")
     local u = unit.create(f, r, 1)
     u:set_skill("shipcraft", 1)
     u:add_item("log", 50)
@@ -249,11 +249,5 @@ function test_repeated_create_n_ship()
     assert_equal("MACHE 3 Boot", u.orders[1])
     process_orders()
     assert_equal(1, u.ship.size)
-    assert_equal("MACHE 2 Boot " .. itoa36(u.ship.id), u.orders[1])
-    process_orders()
-    assert_equal(2, u.ship.size)
-    assert_equal("MACHE 1 Boot " .. itoa36(u.ship.id), u.orders[1])
-    process_orders()
-    assert_equal(3, u.ship.size)
-    assert_equal("ARBEITE", u.orders[1])
+    assert_equal("MACHE SCHIFF " .. itoa36(u.ship.id), u.orders[1])
 end
