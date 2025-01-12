@@ -308,9 +308,8 @@ static void writeorder(gamedata *data, const struct order *ord,
 static bool read_skill(gamedata *data, skill *sv) {
     int val;
     READ_INT(data->store, &val);
-    if (val < 0) return false;
-    sv->id = (skill_t)val;
-    if (sv->id != NOSKILL) {
+    if (val >= 0) {
+        sv->id = (skill_t)val;
         READ_INT(data->store, &val);
         assert(val < CHAR_MAX);
         sv->old = sv->level = val;
@@ -327,8 +326,9 @@ static bool read_skill(gamedata *data, skill *sv) {
         else {
             assert(val > 0);
         }
+        return true;
     }
-    return true;
+    return false;
 }
 
 static int skill_cmp(const void *a, const void *b) {
