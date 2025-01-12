@@ -1515,9 +1515,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier befi
 msgid "stormwinds_effect"
 msgstr "\"$unit($unit) beschwört einen magischen Wind, der die Schiffe über das Wasser treibt.\""
 
-msgid "error102"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren Güter handeln.\""
-
 msgid "drought_effect"
 msgstr "\"$unit($mage) verflucht das Land in $region($region), und eine Dürreperiode beginnt.\""
 

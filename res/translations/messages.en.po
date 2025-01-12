@@ -1515,9 +1515,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician is
 msgid "stormwinds_effect"
 msgstr "\"$unit($unit) calls up a magical storm that whips the ship over the waters.\""
 
-msgid "error102"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot trade any more goods.\""
-
 msgid "drought_effect"
 msgstr "\"$unit($mage) puts a curse on the lands of $region($region) and a drought sets in.\""
 

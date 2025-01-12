@@ -1402,11 +1402,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         return;
     }
 
-    if (!n) {
-        cmistake(u, ord, 102, MSG_COMMERCE);
-        return;
-    }
-
     assert(n >= 0);
 
     s = gettoken(token, sizeof(token));

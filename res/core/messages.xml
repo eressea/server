@@ -4412,13 +4412,6 @@
       <arg name="command" type="order"/>
     </type>
   </message>
-  <message name="error102" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
   <message name="error101" section="errors">
     <type>
       <arg name="unit" type="unit"/>
