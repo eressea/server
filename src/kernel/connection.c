@@ -427,10 +427,14 @@ static void b_readroad(connection * b, gamedata * data)
     assert(b->from && b->to);
     READ_INT(store, &n);
 	dir = reldirection(b->from, b->to);
-	rsetroad(b->from, dir, n);
+    if (dir != NODIRECTION) {
+        rsetroad(b->from, dir, n);
+    }
     READ_INT(store, &n);
 	dir = reldirection(b->to, b->from);
-	rsetroad(b->to, dir, n);
+    if (dir != NODIRECTION) {
+        rsetroad(b->to, dir, n);
+    }
 }
 
 border_type bt_road = {
