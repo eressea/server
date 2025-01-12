@@ -5,6 +5,7 @@
 #endif
 
 #include "crimport.h"
+#include "magic.h"
 #include "reports.h"
 
 #include <attributes/raceprefix.h>
