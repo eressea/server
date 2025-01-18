@@ -4574,7 +4574,7 @@ msgid "fish_shield"
 msgstr "Shield of the Fish"
 
 msgid "corridor1_trail"
-msgstr "a %s"
+msgstr "the corridor of %s"
 
 msgctxt "race"
 msgid "dolphin_d"
@@ -5090,7 +5090,7 @@ msgid "soc"
 msgstr "sack of holding"
 
 msgid "hall1_trail"
-msgstr "the %s"
+msgstr "the great hall of %s"
 
 msgctxt "spellinfo"
 msgid "treewalkenter"

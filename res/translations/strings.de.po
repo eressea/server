@@ -5180,7 +5180,7 @@ msgid "join"
 msgstr "BEITRETEN"
 
 msgid "corridor1_trail"
-msgstr "die %s"
+msgstr "der Gang %s"
 
 msgid "lebkuchenherz_p"
 msgstr "Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'"
@@ -5741,7 +5741,7 @@ msgid "soc"
 msgstr "Beutel des negativen Gewichts"
 
 msgid "hall1_trail"
-msgstr "die %s"
+msgstr "die Halle %s"
 
 msgctxt "spell"
 msgid "draigdestroymagic"

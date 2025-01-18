@@ -858,6 +858,7 @@ static void report_exits(sbstring *sbs, const region *r, const faction* f, const
             nrd--;
             if (dh) {
                 char regname[128], trail[256];
+                const char *s;
                 if (nrd == 0) {
                     sbs_strcat(sbs, " ");
                     sbs_strcat(sbs, LOC(f->locale, "nr_nb_final"));
@@ -868,8 +869,14 @@ static void report_exits(sbstring *sbs, const region *r, const faction* f, const
                 sbs_strcat(sbs, LOC(f->locale, directions[d]));
                 sbs_strcat(sbs, " ");
                 f_regionid(r2, f, regname, sizeof(regname));
-                snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
-                sbs_strcat(sbs, trail);
+                s = trailinto(r2, f->locale);
+                if (strstr(s, "%s")) {
+                    snprintf(trail, sizeof(trail), s, regname);
+                    sbs_strcat(sbs, trail);
+                }
+                else {
+                    sbs_strcat(sbs, s);
+                }
             }
             else {
                 message* msg = msg_message("nr_vicinitystart", "dir region", d, r2);

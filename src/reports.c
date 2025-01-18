@@ -1743,8 +1743,7 @@ const char *trailinto(const region * r, const struct locale *lang)
         sz += str_strlcat(ref + sz, "_trail", sizeof(ref) - sz);
         s = LOC(lang, ref);
         if (s && *s) {
-            if (strstr(s, "%s"))
-                return s;
+            return s;
         }
     }
     return "%s";
