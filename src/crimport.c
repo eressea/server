@@ -306,7 +306,7 @@ static enum CR_Error finish_element(struct context *ctx)
             return CR_ERROR_GRAMMAR;
         }
         err = finish_unit(ctx, u);
-        memset(&ctx->extra.unit, 0, sizeof(ctx->extra.unit));
+        ctx->extra.unit.prefix = NULL;
         if (err != CR_ERROR_NONE) {
             return err;
         }
@@ -319,6 +319,7 @@ static enum CR_Error finish_element(struct context *ctx)
         }
         err = finish_resource(ctx);
         memset(&ctx->extra.resource, 0, sizeof(ctx->extra.resource));
+        ctx->extra.resource.type = NULL;
         if (err != CR_ERROR_NONE) {
             return err;
         }
