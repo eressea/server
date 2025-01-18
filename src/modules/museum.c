@@ -251,9 +251,16 @@ static const char *b_namequestportal(const connection * b, const region * r,
     return LOC(f->locale, mkname("border", bname));
 }
 
+static bool b_transparent_questportal(const connection *b, const struct faction *f)
+{
+    int lock = b->data.i;
+    UNUSED_ARG(f);
+    return lock == 0;
+}
+
 border_type bt_questportal = {
     "questportal", VAR_INT, 0,
-    b_opaque,
+    b_transparent_questportal,
     NULL,                         /* init */
     NULL,                         /* destroy */
     b_read,                       /* read */
