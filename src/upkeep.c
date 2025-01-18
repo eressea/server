@@ -68,7 +68,7 @@ static const char *hunger_damage(const race *rc) {
     return damage;
 }
 
-static bool hunger(int number, unit * u)
+static bool hunger(int number, unit * u, const char *reason)
 {
     region *r = u->region;
     int dead = 0, hpsub = 0;
@@ -105,7 +105,7 @@ static bool hunger(int number, unit * u)
         /* Meldung nur, wenn noch keine fuer Tote generiert. */
         if (dead == 0) {
             /* Durch unzureichende Ernaehrung wird %s geschwaecht */
-            ADDMSG(&u->faction->msgs, msg_message("malnourish", "unit region", u, r));
+            ADDMSG(&u->faction->msgs, msg_message(reason, "unit region", u, r));
         }
     }
     return (dead || hpsub);
@@ -234,7 +234,7 @@ void get_food(region * r)
                 int lspp = lifestyle(u) / u->number;
                 if (lspp > 0) {
                     int number = (need + lspp - 1) / lspp;
-                    if (hunger(number, u))
+                    if (hunger(number, u, "malnourish"))
                         fset(u, UFL_HUNGER);
                 }
             }
@@ -288,7 +288,7 @@ void get_food(region * r)
                 if (hungry > 0) {
                     if (demon_hunger) {
                         /* demons who don't feed are hungry */
-                        if (hunger(hungry, u))
+                        if (hunger(hungry, u, "malnourish_demon"))
                             fset(u, UFL_HUNGER);
                     }
                     else {
@@ -301,7 +301,7 @@ void get_food(region * r)
         else if (is_cold && rc == rc_insect) {
             /* insects in glaciers get hunger damage */
             if (!is_cursed(u->attribs, &ct_insectfur)) {
-                if (hunger(u->number, u)) {
+                if (hunger(u->number, u, "malnourish_insect")) {
                     fset(u, UFL_HUNGER);
                 }
             }

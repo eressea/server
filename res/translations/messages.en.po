@@ -939,7 +939,13 @@ msgid "hornofpeace_r_nosuccess"
 msgstr "\"$unit($unit) in $region($region) blows the Horn of Dancing, but nobody here gets into the mood.\""
 
 msgid "malnourish"
-msgstr "\"$unit($unit) is weakened due to malnourishment.\""
+msgstr "\"$unit($unit) in $region($region) is weakened due to malnourishment.\""
+
+msgid "malnourish_demon"
+msgstr "\"$unit($unit) is weakened due to lack of victims in $region($region).\""
+
+msgid "malnourish_insect"
+msgstr "\"$unit($unit) is weakened due to the cold in $region($region).\""
 
 msgid "iceberg_land"
 msgstr "\"The iceberg $region($region) drifts onto a coast.\""

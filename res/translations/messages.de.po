@@ -941,6 +941,12 @@ msgstr "\"$unit($unit) in $region($region) bläst das Horn des Tanzes, doch niem
 msgid "malnourish"
 msgstr "\"$unit($unit) in $region($region) wird durch unzureichende Nahrung geschwächt.\""
 
+msgid "malnourish_demon"
+msgstr "\"$unit($unit) in $region($region) wird durch unzureichende Opfer geschwächt.\""
+
+msgid "malnourish_insect"
+msgstr "\"$unit($unit) wird durch die extreme Kälte in $region($region) geschwächt.\""
+
 msgid "iceberg_land"
 msgstr "\"Der Eisberg $region($region) treibt an eine Küste.\""
 

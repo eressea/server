@@ -2596,6 +2596,18 @@
       <arg name="region" type="region"/>
     </type>
   </message>
+  <message name="malnourish_insect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
+  <message name="malnourish_demon" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
   <message name="starvation" section="events">
     <type>
       <arg name="unit" type="unit"/>
