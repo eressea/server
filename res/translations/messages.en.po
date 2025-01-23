@@ -1036,9 +1036,6 @@ msgstr "\"Warning: $faction($faction) has not been sending in orders for $int($t
 msgid "arena_leave_fail"
 msgstr "\"The attempt to use wings of the gryphon failed. $unit($unit) could not leave the Plane of Challenge.\""
 
-msgid "battle_critical"
-msgstr "\"$int36($unit.id($unit))/$int($index) does critical damage.\""
-
 msgid "error_spell_on_ship_already"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is already a spell on $ship($ship).\""
 

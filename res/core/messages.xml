@@ -530,12 +530,6 @@
       <arg name="amount" type="int"/>
     </type>
   </message>
-  <message name="battle_critical" section="battle">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="index" type="int"/>
-    </type>
-  </message>
   <message name="teach_asgood" section="errors">
     <type>
       <arg name="unit" type="unit"/>

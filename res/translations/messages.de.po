@@ -1036,9 +1036,6 @@ msgstr "\"Achtung: $faction($faction) hat seit $int($turns) Wochen keine Züge e
 msgid "arena_leave_fail"
 msgstr "\"Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. $unit($unit) konnte die Ebene der Herausforderung nicht verlassen.\""
 
-msgid "battle_critical"
-msgstr "\"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer.\""
-
 msgid "error_spell_on_ship_already"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt bereits ein Zauber.\""
 
