@@ -1162,11 +1162,13 @@ void get_addresses(report_context * ctx)
                 while (u != NULL) {
                     if (u->faction != ctx->f) {
                         faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
-                        bool ballied = sf && sf != ctx->f && sf != lastf
-                            && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                        if (ballied || is_allied(ctx->f, sf)) {
-                            add_seen_faction_i(&flist, sf);
-                            lastf = sf;
+                        if (sf) {
+                            bool ballied = sf != ctx->f && sf != lastf
+                                && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
+                            if (ballied || is_allied(ctx->f, sf)) {
+                                add_seen_faction_i(&flist, sf);
+                                lastf = sf;
+                            }
                         }
                     }
                     u = u->next;
