@@ -4137,6 +4137,9 @@ msgstr "Shhhhhh..."
 msgid "growl3"
 msgstr "Raaaar..."
 
+msgid "growl4"
+msgstr "Chrrr..."
+
 msgctxt "skill"
 msgid "bow"
 msgstr "bow"
