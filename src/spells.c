@@ -3469,6 +3469,7 @@ int sp_charmingsong(castorder * co)
     if (target->faction == mage->faction) {
         /* Die Einheit ist eine der unsrigen */
         cmistake(mage, co->order, 45, MSG_MAGIC);
+        return 0;
     }
     /* niemand mit teurem Talent */
     if (!can_charm(target, (int)(force / 2))) {
