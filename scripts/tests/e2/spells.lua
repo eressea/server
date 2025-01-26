@@ -464,3 +464,43 @@ function test_cast_rostregen()
     assert_equal(4, u2:get_item("plate"))
     assert_equal(1, u2:get_item("rustyplate"))
 end
+
+function test_charming()
+    local r1 = region.create(0, 0, 'plain')
+    local f = faction.create('human', "charmer@eressea.de", "de")
+    local f2 = faction.create('human', "charmee@eressea.de", "de")
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f2, r1, 2)
+    u2.name = 'Xolgrim'
+    local u3 = unit.create(f2, r1, 1)
+    u1.id = 10
+    u2.id = 11
+    u3.id = 12
+    f.id = 10
+    f2.id = 11
+
+    u1.magic = 'cerddor'
+    u1:set_skill('magic', 24)
+    u1.aura = 1000
+    u1:add_spell('song_of_slavery')
+
+    u1:add_order("ZAUBERE 'Gesang der Versklavung' b")
+    u3.magic = 'cerddor'
+    u3:set_skill('magic', 24)
+    u3.aura = 1000
+    u3:add_spell('song_of_slavery')
+
+    process_orders()
+
+    u1:clear_orders()
+    u3:add_order("ZAUBERE 'Gesang der Versklavung' b")
+    process_orders()
+
+    for i = 1,10 do
+        u1:clear_orders()
+        u3:clear_orders()
+        process_orders()
+    end
+
+    assert_equal(f2, u2.faction)
+end

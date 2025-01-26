@@ -1081,69 +1081,82 @@ variant magic_resistance(const unit * target)
     return prob;
 }
 
-variant resist_chance(const unit *magician, const void *obj, int objtyp, int bonus_percent) {
-    variant v02p, v98p, prob = frac_make(bonus_percent, 100);
-    const attrib *a = NULL;
-
-    switch (objtyp) {
-    case TYP_UNIT:
-    {
-        int at, pa = 0;
-        size_t s, len;
-        const unit *u = (const unit *)obj;
-
-        if (ucontact(u, magician)) {
-            return frac_zero;
-        }
-        at = effskill(magician, SK_MAGIC, NULL);
-
-        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
-            const skill* sv = u->skills + s;
-            int sk = eff_skill(u, sv, NULL);
-            if (pa < sk) {
-                pa = sk;
-            }
-        }
-
-        /* Contest, probability = 0.05 * (10 + pa - at); */
-        prob = frac_add(prob, frac_make(10 + pa - at, 20));
-        prob = frac_add(prob, magic_resistance(u));
-        break;
+static bool magic_resistance_enabled(void)
+{
+    static int config;
+    static bool result;
+    if (config_changed(&config)) {
+        result = config_get_int("magic.resist.enable", 1) != 0;
     }
-
-    case TYP_REGION:
-        a = ((const region *)obj)->attribs;
-        break;
-
-    case TYP_BUILDING:
-        a = ((const building *)obj)->attribs;
-        /* Bonus durch Typ */
-        prob = frac_add(prob, ((const building *)obj)->type->magres);
-        break;
-
-    case TYP_SHIP:
-        /* Bonus durch Zauber */
-        a = ((const ship *)obj)->attribs;
-        break;
-    }
-
-    if (a) {
-        const curse *c = get_curse(a, &ct_magicrunes);
-        int effect = curse_geteffect_int(c);
-        prob = frac_add(prob, frac_make(effect, 100));
-    }
-    /* ignore results < 2% and > 98% */
-    v02p = frac_make(1, 50);
-    v98p = frac_make(49, 50);
-    if (frac_sign(frac_sub(prob, v02p)) < 0) {
-        return v02p;
-    }
-    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
-        return v98p;
-    }
-    return prob;
+    return result;
 }
 
+variant resist_chance(const unit *magician, const void *obj, int objtyp, int bonus_percent)
+{
+    if (magic_resistance_enabled()) {
+        variant v02p, v98p, prob = frac_make(bonus_percent, 100);
+        const attrib *a = NULL;
+
+        switch (objtyp) {
+        case TYP_UNIT:
+        {
+            int at, pa = 0;
+            size_t s, len;
+            const unit *u = (const unit *)obj;
+
+            if (ucontact(u, magician)) {
+                return frac_zero;
+            }
+            at = effskill(magician, SK_MAGIC, NULL);
+
+            for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+                const skill *sv = u->skills + s;
+                int sk = eff_skill(u, sv, NULL);
+                if (pa < sk) {
+                    pa = sk;
+                }
+            }
+
+            /* Contest, probability = 0.05 * (10 + pa - at); */
+            prob = frac_add(prob, frac_make(10 + pa - at, 20));
+            prob = frac_add(prob, magic_resistance(u));
+            break;
+        }
+
+        case TYP_REGION:
+            a = ((const region *)obj)->attribs;
+            break;
+
+        case TYP_BUILDING:
+            a = ((const building *)obj)->attribs;
+            /* Bonus durch Typ */
+            prob = frac_add(prob, ((const building *)obj)->type->magres);
+            break;
+
+        case TYP_SHIP:
+            /* Bonus durch Zauber */
+            a = ((const ship *)obj)->attribs;
+            break;
+        }
+
+        if (a) {
+            const curse *c = get_curse(a, &ct_magicrunes);
+            int effect = curse_geteffect_int(c);
+            prob = frac_add(prob, frac_make(effect, 100));
+        }
+        /* ignore results < 2% and > 98% */
+        v02p = frac_make(1, 50);
+        v98p = frac_make(49, 50);
+        if (frac_sign(frac_sub(prob, v02p)) < 0) {
+            return v02p;
+        }
+        else if (frac_sign(frac_sub(prob, v98p)) > 0) {
+            return v98p;
+        }
+        return prob;
+    }
+    return frac_zero;
+}
 /* ------------------------------------------------------------- */
 /* Prueft, ob das Objekt dem Zauber widerstehen kann.
  * Objekte koennen Regionen, Units, Gebaeude oder Schiffe sein.
