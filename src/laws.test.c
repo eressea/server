@@ -1324,7 +1324,7 @@ static void test_name_ship(CuTest *tc) {
 }
 
 static void test_name_group(CuTest *tc) {
-    faction* f;
+    faction* f, *f2;
     unit *u1, *u2;
     group *g1, *g2;
 
@@ -1333,6 +1333,8 @@ static void test_name_group(CuTest *tc) {
     set_group(u1, g1 = create_group(f, "Penner", 1));
     u2 = test_create_unit(u1->faction, u1->region);
     set_group(u2, g2 = create_group(f, "Helden", 2));
+    f2 = test_create_faction();
+    create_group(f2, "Deppen", 3);
 
     u1->thisorder = create_order(K_NAME, f->locale, "%s Deppen", param_name(P_GROUP, f->locale));
     name_cmd(u1, u1->thisorder);
