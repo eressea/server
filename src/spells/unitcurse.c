@@ -1,5 +1,7 @@
 #include "unitcurse.h"
 
+#include <spells/charming.h>
+
 /* kernel includes */
 #include <kernel/curse.h>
 #include <kernel/messages.h>

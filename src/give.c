@@ -5,7 +5,7 @@
 #include "economy.h"
 #include "laws.h"
 
-#include <spells/unitcurse.h>
+#include <spells/charming.h>
 
  /* attributes includes */
 #include <attributes/racename.h>

@@ -85,6 +85,29 @@ static bool can_charm(const unit *u, int maxlevel)
     return true;
 }
 
+void charm_unit(unit *target, unit *mage, double force, int duration)
+{
+    trigger *trestore = trigger_changefaction(target, target->faction);
+    /* laeuft die Dauer ab, setze Partei zurueck */
+    add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
+    /* wird die alte Partei von Target aufgeloest, dann auch diese Einheit */
+    add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
+    /* wird die neue Partei von Target aufgeloest, dann auch diese Einheit */
+    add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
+    /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
+    create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
+
+    /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
+    u_setfaction(target, mage->faction);
+    u_freeorders(target);
+
+    /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
+     * steckt */
+    if (rule_stealth_anon()) {
+        target->flags |= UFL_ANON_FACTION;
+    }
+}
+
 /* ------------------------------------------------------------- */
 /* Name:     Charming
  * Stufe:   13
@@ -114,13 +137,12 @@ static bool can_charm(const unit *u, int maxlevel)
 int sp_charmingsong(castorder *co)
 {
     unit *target;
-    int duration;
     skill_t i;
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double force = co->force;
     spellparameter *param = co->a_params;
-    int resist_bonus = 0;
+    int duration, resist_bonus = 0;
     int tb = 0;
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
@@ -179,28 +201,7 @@ int sp_charmingsong(castorder *co)
     }
 
     duration = 3 + rng_int() % (int)force;
-    {
-        trigger *trestore = trigger_changefaction(target, target->faction);
-        /* laeuft die Dauer ab, setze Partei zurueck */
-        add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
-        /* wird die alte Partei von Target aufgeloest, dann auch diese Einheit */
-        add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
-        /* wird die neue Partei von Target aufgeloest, dann auch diese Einheit */
-        add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
-    }
-    /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
-    create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
-
-    /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
-    u_setfaction(target, mage->faction);
-    u_freeorders(target);
-
-    /* setze Parteitarnung, damit nicht sofort klar ist, wer dahinter
-     * steckt */
-    if (rule_stealth_anon()) {
-        target->flags |= UFL_ANON_FACTION;
-    }
-
+    charm_unit(target, mage, force, duration);
     ADDMSG(&mage->faction->msgs, msg_message("charming_effect",
         "mage unit duration", mage, target, duration));
 

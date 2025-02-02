@@ -22,7 +22,7 @@
 #include "terrain.h"
 #include "unit.h"
 
-#include <spells/unitcurse.h>
+#include <spells/charming.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
