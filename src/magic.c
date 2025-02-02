@@ -2356,7 +2356,7 @@ static int read_magician(variant *var, void *owner, struct gamedata *data)
     return AT_READ_OK;
 }
 
-static int age_unit(attrib * a, void *owner)
+static int age_magic_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
@@ -2368,7 +2368,7 @@ attrib_type at_familiarmage = {
     "familiarmage",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_magician,
     NULL,
@@ -2379,7 +2379,7 @@ attrib_type at_familiar = {
     "familiar",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_familiar,
     NULL,
@@ -2390,7 +2390,7 @@ attrib_type at_clonemage = {
     "clonemage",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_magician,
     NULL,
@@ -2401,7 +2401,7 @@ attrib_type at_clone = {
     "clone",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_clone,
     NULL,

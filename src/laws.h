@@ -97,6 +97,7 @@ extern "C" {
     #define FORCE_LEAVE_ALL 2
     bool rule_force_leave(int flag);
     bool LongHunger(const struct unit *u);
+    void age_unit(struct unit *u);
     int NMRTimeout(void);
     int NewbieImmunity(void);
     bool IsImmune(const struct faction *f, int age);
