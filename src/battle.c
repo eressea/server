@@ -21,6 +21,7 @@
 #include "spells/buildingcurse.h"
 #include "spells/regioncurse.h"
 #include "spells/unitcurse.h"
+#include "spells/charming.h"
 
 #include "kernel/ally.h"
 #include "kernel/alliance.h"

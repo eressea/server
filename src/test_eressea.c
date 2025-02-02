@@ -134,6 +134,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(defaults);
     ADD_SUITE(donations);
     ADD_SUITE(economy);
+    ADD_SUITE(charming);
     ADD_SUITE(flyingship);
     ADD_SUITE(give);
     ADD_SUITE(guard);

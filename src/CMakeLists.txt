@@ -310,6 +310,7 @@ set(TESTS_SRC
   wormhole.test.c
   spells/combatspells.test.c
   spells/flyingship.test.c
+  spells/charming.test.c
   spells/regioncurse.test.c
   triggers/shock.test.c
   ${ATTRIBUTES_TESTS}
