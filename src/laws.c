@@ -215,7 +215,7 @@ static void astral_crumble(unit *u) {
     }
 }
 
-static void age_unit(region * r, unit * u)
+void age_unit(unit * u)
 {
     const race *rc = u_race(u);
 
@@ -233,19 +233,7 @@ static void age_unit(region * r, unit * u)
 
 static void live(region * r)
 {
-    unit **up = &r->units;
-
     get_food(r);
-
-    while (*up) {
-        unit *u = *up;
-        /* IUW: age_unit() kann u loeschen, u->next ist dann
-         * undefiniert, also muessen wir hier schon das naechste
-         * Element bestimmen */
-        age_unit(r, u);
-        if (*up == u)
-            up = &u->next;
-    }
 }
 
 /*
@@ -2817,8 +2805,18 @@ static void ageing(void)
     /* Regionen */
     for (r = regions; r; r = r->next) {
         building **bp;
-        unit **up;
+        unit **up = &r->units;
         ship **sp;
+
+        while (*up) {
+            unit *u = *up;
+            /* IUW: age_unit() kann u loeschen, u->next ist dann
+             * undefiniert, also muessen wir hier schon das naechste
+             * Element bestimmen */
+            age_unit(u);
+            if (*up == u)
+                up = &u->next;
+        }
 
         age_region(r);
 
