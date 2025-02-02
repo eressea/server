@@ -2730,8 +2730,7 @@ static int sp_unholypower(castorder * co)
              * vermutlich eine ganze Reihe von Stellen, wo das nicht
              * korrekt abgefangen wird. Besser (aber nicht gerade einfach)
              * waere es, eine solche Konstruktion irgendwie zu kapseln. */
-            if (fval(u, UFL_LOCKED) || fval(u, UFL_HUNGER)
-                || is_cursed(u->attribs, &ct_slavery)) {
+            if (fval(u, UFL_LOCKED|UFL_HUNGER) || unit_is_slaved(u)) {
                 cmistake(caster, co->order, 74, MSG_MAGIC);
                 continue;
             }

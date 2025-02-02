@@ -22,7 +22,6 @@
 #include "spells/buildingcurse.h"
 #include "spells/regioncurse.h"
 #include "spells/unitcurse.h"
-#include "spells/charming.h"
 
 /* kernel includes */
 #include "kernel/ally.h"
@@ -257,7 +256,7 @@ int forget_cmd(unit * u, order * ord)
     skill_t sk;
     const char *s;
 
-    if (is_cursed(u->attribs, &ct_slavery)) {
+    if (unit_is_slaved(u)) {
         /* charmed units shouldn't be losing their skills */
         return 0;
     }

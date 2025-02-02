@@ -225,7 +225,6 @@ void default_name(const unit* u, char name[], int len);
 const char* unitname(const struct unit* u);
 char* write_unitname(const struct unit* u, char* buffer, size_t size);
 bool unit_name_equals_race(const struct unit* u);
-
 void unit_convert_race(struct unit* u, const struct race* rc, const char* rcname);
 void translate_orders(struct unit* u, const struct locale* lang, struct order** list, bool del);
 
@@ -242,5 +241,7 @@ bool has_horses(const struct unit* u);
 int maintenance_cost(const struct unit* u);
 bool has_limited_skills(const struct unit* u);
 bool is_limited_skill(enum skill_t sk);
+
+bool unit_is_slaved(const struct unit *u);
 
 #endif

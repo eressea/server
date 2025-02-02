@@ -21,7 +21,6 @@
 #include "spells/buildingcurse.h"
 #include "spells/regioncurse.h"
 #include "spells/unitcurse.h"
-#include "spells/charming.h"
 
 #include "kernel/ally.h"
 #include "kernel/alliance.h"
@@ -3859,7 +3858,7 @@ bool start_battle(region * r, battle ** bp)
                         continue;
                     }
 
-                    if (curse_active(get_curse(u->attribs, &ct_slavery))) {
+                    if (unit_is_slaved(u)) {
                         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "slave_active", ""));
                         continue;
                     }

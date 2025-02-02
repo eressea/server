@@ -29,6 +29,7 @@
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include <spells/charming.h>
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
@@ -1797,6 +1798,11 @@ bool has_limited_skills(const struct unit * u)
         }
     }
     return false;
+}
+
+bool unit_is_slaved(const unit *u)
+{
+    return curse_active(get_curse(u->attribs, &ct_slavery));
 }
 
 double u_heal_factor(const unit * u)
