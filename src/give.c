@@ -5,8 +5,6 @@
 #include "economy.h"
 #include "laws.h"
 
-#include <spells/charming.h>
-
  /* attributes includes */
 #include <attributes/racename.h>
 #include <attributes/otherfaction.h>
@@ -275,7 +273,7 @@ bool can_give_men(const unit *u, const unit *dst, order *ord, message **msg)
         /* hungry people cannot be given away */
         if (msg) *msg = msg_error(u, ord, 73);
     }
-    else if (fval(u, UFL_LOCKED) || is_cursed(u->attribs, &ct_slavery)) {
+    else if (fval(u, UFL_LOCKED) || unit_is_slaved(u)) {
         if (msg) *msg = msg_error(u, ord, 74);
     }
     else {
@@ -435,7 +433,7 @@ message * give_men(int n, unit * u, unit * u2, struct order *ord)
     else if (unit_has_cursed_item(u2)) {
         error = 78;
     }
-    else if (fval(u2, UFL_LOCKED) || is_cursed(u2->attribs, &ct_slavery)) {
+    else if (fval(u2, UFL_LOCKED) || unit_is_slaved(u2)) {
         error = 75;
     }
     else if (!ucontact(u2, u)) {

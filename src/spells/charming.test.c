@@ -28,7 +28,7 @@ static void test_charm_unit(CuTest * tc)
 
     charm_unit(u, mage, 3.0, 2);
     CuAssertPtrNotNull(tc, u->attribs);
-    CuAssertTrue(tc, is_cursed(u->attribs, &ct_slavery));
+    CuAssertTrue(tc, unit_is_slaved(u));
 
     test_teardown();
 }
@@ -104,7 +104,7 @@ static void test_charmingsong(CuTest *tc) {
     // success:
     CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
     CuAssertPtrEquals(tc, u->faction, u2->faction);
-    CuAssertTrue(tc, is_cursed(u2->attribs, &ct_slavery));
+    CuAssertTrue(tc, unit_is_slaved(u2));
 
     CuAssertPtrEquals(tc, NULL, f2->msgs);
 

@@ -22,7 +22,6 @@
 #include "terrain.h"
 #include "unit.h"
 
-#include <spells/charming.h>
 #include <attributes/otherfaction.h>
 #include <attributes/racename.h>
 
@@ -727,7 +726,7 @@ int count_faction(const faction * f, int flags)
                 }
             }
             else if (flags&COUNT_MIGRANTS) {
-                if (!is_cursed(u->attribs, &ct_slavery)) {
+                if (!unit_is_slaved(u)) {
                     n += x;
                 }
             }
