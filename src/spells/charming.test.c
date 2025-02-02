@@ -7,6 +7,7 @@
 #include <util/message.h>
 #include <util/rand.h>
 
+#include <laws.h>
 #include <magic.h>
 #include <tests.h>
 
@@ -26,9 +27,14 @@ static void test_charm_unit(CuTest * tc)
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     mage = test_create_unit(test_create_faction(), u->region);
 
+    CuAssertTrue(tc, !unit_is_slaved(u));
     charm_unit(u, mage, 3.0, 2);
     CuAssertPtrNotNull(tc, u->attribs);
     CuAssertTrue(tc, unit_is_slaved(u));
+    age_unit(u);
+    CuAssertTrue(tc, unit_is_slaved(u));
+    age_unit(u);
+    CuAssertTrue(tc, !unit_is_slaved(u));
 
     test_teardown();
 }

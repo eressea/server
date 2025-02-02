@@ -229,6 +229,7 @@ void age_unit(unit * u)
     if (u->items && u->region && is_astral(u->region)) {
         astral_crumble(u);
     }
+    a_age(&u->attribs, u);
 }
 
 static void live(region * r)
@@ -2814,21 +2815,13 @@ static void ageing(void)
              * undefiniert, also muessen wir hier schon das naechste
              * Element bestimmen */
             age_unit(u);
-            if (*up == u)
+            if (*up == u) {
+                handle_event(u->attribs, "timer", u);
                 up = &u->next;
+            }
         }
 
         age_region(r);
-
-        /* Einheiten */
-        for (up = &r->units; *up;) {
-            unit *u = *up;
-            a_age(&u->attribs, u);
-            if (u == *up) 
-                handle_event(u->attribs, "timer", u);
-            if (u == *up) /*-V581 */
-                up = &(*up)->next;
-        }
 
         /* Schiffe */
         for (sp = &r->ships; *sp;) {
