@@ -25,11 +25,6 @@
 #include <assert.h>
 #include <stdlib.h>
 
-typedef struct wallcurse {
-    curse *buddy;
-    connection *wall;
-} wallcurse;
-
 static int cw_read_depr(variant *var, void *target, gamedata *data)
 {
     storage *store = data->store;
@@ -56,25 +51,6 @@ static int cw_read_depr(variant *var, void *target, gamedata *data)
  *
  *   Was fuer eine Wirkung hat die?
  */
-
-static void wall_vigour(curse * c, double delta)
-{
-    wallcurse *wc = (wallcurse *)c->data.v;
-    assert(wc->buddy->vigour == c->vigour);
-    wc->buddy->vigour += delta;
-    if (wc->buddy->vigour <= 0) {
-        erase_border(wc->wall);
-        wc->wall = NULL;
-        ((wallcurse *)wc->buddy->data.v)->wall = NULL;
-    }
-}
-
-const curse_type ct_firewall = {
-    "Feuerwand",
-    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
-    NULL,                         /* curseinfo */
-    wall_vigour                   /* change_vigour */
-};
 
 static void wall_init(connection * b)
 {

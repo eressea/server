@@ -6376,8 +6376,6 @@ void register_spells(void)
 
     at_deprecate("zauber_todeswolke", dc_read_compat);
 
-    /* init_firewall(); */
-    ct_register(&ct_firewall);
     ct_register(&ct_deathcloud);
 
     register_spelldata();
