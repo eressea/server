@@ -2,8 +2,10 @@
 
 #include <kernel/curse.h>
 #include <kernel/faction.h>
+#include <kernel/order.h>
 #include <kernel/unit.h>
 
+#include <util/keyword.h>
 #include <util/message.h>
 #include <util/rand.h>
 
@@ -21,20 +23,64 @@ static void test_charm_unit(CuTest * tc)
     unit *u, *mage;
 
     test_setup();
-    mt_create_va(mt_new("flying_ship_result", NULL),
-        "mage:unit", "ship:ship", MT_NEW_END);
 
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     mage = test_create_unit(test_create_faction(), u->region);
-
+    u->thisorder = create_order(K_WORK, u->faction->locale, NULL);
+    unit_addorder(u,copy_order(u->thisorder));
     CuAssertTrue(tc, !unit_is_slaved(u));
     charm_unit(u, mage, 3.0, 2);
+    CuAssertPtrEquals(tc, NULL, u->orders);
+    CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->attribs);
     CuAssertTrue(tc, unit_is_slaved(u));
     age_unit(u);
     CuAssertTrue(tc, unit_is_slaved(u));
     age_unit(u);
     CuAssertTrue(tc, !unit_is_slaved(u));
+
+    test_teardown();
+}
+
+static void test_charmed_unit_original_faction_dies(CuTest *tc)
+{
+    unit *u, *mage;
+    faction *f;
+
+    test_setup();
+
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    mage = test_create_unit(test_create_faction(), u->region);
+
+    CuAssertTrue(tc, !unit_is_slaved(u));
+    charm_unit(u, mage, 3.0, 2);
+    CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertTrue(tc, unit_is_slaved(u));
+    CuAssertPtrEquals(tc, factions, f);
+    destroyfaction(&factions);
+    age_unit(u);
+    CuAssertIntEquals(tc, 0, u->number);
+
+    test_teardown();
+}
+
+static void test_charmed_unit_new_faction_dies(CuTest *tc)
+{
+    unit *u, *mage;
+    faction *f;
+
+    test_setup();
+
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    mage = test_create_unit(test_create_faction(), u->region);
+
+    CuAssertTrue(tc, !unit_is_slaved(u));
+    charm_unit(u, mage, 3.0, 2);
+    CuAssertPtrNotNull(tc, u->attribs);
+    CuAssertTrue(tc, unit_is_slaved(u));
+    CuAssertPtrEquals(tc, factions->next, u->faction);
+    destroyfaction(&factions->next);
+    CuAssertIntEquals(tc, 0, u->number);
 
     test_teardown();
 }
@@ -123,6 +169,8 @@ CuSuite *get_charming_suite(void)
 
     SUITE_ADD_TEST(suite, test_charm_unit);
     SUITE_ADD_TEST(suite, test_charmingsong);
+    SUITE_ADD_TEST(suite, test_charmed_unit_original_faction_dies);
+    SUITE_ADD_TEST(suite, test_charmed_unit_new_faction_dies);
 
     return suite;
 }
