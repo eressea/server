@@ -215,8 +215,9 @@ static void astral_crumble(unit *u) {
     }
 }
 
-void age_unit(unit * u)
+void age_unit(unit ** up)
 {
+    unit *u = *up;
     const race *rc = u_race(u);
 
     ++u->age;
@@ -230,6 +231,9 @@ void age_unit(unit * u)
         astral_crumble(u);
     }
     a_age(&u->attribs, u);
+    if (*up == u) {
+        handle_event(u->attribs, "timer", u);
+    }
 }
 
 static void live(region * r)
@@ -2814,9 +2818,8 @@ static void ageing(void)
             /* IUW: age_unit() kann u loeschen, u->next ist dann
              * undefiniert, also muessen wir hier schon das naechste
              * Element bestimmen */
-            age_unit(u);
+            age_unit(up);
             if (*up == u) {
-                handle_event(u->attribs, "timer", u);
                 up = &u->next;
             }
         }

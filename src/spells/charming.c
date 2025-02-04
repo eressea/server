@@ -9,6 +9,7 @@
 #include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
+#include <kernel/gamedata.h>
 #include <kernel/messages.h>
 #include <kernel/objtypes.h>
 #include <kernel/skill.h>
@@ -30,7 +31,30 @@
 /*
  * C_SLAVE
  */
-static message *cinfo_slave(const void *obj, objtype_t typ, const curse *c,
+
+typedef struct slave_data
+{
+    struct unit *mage;
+    struct unit *self;
+    struct faction *faction;
+} slave_data;
+
+static void slave_init(curse *c)
+{
+    slave_data *sd = malloc(sizeof(slave_data));
+    if (!sd) abort();
+    sd->mage = NULL;
+    sd->self = NULL;
+    sd->faction = NULL;
+    c->data.v = sd;
+}
+
+static void slave_done(curse *c)
+{
+    free(c->data.v);
+}
+
+static message *slave_info(const void *obj, objtype_t typ, const curse *c,
     int self)
 {
     unit *u;
@@ -46,8 +70,65 @@ static message *cinfo_slave(const void *obj, objtype_t typ, const curse *c,
     return NULL;
 }
 
+static int slave_read(struct gamedata *data, struct curse *c, void *target)
+{
+    slave_data *sd = (slave_data *)c->data.v;
+    if (data->version >= SLAVE_DATA_VERSION) {
+        read_faction_reference(data, &sd->faction);
+        read_unit_reference(data, &sd->mage, NULL);
+        sd->self = (unit *)target;
+    }
+    return 0;
+}
+
+static int slave_write(struct storage *store, const struct curse *c, const void *target)
+{
+#if RELEASE_VERSION >= SLAVE_DATA_VERSION
+    slave_data *sd = (slave_data *)c->data.v;
+    write_faction_reference(sd ? sd->faction : NULL, store);
+    write_unit_reference(sd ? sd->mage : NULL, store);
+#endif
+    return 0;
+}
+
+static bool caster_alive(const unit *u)
+{
+    return u && u->number > 0;
+}
+
+static int slave_age(struct curse *c)
+{
+    slave_data *sd = (slave_data *)c->data.v;
+    if (sd) {
+        if (c->duration == 0) {
+            sd->self->faction = sd->faction;
+        }
+        else if (!faction_alive(sd->mage->faction)) {
+            /* we can't remove_unit() here, because that's what's calling us. */
+            set_number(sd->self, 0);
+        }
+        else if (!faction_alive(sd->faction)) {
+            /* we can't remove_unit() here, because that's what's calling us. */
+            set_number(sd->self, 0);
+        }
+        else {
+            return 1; /* curse is still active */
+        }
+    }
+    return 0;
+}
+
 const struct curse_type ct_slavery = { 
-    "slavery", CURSETYP_NORM, 0, NO_MERGE, cinfo_slave
+    .cname = "slavery",
+    .typ = CURSETYP_NORM,
+    .flags = 0,
+    .mergeflags = NO_MERGE,
+    .curseinfo = slave_info,
+    .read = slave_read,
+    .write = slave_write,
+    .age = slave_age,
+    .construct = slave_init,
+    .destroy = slave_done,
 };
 
 static bool can_charm(const unit *u, int maxlevel)
@@ -88,12 +169,17 @@ static bool can_charm(const unit *u, int maxlevel)
 void charm_unit(unit *target, unit *mage, double force, int duration)
 {
     trigger *trestore = trigger_changefaction(target, target->faction);
-    /* laeuft die Dauer ab, setze Partei zurueck */
-    add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
-    /* wird die alte Partei von Target aufgeloest, dann auch diese Einheit */
-    add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
+    curse *c;
+    slave_data *sd;
+
     /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
-    create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
+    c = create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
+    sd = (slave_data *)c->data.v;
+    if (sd) {
+        sd->faction = target->faction;
+        sd->mage = mage;
+        sd->self = target;
+    }
 
     /* setze Partei um und loesche langen Befehl aus Sicherheitsgruenden */
     u_setfaction(target, mage->faction);

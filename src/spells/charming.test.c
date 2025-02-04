@@ -21,10 +21,11 @@
 static void test_charm_unit(CuTest * tc)
 {
     unit *u, *mage;
+    faction *f;
 
     test_setup();
 
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     mage = test_create_unit(test_create_faction(), u->region);
     u->thisorder = create_order(K_WORK, u->faction->locale, NULL);
     unit_addorder(u,copy_order(u->thisorder));
@@ -34,10 +35,12 @@ static void test_charm_unit(CuTest * tc)
     CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->attribs);
     CuAssertTrue(tc, unit_is_slaved(u));
-    age_unit(u);
+    CuAssertPtrEquals(tc, mage->faction, u->faction);
+    age_unit(&u);
     CuAssertTrue(tc, unit_is_slaved(u));
-    age_unit(u);
+    age_unit(&u);
     CuAssertTrue(tc, !unit_is_slaved(u));
+    CuAssertPtrEquals(tc, f, u->faction);
 
     test_teardown();
 }
@@ -58,7 +61,7 @@ static void test_charmed_unit_original_faction_dies(CuTest *tc)
     CuAssertTrue(tc, unit_is_slaved(u));
     CuAssertPtrEquals(tc, factions, f);
     destroyfaction(&factions);
-    age_unit(u);
+    age_unit(&u);
     CuAssertIntEquals(tc, 0, u->number);
 
     test_teardown();

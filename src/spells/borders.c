@@ -28,10 +28,9 @@
 static int cw_read_depr(variant *var, void *target, gamedata *data)
 {
     storage *store = data->store;
-
-    curse_init(var);
+    curse c;
+    var->v = &c;
     curse_read(var, store, target);
-    curse_done(var);
     READ_INT(store, NULL);
     return AT_READ_DEPR;
 }

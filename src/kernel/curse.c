@@ -86,9 +86,14 @@ static void cunhash(curse * c)
 
 /* ------------------------------------------------------------- */
 /* at_curse */
-void curse_init(variant *var)
+static void curse_init(variant *var)
 {
     var->v = calloc(1, sizeof(curse));
+}
+
+static void curse_done(variant *var)
+{
+    destroy_curse((curse *)var->v);
 }
 
 int curse_age(attrib * a, void *owner)
@@ -99,13 +104,13 @@ int curse_age(attrib * a, void *owner)
     c_clearflag(c, CURSE_ISNEW);
 
     if ((c_flags(c) & CURSE_NOAGE) == 0) {
+        if (--c->duration <= 0) {
+            result = AT_AGE_REMOVE;
+        }
         if (c->type->age) {
             if (c->type->age(c) == 0) {
                 result = AT_AGE_REMOVE;
             }
-        }
-        if (--c->duration <= 0) {
-            result = AT_AGE_REMOVE;
         }
     }
     return result;
@@ -113,13 +118,11 @@ int curse_age(attrib * a, void *owner)
 
 void destroy_curse(curse * c)
 {
+    if (c->type->destroy) {
+        c->type->destroy(c);
+    }
     cunhash(c);
     free(c);
-}
-
-void curse_done(variant * var)
-{
-    destroy_curse((curse *)var->v);
 }
 
 /** reads curses that have been removed from the code */
@@ -541,6 +544,9 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     }
     else if (ap) {
         c = make_curse(magician, ap, ct, vigour, duration, effect, men);
+    }
+    if (c && ct->construct) {
+        ct->construct(c);
     }
     return c;
 }
