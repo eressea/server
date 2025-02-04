@@ -92,8 +92,6 @@ void charm_unit(unit *target, unit *mage, double force, int duration)
     add_trigger(&target->attribs, "timer", trigger_timeout(duration, trestore));
     /* wird die alte Partei von Target aufgeloest, dann auch diese Einheit */
     add_trigger(&target->faction->attribs, "destroy", trigger_killunit(target));
-    /* wird die neue Partei von Target aufgeloest, dann auch diese Einheit */
-    add_trigger(&mage->faction->attribs, "destroy", trigger_killunit(target));
     /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
     create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
 
