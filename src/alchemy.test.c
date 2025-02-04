@@ -104,7 +104,7 @@ static void test_foolpotion_effect(CuTest *tc) {
 	test_set_skill(u, SK_CROSSBOW, 2, 1);
     change_effect(u, itype, 2);
 	CuAssertIntEquals(tc, 2, get_effect(u, itype));
-    age_unit(u);
+    age_unit(&u);
 	CuAssertIntEquals(tc, 1, get_effect(u, itype));
 	CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, unit_skill(u, SK_MAGIC)->days);
 	CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, unit_skill(u, SK_CROSSBOW)->days);

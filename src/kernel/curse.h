@@ -146,6 +146,8 @@ extern "C" {
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
         int(*age) (struct curse *);
+        void(*construct) (struct curse *);
+        void(*destroy) (struct curse *);
     } curse_type;
 
     typedef struct curse {
@@ -227,8 +229,6 @@ extern "C" {
 
     curse *findcurse(int curseid);
 
-    void curse_init(union variant *a);
-    void curse_done(union variant *a);
     int curse_age(struct attrib *a, void *owner);
 
     double destr_curse(struct curse *c, int cast_level, double force);
