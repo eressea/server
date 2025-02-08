@@ -2096,33 +2096,33 @@ report_plaintext(const char *filename, report_context * ctx,
     }
     no_units = f->num_units;
     no_people = f->num_people;
-    m = msg_message("nr_population", "population units limit", no_people, no_units, rule_faction_limit());
+    m = msg_message("nr_population", "population units limit",
+        no_people, no_units, rule_faction_limit());
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     centre(out, buf, true);
     if (f->race == get_race(RC_HUMAN)) {
         int maxmig = count_maxmigrants(f);
         if (maxmig > 0) {
-            m =
-                msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
+            m = msg_message("nr_migrants", "units maxunits",
+                count_migrants(f), maxmig);
             nr_render(m, f->locale, buf, sizeof(buf), f);
             msg_release(m);
             centre(out, buf, true);
         }
     }
     if (f_get_alliance(f)) {
-        m =
-            msg_message("nr_alliance", "leader name id age",
-                alliance_get_leader(f->alliance), f->alliance->name, f->alliance->id,
-                turn - f->alliance_joindate);
+        m = msg_message("nr_alliance", "leader name id age",
+            alliance_get_leader(f->alliance), f->alliance->name,
+            f->alliance->id, turn - f->alliance_joindate);
         nr_render(m, f->locale, buf, sizeof(buf), f);
         msg_release(m);
         centre(out, buf, true);
     }
     maxh = max_heroes(f->num_people);
     if (maxh) {
-        message *msg =
-            msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
+        message *msg = msg_message("nr_heroes", "units maxunits",
+                countheroes(f), maxh);
         nr_render(msg, f->locale, buf, sizeof(buf), f);
         msg_release(msg);
         centre(out, buf, true);
