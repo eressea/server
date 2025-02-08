@@ -2,7 +2,6 @@
 
 #include <magic.h>
 
-#include <triggers/changefaction.h>
 #include <triggers/killunit.h>
 #include <triggers/timeout.h>
 

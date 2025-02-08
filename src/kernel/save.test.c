@@ -21,7 +21,6 @@
 
 #include <attributes/key.h>
 
-#include <triggers/changefaction.h>
 #include <triggers/createunit.h>
 #include <triggers/timeout.h>
 
@@ -337,43 +336,6 @@ static void test_readwrite_dead_faction_regionowner(CuTest *tc) {
     test_teardown();
 }
 
-static void test_readwrite_dead_faction_changefaction(CuTest *tc) {
-    gamedata data;
-    storage store;
-    faction *f, *f2;
-    region *r;
-    trigger *tr;
-    unit * u;
-
-    test_setup();
-    f = test_create_faction();
-    f2 = test_create_faction();
-    u = test_create_unit(f2, r = test_create_plain(0, 0));
-    tr = trigger_changefaction(u, f);
-    add_trigger(&u->attribs, "timer", trigger_timeout(10, tr));
-    CuAssertPtrNotNull(tc, a_find(u->attribs, &at_eventhandler));
-    destroyfaction(&factions);
-    CuAssertTrue(tc, !f->_alive);
-    remove_empty_units();
-    mstream_init(&data.strm);
-    gamedata_init(&data, &store, RELEASE_VERSION);
-    write_game(&data);
-    test_reset();
-    f = NULL;
-    data.strm.api->rewind(data.strm.handle);
-    read_game(&data);
-    mstream_done(&data.strm);
-    gamedata_done(&data);
-    f = factions;
-    CuAssertPtrNotNull(tc, f);
-    r = regions;
-    CuAssertPtrNotNull(tc, r);
-    u = r->units;
-    CuAssertPtrNotNull(tc, u);
-    CuAssertPtrEquals(tc, NULL, a_find(u->attribs, &at_eventhandler));
-    test_teardown();
-}
-
 static void test_readwrite_dead_faction_createunit(CuTest *tc) {
     gamedata data;
     storage store;
@@ -503,7 +465,6 @@ CuSuite *get_save_suite(void)
     SUITE_ADD_TEST(suite, test_readwrite_building);
     SUITE_ADD_TEST(suite, test_readwrite_ship);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_createunit);
-    SUITE_ADD_TEST(suite, test_readwrite_dead_faction_changefaction);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_regionowner);
     SUITE_ADD_TEST(suite, test_readwrite_dead_faction_group);
     SUITE_ADD_TEST(suite, test_read_password);
