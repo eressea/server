@@ -6,6 +6,7 @@
 #include <triggers/killunit.h>
 #include <triggers/timeout.h>
 
+#include <kernel/attrib.h>
 #include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
@@ -16,6 +17,7 @@
 #include <kernel/skills.h>
 #include <kernel/unit.h>
 
+#include <util/log.h>
 #include <util/message.h>
 #include <util/rng.h>
 
@@ -34,7 +36,6 @@
 
 typedef struct slave_data
 {
-    struct unit *mage;
     struct unit *self;
     struct faction *faction;
 } slave_data;
@@ -43,7 +44,6 @@ static void slave_init(curse *c)
 {
     slave_data *sd = malloc(sizeof(slave_data));
     if (!sd) abort();
-    sd->mage = NULL;
     sd->self = NULL;
     sd->faction = NULL;
     c->data.v = sd;
@@ -75,7 +75,6 @@ static int slave_read(struct gamedata *data, struct curse *c, void *target)
     slave_data *sd = (slave_data *)c->data.v;
     if (data->version >= SLAVE_DATA_VERSION) {
         read_faction_reference(data, &sd->faction);
-        read_unit_reference(data, &sd->mage, NULL);
         sd->self = (unit *)target;
     }
     return 0;
@@ -86,7 +85,6 @@ static int slave_write(struct storage *store, const struct curse *c, const void 
 #if RELEASE_VERSION >= SLAVE_DATA_VERSION
     slave_data *sd = (slave_data *)c->data.v;
     write_faction_reference(sd ? sd->faction : NULL, store);
-    write_unit_reference(sd ? sd->mage : NULL, store);
 #endif
     return 0;
 }
@@ -102,10 +100,6 @@ static int slave_age(struct curse *c)
     if (sd) {
         if (c->duration == 0) {
             sd->self->faction = sd->faction;
-        }
-        else if (!faction_alive(sd->mage->faction)) {
-            /* we can't remove_unit() here, because that's what's calling us. */
-            set_number(sd->self, 0);
         }
         else if (!faction_alive(sd->faction)) {
             /* we can't remove_unit() here, because that's what's calling us. */
@@ -168,7 +162,6 @@ static bool can_charm(const unit *u, int maxlevel)
 
 void charm_unit(unit *target, unit *mage, double force, int duration)
 {
-    trigger *trestore = trigger_changefaction(target, target->faction);
     curse *c;
     slave_data *sd;
 
@@ -177,7 +170,6 @@ void charm_unit(unit *target, unit *mage, double force, int duration)
     sd = (slave_data *)c->data.v;
     if (sd) {
         sd->faction = target->faction;
-        sd->mage = mage;
         sd->self = target;
     }
 
@@ -290,4 +282,29 @@ int sp_charmingsong(castorder *co)
         "mage unit duration", mage, target, duration));
 
     return cast_level;
+}
+
+void fix_slaves()
+{
+    faction *f;
+    for (f = factions; f; f = f->next) {
+        attrib *a = a_find(f->attribs, &at_eventhandler);
+        if (a) {
+            trigger **tlist, **tl;
+            tl = tlist = get_triggers(a, "destroy");
+            while (tl && *tl) {
+                trigger *t = *tlist;
+                if (t->type == &tt_killunit) {
+                    *tl = t->next;
+                    t_free(t);
+                }
+                else {
+                    tl = &t->next;
+                }
+            }
+            if (tlist && *tlist == NULL) {
+                a_remove(&f->attribs, a);
+            }
+        }
+    }
 }
