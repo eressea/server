@@ -1,6 +1,5 @@
 PROJECT(triggers C)
 SET(_FILES
-changefaction.c
 changerace.c
 clonedied.c
 createcurse.c

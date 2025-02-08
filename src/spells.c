@@ -13,7 +13,6 @@
 #include "vortex.h"
 
 /* triggers includes */
-#include <triggers/changefaction.h>
 #include <triggers/changerace.h>
 #include <triggers/createcurse.h>
 #include <triggers/createunit.h>
