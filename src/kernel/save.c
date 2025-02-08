@@ -42,7 +42,9 @@
 #include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <attributes/racename.h>
+#include <spells/charming.h>
 #include <triggers/changerace.h>
+#include <triggers/killunit.h>
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
 
@@ -1819,6 +1821,9 @@ int read_game(gamedata *data)
         {
             create_teleport_plane();
         }
+    }
+    if (data->version < SLAVE_DATA_VERSION) {
+        fix_slaves();
     }
 
     log_debug("Done loading turn %d.", turn);
