@@ -2210,6 +2210,10 @@ msgid "error103"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann Straßen bauen.\""
 
 msgctxt "curseinfo"
+msgid "slave_0"
+msgstr "\"$unit($unit) steht unter einem hypnotischen Bann. ($int36($id))\""
+
+msgctxt "curseinfo"
 msgid "slave_1"
 msgstr "\"$unit($unit) wird noch $int($duration) $if($eq($duration,1), \"Woche\", \"Wochen\") unter unserem Bann stehen. ($int36($id))\""
 
