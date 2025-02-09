@@ -1827,7 +1827,6 @@ int read_game(gamedata *data)
     }
 
     log_debug("Done loading turn %d.", turn);
-
     return 0;
 }
 

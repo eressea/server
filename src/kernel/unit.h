@@ -244,4 +244,6 @@ bool is_limited_skill(enum skill_t sk);
 
 bool unit_is_slaved(const struct unit *u);
 
+void dump_unit(const struct unit *u);
+
 #endif
