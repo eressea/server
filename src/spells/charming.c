@@ -88,11 +88,6 @@ static int slave_write(struct storage *store, const struct curse *c, const void 
     return 0;
 }
 
-static bool caster_alive(const unit *u)
-{
-    return u && u->number > 0;
-}
-
 static int slave_age(struct curse *c)
 {
     slave_data *sd = (slave_data *)c->data.v;
