@@ -1895,3 +1895,15 @@ void translate_orders(unit *u, const struct locale *lang, order **list, bool del
         po = &ord->next;
     }
 }
+
+void dump_unit(const unit *u) {
+    if (u) {
+        const attrib *a;
+        fprintf(stdout, "%s, %s, %d %s\n", unitname(u), factionname(u->faction), u->number, u->_race->_name);
+        for (a = u->attribs; a; a = a->next) {
+            dump_attrib(a);
+        }
+    }
+    else fputs("null", stdout);
+}
+

@@ -250,6 +250,17 @@ void curse_write(const variant * var, const void *owner, struct storage *store)
     }
 }
 
+static void curse_dump(const attrib *a)
+{
+    curse *c = (curse *)a->data.v;
+    const curse_type *ct = c->type;
+    fprintf(stdout, "  type: %s\n", ct->cname);
+    fprintf(stdout, "  mage: %s\n", unitname(c->magician));
+    fprintf(stdout, "  duration: %d\n", c->duration);
+    fprintf(stdout, "  effect: %lf\n", c->effect);
+    fprintf(stdout, "  vigour: %lf\n", c->vigour);
+}
+
 attrib_type at_curse = {
     "curse",
     curse_init,
@@ -257,7 +268,8 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
-    NULL
+    NULL,
+    .dump = curse_dump,
 };
 
 /* ------------------------------------------------------------- */

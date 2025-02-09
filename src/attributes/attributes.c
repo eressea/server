@@ -10,7 +10,6 @@
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
-#include "magic.h"
 #include "movement.h"
 #include "otherfaction.h"
 #include "racename.h"

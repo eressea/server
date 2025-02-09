@@ -530,6 +530,14 @@ static int tolua_get_unit(lua_State * L)
     return 1;
 }
 
+static int tolua_dump_unit(lua_State * L)
+{
+    int no = tolua_toid(L, 1, 0);
+    unit *u = findunit(no);
+    dump_unit(u);
+    return 0;
+}
+
 static int tolua_alliance_create(lua_State * L)
 {
     int id = (int)tolua_tonumber(L, 1, 0);
@@ -984,6 +992,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         } tolua_endmodule(L);
         tolua_function(L, "get_region_by_id", tolua_get_region_byid);
         tolua_function(L, "get_unit", tolua_get_unit);
+        tolua_function(L, "dump_unit", tolua_dump_unit);
         tolua_function(L, "get_alliance", tolua_get_alliance);
         tolua_function(L, "get_ship", tolua_get_ship);
         tolua_function(L, "get_building", tolua_get_building);
