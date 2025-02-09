@@ -8,4 +8,4 @@ void charm_unit(struct unit *target, struct unit *mage, double force, int durati
 
 extern const struct curse_type ct_slavery;
 
-void fix_slaves();
+void fix_slaves(void);

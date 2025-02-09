@@ -287,7 +287,7 @@ int sp_charmingsong(castorder *co)
     return cast_level;
 }
 
-void fix_slaves()
+void fix_slaves(void)
 {
     faction *f;
     for (f = factions; f; f = f->next) {
