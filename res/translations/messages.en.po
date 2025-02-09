@@ -2210,6 +2210,10 @@ msgid "error103"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nobody here can build roads.\""
 
 msgctxt "curseinfo"
+msgid "slave_0"
+msgstr "\"$unit($unit) experiences a strong hypnotic influence. ($int36($id))\""
+
+msgctxt "curseinfo"
 msgid "slave_1"
 msgstr "\"$unit($unit) will be under our influence for $int($duration) more $if($eq($duration,1), \"week\", \"weeks\"). ($int36($id))\""
 

@@ -467,11 +467,10 @@ end
 
 function test_charming()
     local r1 = region.create(0, 0, 'plain')
-    local f = faction.create('human', "charmer@eressea.de", "de")
-    local f2 = faction.create('human', "charmee@eressea.de", "de")
+    local f = faction.create('human', "charmer@eressea.de")
+    local f2 = faction.create('human', "charmee@eressea.de")
     local u1 = unit.create(f, r1, 1)
     local u2 = unit.create(f2, r1, 2)
-    u2.name = 'Xolgrim'
     local u3 = unit.create(f2, r1, 1)
     u1.id = 10
     u2.id = 11
@@ -491,7 +490,6 @@ function test_charming()
     u3:add_spell('song_of_slavery')
 
     process_orders()
-
     u1:clear_orders()
     u3:add_order("ZAUBERE 'Gesang der Versklavung' b")
     process_orders()

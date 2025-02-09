@@ -261,6 +261,12 @@
       <arg name="id" type="int"/>
     </type>
   </message>
+  <message name="curseinfo::slave_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+  </message>
   <message name="curseinfo::slave_1" section="events">
     <type>
       <arg name="unit" type="unit"/>

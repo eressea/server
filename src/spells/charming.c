@@ -66,7 +66,7 @@ static message *slave_info(const void *obj, objtype_t typ, const curse *c,
         return msg_message("curseinfo::slave_1", "unit duration id", u, c->duration,
             c->no);
     }
-    return NULL;
+    return msg_message("curseinfo::slave_0", "unit id", u, c->no);
 }
 
 static int slave_read(struct gamedata *data, struct curse *c, void *target)
@@ -130,7 +130,7 @@ static bool can_charm(const unit *u, int maxlevel)
     { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
     size_t s, len;
 
-    if (u->flags & UFL_HERO) {
+    if (u->flags & UFL_HERO || unit_is_slaved(u)) {
         return false;
     }
 
@@ -164,8 +164,12 @@ void charm_unit(unit *target, unit *mage, double force, int duration)
     curse *c;
     slave_data *sd;
 
-    /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
-    c = create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
+    /* previously charmed unit, override old charm. should never actually happen */
+    c = get_curse(target->attribs, &ct_slavery);
+    if (!c) {
+        /* sperre ATTACKIERE, GIB PERSON und ueberspringe Migranten */
+        c = create_curse(mage, &target->attribs, &ct_slavery, force, duration, 0.0, 0);
+    }
     sd = (slave_data *)c->data.v;
     if (sd) {
         sd->faction = target->faction;
