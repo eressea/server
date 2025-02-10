@@ -279,7 +279,3 @@ const trigger_type * tt)
             tp = &t->next;
     }
 }
-
-/***
- ** default events
- **/

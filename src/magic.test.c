@@ -842,7 +842,7 @@ static void test_fumble_toad(CuTest *tc) {
     unit* u;
     struct race* rc_toad;
     const struct race* rc;
-    trigger* t;
+    trigger *t, *tr, **tlist;
     changerace_data* crd;
 
     test_setup();
@@ -850,6 +850,9 @@ static void test_fumble_toad(CuTest *tc) {
     CuAssertPtrEquals(tc, rc_toad, (race *)get_race(RC_TOAD));
 
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    tr = trigger_timeout(10, trigger_timeout(0, NULL));
+    add_trigger(&u->attribs, "timer", tr);
+
     rc = u_race(u);
     fumble_toad(u, NULL, 6);
     CuAssertPtrEquals(tc, rc_toad, (race*)u_race(u));
@@ -857,6 +860,11 @@ static void test_fumble_toad(CuTest *tc) {
     CuAssertPtrNotNull(tc, crd = (changerace_data*)t->data.v);
     CuAssertPtrEquals(tc, (race*)rc, (race*)crd->race);
     CuAssertPtrEquals(tc, NULL, (race*)crd->irace);
+    tlist = get_triggers(u->attribs, "timer");
+    CuAssertPtrNotNull(tc, tlist);
+    CuAssertPtrEquals(tc, tr, *tlist);
+    CuAssertPtrNotNull(tc, tr->next);
+    CuAssertPtrEquals(tc, &tt_timeout, tr->next->type);
 
     test_teardown();
 }
