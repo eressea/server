@@ -162,6 +162,7 @@ race *rc_find(const char *);
 void free_races(void);
 
 bool rc_can_use(const struct race *rc, const struct item_type *itype);
+bool rc_leaves_corpse(const struct race *rc);
 
 const char* race_name(const race* rc);
 typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;

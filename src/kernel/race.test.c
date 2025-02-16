@@ -200,6 +200,20 @@ static void test_rc_mask(CuTest *tc) {
     test_teardown();
 }
 
+static void test_rc_leaves_corpse(CuTest *tc) {
+    race *rc;
+    test_setup();
+    rc = test_create_race("human");
+    CuAssertTrue(tc, rc_leaves_corpse(rc));
+    rc->flags |= RCF_UNDEAD;
+    CuAssertTrue(tc, !rc_leaves_corpse(rc));
+    rc = test_create_race("demon");
+    CuAssertTrue(tc, rc_leaves_corpse(rc));
+    rc = test_create_race("dracoid");
+    CuAssertTrue(tc, !rc_leaves_corpse(rc));
+    test_teardown();
+}
+
 CuSuite *get_race_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -212,6 +226,7 @@ CuSuite *get_race_suite(void)
     SUITE_ADD_TEST(suite, test_rc_mask);
     SUITE_ADD_TEST(suite, test_rc_set_param);
     SUITE_ADD_TEST(suite, test_rc_can_use);
+    SUITE_ADD_TEST(suite, test_rc_leaves_corpse);
     SUITE_ADD_TEST(suite, test_racename);
     return suite;
 }

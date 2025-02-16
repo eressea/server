@@ -77,6 +77,17 @@ enum {
     RCO_TRADEHERB
 };
 
+bool rc_leaves_corpse(const race *rc) {
+    static int config_cache;
+    static const race *rc_dracoid;
+    if (rc->flags & RCF_UNDEAD) {
+        return false;
+    }
+    if (rc_changed(&config_cache)) {
+        rc_dracoid = get_race(RC_DRACOID);
+    }
+    return rc_dracoid != rc;
+}
 
 static void rc_setoption(race *rc, int k, const char *value) {
     unsigned char key = (unsigned char)k;

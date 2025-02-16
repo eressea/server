@@ -91,8 +91,7 @@ static bool hunger(int number, unit * u, const char *reason)
     }
 
     if (dead) {
-        /* Gestorbene aus der Einheit nehmen,
-        * Sie bekommen keine Beerdingung. */
+        /* Gestorbene aus der Einheit nehmen */
         ADDMSG(&u->faction->msgs, msg_message("starvation",
             "unit region dead live", u, r, dead, u->number - dead));
 

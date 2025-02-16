@@ -136,16 +136,18 @@ int region_production(const region* r)
 
 int deathcount(const region * r)
 {
-    attrib *a = a_find(r->attribs, &at_deathcount);
-    if (!a)
-        return 0;
-    return a->data.i;
+    if (r->land) {
+        attrib *a = a_find(r->attribs, &at_deathcount);
+        if (a) {
+            return a->data.i;
+        }
+    }
+    return 0;
 }
 
 void deathcounts(region * r, int fallen)
 {
     attrib *a = NULL;
-
     if (fallen == 0)
         return;
     if (r->attribs) {

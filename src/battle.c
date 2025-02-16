@@ -2597,21 +2597,22 @@ static double PopulationDamage(void)
     return rule_population_damage / 100.0;
 }
 
-static void battle_effects(battle * b, int dead_players)
+static void battle_effects(battle * b, int dead_players, int graves)
 {
     region *r = b->region;
     int rp = rpeasants(r);
-
+    int dead_peasants = 0;
+    assert(graves <= dead_players);
     if (rp > 0) {
-        int dead_peasants = (int)(dead_players * PopulationDamage());
+        dead_peasants = (int)(dead_players * PopulationDamage());
         if (dead_peasants > rp) {
             dead_peasants = rp;
         }
-        if (dead_peasants) {
-            deathcounts(r, dead_peasants + dead_players);
+        if (dead_peasants > 0) {
             rsetpeasants(r, rp - dead_peasants);
         }
     }
+    deathcounts(r, dead_peasants + graves);
 }
 
 static void reorder_fleeing(region * r)
@@ -2644,7 +2645,7 @@ static void aftermath(battle * b)
 {
     region *r = b->region;
     size_t si, sl = arrlen(b->sides);
-    int dead_players = 0;
+    int dead_players = 0, graves = 0;
     bfaction *bf;
     bool ships_damaged = (b->turn + (b->has_tactics_turn ? 1 : 0) > 2);      /* only used for ship damage! */
 
@@ -2782,9 +2783,12 @@ static void aftermath(battle * b)
             }
             s->flee += df->run.number;
 
-            if (!undeadrace(rc)) {
-                /* tote im kampf werden zu regionsuntoten:
-                 * for each of them, a peasant will die as well */
+            if (dead > 0) {
+                if (rc_leaves_corpse(rc)) {
+                    /* tote im kampf werden zu regionsuntoten:
+                     * for each of them, a peasant will die as well */
+                    graves += dead;
+                }
                 dead_players += dead;
             }
             if (du->hp < du->number) {
@@ -2796,7 +2800,7 @@ static void aftermath(battle * b)
         assert(snumber == s->flee + s->alive + s->dead);
     }
 
-    battle_effects(b, dead_players);
+    battle_effects(b, dead_players, graves);
 
     for (si = 0; si != sl; ++si) {
         side *s = b->sides[si];
