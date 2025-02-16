@@ -7,7 +7,6 @@
 #include "unit.h"
 
 #include <kernel/attrib.h>
-#include <kernel/connection.h>
 #include <kernel/gamedata.h>
 
 #include <util/base36.h>
