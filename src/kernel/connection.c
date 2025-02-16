@@ -432,7 +432,7 @@ static void b_readroad(connection * b, gamedata * data)
     }
     READ_INT(store, &n);
 	dir = reldirection(b->to, b->from);
-    if (dir != NODIRECTION) {
+    if (dir < MAXDIRECTIONS && dir >= 0) {
         rsetroad(b->to, dir, n);
     }
 }
