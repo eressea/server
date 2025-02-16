@@ -304,8 +304,8 @@ int build_skill(unit *u, int basesk, int skill_mod, skill_t sk)
       * Talente */
     if (faction_skill_limit(u->faction, sk) == INT_MAX) {
         const resource_type* ring = get_resourcetype(R_RING_OF_NIMBLEFINGER);
-        item* itm = ring ? *i_find(&u->items, ring->itype) : 0;
-        int i = itm ? itm->number : 0;
+        item** itm = ring ? i_find(&u->items, ring->itype) : 0;
+        int i = itm ? (*itm)->number : 0;
         if (i > 0) {
             int rings = (u->number < i) ? u->number : i;
             skills = skills * ((roqf_factor() - 1) * rings + u->number) / u->number;

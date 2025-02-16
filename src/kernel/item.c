@@ -361,24 +361,30 @@ resource_type *rt_find(const char *name)
 
 item **i_find(item ** i, const item_type * it)
 {
-    while (*i && (*i)->type != it)
-        i = &(*i)->next;
-    return i;
+    while (*i) {
+        item *itm = *i;
+        if (itm->type == it) return i;
+        i = &itm->next;
+    }
+    return NULL;
 }
 
 item *const* i_findc(item *const* iter, const item_type * it)
 {
-    while (*iter && (*iter)->type != it) {
-        iter = &(*iter)->next;
+    while (*iter) {
+        item *itm = *iter;
+        if (itm->type == it) return iter;
+        iter = &itm->next;
     }
-    return iter;
+    return NULL;
 }
 
 int i_get(const item * i, const item_type * it)
 {
-    i = *i_find((item **)& i, it);
-    if (i)
-        return i->number;
+    item **itm_p = i_find((item **)&i, it);
+    if (itm_p) {
+        return (*itm_p)->number;
+    }
     return 0;
 }
 
@@ -575,9 +581,9 @@ const resource_type *get_resourcetype(resource_t type) {
 
 int get_item(const unit * u, const item_type *itype)
 {
-    const item *i = *i_findc(&u->items, itype);
-    assert(!i || i->number >= 0);
-    return i ? i->number : 0;
+    item *const *i = i_findc(&u->items, itype);
+    assert(!i || (*i)->number >= 0);
+    return i ? (*i)->number : 0;
 }
 
 #include "move.h"

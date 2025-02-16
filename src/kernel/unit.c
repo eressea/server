@@ -286,29 +286,27 @@ int gift_items(unit * u, int flags)
     }
 
     /* last, but not least, give money and horses to peasants */
-    while (*itm_p) {
+    if (NULL != (itm_p = i_find(&u->items, rsilver->itype))) {
         item *itm = *itm_p;
-
         if (flags & GIFT_PEASANTS) {
             if (u->region->land) {
-                if (itm->type->rtype == rsilver) {
-                    rsetmoney(r, rmoney(r) + itm->number);
-                    itm->number = 0;
-                }
-                else if (itm->type->rtype == rhorse) {
-                    rsethorses(r, rhorses(r) + itm->number);
-                    itm->number = 0;
-                }
+                rsetmoney(r, rmoney(r) + itm->number);
+                itm->number = 0;
             }
         }
-        if (itm->number > 0 && (itm->type->flags & ITF_NOTLOST)) {
-            itm_p = &itm->next;
-            retval = -1;
+        i_remove(&u->items, itm);
+        i_free(itm);
+    }
+    if (NULL != (itm_p = i_find(&u->items, rhorse->itype))) {
+        item *itm = *itm_p;
+        if (flags & GIFT_PEASANTS) {
+            if (u->region->land) {
+                rsethorses(r, rhorses(r) + itm->number);
+                itm->number = 0;
+            }
         }
-        else {
-            i_remove(itm_p, itm);
-            i_free(itm);
-        }
+        i_remove(&u->items, itm);
+        i_free(itm);
     }
     return retval;
 }

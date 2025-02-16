@@ -639,11 +639,11 @@ void give_unit(unit * u, unit * u2, order * ord)
             if (u3) {
                 while (u->items) {
                     item *iold = i_remove(&u->items, u->items);
-                    item *inew = *i_find(&u3->items, iold->type);
+                    item **inew = i_find(&u3->items, iold->type);
                     if (inew == NULL)
                         i_add(&u3->items, iold);
                     else {
-                        inew->number += iold->number;
+                        (*inew)->number += iold->number;
                         i_free(iold);
                     }
                 }
@@ -799,10 +799,10 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
         else {
             const item_type *itype = finditemtype(s, u->faction->locale);
             if (itype != NULL) {
-                item *i = *i_find(&u->items, itype);
+                item **i = i_find(&u->items, itype);
                 if (i != NULL) {
                     if (can_give(u, u2, itype, 0)) {
-                        int n = i->number - get_reservation(u, itype);
+                        int n = (*i)->number - get_reservation(u, itype);
                         give_item(n, itype, u, u2, ord);
                     }
                     else {

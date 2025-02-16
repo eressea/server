@@ -1270,7 +1270,7 @@ static int count_healable(battle * b, fighter * df)
 }
 static bool has_ao_healing(const unit *u) {
     item *const* iter = i_findc(&u->items, it_find("ao_healing"));
-    return (*iter && (*iter)->number > 0);
+    return (iter && (*iter)->number > 0);
 }
 
 /* wiederbeleben */

@@ -1371,7 +1371,7 @@ int sp_rosthauch(castorder * co)
         for (i = 0; force > 0 && ironweapons[i].weapon.type; ++i) {
             struct iron_weapon *iweapon = ironweapons + i;
             item **ip = i_find(&u->items, iweapon->weapon.type);
-            if (*ip) {
+            if (ip) {
                 item *it = *ip;
                 double change = (it->number > force) ? force : it->number;
                 if (iweapon->chance < 1.0) {

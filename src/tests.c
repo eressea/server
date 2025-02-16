@@ -67,14 +67,15 @@ struct skill *test_set_skill(unit *u, enum skill_t sk, int level, int weeks)
 
 int test_set_item(unit * u, const item_type *itype, int value)
 {
-    item *i;
+    item **ip;
 
     assert(itype);
-    i = *i_find(&u->items, itype);
-    if (!i) {
-        i = i_add(&u->items, i_new(itype, value));
+    ip = i_find(&u->items, itype);
+    if (!ip) {
+        i_add(&u->items, i_new(itype, value));
     }
     else {
+        item *i = *ip;
         i->number = value;
         assert(i->number >= 0);
     }
