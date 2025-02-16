@@ -1,12 +1,11 @@
 #include "charming.h"
 
-#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
+#include <kernel/skill.h>
 #include <kernel/unit.h>
 
 #include <util/keyword.h>
-#include <util/message.h>
 #include <util/rand.h>
 
 #include <laws.h>
