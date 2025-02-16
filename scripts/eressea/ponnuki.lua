@@ -43,8 +43,8 @@ function ponnuki.init()
         if home and f then
             if home.terrain~="glacier" then
                 home.terrain="glacier"
-                home.name = 'Magrathea'
             end
+            home.name = 'Magrathea'
             u = unit.create(f, home, 1, "template")
             if u then
                 u.id = atoi36("ponn")
