@@ -308,6 +308,30 @@ static void test_replace_order(CuTest *tc) {
     test_teardown();
 }
 
+static void test_translate_order(CuTest *tc) {
+    order *ord;
+    struct locale *from_lang, *to_lang;
+
+    test_setup();
+    from_lang = test_create_locale();
+    to_lang = test_create_locale();
+    ord = create_order(K_WORK, from_lang, NULL);
+    CuAssertIntEquals(tc, K_WORK, ord->command);
+    CuAssertIntEquals(tc, 0, ord->id);
+    CuAssertTrue(tc, translate_order(ord, from_lang, to_lang));
+    CuAssertIntEquals(tc, K_WORK, ord->command);
+    CuAssertIntEquals(tc, 0, ord->id);
+
+    ord = create_order(K_STUDY, from_lang, skillname(SK_ENTERTAINMENT, from_lang));
+    CuAssertIntEquals(tc, K_STUDY, ord->command);
+    CuAssertIntEquals(tc, (int)SK_ENTERTAINMENT - 100, ord->id);
+    CuAssertTrue(tc, translate_order(ord, from_lang, to_lang));
+    CuAssertIntEquals(tc, K_STUDY, ord->command);
+    CuAssertIntEquals(tc, (int)SK_ENTERTAINMENT - 100, ord->id);
+    free_order(ord);
+    test_teardown();
+}
+
 static void test_get_command(CuTest *tc) {
     struct locale * lang;
     order *ord;
@@ -651,6 +675,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_parse_maketemp);
     SUITE_ADD_TEST(suite, test_init_order);
     SUITE_ADD_TEST(suite, test_replace_order);
+    SUITE_ADD_TEST(suite, test_translate_order);
     SUITE_ADD_TEST(suite, test_skip_token);
     SUITE_ADD_TEST(suite, test_getstrtoken);
     SUITE_ADD_TEST(suite, test_get_command);
