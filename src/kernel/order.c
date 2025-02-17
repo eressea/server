@@ -266,7 +266,7 @@ static int create_data(keyword_t kwd, const char *s,
     if (kwd == K_STUDY || kwd == K_AUTOSTUDY || kwd == K_FORGET) {
         const char * sptr = s;
         skill_t sk = findskill(parse_token_depr(&sptr), lang);
-        if (sk != SK_MAGIC && sk != NOSKILL) {
+        if (kwd == K_FORGET || (sk != SK_MAGIC && sk != NOSKILL)) {
             return ((int)sk)-100;
         }
     }
@@ -650,5 +650,44 @@ order *default_order(const struct locale *lang)
         return create_order(kwd, lang, NULL);
     }
     return NULL;
+}
+
+bool translate_order(order *ord, const struct locale *from_lang, const struct locale *to_lang)
+{
+    (void)to_lang;
+    (void)from_lang;
+
+    if (ord->id <= 0) {
+        /* no arguments, no translation needed */
+        return true;
+    }
+    switch (getkeyword(ord)) {
+    case NOKEYWORD:
+    case K_ATTACK:
+    case K_BANNER:
+    case K_DRIVE:
+    case K_FOLLOW:
+    case K_GROUP:
+    case K_KOMMENTAR:
+    case K_MAIL:
+    case K_NUMBER:
+    case K_PASSWORD:
+    case K_PREFIX:
+    case K_RECRUIT:
+    case K_SPY:
+    case K_STEAL:
+    case K_TEACH:
+    case K_TRANSPORT:
+    case K_URSPRUNG:
+        /* we can keep these, they do not use translated strings */
+        return true;
+    case K_FORGET:
+    case K_AUTOSTUDY:
+    case K_STUDY:
+        /* we can keep these, they do not use translated strings */
+        return (ord->id < 0);
+    default:
+        return false;
+    }
 }
 
