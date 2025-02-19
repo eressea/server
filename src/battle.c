@@ -1620,9 +1620,13 @@ fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, vo
         }
         for (fig = s->fighters; fig; fig = fig->next) {
             if (cb == NULL || cb(vs, fig, cbdata)) {
-                fighter ** n = arraddnptr(arr, 1);
-                *n = fig;
-//                arrput(arr, fig);
+                if (arr) {
+                    arrput(arr, fig);
+                }
+                else {
+                    arrsetlen(arr, 1);
+                    arr[0] = fig;
+                }
             }
         }
     }
