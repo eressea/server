@@ -7,6 +7,7 @@ regioncurse.c
 shipcurse.c
 unitcurse.c
 flyingship.c
+firewall.c
 charming.c
 )
 

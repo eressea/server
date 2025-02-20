@@ -30,13 +30,14 @@
 #include <spells/shipcurse.h>
 #include <spells/combatspells.h>
 #include <spells/charming.h>
+#include <spells/firewall.h>
 #include <spells/flyingship.h>
 
 /* kernel includes */
 #include <kernel/building.h>
 #include <kernel/config.h>
-#include <kernel/curse.h>
 #include <kernel/connection.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include "kernel/direction.h"
 #include <kernel/item.h>
@@ -105,7 +106,7 @@ static void report_spell(unit * mage, region * r, message * msg)
     }
 }
 
-static void report_failure(unit * mage, struct order *ord)
+void report_spell_failure(unit * mage, struct order *ord)
 {
     /* Fehler: "Der Zauber schlaegt fehl" */
     cmistake(mage, ord, 180, MSG_MAGIC);
@@ -449,8 +450,7 @@ int report_action(region * r, unit * actor, message * msg, int flags)
 /* Report a spell's effect to the units in the region.
 */
 
-static void
-report_effect(region * r, unit * mage, message * seen, message * unseen)
+void report_spell_effect(region * r, unit * mage, message * seen, message * unseen)
 {
     int err = report_action(r, mage, seen, ACTION_RESET | ACTION_CANSEE);
     UNUSED_ARG(unseen);
@@ -479,7 +479,7 @@ report_effect(region * r, unit * mage, message * seen, message * unseen)
  {
  message * seen = msg_message("harvest_effect", "mage", mage);
  message * unseen = msg_message("harvest_effect", "mage", NULL);
- report_effect(r, mage, seen, unseen);
+ report_spell_effect(r, mage, seen, unseen);
  }
 
  * Meldungen an den Magier ueber Erfolg sollten, wenn sie nicht als
@@ -928,7 +928,7 @@ int sp_magicstreet(castorder * co)
     {
         message *seen = msg_message("path_effect", "mage region", caster, r);
         message *unseen = msg_message("path_effect", "mage region", (unit *)NULL, r);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -983,7 +983,7 @@ int sp_summonent(castorder * co)
     {
         message *seen = msg_message("ent_effect", "mage amount", caster, ents);
         message *unseen = msg_message("ent_effect", "mage amount", (unit *)NULL, ents);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(unseen);
         msg_release(seen);
     }
@@ -1081,7 +1081,7 @@ int sp_maelstrom(castorder * co)
     if (c) {
         message *seen = msg_message("maelstrom_effect", "mage", caster);
         message *unseen = msg_message("maelstrom_effect", "mage", (unit *)NULL);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -1125,7 +1125,7 @@ static int sp_mallorn(castorder * co)
     {
         message *seen = msg_message("mallorn_effect", "mage", caster);
         message *unseen = msg_message("mallorn_effect", "mage", (unit *)NULL);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -1162,7 +1162,7 @@ int sp_blessedharvest(castorder * co)
         }
         message *seen = msg_message(effect, "mage", caster);
         message *unseen = msg_message(effect, "mage", (unit *)NULL);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -1208,7 +1208,7 @@ static int sp_hain(castorder * co)
         message *seen = msg_message("growtree_effect", "mage amount", caster, trees);
         message *unseen =
             msg_message("growtree_effect", "mage amount", (unit *)NULL, trees);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -1254,7 +1254,7 @@ static int sp_mallornhain(castorder * co)
         message *seen = msg_message("growtree_effect", "mage amount", caster, trees);
         message *unseen =
             msg_message("growtree_effect", "mage amount", (unit *)NULL, trees);
-        report_effect(r, caster, seen, unseen);
+        report_spell_effect(r, caster, seen, unseen);
         msg_release(seen);
         msg_release(unseen);
     }
@@ -1288,7 +1288,7 @@ static void fumble_ents(const castorder * co)
 
         /* melden, 1x pro Partei */
         unseen = msg_message("entrise", "region", r);
-        report_effect(r, mage, unseen, unseen);
+        report_spell_effect(r, mage, unseen, unseen);
         msg_release(unseen);
     }
 }
@@ -1913,7 +1913,7 @@ int sp_treewalkexit(castorder * co)
     remaining_cap = (int)(co->force * 500);
 
     if (!params || params->typ != SPP_REGION) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -2121,7 +2121,7 @@ static int sp_ironkeeper(castorder * co)
 
     if (r->terrain != newterrain(T_MOUNTAIN)
         && r->terrain != newterrain(T_GLACIER)) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -2479,7 +2479,7 @@ int sp_fumblecurse(castorder * co)
     c = create_curse(caster, &target->attribs, &ct_fumble,
         co->force, duration, co->force / 2, 0);
     if (c == NULL) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -2552,7 +2552,7 @@ static int sp_summondragon(castorder * co)
 
     if (r->terrain != newterrain(T_SWAMP) && r->terrain != newterrain(T_DESERT)
         && r->terrain != newterrain(T_GLACIER)) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -2586,65 +2586,6 @@ static int sp_summondragon(castorder * co)
 
     ADDMSG(&caster->faction->msgs, msg_message("summondragon",
         "unit region command target", caster, caster->region, co->order, r));
-
-    return cast_level;
-}
-
-static int sp_firewall(castorder * co)
-{
-    connection *b;
-    wall_data *fd;
-    region *r = co_get_region(co);
-    unit *caster = co_get_caster(co);
-    int cast_level = co->level;
-    double force = co->force;
-    spellparameter *param = co->a_params;
-    int dir;
-    region *r2;
-
-    dir = (int) get_direction(param->data.xs, caster->faction->locale);
-    if (dir >= 0) {
-        r2 = rconnect(r, dir);
-    }
-    else {
-        report_failure(caster, co->order);
-        return 0;
-    }
-
-    if (!r2 || r2 == r) {
-        report_failure(caster, co->order);
-        return 0;
-    }
-
-    b = get_borders(r, r2);
-    while (b != NULL) {
-        if (b->type == &bt_firewall)
-            break;
-        b = b->next;
-    }
-    if (b == NULL) {
-        b = create_border(&bt_firewall, r, r2);
-        fd = (wall_data *)b->data.v;
-        fd->force = (int)(force / 2 + 0.5);
-        fd->mage = caster;
-        fd->active = false;
-        fd->countdown = cast_level + 1;
-    }
-    else {
-        fd = (wall_data *)b->data.v;
-        fd->force = (int)fmax(fd->force, force / 2 + 0.5);
-        if (fd->countdown < cast_level + 1)
-            fd->countdown = cast_level + 1;
-    }
-
-    /* melden, 1x pro Partei */
-    {
-        message *seen = msg_message("firewall_effect", "mage region", caster, r);
-        message *unseen = msg_message("firewall_effect", "mage region", (unit *)NULL, r);
-        report_effect(r, caster, seen, unseen);
-        msg_release(seen);
-        msg_release(unseen);
-    }
 
     return cast_level;
 }
@@ -2871,7 +2812,7 @@ int sp_deathcloud(castorder * co)
         if (a->type == &at_curse) {
             curse *c = a->data.v;
             if (c->type == &ct_deathcloud) {
-                report_failure(caster, co->order);
+                report_spell_failure(caster, co->order);
                 return 0;
             }
             a = a->next;
@@ -3093,7 +3034,7 @@ int sp_magicboost(castorder * co)
 
     /* fehler, wenn schon ein boost */
     if (is_cursed(caster->attribs, &ct_magicboost)) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -3140,7 +3081,7 @@ static int sp_bloodsacrifice(castorder * co)
     int hp = (int)(co->force * 8);
 
     if (hp <= 0) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -3161,7 +3102,7 @@ static int sp_bloodsacrifice(castorder * co)
     }
 
     if (aura <= 0) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -3522,7 +3463,7 @@ static int sp_raisepeasantmob(castorder * co)
     if (n > rp) n = rp;
 
     if (n <= 0) {
-        report_failure(mage, co->order);
+        report_spell_failure(mage, co->order);
         return 0;
     }
 
@@ -3752,7 +3693,7 @@ static int sp_recruit(castorder * co)
     const struct race *rc = f->race;
 
     if (maxp == 0) {
-        report_failure(mage, co->order);
+        report_spell_failure(mage, co->order);
         return 0;
     }
     /* Immer noch zuviel auf niedrigen Stufen. Deshalb die Rekrutierungskosten
@@ -3807,7 +3748,7 @@ static int sp_bigrecruit(castorder * co)
     message *msg;
 
     if (maxp <= 0) {
-        report_failure(mage, co->order);
+        report_spell_failure(mage, co->order);
         return 0;
     }
     /* Fuer vergleichbare Erfolge bei unterschiedlichen Rassen die
@@ -3878,7 +3819,7 @@ int sp_pump(castorder * co)
         return 0;
     }
     if (IS_MONSTERS(target->faction)) {
-        report_failure(mage, co->order);
+        report_spell_failure(mage, co->order);
         return 0;
     }
 
@@ -4046,7 +3987,7 @@ static int sp_calm_monster(castorder * co)
     c = create_curse(caster, &target->attribs, &ct_calmmonster, force,
         (int)force, effect, 0);
     if (c == NULL) {
-        report_failure(caster, co->order);
+        report_spell_failure(caster, co->order);
         return 0;
     }
 
@@ -4237,7 +4178,7 @@ int sp_puttorest(castorder * co)
 
     deathcounts(r, -laid_to_rest);
 
-    report_effect(r, mage, seen, unseen);
+    report_spell_effect(r, mage, seen, unseen);
     msg_release(seen);
     msg_release(unseen);
     return co->level;
