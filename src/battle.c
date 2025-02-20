@@ -1625,7 +1625,9 @@ fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, vo
                 }
                 else {
                     arrsetlen(arr, 1);
-                    arr[0] = fig;
+                    if (arr) {
+                        arr[0] = fig;
+                    }
                 }
             }
         }
@@ -2355,7 +2357,15 @@ static void add_tactics(tactics * ta, fighter * fig, int value)
         arrfree(ta->fighters);
         ta->fighters = NULL;
     }
-    arrput(ta->fighters, fig);
+    if (ta->fighters) {
+        arrput(ta->fighters, fig);
+    }
+    else {
+        arrsetlen(ta->fighters, 1);
+        if (ta->fighters) {
+            ta->fighters[0] = fig;
+        }
+    }
     ta->value = value;
 }
 
@@ -3188,7 +3198,6 @@ static void equip_weapons(fighter* fig)
     item* itm;
     unit* u = fig->unit;
     int wpless = weapon_skill(NULL, u, true);
-    size_t w, i;
     int p_melee = 0, p_missile = 0;
 
     fig->weapons = NULL;
@@ -3203,60 +3212,62 @@ static void equip_weapons(fighter* fig)
         wp->defenseskill = weapon_skill(wtype, u, false);
         wp->item.ref = itm;
     }
-    w = arrlen(fig->weapons);
-    qsort(fig->weapons, w, sizeof(weapon), cmp_weapon);
+    if (fig->weapons) {
+        size_t i, w = arrlen(fig->weapons);
+        qsort(fig->weapons, w, sizeof(weapon), cmp_weapon);
 
-    /* now fig->weapons[0].item is the unit's best weapon */
+        /* now fig->weapons[0].item is the unit's best weapon */
 
-    /* hand out weapons: */
-    for (i = 0; i != w; ++i) {
-        weapon *wp = fig->weapons + i;
-        const item *itm = wp->item.ref;
-        const weapon_type *wtype = resource2weapon(item2resource(itm->type));
-        bool is_missile;
-        assert(wtype);
-        wp->item.type = itm->type;
-        is_missile = (wtype->flags & WTF_MISSILE);
-        if (!is_missile && wpless > wp->attackskill + wp->defenseskill) {
-            /* we fight better with bare hands than this melee weapon */
-            continue;
-        }
-        if (is_missile) {
-            if (p_missile == fig->alive) {
-                /* everyone already has a missile weapon */
+        /* hand out weapons: */
+        for (i = 0; i != w; ++i) {
+            weapon *wp = fig->weapons + i;
+            const item *itm = wp->item.ref;
+            const weapon_type *wtype = resource2weapon(item2resource(itm->type));
+            bool is_missile;
+            assert(wtype);
+            wp->item.type = itm->type;
+            is_missile = (wtype->flags & WTF_MISSILE);
+            if (!is_missile && wpless > wp->attackskill + wp->defenseskill) {
+                /* we fight better with bare hands than this melee weapon */
                 continue;
             }
-        }
-        else {
-            if (p_melee == fig->alive) {
-                /* everyone already has a melee weapon */
-                continue;
-            }
-        }
-        if (wp->attackskill >= 0 || wp->defenseskill >= 0)
-        {
-            int count = itm->number;
-            while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
-                if (is_missile) {
-                    if (p_missile < fig->alive) {
-                        struct person *p = fig->person + fig->alive - ++p_missile;
-                        p->missile = wp;
-                        --count;
-                    }
-                    else {
-                        /* everyone already has a missile weapon */
-                        break;
-                    }
+            if (is_missile) {
+                if (p_missile == fig->alive) {
+                    /* everyone already has a missile weapon */
+                    continue;
                 }
-                else {
-                    if (p_melee < fig->alive) {
-                        struct person *p = fig->person + p_melee++;
-                        p->melee = wp;
-                        --count;
+            }
+            else {
+                if (p_melee == fig->alive) {
+                    /* everyone already has a melee weapon */
+                    continue;
+                }
+            }
+            if (wp->attackskill >= 0 || wp->defenseskill >= 0)
+            {
+                int count = itm->number;
+                while (count > 0 && (p_missile < fig->alive || p_melee < fig->alive)) {
+                    if (is_missile) {
+                        if (p_missile < fig->alive) {
+                            struct person *p = fig->person + fig->alive - ++p_missile;
+                            p->missile = wp;
+                            --count;
+                        }
+                        else {
+                            /* everyone already has a missile weapon */
+                            break;
+                        }
                     }
                     else {
-                        /* everyone already has a melee weapon */
-                        break;
+                        if (p_melee < fig->alive) {
+                            struct person *p = fig->person + p_melee++;
+                            p->melee = wp;
+                            --count;
+                        }
+                        else {
+                            /* everyone already has a melee weapon */
+                            break;
+                        }
                     }
                 }
             }
