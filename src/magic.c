@@ -1985,7 +1985,9 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
                     arrput(par, spobj);
                 } else {
                     arrsetlen(par, 1);
-                    par[0] = spobj;
+                    if (par) {
+                        par[0] = spobj;
+                    }
                 }
             }
             i += j;

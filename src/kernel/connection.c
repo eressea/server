@@ -320,7 +320,9 @@ void age_borders(void)
                             arrput(deleted, b);
                         } else {
                             arrsetlen(deleted, 1);
-                            deleted[0] = b;
+                            if (deleted) {
+                                deleted[0] = b;
+                            }
                         }
                     }
                 }
