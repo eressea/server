@@ -126,8 +126,8 @@ static recruitment **select_recruitment(recruit_request ** requests,
 
             if (qty > 0) {
                 recruitment* rec = NULL;
-                ptrdiff_t i, len = arrlen(recruits);
-                for (i = 0; i != len; ++i) {
+                ptrdiff_t i, reclen = arrlen(recruits);
+                for (i = 0; i != reclen; ++i) {
                     if (recruits[i]->f == u->faction) {
                         rec = recruits[i];
                         break;
