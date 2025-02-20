@@ -54,7 +54,7 @@ static int try_read(int fd, char *out, size_t count)
 		for (;;) {
 			errno = 0;
 			partial = read(fd, out + total, count - total);
-			if (partial == -1 && errno == EINTR)
+            if (partial < 0 && errno == EINTR)
 				continue;
 			break;
 		}
