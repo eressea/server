@@ -140,7 +140,12 @@ static recruitment **select_recruitment(recruit_request ** requests,
                     rec->total = 0;
                     rec->assigned = 0;
                     rec->requests = NULL;
-                    arrput(recruits, rec);
+                    if (recruits) {
+                        arrput(recruits, rec);
+                    } else {
+                        arrsetlen(recruits, 1);
+                        recruits[0] = rec;
+                    }
                 }
                 else {
                     assert(rec->requests);

@@ -104,7 +104,12 @@ region **path_regions_in_range(struct region *handle_start, int maxdist,
                 continue;               /* can't go there */
 
             /* add the region to the list of available ones. */
-            arrput(rlist, rn);
+            if (rlist)  {
+                arrput(rlist, rn);
+            } else {
+                arrsetlen(rlist, 1);
+                rlist[0] = rn;
+            }
 
             /* make sure we don't go here again, and put the region into the set for
                further BFS'ing */

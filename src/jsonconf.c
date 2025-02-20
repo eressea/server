@@ -187,6 +187,7 @@ static void json_construction(cJSON *json, construction *cons) {
     cons->maxsize = -1;
     cons->minskill = -1;
     cons->reqsize = 1;
+    cons->materials = NULL;
     if (json->type != cJSON_Object) {
         log_error("construction %s is not a json object: %d", json->string, json->type);
         return;
@@ -416,9 +417,11 @@ static void json_building(cJSON *json, building_type *bt) {
             if (strcmp(child->string, "construction") == 0) {
                 /* simple, single-stage building */
                 if (!bt->a_stages) {
-                    building_stage *stage = arraddnptr(bt->a_stages, 1);
-                    if (!stage) abort();
+                    building_stage *stage;
+                    arrsetlen(bt->a_stages, 1);
+                    stage = bt->a_stages;
                     memset(stage, 0, sizeof(building_stage));
+                    stage->name = NULL;
                     stage->construction.skill = SK_BUILDING;
                     json_construction(child, &stage->construction);
                 }

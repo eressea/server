@@ -1348,7 +1348,12 @@ struct message *r_addmessage(struct region *r, const struct faction *viewer,
             }
         }
         if (!vmsg) {
-            vmsg = stbds_arraddnptr(r->individual_messages, 1);
+            if (r->individual_messages) {
+                vmsg = arraddnptr(r->individual_messages, 1);
+            } else {
+                arrsetlen(r->individual_messages, 1);
+                vmsg = r->individual_messages;
+            }
             vmsg->viewer = viewer;
             vmsg->msgs = NULL;
         }

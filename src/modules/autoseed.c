@@ -221,7 +221,8 @@ static region ** get_island(region * root)
     size_t qi, ql;
 
     fset(root, RF_MARK);
-    arrput(result, root);
+    arrsetlen(result, 1);
+    result[0] = root;
 
     for (qi = 0, ql = 1; qi != ql; ++qi) {
         int dir;
@@ -252,7 +253,8 @@ get_island_info(region * root, int *size_p, int *inhabited_p, int *maxage_p)
     int size = 0, maxage = 0, inhabited = 0;
     region **island = NULL;
     size_t qi, ql;
-    arrput(island, root);
+    arrsetlen(island, 1);
+    island[0] = root;
     fset(root, RF_MARK);
 
     for (qi = 0, ql = 1; qi != ql; ++qi) {

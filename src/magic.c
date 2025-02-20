@@ -1981,7 +1981,12 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
         }
         else {
             if (spobj.typ != SPP_NONE) {
-                arrput(par, spobj);
+                if (par) {
+                    arrput(par, spobj);
+                } else {
+                    arrsetlen(par, 1);
+                    par[0] = spobj;
+                }
             }
             i += j;
         }

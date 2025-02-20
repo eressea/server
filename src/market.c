@@ -97,7 +97,12 @@ void do_markets(void)
                         attrib *a = a_find(u->attribs, &at_market);
                         if (a == NULL) {
                             a = a_add(&u->attribs, a_new(&at_market));
-                            arrput(traders, u);
+                            if (traders) {
+                                arrput(traders, u);
+                            } else {
+                                arrsetlen(traders, 1);
+                                traders[0] = u;
+                            }
                         }
                         items = (item *)a->data.v;
                         i_change(&items, lux, 1);

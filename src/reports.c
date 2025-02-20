@@ -1262,7 +1262,8 @@ region **get_regions_distance(region * root, int radius)
     region** arr = NULL;
     ptrdiff_t qi;
 
-    arrput(arr, root);
+    arrsetlen(arr, 1);
+    arr[0] = root;
     fset(root, RF_MARK);
 
     for (qi = 0; qi != arrlen(arr); ++qi) {

@@ -316,7 +316,12 @@ void age_borders(void)
             for (; b; b = b->next) {
                 if (b->type->age) {
                     if (b->type->age(b) == AT_AGE_REMOVE) {
-                        arrput(deleted, b);
+                        if (deleted) {
+                            arrput(deleted, b);
+                        } else {
+                            arrsetlen(deleted, 1);
+                            deleted[0] = b;
+                        }
                     }
                 }
             }

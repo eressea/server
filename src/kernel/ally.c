@@ -122,11 +122,12 @@ ally *allies_clone(const ally *al) {
     if (al) {
         ally *al_clone = NULL;
         size_t len = arrlen(al);
-
-        arraddnptr(al_clone, len);
-        if (al_clone) {
-            memcpy(al_clone, al, len * sizeof(ally));
-            return al_clone;
+        if (len > 0) {
+            arrsetlen(al_clone, len);
+            if (al_clone) {
+                memcpy(al_clone, al, len * sizeof(ally));
+                return al_clone;
+            }
         }
     }
     return NULL;
