@@ -1752,7 +1752,7 @@ static void free_spellparameters(spellparameter * param)
         for (i = arrlen(param); i > 0; --i) {
             switch (param[i - 1].typ) {
             case SPP_STRING:
-                free(param[i - 1].data.s);
+                free(param[i - 1].data.xs);
                 break;
             default:
                 break;

@@ -7,6 +7,7 @@
 #include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
+#include "kernel/connection.h"
 #include "kernel/direction.h"
 #include "kernel/event.h"
 #include <kernel/faction.h>
@@ -27,10 +28,12 @@
 #include "util/rand.h"
 #include "util/variant.h"  // for variant
 
+#include <spells/borders.h>
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
 #include <spells/shipcurse.h>
 #include <spells/buildingcurse.h>
+#include <spells/firewall.h>
 #include <spells/flyingship.h>
 #include <attributes/attributes.h>
 #include <attributes/otherfaction.h>
@@ -1901,6 +1904,32 @@ static void test_analysemagic_region(CuTest *tc)
     test_teardown();
 }
 
+static void test_firewall_spell(CuTest *tc)
+{
+    unit *u;
+    castorder co;
+    spellparameter param, *args = NULL;
+    region *r2;
+    connection *wall;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    r2 = test_create_plain(1, 0);
+    u->faction->magiegebiet = M_DRAIG;
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup(locale_string(u->faction->locale, directions[D_EAST], true));
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_firewall(&co));
+    CuAssertPtrNotNull(tc, wall = get_borders(u->region, r2));
+    CuAssertPtrEquals(tc, &bt_firewall, wall->type);
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1951,6 +1980,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_analysemagic_ship);
     SUITE_ADD_TEST(suite, test_analysemagic_building);
     SUITE_ADD_TEST(suite, test_analysemagic_region);
+    SUITE_ADD_TEST(suite, test_firewall_spell);
 
     return suite;
 }
