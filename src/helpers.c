@@ -99,7 +99,7 @@ static void push_param(lua_State * L, char c, spellparameter* param)
     else if (c == 'r')
         tolua_pushusertype(L, param->data.sh, "region");
     else if (c == 'c')
-        tolua_pushstring(L, param->data.s);
+        tolua_pushstring(L, param->data.xs);
     else {
         log_error("unsupported syntax %c.\n", c);
         lua_pushnil(L);

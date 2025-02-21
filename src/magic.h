@@ -58,7 +58,6 @@ extern "C" {
             struct unit *u;
             struct building *b;
             struct ship *sh;
-            char *s;
             char *xs;
             int i;
         } data;

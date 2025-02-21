@@ -5754,7 +5754,7 @@ int sp_break_curse(castorder * co)
 
     obj = params[0].typ;
 
-    c = findcurse(atoi36(params[1].data.s));
+    c = findcurse(atoi36(params[1].data.xs));
     if (!c) {
         /* Es wurde kein Ziel gefunden */
         ADDMSG(&mage->faction->msgs, msg_message("spelltargetnotfound",
