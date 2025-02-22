@@ -57,6 +57,7 @@ static void wall_init(connection * b)
     if (!fd) abort();
     fd->countdown = -1;           /* infinite */
     b->data.v = fd;
+    fd->active = false;
 }
 
 static void wall_destroy(connection * b)
@@ -87,6 +88,7 @@ static int wall_age(connection * b)
 {
     wall_data *fd = (wall_data *)b->data.v;
     --fd->countdown;
+    fd->active = true;
     return (fd->countdown > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
