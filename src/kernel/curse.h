@@ -145,7 +145,7 @@ extern "C" {
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
-        int(*age) (struct curse *);
+        int(*age) (struct curse *, void *);
         void(*construct) (struct curse *);
         void(*destroy) (struct curse *);
     } curse_type;

@@ -108,7 +108,7 @@ int curse_age(attrib * a, void *owner)
             result = AT_AGE_REMOVE;
         }
         if (c->type->age) {
-            if (c->type->age(c) == 0) {
+            if (c->type->age(c, owner) == 0) {
                 result = AT_AGE_REMOVE;
             }
         }

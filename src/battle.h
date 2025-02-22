@@ -38,7 +38,7 @@ union variant;
 #define FL_HEALING_USED 128   /* has used a healing potion */
 
 typedef struct bfaction {
-    struct bfaction* next;
+    struct bfaction* next; /* TODO: stb_ds benutzen? */
     struct faction* faction;
     bool attacker;
 } bfaction;

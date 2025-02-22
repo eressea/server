@@ -512,7 +512,6 @@ function test_firewall()
 	local uno = u.id
 
 	assert_true(u2.hp == u2.hp_max)
-	u.name = 'Xolgrim'
     u.magic = 'draig'
     u:set_skill('magic', 24)
     u.aura = 1000
@@ -527,7 +526,7 @@ function test_firewall()
 	assert_true(r1:has_border("firewall", directions.EAST))
 	assert_true(r2:has_border("firewall", directions.WEST))
 	process_orders()
-	assert_true(u2.hp < u2.hp_max)
 	assert_false(r1:has_border("firewall", directions.EAST))
 	assert_false(r2:has_border("firewall", directions.WEST))
+	assert_true(u2.hp < u2.hp_max)
 end

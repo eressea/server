@@ -1,3 +1,9 @@
+# 30.0
+
+	- Feuerwand erzeugt curses in den beiden Regionen.
+	- Feuerwand-Auflösung nicht mehr über aging borders implementiert.
+	- age_borders Mechanismus ist damit überflüssig.
+
 # 29.4
 
 	- Weg der Bäume kostet auch bei resistenten Zielen [Bug 3051]

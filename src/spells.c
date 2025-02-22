@@ -2706,12 +2706,14 @@ static int change_hitpoints(unit * u, int value)
     return hp;
 }
 
-static int dc_age(struct curse *c)
+static int dc_age(struct curse *c, void *owner)
 /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
 {
     region *r = (region *)c->data.v;
     unit **up;
     unit *mage = c->magician;
+
+    (void) owner;
 
     if (r == NULL || mage == NULL || mage->number == 0) {
         /* if the mage disappears, so does the spell. */
@@ -6161,6 +6163,7 @@ void register_spells(void)
     at_deprecate("zauber_todeswolke", dc_read_compat);
 
     ct_register(&ct_deathcloud);
+    ct_register(&ct_firewall);
 
     register_spelldata();
 
