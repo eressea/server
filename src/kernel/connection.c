@@ -6,6 +6,7 @@
 #include "terrain.h"
 #include "unit.h"
 
+#include <spells/borders.h>
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
 
@@ -487,6 +488,14 @@ int read_borders(gamedata *data)
         if (type->read) {
             connection *b = NULL;
             
+            if (data->version < WALL_DATA_VERSION) {
+                /* remove legacy firewalls */
+                if (type == &bt_firewall) {
+                    log_info("removing legacy firewall in %s", regionname(from, NULL));
+                    b = &dummy;
+                    b->data.v = NULL;
+                }
+            }
             if (data->version < FIX_SEAROADS_VERSION) {
                 /* bug 2694: eliminate roads in oceans */
                 if (type->terrain_flags != 0 && type->terrain_flags != fval(from->terrain, type->terrain_flags)) {
