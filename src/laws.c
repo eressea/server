@@ -2798,9 +2798,6 @@ static void ageing(void)
         }
     }
 
-    /* Borders */
-    age_borders();
-
     /* Factions */
     for (f = factions; f; f = f->next) {
         a_age(&f->attribs, f);

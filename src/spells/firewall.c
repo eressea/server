@@ -5,8 +5,11 @@
 
 #include <magic.h>
 
+#include <kernel/attrib.h>
 #include <kernel/connection.h>
+#include <kernel/curse.h>
 #include <kernel/faction.h>
+#include <kernel/gamedata.h>
 #include <kernel/messages.h>
 #include <kernel/region.h>
 #include <kernel/unit.h>
@@ -17,10 +20,94 @@
 #include <assert.h>
 #include <math.h>
 
+static struct message *firewall_info(const void *obj, objtype_t typ,
+    const struct curse * c, int self)
+{
+    return NULL;
+}
+
+static int firewall_read(gamedata *data, curse *c, void *owner) {
+    int i;
+    READ_INT(data->store, &i); /* direction */
+    c->data.sa[0] = (direction_t)i;
+    return 0;
+}
+
+static int firewall_write(storage *store, const curse *c, const void *owner) {
+    WRITE_INT(store, c->data.sa[0]); /* direction */
+    return 0;
+}
+
+static int firewall_age(struct curse *c, void *owner)
+{
+    direction_t dir = c->data.sa[0];
+    region *r = (region *)owner;
+    region *r2 = rconnect(r, dir);
+    connection *b = get_borders(r, r2);
+    for (; b; b = b->next) {
+        if (b->type == &bt_firewall) {
+            wall_data *wd = (wall_data *)b->data.v;
+            if (0 == wd->countdown) {
+                curse *c2 = get_curse(r2->attribs, &ct_firewall);
+                if (c2) {
+                    remove_curse(&r2->attribs, c2);
+                }
+                erase_border(b);
+                return AT_AGE_REMOVE;
+            }
+            else {
+                wd->active = true;
+                --wd->countdown;
+            }
+        }
+    }
+
+    return AT_AGE_KEEP;
+}
+
+const struct curse_type ct_firewall = {
+    "firewall", CURSETYP_REGION, 0, NO_MERGE,
+    firewall_info,
+    NULL, 
+    firewall_read,
+    firewall_write,
+    NULL,
+    firewall_age,
+};
+
+void create_firewall(unit *mage, region *r, direction_t d, double force, int duration)
+{
+    region *r2 = rconnect(r, d);
+    connection *b = get_borders(r, r2);
+    wall_data *fd;
+    curse *c;
+    while (b != NULL) {
+        if (b->type == &bt_firewall)
+            break;
+        b = b->next;
+    }
+    if (b == NULL) {
+        b = create_border(&bt_firewall, r, r2);
+        fd = (wall_data *)b->data.v;
+        fd->force = (int)force;
+        fd->mage = mage;
+        fd->active = false;
+        fd->countdown = duration * 2;
+    }
+    else {
+        fd = (wall_data *)b->data.v;
+        fd->force = (int)fmax(fd->force, force);
+        if (fd->countdown < duration)
+            fd->countdown = duration;
+    }
+    c = create_curse(mage, &r->attribs, &ct_firewall, force, duration + 1, 0.0, 0);
+    c->data.sa[0] = d; /* direction of r2 */
+    c = create_curse(mage, &r2->attribs, &ct_firewall, force, duration + 1, 0.0, 0);
+    c->data.sa[0] = d_reverse(d); /* direction of r */
+}
+
 int sp_firewall(castorder *co)
 {
-    connection *b;
-    wall_data *fd;
     region *r = co_get_region(co);
     unit *caster = co_get_caster(co);
     int cast_level = co->level;
@@ -43,26 +130,7 @@ int sp_firewall(castorder *co)
         return 0;
     }
 
-    b = get_borders(r, r2);
-    while (b != NULL) {
-        if (b->type == &bt_firewall)
-            break;
-        b = b->next;
-    }
-    if (b == NULL) {
-        b = create_border(&bt_firewall, r, r2);
-        fd = (wall_data *)b->data.v;
-        fd->force = (int)(force / 2 + 0.5);
-        fd->mage = caster;
-        fd->active = false;
-        fd->countdown = cast_level + 1;
-    }
-    else {
-        fd = (wall_data *)b->data.v;
-        fd->force = (int)fmax(fd->force, force / 2 + 0.5);
-        if (fd->countdown < cast_level + 1)
-            fd->countdown = cast_level + 1;
-    }
+    create_firewall(caster, r, dir, force / 2 + 0.5, cast_level);
 
     /* melden, 1x pro Partei */
     {

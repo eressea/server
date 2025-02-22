@@ -84,14 +84,6 @@ static void wall_write(const connection * b, storage * store)
     WRITE_INT(store, fd->countdown);
 }
 
-static int wall_age(connection * b)
-{
-    wall_data *fd = (wall_data *)b->data.v;
-    --fd->countdown;
-    fd->active = true;
-    return (fd->countdown > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
-}
-
 static region *wall_move(const connection * b, struct unit *u,
 struct region *from, struct region *to, bool routing)
 {
@@ -145,8 +137,7 @@ border_type bt_firewall = {
     b_finvisible,                 /* fvisible */
     b_uinvisible,                 /* uvisible */
     NULL,
-    wall_move,
-    wall_age
+    wall_move
 };
 
 void convert_firewall_timeouts(connection * b, attrib * a)

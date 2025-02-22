@@ -72,8 +72,6 @@ extern "C" {
         struct region *(*move) (const connection *, struct unit * u,
         struct region * from, struct region * to, bool routing);
         /* executed when the units traverses this connection */
-        int(*age) (struct connection *);
-        /* return 0 if connection needs to be removed. >0 if still aging, <0 if not aging */
         struct border_type *next;   /* for internal use only */
     } border_type;
 
@@ -94,7 +92,6 @@ extern "C" {
 
     int read_borders(struct gamedata *store);
     void write_borders(struct storage *store);
-    void age_borders(void);
 
     /* provide default implementations for some member functions: */
     void b_read(connection * b, struct gamedata *store);

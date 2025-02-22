@@ -88,9 +88,10 @@ static int slave_write(struct storage *store, const struct curse *c, const void 
     return 0;
 }
 
-static int slave_age(struct curse *c)
+static int slave_age(struct curse *c, void *owner)
 {
     slave_data *sd = (slave_data *)c->data.v;
+    (void) owner;
     if (sd) {
         if (c->duration == 0) {
             sd->self->faction = sd->faction;

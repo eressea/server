@@ -132,6 +132,7 @@ connection *create_border(border_type * type, region * from, region * to)
 
 void erase_border(connection * b)
 {
+    assert(b);
     if (b->from && b->to) {
         connection **bp = get_borders_i(b->from, b->to);
         assert(*bp != NULL || !"error: connection is not registered");
@@ -303,33 +304,6 @@ attrib_type at_countdown = {
     NULL,
     a_readint
 };
-
-void age_borders(void)
-{
-    connection **deleted = NULL;
-    int i;
-
-    for (i = 0; i != BORDER_MAXHASH; ++i) {
-        connection *bhash = borders[i];
-        for (; bhash; bhash = bhash->nexthash) {
-            connection *b = bhash;
-            for (; b; b = b->next) {
-                if (b->type->age) {
-                    if (b->type->age(b) == AT_AGE_REMOVE) {
-                        arrput(deleted, b);
-                    }
-                }
-            }
-        }
-    }
-    if (deleted) {
-        size_t qi, ql;
-        for (ql = arrlen(deleted), qi = 0; qi != ql; ++qi) {
-            erase_border(deleted[qi]);
-        }
-        arrfree(deleted);
-    }
-}
 
 /********
  * implementation of a couple of borders. this shouldn't really be in here, so
