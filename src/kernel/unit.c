@@ -534,15 +534,17 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
 {
     int id;
     READ_INT(data->store, &id);
-    if (id > 0) {
-        *up = findunit(id);
-        if (*up == NULL) {
-            *up = NULL;
-            ur_add(RESOLVE_UNIT | id, (void **)up, fun);
+    if (up) {
+        if (id > 0) {
+            *up = findunit(id);
+            if (*up == NULL) {
+                *up = NULL;
+                ur_add(RESOLVE_UNIT | id, (void **)up, fun);
+            }
         }
-    }
-    else {
-        *up = NULL;
+        else {
+            *up = NULL;
+        }
     }
     return id;
 }

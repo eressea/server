@@ -104,13 +104,13 @@ int curse_age(attrib * a, void *owner)
     c_clearflag(c, CURSE_ISNEW);
 
     if ((c_flags(c) & CURSE_NOAGE) == 0) {
-        if (--c->duration <= 0) {
-            result = AT_AGE_REMOVE;
-        }
         if (c->type->age) {
             if (c->type->age(c, owner) == 0) {
                 result = AT_AGE_REMOVE;
             }
+        }
+        else if (--c->duration <= 0) {
+            result = AT_AGE_REMOVE;
         }
     }
     return result;
@@ -691,12 +691,12 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 * die Kraft des Curse um die halbe Staerke der Antimagie reduziert.
 * Zurueckgegeben wird der noch unverbrauchte Rest von force.
 */
-double destr_curse(curse * c, int cast_level, double force)
+double destr_curse(curse * c, int cast_level, double force, void *curse_target)
 {
     if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
         force -= c->vigour;
         if (c->type->change_vigour) {
-            c->type->change_vigour(c, -(cast_level + 1) / 2);
+            c->type->change_vigour(c, -(cast_level + 1) / 2, curse_target);
         }
         else {
             c->vigour -= (cast_level + 1) / 2.0;
@@ -706,7 +706,7 @@ double destr_curse(curse * c, int cast_level, double force)
         if (force >= c->vigour) {   /* reicht die Kraft noch aus? */
             force -= c->vigour;
             if (c->type->change_vigour) {
-                c->type->change_vigour(c, -c->vigour);
+                c->type->change_vigour(c, -c->vigour, curse_target);
             }
             else {
                 c->vigour = 0;

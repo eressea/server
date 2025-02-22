@@ -20,10 +20,37 @@
 #include <assert.h>
 #include <math.h>
 
+static connection *find_firewall(const region *r1, const region *r2)
+{
+    connection *b = get_borders(r1, r2);
+    for (; b; b = b->next) {
+        if (b->type == &bt_firewall) {
+            return b;
+        }
+    }
+    return NULL;
+}
+
 static struct message *firewall_info(const void *obj, objtype_t typ,
     const struct curse * c, int self)
 {
+    // FIXME: show the firewall curse and curse-id
     return NULL;
+}
+
+static void firewall_change(curse *c, double delta, void *owner)
+{
+    assert(c);
+    c->vigour += delta;
+    if (c->vigour <= 0) {
+        direction_t dir = c->data.sa[0];
+        region *r = (region *)owner;
+        region *r2 = rconnect(r, dir);
+        connection *b = find_firewall(r, r2);
+        if (b) {
+            erase_border(b);
+        }
+    }
 }
 
 static int firewall_read(gamedata *data, curse *c, void *owner) {
@@ -43,39 +70,39 @@ static int firewall_age(struct curse *c, void *owner)
     direction_t dir = c->data.sa[0];
     region *r = (region *)owner;
     region *r2 = rconnect(r, dir);
-    connection *b = get_borders(r, r2);
-    for (; b; b = b->next) {
-        if (b->type == &bt_firewall) {
-            wall_data *wd = (wall_data *)b->data.v;
-            if (0 == wd->countdown) {
-                curse *c2 = get_curse(r2->attribs, &ct_firewall);
-                if (c2) {
-                    remove_curse(&r2->attribs, c2);
-                }
-                erase_border(b);
-                return AT_AGE_REMOVE;
+    connection *b = find_firewall(r, r2);
+    if (b) {
+        wall_data *wd = (wall_data *)b->data.v;
+        if (0 == wd->countdown || c->vigour <= 0.0) {
+            curse *c2 = get_curse(r2->attribs, &ct_firewall);
+            if (c2) {
+                remove_curse(&r2->attribs, c2);
             }
-            else {
-                wd->active = true;
-                --wd->countdown;
-            }
+            erase_border(b);
+            return AT_AGE_REMOVE;
+        }
+        else {
+            wd->active = true;
+            --wd->countdown;
+            return AT_AGE_KEEP;
         }
     }
 
-    return AT_AGE_KEEP;
+    /* if the firewall is gone, we no longer need the curse */
+    return AT_AGE_REMOVE;
 }
 
 const struct curse_type ct_firewall = {
     "firewall", CURSETYP_REGION, 0, NO_MERGE,
     firewall_info,
-    NULL, 
+    firewall_change,
     firewall_read,
     firewall_write,
     NULL,
     firewall_age,
 };
 
-void create_firewall(unit *mage, region *r, direction_t d, double force, int duration)
+void create_firewall(struct unit *mage, struct region *r, enum direction_t d, double force, int duration)
 {
     region *r2 = rconnect(r, d);
     connection *b = get_borders(r, r2);

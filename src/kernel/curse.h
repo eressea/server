@@ -139,7 +139,7 @@ extern "C" {
         int mergeflags;
         struct message *(*curseinfo) (const void *, objtype_t,
             const struct curse *, int);
-        void(*change_vigour) (struct curse *, double);
+        void(*change_vigour) (struct curse *, double, void *);
         int(*read) (struct gamedata *data, struct curse *, void *target);
         int(*write) (struct storage *store, const struct curse *,
             const void *target);
@@ -231,7 +231,7 @@ extern "C" {
 
     int curse_age(struct attrib *a, void *owner);
 
-    double destr_curse(struct curse *c, int cast_level, double force);
+    double destr_curse(struct curse *c, int cast_level, double force, void *curse_target);
 
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 

@@ -1930,6 +1930,61 @@ static void test_firewall_spell(CuTest *tc)
     test_teardown();
 }
 
+static void test_create_firewall(CuTest *tc)
+{
+    unit *u;
+    region *r2, *r1;
+    connection *wall;
+    wall_data *fd;
+    curse *c;
+    double force;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), r1 = test_create_plain(0, 0));
+    r2 = test_create_plain(1, 0);
+    create_firewall(u, r1, D_EAST, force = 3.0, 2);
+    CuAssertPtrNotNull(tc, wall = get_borders(u->region, r2));
+    CuAssertPtrEquals(tc, &bt_firewall, wall->type);
+    CuAssertPtrNotNull(tc, fd = (wall_data *)wall->data.v);
+    CuAssertTrue(tc, ! fd->active);
+    CuAssertDblEquals(tc, 3.0, fd->force, 0.01);
+    CuAssertIntEquals(tc, 4, fd->countdown);
+
+    CuAssertPtrNotNull(tc, c = get_curse(r1->attribs, &ct_firewall));
+    CuAssertIntEquals(tc, 3, c->duration);
+    CuAssertDblEquals(tc, force, c->vigour, 0.01);
+    CuAssertPtrEquals(tc, u, c->magician);
+    CuAssertIntEquals(tc, D_EAST, c->data.sa[0]);
+
+    CuAssertPtrNotNull(tc, c = get_curse(r2->attribs, &ct_firewall));
+    CuAssertIntEquals(tc, 3, c->duration);
+    CuAssertDblEquals(tc, force, c->vigour, 0.01);
+    CuAssertPtrEquals(tc, u, c->magician);
+    CuAssertIntEquals(tc, D_WEST, c->data.sa[0]);
+
+    test_teardown();
+}
+
+static void test_destroy_firewall(CuTest *tc)
+{
+    unit *u;
+    region *r2, *r1;
+    curse *c;
+    double force;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), r1 = test_create_plain(0, 0));
+    r2 = test_create_plain(1, 0);
+    create_firewall(u, r1, D_EAST, force = 3.0, 2);
+
+    CuAssertPtrNotNull(tc, c = get_curse(r1->attribs, &ct_firewall));
+    CuAssertDblEquals(tc, 0.0, destr_curse(c, 4, c->vigour, r1), 0.001);
+
+    CuAssertPtrEquals(tc, NULL, get_borders(u->region, r2));
+
+    test_teardown();
+}
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -1981,6 +2036,8 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_analysemagic_building);
     SUITE_ADD_TEST(suite, test_analysemagic_region);
     SUITE_ADD_TEST(suite, test_firewall_spell);
+    SUITE_ADD_TEST(suite, test_create_firewall);
+    SUITE_ADD_TEST(suite, test_destroy_firewall);
 
     return suite;
 }
