@@ -502,3 +502,32 @@ function test_charming()
 
     assert_equal(f2, u2.faction)
 end
+
+function test_firewall()
+    local r1 = region.create(0, 0, 'plain')
+    local r2 = region.create(1, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r1, 1)
+	local u2 = unit.create(f, r1, 1)
+	local uno = u.id
+
+	assert_true(u2.hp == u2.hp_max)
+	u.name = 'Xolgrim'
+    u.magic = 'draig'
+    u:set_skill('magic', 24)
+    u.aura = 1000
+    u:add_spell('firewall')
+
+    u:add_order("ZAUBERE STUFE 1 'Feuerwand' OST")
+	u2:set_orders("NACH OST") -- no effect yet in same week 
+	process_orders()
+	assert_true(u2.hp == u2.hp_max)
+	u:clear_orders()
+	u2:set_orders("NACH WEST") -- should take damage now
+	assert_true(r1:has_border("firewall", directions.EAST))
+	assert_true(r2:has_border("firewall", directions.WEST))
+	process_orders()
+	assert_true(u2.hp < u2.hp_max)
+	assert_false(r1:has_border("firewall", directions.EAST))
+	assert_false(r2:has_border("firewall", directions.WEST))
+end
