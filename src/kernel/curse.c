@@ -691,7 +691,7 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 * die Kraft des Curse um die halbe Staerke der Antimagie reduziert.
 * Zurueckgegeben wird der noch unverbrauchte Rest von force.
 */
-double destr_curse(curse * c, int cast_level, double force, void *curse_target)
+double reduce_curse(curse * c, int cast_level, double force, void *curse_target)
 {
     if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
         force -= c->vigour;
