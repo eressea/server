@@ -70,7 +70,9 @@ static void wall_read(connection * b, gamedata * data)
     static wall_data dummy;
     wall_data *fd = b->data.v ? (wall_data *)b->data.v : &dummy;
 
-    read_unit_reference(data, &fd->mage, NULL);
+    if (data->version < WALL_DATA_VERSION) {
+        read_unit_reference(data, NULL, NULL);
+    }
     READ_INT(data->store, &fd->force);
     READ_INT(data->store, &fd->countdown);
     fd->active = true;
@@ -79,7 +81,6 @@ static void wall_read(connection * b, gamedata * data)
 static void wall_write(const connection * b, storage * store)
 {
     wall_data *fd = (wall_data *)b->data.v;
-    write_unit_reference(fd->mage, store);
     WRITE_INT(store, fd->force);
     WRITE_INT(store, fd->countdown);
 }

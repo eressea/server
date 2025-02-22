@@ -90,7 +90,6 @@ void create_firewall(unit *mage, region *r, direction_t d, double force, int dur
         b = create_border(&bt_firewall, r, r2);
         fd = (wall_data *)b->data.v;
         fd->force = (int)force;
-        fd->mage = mage;
         fd->active = false;
         fd->countdown = duration * 2;
     }
