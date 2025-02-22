@@ -2217,6 +2217,10 @@ msgctxt "curseinfo"
 msgid "slave_1"
 msgstr "\"$unit($unit) wird noch $int($duration) $if($eq($duration,1), \"Woche\", \"Wochen\") unter unserem Bann stehen. ($int36($id))\""
 
+msgctxt "curseinfo"
+msgid "firewall"
+msgstr "\"Eine magische Feuerwand blockiert den Weg nach $direction($direction). ($int36($id))\""
+
 msgid "alliance::lost"
 msgstr "\"$alliance($alliance) scheidet aus dem Spiel aus, nachdem alle Tempel verloren gingen.\""
 
