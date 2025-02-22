@@ -5,6 +5,7 @@ struct curse_type;
 struct region;
 struct unit;
 struct message;
+struct order;
 
 extern const struct curse_type ct_deathcloud;
 void register_spells(void);
