@@ -4,6 +4,8 @@
 	- Feuerwand-Auflösung nicht mehr über aging borders implementiert.
 	- age_borders Mechanismus ist damit überflüssig.
 	- Dateiformat: Kein Magier mehr in wall_data
+	- Antimagiekristal und Zerstoere Magie können Fuerwand auflösen
+	- TODO: Fluch brechen sollte das auch können
 
 # 29.4
 

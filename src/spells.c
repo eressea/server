@@ -354,7 +354,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
 
 }
 
-static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
+static int break_curse(attrib ** alist, int cast_level, double force, curse * c, void *curse_target)
 {
     int succ = 0;
     /*  attrib **a = a_find(*ap, &at_curse); */
@@ -383,7 +383,7 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c)
          * auf alle Verzauberungen wirken. Ansonsten pruefe, ob der Curse vom
          * richtigen Typ ist. */
         if (!c || c == c1) {
-            double remain = destr_curse(c1, cast_level, force);
+            double remain = destr_curse(c1, cast_level, force, curse_target);
             if (remain < force) {
                 force = remain;
             }
@@ -678,6 +678,7 @@ int sp_destroy_magic(castorder * co)
     curse *c = NULL;
     char ts[80];
     attrib **ap;
+    void *curse_target = NULL;
     int obj;
     int succ;
 
@@ -701,6 +702,7 @@ int sp_destroy_magic(castorder * co)
     {
         /* region *tr = param->data.r; -- farcasting! */
         region *tr = co_get_region(co);
+        curse_target = tr;
         ap = &tr->attribs;
         write_regionname(tr, caster->faction, ts, sizeof(ts));
         break;
@@ -708,24 +710,24 @@ int sp_destroy_magic(castorder * co)
     case SPP_TEMP:
     case SPP_UNIT:
     {
-        unit *u;
-        u = param->data.u;
+        unit *u = param->data.u;
+        curse_target = u;
         ap = &u->attribs;
         write_unitname(u, ts, sizeof(ts));
         break;
     }
     case SPP_BUILDING:
     {
-        building *b;
-        b = param->data.b;
+        building *b = param->data.b;
+        curse_target = b;
         ap = &b->attribs;
         write_buildingname(b, ts, sizeof(ts));
         break;
     }
     case SPP_SHIP:
     {
-        ship *sh;
-        sh = param->data.sh;
+        ship *sh = param->data.sh;
+        curse_target = sh;
         ap = &sh->attribs;
         write_shipname(sh, ts, sizeof(ts));
         break;
@@ -734,7 +736,7 @@ int sp_destroy_magic(castorder * co)
         return 0;
     }
 
-    succ = break_curse(ap, co->level, force, c);
+    succ = break_curse(ap, co->level, force, c, curse_target);
 
     if (succ > 0) {
         ADDMSG(&caster->faction->msgs, msg_message("destroy_magic_effect",

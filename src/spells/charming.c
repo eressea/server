@@ -92,6 +92,7 @@ static int slave_age(struct curse *c, void *owner)
 {
     slave_data *sd = (slave_data *)c->data.v;
     (void) owner;
+    --c->duration;
     if (sd) {
         if (c->duration == 0) {
             sd->self->faction = sd->faction;

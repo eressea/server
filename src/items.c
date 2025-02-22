@@ -122,8 +122,12 @@ struct order *ord)
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
 * Antimagiezone, die zwei Runden bestehen bleibt */
 static int
-use_antimagiccrystal(unit * u, const struct item_type *itype, int amount,
-struct order *ord)
+use_antimagiccrystal(
+    unit * u,
+    const struct item_type *itype,
+    int amount,
+    struct order *ord
+)
 {
     region *r = u->region;
     const resource_type *rt_crystal;
@@ -166,7 +170,7 @@ struct order *ord)
                 continue;
             }
 
-            force = destr_curse(c, effect, force);
+            force = destr_curse(c, effect, force, r);
             if (c->vigour <= 0) {
                 a_remove(&r->attribs, a);
             }
