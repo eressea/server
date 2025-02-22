@@ -383,7 +383,7 @@ static int break_curse(attrib ** alist, int cast_level, double force, curse * c,
          * auf alle Verzauberungen wirken. Ansonsten pruefe, ob der Curse vom
          * richtigen Typ ist. */
         if (!c || c == c1) {
-            double remain = destr_curse(c1, cast_level, force, curse_target);
+            double remain = reduce_curse(c1, cast_level, force, curse_target);
             if (remain < force) {
                 force = remain;
             }
@@ -5815,7 +5815,7 @@ int sp_break_curse(castorder * co)
         }
 
         /* curse aufloesen, wenn zauber staerker (force > vigour) */
-        force = destr_curse(c, cast_level, -force, curse_target);
+        force = reduce_curse(c, cast_level, -force, curse_target);
 
         if (c->vigour <= 0.0) {
             remove_curse(ap, c);

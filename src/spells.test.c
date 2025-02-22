@@ -1978,7 +1978,7 @@ static void test_destroy_firewall(CuTest *tc)
     create_firewall(u, r1, D_EAST, force = 3.0, 2);
 
     CuAssertPtrNotNull(tc, c = get_curse(r1->attribs, &ct_firewall));
-    CuAssertDblEquals(tc, 0.0, destr_curse(c, 4, c->vigour, r1), 0.001);
+    CuAssertDblEquals(tc, 0.0, reduce_curse(c, 4, c->vigour, r1), 0.001);
 
     CuAssertPtrEquals(tc, NULL, get_borders(u->region, r2));
 

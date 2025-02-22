@@ -231,7 +231,7 @@ extern "C" {
 
     int curse_age(struct attrib *a, void *owner);
 
-    double destr_curse(struct curse *c, int cast_level, double force, void *curse_target);
+    double reduce_curse(struct curse *c, int cast_level, double force, void *curse_target);
 
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 

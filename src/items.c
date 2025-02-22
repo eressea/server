@@ -170,7 +170,7 @@ use_antimagiccrystal(
                 continue;
             }
 
-            force = destr_curse(c, effect, force, r);
+            force = reduce_curse(c, effect, force, r);
             if (c->vigour <= 0) {
                 a_remove(&r->attribs, a);
             }
