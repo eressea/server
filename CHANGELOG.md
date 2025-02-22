@@ -3,6 +3,7 @@
 	- Feuerwand erzeugt curses in den beiden Regionen.
 	- Feuerwand-Auflösung nicht mehr über aging borders implementiert.
 	- age_borders Mechanismus ist damit überflüssig.
+	- Dateiformat: Kein Magier mehr in wall_data
 
 # 29.4
 
