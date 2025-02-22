@@ -274,6 +274,12 @@
       <arg name="id" type="int"/>
     </type>
   </message>
+  <message name="curseinfo::firewall" section="events">
+    <type>
+      <arg name="direction" type="direction"/>
+      <arg name="id" type="int"/>
+    </type>
+  </message>
   <message name="curseinfo::speed_1" section="events">
     <type>
       <arg name="number" type="int"/>

@@ -34,8 +34,10 @@ static connection *find_firewall(const region *r1, const region *r2)
 static struct message *firewall_info(const void *obj, objtype_t typ,
     const struct curse * c, int self)
 {
-    // FIXME: show the firewall curse and curse-id
-    return NULL;
+    (void)obj;
+    (void)typ;
+    (void)self;
+    return msg_message("curseinfo::firewall", "direction id", c->data.sa[0], c->no);
 }
 
 static void firewall_change(curse *c, double delta, void *owner)
