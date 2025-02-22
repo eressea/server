@@ -5749,6 +5749,7 @@ int sp_break_curse(castorder * co)
     int cast_level = co->level;
     double force = co->force;
     spellparameter *params = co->a_params;
+    void *curse_target = NULL;
 
     if (arrlen(params) < 2) {
         /* Das Zielobjekt wurde vergessen */
@@ -5769,6 +5770,7 @@ int sp_break_curse(castorder * co)
         attrib **ap;
         switch (obj) {
         case SPP_REGION:
+            curse_target = r;
             ap = &r->attribs;
             ts = regionname(r, mage->faction);
             break;
@@ -5777,6 +5779,7 @@ int sp_break_curse(castorder * co)
         case SPP_UNIT:
         {
             unit *u = params[0].data.u;
+            curse_target = u;
             ap = &u->attribs;
             ts = itoa36(u->no);
             break;
@@ -5784,6 +5787,7 @@ int sp_break_curse(castorder * co)
         case SPP_BUILDING:
         {
             building *b = params[0].data.b;
+            curse_target = b;
             ap = &b->attribs;
             ts = itoa36(b->no);
             break;
@@ -5791,6 +5795,7 @@ int sp_break_curse(castorder * co)
         case SPP_SHIP:
         {
             ship *sh = params[0].data.sh;
+            curse_target = sh;
             ap = &sh->attribs;
             ts = itoa36(sh->no);
             break;
@@ -5810,7 +5815,7 @@ int sp_break_curse(castorder * co)
         }
 
         /* curse aufloesen, wenn zauber staerker (force > vigour) */
-        c->vigour -= force;
+        force = destr_curse(c, cast_level, -force, curse_target);
 
         if (c->vigour <= 0.0) {
             remove_curse(ap, c);
