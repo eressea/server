@@ -1065,7 +1065,7 @@ static bool report_region_roads(struct stream *out, const region *r, faction *f)
             region *r2 = rconnect(r, d);
             const char *name = NULL;
             if (r2 && r->terrain->max_road && r2->terrain->max_road) {
-                if (local < r->terrain->max_road) {
+                if (local > 0 && local < r->terrain->max_road) {
                     const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
                     int percent = 100 * local / r->terrain->max_road;
                     if (percent < 1) percent = 1;
