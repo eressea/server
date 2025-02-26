@@ -1156,8 +1156,9 @@ faction *read_faction(gamedata * data)
     f->race = rc_find(name);
     if (!f->race) {
         log_error("unknown race in data: %s", name);
+        f->race = rc_find("smurf");
+        assert(f->race);
     }
-    assert(f->race);
     READ_INT(data->store, &n);
     f->magiegebiet = (magic_t)n;
 
