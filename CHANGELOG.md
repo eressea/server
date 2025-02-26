@@ -1,4 +1,4 @@
-# 30.0
+# 30.1
 
 	- Feuerwand erzeugt curses in den beiden Regionen.
 	- Feuerwand-Auflösung nicht mehr über aging borders implementiert.
