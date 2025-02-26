@@ -1279,20 +1279,18 @@ static void test_start_battle(CuTest* tc) {
     CuAssertIntEquals(tc, E_ENEMY, get_relation(s2, s1));
 
     CuAssertPtrNotNull(tc, s1->fighters);
-    CuAssertPtrNotNull(tc, s1->bf);
-    CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
+    CuAssertPtrEquals(tc, u1->faction, s1->faction);
     CuAssertPtrEquals(tc, NULL, (faction*)s1->stealthfaction);
-    CuAssertTrue(tc, s1->bf->attacker);
+    CuAssertIntEquals(tc, SIDE_ATTACKER, s1->flags & SIDE_ATTACKER);
     CuAssertPtrEquals(tc, NULL, s1->leader.fighters);
     CuAssertIntEquals(tc, 0, s1->leader.value);
 
     CuAssertPtrNotNull(tc, fig = s2->fighters);
     CuAssertPtrEquals(tc, NULL, fig->next);
     CuAssertPtrEquals(tc, u2, fig->unit);
-    CuAssertPtrNotNull(tc, s2->bf);
-    CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);
+    CuAssertPtrEquals(tc, u2->faction, s2->faction);
     CuAssertPtrEquals(tc, NULL, (faction *)s2->stealthfaction);
-    CuAssertTrue(tc, !s2->bf->attacker);
+    CuAssertIntEquals(tc, 0, s2->flags & SIDE_ATTACKER);
     CuAssertIntEquals(tc, 3 + TACTICS_MODIFIER, s2->leader.value);
 
     CuAssertIntEquals(tc, 2, b->nfighters);
@@ -1311,7 +1309,7 @@ static fighter *test_find_fighter(const battle *b, const unit *u)
 
     for (si = 0; si != num_sides; ++si) {
         side *s = b->sides[si];
-        if (s->bf->faction == u->faction) {
+        if (s->faction == u->faction) {
             fighter *fig;
             for (fig = s->fighters; fig; fig = fig->next) {
                 if (fig->unit == u) {
@@ -1404,9 +1402,8 @@ static void test_battle_leaders(CuTest* tc) {
     init_tactics(b);
     s = b->sides[0];
     CuAssertPtrNotNull(tc, s->fighters);
-    CuAssertPtrNotNull(tc, s->bf);
-    CuAssertPtrEquals(tc, f, s->bf->faction);
-    CuAssertTrue(tc, s->bf->attacker);
+    CuAssertPtrEquals(tc, f, s->faction);
+    CuAssertIntEquals(tc, SIDE_ATTACKER, s->flags & SIDE_ATTACKER);
     CuAssertIntEquals(tc, 2 + TACTICS_BONUS, s->leader.value);
     CuAssertIntEquals(tc, 2 + TACTICS_BONUS, b->max_tactics);
 
@@ -1446,9 +1443,9 @@ static void test_get_tactics(CuTest* tc) {
     s1 = b->sides[1];
     s3 = b->sides[2];
 
-    CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
-    CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);
-    CuAssertPtrEquals(tc, u3->faction, s3->bf->faction);
+    CuAssertPtrEquals(tc, u1->faction, s1->faction);
+    CuAssertPtrEquals(tc, u2->faction, s2->faction);
+    CuAssertPtrEquals(tc, u3->faction, s3->faction);
     CuAssertPtrEquals(tc, u1->faction, (struct faction *)s3->stealthfaction);
     CuAssertIntEquals(tc, 0, s1->leader.value);
     CuAssertIntEquals(tc, 3, s2->leader.value);
@@ -1482,9 +1479,9 @@ static void test_get_unitrow(CuTest* tc) {
     s1 = b->sides[0];
     s2 = b->sides[1];
 
-    CuAssertPtrEquals(tc, u1->faction, s1->bf->faction);
+    CuAssertPtrEquals(tc, u1->faction, s1->faction);
     CuAssertPtrEquals(tc, u1, s1->fighters->unit);
-    CuAssertPtrEquals(tc, u2->faction, s2->bf->faction);
+    CuAssertPtrEquals(tc, u2->faction, s2->faction);
     CuAssertPtrEquals(tc, u3, s2->fighters->unit);
     CuAssertPtrEquals(tc, u2, s2->fighters->next->unit);
     CuAssertIntEquals(tc, FIGHT_ROW, get_unitrow(s1->fighters, s2));
