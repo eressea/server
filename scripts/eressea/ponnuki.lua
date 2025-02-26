@@ -43,8 +43,8 @@ function ponnuki.init()
         if home and f then
             if home.terrain~="glacier" then
                 home.terrain="glacier"
-                home.name = 'Magrathea'
             end
+            home.name = 'Magrathea'
             u = unit.create(f, home, 1, "template")
             if u then
                 u.id = atoi36("ponn")
@@ -61,7 +61,9 @@ function ponnuki.init()
         eressea.log.info("Ponnuki is in " .. tostring(u.region))
         u.status = 5 -- FLIEHE
     end
-    ponnuki_brain(u)
+    if u then
+        ponnuki_brain(u)
+    end
 end
 
 return ponnuki

@@ -29,6 +29,7 @@
 #include <attributes/racename.h>
 #include <attributes/stealth.h>
 
+#include <spells/charming.h>
 #include <spells/unitcurse.h>
 #include <spells/regioncurse.h>
 
@@ -285,29 +286,27 @@ int gift_items(unit * u, int flags)
     }
 
     /* last, but not least, give money and horses to peasants */
-    while (*itm_p) {
+    if (NULL != (itm_p = i_find(&u->items, rsilver->itype))) {
         item *itm = *itm_p;
-
         if (flags & GIFT_PEASANTS) {
             if (u->region->land) {
-                if (itm->type->rtype == rsilver) {
-                    rsetmoney(r, rmoney(r) + itm->number);
-                    itm->number = 0;
-                }
-                else if (itm->type->rtype == rhorse) {
-                    rsethorses(r, rhorses(r) + itm->number);
-                    itm->number = 0;
-                }
+                rsetmoney(r, rmoney(r) + itm->number);
+                itm->number = 0;
             }
         }
-        if (itm->number > 0 && (itm->type->flags & ITF_NOTLOST)) {
-            itm_p = &itm->next;
-            retval = -1;
+        i_remove(&u->items, itm);
+        i_free(itm);
+    }
+    if (NULL != (itm_p = i_find(&u->items, rhorse->itype))) {
+        item *itm = *itm_p;
+        if (flags & GIFT_PEASANTS) {
+            if (u->region->land) {
+                rsethorses(r, rhorses(r) + itm->number);
+                itm->number = 0;
+            }
         }
-        else {
-            i_remove(itm_p, itm);
-            i_free(itm);
-        }
+        i_remove(&u->items, itm);
+        i_free(itm);
     }
     return retval;
 }
@@ -535,15 +534,17 @@ int read_unit_reference(gamedata * data, unit **up, resolve_fun fun)
 {
     int id;
     READ_INT(data->store, &id);
-    if (id > 0) {
-        *up = findunit(id);
-        if (*up == NULL) {
-            *up = NULL;
-            ur_add(RESOLVE_UNIT | id, (void **)up, fun);
+    if (up) {
+        if (id > 0) {
+            *up = findunit(id);
+            if (*up == NULL) {
+                *up = NULL;
+                ur_add(RESOLVE_UNIT | id, (void **)up, fun);
+            }
         }
-    }
-    else {
-        *up = NULL;
+        else {
+            *up = NULL;
+        }
     }
     return id;
 }
@@ -581,6 +582,7 @@ void set_level(struct unit * u, enum skill_t sk, unsigned int value)
         skill* sv = u->skills + s;
         if (sv->id == sk) {
             sk_set_level(sv, value);
+            sv->old = sv->level;
             return;
         }
         ++sv;
@@ -750,7 +752,6 @@ void move_unit(unit * u, region * r, unit ** ulist)
 {
     assert(u && r);
 
-    assert(u->faction || !"this unit is dead");
     if (!ulist) {
         ulist = &r->units;
     }
@@ -985,7 +986,7 @@ struct skill *add_skill(struct unit * u, enum skill_t sk)
     return sv;
 }
 
-skill *unit_skill(const unit * u, enum skill_t sk)
+struct skill *unit_skill(const struct unit * u, enum skill_t sk)
 {
     assert(u && sk != NOSKILL);
 
@@ -1071,7 +1072,7 @@ static int att_modification(const unit * u, enum skill_t sk)
     return (int)result;
 }
 
-static int terrain_mod(const race * rc, enum skill_t sk, const region *r)
+int terrain_mod(const race * rc, enum skill_t sk, const region *r)
 {
     static int rc_cache, t_cache;
     static const race *rc_dwarf, *rc_insect, *rc_elf;
@@ -1114,14 +1115,6 @@ static int terrain_mod(const race * rc, enum skill_t sk, const region *r)
         }
     }
     return 0;
-}
-
-static int rc_skillmod(const struct race *rc, enum skill_t sk)
-{
-    if (!skill_enabled(sk)) {
-        return 0;
-    }
-    return rc->bonus[sk];
 }
 
 int get_modifier(const unit * u, enum skill_t sk, int level, const region * r, bool noitem)
@@ -1599,21 +1592,23 @@ const struct race *u_race(const struct unit *u)
 void u_setrace(struct unit *u, const struct race *rc)
 {
     assert(rc);
-    if (!u->faction) {
-        u->_race = rc;
-    }
-    else {
-        int n = 0;
-        if (count_unit(u)) {
-            --n;
+    if (u->_race != rc) {
+        if (!u->faction) {
+            u->_race = rc;
         }
-        u->_race = rc;
-        if (count_unit(u)) {
-            ++n;
-        }
-        if (n != 0) {
-            u->faction->num_units += n;
-            u->faction->num_people += n * u->number;
+        else {
+            int n = 0;
+            if (count_unit(u)) {
+                --n;
+            }
+            u->_race = rc;
+            if (count_unit(u)) {
+                ++n;
+            }
+            if (n != 0) {
+                u->faction->num_units += n;
+                u->faction->num_people += n * u->number;
+            }
         }
     }
 }
@@ -1805,6 +1800,11 @@ bool has_limited_skills(const struct unit * u)
     return false;
 }
 
+bool unit_is_slaved(const unit *u)
+{
+    return curse_active(get_curse(u->attribs, &ct_slavery));
+}
+
 double u_heal_factor(const unit * u)
 {
     const race * rc = u_race(u);
@@ -1839,40 +1839,6 @@ void unit_convert_race(unit *u, const race *rc, const char *rcname)
     }
 }
 
-bool translate_order(order *ord, const struct locale *from_lang, const struct locale *to_lang)
-{
-    (void)to_lang;
-    (void)from_lang;
-
-    if (ord->id <= 0) {
-        /* no arguments, no translation needed */
-        return true;
-    }
-    switch (getkeyword(ord)) {
-    case NOKEYWORD:
-    case K_ATTACK:
-    case K_BANNER:
-    case K_DRIVE:
-    case K_FOLLOW:
-    case K_GROUP:
-    case K_KOMMENTAR:
-    case K_MAIL:
-    case K_NUMBER:
-    case K_PASSWORD:
-    case K_PREFIX:
-    case K_RECRUIT:
-    case K_SPY:
-    case K_STEAL:
-    case K_TEACH:
-    case K_TRANSPORT:
-    case K_URSPRUNG:
-        /* we can keep these, they do not use translated strings */
-        return true;
-    default:
-        return false;
-    }
-}
-
 void translate_orders(unit *u, const struct locale *lang, order **list, bool del)
 {
     order **po = list;
@@ -1895,3 +1861,15 @@ void translate_orders(unit *u, const struct locale *lang, order **list, bool del
         po = &ord->next;
     }
 }
+
+void dump_unit(const unit *u) {
+    if (u) {
+        const attrib *a;
+        fprintf(stdout, "%s, %s, %d %s\n", unitname(u), factionname(u->faction), u->number, u->_race->_name);
+        for (a = u->attribs; a; a = a->next) {
+            dump_attrib(a);
+        }
+    }
+    else fputs("null", stdout);
+}
+

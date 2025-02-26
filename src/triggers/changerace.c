@@ -96,26 +96,35 @@ trigger *trigger_changerace(unit * u, const race * prace, const race * irace)
 }
 
 static struct trigger *change_race_i(struct unit *u, int duration, const struct race *rc, bool is_stealth) {
-    trigger **texists = get_triggers(u->attribs, "timer");
-    trigger *tr = NULL;
-
-    assert(rc);
-    if (texists) {
-        tr = *texists;
+    trigger *tr = NULL, *tt = NULL;
+    trigger **tp = get_triggers(u->attribs, "timer");
+    if (tp)
+    {
+        while (*tp) {
+            trigger *t = *tp;
+            if (t->type == &tt_timeout) {
+                timeout_data *td = (timeout_data *)t->data.v;
+                for (tr = td->triggers; tr; tr = tr->next) {
+                    if (tr->type == &tt_changerace) {
+                        tt = t; /* return the old timeout, don't create a new one */
+                        break;
+                    }
+                }
+            }
+            tp = &t->next;
+        }
     }
-    else {
-        trigger* trestore;
+    /* only add another change_race timeout if there wasn't one already (toad becomes smurf) */
+    if (!tt) {
         if (is_stealth) {
-            trestore = trigger_changerace(u, NULL, u->irace);
+            tr = trigger_changerace(u, NULL, u->irace);
         }
         else {
-            trestore = trigger_changerace(u, u_race(u), u->irace);
-        }
-        if (trestore) {
-            tr = trigger_timeout(duration, trestore);
+            tr = trigger_changerace(u, u_race(u), u->irace);
         }
         if (tr) {
-            add_trigger(&u->attribs, "timer", tr);
+            tt = trigger_timeout(duration, tr);
+            add_trigger(&u->attribs, "timer", tt);
         }
     }
     if (tr) {
@@ -127,7 +136,7 @@ static struct trigger *change_race_i(struct unit *u, int duration, const struct 
             u->irace = NULL;
         }
     }
-    return tr;
+    return tt;
 }
 
 struct trigger* change_race(struct unit* u, int duration, const struct race* urace, const struct race* irace) {

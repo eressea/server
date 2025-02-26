@@ -60,6 +60,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+#include <util/variant.h>
 
 #include <critbit.h>
 #include <selist.h>
@@ -156,7 +157,7 @@ void unit_add_spell(unit * u, struct spell * sp, int level)
     sc_mage *mage = get_mage(u);
 
     if (!mage) {
-        log_error("adding new spell %s to a previously non-magical unit %s\n", sp->sname, unitname(u));
+        log_warning("adding new spell %s to a previously non-magical unit %s\n", sp->sname, unitname(u));
         mage = create_mage(u, M_GRAY);
     }
     if (!mage->spellbook) {
@@ -1080,69 +1081,82 @@ variant magic_resistance(const unit * target)
     return prob;
 }
 
-variant resist_chance(const unit *magician, const void *obj, int objtyp, int bonus_percent) {
-    variant v02p, v98p, prob = frac_make(bonus_percent, 100);
-    const attrib *a = NULL;
-
-    switch (objtyp) {
-    case TYP_UNIT:
-    {
-        int at, pa = 0;
-        size_t s, len;
-        const unit *u = (const unit *)obj;
-
-        if (ucontact(u, magician)) {
-            return frac_zero;
-        }
-        at = effskill(magician, SK_MAGIC, NULL);
-
-        for (len = arrlen(u->skills), s = 0; s != len; ++s) {
-            const skill* sv = u->skills + s;
-            int sk = eff_skill(u, sv, NULL);
-            if (pa < sk) {
-                pa = sk;
-            }
-        }
-
-        /* Contest, probability = 0.05 * (10 + pa - at); */
-        prob = frac_add(prob, frac_make(10 + pa - at, 20));
-        prob = frac_add(prob, magic_resistance(u));
-        break;
+static bool magic_resistance_enabled(void)
+{
+    static int config;
+    static bool result;
+    if (config_changed(&config)) {
+        result = config_get_int("magic.resist.enable", 1) != 0;
     }
-
-    case TYP_REGION:
-        a = ((const region *)obj)->attribs;
-        break;
-
-    case TYP_BUILDING:
-        a = ((const building *)obj)->attribs;
-        /* Bonus durch Typ */
-        prob = frac_add(prob, ((const building *)obj)->type->magres);
-        break;
-
-    case TYP_SHIP:
-        /* Bonus durch Zauber */
-        a = ((const ship *)obj)->attribs;
-        break;
-    }
-
-    if (a) {
-        const curse *c = get_curse(a, &ct_magicrunes);
-        int effect = curse_geteffect_int(c);
-        prob = frac_add(prob, frac_make(effect, 100));
-    }
-    /* ignore results < 2% and > 98% */
-    v02p = frac_make(1, 50);
-    v98p = frac_make(49, 50);
-    if (frac_sign(frac_sub(prob, v02p)) < 0) {
-        return v02p;
-    }
-    else if (frac_sign(frac_sub(prob, v98p)) > 0) {
-        return v98p;
-    }
-    return prob;
+    return result;
 }
 
+variant resist_chance(const unit *magician, const void *obj, int objtyp, int bonus_percent)
+{
+    if (magic_resistance_enabled()) {
+        variant v02p, v98p, prob = frac_make(bonus_percent, 100);
+        const attrib *a = NULL;
+
+        switch (objtyp) {
+        case TYP_UNIT:
+        {
+            int at, pa = 0;
+            size_t s, len;
+            const unit *u = (const unit *)obj;
+
+            if (ucontact(u, magician)) {
+                return frac_zero;
+            }
+            at = effskill(magician, SK_MAGIC, NULL);
+
+            for (len = arrlen(u->skills), s = 0; s != len; ++s) {
+                const skill *sv = u->skills + s;
+                int sk = eff_skill(u, sv, NULL);
+                if (pa < sk) {
+                    pa = sk;
+                }
+            }
+
+            /* Contest, probability = 0.05 * (10 + pa - at); */
+            prob = frac_add(prob, frac_make(10 + pa - at, 20));
+            prob = frac_add(prob, magic_resistance(u));
+            break;
+        }
+
+        case TYP_REGION:
+            a = ((const region *)obj)->attribs;
+            break;
+
+        case TYP_BUILDING:
+            a = ((const building *)obj)->attribs;
+            /* Bonus durch Typ */
+            prob = frac_add(prob, ((const building *)obj)->type->magres);
+            break;
+
+        case TYP_SHIP:
+            /* Bonus durch Zauber */
+            a = ((const ship *)obj)->attribs;
+            break;
+        }
+
+        if (a) {
+            const curse *c = get_curse(a, &ct_magicrunes);
+            int effect = curse_geteffect_int(c);
+            prob = frac_add(prob, frac_make(effect, 100));
+        }
+        /* ignore results < 2% and > 98% */
+        v02p = frac_make(1, 50);
+        v98p = frac_make(49, 50);
+        if (frac_sign(frac_sub(prob, v02p)) < 0) {
+            return v02p;
+        }
+        else if (frac_sign(frac_sub(prob, v98p)) > 0) {
+            return v98p;
+        }
+        return prob;
+    }
+    return frac_zero;
+}
 /* ------------------------------------------------------------- */
 /* Prueft, ob das Objekt dem Zauber widerstehen kann.
  * Objekte koennen Regionen, Units, Gebaeude oder Schiffe sein.
@@ -1738,7 +1752,7 @@ static void free_spellparameters(spellparameter * param)
         for (i = arrlen(param); i > 0; --i) {
             switch (param[i - 1].typ) {
             case SPP_STRING:
-                free(param[i - 1].data.s);
+                free(param[i - 1].data.xs);
                 break;
             default:
                 break;
@@ -2086,35 +2100,38 @@ static int sm_familiar(const unit * u, const region * r, skill_t sk, int value)
 void set_familiar(unit * mage, unit * familiar)
 {
     /* if the skill modifier for the mage does not yet exist, add it */
-    attrib *a = a_find(mage->attribs, &at_skillmod);
-    while (a && a->type == &at_skillmod) {
-        skillmod_data *smd = (skillmod_data *)a->data.v;
-        if (smd->special == sm_familiar)
-            break;
-        a = a->next;
-    }
-    if (a == NULL) {
-        a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
-        a_add(&mage->attribs, a);
-    }
+    if (mage) {
+        attrib *a = a_find(mage->attribs, &at_skillmod);
+        while (a && a->type == &at_skillmod) {
+            skillmod_data *smd = (skillmod_data *)a->data.v;
+            if (smd->special == sm_familiar)
+                break;
+            a = a->next;
+        }
+        if (a == NULL) {
+            a = make_skillmod(NOSKILL, sm_familiar, 0.0, 0);
+            a_add(&mage->attribs, a);
+        }
 
-    a = a_find(mage->attribs, &at_familiar);
-    if (a == NULL) {
-        a = a_add(&mage->attribs, a_new(&at_familiar));
-        a->data.v = familiar;
+        a = a_find(mage->attribs, &at_familiar);
+        if (a == NULL) {
+            a = a_add(&mage->attribs, a_new(&at_familiar));
+            a->data.v = familiar;
+        }
+        else {
+            assert(!a->data.v || a->data.v == familiar);
+        }
     }
-    else {
-        assert(!a->data.v || a->data.v == familiar);
-    }
-
-    /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
-    a = a_find(familiar->attribs, &at_familiarmage);
-    if (a == NULL) {
-        a = a_add(&familiar->attribs, a_new(&at_familiarmage));
-        a->data.v = mage;
-    }
-    else {
-        assert(!a->data.v || a->data.v == mage);
+    if (familiar) {
+        /* TODO: Diese Attribute beim Tod des Familiars entfernen: */
+        attrib *a = a_find(familiar->attribs, &at_familiarmage);
+        if (a == NULL) {
+            a = a_add(&familiar->attribs, a_new(&at_familiarmage));
+            a->data.v = mage;
+        }
+        else {
+            assert(!a->data.v || a->data.v == mage);
+        }
     }
 }
 
@@ -2339,7 +2356,7 @@ static int read_magician(variant *var, void *owner, struct gamedata *data)
     return AT_READ_OK;
 }
 
-static int age_unit(attrib * a, void *owner)
+static int age_magic_unit(attrib * a, void *owner)
 /* if unit is gone or dead, remove the attribute */
 {
     unit *u = (unit *)a->data.v;
@@ -2351,7 +2368,7 @@ attrib_type at_familiarmage = {
     "familiarmage",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_magician,
     NULL,
@@ -2362,7 +2379,7 @@ attrib_type at_familiar = {
     "familiar",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_familiar,
     NULL,
@@ -2373,7 +2390,7 @@ attrib_type at_clonemage = {
     "clonemage",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_magician,
     NULL,
@@ -2384,7 +2401,7 @@ attrib_type at_clone = {
     "clone",
     NULL,
     NULL,
-    age_unit,
+    age_magic_unit,
     a_write_unit,
     read_clone,
     NULL,
@@ -2905,13 +2922,10 @@ static void select_spellbook(void **tokens, spellbook *sb, const struct locale *
     }
 }
 
-spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
+spell *spellbook_getspell(spellbook *sb, const char *name, const struct locale *lang)
 {
-    spellbook *sb;
-
-    sb = unit_get_spellbook(u);
     if (sb) {
-        void * tokens = NULL;
+        void *tokens = NULL;
         select_spellbook(&tokens, sb, lang);
         if (tokens) {
             variant token;
@@ -2923,6 +2937,14 @@ spell *unit_getspell(struct unit *u, const char *name, const struct locale * lan
         }
     }
     return NULL;
+}
+
+spell *unit_getspell(struct unit *u, const char *name, const struct locale * lang)
+{
+    spellbook *sb;
+
+    sb = unit_get_spellbook(u);
+    return spellbook_getspell(sb, name, lang);
 }
 
 int cast_spell(struct castorder *co)
@@ -2942,11 +2964,14 @@ int cast_spell(struct castorder *co)
     }
 
     fun = get_spellcast(sp->sname);
-    if (!fun) {
-        log_debug("no spell function for %s, try callback", sp->sname);
+    if (fun) {
+        return fun(co);
+    }
+    log_debug("no spell function for %s, try callback", sp->sname);
+    if (callbacks.cast_spell) {
         return callbacks.cast_spell(co, fname);
     }
-    return fun(co);
+    return -1;
 }
 
 const char *magic_name(magic_t mtype, const struct locale *lang)

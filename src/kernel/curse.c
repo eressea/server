@@ -86,9 +86,14 @@ static void cunhash(curse * c)
 
 /* ------------------------------------------------------------- */
 /* at_curse */
-void curse_init(variant *var)
+static void curse_init(variant *var)
 {
     var->v = calloc(1, sizeof(curse));
+}
+
+static void curse_done(variant *var)
+{
+    destroy_curse((curse *)var->v);
 }
 
 int curse_age(attrib * a, void *owner)
@@ -100,11 +105,11 @@ int curse_age(attrib * a, void *owner)
 
     if ((c_flags(c) & CURSE_NOAGE) == 0) {
         if (c->type->age) {
-            if (c->type->age(c) == 0) {
+            if (c->type->age(c, owner) == 0) {
                 result = AT_AGE_REMOVE;
             }
         }
-        if (--c->duration <= 0) {
+        else if (--c->duration <= 0) {
             result = AT_AGE_REMOVE;
         }
     }
@@ -113,13 +118,11 @@ int curse_age(attrib * a, void *owner)
 
 void destroy_curse(curse * c)
 {
+    if (c->type->destroy) {
+        c->type->destroy(c);
+    }
     cunhash(c);
     free(c);
-}
-
-void curse_done(variant * var)
-{
-    destroy_curse((curse *)var->v);
 }
 
 /** reads curses that have been removed from the code */
@@ -247,6 +250,17 @@ void curse_write(const variant * var, const void *owner, struct storage *store)
     }
 }
 
+static void curse_dump(const attrib *a)
+{
+    curse *c = (curse *)a->data.v;
+    const curse_type *ct = c->type;
+    fprintf(stdout, "  type: %s\n", ct->cname);
+    fprintf(stdout, "  mage: %s\n", unitname(c->magician));
+    fprintf(stdout, "  duration: %d\n", c->duration);
+    fprintf(stdout, "  effect: %lf\n", c->effect);
+    fprintf(stdout, "  vigour: %lf\n", c->vigour);
+}
+
 attrib_type at_curse = {
     "curse",
     curse_init,
@@ -254,7 +268,8 @@ attrib_type at_curse = {
     curse_age,
     curse_write,
     curse_read,
-    NULL
+    NULL,
+    .dump = curse_dump,
 };
 
 /* ------------------------------------------------------------- */
@@ -542,6 +557,9 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
     else if (ap) {
         c = make_curse(magician, ap, ct, vigour, duration, effect, men);
     }
+    if (c && ct->construct) {
+        ct->construct(c);
+    }
     return c;
 }
 
@@ -673,12 +691,12 @@ message *cinfo_simple(const void *obj, objtype_t typ, const struct curse * c,
 * die Kraft des Curse um die halbe Staerke der Antimagie reduziert.
 * Zurueckgegeben wird der noch unverbrauchte Rest von force.
 */
-double destr_curse(curse * c, int cast_level, double force)
+double reduce_curse(curse * c, int cast_level, double force, void *curse_target)
 {
     if (cast_level < c->vigour) { /* Zauber ist nicht stark genug */
         force -= c->vigour;
         if (c->type->change_vigour) {
-            c->type->change_vigour(c, -(cast_level + 1) / 2);
+            c->type->change_vigour(c, -(cast_level + 1) / 2, curse_target);
         }
         else {
             c->vigour -= (cast_level + 1) / 2.0;
@@ -688,7 +706,7 @@ double destr_curse(curse * c, int cast_level, double force)
         if (force >= c->vigour) {   /* reicht die Kraft noch aus? */
             force -= c->vigour;
             if (c->type->change_vigour) {
-                c->type->change_vigour(c, -c->vigour);
+                c->type->change_vigour(c, -c->vigour, curse_target);
             }
             else {
                 c->vigour = 0;

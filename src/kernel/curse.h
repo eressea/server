@@ -139,13 +139,15 @@ extern "C" {
         int mergeflags;
         struct message *(*curseinfo) (const void *, objtype_t,
             const struct curse *, int);
-        void(*change_vigour) (struct curse *, double);
+        void(*change_vigour) (struct curse *, double, void *);
         int(*read) (struct gamedata *data, struct curse *, void *target);
         int(*write) (struct storage *store, const struct curse *,
             const void *target);
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
-        int(*age) (struct curse *);
+        int(*age) (struct curse *, void *);
+        void(*construct) (struct curse *);
+        void(*destroy) (struct curse *);
     } curse_type;
 
     typedef struct curse {
@@ -227,11 +229,9 @@ extern "C" {
 
     curse *findcurse(int curseid);
 
-    void curse_init(union variant *a);
-    void curse_done(union variant *a);
     int curse_age(struct attrib *a, void *owner);
 
-    double destr_curse(struct curse *c, int cast_level, double force);
+    double reduce_curse(struct curse *c, int cast_level, double force, void *curse_target);
 
     bool is_cursed_with(const struct attrib *ap, const struct curse *c);
 

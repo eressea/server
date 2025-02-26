@@ -7,7 +7,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
   add_compile_options(-Wvla)
 endif()
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wsign-compare -Wall -Werror -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
+  add_compile_options(-Wsign-compare -Wall -Werror -Wno-switch -Wno-unknown-pragmas -Wstrict-prototypes -Wpointer-arith -Wno-char-subscripts -Wno-long-long)
 elseif(MSVC)
   add_compile_options(/WX /MP /FC)
 #  set(EXTRA_C_FLAGS /WX /MP /D_CRT_SECURE_NO_WARNINGS /D_USE_MATH_DEFINES)
@@ -26,7 +26,7 @@ elseif(CMAKE_COMPILER_IS_GCC)
     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
         OUTPUT_VARIABLE GCC_VERSION)
     if (GCC_VERSION VERSION_GREATER 4.9)
-        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wfloat-conversion")
     endif()
 endif(CMAKE_COMPILER_IS_CLANG)
 
@@ -41,25 +41,17 @@ add_subdirectory(triggers)
 add_subdirectory(modules)
 add_subdirectory(races)
 
-macro(ADD_LUA_MODULE MODULE_NAME FILES)
-  add_library (${MODULE_NAME} SHARED ${FILES})
-  set_target_properties(${MODULE_NAME}
-    PROPERTIES
-    PREFIX ""
-  )
-endmacro(ADD_LUA_MODULE)
-
-set (_TOLUA_FILES
-  log.pkg.c
-  locale.pkg.c
-  config.pkg.c
-  process.pkg.c
-  game.pkg.c
-  eressea.pkg.c
-  settings.pkg.c
-)
-
 if (TOLUA_EXECUTABLE)
+  set (_TOLUA_FILES
+    log.pkg.c
+    locale.pkg.c
+    config.pkg.c
+    process.pkg.c
+    game.pkg.c
+    eressea.pkg.c
+    settings.pkg.c
+  )
+
   macro(TOLUA_BINDING _NAME _FILES)
     set(_PKGFILE ${_NAME}.pkg)
     set(_SRCFILE ${_PKGFILE}.c)
@@ -154,11 +146,12 @@ set(CHECK_SRC
   checker.c
   )
 
+if (LUA_FOUND)
 set(SERVER_SRC
   bind_building.c
-  bind_config.c
   bind_eressea.c
   bind_faction.c
+  bind_gmtool.c
   bind_locale.c
   bind_message.c
   bind_monsters.c
@@ -170,19 +163,28 @@ set(SERVER_SRC
   bind_tolua.c
   bind_unit.c
   bindings.c
+  crimport.c
   console.c
   helpers.c
-  signals.c
-  main.c
-  )
+)
+else(LUA_FOUND)
+set(SERVER_SRC
+  processing.c
+)
+endif(LUA_FOUND)
 
 if (CURSES_FOUND)
 set (SERVER_SRC ${SERVER_SRC}
-  bind_gmtool.c
+  bind_config.c
   gmtool.c
   listbox.c
 )
 endif(CURSES_FOUND)
+
+set (SERVER_SRC ${SERVER_SRC}
+  main.c
+  signals.c
+)
 
 add_library(version STATIC ${VERSION_SRC})
 if(DEFINED ERESSEA_VERSION)
@@ -216,18 +218,26 @@ endif (HAVE_LIBM)
 
 add_library(game ${ERESSEA_SRC})
 target_include_directories (game PUBLIC ${INIPARSER_INCLUDE_DIR})
-target_include_directories (game PUBLIC ${TOLUA_INCLUDE_DIR})
-target_include_directories (game PUBLIC ${LUA_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${CRPAT_INCLUDE_DIR})
 target_link_libraries(game ${EXTRA_LIBS} parser version)
 
 add_executable(eressea ${SERVER_SRC})
 target_link_libraries(eressea
   game
-  ${TOLUA_LIBRARY}
-  ${LUA_LIBRARIES}
   ${STORAGE_LIBRARIES}
+  ${CRPAT_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
+)
+
+if (LUA_FOUND)
+target_compile_definitions(game PRIVATE HAVE_LUA)
+target_compile_definitions(eressea PRIVATE HAVE_LUA)
+target_include_directories (game PUBLIC ${TOLUA_INCLUDE_DIR})
+target_include_directories (game PUBLIC ${LUA_INCLUDE_DIR})
+target_link_libraries(eressea
+  ${TOLUA_LIBRARY}
+  ${LUA_LIBRARIES}
 )
 
 add_test(NAME lua-core
@@ -242,6 +252,7 @@ add_test(NAME lua-e3
   COMMAND eressea -v1 ../scripts/run-tests-e3.lua
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
+set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
 
 find_program(LUAROCKS_EXECUTABLE luarocks)
 if(LUAROCKS_EXECUTABLE)
@@ -252,7 +263,7 @@ string(REPLACE ";" "\;" LUA_CPATH "${LR_CPATH}")
 set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}")
 endif(LUAROCKS_EXECUTABLE)
 
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
+endif (LUA_FOUND)
 
 set(TESTS_SRC
   alchemy.test.c
@@ -299,6 +310,7 @@ set(TESTS_SRC
   wormhole.test.c
   spells/combatspells.test.c
   spells/flyingship.test.c
+  spells/charming.test.c
   spells/regioncurse.test.c
   triggers/shock.test.c
   ${ATTRIBUTES_TESTS}
@@ -357,18 +369,17 @@ target_include_directories (game PUBLIC ${UTF8PROC_INCLUDE_DIR})
 target_include_directories (game PRIVATE ${SQLITE3_INCLUDE_DIR})
 target_link_libraries(eressea ${SQLITE3_LIBRARY})
 target_link_libraries(test_eressea ${SQLITE3_LIBRARY})
-target_compile_definitions(game PRIVATE USE_SQLITE)
 
 if (READLINE_FOUND)
 target_include_directories (eressea PRIVATE ${READLINE_INCLUDE_DIR})
 target_link_libraries(eressea ${READLINE_LIBRARY})
-target_compile_definitions(eressea PRIVATE DUSE_READLINE)
+target_compile_definitions(eressea PRIVATE HAVE_READLINE)
 endif (READLINE_FOUND)
 
 if (CURSES_FOUND)
 target_include_directories (eressea PRIVATE ${CURSES_INCLUDE_DIRS})
 target_link_libraries(eressea ${CURSES_LIBRARY})
-target_compile_definitions(eressea PRIVATE USE_CURSES)
+target_compile_definitions(eressea PRIVATE HAVE_CURSES)
 endif(CURSES_FOUND)
 
 if (EXPAT_FOUND)

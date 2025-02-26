@@ -939,7 +939,13 @@ msgid "hornofpeace_r_nosuccess"
 msgstr "\"$unit($unit) in $region($region) blows the Horn of Dancing, but nobody here gets into the mood.\""
 
 msgid "malnourish"
-msgstr "\"$unit($unit) is weakened due to malnourishment.\""
+msgstr "\"$unit($unit) in $region($region) is weakened due to malnourishment.\""
+
+msgid "malnourish_demon"
+msgstr "\"$unit($unit) is weakened due to lack of victims in $region($region).\""
+
+msgid "malnourish_insect"
+msgstr "\"$unit($unit) is weakened due to the cold in $region($region).\""
 
 msgid "iceberg_land"
 msgstr "\"The iceberg $region($region) drifts onto a coast.\""
@@ -1029,9 +1035,6 @@ msgstr "\"Warning: $faction($faction) has not been sending in orders for $int($t
 
 msgid "arena_leave_fail"
 msgstr "\"The attempt to use wings of the gryphon failed. $unit($unit) could not leave the Plane of Challenge.\""
-
-msgid "battle_critical"
-msgstr "\"$int36($unit.id($unit))/$int($index) does critical damage.\""
 
 msgid "error_spell_on_ship_already"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - There is already a spell on $ship($ship).\""
@@ -1514,9 +1517,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - The magician is
 
 msgid "stormwinds_effect"
 msgstr "\"$unit($unit) calls up a magical storm that whips the ship over the waters.\""
-
-msgid "error102"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot trade any more goods.\""
 
 msgid "drought_effect"
 msgstr "\"$unit($mage) puts a curse on the lands of $region($region) and a drought sets in.\""
@@ -2210,8 +2210,16 @@ msgid "error103"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Nobody here can build roads.\""
 
 msgctxt "curseinfo"
+msgid "slave_0"
+msgstr "\"$unit($unit) experiences a strong hypnotic influence. ($int36($id))\""
+
+msgctxt "curseinfo"
 msgid "slave_1"
 msgstr "\"$unit($unit) will be under our influence for $int($duration) more $if($eq($duration,1), \"week\", \"weeks\"). ($int36($id))\""
+
+msgctxt "curseinfo"
+msgid "firewall"
+msgstr "\"A wall of magical fire is blocking the way $direction($direction). ($int36($id))\""
 
 msgid "alliance::lost"
 msgstr "\"$alliance($alliance) has to leave the game after all their temples were lost.\""

@@ -14,18 +14,22 @@
 #include <util/password.h>
 
 #include "eressea.h"
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
 #include "gmtool.h"
+#endif
+#ifdef HAVE_LUA
+#include "bindings.h"
+#else
+#include "processing.h"
 #endif
 
 #include "signals.h"
-#include "bindings.h"
-
 #include <iniparser.h>
 #include <dictionary.h>
 
+#ifdef HAVE_LUA
 #include <lua.h>
-
+#endif
 #include <limits.h>
 #include <locale.h>
 #include <stdio.h>
@@ -58,7 +62,7 @@ static void load_inifile(void)
 
     verbosity = config_get_int("game.verbose", 2);
     memdebug = config_get_int("game.memcheck", memdebug);
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
     /* only one value in the [editor] section */
     force_color = config_get_int("editor.color", force_color);
 #endif
@@ -74,6 +78,7 @@ static const char * valid_keys[] = {
     "game.locale",
     "game.verbose",
     "game.report",
+    "game.rules",
     "game.memcheck",
     "game.email",
     "game.mailcmd",
@@ -89,24 +94,29 @@ static const char * valid_keys[] = {
     NULL
 };
 
+static dictionary * load_config(const char *path)
+{
+    log_debug("reading from configuration file %s\n", path);
+    return iniparser_load(path);
+}
+
 static dictionary *parse_config(const char *filename)
 {
-    dictionary *d;
-    const char *str, *cfgpath = config_get("config.path");
+    char path[PATH_MAX];
+    dictionary *d = NULL;
+    const char *str;
 
-    if (cfgpath) {
-        char path[PATH_MAX];
-        path_join(cfgpath, filename, path, sizeof(path));
-        log_debug("reading from configuration file %s\n", path);
-        d = iniparser_load(path);
-    }
-    else {
-        log_debug("reading from configuration file %s\n", filename);
-        d = iniparser_load(filename);
+    d = load_config(filename);
+    if (!d) {
+        path_join(basepath(), filename, path, sizeof(path));
+        d = load_config(path);
     }
     if (d) {
         config_set_from(d, valid_keys);
         load_inifile();
+    }
+    else {
+        log_fatal("could not find eressea.ini");
     }
     str = config_get("game.locales");
     make_locales(str ? str : "de,en");
@@ -179,7 +189,7 @@ static int parse_args(int argc, char **argv)
                     "Copyright (C) 2023 Enno Rehling et al.\n",
                     eressea_version());
                 return 1;
-#ifdef USE_CURSES          
+#ifdef HAVE_CURSES          
             }
             else if (strcmp(argi + 2, "color") == 0) {
                 /* force the editor to have colors */
@@ -205,11 +215,11 @@ static int parse_args(int argc, char **argv)
                 break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.path", arg);
+                inifile = arg;
                 break;
             case 'r':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.rules", arg);
+                config_set("game.rules", arg);
                 break;
             case 'f':
                 i = get_arg(argc, argv, 2, i, &luafile, 0);
@@ -267,8 +277,10 @@ void locale_init(void)
 
 int main(int argc, char **argv)
 {
-    int err = 0;
+#ifdef HAVE_LUA
     lua_State *L;
+#endif
+    int err = 0;
     dictionary *d = NULL;
     setup_signal_handler();
     message_handle_missing(MESSAGE_MISSING_REPLACE);
@@ -284,16 +296,27 @@ int main(int argc, char **argv)
 
     locale_init();
 
+#ifdef HAVE_LUA
     L = lua_init(d);
+#endif
     game_init();
+#ifdef HAVE_LUA
     bind_monsters(L);
     err = eressea_run(L, luafile);
     if (err) {
         log_error("script %s failed with code %d\n", luafile, err);
         return err;
     }
+#else
+    if (luafile) {
+        log_error("Lua is disabled, cannot execute %s", luafile);
+    }
+    run_turn();
+#endif
     game_done();
+#ifdef HAVE_LUA
     lua_done(L);
+#endif
     log_close();
     stats_write(stdout, "");
     stats_close();

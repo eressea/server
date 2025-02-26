@@ -1076,10 +1076,6 @@ msgstr "This spell can project a slightly distorted image of the own troops, lik
 msgid "section_newpotions"
 msgstr "New Potions"
 
-msgctxt "border"
-msgid "an_illusionwall"
-msgstr "an illusionary wall"
-
 msgctxt "race"
 msgid "apepsnake"
 msgstr "apepsnake"
@@ -2535,10 +2531,6 @@ msgstr "Song of Fear"
 msgctxt "race"
 msgid "songdragon_x"
 msgstr "song dragon"
-
-msgctxt "border"
-msgid "illusionwall"
-msgstr "illusionary wall"
 
 msgctxt "spellinfo"
 msgid "summonshadowlords"
@@ -4142,6 +4134,12 @@ msgstr "Tshrrrk..."
 msgid "growl2"
 msgstr "Shhhhhh..."
 
+msgid "growl3"
+msgstr "Raaaar..."
+
+msgid "growl4"
+msgstr "Chrrr..."
+
 msgctxt "skill"
 msgid "bow"
 msgstr "bow"
@@ -4579,7 +4577,7 @@ msgid "fish_shield"
 msgstr "Shield of the Fish"
 
 msgid "corridor1_trail"
-msgstr "a %s"
+msgstr "the corridor of %s"
 
 msgctxt "race"
 msgid "dolphin_d"
@@ -5095,7 +5093,7 @@ msgid "soc"
 msgstr "sack of holding"
 
 msgid "hall1_trail"
-msgstr "the %s"
+msgstr "the great hall of %s"
 
 msgctxt "spellinfo"
 msgid "treewalkenter"

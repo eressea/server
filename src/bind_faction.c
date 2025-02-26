@@ -32,8 +32,6 @@
 #include <stdbool.h>          // for bool
 #include <stdio.h>            // for puts
 
-struct allies;
-
 int tolua_factionlist_next(lua_State * L)
 {
     faction **faction_ptr = (faction **)lua_touserdata(L, lua_upvalueindex(1));
@@ -497,7 +495,7 @@ static const char *status_names[] = {
     "money", "fight", "observe", "give", "guard", "stealth", "travel", NULL
 };
 
-static int cb_ally_push(struct allies *af, struct faction *f, int status, void *udata) {
+static int cb_ally_push(struct faction *f, int status, void *udata) {
     struct lua_State *L = (struct lua_State *)udata;
     int len = 1;
     int i;

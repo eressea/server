@@ -463,7 +463,7 @@ static void rotting_herbs(void)
             item **itmp = &u->items;
             int rot_chance = rule_rot;
 
-            if (it_bag && *i_find(itmp, it_bag)) {
+            if (it_bag && i_find(itmp, it_bag)) {
                 rot_chance = (rot_chance * 2) / 5;
             }
             while (*itmp) {

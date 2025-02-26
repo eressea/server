@@ -152,13 +152,32 @@ static int read_handler(variant *var, void *owner, gamedata *data)
     return AT_READ_FAIL;
 }
 
+void dump_trigger(const trigger *t, int indent)
+{
+    fprintf(stdout, "%*s- trigger: %s\n", indent, "", t->type->name);
+    if (t->type->dump) {
+        t->type->dump(t, indent + 2);
+    }
+}
+
+static void dump_handler(const attrib *a)
+{
+    const handler_info *hi = (const handler_info *)a->data.v;
+    const trigger *t;
+    fprintf(stdout, "  event: %s\n", hi->event);
+    for (t = hi->triggers; t; t = t->next) {
+        dump_trigger(t, 2);
+    }
+}
+
 attrib_type at_eventhandler = {
     "eventhandler",
     init_handler,
     free_handler,
     NULL,
     write_handler,
-    read_handler
+    read_handler,
+    .dump = dump_handler
 };
 
 struct trigger **get_triggers(struct attrib *ap, const char *eventname)
@@ -260,7 +279,3 @@ const trigger_type * tt)
             tp = &t->next;
     }
 }
-
-/***
- ** default events
- **/

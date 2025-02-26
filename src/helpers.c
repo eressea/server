@@ -2,24 +2,23 @@
 
 #include "helpers.h"
 #include "vortex.h"
-#include "alchemy.h"
 #include "magic.h"
 
-#include <kernel/attrib.h>
-#include <kernel/event.h>
 #include <util/functions.h>
-#include <kernel/gamedata.h>
 #include <util/log.h>
 #include <util/macros.h>
 #include <util/parser.h>
 #include <util/variant.h>
 
+#include <kernel/attrib.h>
 #include <kernel/config.h>
 #include <kernel/callbacks.h>
-#include <kernel/spell.h>
-#include <kernel/unit.h>
+#include <kernel/event.h>
+#include <kernel/gamedata.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
+#include <kernel/spell.h>
+#include <kernel/unit.h>
 
 #include <storage.h>
 
@@ -27,48 +26,10 @@
 #include <tolua.h>
 #include <lua.h>
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 struct order;
-
-static int
-lua_giveitem(unit * s, unit * d, const item_type * itype, int n, struct order *ord)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-    char fname[64];
-    int result = -1, len;
-    const char *iname = itype->rtype->_name;
-
-    UNUSED_ARG(ord);
-    assert(s != NULL);
-    len = snprintf(fname, sizeof(fname), "%s_give", iname);
-    if (len > 0 && (size_t)len < sizeof(fname)) {
-        lua_getglobal(L, fname);
-        if (lua_isfunction(L, -1)) {
-            tolua_pushusertype(L, s, "unit");
-            tolua_pushusertype(L, d, "unit");
-            tolua_pushstring(L, iname);
-            lua_pushinteger(L, n);
-
-            if (lua_pcall(L, 4, 1, 0) != 0) {
-                const char *error = lua_tostring(L, -1);
-                log_error("unit %s calling '%s': %s.\n", unitname(s), fname, error);
-                lua_pop(L, 1);
-            }
-            else {
-                result = (int)lua_tonumber(L, -1);
-                lua_pop(L, 1);
-            }
-        }
-        else {
-            log_error("unit %s trying to call '%s' : not a function.\n", unitname(s), fname);
-            lua_pop(L, 1);
-        }
-    }
-    return result;
-}
 
 static int limit_resource_lua(const region * r, const resource_type * rtype)
 {
@@ -138,7 +99,7 @@ static void push_param(lua_State * L, char c, spellparameter* param)
     else if (c == 'r')
         tolua_pushusertype(L, param->data.sh, "region");
     else if (c == 'c')
-        tolua_pushstring(L, param->data.s);
+        tolua_pushstring(L, param->data.xs);
     else {
         log_error("unsupported syntax %c.\n", c);
         lua_pushnil(L);
@@ -262,59 +223,35 @@ lua_changeresource(unit * u, const struct resource_type *rtype, int delta)
 
 /** callback for an item-use function written in lua. */
 static int
-lua_use_item(unit *u, const item_type *itype, const char * fname, int amount, struct order *ord)
-{
-    lua_State *L = (lua_State *)global.vm_state;
-
-    lua_getglobal(L, fname);
-    if (lua_isfunction(L, -1)) {
-        tolua_pushusertype(L, (void *)u, "unit");
-        lua_pushinteger(L, amount);
-        lua_pushstring(L, getstrtoken());
-        tolua_pushusertype(L, (void *)ord, "order");
-        if (lua_pcall(L, 4, 1, 0) != 0) {
-            const char *error = lua_tostring(L, -1);
-            log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
-        }
-        else {
-            int result = (int)lua_tonumber(L, -1);
-            lua_pop(L, 1);
-            return result;
-        }
-    }
-    else {
-        log_error("use_item(%s) calling '%s': not a function.\n", unitname(u), fname);
-    }
-    lua_pop(L, 1);
-    return EUNUSABLE;
-}
-
-static int
-use_item_callback(unit *u, const item_type *itype, int amount, struct order *ord)
+lua_use_item(unit *u, const item_type *itype, int amount, struct order *ord)
 {
     int len;
     char fname[64];
 
     len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
     if (len > 0 && (size_t)len < sizeof(fname)) {
-        int(*callout)(unit *, const item_type *, int, struct order *);
-
-        /* check if we have a register_item_use function */
-        callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
-        if (callout) {
-            return callout(u, itype, amount, ord);
+        lua_State *L = (lua_State *)global.vm_state;
+        lua_getglobal(L, fname);
+        if (lua_isfunction(L, -1)) {
+            tolua_pushusertype(L, (void *)u, "unit");
+            lua_pushinteger(L, amount);
+            lua_pushstring(L, getstrtoken());
+            tolua_pushusertype(L, (void *)ord, "order");
+            if (lua_pcall(L, 4, 1, 0) != 0) {
+                const char *error = lua_tostring(L, -1);
+                log_error("use(%s) calling '%s': %s.\n", unitname(u), fname, error);
+            }
+            else {
+                int result = (int)lua_tonumber(L, -1);
+                lua_pop(L, 1);
+                return result;
+            }
         }
-
-        /* if the item is a potion, try use_potion,
-         * the generic function for potions that add an effect: */
-        if (itype->flags & ITF_POTION) {
-            return use_potion(u, itype, amount, ord);
+        else {
+            log_error("use_item(%s) calling '%s': not a function.\n", unitname(u), fname);
         }
-
-        /* finally, check if we have a matching lua function */
-        return lua_use_item(u, itype, fname, amount, ord);
+        lua_pop(L, 1);
     }
-
     return EUNUSABLE;
 }
 
@@ -357,10 +294,9 @@ void register_tolua_helpers(void)
 
     callbacks.equip_unit = lua_equipunit;
     callbacks.cast_spell = lua_callspell;
-    callbacks.use_item = use_item_callback;
+    callbacks.use_item = lua_use_item;
     callbacks.produce_resource = produce_resource_lua;
     callbacks.limit_resource = limit_resource_lua;
 
     register_function((pf_generic)lua_changeresource, "lua_changeresource");
-    register_item_give(lua_giveitem, "lua_giveitem");
 }

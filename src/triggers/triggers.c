@@ -1,7 +1,6 @@
 #include "triggers.h"
 
 /* triggers includes */
-#include <triggers/changefaction.h>
 #include <triggers/changerace.h>
 #include <triggers/createcurse.h>
 #include <triggers/createunit.h>
@@ -13,10 +12,30 @@
 #include <triggers/clonedied.h>
 
 /* util includes */
+#include <kernel/attrib.h>
+#include <kernel/gamedata.h>
 #include <kernel/event.h>
+
+#include <storage.h>
 
 /* libc includes */
 #include <stdio.h>
+
+/* tt_changefaction was once used by sp_charming song,
+ * and now only needs to exist for loading from old files
+ */
+
+static int changefaction_read(trigger *t, gamedata *data)
+{
+    READ_INT(data->store, NULL);
+    READ_INT(data->store, NULL);
+    return AT_READ_FAIL;
+}
+
+trigger_type tt_changefaction = {
+    .name = "changefaction",
+    .read = changefaction_read
+};
 
 void register_triggers(void)
 {

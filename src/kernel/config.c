@@ -66,17 +66,6 @@
 #endif
 struct settings global;
 
-int findoption(const char *s, const struct locale *lang)
-{
-    void **tokens = get_translations(lang, UT_OPTIONS);
-    variant token;
-
-    if (findtoken(*tokens, s, &token) == E_TOK_SUCCESS) {
-        return (direction_t)token.i;
-    }
-    return NODIRECTION;
-}
-
 /* -- Erschaffung neuer Einheiten ------------------------------ */
 
 static int *forbidden_ids;

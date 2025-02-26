@@ -837,7 +837,7 @@ static void report_region_resource(sbstring *sbp, const struct locale *lang, con
     }
 }
 
-static void report_roads(sbstring *sbs, const region *r, const faction* f, const bool see[])
+static void report_exits(sbstring *sbs, const region *r, const faction* f, const bool see[])
 {
     attrib* a;
     int d, nrd = 0;
@@ -858,6 +858,7 @@ static void report_roads(sbstring *sbs, const region *r, const faction* f, const
             nrd--;
             if (dh) {
                 char regname[128], trail[256];
+                const char *s;
                 if (nrd == 0) {
                     sbs_strcat(sbs, " ");
                     sbs_strcat(sbs, LOC(f->locale, "nr_nb_final"));
@@ -868,8 +869,14 @@ static void report_roads(sbstring *sbs, const region *r, const faction* f, const
                 sbs_strcat(sbs, LOC(f->locale, directions[d]));
                 sbs_strcat(sbs, " ");
                 f_regionid(r2, f, regname, sizeof(regname));
-                snprintf(trail, sizeof(trail), trailinto(r2, f->locale), regname);
-                sbs_strcat(sbs, trail);
+                s = trailinto(r2, f->locale);
+                if (strstr(s, "%s")) {
+                    snprintf(trail, sizeof(trail), s, regname);
+                    sbs_strcat(sbs, trail);
+                }
+                else {
+                    sbs_strcat(sbs, s);
+                }
             }
             else {
                 message* msg = msg_message("nr_vicinitystart", "dir region", d, r2);
@@ -1029,31 +1036,83 @@ static void report_region_description(struct stream *out, const region * r, fact
 
     pump_paragraph(&sbs, out, REPORTWIDTH, false);
 
-    report_roads(&sbs, r, f, see);
+    report_exits(&sbs, r, f, see);
     pump_paragraph(&sbs, out, REPORTWIDTH, true);
+}
+
+
+static void report_region_edge(struct stream *out, faction *f, direction_t d, const char *name, bool transparent)
+{
+    char buf[512];
+    message * msg = msg_message(transparent ? "nr_border_transparent" : "nr_border_opaque",
+        "object dir", name, d);
+    nr_render(msg, f->locale, buf, sizeof(buf), f);
+    msg_release(msg);
+    paragraph(out, buf, 0, 0, 0);
+}
+/**
+ * Show roads and certain magic effects.
+ */
+static bool report_region_roads(struct stream *out, const region *r, faction *f)
+{
+    bool output = false;
+    if (r->land) {
+        direction_t d;
+
+        for (d = 0; d != MAXDIRECTIONS; ++d) {
+            int local = r->land->roads[d];
+            char buffer[64];
+            region *r2 = rconnect(r, d);
+            const char *name = NULL;
+            if (r2 && r->terrain->max_road && r2->terrain->max_road) {
+                if (local > 0 && local < r->terrain->max_road) {
+                    const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
+                    int percent = 100 * local / r->terrain->max_road;
+                    if (percent < 1) percent = 1;
+                    str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
+                    name = buffer;
+                }
+                else {
+                    direction_t dr = d_reverse(d);
+                    int remote = r2->land ? r2->land->roads[dr] : 0;
+                    if (local > 0) {
+                        if (r2->terrain->max_road <= remote) {
+                            name = LOC(f->locale, mkname("border", "a_road"));
+                        }
+                        else {
+                            name = LOC(f->locale, mkname("border", "an_incomplete_road"));
+                        }
+                    }
+                    else if (remote > 0) {
+                        name = LOC(f->locale, mkname("border", "a_road_connection"));
+                    }
+                }
+                if (name) {
+                    if (!output) {
+                        newline(out);
+                    }
+                    report_region_edge(out, f, d, name, true);
+                    output = true;
+                }
+            }
+        }
+    }
+    return output;
 }
 
 /**
  * Show roads and certain magic effects.
  */
-static void report_region_edges(struct stream *out, const region * r, faction * f, struct edge edges[], int nedges) {
-    nr_curses(out, 0, f, TYP_REGION, r);
-
+static void report_region_edges(struct stream *out, const region * r, faction * f, struct edge edges[], int nedges)
+{
     if (nedges > 0) {
         int e;
-        newline(out);
         for (e = 0; e != nedges; ++e) {
-            message *msg;
-            int d;
+            direction_t d;
 
             for (d = 0; d != MAXDIRECTIONS; ++d) {
                 if (edges[e].exist[d]) {
-                    char buf[512];
-                    msg = msg_message(edges[e].transparent ? "nr_border_transparent" : "nr_border_opaque",
-                        "object dir", edges[e].name, d);
-                    nr_render(msg, f->locale, buf, sizeof(buf), f);
-                    msg_release(msg);
-                    paragraph(out, buf, 0, 0, 0);
+                    report_region_edge(out, f, d, edges[e].name, edges[e].transparent);
                 }
             }
             free(edges[e].name);
@@ -1158,6 +1217,11 @@ void report_region(struct stream *out, const region * r, faction * f)
     report_region_description(out, r, f, see);
     if (see_schemes(r, r->seen.mode)) {
         report_region_schemes(out, r, f);
+    }
+    nr_curses(out, 0, f, TYP_REGION, r);
+
+    if (!report_region_roads(out, r, f) && ne > 0) {
+        newline(out);
     }
     report_region_edges(out, r, f, edges, ne);
 }
@@ -1408,8 +1472,7 @@ int write_template(const char* filename, const char* bom, const faction* f, cons
     return 0;
 }
 
-static int count_allies_cb(struct allies *al, faction *af, int status, void *udata) {
-    (void)al;
+static int count_allies_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         int *num = (int *)udata;
         if (status > 0) {
@@ -1485,8 +1548,7 @@ void pump_paragraph(sbstring *sbp, stream *out, size_t maxlen, bool isfinal)
     }
 }
 
-static int show_allies_cb(struct allies *al, faction *af, int status, void *udata) {
-    (void)al;
+static int show_allies_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         struct show_s *show = (struct show_s *)udata;
         const faction *f = show->f;
@@ -1556,7 +1618,7 @@ static int show_allies_cb(struct allies *al, faction *af, int status, void *udat
     return 0;
 }
 
-void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct allies * allies, const char *prefix)
+void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct ally * allies, const char *prefix)
 {
     int num_allies = 0;
 
@@ -2034,33 +2096,33 @@ report_plaintext(const char *filename, report_context * ctx,
     }
     no_units = f->num_units;
     no_people = f->num_people;
-    m = msg_message("nr_population", "population units limit", no_people, no_units, rule_faction_limit());
+    m = msg_message("nr_population", "population units limit",
+        no_people, no_units, rule_faction_limit());
     nr_render(m, f->locale, buf, sizeof(buf), f);
     msg_release(m);
     centre(out, buf, true);
     if (f->race == get_race(RC_HUMAN)) {
         int maxmig = count_maxmigrants(f);
         if (maxmig > 0) {
-            m =
-                msg_message("nr_migrants", "units maxunits", count_migrants(f), maxmig);
+            m = msg_message("nr_migrants", "units maxunits",
+                count_migrants(f), maxmig);
             nr_render(m, f->locale, buf, sizeof(buf), f);
             msg_release(m);
             centre(out, buf, true);
         }
     }
     if (f_get_alliance(f)) {
-        m =
-            msg_message("nr_alliance", "leader name id age",
-                alliance_get_leader(f->alliance), f->alliance->name, f->alliance->id,
-                turn - f->alliance_joindate);
+        m = msg_message("nr_alliance", "leader name id age",
+            alliance_get_leader(f->alliance), f->alliance->name,
+            f->alliance->id, turn - f->alliance_joindate);
         nr_render(m, f->locale, buf, sizeof(buf), f);
         msg_release(m);
         centre(out, buf, true);
     }
     maxh = max_heroes(f->num_people);
     if (maxh) {
-        message *msg =
-            msg_message("nr_heroes", "units maxunits", countheroes(f), maxh);
+        message *msg = msg_message("nr_heroes", "units maxunits",
+                countheroes(f), maxh);
         nr_render(msg, f->locale, buf, sizeof(buf), f);
         msg_release(msg);
         centre(out, buf, true);

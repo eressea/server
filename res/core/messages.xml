@@ -261,10 +261,22 @@
       <arg name="id" type="int"/>
     </type>
   </message>
+  <message name="curseinfo::slave_0" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="id" type="int"/>
+    </type>
+  </message>
   <message name="curseinfo::slave_1" section="events">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="duration" type="int"/>
+      <arg name="id" type="int"/>
+    </type>
+  </message>
+  <message name="curseinfo::firewall" section="events">
+    <type>
+      <arg name="direction" type="direction"/>
       <arg name="id" type="int"/>
     </type>
   </message>
@@ -528,12 +540,6 @@
       <arg name="unit" type="unit"/>
       <arg name="item" type="resource"/>
       <arg name="amount" type="int"/>
-    </type>
-  </message>
-  <message name="battle_critical" section="battle">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="index" type="int"/>
     </type>
   </message>
   <message name="teach_asgood" section="errors">
@@ -2596,6 +2602,18 @@
       <arg name="region" type="region"/>
     </type>
   </message>
+  <message name="malnourish_insect" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
+  <message name="malnourish_demon" section="events">
+    <type>
+      <arg name="unit" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
   <message name="starvation" section="events">
     <type>
       <arg name="unit" type="unit"/>
@@ -4406,13 +4424,6 @@
     </type>
   </message>
   <message name="error103" section="errors">
-    <type>
-      <arg name="unit" type="unit"/>
-      <arg name="region" type="region"/>
-      <arg name="command" type="order"/>
-    </type>
-  </message>
-  <message name="error102" section="errors">
     <type>
       <arg name="unit" type="unit"/>
       <arg name="region" type="region"/>

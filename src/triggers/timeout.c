@@ -65,13 +65,24 @@ static int timeout_read(trigger * t, gamedata *data)
     return AT_READ_FAIL;
 }
 
+static void timeout_dump(const trigger *t, int indent)
+{
+    timeout_data *td = (timeout_data *)t->data.v;
+    trigger *tc;
+    fprintf(stdout, "%*stimer: %d\n", indent, "", td->timer);
+    for (tc = td->triggers; tc; tc = tc->next) {
+        dump_trigger(tc, indent);
+    }
+}
+
 trigger_type tt_timeout = {
     "timeout",
     timeout_init,
     timeout_free,
     timeout_handle,
     timeout_write,
-    timeout_read
+    timeout_read,
+    timeout_dump
 };
 
 trigger *trigger_timeout(int time, trigger * callbacks)

@@ -498,3 +498,13 @@ void attrib_done(void) {
     cb_clear(&cb_deprecated);
     hmfree(at_hash);
 }
+
+void dump_attrib(const attrib *a) {
+    if (a) {
+        fprintf(stdout, "- %s\n", a->type->name);
+        if (a->type->dump) {
+            a->type->dump(a);
+        }
+    }
+    else fputs("null", stdout);
+}

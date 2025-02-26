@@ -1324,7 +1324,7 @@ static void test_name_ship(CuTest *tc) {
 }
 
 static void test_name_group(CuTest *tc) {
-    faction* f;
+    faction* f, *f2;
     unit *u1, *u2;
     group *g1, *g2;
 
@@ -1333,6 +1333,8 @@ static void test_name_group(CuTest *tc) {
     set_group(u1, g1 = create_group(f, "Penner", 1));
     u2 = test_create_unit(u1->faction, u1->region);
     set_group(u2, g2 = create_group(f, "Helden", 2));
+    f2 = test_create_faction();
+    create_group(f2, "Deppen", 3);
 
     u1->thisorder = create_order(K_NAME, f->locale, "%s Deppen", param_name(P_GROUP, f->locale));
     name_cmd(u1, u1->thisorder);
@@ -2069,7 +2071,35 @@ static void test_demon_hunger(CuTest * tc)
     get_food(r);
 
     CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "malnourish"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "malnourish_demon"));
+
+    test_teardown();
+}
+
+static void test_insect_hunger(CuTest * tc)
+{
+    const resource_type *rtype;
+    region *r;
+    race *rc;
+    faction *f;
+    unit *u;
+
+    test_setup();
+    config_set("hunger.damage", NULL);
+    init_resources();
+    r = test_create_region(0, 0, test_create_terrain("glacier", LAND_REGION | ARCTIC_REGION));
+    rc = test_create_race("insect");
+    f = test_create_faction_ex(rc, NULL);
+    u = test_create_unit(f, r);
+    u->hp = 999;
+
+    rtype = get_resourcetype(R_SILVER);
+    i_change(&u->items, rtype->itype, 20);
+
+    get_food(r);
+
+    CuAssertIntEquals(tc, 10, i_get(u->items, rtype->itype));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "malnourish_insect"));
 
     test_teardown();
 }
@@ -3016,6 +3046,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_repopulate_income_based);
     SUITE_ADD_TEST(suite, test_repopulate_blocked);
     SUITE_ADD_TEST(suite, test_demon_hunger);
+    SUITE_ADD_TEST(suite, test_insect_hunger);
     SUITE_ADD_TEST(suite, test_armedmen);
     SUITE_ADD_TEST(suite, test_cansee);
     SUITE_ADD_TEST(suite, test_cansee_ring);

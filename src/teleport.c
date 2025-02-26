@@ -174,6 +174,18 @@ plane *get_astralplane(void)
     return astralspace;
 }
 
+static region *make_teleport_region(const region *r, plane *aplane, const terrain_type *terrain)
+{
+    region *ra;
+    int x = real2tp(r->x);
+    int y = real2tp(r->y);
+    pnormalize(&x, &y, aplane);
+
+    ra = new_region(x, y, aplane, 0);
+    terraform_region(ra, terrain);
+    return ra;
+}
+
 void create_teleport_plane(void)
 {
     region *r;
@@ -190,23 +202,30 @@ void create_teleport_plane(void)
     }
 }
 
+static bool cb_blocked(const region *r)
+{
+    return (r->terrain->flags & FORBIDDEN_REGION);
+}
+
 void update_teleport_plane(const region* r, plane* aplane, const terrain_type* terrain, const struct terrain_type* blocked)
 {
     static region* rlast = NULL;
     region* ra = tpregion(r);
+    bool forbidden = (r->terrain->flags & FORBIDDEN_REGION);
     const terrain_type* fog = terrain ? terrain : get_terrain("fog");
     const terrain_type* tfog = blocked ? blocked : get_terrain("thickfog");
-    const terrain_type* ter = (r->terrain->flags & FORBIDDEN_REGION) ? tfog : fog;
 
     if (ra == NULL) {
-        int x = real2tp(r->x);
-        int y = real2tp(r->y);
-        pnormalize(&x, &y, aplane);
-
-        ra = new_region(x, y, aplane, 0);
-        terraform_region(ra, ter);
+        make_teleport_region(r, aplane, forbidden ? tfog : fog);
     }
-    else if (ra->terrain == fog && ter == tfog) {
+    else if (ra->terrain == tfog && !forbidden) {
+        int num = get_astralregions(ra, cb_blocked, NULL);
+        if (num == 0) {
+            /* none of the regions below ra are blocked, meaning we can unblock it */
+            terraform_region(ra, fog);
+        }
+    }
+    else if (ra->terrain == fog && forbidden) {
         /* try fixing this region, but only once: */
         if (ra != rlast) {
             rlast = ra;
@@ -225,7 +244,7 @@ void update_teleport_plane(const region* r, plane* aplane, const terrain_type* t
                 }
             }
         }
-        terraform_region(ra, ter);
+        terraform_region(ra, tfog);
     }
 }
 

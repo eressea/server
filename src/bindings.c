@@ -296,17 +296,19 @@ static int tolua_create_curse(lua_State * L)
             ap = &target->attribs;
     }
     if (ap) {
-        const char *cname = tolua_tostring(L, 3, 0);
-        const curse_type *ctype = ct_find(cname);
-        if (ctype) {
-            float vigour = (float)tolua_tonumber(L, 4, 0);
-            int duration = (int)tolua_tonumber(L, 5, 0);
-            float effect = (float)tolua_tonumber(L, 6, 0);
-            int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
-            curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
-            if (c) {
-                tolua_pushboolean(L, true);
-                return 1;
+        const char *cname = tolua_tostring(L, 3, NULL);
+        if (cname) {
+            const curse_type *ctype = ct_find(cname);
+            if (ctype) {
+                float vigour = (float)tolua_tonumber(L, 4, 0);
+                int duration = (int)tolua_tonumber(L, 5, 0);
+                float effect = (float)tolua_tonumber(L, 6, 0);
+                int men = (int)tolua_tonumber(L, 7, 0);   /* optional */
+                curse *c = create_curse(u, ap, ctype, vigour, duration, effect, men);
+                if (c) {
+                    tolua_pushboolean(L, true);
+                    return 1;
+                }
             }
         }
     }
@@ -526,6 +528,14 @@ static int tolua_get_unit(lua_State * L)
     unit *u = findunit(no);
     tolua_pushusertype(L, u, "unit");
     return 1;
+}
+
+static int tolua_dump_unit(lua_State * L)
+{
+    int no = tolua_toid(L, 1, 0);
+    unit *u = findunit(no);
+    dump_unit(u);
+    return 0;
 }
 
 static int tolua_alliance_create(lua_State * L)
@@ -851,7 +861,7 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     lua_pushstring(L, "reportpath");
     lua_pushstring(L, reportpath());
     lua_rawset(L, -3);
-    arg = config_get("config.rules");
+    arg = config_get("game.rules");
     if (arg) {
         lua_pushstring(L, "rules");
         lua_pushstring(L, arg);
@@ -982,6 +992,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         } tolua_endmodule(L);
         tolua_function(L, "get_region_by_id", tolua_get_region_byid);
         tolua_function(L, "get_unit", tolua_get_unit);
+        tolua_function(L, "dump_unit", tolua_dump_unit);
         tolua_function(L, "get_alliance", tolua_get_alliance);
         tolua_function(L, "get_ship", tolua_get_ship);
         tolua_function(L, "get_building", tolua_get_building);
@@ -1050,7 +1061,7 @@ lua_State *lua_init(const dictionary *inifile) {
     tolua_unit_open(L);
     tolua_message_open(L);
     tolua_order_open(L);
-#ifdef USE_CURSES
+#ifdef HAVE_CURSES
     tolua_gmtool_open(L);
 #endif
     tolua_storage_open(L);

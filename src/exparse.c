@@ -285,7 +285,7 @@ static void handle_weapon(parseinfo *pi, const XML_Char *el, const XML_Char **at
             wtype->reload = (unsigned char) xml_int(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "skill")) {
-            wtype->skill = findskill(attr[i + 1]);
+            wtype->skill = find_skill(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "magres")) {
             wtype->magres = xml_fraction(attr[i + 1]);;
@@ -706,7 +706,7 @@ static void handle_modifier(parseinfo *pi, const XML_Char *el, const XML_Char **
             mod->btype = bt_get_or_create(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "skill")) {
-            sk = findskill(attr[i + 1]);
+            sk = find_skill(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "races")) {
             char list[64];
@@ -763,7 +763,7 @@ void parse_construction(construction *con, parseinfo *pi, const XML_Char *el, co
     con->reqsize = 1;
     for (i = 0; attr[i]; i += 2) {
         if (xml_strequal(attr[i], "skill")) {
-            con->skill = findskill(attr[i + 1]);
+            con->skill = find_skill(attr[i + 1]);
         }
         else if (xml_strequal(attr[i], "maxsize")) {
             con->maxsize = xml_int(attr[i + 1]);
@@ -776,6 +776,7 @@ void parse_construction(construction *con, parseinfo *pi, const XML_Char *el, co
         }
         else if (stage != NULL && xml_strequal(attr[i], "name")) {
             /* only building stages have names */
+            if (stage->name) free(stage->name);
             stage->name = str_strdup(attr[i + 1]);
         }
         else {
@@ -805,7 +806,11 @@ static void start_resources(parseinfo *pi, const XML_Char *el, const XML_Char **
                     name = attr[i + 1];
                 }
                 else if (xml_strequal(attr[i], "value")) {
-                    fun = get_function(attr[i + 1]);
+                    const char *value = attr[i + 1];
+                    fun = get_function(value);
+                    if (!fun) {
+                        log_warning("no such resource function: %s", value);
+                    }
                 }
                 else {
                     handle_bad_input(pi, el, attr[i]);
@@ -1083,7 +1088,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             }
         }
         if (name) {
-            skill_t sk = findskill(name);
+            skill_t sk = find_skill(name);
             if (sk != NOSKILL) {
                 rc->bonus[sk] = (char)mod;
                 if (speed != 0) {

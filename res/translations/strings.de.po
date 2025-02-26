@@ -1263,10 +1263,6 @@ msgstr "Dieser Zauber vermag dem Gegner ein geringfügig versetztes Bild der eig
 msgid "section_newpotions"
 msgstr "Neue Tränke"
 
-msgctxt "border"
-msgid "an_illusionwall"
-msgstr "eine Illusionswand"
-
 msgctxt "race"
 msgid "apepsnake"
 msgstr "Apepschlange"
@@ -2894,10 +2890,6 @@ msgstr "REKRUTIERE"
 msgctxt "race"
 msgid "songdragon_x"
 msgstr "Singdrachen"
-
-msgctxt "border"
-msgid "illusionwall"
-msgstr "Illusionswand"
 
 msgctxt "spellinfo"
 msgid "summonshadowlords"
@@ -5188,7 +5180,7 @@ msgid "join"
 msgstr "BEITRETEN"
 
 msgid "corridor1_trail"
-msgstr "die %s"
+msgstr "der Gang %s"
 
 msgid "lebkuchenherz_p"
 msgstr "Lebkuchenherzen mit der Aufschrift 'Erz und Stein, das ist fein'"
@@ -5749,7 +5741,7 @@ msgid "soc"
 msgstr "Beutel des negativen Gewichts"
 
 msgid "hall1_trail"
-msgstr "die %s"
+msgstr "die Halle %s"
 
 msgctxt "spell"
 msgid "draigdestroymagic"

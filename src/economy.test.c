@@ -9,7 +9,6 @@
 #include <kernel/building.h>
 #include <kernel/calendar.h>
 #include <kernel/config.h>
-#include "kernel/connection.h"
 #include <kernel/curse.h>
 #include <kernel/faction.h>
 #include "kernel/direction.h"         // for D_EAST, directions
@@ -575,12 +574,13 @@ static void test_trade_produceexp(CuTest *tc) {
     it_jewel = it_find("jewel");
     u = test_create_unit(test_create_faction(), r);
     sv = test_set_skill(u, SK_TRADE, 2, 1);
+    CuAssertIntEquals(tc, 2, sv->level);
     i_change(&u->items, it_find("money"), 500);
     unit_addorder(u, create_order(K_BUY, u->faction->locale, "10 %s",
         LOC(u->faction->locale, resourcename(it_jewel->rtype, 0))));
     it_balm = it_find("balm");
     i_change(&u->items, it_balm, 20);
-    unit_addorder(u, create_order(K_SELL, u->faction->locale, "10 %s",
+    unit_addorder(u, create_order(K_SELL, u->faction->locale, "20 %s",
         LOC(u->faction->locale, resourcename(it_balm->rtype, 0))));
     produce(r);
     CuAssertIntEquals(tc, 10, i_get(u->items, it_jewel));
@@ -1700,7 +1700,7 @@ static void test_destroy_cmd(CuTest* tc) {
 }
 
 static void test_make_road(CuTest *tc) {
-    region *r, *r2;
+    region *r;
     unit *u;
     faction *f;
     struct item_type *itype;
@@ -1710,7 +1710,7 @@ static void test_make_road(CuTest *tc) {
     t_plain = test_create_terrain("plain", LAND_REGION);
     t_plain->max_road = 100;
     u = test_create_unit(f = test_create_faction(), r = test_create_region(0, 0, t_plain));
-    r2 = test_create_region(1, 0, t_plain);
+    test_create_region(1, 0, t_plain);
     set_level(u, SK_ROAD_BUILDING, 10);
     scale_number(u, 10);
     i_change(&u->items, itype = test_create_itemtype("stone"), 100);
@@ -1719,7 +1719,6 @@ static void test_make_road(CuTest *tc) {
     make_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, 50, i_get(u->items, itype));
     CuAssertIntEquals(tc, 50, rroad(r, D_EAST));
-    CuAssertPtrNotNull(tc, get_borders(r, r2));
     test_teardown();
 }
 

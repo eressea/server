@@ -57,18 +57,6 @@ static int res_changeaura(unit * u, const resource_type * rtype, int delta)
     return change_spellpoints(u, delta);
 }
 
-static int res_changeperson(unit * u, const resource_type * rtype, int delta)
-{
-    assert(rtype != NULL || !"not implemented");
-    if (u->number + delta >= 0) {
-        scale_number(u, u->number + delta);
-    }
-    else {
-        scale_number(u, 0);
-    }
-    return u->number;
-}
-
 static int res_changepermaura(unit * u, const resource_type * rtype, int delta)
 {
     assert(rtype != NULL);
@@ -77,16 +65,27 @@ static int res_changepermaura(unit * u, const resource_type * rtype, int delta)
 
 static int res_changehp(unit * u, const resource_type * rtype, int delta)
 {
+    int hp = u->hp + delta;
     assert(rtype != NULL);
-    u->hp += delta;
-    return u->hp;
+    if (hp < u->number) {
+        if (hp <= 0) {
+            set_number(u, 0);
+            hp = 0;
+        }
+        else {
+            scale_number(u, hp);
+        }
+    }
+    return u->hp = hp;
 }
 
 static int res_changepeasants(unit * u, const resource_type * rtype, int delta)
 {
+    int p = rpeasants(u->region) + delta;
     assert(rtype != NULL && u->region->land);
-    rsetpeasants(u->region, rpeasants(u->region) + delta);
-    return rpeasants(u->region);
+
+    if (p < 0) p = 0;
+    return rsetpeasants(u->region, p);
 }
 
 static int golem_factor(const unit *u, const resource_type *rtype) {
@@ -362,24 +361,30 @@ resource_type *rt_find(const char *name)
 
 item **i_find(item ** i, const item_type * it)
 {
-    while (*i && (*i)->type != it)
-        i = &(*i)->next;
-    return i;
+    while (*i) {
+        item *itm = *i;
+        if (itm->type == it) return i;
+        i = &itm->next;
+    }
+    return NULL;
 }
 
 item *const* i_findc(item *const* iter, const item_type * it)
 {
-    while (*iter && (*iter)->type != it) {
-        iter = &(*iter)->next;
+    while (*iter) {
+        item *itm = *iter;
+        if (itm->type == it) return iter;
+        iter = &itm->next;
     }
-    return iter;
+    return NULL;
 }
 
 int i_get(const item * i, const item_type * it)
 {
-    i = *i_find((item **)& i, it);
-    if (i)
-        return i->number;
+    item **itm_p = i_find((item **)&i, it);
+    if (itm_p) {
+        return (*itm_p)->number;
+    }
     return 0;
 }
 
@@ -576,28 +581,12 @@ const resource_type *get_resourcetype(resource_t type) {
 
 int get_item(const unit * u, const item_type *itype)
 {
-    const item *i = *i_findc(&u->items, itype);
-    assert(!i || i->number >= 0);
-    return i ? i->number : 0;
+    item *const *i = i_findc(&u->items, itype);
+    assert(!i || (*i)->number >= 0);
+    return i ? (*i)->number : 0;
 }
 
 #include "move.h"
-
-static int
-mod_elves_only(const unit * u, const region * r, skill_t sk, int value)
-{
-    if (u_race(u) == get_race(RC_ELF))
-        return value;
-    UNUSED_ARG(r);
-    return -118;
-}
-
-void
-register_item_give(int(*foo) (struct unit *, struct unit *,
-const struct item_type *, int, struct order *), const char *name)
-{
-    register_function((pf_generic)foo, name);
-}
 
 void
 register_item_use(int(*foo) (struct unit *, const struct item_type *, int,
@@ -606,7 +595,7 @@ struct order *), const char *name)
     register_function((pf_generic)foo, name);
 }
 
-static void init_oldpotions(void)
+void init_oldpotions(void)
 {
     const char *potionnames[MAX_POTIONS] = {
         "p0", "goliathwater", "lifepotion", "p3", "ointment", "peasantblood", "p6",
@@ -629,17 +618,18 @@ void init_resources(void)
     /* there are resources that are special and must be hard-coded.
      * these are not items, but things like trees or hitpoints
      * which can be used in a construction recipe or as a spell ingredient.
+     * 
+     * These default behaviors can still be modified from configuration files,
+     * for example to add a constructon skill, or modify the default flags.
      */
 
     /* special resources needed in report_region */
     rtype = rt_get_or_create(resourcenames[R_SILVER]);
-    rtype->flags |= RTF_ITEM | RTF_POOLED;
     rtype->uchange = res_changeitem;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->weight = 1;
 
     rtype = rt_get_or_create(resourcenames[R_HORSE]);
-    rtype->flags |= RTF_ITEM | RTF_LIMITED;
     rtype->itype = it_get_or_create(rtype);
     rtype->itype->flags |= ITF_ANIMAL | ITF_BIG;
     rtype->itype->weight = 5000;
@@ -660,9 +650,6 @@ void init_resources(void)
     rt_get_or_create(resourcenames[R_TREE]);
     rt_get_or_create(resourcenames[R_MALLORN_SAPLING]);
     rt_get_or_create(resourcenames[R_MALLORN_TREE]);
-
-    /* alte typen registrieren: */
-    init_oldpotions();
 }
 
 int get_money(const unit * u)
@@ -960,9 +947,7 @@ void register_resources(void)
     if (registered) return;
     registered = true;
 
-    register_function((pf_generic)mod_elves_only, "mod_elves_only");
     register_function((pf_generic)res_changeitem, "changeitem");
-    register_function((pf_generic)res_changeperson, "changeperson");
     register_function((pf_generic)res_changepeasants, "changepeasants");
     register_function((pf_generic)res_changepermaura, "changepermaura");
     register_function((pf_generic)res_changehp, "changehp");

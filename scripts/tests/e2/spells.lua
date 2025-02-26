@@ -464,3 +464,69 @@ function test_cast_rostregen()
     assert_equal(4, u2:get_item("plate"))
     assert_equal(1, u2:get_item("rustyplate"))
 end
+
+function test_charming()
+    local r1 = region.create(0, 0, 'plain')
+    local f = faction.create('human', "charmer@eressea.de")
+    local f2 = faction.create('human', "charmee@eressea.de")
+    local u1 = unit.create(f, r1, 1)
+    local u2 = unit.create(f2, r1, 2)
+    local u3 = unit.create(f2, r1, 1)
+    u1.id = 10
+    u2.id = 11
+    u3.id = 12
+    f.id = 10
+    f2.id = 11
+
+    u1.magic = 'cerddor'
+    u1:set_skill('magic', 24)
+    u1.aura = 1000
+    u1:add_spell('song_of_slavery')
+
+    u1:add_order("ZAUBERE 'Gesang der Versklavung' b")
+    u3.magic = 'cerddor'
+    u3:set_skill('magic', 24)
+    u3.aura = 1000
+    u3:add_spell('song_of_slavery')
+
+    process_orders()
+    u1:clear_orders()
+    u3:add_order("ZAUBERE 'Gesang der Versklavung' b")
+    process_orders()
+
+    for i = 1,10 do
+        u1:clear_orders()
+        u3:clear_orders()
+        process_orders()
+    end
+
+    assert_equal(f2, u2.faction)
+end
+
+function test_firewall()
+    local r1 = region.create(0, 0, 'plain')
+    local r2 = region.create(1, 0, 'plain')
+    local f = faction.create('human')
+    local u = unit.create(f, r1, 1)
+	local u2 = unit.create(f, r1, 1)
+	local uno = u.id
+
+	assert_true(u2.hp == u2.hp_max)
+    u.magic = 'draig'
+    u:set_skill('magic', 24)
+    u.aura = 1000
+    u:add_spell('firewall')
+
+    u:add_order("ZAUBERE STUFE 1 'Feuerwand' OST")
+	u2:set_orders("NACH OST") -- no effect yet in same week 
+	process_orders()
+	assert_true(u2.hp == u2.hp_max)
+	u:clear_orders()
+	u2:set_orders("NACH WEST") -- should take damage now
+	assert_true(r1:has_border("firewall", directions.EAST))
+	assert_true(r2:has_border("firewall", directions.WEST))
+	process_orders()
+	assert_false(r1:has_border("firewall", directions.EAST))
+	assert_false(r2:has_border("firewall", directions.WEST))
+	assert_true(u2.hp < u2.hp_max)
+end

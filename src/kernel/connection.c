@@ -1,13 +1,16 @@
 #include <kernel/config.h>
 #include "connection.h"
 
+#include "move.h"
 #include "region.h"
 #include "terrain.h"
 #include "unit.h"
 
+#include <spells/borders.h>
 #include <kernel/attrib.h>
-#include <util/base36.h>
 #include <kernel/gamedata.h>
+
+#include <util/base36.h>
 #include <util/language.h>
 #include <util/log.h>
 #include <util/macros.h>
@@ -101,6 +104,14 @@ connection *get_borders(const region * r1, const region * r2)
     return *bp;
 }
 
+connection *border_create(region *from)
+{
+    connection * b = calloc(1, sizeof(connection));
+    if (!b) abort();
+    b->from = from;
+    return b;
+}
+
 connection *create_border(border_type * type, region * from, region * to)
 {
     connection *b, **bp;
@@ -110,10 +121,8 @@ connection *create_border(border_type * type, region * from, region * to)
     while (*bp) {
         bp = &(*bp)->next;
     }
-    *bp = b = calloc(1, sizeof(connection));
-    if (!b) abort();
+    *bp = b = border_create(from);
     b->type = type;
-    b->from = from;
     b->to = to;
 
     if (type->init) {
@@ -124,6 +133,7 @@ connection *create_border(border_type * type, region * from, region * to)
 
 void erase_border(connection * b)
 {
+    assert(b);
     if (b->from && b->to) {
         connection **bp = get_borders_i(b->from, b->to);
         assert(*bp != NULL || !"error: connection is not registered");
@@ -296,33 +306,6 @@ attrib_type at_countdown = {
     a_readint
 };
 
-void age_borders(void)
-{
-    connection **deleted = NULL;
-    int i;
-
-    for (i = 0; i != BORDER_MAXHASH; ++i) {
-        connection *bhash = borders[i];
-        for (; bhash; bhash = bhash->nexthash) {
-            connection *b = bhash;
-            for (; b; b = b->next) {
-                if (b->type->age) {
-                    if (b->type->age(b) == AT_AGE_REMOVE) {
-                        arrput(deleted, b);
-                    }
-                }
-            }
-        }
-    }
-    if (deleted) {
-        size_t qi, ql;
-        for (ql = arrlen(deleted), qi = 0; qi != ql; ++qi) {
-            erase_border(deleted[qi]);
-        }
-        arrfree(deleted);
-    }
-}
-
 /********
  * implementation of a couple of borders. this shouldn't really be in here, so
  * let's keep it separate from the more general stuff above
@@ -410,127 +393,30 @@ border_type bt_fogwall = {
     b_uvisible,                   /* uvisible */
 };
 
-static const char *b_nameillusionwall(const connection * b, const region * r,
-    const struct faction *f, int gflags)
-{
-    int fno = b->data.i;
-    UNUSED_ARG(b);
-    UNUSED_ARG(r);
-    if (gflags & GF_PURE)
-        return (f && fno == f->no) ? "illusionwall" : "wall";
-    if (gflags & GF_ARTICLE) {
-        return LOC(f->locale, mkname("border", (f
-            && fno == f->uid) ? "an_illusionwall" : "a_wall"));
-    }
-    return LOC(f->locale, mkname("border", (f
-        && fno == f->no) ? "illusionwall" : "wall"));
-}
-
-border_type bt_illusionwall = {
-    "illusionwall", VAR_INT, 0,
-    b_opaque,
-    NULL,                         /* init */
-    NULL,                         /* destroy */
-    b_read,                       /* read */
-    b_write,                      /* write */
-    b_blocknone,                  /* block */
-    b_nameillusionwall,           /* name */
-    b_rvisible,                   /* rvisible */
-    b_fvisible,                   /* fvisible */
-    b_uvisible,                   /* uvisible */
-};
-
-/***
- * roads. meant to replace the old at_road or r->road attribute
- ***/
-
-static const char *b_nameroad(const connection * b, const region * r,
-    const struct faction *f, int gflags)
-{
-    region *r2 = (r == b->to) ? b->from : b->to;
-    int local = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
-    static char buffer[64];
-
-    UNUSED_ARG(f);
-    if (gflags & GF_PURE)
-        return "road";
-    if (gflags & GF_ARTICLE) {
-        if (!(gflags & GF_DETAILED))
-            return LOC(f->locale, mkname("border", "a_road"));
-        else if (r->terrain->max_road <= local) {
-            int remote = (r2 == b->from) ? b->data.sa[0] : b->data.sa[1];
-            if (r2->terrain->max_road <= remote) {
-                return LOC(f->locale, mkname("border", "a_road"));
-            }
-            else {
-                return LOC(f->locale, mkname("border", "an_incomplete_road"));
-            }
-        }
-        else {
-            if (local) {
-                const char *temp = LOC(f->locale, mkname("border", "a_road_percent"));
-                int percent = 100 * local / r->terrain->max_road;
-                if (percent < 1) percent = 1;
-                str_replace(buffer, sizeof(buffer), temp, "$percent", itoa10(percent));
-            }
-            else {
-                return LOC(f->locale, mkname("border", "a_road_connection"));
-            }
-        }
-    }
-    else if (gflags & GF_PLURAL)
-        return LOC(f->locale, mkname("border", "roads"));
-    else
-        return LOC(f->locale, mkname("border", "road"));
-    return buffer;
-}
-
 static void b_readroad(connection * b, gamedata * data)
 {
     storage * store = data->store;
     int n;
+    direction_t dir;
+    assert(b->from && b->to);
     READ_INT(store, &n);
-    b->data.sa[0] = (short)n;
+	dir = reldirection(b->from, b->to);
+    if (dir < MAXDIRECTIONS && dir >= 0) {
+        rsetroad(b->from, dir, n);
+    }
     READ_INT(store, &n);
-    b->data.sa[1] = (short)n;
-}
-
-static void b_writeroad(const connection * b, storage * store)
-{
-    WRITE_INT(store, b->data.sa[0]);
-    WRITE_INT(store, b->data.sa[1]);
-}
-
-static bool b_validroad(const connection * b)
-{
-    return (b->data.sa[0] != SHRT_MAX);
-}
-
-static bool b_rvisibleroad(const connection * b, const region * r)
-{
-    int x = (r == b->from) ? b->data.sa[0] : b->data.sa[1];
-    if (x == 0) {
-        return false;
+	dir = reldirection(b->to, b->from);
+    if (dir < MAXDIRECTIONS && dir >= 0) {
+        rsetroad(b->to, dir, n);
     }
-    if (b->to != r && b->from != r) {
-        return false;
-    }
-    return true;
 }
 
 border_type bt_road = {
-    "road", VAR_INT, LAND_REGION,
-    b_transparent,
+    "road", VAR_NONE, LAND_REGION,
+    NULL,
     NULL,                         /* init */
     NULL,                         /* destroy */
     b_readroad,                   /* read */
-    b_writeroad,                  /* write */
-    b_blocknone,                  /* block */
-    b_nameroad,                   /* name */
-    b_rvisibleroad,               /* rvisible */
-    b_finvisible,                 /* fvisible */
-    b_uinvisible,                 /* uvisible */
-    b_validroad                   /* valid */
 };
 
 void write_borders(struct storage *store)
@@ -581,8 +467,8 @@ int read_borders(gamedata *data)
 
         READ_INT(store, &fid);
         READ_INT(store, &tid);
-        from = findregionbyid(fid);
-        to = findregionbyid(tid);
+        from = dummy.from = findregionbyid(fid);
+        to = dummy.to = findregionbyid(tid);
         if (!to || !from) {
             log_error("%s connection from %d to %d has missing regions", zText, fid, tid);
             if (type->read) {
@@ -602,6 +488,14 @@ int read_borders(gamedata *data)
         if (type->read) {
             connection *b = NULL;
             
+            if (data->version < WALL_DATA_VERSION) {
+                /* remove legacy firewalls */
+                if (type == &bt_firewall) {
+                    log_info("removing legacy firewall in %s", regionname(from, NULL));
+                    b = &dummy;
+                    b->data.v = NULL;
+                }
+            }
             if (data->version < FIX_SEAROADS_VERSION) {
                 /* bug 2694: eliminate roads in oceans */
                 if (type->terrain_flags != 0 && type->terrain_flags != fval(from->terrain, type->terrain_flags)) {
@@ -610,10 +504,16 @@ int read_borders(gamedata *data)
                 }
             }
             if (b == NULL) {
-                b = create_border(type, from, to);
+				if (type == &bt_road) {
+					/* delete old bt_road instances */
+					b = &dummy;
+				}
+				else {
+					b = create_border(type, from, to);
+				}
             }
             type->read(b, data);
-            if (!type->write) {
+            if (type->datatype != VAR_NONE && !type->write) {
                 log_warning("invalid border '%s' between '%s' and '%s'\n", zText, regionname(from, 0), regionname(to, 0));
             }
         }
@@ -631,4 +531,13 @@ const char * border_name(const connection *co, const struct region * r, const st
         }
     }
     return bname;
+}
+
+void register_connections(void)
+{
+    /* connection-typen */
+    register_bordertype(&bt_noway);
+    register_bordertype(&bt_fogwall);
+    register_bordertype(&bt_wall);
+    register_bordertype(&bt_road);
 }

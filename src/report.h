@@ -14,14 +14,14 @@ extern "C" {
     struct region;
     struct faction;
     struct locale;
-    struct allies;
+    struct ally;
 
     void register_nr(void);
     void report_cleanup(void);
     void write_spaces(struct stream *out, size_t num);
     void report_travelthru(struct stream *out, struct region * r, const struct faction * f);
     void report_region(struct stream *out, const struct region * r, struct faction * f);
-    void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct allies * allies, const char *prefix);
+    void report_allies(struct stream *out, size_t maxlen, const struct faction * f, struct ally * allies, const char *prefix);
     void pump_paragraph(struct sbstring *sbp, struct stream *out, size_t maxlen, bool isfinal);
     void paragraph(struct stream *out, const char *str, ptrdiff_t indent, int hanging_indent, char marker);
 

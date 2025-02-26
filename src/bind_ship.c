@@ -14,8 +14,6 @@
 #include <util/language.h>
 #include <util/log.h>
 
-#include <strings.h>
-
 #include <tolua.h>
 #include <lauxlib.h>
 #include <lua.h>
@@ -134,13 +132,20 @@ static int tolua_ship_set_size(lua_State * L)
 static int tolua_ship_set_display(lua_State * L)
 {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
-    free(sh->display);
-    sh->display = str_strdup(tolua_tostring(L, 2, NULL));
+    ship_setinfo(sh, tolua_tostring(L, 2, NULL));
     return 0;
 }
 
 static int tolua_ship_get_units(lua_State * L)
 {
+#ifndef TOLUA_RELEASE
+tolua_Error tolua_err;
+if (!tolua_isusertype(L, 1, "ship", 0, &tolua_err)) {
+    goto tolua_lerror;
+}
+else
+#endif
+ {
     ship *sh = (ship *)tolua_tousertype(L, 1, NULL);
     unit **unit_ptr = (unit **)lua_newuserdata(L, sizeof(unit *));
     unit *u = sh->region->units;
@@ -154,6 +159,12 @@ static int tolua_ship_get_units(lua_State * L)
 
     lua_pushcclosure(L, tolua_unitlist_nexts, 1);
     return 1;
+ }
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(L, "#ferror in function 'units'.", &tolua_err);
+ return 0;
+#endif
 }
 
 static int tolua_ship_create(lua_State * L)

@@ -24,7 +24,7 @@
 #define lua_strlen(L, idx) lua_rawlen(L, idx)
 #endif
 
-#ifdef LUA_USE_READLINE
+#ifdef HAVE_READLINE
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>

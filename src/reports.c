@@ -31,7 +31,6 @@
 #include "kernel/alliance.h"
 #include "kernel/connection.h"
 #include "kernel/building.h"
-#include "kernel/curse.h"
 #include "kernel/faction.h"
 #include "kernel/group.h"
 #include "kernel/item.h"
@@ -1162,11 +1161,13 @@ void get_addresses(report_context * ctx)
                 while (u != NULL) {
                     if (u->faction != ctx->f) {
                         faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
-                        bool ballied = sf && sf != ctx->f && sf != lastf
-                            && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                        if (ballied || is_allied(ctx->f, sf)) {
-                            add_seen_faction_i(&flist, sf);
-                            lastf = sf;
+                        if (sf) {
+                            bool ballied = sf != ctx->f && sf != lastf
+                                && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
+                            if (ballied || is_allied(ctx->f, sf)) {
+                                add_seen_faction_i(&flist, sf);
+                                lastf = sf;
+                            }
                         }
                     }
                     u = u->next;
@@ -1743,8 +1744,7 @@ const char *trailinto(const region * r, const struct locale *lang)
         sz += str_strlcat(ref + sz, "_trail", sizeof(ref) - sz);
         s = LOC(lang, ref);
         if (s && *s) {
-            if (strstr(s, "%s"))
-                return s;
+            return s;
         }
     }
     return "%s";
@@ -1850,18 +1850,6 @@ static void eval_curse(struct opstack **stack, const void *userdata)
 
     assert(c || !"spell effect without description!");
     var.v = strcpy(balloc(strlen(c) + 1), c);
-    opush(stack, var);
-}
-
-static void eval_unitid(struct opstack **stack, const void *userdata)
-{                               /* unit -> int */
-    const struct faction *f = (const struct faction *)userdata;
-    const struct unit *u = (const struct unit *)opop(stack).v;
-    const char *c = u ? unit_getname(u) : LOC(f->locale, "an_unknown_unit");
-    size_t len = strlen(c);
-    variant var;
-
-    var.v = strcpy(balloc(len + 1), c);
     opush(stack, var);
 }
 
@@ -2355,7 +2343,6 @@ void register_reports(void)
     add_function("ship", &eval_ship);
     add_function("unit", &eval_unit);
     add_function("unit.dative", &eval_unit_dative);
-    add_function("unit.id", &eval_unitid);
     add_function("unit.size", &eval_unitsize);
     add_function("building", &eval_building);
     add_function("skill", &eval_skill);

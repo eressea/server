@@ -421,7 +421,7 @@ static int tolua_unit_getskill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *skname = tolua_tostring(L, 2, NULL);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
     int value = -1;
     if (sk != NOSKILL) {
         skill *sv = unit_skill(u, sk);
@@ -439,7 +439,7 @@ static int tolua_unit_effskill(lua_State * L)
 {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *skname = tolua_tostring(L, 2, NULL);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
     int value = (sk == NOSKILL) ? -1 : effskill(u, sk, NULL);
     lua_pushinteger(L, value);
     return 1;
@@ -523,8 +523,11 @@ static int tolua_unit_getspell(lua_State *L)
             sbe = spellbook_get(sb, sp);
         }
     }
-    lua_pushinteger(L, sbe->level);
-    return 1;
+    if (sbe) {
+        lua_pushinteger(L, sbe->level);
+        return 1;
+    }
+    return 0;
 }
 
 static int tolua_unit_addspell(lua_State * L)
@@ -573,7 +576,7 @@ static int tolua_unit_setskill(lua_State * L)
     const char *skname = tolua_tostring(L, 2, NULL);
     int level = (int)tolua_tonumber(L, 3, 0);
     bool rcmod = tolua_toboolean(L, 4, 0);
-    skill_t sk = findskill(skname);
+    skill_t sk = find_skill(skname);
 
     if (sk != NOSKILL) {
         if (rcmod) level -= u_race(u)->bonus[sk];
@@ -845,15 +848,18 @@ static int tolua_unit_clear_attribs(lua_State *L) {
 static int tolua_unit_has_attrib(lua_State *L) {
     unit *u = (unit *)tolua_tousertype(L, 1, NULL);
     const char *name = tolua_tostring(L, 2, NULL);
-    attrib * a = u->attribs;
-    while (a) {
-        if (strcmp(a->type->name, name) == 0) {
-            break;
+    if (u && name) {
+        attrib * a = u->attribs;
+        while (a) {
+            if (strcmp(a->type->name, name) == 0) {
+                break;
+            }
+            a = a->nexttype;
         }
-        a = a->nexttype;
+        lua_pushboolean(L, a != NULL);
+        return 1;
     }
-    lua_pushboolean(L, a != NULL);
-    return 1;
+    return 0;
 }
 
 static int tolua_unit_get_key(lua_State * L)

@@ -1,5 +1,7 @@
 #include "unitcurse.h"
 
+#include <spells/charming.h>
+
 /* kernel includes */
 #include <kernel/curse.h>
 #include <kernel/messages.h>
@@ -57,31 +59,6 @@ const struct curse_type ct_auraboost = {
 const struct curse_type ct_magicboost = {
     "magicboost",
     CURSETYP_UNIT, CURSE_SPREADMODULO | CURSE_IMMUNE, M_MEN, cinfo_simple
-};
-
-/* ------------------------------------------------------------- */
-/*
- * C_SLAVE
- */
-static message *cinfo_slave(const void *obj, objtype_t typ, const curse * c,
-    int self)
-{
-    unit *u;
-    UNUSED_ARG(typ);
-
-    assert(typ == TYP_UNIT);
-    u = (unit *)obj;
-
-    if (self != 0) {
-        return msg_message("curseinfo::slave_1", "unit duration id", u, c->duration,
-            c->no);
-    }
-    return NULL;
-}
-
-const struct curse_type ct_slavery = { "slavery",
-CURSETYP_NORM, 0, NO_MERGE,
-cinfo_slave
 };
 
 /* ------------------------------------------------------------- */

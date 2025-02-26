@@ -3,6 +3,7 @@
 #endif
 #include "bind_eressea.h"
 
+#include "crimport.h"
 #include "eressea.h"
 #include "json.h"
 #include "orderfile.h"
@@ -12,7 +13,6 @@
 #include <kernel/save.h>
 
 #include <util/language.h>
-#include <util/log.h>
 
 #include <stream.h>
 #include <stdio.h>
@@ -41,20 +41,7 @@ int eressea_write_game(const char * filename) {
 }
 
 int eressea_read_orders(const char * filename) {
-    if (filename) {
-        FILE *F = fopen(filename, "r");
-        int result;
-
-        if (!F) {
-            perror(filename);
-            return -1;
-        }
-        log_info("reading orders from %s", filename);
-        result = parseorders(F);
-        fclose(F);
-        return result;
-    }
-    return -1;
+    return readorders(filename);
 }
 
 int eressea_export_json(const char * filename, int flags) {
@@ -87,4 +74,15 @@ int eressea_import_json(const char * filename) {
         perror(filename);
     }
     return -1;
+}
+
+int eressea_import_cr(const char *filename)
+{
+    return crimport(filename);
+}
+
+int eressea_fixup_import(void)
+{
+    crimport_fixup();
+    return 0;
 }

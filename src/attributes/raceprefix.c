@@ -20,7 +20,12 @@ void set_prefix(attrib ** ap, const char *str)
         a = a_add(ap, a_new(&at_raceprefix));
     }
     else {
-        free(a->data.v);
+        if (a->data.v) {
+            if (0 == strcmp(str, (const char *)a->data.v)) {
+                return;
+            }
+            free(a->data.v);
+        }
     }
     assert(a->type == &at_raceprefix);
     a->data.v = str_strdup(str);

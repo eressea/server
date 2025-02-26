@@ -941,6 +941,12 @@ msgstr "\"$unit($unit) in $region($region) bläst das Horn des Tanzes, doch niem
 msgid "malnourish"
 msgstr "\"$unit($unit) in $region($region) wird durch unzureichende Nahrung geschwächt.\""
 
+msgid "malnourish_demon"
+msgstr "\"$unit($unit) in $region($region) wird durch unzureichende Opfer geschwächt.\""
+
+msgid "malnourish_insect"
+msgstr "\"$unit($unit) wird durch die extreme Kälte in $region($region) geschwächt.\""
+
 msgid "iceberg_land"
 msgstr "\"Der Eisberg $region($region) treibt an eine Küste.\""
 
@@ -1029,9 +1035,6 @@ msgstr "\"Achtung: $faction($faction) hat seit $int($turns) Wochen keine Züge e
 
 msgid "arena_leave_fail"
 msgstr "\"Der Versuch, die Greifenschwingen zu benutzen, schlug fehl. $unit($unit) konnte die Ebene der Herausforderung nicht verlassen.\""
-
-msgid "battle_critical"
-msgstr "\"$int36($unit.id($unit))/$int($index) erzielt einen kritischen Treffer.\""
 
 msgid "error_spell_on_ship_already"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Auf $ship($ship) liegt bereits ein Zauber.\""
@@ -1514,9 +1517,6 @@ msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Magier befi
 
 msgid "stormwinds_effect"
 msgstr "\"$unit($unit) beschwört einen magischen Wind, der die Schiffe über das Wasser treibt.\""
-
-msgid "error102"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann keine weiteren Güter handeln.\""
 
 msgid "drought_effect"
 msgstr "\"$unit($mage) verflucht das Land in $region($region), und eine Dürreperiode beginnt.\""
@@ -2210,8 +2210,16 @@ msgid "error103"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Keiner hier kann Straßen bauen.\""
 
 msgctxt "curseinfo"
+msgid "slave_0"
+msgstr "\"$unit($unit) steht unter einem hypnotischen Bann. ($int36($id))\""
+
+msgctxt "curseinfo"
 msgid "slave_1"
 msgstr "\"$unit($unit) wird noch $int($duration) $if($eq($duration,1), \"Woche\", \"Wochen\") unter unserem Bann stehen. ($int36($id))\""
+
+msgctxt "curseinfo"
+msgid "firewall"
+msgstr "\"Eine magische Feuerwand blockiert den Weg nach $direction($direction). ($int36($id))\""
 
 msgid "alliance::lost"
 msgstr "\"$alliance($alliance) scheidet aus dem Spiel aus, nachdem alle Tempel verloren gingen.\""

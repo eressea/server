@@ -8,7 +8,7 @@
 
 static void test_allies_clone(CuTest * tc)
 {
-    struct allies * al = NULL, *ac;
+    struct ally * al = NULL, *ac;
     struct faction * f;
 
     test_setup();
@@ -27,16 +27,16 @@ static void test_allies_clone(CuTest * tc)
 }
 
 static void test_allies(CuTest *tc) {
-    struct allies * al = NULL;
+    struct ally * al = NULL;
     struct faction * f;
 
     test_setup();
     f = test_create_faction();
 
     CuAssertIntEquals(tc, 0, ally_get(al, f));
-    ally_set(&al, f, 42);
+    CuAssertPtrNotNull(tc, ally_set(&al, f, 42));
     CuAssertIntEquals(tc, 42, ally_get(al, f));
-    ally_set(&al, f, 0);
+    CuAssertPtrEquals(tc, NULL, ally_set(&al, f, 0));
     CuAssertIntEquals(tc, 0, ally_get(al, f));
     CuAssertPtrEquals(tc, NULL, al);
     test_teardown();
@@ -44,23 +44,23 @@ static void test_allies(CuTest *tc) {
 
 static void test_allies_set(CuTest *tc) {
     struct faction *f1, *f2;
-    struct allies * al = NULL;
+    struct ally * al = NULL;
 
     test_setup();
     f1 = test_create_faction();
     f2 = test_create_faction();
 
     CuAssertPtrEquals(tc, NULL, al);
-    ally_set(&al, f1, HELP_ALL);
+    CuAssertPtrEquals(tc, al, ally_set(&al, f1, HELP_ALL));
     CuAssertPtrNotNull(tc, al);
-    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, f1->allies);
-    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, al);
 
-    ally_set(&al, f1, HELP_ALL);
-    ally_set(&al, f2, DONT_HELP);
-    ally_set(&al, f1, DONT_HELP);
+    CuAssertPtrEquals(tc, al, ally_set(&al, f1, HELP_ALL));
+    CuAssertPtrEquals(tc, NULL, ally_set(&al, f2, DONT_HELP));
+    CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, al);
 
     test_teardown();

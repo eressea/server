@@ -34,11 +34,13 @@
 /* kernel includes */
 #include "kernel/alliance.h"
 #include "kernel/ally.h"
+#include <kernel/attrib.h>
+#include "kernel/building.h"
 #include "kernel/calendar.h"
 #include "kernel/callbacks.h"
 #include "kernel/connection.h"
 #include "kernel/curse.h"
-#include "kernel/building.h"
+#include <kernel/event.h>
 #include "kernel/faction.h"
 #include "kernel/group.h"
 #include "kernel/item.h"
@@ -58,9 +60,8 @@
 #include "kernel/unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
-#include <kernel/event.h>
+#include <util/functions.h>
 #include <util/goodies.h>
 #include "util/keyword.h"
 #include <util/language.h>
@@ -214,8 +215,9 @@ static void astral_crumble(unit *u) {
     }
 }
 
-static void age_unit(region * r, unit * u)
+void age_unit(unit ** up)
 {
+    unit *u = *up;
     const race *rc = u_race(u);
 
     ++u->age;
@@ -228,23 +230,15 @@ static void age_unit(region * r, unit * u)
     if (u->items && u->region && is_astral(u->region)) {
         astral_crumble(u);
     }
+    a_age(&u->attribs, u);
+    if (*up == u) {
+        handle_event(u->attribs, "timer", u);
+    }
 }
 
 static void live(region * r)
 {
-    unit **up = &r->units;
-
     get_food(r);
-
-    while (*up) {
-        unit *u = *up;
-        /* IUW: age_unit() kann u loeschen, u->next ist dann
-         * undefiniert, also muessen wir hier schon das naechste
-         * Element bestimmen */
-        age_unit(r, u);
-        if (*up == u)
-            up = &u->next;
-    }
 }
 
 /*
@@ -1413,7 +1407,7 @@ void quit(void)
 int ally_cmd(unit * u, struct order *ord)
 {
     char token[128];
-    struct allies **sfp;
+    struct ally **sfp;
     faction *f;
     int keyword, not_kw;
     const char *s;
@@ -2804,9 +2798,6 @@ static void ageing(void)
         }
     }
 
-    /* Borders */
-    age_borders();
-
     /* Factions */
     for (f = factions; f; f = f->next) {
         a_age(&f->attribs, f);
@@ -2816,20 +2807,21 @@ static void ageing(void)
     /* Regionen */
     for (r = regions; r; r = r->next) {
         building **bp;
-        unit **up;
+        unit **up = &r->units;
         ship **sp;
 
-        age_region(r);
-
-        /* Einheiten */
-        for (up = &r->units; *up;) {
+        while (*up) {
             unit *u = *up;
-            a_age(&u->attribs, u);
-            if (u == *up) 
-                handle_event(u->attribs, "timer", u);
-            if (u == *up) /*-V581 */
-                up = &(*up)->next;
+            /* IUW: age_unit() kann u loeschen, u->next ist dann
+             * undefiniert, also muessen wir hier schon das naechste
+             * Element bestimmen */
+            age_unit(up);
+            if (*up == u) {
+                up = &u->next;
+            }
         }
+
+        age_region(r);
 
         /* Schiffe */
         for (sp = &r->ships; *sp;) {
@@ -3011,6 +3003,36 @@ void new_units(void)
     }
 }
 
+static int callback_use(unit *u, const item_type *itype, int amount, struct order *ord)
+{
+    int len;
+    char fname[64];
+
+    len = snprintf(fname, sizeof(fname), "use_%s", itype->rtype->_name);
+    if (len > 0 && (size_t)len < sizeof(fname)) {
+        int(*callout)(unit *, const item_type *, int, struct order *);
+
+        /* check if we have a register_item_use function */
+        callout = (int(*)(unit *, const item_type *, int, struct order *))get_function(fname);
+        if (callout) {
+            return callout(u, itype, amount, ord);
+        }
+    }
+    /* if the item is a potion, try use_potion,
+     * the generic function for potions that add an effect:
+     */
+    if (itype->flags & ITF_POTION) {
+        return use_potion(u, itype, amount, ord);
+    }
+
+    /* finally, check if we have a matching lua function */
+    if (callbacks.use_item) {
+        return callbacks.use_item(u, itype, amount, ord);
+    }
+
+    return EUNUSABLE;
+}
+
 static int use_item(unit * u, const item_type * itype, int amount, struct order *ord)
 {
     int i;
@@ -3025,7 +3047,7 @@ static int use_item(unit * u, const item_type * itype, int amount, struct order 
     }
 
     if (itype->flags & ITF_CANUSE) {
-        int result = callbacks.use_item(u, itype, amount, ord);
+        int result = callback_use(u, itype, amount, ord);
         if (result > 0) {
             use_pooled(u, itype->rtype, GET_DEFAULT, result);
         }

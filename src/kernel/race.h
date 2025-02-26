@@ -162,6 +162,7 @@ race *rc_find(const char *);
 void free_races(void);
 
 bool rc_can_use(const struct race *rc, const struct item_type *itype);
+bool rc_leaves_corpse(const struct race *rc);
 
 const char* race_name(const race* rc);
 typedef enum name_t { NAME_SINGULAR, NAME_PLURAL, NAME_DEFINITIVE, NAME_CATEGORY } name_t;
@@ -178,6 +179,7 @@ variant rc_magres(const struct race *rc);
 double rc_maxaura(const struct race *rc);
 int rc_armor_bonus(const struct race *rc);
 int rc_scare(const struct race *rc);
+int rc_skillmod(const struct race *rc, enum skill_t sk);
 const char * rc_hungerdamage(const race *rc);
 const race *rc_otherrace(const race *rc);
 

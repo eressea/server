@@ -10,7 +10,6 @@
 #include "iceberg.h"
 #include "key.h"
 #include "stealth.h"
-#include "magic.h"
 #include "movement.h"
 #include "otherfaction.h"
 #include "racename.h"
@@ -174,13 +173,6 @@ void register_attributes(void)
     at_register(&at_group);
 
     at_register(&at_building_generic_type);
-
-    /* connection-typen */
-    register_bordertype(&bt_noway);
-    register_bordertype(&bt_fogwall);
-    register_bordertype(&bt_wall);
-    register_bordertype(&bt_illusionwall);
-    register_bordertype(&bt_road);
 
     at_deprecate("movement", a_readint); /* individual units that can fly or swim, never used */
     at_deprecate("roads_override", a_readstring);

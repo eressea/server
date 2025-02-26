@@ -25,18 +25,12 @@
 #include <assert.h>
 #include <stdlib.h>
 
-typedef struct wallcurse {
-    curse *buddy;
-    connection *wall;
-} wallcurse;
-
 static int cw_read_depr(variant *var, void *target, gamedata *data)
 {
     storage *store = data->store;
-
-    curse_init(var);
+    curse c;
+    var->v = &c;
     curse_read(var, store, target);
-    curse_done(var);
     READ_INT(store, NULL);
     return AT_READ_DEPR;
 }
@@ -57,31 +51,13 @@ static int cw_read_depr(variant *var, void *target, gamedata *data)
  *   Was fuer eine Wirkung hat die?
  */
 
-static void wall_vigour(curse * c, double delta)
-{
-    wallcurse *wc = (wallcurse *)c->data.v;
-    assert(wc->buddy->vigour == c->vigour);
-    wc->buddy->vigour += delta;
-    if (wc->buddy->vigour <= 0) {
-        erase_border(wc->wall);
-        wc->wall = NULL;
-        ((wallcurse *)wc->buddy->data.v)->wall = NULL;
-    }
-}
-
-const curse_type ct_firewall = {
-    "Feuerwand",
-    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR | NO_MERGE),
-    NULL,                         /* curseinfo */
-    wall_vigour                   /* change_vigour */
-};
-
 static void wall_init(connection * b)
 {
     wall_data *fd = (wall_data *)calloc(1, sizeof(wall_data));
     if (!fd) abort();
     fd->countdown = -1;           /* infinite */
     b->data.v = fd;
+    fd->active = false;
 }
 
 static void wall_destroy(connection * b)
@@ -94,7 +70,9 @@ static void wall_read(connection * b, gamedata * data)
     static wall_data dummy;
     wall_data *fd = b->data.v ? (wall_data *)b->data.v : &dummy;
 
-    read_unit_reference(data, &fd->mage, NULL);
+    if (data->version < WALL_DATA_VERSION) {
+        read_unit_reference(data, NULL, NULL);
+    }
     READ_INT(data->store, &fd->force);
     READ_INT(data->store, &fd->countdown);
     fd->active = true;
@@ -103,16 +81,8 @@ static void wall_read(connection * b, gamedata * data)
 static void wall_write(const connection * b, storage * store)
 {
     wall_data *fd = (wall_data *)b->data.v;
-    write_unit_reference(fd->mage, store);
     WRITE_INT(store, fd->force);
     WRITE_INT(store, fd->countdown);
-}
-
-static int wall_age(connection * b)
-{
-    wall_data *fd = (wall_data *)b->data.v;
-    --fd->countdown;
-    return (fd->countdown > 0) ? AT_AGE_KEEP : AT_AGE_REMOVE;
 }
 
 static region *wall_move(const connection * b, struct unit *u,
@@ -168,8 +138,7 @@ border_type bt_firewall = {
     b_finvisible,                 /* fvisible */
     b_uinvisible,                 /* uvisible */
     NULL,
-    wall_move,
-    wall_age
+    wall_move
 };
 
 void convert_firewall_timeouts(connection * b, attrib * a)

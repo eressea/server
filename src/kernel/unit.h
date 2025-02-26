@@ -140,6 +140,7 @@ void transfermen(struct unit* src, struct unit* dst, int n);
 int eff_skill(const struct unit* u, const struct skill* sv, const struct region* r);
 int effskill_study(const struct unit* u, enum skill_t sk);
 
+int terrain_mod(const struct race *rc, enum skill_t sk, const struct region *r);
 int get_modifier(const struct unit* u, enum skill_t sk, int level,
     const struct region* r, bool noitem);
 int remove_unit(struct unit** ulist, struct unit* u);
@@ -224,7 +225,6 @@ void default_name(const unit* u, char name[], int len);
 const char* unitname(const struct unit* u);
 char* write_unitname(const struct unit* u, char* buffer, size_t size);
 bool unit_name_equals_race(const struct unit* u);
-
 void unit_convert_race(struct unit* u, const struct race* rc, const char* rcname);
 void translate_orders(struct unit* u, const struct locale* lang, struct order** list, bool del);
 
@@ -241,5 +241,9 @@ bool has_horses(const struct unit* u);
 int maintenance_cost(const struct unit* u);
 bool has_limited_skills(const struct unit* u);
 bool is_limited_skill(enum skill_t sk);
+
+bool unit_is_slaved(const struct unit *u);
+
+void dump_unit(const struct unit *u);
 
 #endif

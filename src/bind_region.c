@@ -9,6 +9,7 @@
 #include <kernel/calendar.h>
 #include <kernel/curse.h>
 #include <kernel/region.h>
+#include "kernel/connection.h"
 #include "kernel/direction.h"
 #include <kernel/resources.h>
 #include <kernel/unit.h>
@@ -261,6 +262,28 @@ static int tolua_region_get_roads(lua_State * L)
         lua_rawseti(L, -2, ++idx);
     }
     return 1;
+}
+
+static int tolua_region_has_border(lua_State *L)
+{
+    region *r = (region *)tolua_tousertype(L, 1, NULL);
+    const char * bname = tolua_tostring(L, 2, NULL);
+    const border_type *btype = bname ? find_bordertype(bname) : NULL;
+
+    if (btype) {
+        direction_t dir = (direction_t)tolua_tonumber(L, 3, 0);
+        region *r2 = rconnect(r, dir);
+        connection *b;
+        for (b = get_borders(r, r2); b; b = b->next) {
+            if (b->type == btype) {
+                lua_pushboolean(L, true);
+                return 1;
+            }
+        }
+        lua_pushboolean(L, false);
+        return 1;
+    }
+    return 0;
 }
 
 static int tolua_region_get_luxury(lua_State * L)
@@ -829,6 +852,7 @@ void tolua_region_open(lua_State * L)
             tolua_function(L, "next", tolua_region_get_next);
             tolua_variable(L, "adj", tolua_region_get_adj, NULL);
             tolua_variable(L, "roads", tolua_region_get_roads, NULL);
+            tolua_function(L, "has_border", tolua_region_has_border);
 
             tolua_variable(L, "luxury", &tolua_region_get_luxury,
                 &tolua_region_set_luxury);

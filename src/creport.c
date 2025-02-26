@@ -994,8 +994,7 @@ struct print_ally_s {
     FILE *F;
 };
 
-static int print_ally_cb(struct allies *al, faction *af, int status, void *udata) {
-    UNUSED_ARG(al);
+static int print_ally_cb(faction *af, int status, void *udata) {
     if (af && faction_alive(af)) {
         struct print_ally_s *data = (struct print_ally_s *)udata;
         int mode = alliance_status(data->f, af, status);
@@ -1010,7 +1009,7 @@ static void show_allies_cr(FILE * F, const faction * f, const group *g)
     struct print_ally_s data;
     data.F = F;
     data.f = f;
-    struct allies *sf = g ? g->allies : f->allies;
+    struct ally *sf = g ? g->allies : f->allies;
     allies_walk(sf, print_ally_cb, &data);
 }
 
@@ -1125,11 +1124,50 @@ static char *cr_output_resource(char *buf, const resource_type *rtype,
     return buf;
 }
 
-static void
-cr_borders(stream *out, const region * r, const faction * f)
+static int
+cr_roads(stream *out, const faction *f, const region *r, enum seen_mode mode, int offset)
+{
+    int g = offset;
+    if (mode > seen_none) {
+        static const char *road_type = NULL;
+        if (!road_type) {
+            road_type = LOC(f->locale, mkname("border", "road"));
+        }
+        if (r->land && r->terrain->max_road) {
+            direction_t d;
+            for (d = 0; d != MAXDIRECTIONS; d++) {        /* Nachbarregionen, die gesehen werden, ermitteln */
+                int p = rroad(r, d);
+                if (p) {
+                    if (mode <= seen_neighbour) {
+                        region *rn = rconnect(r, d);
+                        if (!rn || rn->seen.mode <= seen_neighbour) {
+                            continue;
+                        }
+                        if (rroad(rn, d_reverse(d)) <= 0) {
+                            continue;
+                        }
+                    }
+                    p = p * 100 / r->terrain->max_road;
+                    creport_block_1(out, "GRENZE", ++g);
+                    creport_tag(out, "typ", road_type);
+                    creport_tag_int(out, "richtung", d);
+                    creport_tag_int(out, "prozent", p);
+                }
+            }
+        }
+    }
+    return g;
+}
+
+static int
+cr_borders(stream *out, const faction *f, const region * r, enum seen_mode mode, int offset)
 {
     direction_t d;
-    int g = 0;
+    int g = offset;
+
+    if (mode <= seen_neighbour) {
+        return offset;
+    }
     for (d = 0; d != MAXDIRECTIONS; d++) {        /* Nachbarregionen, die gesehen werden, ermitteln */
         const region *r2 = rconnect(r, d);
         const connection *b;
@@ -1159,15 +1197,11 @@ cr_borders(stream *out, const region * r, const faction * f)
                 creport_tag_int(out, "richtung", d);
                 if (!b->type->transparent(b, f))
                     sputs("1;opaque", out);
-                /* hack: */
-                if (b->type == &bt_road && r->terrain->max_road) {
-                    int p = rroad(r, d) * 100 / r->terrain->max_road;
-                    creport_tag_int(out, "prozent", p);
-                }
             }
             b = b->next;
         }
     }
+    return g;
 }
 
 void cr_output_resources(struct stream *out, const struct faction * f, const struct region *r, enum seen_mode mode)
@@ -1413,8 +1447,8 @@ void cr_output_region(struct stream* out, const struct faction* f,
             }
         }
         cr_output_curses(out, f, r, TYP_REGION);
-        cr_borders(out, r, f);
     }
+    cr_borders(out, f, r, mode, cr_roads(out, f, r, mode, 0));
     if (see_schemes(r, mode)) {
         /* Sonderbehandlung Teleport-Ebene */
         region *rl[MAX_SCHEMES];

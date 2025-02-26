@@ -42,7 +42,9 @@
 #include <attributes/attributes.h>
 #include <attributes/key.h>
 #include <attributes/racename.h>
+#include <spells/charming.h>
 #include <triggers/changerace.h>
+#include <triggers/killunit.h>
 #include <triggers/timeout.h>
 #include <triggers/shock.h>
 
@@ -308,9 +310,8 @@ static void writeorder(gamedata *data, const struct order *ord,
 static bool read_skill(gamedata *data, skill *sv) {
     int val;
     READ_INT(data->store, &val);
-    if (val < 0) return false;
-    sv->id = (skill_t)val;
-    if (sv->id != NOSKILL) {
+    if (val >= 0) {
+        sv->id = (skill_t)val;
         READ_INT(data->store, &val);
         assert(val < CHAR_MAX);
         sv->old = sv->level = val;
@@ -327,8 +328,9 @@ static bool read_skill(gamedata *data, skill *sv) {
         else {
             assert(val > 0);
         }
+        return true;
     }
-    return true;
+    return false;
 }
 
 static int skill_cmp(const void *a, const void *b) {
@@ -1431,10 +1433,8 @@ ship *read_ship(gamedata *data)
     int n;
     storage *store = data->store;
 
-    sh = (ship *)calloc(1, sizeof(ship));
-    if (!sh) abort();
-    READ_INT(store, &sh->no);
-    shash(sh);
+    READ_INT(store, &n);
+    sh = ship_create(n);
     READ_STR(store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
         if (utf8_trim(name) != 0) {
@@ -1823,9 +1823,11 @@ int read_game(gamedata *data)
             create_teleport_plane();
         }
     }
+    if (data->version < SLAVE_DATA_VERSION) {
+        fix_slaves();
+    }
 
     log_debug("Done loading turn %d.", turn);
-
     return 0;
 }
 

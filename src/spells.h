@@ -5,6 +5,7 @@ struct curse_type;
 struct region;
 struct unit;
 struct message;
+struct order;
 
 extern const struct curse_type ct_deathcloud;
 void register_spells(void);
@@ -53,3 +54,6 @@ int sp_pump(struct castorder *co);
 int sp_readmind(struct castorder *co);
 int sp_auraleak(struct castorder *co);
 int sp_movecastle(struct castorder *co);
+
+void report_spell_effect(struct region *r, struct unit *mage, struct message *seen, struct message *unseen);
+void report_spell_failure(struct unit *mage, struct order *ord);

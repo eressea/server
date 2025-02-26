@@ -101,13 +101,23 @@ static int createcurse_read(trigger * t, gamedata *data)
     return AT_READ_OK;
 }
 
+static void createcurse_dump(const trigger *t, int indent)
+{
+    createcurse_data *td = (createcurse_data *)t->data.v;
+    fprintf(stdout, "%*sduration: %d\n", indent, "", td->duration);
+    fprintf(stdout, "%*scurse: %s\n", indent, "", td->type->cname);
+    fprintf(stdout, "%*smage: %s\n", indent, "", unitname(td->mage));
+    fprintf(stdout, "%*starget: %s\n", indent, "", unitname(td->target));
+}
+
 trigger_type tt_createcurse = {
     "createcurse",
     createcurse_init,
     createcurse_free,
     createcurse_handle,
     createcurse_write,
-    createcurse_read
+    createcurse_read,
+    createcurse_dump
 };
 
 trigger *trigger_createcurse(struct unit * mage, struct unit * target,

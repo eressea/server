@@ -58,7 +58,7 @@ skill_t getskill(const struct locale *lang)
 {
     char token[128];
     const char * s = gettoken(token, sizeof(token));
-    return s ? get_skill(s, lang) : NOSKILL;
+    return s ? findskill(s, lang) : NOSKILL;
 }
 
 magic_t getmagicskill(const struct locale * lang)
@@ -92,6 +92,8 @@ bool is_migrant(unit * u)
     static const race *toad_rc;
 
     if (u_race(u) == u->faction->race)
+        return false;
+    if (is_familiar(u))
         return false;
 
     if (fval(u_race(u), RCF_UNDEAD | RCF_ILLUSIONARY))
@@ -807,7 +809,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    increase_skill_days(u, sk, days);
+    change_skill_days(u, sk, days);
     return cost;
 }
 

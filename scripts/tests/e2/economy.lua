@@ -202,3 +202,52 @@ function test_trade_limits()
     process_orders()
     assert_equal(10, u:get_item(lux))
 end
+
+-- MACHE 3 Schwert verhält sich anders als MACHE 3 Burg/Schiff
+-- @see test_repeated_create_n_building
+function test_repeated_create_n_items()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:set_skill("weaponsmithing", 3)
+    u:add_item("iron", 50)
+    u:set_orders("MACHE 3 Schwert")
+    assert_equal("MACHE 3 Schwert", u.orders[1])
+    process_orders()
+    assert_equal(1, u:get_item("sword"))
+    assert_equal("MACHE 3 Schwert", u.orders[1])
+end
+
+-- MACHE n BURG countdown
+function test_repeated_create_n_building()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    u:set_skill("building", 3)
+    u:add_item("stone", 50)
+    u:set_orders("MACHE 7 Burg")
+    assert_equal("MACHE 7 Burg", u.orders[1])
+    process_orders()
+    assert_equal(3, u.building.size)
+    assert_equal("MACHE 4 Burg " .. itoa36(u.building.id), u.orders[1])
+    process_orders()
+    assert_equal(6, u.building.size)
+    assert_equal("MACHE 1 Burg " .. itoa36(u.building.id), u.orders[1])
+    process_orders()
+    assert_equal(7, u.building.size)
+    assert_equal("ARBEITE", u.orders[1])
+end
+
+-- MACHE n SCHIFF has no countdown
+function test_repeated_create_n_ship()
+    local r = region.create(0,0, "plain")
+    local f = faction.create("insect")
+    local u = unit.create(f, r, 1)
+    u:set_skill("shipcraft", 1)
+    u:add_item("log", 50)
+    u:set_orders("MACHE 3 Boot")
+    assert_equal("MACHE 3 Boot", u.orders[1])
+    process_orders()
+    assert_equal(1, u.ship.size)
+    assert_equal("MACHE SCHIFF " .. itoa36(u.ship.id), u.orders[1])
+end

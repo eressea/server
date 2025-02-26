@@ -858,15 +858,11 @@ void plan_monsters(faction * f)
                 if (fval(rc, RCF_DRAGON)) {
                     long_order = plan_dragon(u);
                 }
-                else {
-                    if (can_move && rc == get_race(RC_SEASERPENT)) {
-                        long_order = create_order(K_PIRACY, u->faction->locale, NULL);
-                    }
-                    else {
-                        if (monster_can_learn(rc)) {
-                            long_order = monster_learn(u);
-                        }
-                    }
+                else if (can_move && rc == get_race(RC_SEASERPENT)) {
+                    long_order = create_order(K_PIRACY, u->faction->locale, NULL);
+                }
+                else if (monster_can_learn(rc)) {
+                    long_order = monster_learn(u);
                 }
             }
             if (long_order == NULL && check_student(u, NULL, SK_WEAPONLESS)) {

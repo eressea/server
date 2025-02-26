@@ -426,9 +426,9 @@ function test_use_foolpotion()
     u2:set_skill('crossbow', 1)
     turn_process()
     assert_equal(2, u:get_item('p7'))
-    assert_equal(9, u2:effect('p7'))
     assert_equal(1, f:count_msg_type('givedumb'))
     turn_end()
+    assert_equal(9, u2:effect('p7'))
 end
 
 function test_snowman()

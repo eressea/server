@@ -72,8 +72,6 @@ extern "C" {
         struct region *(*move) (const connection *, struct unit * u,
         struct region * from, struct region * to, bool routing);
         /* executed when the units traverses this connection */
-        int(*age) (struct connection *);
-        /* return 0 if connection needs to be removed. >0 if still aging, <0 if not aging */
         struct border_type *next;   /* for internal use only */
     } border_type;
 
@@ -83,6 +81,7 @@ extern "C" {
     connection *get_borders(const struct region *r1,
         const struct region *r2);
     /* returns the list of borders between r1 and r2 or r2 and r1 */
+    connection *border_create(struct region *from);
     connection *create_border(border_type *type, struct region *from, struct region *to);
     /* creates a connection of the specified type */
     void erase_border(connection * b);
@@ -93,7 +92,6 @@ extern "C" {
 
     int read_borders(struct gamedata *store);
     void write_borders(struct storage *store);
-    void age_borders(void);
 
     /* provide default implementations for some member functions: */
     void b_read(connection * b, struct gamedata *store);
@@ -116,7 +114,6 @@ extern "C" {
     extern border_type bt_fogwall;
     extern border_type bt_noway;
     extern border_type bt_wall;
-    extern border_type bt_illusionwall;
     extern border_type bt_road;
     extern border_type bt_questportal;
 
@@ -128,6 +125,7 @@ extern "C" {
     const char * border_name(const struct connection *co, const struct region * r,
         const struct faction * f, int flags, const struct locale* lang);
 
+    void register_connections(void);
 #ifdef __cplusplus
 }
 #endif
