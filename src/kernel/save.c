@@ -690,8 +690,10 @@ static void read_landregion(gamedata* data, region* r)
     char name[NAMESIZE];
     int n, i;
     r->land = calloc(1, sizeof(land_region));
+
     READ_STR(data->store, name, sizeof(name));
     if (data->version <= NOWATCH_VERSION) {
+        // TODO: why is not < NOWATCH_VERSION?
         if (utf8_trim(name) != 0) {
             log_warning("trim region %d name to '%s'", r->uid, name);
         }
@@ -703,6 +705,7 @@ static void read_landregion(gamedata* data, region* r)
         read_regioninfo(data, r, info, sizeof(info));
         region_setinfo(r, info);
     }
+
     READ_INT(data->store, &i);
     if (i < 0) {
         log_error("number of trees in %s is %d.", regionname(r, NULL), i);
@@ -725,6 +728,13 @@ static void read_landregion(gamedata* data, region* r)
     READ_INT(data->store, &i);
     rsethorses(r, i);
 
+    if (data->version >= FIX_ROADS_VERSION) {
+        for (i = 0; i != MAXDIRECTIONS; ++i) {
+            int n;
+            READ_INT(data->store, &n);
+            r->land->roads[i] = (short)n;
+        }
+    }
     for (;;) {
         rawmaterial* res;
         const resource_type* rtype;
@@ -925,6 +935,11 @@ static void write_landregion(gamedata* data, const region* r)
     WRITE_INT(data->store, rtrees(r, 2));
     WRITE_INT(data->store, rhorses(r));
 
+#if RELEASE_VERSION >= FIX_ROADS_VERSION
+    for (i = 0; i != MAXDIRECTIONS; ++i) {
+        WRITE_INT(data->store, r->land->roads[i]);
+    }
+#endif
     for (i = 0; i != len; ++i) {
         rawmaterial* res = r->resources + i;
         WRITE_TOK(data->store, res->rtype->_name);
