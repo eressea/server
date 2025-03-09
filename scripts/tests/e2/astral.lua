@@ -79,18 +79,21 @@ function test_pull_astral()
     u1.aura = 0
     u1:add_spell("pull_astral")
 
+    -- no region
     u1:clear_orders()
     u1:add_order("ZAUBERE Astraler~Ruf " .. itoa36(u2.id))
     process_orders()
     assert_equal(1, f:count_msg_type('error209'), 'syntax error')
     u1:clear_orders()
 
+    -- no such region
     u1:clear_orders()
-    u1:add_order("ZAUBERE Astraler~Ruf 1 0 " .. itoa36(u2.id))
+    u1:add_order("ZAUBERE Astraler~Ruf 0 1 " .. itoa36(u2.id))
     process_orders()
     assert_equal(0, f:count_msg_type('error209'), 'syntax error')
     assert_equal(1, f:count_msg_type('error194'), 'target region')
 
+    -- no aura
     u1:clear_orders()
     u1:add_order("ZAUBERE Astraler~Ruf 0 0 " .. itoa36(u2.id))
     u1.aura = 0 -- missing components
@@ -98,10 +101,12 @@ function test_pull_astral()
     assert_equal(0, f:count_msg_type('error194'), 'target region')
     assert_equal(1, f:count_msg_type('missing_components_list'), 'no components')
 
+    -- not in astral space
     u1.aura = 12 -- 2 Aura pro Stufe
     process_orders()
     assert_equal(1, f:count_msg_type('spellfail_astralonly'), 'astral space')
 
+    -- success
     u1.region = u1.region:get_astral('fog')
     assert_equal('fog', u1.region.terrain)
     process_orders()
@@ -109,15 +114,55 @@ function test_pull_astral()
     assert_equal(1, f:count_msg_type('send_astral'), 'astral space')
     assert_equal(u1.region, u2.region)
 
+    -- no connection
     u1.aura = 12 -- 2 Aura pro Stufe
     u1:clear_orders()
     u1:add_order("ZAUBERE Astraler~Ruf -1 0 " .. itoa36(u2.id))
-    r = region.create(-1,0, 'plain')
+    r = region.create(-1, 0, "plain")
     u2.region = r
-    process_orders()
     assert_not_equal(u1.region, u2.region:get_astral('fog')) -- unerreichbar
+    process_orders()
+
     assert_equal(r, u2.region)
     assert_equal(0, f:count_msg_type('send_astral'), 'astral space')
-    assert_equal(1, f:count_msg_type('spellfail::nocontact'), 'out of range')
-end
+    assert_equal(1, f:count_msg_type('spellfail_distance'), 'out of range')
 
+    -- success
+    u1.aura = 12 -- 2 Aura pro Stufe
+    u1:clear_orders()
+    u1:add_order("ZAUBERE Astraler~Ruf 1 0 " .. itoa36(u2.id))
+    r = region.create(1, 0, "plain")
+    u2.region = r
+    assert_equal(u1.region, u2.region:get_astral('fog'))
+    process_orders()
+
+    assert_equal(u1.region, u2.region)
+    assert_equal(1, f:count_msg_type('send_astral'), 'astral space')
+    assert_equal(0, f:count_msg_type('spellfail::nocontact'), 'out of range')
+    assert_equal(0, f:count_msg_type('spellfail_distance'), 'out of range')
+
+
+    -- connection to weird diamond area
+    u1.aura = 12 -- 2 Aura pro Stufe
+    u1:clear_orders()
+    u1:add_order("ZAUBERE Astraler~Ruf 3 3 " .. itoa36(u2.id))
+    r = region.create(3, 3, "plain")
+    u2.region = r
+    assert_equal(u1.region, u2.region:get_astral('fog'))
+    process_orders()
+
+    assert_equal(u1.region, u2.region)
+    assert_equal(1, f:count_msg_type('send_astral'), 'astral space')
+    assert_equal(0, f:count_msg_type('spellfail::nocontact'), 'out of range')
+
+    -- no connection
+    u1.aura = 12 -- 2 Aura pro Stufe
+    u1:clear_orders()
+    u1:add_order("ZAUBERE Astraler~Ruf 4 0 " .. itoa36(u2.id))
+    r = region.create(4, 0, "plain")
+    u2.region = r
+    process_orders()
+    assert_equal(r, u2.region)
+    assert_equal(0, f:count_msg_type('send_astral'), 'astral space')
+    assert_equal(1, f:count_msg_type('spellfail_distance'), 'out of range')
+end

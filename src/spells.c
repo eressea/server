@@ -4834,14 +4834,15 @@ int sp_pullastral(castorder *co)
     double power = co->force;
     spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
+    int cost = 0;
 
     switch (getplaneid(r)) {
     case 1:
         rt = r;
         ro = params ? params->data.r : NULL;
-        if (r_astral_to_standard(r) != ro) {
+        if (ro && r_standard_to_astral(ro) != rt) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-                "spellfail::nocontact", "target", rt));
+                "spellfail_distance", "target", rt));
             return 0;
         }
         break;
@@ -4858,13 +4859,18 @@ int sp_pullastral(castorder *co)
         return 0;
     }
 
+    if (params->flag == TARGET_RESISTS) {
+        return co->level;
+    }
+
     remaining_cap = (int)((power - 3) * 1500);
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < len; ++n) {
         spellparameter* spobj = params + n;
-        if (spobj->flag)
-            continue;
+
+        if (spobj->flag == TARGET_NOTFOUND)
+          continue;
 
         u = spobj->data.u;
 
@@ -4878,7 +4884,7 @@ int sp_pullastral(castorder *co)
             }
             spobj->flag = TARGET_NOTFOUND;
             ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
-            return false;
+            continue;
         }
 
         if (!ucontact(u, mage)) {
@@ -4891,6 +4897,7 @@ int sp_pullastral(castorder *co)
                     "feedback_no_contact_resist", "target", u));
                 ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage,
                     u));
+                cost = cast_level;
                 continue;
             }
         }
@@ -4905,6 +4912,7 @@ int sp_pullastral(castorder *co)
                 "fail_tooheavy", "target", u));
         }
         else {
+            cost = cast_level;
             ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage,
                 u));
             remaining_cap = remaining_cap - w;
@@ -4917,7 +4925,7 @@ int sp_pullastral(castorder *co)
             astral_appear(rt, u, mage->faction);
         }
     }
-    return cast_level;
+    return cost;
 }
 
 int sp_leaveastral(castorder * co)
