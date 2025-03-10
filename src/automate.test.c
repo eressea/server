@@ -396,7 +396,7 @@ static void test_autostudy_run_teachers_learn(CuTest *tc) {
     f = test_create_faction();
     u1 = test_create_unit(f, r);
     u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
-    set_number(u1, 2);
+    set_number(u1, 3);
     set_level(u1, SK_ENTERTAINMENT, 2);
     u2 = test_create_unit(f, r);
     u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
@@ -405,8 +405,66 @@ static void test_autostudy_run_teachers_learn(CuTest *tc) {
     CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
     CuAssertPtrEquals(tc, NULL, ulist);
     autostudy_run(scholars, nscholars);
-    CuAssertIntEquals(tc, 1, scholars[0].learn);
+    CuAssertIntEquals(tc, 2, scholars[0].learn);
     CuAssertIntEquals(tc, 20, scholars[1].learn);
+    test_teardown();
+}
+
+/**
+ * If a teacher unit doesn't have enough students, the remaining members study.
+ */
+static void test_autostudy_run_teachers_learn_roundup(CuTest *tc) {
+    scholar scholars[4];
+    int nscholars;
+    unit *u1, *u2, *ulist;
+    faction *f;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u1, 3);
+    set_level(u1, SK_ENTERTAINMENT, 2);
+    u2 = test_create_unit(f, r);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u2, 9);
+    ulist = r->units;
+    CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertPtrEquals(tc, NULL, ulist);
+    autostudy_run(scholars, nscholars);
+    CuAssertIntEquals(tc, 2, scholars[0].learn);
+    CuAssertIntEquals(tc, 18, scholars[1].learn);
+    test_teardown();
+}
+
+/**
+ * If a teacher unit doesn't have enough students, the remaining members study.
+ */
+static void test_autostudy_run_teachers_learn_roundup2(CuTest *tc) {
+    scholar scholars[4];
+    int nscholars;
+    unit *u1, *u2, *ulist;
+    faction *f;
+    region *r;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u1, 3);
+    set_level(u1, SK_ENTERTAINMENT, 2);
+    u2 = test_create_unit(f, r);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_ENTERTAINMENT]);
+    set_number(u2, 11);
+    ulist = r->units;
+    CuAssertIntEquals(tc, 2, nscholars = autostudy_init(scholars, 4, &ulist, NULL));
+    CuAssertPtrEquals(tc, NULL, ulist);
+    autostudy_run(scholars, nscholars);
+    CuAssertIntEquals(tc, 1, scholars[0].learn);
+    CuAssertIntEquals(tc, 22, scholars[1].learn);
     test_teardown();
 }
 
@@ -522,6 +580,8 @@ CuSuite *get_automate_suite(void)
     SUITE_ADD_TEST(suite, test_autostudy_run_can_teach);
     SUITE_ADD_TEST(suite, test_autostudy_run_cannot_teach);
     SUITE_ADD_TEST(suite, test_autostudy_run_teachers_learn);
+    SUITE_ADD_TEST(suite, test_autostudy_run_teachers_learn_roundup);
+    SUITE_ADD_TEST(suite, test_autostudy_run_teachers_learn_roundup2);
     SUITE_ADD_TEST(suite, test_autostudy_run_twoteachers);
     SUITE_ADD_TEST(suite, test_autostudy_run_bigunit);
     SUITE_ADD_TEST(suite, test_autostudy_run_few_teachers);
