@@ -4,6 +4,8 @@
 #include "magic.h"
 #include "teleport.h"
 
+#include "kernel/messages.h"
+
 #include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
@@ -803,6 +805,134 @@ static void test_treewalkexit(CuTest *tc) {
     CuAssertPtrNotNull(tc, u->region->individual_messages);
     CuAssertPtrNotNull(tc, test_find_messagetype(r->individual_messages->msgs, "astral_appear"));
     CuAssertPtrNotNull(tc, test_find_messagetype(ra->individual_messages->msgs, "astral_disappear"));
+
+    test_teardown();
+}
+
+static void test_pullastral(CuTest *tc) {
+    unit *u, *u2;
+    region *r, *ra;
+    castorder co;
+    spellparameter param, * args = NULL;
+
+    test_setup();
+    test_use_astral();
+    r = test_create_plain(0, 0);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+
+    CuAssertPtrEquals(tc, r_astral_to_standard(ra), r);
+
+    u = test_create_unit(test_create_faction(), ra);
+    ra->_plane = get_astralplane();
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+
+    param.flag = TARGET_NOTFOUND;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(test_create_faction(), r);
+    test_create_unit(u2->faction, r);
+    arrput(args, param);
+    test_create_castorder(&co, u, 4, 5.0, 0, args);
+
+    /* spell fails because target region resists */
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    /* spell fails because target unit not found */
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, 0, sp_pullastral(&co));
+
+    co.a_params[1].flag = TARGET_RESISTS;
+    /* spell fails because target units resist it, but is paid in full */
+    test_clear_messages(u->faction);
+
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, r, u2->region);
+
+    co.level = 13;
+    co.force = 13.0;
+    /* spell level high enough, but target unit resists */
+    test_clear_messages(u->faction);
+
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "feedback_no_contact_resist"));
+
+    /* spell succeeds because target can't resist */
+    co.a_params[1].flag = TARGET_OK;
+    test_clear_messages(u->faction);
+    test_clear_messages(u2->faction);
+
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "feedback_no_contact_no_resist"));
+
+    /* spell succeeds */
+    move_unit(u2, r, NULL);
+    test_clear_messages(u->faction);
+    test_clear_messages(u2->faction);
+    co.level = 4;
+    co.force = 4.0;
+    contact_unit(u2, u);
+
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "feedback_no_contact_no_resist"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "feedback_no_contact_resist"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "astral_disappear", u2->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_appear", u2->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_appear", u->faction));
+
+
+    /* other visible region */
+    test_clear_messages(u->faction);
+    test_clear_messages(u2->faction);
+    co.a_params[1].data.u = u2 = test_create_unit(u2->faction, r =test_create_plain(3,0));
+    test_create_unit(u2->faction, r);
+    co.a_params[0].data.r = r;
+    contact_unit(u2, u);
+
+    CuAssertIntEquals(tc, co.level, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "feedback_no_contact_no_resist"));
+    CuAssertPtrEquals(tc, NULL, test_find_faction_message(u->faction, "feedback_no_contact_resist"));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "astral_disappear", u2->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_appear", u2->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_appear", u->faction));
+
+
+    /* region out of range */
+    test_clear_messages(u->faction);
+    test_clear_messages(u2->faction);
+    co.a_params[1].data.u = u2 = test_create_unit(u2->faction, r = test_create_plain(4,0));
+    test_create_unit(u2->faction, r);
+    co.a_params[0].data.r = r;
+    contact_unit(u2, u);
+
+    CuAssertIntEquals(tc, 0, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail_distance"));
+
+    /* region out of range */
+    test_clear_messages(u->faction);
+    test_clear_messages(u2->faction);
+    co.a_params[1].data.u = u2 = test_create_unit(u2->faction, r = test_create_plain(-1,0));
+    test_create_unit(u2->faction, r);
+    co.a_params[0].data.r = r;
+    contact_unit(u2, u);
+
+    CuAssertIntEquals(tc, 0, sp_pullastral(&co));
+
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail_distance"));
 
     test_teardown();
 }
@@ -2006,6 +2136,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_kaelteschutz);
     SUITE_ADD_TEST(suite, test_treewalkenter);
     SUITE_ADD_TEST(suite, test_treewalkexit);
+    SUITE_ADD_TEST(suite, test_pullastral);
     SUITE_ADD_TEST(suite, test_holyground);
     SUITE_ADD_TEST(suite, test_drought);
     SUITE_ADD_TEST(suite, test_great_drought_no_terraform);

@@ -4825,23 +4825,21 @@ int sp_enterastral(castorder * co)
  */
 int sp_pullastral(castorder *co)
 {
-    region *rt, *ro;
-    unit *u;
     int remaining_cap, w;
-    region *r = co_get_region(co);
+    region *rt = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
     spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
+    int cost = 0;
+    region *ro = params ? params->data.r : NULL;
 
-    switch (getplaneid(r)) {
+    switch (getplaneid(rt)) {
     case 1:
-        rt = r;
-        ro = params ? params->data.r : NULL;
-        if (r_astral_to_standard(r) != ro) {
+        if (ro && r_standard_to_astral(ro) != rt) {
             ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
-                "spellfail::nocontact", "target", rt));
+                "spellfail_distance", "target", rt));
             return 0;
         }
         break;
@@ -4858,13 +4856,19 @@ int sp_pullastral(castorder *co)
         return 0;
     }
 
+    if (params->flag == TARGET_RESISTS) {
+        return co->level;
+    }
+
     remaining_cap = (int)((power - 3) * 1500);
 
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < len; ++n) {
         spellparameter* spobj = params + n;
-        if (spobj->flag)
-            continue;
+        unit *u;
+
+        if (spobj->flag == TARGET_NOTFOUND)
+          continue;
 
         u = spobj->data.u;
 
@@ -4878,7 +4882,7 @@ int sp_pullastral(castorder *co)
             }
             spobj->flag = TARGET_NOTFOUND;
             ADDMSG(&mage->faction->msgs, msg_unitnotfound(mage, co->order, spobj));
-            return false;
+            continue;
         }
 
         if (!ucontact(u, mage)) {
@@ -4891,6 +4895,7 @@ int sp_pullastral(castorder *co)
                     "feedback_no_contact_resist", "target", u));
                 ADDMSG(&u->faction->msgs, msg_message("try_astral", "unit target", mage,
                     u));
+                cost = cast_level;
                 continue;
             }
         }
@@ -4905,6 +4910,7 @@ int sp_pullastral(castorder *co)
                 "fail_tooheavy", "target", u));
         }
         else {
+            cost = cast_level;
             ADDMSG(&u->faction->msgs, msg_message("send_astral", "unit target", mage,
                 u));
             remaining_cap = remaining_cap - w;
@@ -4917,29 +4923,26 @@ int sp_pullastral(castorder *co)
             astral_appear(rt, u, mage->faction);
         }
     }
-    return cast_level;
+    return cost;
 }
 
 int sp_leaveastral(castorder * co)
 {
-    region *rt, *ro;
-    unit *u;
     int remaining_cap, w;
-    region *r = co_get_region(co);
+    region *ro = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
     const spellparameter* params = co->a_params;
     size_t n, len = arrlen(params);
+    region *rt = params ? params->data.r : NULL;
 
-    switch (getplaneid(r)) {
+    switch (getplaneid(ro)) {
     case 1:
-        rt = params ? params->data.r : NULL;
-        if (!rt || r_standard_to_astral(rt) != r || !inhabitable(rt)) {
+        if (!rt || r_standard_to_astral(rt) != ro || !inhabitable(rt)) {
             cmistake(mage, co->order, 216, MSG_MAGIC);
             return 0;
         }
-        ro = r;
         break;
     default:
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
@@ -4947,7 +4950,7 @@ int sp_leaveastral(castorder * co)
         return 0;
     }
 
-    if (ro == NULL || is_cursed(ro->attribs, &ct_astralblock)
+    if (is_cursed(ro->attribs, &ct_astralblock)
         || is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", NULL));
@@ -4959,6 +4962,8 @@ int sp_leaveastral(castorder * co)
     /* fuer jede Einheit in der Kommandozeile */
     for (n = 1; n < len; ++n) {
         const spellparameter* param = params + n;
+        unit *u;
+
         if (param->flag != TARGET_OK)
             continue;
 
@@ -4995,7 +5000,7 @@ int sp_leaveastral(castorder * co)
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-            astral_disappear(r, u);
+            astral_disappear(ro, u);
 
             /* Meldungen in der Zielregion */
             astral_appear(rt, u, mage->faction);
