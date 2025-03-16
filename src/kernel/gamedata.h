@@ -60,8 +60,9 @@
 #define BORDER_ID_VERSION 382 /* borders no longer have an id, from turn 1376 */
 #define SLAVE_DATA_VERSION 383 /* ct_slavery has curse-data */
 #define WALL_DATA_VERSION 384 /* wall_data no longer has mage stored in it */
+#define FIX_ROADS_VERSION 385 /* regions did not write the new roads */
 
-#define RELEASE_VERSION WALL_DATA_VERSION /* use for new datafiles */
+#define RELEASE_VERSION FIX_ROADS_VERSION /* use for new datafiles */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
