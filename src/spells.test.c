@@ -4,8 +4,6 @@
 #include "magic.h"
 #include "teleport.h"
 
-#include "kernel/messages.h"
-
 #include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
