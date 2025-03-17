@@ -3090,7 +3090,7 @@ msgid "mallornbow_p"
 msgstr "Mallornbögen"
 
 msgid "aquarianspoil"
-msgstr "Meermenschschuppe"
+msgstr "Meermenschenschuppe"
 
 msgid "mistletoe_p"
 msgstr "Mistelzweige"
@@ -5479,7 +5479,7 @@ msgid "dragonblood"
 msgstr "Drachenblut"
 
 msgid "aquarianspoil_p"
-msgstr "Meermenschschuppen"
+msgstr "Meermenschenschuppen"
 
 msgctxt "spell"
 msgid "calmmonster"
