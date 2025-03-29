@@ -1852,7 +1852,7 @@ static void breedtrees(unit * u, int raw)
     if (skill < minskill) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, u->thisorder, "plant_skills",
-                "skill minskill product", SK_HERBALISM, 6, rtype, 1));
+                "skill minskill product", SK_HERBALISM, minskill, rtype, 1));
         return;
     }
 
