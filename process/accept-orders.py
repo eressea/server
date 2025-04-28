@@ -197,7 +197,7 @@ def formatpar(string, l=76, indent=2):
 
 def store_message(message, filename):
     outfile = io.open(filename, "wb")
-    outfile.write(message.as_string())
+    outfile.write(message.as_bytes())
     outfile.close()
     return
 
