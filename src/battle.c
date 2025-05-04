@@ -167,14 +167,25 @@ static int army_index(const side * s)
     return s->index;
 }
 
-const char *sidename(const side * s)
+static const struct faction *visible_side_faction(const struct side *s, const struct faction *f)
+{
+    if (f == s->faction || s->stealthfaction == NULL) {
+        return s->faction;
+    }
+    if (alliedgroup(s->faction, f, s->group, HELP_FSTEALTH)) {
+        return s->faction;
+    }
+    return s->stealthfaction;
+}
+
+const char *sidename(const struct side *s, const struct faction *f)
 {
 #define SIDENAMEBUFLEN 256
     static int bufno;             /* STATIC_XCALL: used across calls */
     static char sidename_buf[4][SIDENAMEBUFLEN];  /* STATIC_RESULT: used for return, not across calls */
 
     bufno = bufno % 4;
-    str_strlcpy(sidename_buf[bufno], factionname(s->stealthfaction ? s->stealthfaction : s->faction), SIDENAMEBUFLEN);
+    str_strlcpy(sidename_buf[bufno], factionname(visible_side_faction(s, f)), SIDENAMEBUFLEN);
     return sidename_buf[bufno++];
 }
 
@@ -2810,22 +2821,44 @@ static void aftermath(battle * b)
     for (si = 0; si != sl; ++si) {
         side *s = b->sides[si];
         size_t bi;
-        message *seen = msg_message("army_report",
-            "index abbrev dead fled survived",
-            army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
-        message *unseen = msg_message("army_report",
-            "index abbrev dead fled survived",
-            army_index(s), "-?-", s->dead, s->flee, s->alive);
+        message *seen_true = NULL, * seen_false = NULL, * unseen = NULL;
 
         for (bi = arrlen(b->factions); bi != 0; --bi) {
             faction *bf = b->factions[bi - 1];
-            message *m = seematrix(bf, s) ? seen : unseen;
+            message *m;
+            if (seematrix(bf, s)) {
+                if (visible_side_faction(s, bf) == s->faction) {
+                    if (!seen_true) {
+                        seen_true = msg_message("army_report",
+                            "index abbrev dead fled survived",
+                            army_index(s), sideabkz(s, true), s->dead, s->flee, s->alive);
+                    }
+                    m = seen_true;
+                }
+                else {
+                    if (!seen_false) {
+                        seen_false = msg_message("army_report",
+                            "index abbrev dead fled survived",
+                            army_index(s), sideabkz(s, false), s->dead, s->flee, s->alive);
+                    }
+                    m = seen_false;
+                }
+            }
+            else {
+                if (!unseen) {
+                    unseen = msg_message("army_report",
+                        "index abbrev dead fled survived",
+                        army_index(s), "-?-", s->dead, s->flee, s->alive);
+                }
+                m = unseen;
+            }
 
             battle_message_faction(b, bf, m);
         }
 
-        msg_release(seen);
-        msg_release(unseen);
+        if (seen_true) msg_release(seen_true);
+        if (seen_false) msg_release(seen_false);
+        if (unseen) msg_release(unseen);
     }
 
     /* Wir benutzen drifted, um uns zu merken, ob ein Schiff
@@ -2970,7 +3003,7 @@ static struct message * army_message(const battle* b, const faction* f, const si
 
     assert(f);
     fv = seematrix(f, s) ? s->faction : s->stealthfaction;
-    sname = fv ? sidename(s) : LOC(f->locale, "unknown_faction");
+    sname = fv ? sidename(s, f) : LOC(f->locale, "unknown_faction");
 
     return msg_message("para_army_index", "index name faction", army_index(s), sname, fv);
 }
@@ -3047,7 +3080,8 @@ static void print_stats(battle * b)
             for (se = 0; se != sl; ++se) {
                 side *s2 = b->sides[se];
                 if (enemy(s2, s)) {
-                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
+                    bool see_stealth = (visible_side_faction(s, f) == s->faction);
+                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, see_stealth) : "-?-";
                     rsize = slprintf(bufp, size, "%s %s %d (%s)",
                         komma++ ? "," : (const char *)header, loc_army, army_index(s2),
                         abbrev);
@@ -3069,7 +3103,8 @@ static void print_stats(battle * b)
             for (se = 0; se != sl; ++se) {
                 side *s2 = b->sides[se];
                 if (s2 != s && friendly(s2, s)) {
-                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
+                    bool see_stealth = (visible_side_faction(s, f) == s->faction);
+                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, see_stealth) : "-?-";
                     rsize = slprintf(bufp, size, "%s %s %d(%s)",
                         komma++ ? "," : (const char *)header, loc_army, army_index(s2),
                         abbrev);
@@ -3090,7 +3125,8 @@ static void print_stats(battle * b)
             for (se = 0; se != sl; ++se) {
                 side *s2 = b->sides[se];
                 if (get_relation(s, s2) & E_ATTACKING) {
-                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, false) : "-?-";
+                    bool see_stealth = (visible_side_faction(s, f) == s->faction);
+                    const char *abbrev = seematrix(f, s2) ? sideabkz(s2, see_stealth) : "-?-";
                     rsize =
                         slprintf(bufp, size, "%s %s %d(%s)",
                             komma++ ? "," : (const char *)header, loc_army, army_index(s2),
@@ -3589,7 +3625,8 @@ static int battle_report(battle * b)
             if (s->alive) {
                 int r, k = 0, *alive = get_alive(s);
                 int l = FIGHT_ROW;
-                const char *abbrev = seematrix(fac, s) ? sideabkz(s, false) : "-?-";
+                bool see_stealth = (visible_side_faction(s, fac) == s->faction);
+                const char *abbrev = seematrix(fac, s) ? sideabkz(s, see_stealth) : "-?-";
                 const char *loc_army = LOC(fac->locale, "battle_army");
                 char buffer[32];
 

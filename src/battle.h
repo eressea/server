@@ -245,7 +245,7 @@ struct side* make_side(struct battle* b, const struct faction* f,
 int skilldiff(troop at, troop dt, int dist);
 void force_leave(struct region* r, struct battle* b);
 bool seematrix(const struct faction* f, const struct side* s);
-const char* sidename(const struct side* s);
+const char *sidename(const struct side *s, const struct faction *f);
 void battle_message_faction(struct battle* b, struct faction* f, struct message* m);
 
 double tactics_chance(const struct unit* u, int skilldiff);

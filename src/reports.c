@@ -2051,10 +2051,12 @@ void report_battle_start(battle * b)
                         str = gb_append_cstring(str, lastf);
                         first = true;
                     }
-                    if (seematrix(f, s))
-                        lastf = sidename(s);
-                    else
+                    if (seematrix(f, s)) {
+                        lastf = sidename(s, f);
+                    }
+                    else {
                         lastf = LOC(f->locale, "unknown_faction_dative");
+                    }
                     break;
                 }
             }
