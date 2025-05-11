@@ -337,7 +337,7 @@ void report_summary(const summary * s, bool full)
         if (timeout>0 && full) {
             int i;
             fprintf(F, "\n\nFactions with NMRs:\n");
-            for (i = timeout; i > 0; --i) {
+            for (i = timeout; i > 1; --i) {
                 for (f = factions; f; f = f->next) {
                     if (i == timeout) {
                         if (turn - f->lastorders >= i) {
