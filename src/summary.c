@@ -235,8 +235,10 @@ typedef struct nmr_faction {
     int nmr;
 } nmr_faction;
 
-static int cmp_nmr_faction(const nmr_faction *lhs, const nmr_faction *rhs)
+static int cmp_nmr_faction(const void *a, const void *b)
 {
+    const nmr_faction *lhs = (const nmr_faction *)a;
+    const nmr_faction *rhs = (const nmr_faction *)b;
     if (lhs->nmr == rhs->nmr) {
         return (lhs->f->uid > rhs->f->uid) ? 1 : -1;
     };
