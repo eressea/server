@@ -95,7 +95,7 @@ static int firewall_age(struct curse *c, void *owner)
 }
 
 const struct curse_type ct_firewall = {
-    "firewall", CURSETYP_REGION, 0, NO_MERGE,
+    "firewall", CURSETYP_NORM, 0, NO_MERGE,
     firewall_info,
     firewall_change,
     firewall_read,
