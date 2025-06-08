@@ -109,15 +109,10 @@ unit *is_guarded(region * r, unit * u)
         return NULL;
     }
 
-    /* at this point, u2 is the last unit we tested to
-    * be a guard (and failed), or NULL
-    * i is the position of the first free slot in the cache */
-
     for (u2 = r->units; u2; u2 = u2->next) {
         if (is_guardian_r(u2)) {
             noguards = false;
             if (is_guardian_u(u2, u)) {
-                /* u2 is our guard. stop processing (we might have to go further next time) */
                 return u2;
             }
         }

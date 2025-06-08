@@ -1367,10 +1367,6 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
-    if (u->ship && is_guarded(r, u)) {
-        cmistake(u, ord, 69, MSG_INCOME);
-        return;
-    }
     /* Im Augenblick kann man nur 1 Produkt kaufen. expandbuying ist aber
      * schon dafuer ausgeruestet, mehrere Produkte zu kaufen. */
 
@@ -1656,7 +1652,7 @@ static bool sell(unit * u, econ_request ** sellorders, struct order *ord)
         return false;
     }
 
-    if (u->ship && is_guarded(r, u)) {
+    if (is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return false;
     }
