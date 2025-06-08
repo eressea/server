@@ -1363,7 +1363,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
         return;
     }
 
-    if (u->ship && is_guarded(r, u)) {
+    if (is_guarded(r, u)) {
         cmistake(u, ord, 69, MSG_INCOME);
         return;
     }
@@ -1409,7 +1409,7 @@ static void buy(unit * u, econ_request ** buyorders, struct order *ord)
             return;
         }
     }
-    if (!r->land || r_demand(r, ltype)) {
+    if (!r->land || r_demand(r, ltype) != 0) {
         ADDMSG(&u->faction->msgs, msg_feedback(u, ord, "luxury_notsold", NULL));
         return;
     }
@@ -2535,6 +2535,7 @@ void produce(struct region *r)
                 }
             }
             if (trader) {
+                a_removeall(&u->attribs, &at_luxuries);
                 fset(u, UFL_LONGACTION | UFL_NOTMOVING | UFL_MARK);
             }
         }
