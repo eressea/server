@@ -69,6 +69,70 @@ function test_guards_block_forestry()
     assert_equal(2, u:get_item("log"))
 end
 
+function test_guards_block_buy()
+    local r = region.create(0, 0, "plain")
+    local guard = unit.create(faction.create("human"), r)
+    guard:add_order("BEWACHEN") -- fails, because unarmed
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    building.create(r, "castle", 2)
+    u:set_skill("trade", 5)
+    local lux = "jewel"
+    local loc = "Juwel"
+    r.luxury = lux
+    u:add_item("money", 100000)
+    u.name = "Xolgrim"
+    u:set_orders("KAUFE 1 " .. loc)
+    process_orders()
+    assert_equal(1, u:get_item(lux))
+    guard:add_item("sword", 1)
+    guard:set_skill("melee", 1)
+    guard:add_order("BEWACHEN") -- success
+    process_orders()
+    -- GUARD starts after SELL/BUY:
+    assert_equal(2, u:get_item(lux))
+    process_orders()
+    -- GUARD was active this turn:
+    assert_equal(2, u:get_item(lux))
+    u:set_skill("stealth", 1)
+    process_orders()
+    -- guard cannot see the trader:
+    assert_equal(3, u:get_item(lux))
+end
+
+function test_guards_block_sell()
+    local r = region.create(0, 0, "plain")
+    local guard = unit.create(faction.create("human"), r)
+    guard:add_order("BEWACHEN") -- fails, because unarmed
+    local f = faction.create("human")
+    local u = unit.create(f, r, 1)
+    building.create(r, "castle", 2)
+    u:set_skill("trade", 5)
+    local lux = "jewel"
+    local loc = "Juwel"
+    if lux == r.luxury then
+        lux = "balm"
+        loc = "Balsam"
+    end
+    u:add_item(lux, 80)
+    u:set_orders("VERKAUFE 10 " .. loc)
+    process_orders()
+    assert_equal(70, u:get_item(lux))
+    guard:add_item("sword", 1)
+    guard:set_skill("melee", 1)
+    guard:add_order("BEWACHEN") -- success
+    process_orders()
+    -- GUARD starts after SELL/BUY:
+    assert_equal(60, u:get_item(lux))
+    process_orders()
+    -- GUARD was active this turn:
+    assert_equal(60, u:get_item(lux))
+    u:set_skill("stealth", 1)
+    process_orders()
+    -- guard cannot see the trader:
+    assert_equal(50, u:get_item(lux))
+end
+
 function test_guards_stop_recruiting()
     local r = region.create(0, 0, "plain")
     r:set_resource("peasant", 100)
