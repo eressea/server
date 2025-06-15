@@ -618,7 +618,7 @@ int test_count_messagetype(struct message_list *msgs, const char *name)
     struct mlist *ml;
     if (!msgs) return 0;
     for (ml = msgs->begin; ml; ml = ml->next) {
-        if (strcmp(name, test_get_messagetype(ml->msg)) == 0) {
+        if (name == NULL || 0 == strcmp(name, test_get_messagetype(ml->msg))) {
             ++count;
         }
     }
