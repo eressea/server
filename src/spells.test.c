@@ -169,6 +169,61 @@ static void test_change_race(CuTest* tc) {
     test_teardown();
 }
 
+static void test_break_curse(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u1, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 30);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_BUILDING;
+    param.data.b = NULL;
+    arrput(args, param);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_STRING;
+    param.data.xs = NULL;
+    arrput(args, param);
+
+    test_create_castorder(&co, u1, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
+    test_teardown();
+}
+
+static void test_magicrunes(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u1, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 30);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_BUILDING;
+    param.data.b = NULL;
+    arrput(args, param);
+
+    test_create_castorder(&co, u1, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_magicrunes(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
+    test_teardown();
+}
+
 static void test_speed2(CuTest *tc) {
     struct region *r;
     struct faction *f;
@@ -2133,6 +2188,7 @@ static void test_destroy_firewall(CuTest *tc)
     test_teardown();
 }
 
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -2187,6 +2243,8 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_firewall_spell);
     SUITE_ADD_TEST(suite, test_create_firewall);
     SUITE_ADD_TEST(suite, test_destroy_firewall);
+    SUITE_ADD_TEST(suite, test_break_curse);
+    SUITE_ADD_TEST(suite, test_magicrunes);
 
     return suite;
 }

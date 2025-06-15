@@ -17,6 +17,8 @@ void init_spells(void);
 int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
 
 #define SHOWASTRAL_MAX_RADIUS 5
+int sp_break_curse(struct castorder *co);
+int sp_magicrunes(struct castorder *co);
 int sp_baddreams(struct castorder * co);
 int sp_gooddreams(struct castorder * co);
 int sp_viewreality(struct castorder * co);

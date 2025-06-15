@@ -4599,39 +4599,41 @@ int sp_analysemagic(castorder * co)
     }
     /* Objekt ermitteln */
 
-    if (param->flag != TARGET_RESISTS) {
-        switch (param->typ) {
-        case SPP_REGION:
-        {
-            region *tr = param->data.r;
-            magicanalyse_region(tr, mage, co->force);
-            break;
-        }
-        case SPP_TEMP:
-        case SPP_UNIT:
-        {
-            unit *u;
-            u = param->data.u;
-            magicanalyse_unit(u, mage, co->force);
-            break;
-        }
-        case SPP_BUILDING:
-        {
-            magicanalyse_building(param->data.b, mage, co->force);
-            break;
-        }
-        case SPP_SHIP:
-        {
-            ship *sh;
-            sh = param->data.sh;
-            magicanalyse_ship(sh, mage, co->force);
-            break;
-        }
-        default:
-            /* Fehlerhafter Parameter */
-            return 0;
-        }
+    if (param->flag == TARGET_RESISTS)
+        return cast_level;
+
+    switch (param->typ) {
+    case SPP_REGION:
+    {
+        region *tr = param->data.r;
+        magicanalyse_region(tr, mage, co->force);
+        break;
     }
+    case SPP_TEMP:
+    case SPP_UNIT:
+    {
+        unit *u;
+        u = param->data.u;
+        magicanalyse_unit(u, mage, co->force);
+        break;
+    }
+    case SPP_BUILDING:
+    {
+        magicanalyse_building(param->data.b, mage, co->force);
+        break;
+    }
+    case SPP_SHIP:
+    {
+        ship *sh;
+        sh = param->data.sh;
+        magicanalyse_ship(sh, mage, co->force);
+        break;
+    }
+    default:
+        /* Fehlerhafter Parameter */
+        return 0;
+    }
+
     return cast_level;
 }
 
@@ -5625,7 +5627,7 @@ int sp_antimagiczone(castorder * co)
  * "kc"
  */
 
-static int sp_magicrunes(castorder * co)
+int sp_magicrunes(castorder * co)
 {
     int duration;
     unit *mage = co_get_caster(co);
@@ -5637,11 +5639,13 @@ static int sp_magicrunes(castorder * co)
     duration = 3 + rng_int() % cast_level;
     effect = 20;
 
+    if (param->flag == TARGET_RESISTS)
+        return cast_level;
+
     switch (param->typ) {
     case SPP_BUILDING:
     {
-        building *b;
-        b = param->data.b;
+        building *b = param->data.b;
 
         /* Magieresistenz der Burg erhoeht sich um 20% */
         create_curse(mage, &b->attribs, &ct_magicrunes, force,
@@ -5760,6 +5764,9 @@ int sp_break_curse(castorder * co)
     }
 
     obj = params[0].typ;
+
+    if (params[0].flag == TARGET_RESISTS)
+        return cast_level;
 
     c = findcurse(atoi36(params[1].data.xs));
     if (!c) {
