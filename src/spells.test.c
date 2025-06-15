@@ -1871,6 +1871,11 @@ static void test_analysemagic_unit(CuTest *tc)
     CuAssertIntEquals(tc, 15, m->parameters[3].i);
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_unit_nospell"));
 
+    test_clear_messages(f);
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
+
     test_teardown();
 }
 
@@ -1919,6 +1924,11 @@ static void test_analysemagic_ship(CuTest *tc)
     CuAssertPtrEquals(tc, (void *)c->type, m->parameters[2].v);
     CuAssertIntEquals(tc, 15, m->parameters[3].i);
     CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "analyse_ship_nospell"));
+
+    test_clear_messages(f);
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
 
     test_teardown();
 }
@@ -1975,6 +1985,11 @@ static void test_analysemagic_building(CuTest *tc)
     CuAssertPtrEquals(tc, u->building, m->parameters[1].v);
     CuAssertPtrEquals(tc, (void *)c2->type, m->parameters[2].v);
 
+    test_clear_messages(f);
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
+
     test_teardown();
 }
 
@@ -2028,6 +2043,11 @@ static void test_analysemagic_region(CuTest *tc)
     CuAssertPtrEquals(tc, u, m->parameters[0].v);
     CuAssertPtrEquals(tc, u->region, m->parameters[1].v);
     CuAssertPtrEquals(tc, (void *)c2->type, m->parameters[2].v);
+
+    test_clear_messages(f);
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_analysemagic(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
 
     test_teardown();
 }
