@@ -4590,7 +4590,6 @@ int sp_disturbingdreams(castorder * co)
 
 int sp_analysemagic(castorder * co)
 {
-    int obj;
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     const spellparameter *param = co->a_params;
@@ -4599,42 +4598,40 @@ int sp_analysemagic(castorder * co)
         return 0;
     }
     /* Objekt ermitteln */
-    obj = param->typ;
 
-    switch (obj) {
-    case SPP_REGION:
-    {
-        region *tr = param->data.r;
-        magicanalyse_region(tr, mage, co->force);
-        break;
+    if (param->flag != TARGET_RESISTS) {
+        switch (param->typ) {
+        case SPP_REGION:
+        {
+            region *tr = param->data.r;
+            magicanalyse_region(tr, mage, co->force);
+            break;
+        }
+        case SPP_TEMP:
+        case SPP_UNIT:
+        {
+            unit *u;
+            u = param->data.u;
+            magicanalyse_unit(u, mage, co->force);
+            break;
+        }
+        case SPP_BUILDING:
+        {
+            magicanalyse_building(param->data.b, mage, co->force);
+            break;
+        }
+        case SPP_SHIP:
+        {
+            ship *sh;
+            sh = param->data.sh;
+            magicanalyse_ship(sh, mage, co->force);
+            break;
+        }
+        default:
+            /* Fehlerhafter Parameter */
+            return 0;
+        }
     }
-    case SPP_TEMP:
-    case SPP_UNIT:
-    {
-        unit *u;
-        u = param->data.u;
-        magicanalyse_unit(u, mage, co->force);
-        break;
-    }
-    case SPP_BUILDING:
-    {
-        building *b;
-        b = param->data.b;
-        magicanalyse_building(b, mage, co->force);
-        break;
-    }
-    case SPP_SHIP:
-    {
-        ship *sh;
-        sh = param->data.sh;
-        magicanalyse_ship(sh, mage, co->force);
-        break;
-    }
-    default:
-        /* Fehlerhafter Parameter */
-        return 0;
-    }
-
     return cast_level;
 }
 

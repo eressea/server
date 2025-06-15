@@ -1487,7 +1487,7 @@ verify_ship(region * r, unit * mage, const spell * sp, spellparameter * spobj,
             "unit region command id", mage, mage->region, ord, spobj->data.i));
         return false;
     }
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->data.sh = sh;
     return true;
 }
@@ -1510,7 +1510,7 @@ verify_building(region * r, unit * mage, const spell * sp, spellparameter* spobj
             "unit region command id", mage, mage->region, ord, spobj->data.i));
         return false;
     }
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->data.b = b;
     return true;
 }
@@ -1569,7 +1569,7 @@ verify_unit(region * r, unit * mage, const spell * sp, spellparameter * spobj,
         return false;
     }
     /* Einheit wurde gefunden, pointer setzen */
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->data.u = u;
     return true;
 }
@@ -1715,7 +1715,7 @@ verify_targets(castorder * co, int *invalid, int *resist, int *success)
         if ((sp->sptyp & REGIONSPELL)) {
             /* Zielobjekt Region anlegen */
             spellparameter *spobj = arraddnptr(co->a_params, 1);
-            spobj->flag = 0;
+            spobj->flag = TARGET_OK;
             spobj->typ = SPP_REGION;
             spobj->data.r = target_r;
 
@@ -1766,7 +1766,7 @@ static int addparam_string(const char *const param[], spellparameter * spobj)
 {
     assert(param[0]);
 
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->typ = SPP_STRING;
     spobj->data.xs = str_strdup(param[0]);
     return 1;
@@ -1774,7 +1774,7 @@ static int addparam_string(const char *const param[], spellparameter * spobj)
 
 static int addparam_int(const char *const param[], spellparameter * spobj)
 {
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->typ = SPP_INT;
     spobj->data.i = atoi((char *)param[0]);
     return 1;
@@ -1784,7 +1784,7 @@ static int addparam_ship(const char *const param[], spellparameter * spobj)
 {
     int id = atoi36((const char *)param[0]);
 
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->typ = SPP_SHIP;
     spobj->data.i = id;
     return 1;
@@ -1794,7 +1794,7 @@ static int addparam_building(const char *const param[], spellparameter * spobj)
 {
     int id = atoi36((const char *)param[0]);
 
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->typ = SPP_BUILDING;
     spobj->data.i = id;
     return 1;
@@ -1821,7 +1821,7 @@ addparam_region(const char *const param[], spellparameter * spobj, const unit * 
         rt = findregion(x, y);
 
         if (rt != NULL) {
-            spobj->flag = 0;
+            spobj->flag = TARGET_OK;
             spobj->typ = SPP_REGION;
             spobj->data.r = rt;
         }
@@ -1851,7 +1851,7 @@ addparam_unit(const char *const param[], spellparameter * spobj, const unit * u,
         otype = SPP_TEMP;
     }
 
-    spobj->flag = 0;
+    spobj->flag = TARGET_OK;
     spobj->typ = otype;
     spobj->data.i = atoi36((const char*)param[i]);
     return i + 1;
@@ -1941,7 +1941,7 @@ static spellparameter *add_spellparameters(region * target_r, unit * u,
             ++c;
             switch (findparam_ex(param[i++], u->faction->locale)) {
             case P_REGION:
-                spobj.flag = 0;
+                spobj.flag = TARGET_OK;
                 spobj.typ = SPP_REGION;
                 spobj.data.r = target_r;
                 j = 0;
