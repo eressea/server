@@ -1,3 +1,11 @@
+# 30.2
+
+    - Die Liste der struct bfaction in battle.c war unnötig, und ist
+      durch ein stb_ds array con struct faction ersetzt worden.
+    - Ein paar kleine Meldungen von Coverity adressiert.
+	- KAUFE und VERKAUFE werden auch außerhalb von Schiffen durch BEWACHE
+	  verhindert.
+
 # 30.1
 
 	- Feuerwand erzeugt curses in den beiden Regionen.

@@ -37,19 +37,14 @@ union variant;
 #define FL_HIT        64      /* the person at attacked */
 #define FL_HEALING_USED 128   /* has used a healing potion */
 
-typedef struct bfaction {
-    struct bfaction* next; /* TODO: stb_ds benutzen? */
-    struct faction* faction;
-    bool attacker;
-} bfaction;
-
 typedef struct tactics {
     struct fighter** fighters;
     int value;
 } tactics;
 
 #define SIDE_STEALTH   1<<0
-#define SIDE_HASGUARDS  1<<1
+#define SIDE_HASGUARDS 1<<1
+#define SIDE_ATTACKER  1<<2
 
 #define E_ENEMY 1
 #define E_FRIEND 2
@@ -57,7 +52,7 @@ typedef struct tactics {
 
 typedef struct side {
     struct battle* battle;
-    struct bfaction* bf;        /* battle info that goes with the faction */
+    struct faction* faction;        /* battle info that goes with the faction */
     const struct group* group;
     struct tactics leader;      /* this army's best tactician */
     struct fighter* fighters;
@@ -84,7 +79,7 @@ typedef struct relation {
 typedef struct battle {
     struct region* region;
     struct plane* plane;
-    bfaction* factions;
+    struct faction** factions; /* stb array */
     struct relation *relations;
     int nfactions;
     int nfighters;
@@ -250,7 +245,7 @@ struct side* make_side(struct battle* b, const struct faction* f,
 int skilldiff(troop at, troop dt, int dist);
 void force_leave(struct region* r, struct battle* b);
 bool seematrix(const struct faction* f, const struct side* s);
-const char* sidename(const struct side* s);
+const char *sidename(const struct side *s, const struct faction *f);
 void battle_message_faction(struct battle* b, struct faction* f, struct message* m);
 
 double tactics_chance(const struct unit* u, int skilldiff);

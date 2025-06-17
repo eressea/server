@@ -2029,11 +2029,11 @@ static void eval_order(struct opstack **stack, const void *userdata)
 
 void report_battle_start(battle * b)
 {
-    bfaction *bf;
+    size_t bi, bl;
 
-    for (bf = b->factions; bf; bf = bf->next) {
+    for (bi = 0, bl = arrlen(b->factions); bi != bl; ++bi) {
         message *m;
-        faction *f = bf->faction;
+        faction *f = b->factions[bi];
         const char *lastf = NULL;
         bool first = false;
         size_t si, sl = arrlen(b->sides);
@@ -2051,10 +2051,12 @@ void report_battle_start(battle * b)
                         str = gb_append_cstring(str, lastf);
                         first = true;
                     }
-                    if (seematrix(f, s))
-                        lastf = sidename(s);
-                    else
+                    if (seematrix(f, s)) {
+                        lastf = sidename(s, f);
+                    }
+                    else {
                         lastf = LOC(f->locale, "unknown_faction_dative");
+                    }
                     break;
                 }
             }

@@ -230,6 +230,42 @@ static void summarize_players(const summary *s, FILE *F) {
     }
 }
 
+typedef struct nmr_faction {
+    faction *f;
+    int nmr;
+} nmr_faction;
+
+static int cmp_nmr_faction(const void *a, const void *b)
+{
+    const nmr_faction *lhs = (const nmr_faction *)a;
+    const nmr_faction *rhs = (const nmr_faction *)b;
+    if (lhs->nmr == rhs->nmr) {
+        return (lhs->f->uid > rhs->f->uid) ? 1 : -1;
+    };
+    return (lhs->nmr < rhs->nmr) ? 1 : -1;
+}
+
+static void report_nmrs(FILE *F, int timeout)
+{
+    nmr_faction *nmrs = NULL;
+    size_t len, i;
+    faction *f;
+    for (f = factions; f; f = f->next) {
+        if (turn - 1 - f->lastorders > 0) {
+            struct nmr_faction *nmr = arraddnptr(nmrs, 1);
+            nmr->f = f;
+            nmr->nmr = turn - 1 - f->lastorders;
+        }
+    }
+    len = arrlen(nmrs);
+    qsort(nmrs, len, sizeof(struct nmr_faction), cmp_nmr_faction);
+    fprintf(F, "\n\nFactions with NMRs:\n");
+    for (i = 0; i != len; ++i) {
+        out_faction(F, nmrs[i].f);
+    }
+    arrfree(nmrs);
+}
+
 void report_summary(const summary * s, bool full)
 {
     FILE *F = NULL;
@@ -333,24 +369,8 @@ void report_summary(const summary * s, bool full)
                 out_faction(F, f);
             }
         }
-
-        if (timeout>0 && full) {
-            int i;
-            fprintf(F, "\n\nFactions with NMRs:\n");
-            for (i = timeout; i > 0; --i) {
-                for (f = factions; f; f = f->next) {
-                    if (i == timeout) {
-                        if (turn - f->lastorders >= i) {
-                            out_faction(F, f);
-                        }
-                    }
-                    else {
-                        if (turn - f->lastorders == i) {
-                            out_faction(F, f);
-                        }
-                    }
-                }
-            }
+        if (timeout > 0 && full) {
+            report_nmrs(F, timeout);
         }
     }
 
