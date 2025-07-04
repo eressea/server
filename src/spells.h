@@ -32,6 +32,7 @@ int sp_blessedharvest(struct castorder* co);
 int sp_kaelteschutz(struct castorder* co);
 int sp_treewalkenter(struct castorder* co);
 int sp_treewalkexit(struct castorder* co);
+int sp_leaveastral(struct castorder *co);
 int sp_pullastral(struct castorder *co);
 int sp_holyground(struct castorder* co);
 int sp_drought(struct castorder* co);

@@ -4925,31 +4925,35 @@ int sp_pullastral(castorder *co)
     return cost;
 }
 
-int sp_leaveastral(castorder * co)
+int sp_leaveastral(castorder *co)
 {
     int remaining_cap, w;
-    region *ro = co_get_region(co);
+    region *ra = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
-    const spellparameter* params = co->a_params;
+    const spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
     region *rt = params ? params->data.r : NULL;
 
-    switch (getplaneid(ro)) {
-    case 1:
-        if (!rt || r_standard_to_astral(rt) != ro || !inhabitable(rt)) {
-            cmistake(mage, co->order, 216, MSG_MAGIC);
-            return 0;
-        }
-        break;
-    default:
+    if (!rt) {
+        /* how? */
+        return 0;
+    }
+    if (params && params->flag == TARGET_RESISTS) {
+        /* message already generated in verify_targets */
+        return cast_level;
+    }
+    if (getplaneid(ra) != 1) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spell_astral_only", NULL));
         return 0;
     }
-
-    if (is_cursed(ro->attribs, &ct_astralblock)
+    if (!inhabitable(rt) || ra != r_standard_to_astral(rt)) {
+        cmistake(mage, co->order, 216, MSG_MAGIC);
+        return 0;
+    }
+    if (is_cursed(ra->attribs, &ct_astralblock)
         || is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", NULL));
@@ -4999,7 +5003,7 @@ int sp_leaveastral(castorder * co)
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-            astral_disappear(ro, u);
+            astral_disappear(ra, u);
 
             /* Meldungen in der Zielregion */
             astral_appear(rt, u, mage->faction);

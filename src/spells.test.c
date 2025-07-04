@@ -506,6 +506,57 @@ static void test_auraleak(CuTest *tc) {
     test_teardown();
 }
 
+static void test_leaveastral(CuTest *tc) {
+    region *r, *ra;
+    faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    test_use_astral();
+    mt_create_error(216);
+    mt_create_error(231);
+    r = test_create_plain(0, 0);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    ra->_plane = get_astralplane();
+    CuAssertPtrEquals(tc, ra, r_standard_to_astral(r));
+    f = test_create_faction();
+    u = test_create_unit(f, ra);
+    u2 = test_create_unit(f, ra);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+    param.flag = TARGET_OK;
+    param.typ = SPP_UNIT;
+    param.data.u = u2;
+    arrput(args, param);
+    test_create_castorder(&co, u, 10, 11., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+
+    args[0].flag = TARGET_OK;
+    args[1].flag = TARGET_RESISTS;
+
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+
+    // Success:
+    args[1].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_disappear", u->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "astral_appear", u->faction));
+
+
+    test_use_astral();
+}
+
 static void test_show_astral(CuTest *tc) {
     region *r, *ra, *rx;
     faction *f;
@@ -514,6 +565,7 @@ static void test_show_astral(CuTest *tc) {
     curse * c;
 
     test_setup();
+    // create r before creating astral plane, so astral region won't get auto-created.
     r = test_create_plain(0, 0);
     test_use_astral();
     mt_create_error(216);
@@ -2196,6 +2248,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_view_reality);
     SUITE_ADD_TEST(suite, test_movecastle);
     SUITE_ADD_TEST(suite, test_auraleak);
+    SUITE_ADD_TEST(suite, test_leaveastral);
     SUITE_ADD_TEST(suite, test_show_astral);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
