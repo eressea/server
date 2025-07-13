@@ -151,6 +151,7 @@ function process(rules, orders)
   turn_end() -- ageing, etc.
 
   if not config.debug then
+      init_reports()
       file = '' .. get_turn() .. '.dat'
       if eressea.write_game(file)~=0 then
         eressea.log.error("could not write game")
