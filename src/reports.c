@@ -79,6 +79,10 @@
 
 #include "move.h"
 
+const attrib_type at_password = {
+    "password", NULL
+};
+
 #if defined(_MSC_VER) && _MSC_VER >= 1900
 # pragma warning(disable: 4774) /* TODO: remove this */
 #endif
@@ -1589,14 +1593,29 @@ static void write_script(FILE * F, const faction * f)
 
 int init_reports(void)
 {
+    char buffer[PASSWORD_MAXSIZE];
     region *r;
+    faction *f;
     bool update = true;
+
     create_directories();
     for (r = regions; r; r = r->next) {
         if (update) {
             update = update_lighthouses(r);
         }
         reorder_units(r);
+    }
+    for (f = factions; f; f = f->next) {
+        if (f->email && !fval(f, FFL_NPC)) {
+            if (f->lastorders == 0 || faction_age(f) <= 1) {
+                attrib *a;
+                /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
+                 * kriegen ein neues Passwort: */
+                char *password = faction_genpassword(f, buffer);
+                a = a_add(&f->attribs, a_new(&at_password));
+                a->data.v = str_strdup(password);
+            }
+        }
     }
     return 0;
 }
@@ -1606,7 +1625,6 @@ int reports(const char *filename)
     faction *f;
     FILE *mailit = NULL;
     int retval = 0;
-    char buffer[PASSWORD_MAXSIZE];
 
     log_info("Writing reports for turn %d:", turn);
     report_donations();
@@ -1625,9 +1643,14 @@ int reports(const char *filename)
             if (f->lastorders == 0 || faction_age(f) <= 1) {
                 /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
                  * kriegen ein neues Passwort: */
-                password = faction_genpassword(f, buffer);
+                attrib *a = a_find(f->attribs, &at_password);
+                if (a) {
+                    password = (char *)a->data.v;
+                    a->data.v = NULL;
+                }
             }
             int error = write_reports(f, f->options, password);
+            if (password) free(password);
             if (error)
                 retval = error;
             if (mailit)
