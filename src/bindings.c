@@ -395,7 +395,6 @@ static int tolua_write_reports(lua_State * L)
     char path[PATH_MAX];
     const char *rpath = reportpath();
 
-    init_reports();
     result = reports(path_join(rpath, "reports.txt", path, sizeof(path)));
     lua_pushinteger(L, result);
     return 1;
