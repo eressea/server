@@ -160,6 +160,7 @@ function process(rules, orders)
 
       write_files(config.locales)
       update_scores()
+      write_scores()
   end
   return 0
 end

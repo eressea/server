@@ -55,6 +55,7 @@ void free_terrains(void)
         terrain_type * t = registered_terrains;
         registered_terrains = t->next;
         free(t->_name);
+        free(t->alias);
         free(t->herbs);
         if (t->production) {
             int n;
@@ -179,6 +180,14 @@ const char *terrain_name(const struct region *r)
         }
     }
     return r->terrain->_name;
+}
+
+const char *terrain_alias(const region *r)
+{
+    if (r->terrain->alias) {
+        return r->terrain->alias;
+    }
+    return terrain_name(r);
 }
 
 void init_terrains(void)
