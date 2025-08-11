@@ -38,7 +38,7 @@
 		"rules.economy.repopulate_maximum": 500,
 		"rules.lighthouse.unit_capacity": true,
 		"rules.tactics.formula": 1,
-		"rules.barrier.max_age": 300,
+		"rules.barrier.max_age": 300
 	},
 	"disabled": [
 		"jsreport",
