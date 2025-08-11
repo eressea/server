@@ -41,11 +41,12 @@ struct region;
 
     typedef struct terrain_type {
         char *_name;
+        char *alias;
         int size;                   /* how many peasants can work? */
         int flags;
         short max_road;             /* this many stones make a full road */
         short distribution;         /* multiplier used for seeding */
-        struct terrain_production *production;
+        struct terrain_production *production; /* TODO: array with a terminator, use stb_ds */
         struct item_type **herbs;     /* zero-terminated array of herbs */
         const char *(*name) (const struct region * r);
         struct terrain_type *next;
@@ -55,6 +56,7 @@ struct region;
     const terrain_type *terrains(void);
     const terrain_type *get_terrain(const char *name);
     const char *terrain_name(const struct region *r);
+    const char *terrain_alias(const struct region *r);
     bool terrain_changed(int *cache);
 
     void init_terrains(void);

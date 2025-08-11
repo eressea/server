@@ -932,7 +932,7 @@ static void report_region_description(struct stream *out, const region * r, fact
     }
 
     /* Terrain */
-    tname = terrain_name(r);
+    tname = terrain_alias(r);
     sbs_strcat(&sbs, ", ");
     sbs_strcat(&sbs, LOC(f->locale, tname));
     pump_paragraph(&sbs, out, REPORTWIDTH, false);

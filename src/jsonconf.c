@@ -291,6 +291,15 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
             }
             break;
+        case cJSON_String:
+            if (strcmp(child->string, "alias") == 0) {
+                assert(!ter->alias);
+                ter->alias = str_strdup(child->valuestring);
+            }
+            else {
+                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+            }
+            break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
                 const char * flags[] = {

@@ -3633,9 +3633,6 @@ msgstr "Schattenritter"
 msgid "firewall_trail"
 msgstr "eine %s"
 
-msgid "iceberg_sleep"
-msgstr "Gletscher"
-
 msgid "speedsail"
 msgstr "Sonnensegel"
 
