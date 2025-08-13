@@ -751,7 +751,7 @@ const char *rname(const region * r, const struct locale *lang)
     if (r->land && r->land->name) {
         return r->land->name;
     }
-    return LOC(lang, terrain_name(r));
+    return LOC(lang, terrain_alias(r));
 }
 
 int rtrees(const region * r, int ageclass)
