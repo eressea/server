@@ -7,6 +7,7 @@
 #include "spells.h"
 #include "jsonconf.h"
 
+#include <kernel/config.h>
 #include <kernel/item.h>
 
 #include <util/language.h>
@@ -91,5 +92,10 @@ int bind_config_read(const char *filename, const char * relpath)
         fclose(F);
     }
     return 1;
+}
+
+const char * bind_config_get(const char *key)
+{
+    return config_get(key);
 }
 

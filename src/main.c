@@ -228,6 +228,10 @@ static int parse_args(int argc, char **argv)
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 log_flags = arg ? atoi(arg) : 0xff;
                 break;
+            case 'o':
+                i = get_arg(argc, argv, 2, i, &arg, 0);
+                config_set("config.orderfile", arg);
+                break;
             case 't':
                 i = get_arg(argc, argv, 2, i, &arg, 0);
                 turn = atoi(arg);

@@ -7,6 +7,6 @@ module eressea {
     void bind_config_reset @ reset(void);
     int bind_config_read @ read(const char *filename, const char *relpath);
     int bind_config_parse @ parse(const char *json);
+    const char * bind_config_get @ get(const char *key);
   }
 }
-
