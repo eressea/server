@@ -104,6 +104,7 @@ extern "C" {
     bool help_enter(struct unit *uo, struct unit *u);
 
     enum param_t findparam_ex(const char *s, const struct locale * lang);
+    void age_region(struct region *r);
 
 #define QUIT_WITH_TRANSFER
 

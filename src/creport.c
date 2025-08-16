@@ -1376,7 +1376,7 @@ void cr_output_region(struct stream* out, const struct faction* f,
             creport_tag(out, "Name", str);
         }
     }
-    tname = terrain_name(r);
+    tname = terrain_alias(r);
 
     creport_tag(out, "Terrain", translate(tname, LOC(f->locale, tname)));
     if (mode != seen_unit) {
@@ -1733,7 +1733,7 @@ int crwritemap(const char *filename)
                 fprintf(F, "REGION %d %d\n", r->x, r->y);
             }
             fprintf(F, "\"%s\";Name\n\"%s\";Terrain\n", rname(r, default_locale),
-                LOC(default_locale, terrain_name(r)));
+                LOC(default_locale, terrain_alias(r)));
         }
         fclose(F);
         return 0;

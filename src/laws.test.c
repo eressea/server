@@ -41,6 +41,7 @@
 #include <assert.h>
 #include <stdbool.h>                 // for false, true, bool
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
@@ -2659,6 +2660,37 @@ static void test_tree_growth_autumn(CuTest* tc) {
     test_teardown();
 }
 
+static void test_age_barrier(CuTest *tc) {
+    region *r;
+    terrain_type *t_barrier, *t_desert;
+    const int max_age = 10;
+
+    test_setup();
+    init_resources();
+    config_set_int("rules.barrier.max_age", max_age);
+    t_barrier = test_create_terrain("barrier", FORBIDDEN_REGION);
+    t_desert = test_create_terrain("desert", LAND_REGION);
+    t_desert->production = calloc(2, sizeof(terrain_production));
+    t_desert->production->chance = 1.0;
+    t_desert->production->type = get_resourcetype(R_TREE);
+    init_terrains();
+    r = test_create_region(0, 0, t_barrier);
+    CuAssertIntEquals(tc, 0, r->age);
+    demographics();
+    CuAssertIntEquals(tc, 1, r->age);
+    age_region(r);
+    CuAssertPtrEquals(tc, t_barrier, (terrain_type *)r->terrain);
+    r->age = max_age - 1;
+    age_region(r);
+    CuAssertPtrEquals(tc, t_barrier, (terrain_type *)r->terrain);
+    r->age = max_age;
+    age_region(r);
+    CuAssertPtrEquals(tc, t_desert, (terrain_type *)r->terrain);
+    CuAssertPtrNotNull(tc, r->land);
+    CuAssertPtrEquals(tc, NULL, r->resources);
+    test_teardown();
+}
+
 static void test_quit(CuTest *tc) {
     faction *f;
     unit *u;
@@ -3065,6 +3097,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_tree_growth_spring);
     SUITE_ADD_TEST(suite, test_tree_growth_summer);
     SUITE_ADD_TEST(suite, test_tree_growth_autumn);
+    SUITE_ADD_TEST(suite, test_age_barrier);
 #ifdef QUIT_WITH_TRANSFER
     SUITE_ADD_TEST(suite, test_quit_transfer);
     SUITE_ADD_TEST(suite, test_quit_transfer_no_contact);

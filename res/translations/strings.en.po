@@ -3203,9 +3203,6 @@ msgstr "This ancient battle chant lifts the spirit of your troops and helps them
 msgid "firewall_trail"
 msgstr "a %s"
 
-msgid "iceberg_sleep"
-msgstr "glacier"
-
 msgctxt "race"
 msgid "shadowknight_p"
 msgstr "shadow knight"

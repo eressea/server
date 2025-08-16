@@ -1760,7 +1760,7 @@ const char *trailinto(const region * r, const struct locale *lang)
     if (r) {
         static char ref[32];
         const char *s;
-        const char *tname = terrain_name(r);
+        const char *tname = terrain_alias(r);
         size_t sz;
 
         sz = str_strlcpy(ref, tname, sizeof(ref));
@@ -1931,7 +1931,7 @@ static void eval_terrain(struct opstack **stack, const void *userdata)
 {                               /* region -> string */
     const struct faction *f = (const struct faction *)userdata;
     const struct region *r = (const struct region *)opop(stack).v;
-    const char *c = LOC(f->locale, terrain_name(r));
+    const char *c = LOC(f->locale, terrain_alias(r));
     size_t len = strlen(c);
     variant var;
 

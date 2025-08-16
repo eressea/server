@@ -863,7 +863,7 @@ void demographics_week(int week)
     for (r = regions; r; r = r->next) {
         /** Ageing of regions starts when they are first discovered.
          * This should prevent monsters from being created there. */
-        if (r->age>0 || r->units || r->attribs) {
+        if (r->age>0 || r->units || r->attribs || (r->terrain->flags & FORBIDDEN_REGION)) {
             ++r->age; /* also oceans. no idea why we didn't always do that */
         }
         live(r);
@@ -2752,11 +2752,29 @@ static building *age_building(building * b)
     return b;
 }
 
-static void age_region(region * r)
+void age_region(region * r)
 {
+    static const terrain_type *t_barrier = NULL;
+    static const terrain_type *t_desert = NULL;
+    static int cache_config = 0;
+    static int cache_terrain = 0;
+    static int barrier_age = 0;
     a_age(&r->attribs, r);
     handle_event(r->attribs, "timer", r);
 
+    if (config_changed(&cache_config)) {
+        barrier_age = config_get_int("rules.barrier.max_age", 0);
+    }
+    if (terrain_changed(&cache_terrain)) {
+        if (barrier_age > 0) {
+            t_barrier = get_terrain("barrier");
+            t_desert = newterrain(T_DESERT);
+        }
+    }
+    if (t_barrier && t_desert && r->age >= barrier_age) {
+        terraform_region(r, t_desert);
+        arrfree(r->resources);
+    }
     if (!r->land)
         return;
 

@@ -83,9 +83,10 @@ void terraform_resources(region * r)
 
         if (chance(production->chance)) {
             rawmaterial_type *raw;
-            rawmaterial* rm = add_resource(r, dice_rand(production->startlevel),
-                dice_rand(production->base), dice_rand(production->divisor),
-                production->type);
+            int level = production->startlevel ? dice_rand(production->startlevel) : 1;
+            int base = production->base ? dice_rand(production->base) : 1;
+            int divisor = production->divisor ? dice_rand(production->divisor) : 1;
+            rawmaterial* rm = add_resource(r, level, base, divisor, production->type);
             update_resource(rm, 1.0);
             raw = rmt_get(rm->rtype);
             if (raw && raw->terraform) {
