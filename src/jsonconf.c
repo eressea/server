@@ -273,11 +273,16 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 int size = cJSON_GetArraySize(child);
                 if (size > 0) {
                     int n;
-                    ter->production = (terrain_production *)calloc(size + 1, sizeof(terrain_production));
-                    if (!ter->production) abort();
-                    ter->production[size].type = 0;
+                    assert(!ter->production);
+                    arrsetlen(ter->production, size);
+                    arrsetcap(ter->production, size);
                     for (n = 0, entry = child->child; entry; entry = entry->next, ++n) {
-                        ter->production[n].type = rt_get_or_create(entry->string);
+                        terrain_production *tp = ter->production + n;
+                        tp->type = rt_get_or_create(entry->string);
+                        tp->base = NULL;
+                        tp->divisor = NULL;
+                        tp->startlevel = NULL;
+                        tp->chance = 1.0f;
                         if (entry->type != cJSON_Object) {
                             log_error("terrain %s contains invalid production %s", json->string, entry->string);
                         }

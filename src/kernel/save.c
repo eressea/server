@@ -650,8 +650,8 @@ static void read_regioninfo(gamedata *data, const region *r, char *info, size_t 
 
 static void fix_resource_values(region* r)
 {
-    struct terrain_production* p;
-    for (p = r->terrain->production; p->type; ++p) {
+    for (size_t n = arrlen(r->terrain->production); n > 0; --n) {
+        const terrain_production *p = r->terrain->production + n - 1;
         rawmaterial* res = rm_get(r, p->type);
         if (res) {
             char* end;

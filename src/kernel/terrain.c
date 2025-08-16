@@ -13,6 +13,7 @@
 
 #include <util/log.h>
 
+#include <stb_ds.h>
 #include <strings.h>
 
 /* libc includes */
@@ -58,13 +59,13 @@ void free_terrains(void)
         free(t->alias);
         free(t->herbs);
         if (t->production) {
-            int n;
-            for (n = 0; t->production[n].type; ++n) {
-                free(t->production[n].base);
-                free(t->production[n].divisor);
-                free(t->production[n].startlevel);
+            for (size_t n = arrlen(t->production); n > 0; --n) {
+                terrain_production *tp = t->production + n - 1;
+                free(tp->base);
+                free(tp->divisor);
+                free(tp->startlevel);
             }
-            free(t->production);
+            arrfree(t->production);
         }
         free(t);
     }

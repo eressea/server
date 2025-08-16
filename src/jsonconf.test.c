@@ -622,7 +622,10 @@ static void test_terrains(CuTest * tc)
     CuAssertStrEquals(tc, "1d5", ter->production[0].divisor);
     CuAssertStrEquals(tc, "1d6", ter->production[0].startlevel);
     CuAssertPtrEquals(tc, rt_get_or_create("iron"), (resource_type *)ter->production[1].type);
-    CuAssertPtrEquals(tc, NULL, (void *)ter->production[2].type);
+    CuAssertDblEquals(tc, 1.0, ter->production[1].chance, 0.01);
+    CuAssertPtrEquals(tc, NULL, ter->production[1].base);
+    CuAssertPtrEquals(tc, NULL, ter->production[1].divisor);
+    CuAssertPtrEquals(tc, NULL, ter->production[1].startlevel);
 
     cJSON_Delete(json);
     test_teardown();

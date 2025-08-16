@@ -68,7 +68,6 @@ const resource_type * rtype)
 
 void terraform_resources(region * r)
 {
-    int i;
     const terrain_type *terrain = r->terrain;
 
     if (terrain->production == NULL) {
@@ -77,9 +76,8 @@ void terraform_resources(region * r)
     if (r->resources != NULL) {
         arrfree(r->resources);
     }
-    for (i = 0; terrain->production[i].type; ++i) {
-        
-        const terrain_production *production = terrain->production + i;
+    for (size_t n = arrlen(r->terrain->production); n > 0; --n) {
+        terrain_production *production = r->terrain->production + n - 1;
 
         if (chance(production->chance)) {
             rawmaterial_type *raw;
@@ -144,10 +142,9 @@ static void use_default(rawmaterial * res, const region * r, int amount)
     while (res->amount == 0) {
         long rn = ((rng_int() % (SHIFT * 2 + 1)) - SHIFT) * ((rng_int() % (SHIFT * 2 + 1)) - SHIFT);
         double modifier = 1.0 + rn / 10000.0;
-        int i;
-
-        for (i = 0; r->terrain->production[i].type; ++i) {
-            if (res->rtype == r->terrain->production[i].type)
+        for (size_t n = arrlen(r->terrain->production); n > 0; --n) {
+            terrain_production *tp = r->terrain->production + n - 1;
+            if (res->rtype == tp->type)
                 break;
         }
 
