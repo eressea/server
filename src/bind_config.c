@@ -22,11 +22,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void config_reset(void) {
+void bind_config_reset(void) {
     free_configuration();
 }
 
-int config_parse(const char *json)
+int bind_config_parse(const char *json)
 {
     cJSON * conf = cJSON_Parse(json);
     reset_locales();
@@ -56,7 +56,7 @@ int config_parse(const char *json)
     return 1;
 }
 
-int config_read(const char *filename, const char * relpath)
+int bind_config_read(const char *filename, const char * relpath)
 {
     FILE *F;
 
@@ -84,7 +84,7 @@ int config_read(const char *filename, const char * relpath)
             sz = fread(data, 1, sz, F);
             data[sz] = 0;
             fclose(F);
-            result = config_parse(data);
+            result = bind_config_parse(data);
             free(data);
             return result;
         }
