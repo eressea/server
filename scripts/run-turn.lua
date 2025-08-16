@@ -171,8 +171,8 @@ function run_turn(rules)
     turn = read_turn()
     set_turn(turn)
   end
-
-  orderfile = orderfile or config.basepath .. '/orders.' .. turn
+  orderfile = eressea.config.get("config.orderfile") or config.basepath .. '/orders.' .. turn
+  print("reading orders from " .. orderfile)
   eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
   local result = process(rules, orderfile)
   return result
