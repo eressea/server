@@ -5395,10 +5395,10 @@ int sp_permtransfer(castorder * co)
     change_spellpoints(mage, -aura);
 
     if (unit_get_magic(tu) == unit_get_magic(mage)) {
-        change_maxspellpoints(tu, aura / 2);
+        change_maxspellpoints(tu, aura = aura / 2);
     }
     else {
-        change_maxspellpoints(tu, aura / 3);
+        change_maxspellpoints(tu, aura = aura / 3);
     }
 
     msg = msg_message("permtransfer_effect", "mage target amount", mage, tu, aura);

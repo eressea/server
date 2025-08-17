@@ -24,6 +24,7 @@ int sp_gooddreams(struct castorder * co);
 int sp_viewreality(struct castorder * co);
 int sp_disruptastral(struct castorder *co);
 int sp_eternizewall(struct castorder *co);
+int sp_permtransfer(struct castorder *co);
 int sp_showastral(struct castorder * co);
 int sp_speed2(struct castorder* co);
 int sp_goodwinds(struct castorder* co);

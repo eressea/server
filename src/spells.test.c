@@ -16,8 +16,9 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include "kernel/ship.h"            // for SK_MELEE
-#include "kernel/skill.h"            // for SK_MELEE
+#include "kernel/ship.h"
+#include "kernel/skill.h"
+#include "kernel/spell.h"
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include "kernel/types.h"
@@ -534,6 +535,64 @@ static void test_eternizewall(CuTest *tc) {
     CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "eternizewall_effect", f));
 
     a_removeall(&b->attribs, NULL);
+
+    test_teardown();
+}
+
+static void test_permtransfer(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    faction *f;
+    castorder co;
+    spellparameter param, *args = NULL;
+    spell *sp;
+    message *m;
+    int maxaura;
+
+    test_setup();
+    mt_create_error(214);
+    mt_create_va(mt_new("permtransfer_effect", NULL),
+        "mage:unit", "target:unit", "amount:int", MT_NEW_END);
+    init_resources();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    set_level(u, SK_MAGIC, 10);
+    mage_set_spellpoints(create_mage(u, M_TYBIED), 100);
+    maxaura = max_spellpoints(u, r);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f, r);
+    arrput(args, param);
+    param.typ = SPP_INT;
+    param.data.i = 12;
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 5, 12.0, 0, args);
+    co.sp = sp = test_create_spell();
+    CuAssertIntEquals(tc, 1, auracost(u, sp));
+    co.a_params[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_permtransfer(&co));
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_permtransfer(&co));
+
+    co.a_params[0].flag = TARGET_OK;
+    /* still does nothing if target is not a mage: */
+    CuAssertIntEquals(tc, 0, sp_permtransfer(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error214"));
+    test_clear_messages(f);
+
+    set_level(u2, SK_MAGIC, 10);
+    /* target is also a Tybied mage, gets half the aura: */
+    mage_set_spellpoints(create_mage(u2, M_TYBIED), 100);
+    CuAssertIntEquals(tc, co.level, sp_permtransfer(&co));
+    CuAssertIntEquals(tc, 100 - 12, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, maxaura - 12, max_spellpoints(u, r));
+    CuAssertIntEquals(tc, maxaura + 6, max_spellpoints(u2, r));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "permtransfer_effect"));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(u2->faction, "permtransfer_effect"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u2, m->parameters[1].v);
+    CuAssertIntEquals(tc, 6, m->parameters[2].i);
 
     test_teardown();
 }
@@ -2367,6 +2426,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_view_reality);
     SUITE_ADD_TEST(suite, test_disruptastral);
     SUITE_ADD_TEST(suite, test_eternizewall);
+    SUITE_ADD_TEST(suite, test_permtransfer);
     SUITE_ADD_TEST(suite, test_movecastle);
     SUITE_ADD_TEST(suite, test_auraleak);
     SUITE_ADD_TEST(suite, test_leaveastral);
