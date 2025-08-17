@@ -423,7 +423,7 @@ static void test_view_reality(CuTest *tc) {
 static void test_disruptastral(CuTest *tc) {
     unit *u;
     faction *f;
-    region *r, *ra;
+    region *r, *ra, *rx;
     castorder co;
 
     test_setup();
@@ -441,18 +441,32 @@ static void test_disruptastral(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertPtrEquals(tc, NULL, r->attribs);
 
-    /* casts a curse on all connected realspace regions: */
-    test_clear_messages(f);
+    /* create directly targeted origin astralspace region */
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    /* region at range 2 from origin, needs force >= 10 */
+    rx = test_create_region(real2tp(0) + 2, real2tp(0), NULL);
+
+    /* casts a curse on all astral regions in range: */
     CuAssertPtrEquals(tc, get_astralplane(), ra->_plane);
+    test_clear_messages(f);
     CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
     CuAssertPtrEquals(tc, NULL, r->attribs);
     CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
     a_removeall(&r->attribs, NULL);
+    CuAssertTrue(tc, is_cursed(rx->attribs, &ct_astralblock));
+    a_removeall(&rx->attribs, NULL);
+
+    /* force 9 only has a range of 1, rx is unchanged */
+    co.force = 9.0;
+    test_clear_messages(f);
+    CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
+    CuAssertPtrEquals(tc, NULL, rx->attribs);
+    CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
+    a_removeall(&r->attribs, NULL);
 
     /* can also be cast from astral space: */
-    test_clear_messages(f);
     move_unit(u, ra, NULL);
+    test_clear_messages(f);
     CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
     CuAssertPtrEquals(tc, NULL, r->attribs);
     CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
