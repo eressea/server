@@ -1,3 +1,7 @@
+# 30.3
+	- Opfere Kraft: Statt der Aura, die der Magier verliert, wird jetzt
+	  immer die Aura angezeigt, die das Ziel erhalten hat.
+
 # 30.2
 
     - Die Liste der struct bfaction in battle.c war unnötig, und ist
