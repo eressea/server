@@ -2661,8 +2661,9 @@ static void test_tree_growth_autumn(CuTest* tc) {
 }
 
 static void test_age_barrier(CuTest *tc) {
-    region *r;
+    region *r, *r2;
     terrain_type *t_barrier, *t_desert;
+    const terrain_type *t_plain;
     const int max_age = 10;
 
     test_setup();
@@ -2675,19 +2676,25 @@ static void test_age_barrier(CuTest *tc) {
     t_desert->production->type = get_resourcetype(R_TREE);
     init_terrains();
     r = test_create_region(0, 0, t_barrier);
+    r2 = test_create_plain(1, 0);
+    t_plain = r2->terrain;
     CuAssertIntEquals(tc, 0, r->age);
     demographics();
     CuAssertIntEquals(tc, 1, r->age);
     age_region(r);
     CuAssertPtrEquals(tc, t_barrier, (terrain_type *)r->terrain);
-    r->age = max_age - 1;
+    r2->age = r->age = max_age - 1;
     age_region(r);
     CuAssertPtrEquals(tc, t_barrier, (terrain_type *)r->terrain);
-    r->age = max_age;
+    age_region(r2);
+    CuAssertPtrEquals(tc, (void *)t_plain, (void *)r2->terrain);
+    r2->age = r->age = max_age;
     age_region(r);
     CuAssertPtrEquals(tc, t_desert, (terrain_type *)r->terrain);
     CuAssertPtrNotNull(tc, r->land);
     CuAssertPtrEquals(tc, NULL, r->resources);
+    age_region(r2);
+    CuAssertPtrEquals(tc, (void *)t_plain, (void *)r2->terrain);
     test_teardown();
 }
 

@@ -20,6 +20,7 @@ int report_action(struct region *r, struct unit *actor, struct message *msg, int
 int sp_baddreams(struct castorder * co);
 int sp_gooddreams(struct castorder * co);
 int sp_viewreality(struct castorder * co);
+int sp_disruptastral(struct castorder *co);
 int sp_showastral(struct castorder * co);
 int sp_speed2(struct castorder* co);
 int sp_goodwinds(struct castorder* co);

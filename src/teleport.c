@@ -190,7 +190,7 @@ void create_teleport_plane(void)
 {
     region *r;
     const struct plane *hplane = get_homeplane();
-    struct plane* aplane = get_astralplane();
+    struct plane *aplane = get_astralplane();
 
     const terrain_type *fog = get_terrain("fog");
     const terrain_type *tfog = get_terrain("thickfog");
@@ -209,42 +209,44 @@ static bool cb_blocked(const region *r)
 
 void update_teleport_plane(const region* r, plane* aplane, const terrain_type* terrain, const struct terrain_type* blocked)
 {
-    static region* rlast = NULL;
-    region* ra = tpregion(r);
-    bool forbidden = (r->terrain->flags & FORBIDDEN_REGION);
-    const terrain_type* fog = terrain ? terrain : get_terrain("fog");
-    const terrain_type* tfog = blocked ? blocked : get_terrain("thickfog");
+    if (config_get_int("astralspace.auto", 1) != 0) {
+        static region *rlast = NULL;
+        region *ra = tpregion(r);
+        bool forbidden = (r->terrain->flags & FORBIDDEN_REGION);
+        const terrain_type *fog = terrain ? terrain : get_terrain("fog");
+        const terrain_type *tfog = blocked ? blocked : get_terrain("thickfog");
 
-    if (ra == NULL) {
-        make_teleport_region(r, aplane, forbidden ? tfog : fog);
-    }
-    else if (ra->terrain == tfog && !forbidden) {
-        int num = get_astralregions(ra, cb_blocked, NULL);
-        if (num == 0) {
-            /* none of the regions below ra are blocked, meaning we can unblock it */
-            terraform_region(ra, fog);
+        if (ra == NULL) {
+            make_teleport_region(r, aplane, forbidden ? tfog : fog);
         }
-    }
-    else if (ra->terrain == fog && forbidden) {
-        /* try fixing this region, but only once: */
-        if (ra != rlast) {
-            rlast = ra;
-            if (ra->units) {
-                unit* u;
-                for (u = ra->units; u; u = u->next) {
-                    if (!IS_MONSTERS(u->faction)) {
-                        log_warning("astral space above %s should be impassable, but there are units of %s here.", regionname(r, NULL), factionname(u->faction));
-                        break;
+        else if (ra->terrain == tfog && !forbidden) {
+            int num = get_astralregions(ra, cb_blocked, NULL);
+            if (num == 0) {
+                /* none of the regions below ra are blocked, meaning we can unblock it */
+                terraform_region(ra, fog);
+            }
+        }
+        else if (ra->terrain == fog && forbidden) {
+            /* try fixing this region, but only once: */
+            if (ra != rlast) {
+                rlast = ra;
+                if (ra->units) {
+                    unit *u;
+                    for (u = ra->units; u; u = u->next) {
+                        if (!IS_MONSTERS(u->faction)) {
+                            log_warning("astral space above %s should be impassable, but there are units of %s here.", regionname(r, NULL), factionname(u->faction));
+                            break;
+                        }
                     }
-                }
-                if (!u) {
-                    while (ra->units) {
-                        erase_unit(&ra->units, ra->units);
+                    if (!u) {
+                        while (ra->units) {
+                            erase_unit(&ra->units, ra->units);
+                        }
                     }
                 }
             }
+            terraform_region(ra, tfog);
         }
-        terraform_region(ra, tfog);
     }
 }
 

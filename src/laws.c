@@ -2771,7 +2771,7 @@ void age_region(region * r)
             t_desert = newterrain(T_DESERT);
         }
     }
-    if (t_barrier && t_desert && r->age >= barrier_age) {
+    if (t_barrier && t_desert && r->age >= barrier_age && r->terrain == t_barrier) {
         terraform_region(r, t_desert);
         arrfree(r->resources);
     }

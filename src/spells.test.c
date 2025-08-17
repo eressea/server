@@ -7,6 +7,7 @@
 #include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/curse.h>
+#include <kernel/config.h>
 #include "kernel/connection.h"
 #include "kernel/direction.h"
 #include "kernel/event.h"
@@ -360,6 +361,46 @@ static void test_view_reality(CuTest *tc) {
     CuAssertIntEquals(tc, 0, sp_viewreality(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertIntEquals(tc, -1, get_observer(r, f));
+
+    test_teardown();
+}
+
+static void test_disruptastral(CuTest *tc) {
+    unit *u;
+    faction *f;
+    region *r, *ra;
+    castorder co;
+
+    test_setup();
+    test_use_astral();
+    config_set_int("astralspace.auto", 0);
+    mt_create_error(216);
+
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+
+    /* need a matching astral region: */
+    test_create_castorder(&co, u, 9, 10.0, 0, NULL);
+    CuAssertIntEquals(tc, 0, sp_disruptastral(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
+    CuAssertPtrEquals(tc, NULL, r->attribs);
+
+    /* casts a curse on all connected realspace regions: */
+    test_clear_messages(f);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    CuAssertPtrEquals(tc, get_astralplane(), ra->_plane);
+    CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
+    CuAssertPtrEquals(tc, NULL, r->attribs);
+    CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
+    a_removeall(&r->attribs, NULL);
+
+    /* can also be cast from astral space: */
+    test_clear_messages(f);
+    move_unit(u, ra, NULL);
+    CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
+    CuAssertPtrEquals(tc, NULL, r->attribs);
+    CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
 
     test_teardown();
 }
@@ -2138,6 +2179,7 @@ CuSuite *get_spells_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
+    SUITE_ADD_TEST(suite, test_disruptastral);
     SUITE_ADD_TEST(suite, test_movecastle);
     SUITE_ADD_TEST(suite, test_auraleak);
     SUITE_ADD_TEST(suite, test_show_astral);
