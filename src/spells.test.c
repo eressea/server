@@ -474,6 +474,70 @@ static void test_disruptastral(CuTest *tc) {
     test_teardown();
 }
 
+static void test_eternizewall(CuTest *tc) {
+    unit *u, *u2, *u3;
+    faction *f;
+    region *r;
+    building *b;
+    curse *c;
+    castorder co;
+    message *m;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    mt_create_error(206);
+    mt_create_va(mt_new("eternizewall_effect", NULL),
+        "mage:unit", "region:region", "building:building", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), r);
+    u3 = test_create_unit(test_create_faction(), r);
+    param.flag = TARGET_OK;
+    param.typ = SPP_BUILDING;
+    param.data.b = b = test_create_building(r, test_create_castle());
+    b->size = 24;
+    u2->building = b;
+    arrput(args, param);
+    test_create_castorder(&co, u, 5, 12.0, 0, args);
+
+    /* target not found, no cost */
+    co.a_params[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrEquals(tc, NULL, b->attribs);
+
+    /* target resists */
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrEquals(tc, NULL, b->attribs);
+
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_eternizewall(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(b->attribs, &ct_nocostbuilding));
+    CuAssertDblEquals(tc, co.force * co.force, c->vigour, 0.01);
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertDblEquals(tc, 0.0, c->effect, 0.01);
+    /* mage and factions with units in the building get a message: */
+    CuAssertPtrNotNull(tc, m = test_find_region_message(r, "eternizewall_effect", f));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertPtrEquals(tc, b, m->parameters[2].v);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "eternizewall_effect", u2->faction));
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "eternizewall_effect", u3->faction));
+    test_clear_region_messages(r);
+
+    /* target is already cursed: */
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error206"));
+    CuAssertPtrNotNull(tc, c = get_curse(b->attribs, &ct_nocostbuilding));
+    CuAssertDblEquals(tc, co.force * co.force, c->vigour, 0.01);
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertDblEquals(tc, 0.0, c->effect, 0.01);
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "eternizewall_effect", f));
+
+    a_removeall(&b->attribs, NULL);
+
+    test_teardown();
+}
+
 static void test_movecastle(CuTest *tc) {
     unit *u;
     region *r, *r2;
@@ -2302,6 +2366,7 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
     SUITE_ADD_TEST(suite, test_disruptastral);
+    SUITE_ADD_TEST(suite, test_eternizewall);
     SUITE_ADD_TEST(suite, test_movecastle);
     SUITE_ADD_TEST(suite, test_auraleak);
     SUITE_ADD_TEST(suite, test_leaveastral);

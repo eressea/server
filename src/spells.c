@@ -5291,7 +5291,7 @@ int sp_disruptastral(castorder * co)
  * ZAUBER "Mauern der Ewigkeit" <gebaeude-nummer>
  * Flags: (0)
  */
-static int sp_eternizewall(castorder * co)
+int sp_eternizewall(castorder * co)
 {
     unit *u;
     curse *c;
