@@ -21,7 +21,7 @@ extern "C" {
         char *parameter;
         int sptyp;
         int rank;                   /* Reihenfolge der Zauber */
-        struct spell_component *components;
+        struct spell_component *components; /* TODO: use stb_ds array */
     } spell;
 
     typedef struct spellref {
