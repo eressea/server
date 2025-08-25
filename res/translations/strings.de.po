@@ -5824,7 +5824,7 @@ msgstr "SABOTIERE"
 
 msgctxt "describe"
 msgid "truthpotion"
-msgstr "Dieses wirkungsvolle einfache Gebräu schärft die Sinne des Trinkenden derart, dass er in der Lage ist, eine Woche lang auch die komplexesten Illusionen zu durchschauen."
+msgstr "Dieses Gebräu hat überhaupt keine Funktion."
 
 msgid "plate_p"
 msgstr "Plattenpanzer"
