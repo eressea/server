@@ -1197,6 +1197,12 @@ giveunit="yes" getitem="yes" recruitethereal="yes" equipment="yes">
     <skill name="cartmaking" modifier="-1"/>
     <skill name="taxation" modifier="1"/>
     <skill name="unarmed" modifier="-99"/>
+    <skill name="bow" speed="0"/>
+    <skill name="catapult" speed="0"/>
+    <skill name="crossbow" speed="0"/>
+    <skill name="melee" speed="0"/>
+    <skill name="polearm" speed="0"/>
+    <skill name="stamina" speed="0"/>
     <attack type="1" damage="1d5"/>
     <familiar race="goblin"/>
     <familiar race="ghost"/>
