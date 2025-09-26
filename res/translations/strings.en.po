@@ -5179,7 +5179,7 @@ msgstr "platemails"
 
 msgctxt "describe"
 msgid "truthpotion"
-msgstr "This simple but very potent brew sharpens the senses of anyone that drinks of it and makes him able to see through even the most complex illusions for one week."
+msgstr "This concoction has no function at all."
 
 msgid "tradepost"
 msgstr "tradepost"
