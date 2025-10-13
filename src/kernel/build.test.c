@@ -370,6 +370,7 @@ static void test_build_building_success(CuTest *tc)
     CuAssertPtrNotNull(tc, u->region->buildings);
     CuAssertPtrEquals(tc, u->region->buildings, u->building);
     CuAssertIntEquals(tc, 1, u->building->size);
+    CuAssertIntEquals(tc, BLD_EXPANDED|BLD_UNMAINTAINED, u->building->flags);
     CuAssertIntEquals(tc, 0, i_get(u->items, rtype->itype));
     CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, sv->days);
     teardown_build(&bf);
