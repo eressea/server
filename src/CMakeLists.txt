@@ -197,6 +197,7 @@ endif()
 add_library(parser ${PARSER_SRC})
 
 target_include_directories (parser PUBLIC ${CLIBS_INCLUDE_DIR})
+target_include_directories (parser PUBLIC ${INIPARSER_INCLUDE_DIR})
 target_include_directories (parser PUBLIC ${STORAGE_INCLUDE_DIR})
 target_include_directories (parser PUBLIC ${UTF8PROC_INCLUDE_DIR})
 
