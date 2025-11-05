@@ -866,7 +866,7 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
         lua_rawset(L, -3);
     }
 
-    for (size_t i = 0; d && i != d->n; ++i) {
+    for (size_t i = 0; d && i != (size_t) d->n; ++i) {
         const char *key = d->key[i];
         if (strncmp(section, key, len) == 0 && key[len] == ':') {
             const char *str_value = d->val[i];
