@@ -131,6 +131,35 @@ static void test_give_unit(CuTest * tc) {
     test_teardown();
 }
 
+/**
+ * Test bug 3086
+ * 
+ * Silencing the GIVE comamnd should not skip checks.
+ */
+static void test_give_unit_cmd_checks_region(CuTest * tc) {
+    struct give env = { 0 };
+    unit *u;
+
+    test_setup_ex(tc);
+    env.f1 = test_create_faction();
+    env.f2 = test_create_faction();
+    setup_give(&env);
+    u = env.src;
+
+    CuAssertIntEquals(tc, 1, env.f1->num_units);
+    CuAssertIntEquals(tc, 1, env.f2->num_units);
+
+    contact_unit(env.dst, u);
+    u->thisorder = create_order(K_GIVE, u->faction->locale, "%s EINHEIT", itoa36(env.dst->no));
+    u->thisorder->command |= CMD_QUIET;
+
+    CuAssertIntEquals(tc, P_UNIT, give_cmd(u, u->thisorder));
+    move_unit(env.dst, test_create_plain(1, 1), NULL);
+    CuAssertIntEquals(tc, NOPARAM, give_cmd(u, u->thisorder));
+
+    test_teardown();
+}
+
 static void test_give_unit_stealth(CuTest * tc) {
     struct give env = { 0 };
 
@@ -882,6 +911,7 @@ CuSuite *get_give_suite(void)
     SUITE_ADD_TEST(suite, test_give);
     SUITE_ADD_TEST(suite, test_give_cmd);
     SUITE_ADD_TEST(suite, test_give_cmd_limit);
+    SUITE_ADD_TEST(suite, test_give_unit_cmd_checks_region);
     SUITE_ADD_TEST(suite, test_give_men);
     SUITE_ADD_TEST(suite, test_give_men_magicians);
     SUITE_ADD_TEST(suite, test_give_men_limit);

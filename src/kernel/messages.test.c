@@ -55,7 +55,7 @@ void test_message(CuTest *tc) {
     CuAssertIntEquals(tc, 0, mtype->nparameters);
     CuAssertPtrEquals(tc, NULL, (void *)mtype->pnames);
     CuAssertPtrEquals(tc, NULL, (void *)mtype->types);
-    msg = msg_message("custom", "");
+    msg = msg_message("custom", NULL);
     CuAssertPtrNotNull(tc, msg);
     CuAssertIntEquals(tc, 1, msg->refcount);
     CuAssertPtrEquals(tc, NULL, msg->parameters);
@@ -64,6 +64,36 @@ void test_message(CuTest *tc) {
     CuAssertPtrEquals(tc, msg, msg_addref(msg));
     CuAssertIntEquals(tc, 2, msg->refcount);
     msg_release(msg);
+    CuAssertIntEquals(tc, 1, msg->refcount);
+    msg_release(msg);
+    test_teardown();
+}
+
+void test_add_message(CuTest *tc) {
+    message *msg;
+    message_type *mtype;
+    message_list *mlist = NULL;
+
+    test_setup();
+    mtype = mt_create(mt_new("custom", NULL), NULL, 0);
+    CuAssertPtrEquals(tc, mtype, (void *)mt_find("custom"));
+    CuAssertIntEquals(tc, 0, mtype->nparameters);
+    CuAssertPtrEquals(tc, NULL, (void *)mtype->pnames);
+    CuAssertPtrEquals(tc, NULL, (void *)mtype->types);
+    msg = msg_message("custom", NULL);
+    CuAssertPtrNotNull(tc, msg);
+    CuAssertIntEquals(tc, 1, msg->refcount);
+    CuAssertPtrEquals(tc, NULL, msg->parameters);
+    CuAssertPtrEquals(tc, mtype, (void *)msg->type);
+    add_message(&mlist, msg);
+    CuAssertPtrEquals(tc, msg, mlist->begin->msg);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
+    CuAssertIntEquals(tc, 2, msg->refcount);
+    msg->is_silent = 1;
+    add_message(&mlist, msg);
+    CuAssertIntEquals(tc, 2, msg->refcount);
+    CuAssertPtrEquals(tc, NULL, mlist->begin->next);
+    free_messagelist(mlist);
     CuAssertIntEquals(tc, 1, msg->refcount);
     msg_release(msg);
     test_teardown();
@@ -109,10 +139,10 @@ static void test_noerror(CuTest *tc) {
     u->thisorder = parse_order("!@move", lang);
     CuAssertIntEquals(tc, K_MOVE | CMD_QUIET | CMD_PERSIST,  u->thisorder->command);
     CuAssertTrue(tc, !is_persistent(u->thisorder));
-    CuAssertPtrEquals(tc, NULL, msg = msg_error(u, u->thisorder, 100));
-    assert(!msg);
-    CuAssertPtrEquals(tc, NULL, msg = msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
-    assert(!msg);
+    CuAssertPtrNotNull(tc, msg = msg_error(u, u->thisorder, 100));
+    CuAssertTrue(tc, msg->is_silent);
+    CuAssertPtrNotNull(tc, msg = msg_feedback(u, u->thisorder, "error_unit_not_found", NULL));
+    CuAssertTrue(tc, msg->is_silent);
     test_teardown();
 }
 
@@ -122,6 +152,7 @@ CuSuite *get_messages_suite(void) {
     SUITE_ADD_TEST(suite, test_missing_feedback);
     SUITE_ADD_TEST(suite, test_merge_split);
     SUITE_ADD_TEST(suite, test_message);
+    SUITE_ADD_TEST(suite, test_add_message);
     SUITE_ADD_TEST(suite, test_noerror);
     return suite;
 }

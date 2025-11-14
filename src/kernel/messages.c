@@ -96,34 +96,91 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
     const char *name, const char *sig, ...)
 {
     const message_type *mtype = mt_find(name);
+    message *msg;
     variant args[16];
     variant var;
     memset(args, 0, sizeof(args));
 
-    if (ord && is_silent(ord)) {
-        return NULL;
+    if (!mtype) {
+        msg = missing_feedback(name, u, u->region, ord);
     }
+    else {
+        var.v = (void *)u;
+        arg_set(args, mtype, "unit", var);
+        var.v = (void *)u->region;
+        arg_set(args, mtype, "region", var);
+        var.v = (void *)ord;
+        arg_set(args, mtype, "command", var);
+
+        if (sig) {
+            const char *ic = sig;
+            va_list marker;
+
+            va_start(marker, sig);
+            while (*ic && !isalnum(*ic))
+                ic++;
+            while (*ic) {
+                char paramname[64];
+                char *oc = paramname;
+                int i;
+
+                while (isalnum(*ic))
+                    *oc++ = *ic++;
+                *oc = '\0';
+
+                for (i = 0; i != mtype->nparameters; ++i) {
+                    if (!strcmp(paramname, mtype->pnames[i]))
+                        break;
+                }
+                if (i != mtype->nparameters) {
+                    if (mtype->types[i]->vtype == VAR_VOIDPTR) {
+                        args[i].v = va_arg(marker, void *);
+                    }
+                    else if (mtype->types[i]->vtype == VAR_INT) {
+                        args[i].i = va_arg(marker, int);
+                    }
+                    else {
+                        assert(!"unknown variant type");
+                    }
+                }
+                else {
+                    log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
+                    assert(!"program aborted.");
+                }
+                while (*ic && !isalnum(*ic))
+                    ic++;
+            }
+            va_end(marker);
+        }
+        msg = msg_create(mtype, args);
+    }
+    if (ord && is_silent(ord)) {
+        msg->is_silent = 1;
+    }
+
+    return msg;
+}
+
+message *msg_message(const char *name, const char *sig, ...)
+/* msg_message("oops_error", "unit region command", u, r, cmd) */
+{
+    va_list vargs;
+    const message_type *mtype = mt_find(name);
+    char paramname[64];
+    int argnum=0;
+    variant args[16];
+    memset(args, 0, sizeof(args));
 
     if (!mtype) {
-        return missing_feedback(name, u, u->region, ord);
+        return missing_message(name);
     }
-
-    var.v = (void *)u;
-    arg_set(args, mtype, "unit", var);
-    var.v = (void *)u->region;
-    arg_set(args, mtype, "region", var);
-    var.v = (void *)ord;
-    arg_set(args, mtype, "command", var);
 
     if (sig) {
         const char *ic = sig;
-        va_list marker;
-
-        va_start(marker, sig);
+        va_start(vargs, sig);
         while (*ic && !isalnum(*ic))
             ic++;
         while (*ic) {
-            char paramname[64];
             char *oc = paramname;
             int i;
 
@@ -137,76 +194,24 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
             }
             if (i != mtype->nparameters) {
                 if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-                    args[i].v = va_arg(marker, void *);
+                    args[i].v = va_arg(vargs, void *);
                 }
                 else if (mtype->types[i]->vtype == VAR_INT) {
-                    args[i].i = va_arg(marker, int);
+                    args[i].i = va_arg(vargs, int);
                 }
                 else {
                     assert(!"unknown variant type");
                 }
+                argnum++;
             }
             else {
                 log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
-                assert(!"program aborted.");
             }
             while (*ic && !isalnum(*ic))
                 ic++;
         }
-        va_end(marker);
+        va_end(vargs);
     }
-    return msg_create(mtype, args);
-}
-
-message *msg_message(const char *name, const char *sig, ...)
-/* msg_message("oops_error", "unit region command", u, r, cmd) */
-{
-    va_list vargs;
-    const message_type *mtype = mt_find(name);
-    char paramname[64];
-    const char *ic = sig;
-    int argnum=0;
-    variant args[16];
-    memset(args, 0, sizeof(args));
-
-    if (!mtype) {
-        return missing_message(name);
-    }
-
-    va_start(vargs, sig);
-    while (*ic && !isalnum(*ic))
-        ic++;
-    while (*ic) {
-        char *oc = paramname;
-        int i;
-
-        while (isalnum(*ic))
-            *oc++ = *ic++;
-        *oc = '\0';
-
-        for (i = 0; i != mtype->nparameters; ++i) {
-            if (!strcmp(paramname, mtype->pnames[i]))
-                break;
-        }
-        if (i != mtype->nparameters) {
-            if (mtype->types[i]->vtype == VAR_VOIDPTR) {
-                args[i].v = va_arg(vargs, void *);
-            }
-            else if (mtype->types[i]->vtype == VAR_INT) {
-                args[i].i = va_arg(vargs, int);
-            }
-            else {
-                assert(!"unknown variant type");
-            }
-            argnum++;
-        }
-        else {
-            log_error("invalid parameter %s for message type %s\n", paramname, mtype->name);
-        }
-        while (*ic && !isalnum(*ic))
-            ic++;
-    }
-    va_end(vargs);
     if (argnum !=  mtype->nparameters) {
         log_error("not enough parameters for message type %s\n", mtype->name);
     }
@@ -302,7 +307,7 @@ void free_messagelist(message_list *msgs)
 
 message *add_message(message_list ** pm, message * m)
 {
-    if (m != NULL) {
+    if (m != NULL && !m->is_silent) {
         struct mlist *mnew = malloc(sizeof(struct mlist));
         if (!mnew) abort();
         if (*pm == NULL) {

@@ -827,17 +827,7 @@ void give_unit_cmd(unit* u, order* ord)
     init_order(ord, NULL);
     err = getunit(u->region, u->faction, &u2);
 
-    if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
-        msg = msg_feedback(u, ord, "feedback_unit_not_found", NULL);
-    }
-    else {
-        msg = check_give(u, u2, ord);
-    }
-
-    if (msg) {
-        ADDMSG(&u->faction->msgs, msg);
-    }
-    else if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
+    if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
         cmistake(u, ord, 167, MSG_COMMERCE);
     }
     else {
@@ -867,12 +857,6 @@ param_t give_cmd(unit * u, order * ord)
     n = s ? atoip(s) : 0;
     p = (n > 0) ? NOPARAM : get_param(s, u->faction->locale);
 
-    /* quick exit before any errors are generated: */
-    if (p == P_UNIT || p == P_CONTROL) {
-        /* handled in give_unit_cmd */
-        return p;
-    }
-
     if (err == GET_NOTFOUND || (err != GET_PEASANTS && !can_give_to(u, u2))) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "feedback_unit_not_found", NULL));
@@ -881,6 +865,17 @@ param_t give_cmd(unit * u, order * ord)
     if (u == u2) {
         cmistake(u, ord, 8, MSG_COMMERCE);
         return NOPARAM;
+    }
+
+    msg = check_give(u, u2, ord);
+    if (msg) {
+        ADDMSG(&u->faction->msgs, msg);
+        return NOPARAM;
+    }
+
+    if (p == P_UNIT || p == P_CONTROL) {
+        /* handled in give_unit_cmd */
+        return p;
     }
 
     /* first, do all the ones that do not require HELP_GIVE or CONTACT */
@@ -892,12 +887,6 @@ param_t give_cmd(unit * u, order * ord)
     else if (p == P_PERSON) {
         ADDMSG(&u->faction->msgs,
             msg_feedback(u, ord, "give_number_missing", "resource", "person_p"));
-        return p;
-    }
-
-    msg = check_give(u, u2, ord);
-    if (msg) {
-        ADDMSG(&u->faction->msgs, msg);
         return p;
     }
 
