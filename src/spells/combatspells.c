@@ -287,11 +287,12 @@ int sp_combatrosthauch(struct castorder * co)
                     if (*itp) {
                         item *it = *itp;
                         requirement *mat = itype->construction->materials;
+                        const struct resource_type *rt_iron = get_resourcetype(R_IRON);
                         int n = force;
                         if (it->number < n) n = it->number;
 
                         while (mat && mat->number > 0) {
-                            if (mat->rtype == get_resourcetype(R_IRON)) {
+                            if (mat->rtype == rt_iron) {
                                 int p;
                                 force -= n;
                                 k += n;
