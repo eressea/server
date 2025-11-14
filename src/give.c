@@ -820,17 +820,15 @@ static void give_all_items(unit *u, unit *u2, order *ord) {
 void give_unit_cmd(unit* u, order* ord)
 {
     char token[64];
-    unit* u2;
-    message* msg = NULL;
-    int err;
+    unit* u2 = NULL;
 
     init_order(ord, NULL);
-    err = getunit(u->region, u->faction, &u2);
+    getunit(u->region, u->faction, &u2);
 
     if (!(u_race(u)->ec_flags & ECF_GIVEUNIT)) {
         cmistake(u, ord, 167, MSG_COMMERCE);
     }
-    else {
+    else if (u2) {
         param_t p = get_param(gettoken(token, sizeof(token)), u->faction->locale);
         if (p == P_UNIT) {
             give_unit(u, u2, ord);
