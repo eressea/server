@@ -2592,7 +2592,7 @@ static castorder *cast_cmd(unit * u, order * ord)
      * OCEANCASTABLE deklarierte Sprueche */
     if (fval(r->terrain, SEA_REGION)) {
         if (u_race(u) != get_race(RC_AQUARIAN)
-            && !fval(u_race(u), RCF_SWIM)
+            && !fval(u_race(u), (RCF_FLY | RCF_SWIM))
             && !(sp->sptyp & OCEANCASTABLE)) {
             /* Fehlermeldung */
             ADDMSG(&u->faction->msgs, msg_message("spellfail_onocean",
