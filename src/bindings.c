@@ -843,7 +843,6 @@ static int tolua_report_unit(lua_State * L)
 
 static void parse_inifile(lua_State * L, const dictionary * d, const char *section)
 {
-    int i;
     const char *arg;
     size_t len = strlen(section);
 
@@ -867,7 +866,7 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
         lua_rawset(L, -3);
     }
 
-    for (i = 0; d && i != d->n; ++i) {
+    for (unsigned i = 0; d && i != (unsigned) d->n; ++i) {
         const char *key = d->key[i];
         if (strncmp(section, key, len) == 0 && key[len] == ':') {
             const char *str_value = d->val[i];
@@ -982,11 +981,11 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_beginmodule(L, "config");
         {
             parse_inifile(L, inifile, "lua");
-            tolua_variable(L, "locales", &config_get_locales, 0);
+            tolua_variable(L, "locales", &config_get_locales, NULL);
             tolua_function(L, "get_resource", &config_get_resource);
-            tolua_variable(L, "buildings", &config_get_buildings, 0);
+            tolua_variable(L, "buildings", &config_get_buildings, NULL);
             tolua_function(L, "get_building", &config_get_btype);
-            tolua_variable(L, "ships", &config_get_ships, 0);
+            tolua_variable(L, "ships", &config_get_ships, NULL);
             tolua_function(L, "get_ship", &config_get_stype);
         } tolua_endmodule(L);
         tolua_function(L, "get_region_by_id", tolua_get_region_byid);

@@ -44,21 +44,23 @@ static void test_allies(CuTest *tc) {
 
 static void test_allies_set(CuTest *tc) {
     struct faction *f1, *f2;
-    struct ally * al = NULL;
+    struct ally * ax, * al = NULL;
 
     test_setup();
     f1 = test_create_faction();
     f2 = test_create_faction();
 
     CuAssertPtrEquals(tc, NULL, al);
-    CuAssertPtrEquals(tc, al, ally_set(&al, f1, HELP_ALL));
+    ax = ally_set(&al, f1, HELP_ALL);
+    CuAssertPtrEquals(tc, ax, al);
     CuAssertPtrNotNull(tc, al);
     CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, f1->allies);
     CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, al);
 
-    CuAssertPtrEquals(tc, al, ally_set(&al, f1, HELP_ALL));
+    ax = ally_set(&al, f1, HELP_ALL);
+    CuAssertPtrEquals(tc, ax, al);
     CuAssertPtrEquals(tc, NULL, ally_set(&al, f2, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, ally_set(&al, f1, DONT_HELP));
     CuAssertPtrEquals(tc, NULL, al);

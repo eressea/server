@@ -607,6 +607,7 @@ build_building(unit *u, const building_type *btype, int id, int want, order *ord
         /* build a new building */
         b = new_building(btype, r, lang, built);
         b->type = btype;
+        b->flags |= BLD_UNMAINTAINED;
 
         /* Die Einheit befindet sich automatisch im Inneren der neuen Burg. */
         if (u->number && leave(u, false)) {

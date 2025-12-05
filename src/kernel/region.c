@@ -881,9 +881,8 @@ struct rawmaterial *region_setresource(region * r, const struct resource_type *r
         }
         else {
             if (r->terrain->production) {
-                int i;
-                for (i = 0; r->terrain->production[i].type; ++i) {
-                    const terrain_production *production = r->terrain->production + i;
+                for (size_t n = arrlen(r->terrain->production); n > 0; --n) {
+                    const terrain_production *production = r->terrain->production + n - 1;
                     if (production->type == rtype) {
                         return add_resource(r, 1, value, dice_rand(production->divisor), rtype);
                     }

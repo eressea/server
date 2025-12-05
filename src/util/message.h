@@ -31,7 +31,8 @@ extern "C" {
     typedef struct message {
         const struct message_type *type;
         variant *parameters;
-        int refcount;
+        int refcount : 31;
+        int is_silent : 1;
     } message;
 
     void message_done(void);

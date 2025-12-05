@@ -46,7 +46,7 @@ struct region;
         int flags;
         short max_road;             /* this many stones make a full road */
         short distribution;         /* multiplier used for seeding */
-        struct terrain_production *production; /* TODO: array with a terminator, use stb_ds */
+        struct terrain_production *production; /* stb_ds array */
         struct item_type **herbs;     /* zero-terminated array of herbs */
         const char *(*name) (const struct region * r);
         struct terrain_type *next;

@@ -683,7 +683,7 @@ msgid "error11"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The ship is still off shore.\""
 
 msgid "error33"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not in our castle.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit is not in this building.\""
 
 msgid "error22"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Unknown command.\""

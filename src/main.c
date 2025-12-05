@@ -133,7 +133,7 @@ static int usage(const char *prog, const char *arg)
         "-f <script.lua>  : execute a lua script\n"
         "-q               : be quite (same as -v 0)\n"
         "-v <level>       : verbosity level\n"
-        "-C               : run in interactive mode\n"
+        "-o <file>        : set default orders file\n"
         "--color          : force curses to use colors even when not detected\n", prog);
     return -1;
 }
@@ -210,38 +210,72 @@ static int parse_args(int argc, char **argv)
                 config_set("config.debug", "1");
                 break;
             case 'i':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("config.install", arg);
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    config_set("config.install", arg);
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 'c':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                inifile = arg;
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    inifile = arg;
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 'r':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                config_set("game.rules", arg);
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    config_set("game.rules", arg);
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 'f':
-                i = get_arg(argc, argv, 2, i, &luafile, 0);
+                i = get_arg(argc, argv, 2, i, &luafile, NULL);
                 break;
             case 'l':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                log_flags = arg ? atoi(arg) : 0xff;
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    log_flags = arg ? atoi(arg) : 0xff;
+                } else {
+                    return usage(argv[0], NULL);
+                }
+                break;
+            case 'o':
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    config_set("config.orderfile", arg);
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 't':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                turn = atoi(arg);
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    turn = atoi(arg);
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 'w':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                bcrypt_workfactor = arg ? atoi(arg) : 0xff;
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    bcrypt_workfactor = arg ? atoi(arg) : 0xff;
+                } else {
+                    return usage(argv[0], NULL);
+                }
                 break;
             case 'q':
                 verbosity = 0;
                 break;
             case 'v':
-                i = get_arg(argc, argv, 2, i, &arg, 0);
-                verbosity = arg ? atoi(arg) : 0xff;
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
+                if (arg) {
+                    verbosity = arg ? atoi(arg) : 0xff;
+                }
                 break;
             case 'h':
                 usage(argv[0], NULL);

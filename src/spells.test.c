@@ -16,8 +16,9 @@
 #include <kernel/order.h>
 #include <kernel/race.h>
 #include <kernel/region.h>
-#include "kernel/ship.h"            // for SK_MELEE
-#include "kernel/skill.h"            // for SK_MELEE
+#include "kernel/ship.h"
+#include "kernel/skill.h"
+#include "kernel/spell.h"
 #include <kernel/terrain.h>
 #include <kernel/terrainid.h>
 #include "kernel/types.h"
@@ -167,6 +168,61 @@ static void test_change_race(CuTest* tc) {
     CuAssertPtrEquals(tc, (void*)u->faction->race, (void*)crd->race);
     CuAssertPtrEquals(tc, NULL, (void*)crd->irace);
 
+    test_teardown();
+}
+
+static void test_break_curse(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u1, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 30);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_BUILDING;
+    param.data.b = NULL;
+    arrput(args, param);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_STRING;
+    param.data.xs = NULL;
+    arrput(args, param);
+
+    test_create_castorder(&co, u1, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
+    test_teardown();
+}
+
+static void test_magicrunes(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u1, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u1 = test_create_unit(f, r);
+    u2 = test_create_unit(f, r);
+    scale_number(u2, 30);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_BUILDING;
+    param.data.b = NULL;
+    arrput(args, param);
+
+    test_create_castorder(&co, u1, 3, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_magicrunes(&co));
+    CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
     test_teardown();
 }
 
@@ -368,7 +424,7 @@ static void test_view_reality(CuTest *tc) {
 static void test_disruptastral(CuTest *tc) {
     unit *u;
     faction *f;
-    region *r, *ra;
+    region *r, *ra, *rx;
     castorder co;
 
     test_setup();
@@ -386,21 +442,157 @@ static void test_disruptastral(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_faction_message(f, "error216"));
     CuAssertPtrEquals(tc, NULL, r->attribs);
 
-    /* casts a curse on all connected realspace regions: */
-    test_clear_messages(f);
+    /* create directly targeted origin astralspace region */
     ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    /* region at range 2 from origin, needs force >= 10 */
+    rx = test_create_region(real2tp(0) + 2, real2tp(0), NULL);
+
+    /* casts a curse on all astral regions in range: */
     CuAssertPtrEquals(tc, get_astralplane(), ra->_plane);
+    test_clear_messages(f);
     CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
     CuAssertPtrEquals(tc, NULL, r->attribs);
     CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
     a_removeall(&r->attribs, NULL);
+    CuAssertTrue(tc, is_cursed(rx->attribs, &ct_astralblock));
+    a_removeall(&rx->attribs, NULL);
+
+    /* force 9 only has a range of 1, rx is unchanged */
+    co.force = 9.0;
+    test_clear_messages(f);
+    CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
+    CuAssertPtrEquals(tc, NULL, rx->attribs);
+    CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
+    a_removeall(&r->attribs, NULL);
 
     /* can also be cast from astral space: */
-    test_clear_messages(f);
     move_unit(u, ra, NULL);
+    test_clear_messages(f);
     CuAssertIntEquals(tc, co.level, sp_disruptastral(&co));
     CuAssertPtrEquals(tc, NULL, r->attribs);
     CuAssertTrue(tc, is_cursed(ra->attribs, &ct_astralblock));
+
+    test_teardown();
+}
+
+static void test_eternizewall(CuTest *tc) {
+    unit *u, *u2, *u3;
+    faction *f;
+    region *r;
+    building *b;
+    curse *c;
+    castorder co;
+    message *m;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    mt_create_error(206);
+    mt_create_va(mt_new("eternizewall_effect", NULL),
+        "mage:unit", "region:region", "building:building", MT_NEW_END);
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    u2 = test_create_unit(test_create_faction(), r);
+    u3 = test_create_unit(test_create_faction(), r);
+    param.flag = TARGET_OK;
+    param.typ = SPP_BUILDING;
+    param.data.b = b = test_create_building(r, test_create_castle());
+    b->size = 24;
+    u2->building = b;
+    arrput(args, param);
+    test_create_castorder(&co, u, 5, 12.0, 0, args);
+
+    /* target not found, no cost */
+    co.a_params[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrEquals(tc, NULL, b->attribs);
+
+    /* target resists */
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrEquals(tc, NULL, b->attribs);
+
+    co.a_params[0].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_eternizewall(&co));
+    CuAssertPtrNotNull(tc, c = get_curse(b->attribs, &ct_nocostbuilding));
+    CuAssertDblEquals(tc, co.force * co.force, c->vigour, 0.01);
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertDblEquals(tc, 0.0, c->effect, 0.01);
+    /* mage and factions with units in the building get a message: */
+    CuAssertPtrNotNull(tc, m = test_find_region_message(r, "eternizewall_effect", f));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, r, m->parameters[1].v);
+    CuAssertPtrEquals(tc, b, m->parameters[2].v);
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "eternizewall_effect", u2->faction));
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "eternizewall_effect", u3->faction));
+    test_clear_region_messages(r);
+
+    /* target is already cursed: */
+    CuAssertIntEquals(tc, 0, sp_eternizewall(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error206"));
+    CuAssertPtrNotNull(tc, c = get_curse(b->attribs, &ct_nocostbuilding));
+    CuAssertDblEquals(tc, co.force * co.force, c->vigour, 0.01);
+    CuAssertIntEquals(tc, 1, c->duration);
+    CuAssertDblEquals(tc, 0.0, c->effect, 0.01);
+    CuAssertPtrEquals(tc, NULL, test_find_region_message(r, "eternizewall_effect", f));
+
+    a_removeall(&b->attribs, NULL);
+
+    test_teardown();
+}
+
+static void test_permtransfer(CuTest *tc) {
+    unit *u, *u2;
+    region *r;
+    faction *f;
+    castorder co;
+    spellparameter param, *args = NULL;
+    spell *sp;
+    message *m;
+    int maxaura;
+
+    test_setup();
+    mt_create_error(214);
+    mt_create_va(mt_new("permtransfer_effect", NULL),
+        "mage:unit", "target:unit", "amount:int", MT_NEW_END);
+    init_resources();
+    u = test_create_unit(f = test_create_faction(), r = test_create_plain(0, 0));
+    set_level(u, SK_MAGIC, 10);
+    mage_set_spellpoints(create_mage(u, M_TYBIED), 100);
+    maxaura = max_spellpoints(u, r);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_UNIT;
+    param.data.u = u2 = test_create_unit(f, r);
+    arrput(args, param);
+    param.typ = SPP_INT;
+    param.data.i = 12;
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 5, 12.0, 0, args);
+    co.sp = sp = test_create_spell();
+    CuAssertIntEquals(tc, 1, auracost(u, sp));
+    co.a_params[0].flag = TARGET_NOTFOUND;
+    CuAssertIntEquals(tc, 0, sp_permtransfer(&co));
+    co.a_params[0].flag = TARGET_RESISTS;
+    CuAssertIntEquals(tc, co.level, sp_permtransfer(&co));
+
+    co.a_params[0].flag = TARGET_OK;
+    /* still does nothing if target is not a mage: */
+    CuAssertIntEquals(tc, 0, sp_permtransfer(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "error214"));
+    test_clear_messages(f);
+
+    set_level(u2, SK_MAGIC, 10);
+    /* target is also a Tybied mage, gets half the aura: */
+    mage_set_spellpoints(create_mage(u2, M_TYBIED), 100);
+    CuAssertIntEquals(tc, co.level, sp_permtransfer(&co));
+    CuAssertIntEquals(tc, 100 - 12, mage_get_spellpoints(get_mage(u)));
+    CuAssertIntEquals(tc, maxaura - 12, max_spellpoints(u, r));
+    CuAssertIntEquals(tc, maxaura + 6, max_spellpoints(u2, r));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "permtransfer_effect"));
+    CuAssertPtrNotNull(tc, m = test_find_faction_message(u2->faction, "permtransfer_effect"));
+    CuAssertPtrEquals(tc, u, m->parameters[0].v);
+    CuAssertPtrEquals(tc, u2, m->parameters[1].v);
+    CuAssertIntEquals(tc, 6, m->parameters[2].i);
 
     test_teardown();
 }
@@ -492,6 +684,57 @@ static void test_auraleak(CuTest *tc) {
     test_teardown();
 }
 
+static void test_leaveastral(CuTest *tc) {
+    region *r, *ra;
+    faction *f;
+    unit *u, *u2;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    test_use_astral();
+    mt_create_error(216);
+    mt_create_error(231);
+    r = test_create_plain(0, 0);
+    ra = test_create_region(real2tp(0), real2tp(0), NULL);
+    ra->_plane = get_astralplane();
+    CuAssertPtrEquals(tc, ra, r_standard_to_astral(r));
+    f = test_create_faction();
+    u = test_create_unit(f, ra);
+    u2 = test_create_unit(f, ra);
+
+    param.flag = TARGET_RESISTS;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+    param.flag = TARGET_OK;
+    param.typ = SPP_UNIT;
+    param.data.u = u2;
+    arrput(args, param);
+    test_create_castorder(&co, u, 10, 11., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+
+    args[0].flag = TARGET_OK;
+    args[1].flag = TARGET_RESISTS;
+
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, ra, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+
+    // Success:
+    args[1].flag = TARGET_OK;
+    CuAssertIntEquals(tc, co.level, sp_leaveastral(&co));
+    CuAssertPtrEquals(tc, r, u2->region);
+    CuAssertPtrEquals(tc, NULL, f->msgs);
+    CuAssertPtrNotNull(tc, test_find_region_message(ra, "astral_disappear", u->faction));
+    CuAssertPtrNotNull(tc, test_find_region_message(r, "astral_appear", u->faction));
+
+
+    test_use_astral();
+}
+
 static void test_show_astral(CuTest *tc) {
     region *r, *ra, *rx;
     faction *f;
@@ -500,6 +743,7 @@ static void test_show_astral(CuTest *tc) {
     curse * c;
 
     test_setup();
+    // create r before creating astral plane, so astral region won't get auto-created.
     r = test_create_plain(0, 0);
     test_use_astral();
     mt_create_error(216);
@@ -2174,14 +2418,18 @@ static void test_destroy_firewall(CuTest *tc)
     test_teardown();
 }
 
+
 CuSuite *get_spells_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_watch_region);
     SUITE_ADD_TEST(suite, test_view_reality);
     SUITE_ADD_TEST(suite, test_disruptastral);
+    SUITE_ADD_TEST(suite, test_eternizewall);
+    SUITE_ADD_TEST(suite, test_permtransfer);
     SUITE_ADD_TEST(suite, test_movecastle);
     SUITE_ADD_TEST(suite, test_auraleak);
+    SUITE_ADD_TEST(suite, test_leaveastral);
     SUITE_ADD_TEST(suite, test_show_astral);
     SUITE_ADD_TEST(suite, test_good_dreams);
     SUITE_ADD_TEST(suite, test_bad_dreams);
@@ -2229,6 +2477,8 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_firewall_spell);
     SUITE_ADD_TEST(suite, test_create_firewall);
     SUITE_ADD_TEST(suite, test_destroy_firewall);
+    SUITE_ADD_TEST(suite, test_break_curse);
+    SUITE_ADD_TEST(suite, test_magicrunes);
 
     return suite;
 }

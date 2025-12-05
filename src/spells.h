@@ -17,10 +17,14 @@ void init_spells(void);
 int report_action(struct region *r, struct unit *actor, struct message *msg, int flags);
 
 #define SHOWASTRAL_MAX_RADIUS 5
+int sp_break_curse(struct castorder *co);
+int sp_magicrunes(struct castorder *co);
 int sp_baddreams(struct castorder * co);
 int sp_gooddreams(struct castorder * co);
 int sp_viewreality(struct castorder * co);
 int sp_disruptastral(struct castorder *co);
+int sp_eternizewall(struct castorder *co);
+int sp_permtransfer(struct castorder *co);
 int sp_showastral(struct castorder * co);
 int sp_speed2(struct castorder* co);
 int sp_goodwinds(struct castorder* co);
@@ -31,6 +35,7 @@ int sp_blessedharvest(struct castorder* co);
 int sp_kaelteschutz(struct castorder* co);
 int sp_treewalkenter(struct castorder* co);
 int sp_treewalkexit(struct castorder* co);
+int sp_leaveastral(struct castorder *co);
 int sp_pullastral(struct castorder *co);
 int sp_holyground(struct castorder* co);
 int sp_drought(struct castorder* co);

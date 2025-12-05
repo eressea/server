@@ -104,22 +104,26 @@ local function write_files(locales)
   write_htpasswd()
 end
 
-local function write_scores()
-  local scores = {}
-  for r in regions() do
-    f = r.owner
-    if f~=nil then
-      value = scores[f.id]
-      if value==nil then value=0 end
-      value = value + r:get_resource("money")/100
-      scores[f.id] = value
+local function write_scores(filename)
+    local out = io.open(join_path(config.basepath, filename), "w")
+    if out then
+        local scores = {}
+        for r in regions() do
+            f = r.owner
+            if f~=nil then
+                value = scores[f.id]
+                if value==nil then value=0 end
+                    value = value + r:get_resource("money")/100
+                    scores[f.id] = value
+                end
+            end
+            for f in factions() do
+            score=scores[f.id]
+            if score==nil then score=0 end
+            out:write(math.floor(score)..":"..f.name..":"..itoa36(f.id)..'\n')
+        end
+        out:close()
     end
-  end
-  for f in factions() do
-    score=scores[f.id]
-    if score==nil then score=0 end
-    print(math.floor(score)..":"..f.name..":"..itoa36(f.id))
-  end
 end
 
 function process(rules, orders)
@@ -160,7 +164,7 @@ function process(rules, orders)
 
       write_files(config.locales)
       update_scores()
-      write_scores()
+      write_scores("scores")
   end
   return 0
 end
@@ -171,8 +175,8 @@ function run_turn(rules)
     turn = read_turn()
     set_turn(turn)
   end
-
-  orderfile = orderfile or config.basepath .. '/orders.' .. turn
+  orderfile = eressea.config.get("config.orderfile") or config.basepath .. '/orders.' .. turn
+  print("reading orders from " .. orderfile)
   eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
   local result = process(rules, orderfile)
   return result

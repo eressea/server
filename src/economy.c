@@ -389,13 +389,7 @@ void do_give(region * r)
                 }
             }
             if (transfer) {
-                for (ord = transfer; ord; ord = ord->next) {
-                    keyword_t kwd = getkeyword(ord);
-                    if (kwd == K_GIVE) {
-                        give_unit_cmd(u, ord);
-                        break;
-                    }
-                }
+                give_unit_cmd(u, transfer);
             }
         }
     }

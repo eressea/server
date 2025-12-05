@@ -683,7 +683,7 @@ msgid "error11"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Das Schiff befindet sich auf hoher See.\""
 
 msgid "error33"
-msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht in unserer Burg.\""
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit befindet sich nicht in diesem Gebäude.\""
 
 msgid "error22"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Befehl wurde nicht erkannt.\""

@@ -4599,39 +4599,41 @@ int sp_analysemagic(castorder * co)
     }
     /* Objekt ermitteln */
 
-    if (param->flag != TARGET_RESISTS) {
-        switch (param->typ) {
-        case SPP_REGION:
-        {
-            region *tr = param->data.r;
-            magicanalyse_region(tr, mage, co->force);
-            break;
-        }
-        case SPP_TEMP:
-        case SPP_UNIT:
-        {
-            unit *u;
-            u = param->data.u;
-            magicanalyse_unit(u, mage, co->force);
-            break;
-        }
-        case SPP_BUILDING:
-        {
-            magicanalyse_building(param->data.b, mage, co->force);
-            break;
-        }
-        case SPP_SHIP:
-        {
-            ship *sh;
-            sh = param->data.sh;
-            magicanalyse_ship(sh, mage, co->force);
-            break;
-        }
-        default:
-            /* Fehlerhafter Parameter */
-            return 0;
-        }
+    if (param->flag == TARGET_RESISTS)
+        return cast_level;
+
+    switch (param->typ) {
+    case SPP_REGION:
+    {
+        region *tr = param->data.r;
+        magicanalyse_region(tr, mage, co->force);
+        break;
     }
+    case SPP_TEMP:
+    case SPP_UNIT:
+    {
+        unit *u;
+        u = param->data.u;
+        magicanalyse_unit(u, mage, co->force);
+        break;
+    }
+    case SPP_BUILDING:
+    {
+        magicanalyse_building(param->data.b, mage, co->force);
+        break;
+    }
+    case SPP_SHIP:
+    {
+        ship *sh;
+        sh = param->data.sh;
+        magicanalyse_ship(sh, mage, co->force);
+        break;
+    }
+    default:
+        /* Fehlerhafter Parameter */
+        return 0;
+    }
+
     return cast_level;
 }
 
@@ -4923,31 +4925,35 @@ int sp_pullastral(castorder *co)
     return cost;
 }
 
-int sp_leaveastral(castorder * co)
+int sp_leaveastral(castorder *co)
 {
     int remaining_cap, w;
-    region *ro = co_get_region(co);
+    region *ra = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
     double power = co->force;
-    const spellparameter* params = co->a_params;
+    const spellparameter *params = co->a_params;
     size_t n, len = arrlen(params);
     region *rt = params ? params->data.r : NULL;
 
-    switch (getplaneid(ro)) {
-    case 1:
-        if (!rt || r_standard_to_astral(rt) != ro || !inhabitable(rt)) {
-            cmistake(mage, co->order, 216, MSG_MAGIC);
-            return 0;
-        }
-        break;
-    default:
+    if (!rt) {
+        /* how? */
+        return 0;
+    }
+    if (params && params->flag == TARGET_RESISTS) {
+        /* message already generated in verify_targets */
+        return cast_level;
+    }
+    if (getplaneid(ra) != 1) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spell_astral_only", NULL));
         return 0;
     }
-
-    if (is_cursed(ro->attribs, &ct_astralblock)
+    if (!inhabitable(rt) || ra != r_standard_to_astral(rt)) {
+        cmistake(mage, co->order, 216, MSG_MAGIC);
+        return 0;
+    }
+    if (is_cursed(ra->attribs, &ct_astralblock)
         || is_cursed(rt->attribs, &ct_astralblock)) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_astralblock", NULL));
@@ -4997,7 +5003,7 @@ int sp_leaveastral(castorder * co)
             move_unit(u, rt, NULL);
 
             /* Meldungen in der Ausgangsregion */
-            astral_disappear(ro, u);
+            astral_disappear(ra, u);
 
             /* Meldungen in der Zielregion */
             astral_appear(rt, u, mage->faction);
@@ -5285,7 +5291,7 @@ int sp_disruptastral(castorder * co)
  * ZAUBER "Mauern der Ewigkeit" <gebaeude-nummer>
  * Flags: (0)
  */
-static int sp_eternizewall(castorder * co)
+int sp_eternizewall(castorder * co)
 {
     unit *u;
     curse *c;
@@ -5389,10 +5395,10 @@ int sp_permtransfer(castorder * co)
     change_spellpoints(mage, -aura);
 
     if (unit_get_magic(tu) == unit_get_magic(mage)) {
-        change_maxspellpoints(tu, aura / 2);
+        change_maxspellpoints(tu, aura = aura / 2);
     }
     else {
-        change_maxspellpoints(tu, aura / 3);
+        change_maxspellpoints(tu, aura = aura / 3);
     }
 
     msg = msg_message("permtransfer_effect", "mage target amount", mage, tu, aura);
@@ -5625,7 +5631,7 @@ int sp_antimagiczone(castorder * co)
  * "kc"
  */
 
-static int sp_magicrunes(castorder * co)
+int sp_magicrunes(castorder * co)
 {
     int duration;
     unit *mage = co_get_caster(co);
@@ -5637,11 +5643,13 @@ static int sp_magicrunes(castorder * co)
     duration = 3 + rng_int() % cast_level;
     effect = 20;
 
+    if (param->flag == TARGET_RESISTS)
+        return cast_level;
+
     switch (param->typ) {
     case SPP_BUILDING:
     {
-        building *b;
-        b = param->data.b;
+        building *b = param->data.b;
 
         /* Magieresistenz der Burg erhoeht sich um 20% */
         create_curse(mage, &b->attribs, &ct_magicrunes, force,
@@ -5760,6 +5768,9 @@ int sp_break_curse(castorder * co)
     }
 
     obj = params[0].typ;
+
+    if (params[0].flag == TARGET_RESISTS)
+        return cast_level;
 
     c = findcurse(atoi36(params[1].data.xs));
     if (!c) {

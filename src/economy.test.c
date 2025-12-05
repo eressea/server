@@ -52,19 +52,11 @@ static void test_give_unit_cmd(CuTest * tc)
     test_setup();
     r = test_create_plain(0, 0);
     u1 = test_create_unit(f = test_create_faction(), r);
-    u2 = test_create_unit(test_create_faction(), test_create_plain(1, 1));
+    u2 = test_create_unit(test_create_faction(), r);
     contact_unit(u2, u1);
     ord = create_order(K_GIVE, u1->faction->locale, "%i %s",
         u2->no, param_name(P_UNIT, u1->faction->locale));
 
-    test_clear_messages(u1->faction);
-    test_clear_messages(u2->faction);
-    give_unit_cmd(u1, ord);
-    CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "feedback_unit_not_found"));
-    CuAssertPtrEquals(tc, NULL, u2->faction->msgs);
-    CuAssertPtrEquals(tc, f, u1->faction);
-
-    move_unit(u2, u1->region, NULL);
     test_clear_messages(u1->faction);
     test_clear_messages(u2->faction);
     give_unit_cmd(u1, ord);

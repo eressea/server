@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 WITHOUT_LUA=OFF
 ERESSEA_DB=memory
@@ -8,7 +8,7 @@ usage()
 {
     echo "usage: $0 --help --db=DB"
 }
-options=$(getopt -a -l help,no-lua,db: 'hd:' "$@")
+options=$(getopt -a 'hd:' "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$options"
 

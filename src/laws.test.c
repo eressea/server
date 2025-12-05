@@ -38,6 +38,8 @@
 #include <CuTest.h>
 #include <tests.h>
 
+#include <stb_ds.h>
+
 #include <assert.h>
 #include <stdbool.h>                 // for false, true, bool
 #include <stdio.h>
@@ -2671,9 +2673,15 @@ static void test_age_barrier(CuTest *tc) {
     config_set_int("rules.barrier.max_age", max_age);
     t_barrier = test_create_terrain("barrier", FORBIDDEN_REGION);
     t_desert = test_create_terrain("desert", LAND_REGION);
-    t_desert->production = calloc(2, sizeof(terrain_production));
-    t_desert->production->chance = 1.0;
-    t_desert->production->type = get_resourcetype(R_TREE);
+
+    terrain_production tp = {
+        .type = get_resourcetype(R_TREE),
+        .chance = 1.0,
+        .base = NULL,
+        .startlevel = NULL,
+        .divisor = NULL,
+    };
+    arrpush(t_desert->production, tp);
     init_terrains();
     r = test_create_region(0, 0, t_barrier);
     r2 = test_create_plain(1, 0);

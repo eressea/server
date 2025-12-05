@@ -222,6 +222,7 @@ message *msg_create(const struct message_type *mtype, variant args[])
     if (!msg) abort();
     msg->type = mtype;
     msg->refcount = 1;
+    msg->is_silent = 0;
     msg->parameters = NULL;
     if (mtype->nparameters > 0) {
         int i;
