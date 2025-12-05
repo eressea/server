@@ -1,6 +1,21 @@
+# 30.4
+	- Zauber Schutzrunen prüft die Magieresistenz des Ziels.
+	- Astraler Ruf und Astraler Ausgang funktionieren aus nzw. auf
+	  allen Schemenregionen gezaubert werden (Bug 3065).
+	- Astraler Ausgang prüft Zielregion auf Magieresistenz, gibt
+	  klarere Fehlermeldung (Bug 3071).
+	- Gebäude fuktionieren in der Bauwoche noch nicht (Bug 3081).
+	- Untersrückte Fehlermeldungen führten zu Ausführung des Befehls,
+	  was z.B. GIB an Personen in entfernten Regionen ermöglichte
+	  (Bug 3086).
+	- Fliegende Einheiten können Seezauber über dem Ozean zaubern,
+	  wie schwimmende (Bug 3085).
+
 # 30.3
 	- Opfere Kraft: Statt der Aura, die der Magier verliert, wird jetzt
 	  immer die Aura angezeigt, die das Ziel erhalten hat.
+	- init_reports vor write_game aufrufen, da es die Regionsreihenfolge
+	  ändert, und z.B. Schiffsbesitzer ändert (Bug 3076).
 
 # 30.2
 
