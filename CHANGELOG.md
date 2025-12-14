@@ -1,3 +1,7 @@
+# 30.4.1
+	- Verzauberungen, die eigene Daten speichern, müssen Speicher
+	  reservieren, in den sie sie laden (null-pointer crash).
+
 # 30.4
 	- Zauber Schutzrunen prüft die Magieresistenz des Ziels.
 	- Astraler Ruf und Astraler Ausgang funktionieren aus nzw. auf
@@ -9,7 +13,7 @@
 	  was z.B. GIB an Personen in entfernten Regionen ermöglichte
 	  (Bug 3086).
 	- Fliegende Einheiten können Seezauber über dem Ozean zaubern,
-	  wie schwimmende (Bug 3085).
+	  genau wie schwimmende (Bug 3085).
 
 # 30.3
 	- Opfere Kraft: Statt der Aura, die der Magier verliert, wird jetzt

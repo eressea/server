@@ -192,7 +192,11 @@ int curse_read(variant *var, void *owner, gamedata *data)
         c->effect = flt;
     }
     c->type = ct_find(cursename);
-    if (c->type == NULL) {
+    if (c->type) {
+        if (c->type->construct) {
+            c->type->construct(c);
+        }
+    } else {
         int result = read_ccompat(cursename, store);
         if (result != 0) {
             log_error("missing curse %s, no compatibility code either.\n", cursename);
