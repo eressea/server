@@ -86,6 +86,7 @@ backup BACKUP "$GAME" "$TURN"
 upload "$BACKUP"
 rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
+"$BIN/updatelist.sh" "$TURN"
 touch execute.lock
 
 (( NEXTTURN=TURN+1 )) || true

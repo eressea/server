@@ -1,5 +1,5 @@
 install(PROGRAMS create-orders backup-box backup-onedrive
-  run-turn send-zip-report
+  run-turn send-zip-report updatelist.sh
 send-bz2-report compress.py compress.sh epasswd.py
 accept-orders.py getemail.py checkpasswd.py
 sendreport.sh sendreports.sh orders-accept DESTINATION bin)
