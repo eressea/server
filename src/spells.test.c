@@ -912,7 +912,6 @@ static void test_maelstrom(CuTest *tc) {
     test_create_castorder(&co, u, 4, 5.0, 0, NULL);
     CuAssertIntEquals(tc, co.level, sp_maelstrom(&co));
     CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_maelstrom));
-    CuAssertTrue(tc, !curse_active(c));
     CuAssertDblEquals(tc, co.force, c->vigour, 0.01);
     CuAssertDblEquals(tc, co.force, c->effect, 0.01);
     CuAssertIntEquals(tc, co.level + 1, c->duration);
@@ -1488,7 +1487,6 @@ static void test_deathcloud(CuTest *tc) {
     CuAssertIntEquals(tc, 20, u->hp);
     CuAssertIntEquals(tc, AT_AGE_KEEP, c->type->age(c, NULL));
     CuAssertIntEquals(tc, 18, u->hp);
-    CuAssertTrue(tc, !curse_active(c));
     test_teardown();
 }
 

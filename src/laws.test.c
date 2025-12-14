@@ -43,7 +43,6 @@
 #include <assert.h>
 #include <stdbool.h>                 // for false, true, bool
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 static void test_new_building_can_be_renamed(CuTest * tc)
