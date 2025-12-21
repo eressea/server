@@ -266,7 +266,7 @@ static int create_data(keyword_t kwd, const char *s,
     if (kwd == K_STUDY || kwd == K_AUTOSTUDY || kwd == K_FORGET) {
         const char * sptr = s;
         skill_t sk = findskill(parse_token_depr(&sptr), lang);
-        if (kwd == K_FORGET || (sk != SK_MAGIC && sk != NOSKILL)) {
+        if (sk != SK_MAGIC && sk != NOSKILL) {
             return ((int)sk)-100;
         }
     }
@@ -597,7 +597,7 @@ keyword_t init_order(const struct order *ord, const struct locale *lang)
             assert(sk < MAXSKILLS);
             assert(lang);
             str = skillname(sk, lang);
-            if (strchr(str, ' ') == NULL) {
+            if (!str || strchr(str, ' ') == NULL) {
                 init_tokens_str(str);
             }
             else {

@@ -879,6 +879,19 @@ static void test_forget_cmd(CuTest *tc) {
     test_teardown();
 }
 
+static void test_forget_cmd_unknown_skill(CuTest *tc) {
+    unit *u;
+
+    test_setup();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_set_skill(u, SK_CATAPULT, 3, 4);
+    u->thisorder = create_order(K_FORGET, u->faction->locale, "hurrdurr");
+    forget_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "error77"));
+    CuAssertPtrNotNull(tc, u->skills);
+    test_teardown();
+}
+
 static void test_buy_cmd(CuTest *tc) {
     region * r;
     unit *u;
@@ -1772,6 +1785,7 @@ CuSuite *get_economy_suite(void)
     SUITE_ADD_TEST(suite, test_tax_cmd);
     SUITE_ADD_TEST(suite, test_trade_is_long_action);
     SUITE_ADD_TEST(suite, test_forget_cmd);
+    SUITE_ADD_TEST(suite, test_forget_cmd_unknown_skill);
     SUITE_ADD_TEST(suite, test_buy_cmd);
     SUITE_ADD_TEST(suite, test_buy_twice);
     SUITE_ADD_TEST(suite, test_buy_prices);

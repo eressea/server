@@ -286,6 +286,9 @@ int forget_cmd(unit * u, order * ord)
         ADDMSG(&u->faction->msgs, msg_message("forget", "unit skill", u, sk));
         set_level(u, sk, 0);
     }
+    else {
+        cmistake(u, ord, 77, MSG_EVENT);
+    }
     return 0;
 }
 

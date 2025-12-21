@@ -3,6 +3,7 @@
 #include "eressea.h"
 
 #include "skill.h"
+#include "faction.h"
 #include "unit.h"
 
 #include <util/keyword.h>   // for keyword, K_STUDY, K_MOVE, init_keywords
@@ -547,6 +548,18 @@ static void test_study_order_quoted(CuTest *tc) {
     test_teardown();
 }
 
+static void test_forget_order_bad_skill(CuTest *tc) {
+    test_setup();
+    unit *u;
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+
+    u->thisorder = create_order(K_FORGET, u->faction->locale, "hurrdurr");
+    CuAssertIntEquals(tc, K_FORGET, init_order(u->thisorder, u->faction->locale));
+    CuAssertStrEquals(tc, "hurrdurr", getstrtoken());
+
+    test_teardown();
+}
+
 static void test_study_order_unknown_tilde(CuTest *tc) {
     char token[32];
     stream out;
@@ -666,6 +679,7 @@ CuSuite *get_order_suite(void)
     SUITE_ADD_TEST(suite, test_study_order_unknown_tilde);
     SUITE_ADD_TEST(suite, test_study_order_unknown_quoted);
     SUITE_ADD_TEST(suite, test_study_order_quoted);
+    SUITE_ADD_TEST(suite, test_forget_order_bad_skill);
     SUITE_ADD_TEST(suite, test_parse_order);
     SUITE_ADD_TEST(suite, test_parse_parameters);
     SUITE_ADD_TEST(suite, test_parse_make);
