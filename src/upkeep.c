@@ -12,6 +12,7 @@
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
+#include "util/log.h"
 #include "util/message.h"
 #include "util/rand.h"
 
@@ -72,9 +73,15 @@ static bool hunger(int number, unit * u, const char *reason)
 {
     region *r = u->region;
     int dead = 0, hpsub = 0;
-    int hp = u->hp / u->number;
+    int hp;
     const char *damage = 0;
 
+    if (u->number <=0) {
+        log_error("unit %s has %d members and hungers",
+                unitname(u), u->number);
+        return false;
+    }
+    hp = u->hp / u->number;
     damage = hunger_damage(u_race(u));
 
     while (number--) {
