@@ -239,7 +239,7 @@ static int parse_args(int argc, char **argv)
             case 'l':
                 i = get_arg(argc, argv, 2, i, &arg, NULL);
                 if (arg) {
-                    log_flags = arg ? atoi(arg) : 0xff;
+                    log_flags = atoi(arg);
                 } else {
                     return usage(argv[0], NULL);
                 }
@@ -263,7 +263,7 @@ static int parse_args(int argc, char **argv)
             case 'w':
                 i = get_arg(argc, argv, 2, i, &arg, NULL);
                 if (arg) {
-                    bcrypt_workfactor = arg ? atoi(arg) : 0xff;
+                    bcrypt_workfactor = atoi(arg);
                 } else {
                     return usage(argv[0], NULL);
                 }
@@ -274,7 +274,7 @@ static int parse_args(int argc, char **argv)
             case 'v':
                 i = get_arg(argc, argv, 2, i, &arg, NULL);
                 if (arg) {
-                    verbosity = arg ? atoi(arg) : 0xff;
+                    verbosity = atoi(arg);
                 }
                 break;
             case 'h':
