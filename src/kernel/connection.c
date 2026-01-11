@@ -100,8 +100,11 @@ static connection **get_borders_i(const region * r1, const region * r2)
 
 connection *get_borders(const region * r1, const region * r2)
 {
-    connection **bp = get_borders_i(r1, r2);
-    return *bp;
+    if (r1 && r2) {
+        connection **bp = get_borders_i(r1, r2);
+        return *bp;
+    }
+    return NULL;
 }
 
 connection *border_create(region *from)

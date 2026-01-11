@@ -248,7 +248,6 @@ static int cmp_nmr_faction(const void *a, const void *b)
 static void report_nmrs(FILE *F, int timeout)
 {
     nmr_faction *nmrs = NULL;
-    size_t len, i;
     faction *f;
     for (f = factions; f; f = f->next) {
         if (turn - 1 - f->lastorders > 0) {
@@ -257,13 +256,16 @@ static void report_nmrs(FILE *F, int timeout)
             nmr->nmr = turn - 1 - f->lastorders;
         }
     }
-    len = arrlen(nmrs);
-    qsort(nmrs, len, sizeof(struct nmr_faction), cmp_nmr_faction);
-    fprintf(F, "\n\nFactions with NMRs:\n");
-    for (i = 0; i != len; ++i) {
-        out_faction(F, nmrs[i].f);
+    if (nmrs) {
+        size_t len, i;
+        len = arrlen(nmrs);
+        qsort(nmrs, len, sizeof(struct nmr_faction), cmp_nmr_faction);
+        fprintf(F, "\n\nFactions with NMRs:\n");
+        for (i = 0; i != len; ++i) {
+            out_faction(F, nmrs[i].f);
+        }
+        arrfree(nmrs);
     }
-    arrfree(nmrs);
 }
 
 void report_summary(const summary * s, bool full)
