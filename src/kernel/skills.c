@@ -5,6 +5,7 @@
 #include "unit.h"
 
 #include <kernel/attrib.h>
+#include <kernel/race.h>
 #include <kernel/skills.h>
 
 #include <util/goodies.h>
@@ -93,16 +94,19 @@ static int progress_weeks(unsigned int level)
 
 static void skill_set(skill *sv, unsigned int level, unsigned int days)
 {
-    assert(days <= MAX_DAYS_TO_NEXT_LEVEL(level));
     sv->level = level;
     sv->days = days;
     assert(sv->days == days && sv->level == level);
 }
 
-void sk_set_level(skill *sv, int level)
+void sk_set_level(const struct unit *u, skill *sv, int level)
 {
     int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
-    skill_set(sv, level, weeks * SKILL_DAYS_PER_WEEK);
+    const struct race *rc = u ? u_race(u) : NULL;
+    int speed = rc ? study_speed(rc, sv->id) : SKILL_DAYS_PER_WEEK;
+    int days = SKILL_DAYS_PER_WEEK + (weeks - 1) * speed;
+    ASSERT_VALID_SKILL(sv, rc);
+    skill_set(sv, level, days);
 }
 
 void increase_skill_weeks(unit * u, enum skill_t sk, const unsigned int weeks)
@@ -114,10 +118,10 @@ void increase_skill_weeks(unit * u, enum skill_t sk, const unsigned int weeks)
     }
     while (sv->days <= days) {
         days -= sv->days;
-        sk_set_level(sv, sv->level + 1);
+        sk_set_level(u, sv, sv->level + 1);
     }
     sv->days -= days;
-    assert(sv->days <= MAX_DAYS_TO_NEXT_LEVEL(sv->level));
+    ASSERT_VALID_SKILL(sv, u_race(u));
 }
 
 void reduce_skill_weeks(unit * u, skill * sv, const unsigned int weeks)
@@ -133,9 +137,9 @@ void reduce_skill_weeks(unit * u, skill * sv, const unsigned int weeks)
     }
     if (sv->level == 0) {
         /* reroll */
-        sk_set_level(sv, sv->level + 1);
+        sk_set_level(u, sv, sv->level + 1);
     }
-    assert(sv->days <= MAX_DAYS_TO_NEXT_LEVEL(sv->level));
+    ASSERT_VALID_SKILL(sv, u_race(u));
 }
 
 int skill_compare(const skill * sk, const skill * sc)
@@ -231,4 +235,10 @@ int skill_days(unit *u, enum skill_t sk)
 {
     const skill *sv = unit_skill(u, sk);
     return sv ? sv->days : 1;
+}
+
+int study_speed(const struct race *rc, skill_t sk)
+{
+    int mod = (rc && rc->study_speed) ? rc->study_speed[sk] : 0;
+    return SKILL_DAYS_PER_WEEK - mod;
 }

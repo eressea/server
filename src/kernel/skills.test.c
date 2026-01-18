@@ -17,7 +17,7 @@ static void test_skill_set(CuTest *tc)
 
     test_setup();
     config_set_int("study.random_progress", 0);
-    sk_set_level(&value, 2);
+    sk_set_level(NULL, &value, 2);
     CuAssertIntEquals(tc, 1, value.old);
     CuAssertIntEquals(tc, 2, value.level);
     CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, value.days);
