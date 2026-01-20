@@ -687,64 +687,24 @@ bool can_teach(const unit* u)
     return !(fval(u, UFL_WERE) || fval(u_race(u), RCF_NOTEACH));
 }
 
-static learn_fun inject_learn_fun = 0;
-
-void inject_learn(learn_fun fun) {
-    inject_learn_fun = fun;
-}
-
-static void increase_skill_days(unit *u, skill_t sk, int days) {
-    assert(sk >= 0 && sk < MAXSKILLS && days >= 0);
-    if (days > 0) {
-        int leveldays = SKILL_DAYS_PER_WEEK * u->number;
-        int weeks = 0;
-        if (inject_learn_fun) {
-            inject_learn_fun(u, sk, days);
-        }
-        while (days >= leveldays) {
-            ++weeks;
-            days -= leveldays;
-        }
-        if (days > 0 && rng_int() % leveldays >= leveldays - days) {
-            ++weeks;
-        }
-        if (weeks > 0) {
-            increase_skill_weeks(u, sk, weeks);
-        }
-    }
-}
-
 void produceexp(struct unit *u, enum skill_t sk)
 {
     assert(u);
     if (u->number > 0) {
         const struct race *rc = u_race(u);
         if ((rc->flags & RCF_NOLEARN) == 0 && rc_can_learn(rc, sk)) {
-            increase_skill_days(u, sk, produceexp_days() * u->number);
+            change_skill_days(u, sk, produceexp_days() * u->number);
         }
     }
 }
 
-static void reduce_skill_days(unit *u, skill_t sk, int days) {
-    if (days > 0) {
-        skill *sv = unit_skill(u, sk);
-        if (sv) {
-            while (days > 0) {
-                if (days >= SKILL_DAYS_PER_WEEK * u->number) {
-                    reduce_skill_weeks(u, sv, 1);
-                    days -= SKILL_DAYS_PER_WEEK;
-                }
-                else {
-                    if (chance(days / ((double)SKILL_DAYS_PER_WEEK * u->number))) /* (rng_int() % (30 * u->number) < days)*/
-                        reduce_skill_weeks(u, sv, 1);
-                    days = 0;
-                }
-            }
-        }
-    }
+static learn_fun inject_learn_fun = 0;
+
+void inject_learn(learn_fun fun) {
+    inject_learn_fun = fun;
 }
 
-/** 
+/**
  * days should be scaled by u->number; SKILL_DAYS_PER_WEEK * u->number is one week worth of learning
  * @return int
  *   The additional spend, i.e. from an academy.
@@ -753,6 +713,9 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     region *r = u->region;
     int cost = 0;
 
+    if (inject_learn_fun) {
+        inject_learn_fun(u, sk, days);
+    }
     if (r->buildings) {
         static const building_type *bt_artacademy;
         static const building_type *bt_academy;
@@ -809,17 +772,8 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    change_skill_days(u, sk, days);
+    change_skill_days(u, sk, days / u->number);
     return cost;
-}
-
-void change_skill_days(unit *u, enum skill_t sk, int days) {
-    if (days < 0) {
-        reduce_skill_days(u, sk, -days);
-    }
-    else {
-        increase_skill_days(u, sk, days);
-    }
 }
 
 /**
@@ -864,14 +818,14 @@ void demon_skillchange(unit *u)
             }
 
             if (roll < downchance) {
-                reduce_skill_weeks(u, sv, weeks);
+                change_skill(u, sv, -SKILL_DAYS_PER_WEEK * weeks);
                 if (sv->level < 1) {
                     /* demons should never forget below 1 */
                     set_level(u, sv->id, 1);
                 }
             }
             else {
-                change_skill_days(u, sv->id, SKILL_DAYS_PER_WEEK * u->number * weeks);
+                change_skill_days(u, sv->id, SKILL_DAYS_PER_WEEK * weeks);
             }
         }
         ++sv;
