@@ -36,7 +36,6 @@ bool check_student(const struct unit *u, struct order *ord,
 
 int learn_skill(struct unit *u, enum skill_t sk, int days,
         int studycost);
-void change_skill_days(struct unit *u, enum skill_t sk, int days);
 
 void produceexp(struct unit *u, enum skill_t sk);
 
