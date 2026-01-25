@@ -270,6 +270,7 @@ void test_reset(void)
     if (month_season == test_months) {
         month_season = NULL;
     }
+    random_source_reset();
     free_gamedata();
 }
 

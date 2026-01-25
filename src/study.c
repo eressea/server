@@ -164,21 +164,6 @@ static int produceexp_days(void) {
     return rule;
 }
 
-static int study_days(unit * u, skill_t sk)
-{
-    int speed = SKILL_DAYS_PER_WEEK;
-    if (u_race(u)->study_speed) {
-        speed += u_race(u)->study_speed[sk];
-        if (speed < SKILL_DAYS_PER_WEEK) {
-            skill *sv = unit_skill(u, sk);
-            if (sv == NULL) {
-                speed = SKILL_DAYS_PER_WEEK;
-            }
-        }
-    }
-    return u->number * speed;
-}
-
 static int
 teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
     bool report, int *academy_students)
@@ -215,7 +200,7 @@ teach_unit(unit * teacher, unit * student, int nteaching, skill_t sk,
             const struct building_type *btype = bt_find("academy");
             if (active_building(student, btype)) {
                 /* Jeder Schueler zusaetzlich +10 Tage wenn in Uni. */
-                teach->days += students * produceexp_days();  /* learning erhoehen */
+                teach->days += students * SKILL_DAYS_PER_WEEK/3;  /* learning erhoehen */
                 /* Lehrer zusaetzlich +1 Tag pro Schueler. */
                 if (academy_students) {
                     *academy_students += students;
@@ -429,7 +414,8 @@ int teach_cmd(unit * teacher, struct order *ord)
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
     if (academy_students > 0 && sk_academy != NOSKILL) {
-        change_skill_days(teacher, sk_academy, academy_students);
+        // TODO: rounding errors here.
+        change_skill_days(teacher, sk_academy, academy_students / teacher->number);
     }
     reset_order();
     return 0;
@@ -636,7 +622,7 @@ int study_cmd(unit * u, order * ord)
     }
 
     days = teach ? teach->days : 0;
-    days += study_days(u, sk);
+    days += SKILL_DAYS_PER_WEEK * u->number;
 
     if (studycost) {
         int cost = studycost * u->number;
@@ -698,12 +684,6 @@ void produceexp(struct unit *u, enum skill_t sk)
     }
 }
 
-static learn_fun inject_learn_fun = 0;
-
-void inject_learn(learn_fun fun) {
-    inject_learn_fun = fun;
-}
-
 /**
  * days should be scaled by u->number; SKILL_DAYS_PER_WEEK * u->number is one week worth of learning
  * @return int
@@ -713,9 +693,6 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     region *r = u->region;
     int cost = 0;
 
-    if (inject_learn_fun) {
-        inject_learn_fun(u, sk, days);
-    }
     if (r->buildings) {
         static const building_type *bt_artacademy;
         static const building_type *bt_academy;
@@ -737,7 +714,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
                 n = n * avail / cost;
                 cost = n * studycost;
             }
-            days += produceexp_days() * n;
+            days += SKILL_DAYS_PER_WEEK * n / 3;
         }
 
         /* the artacademy currently improves the learning of entertainment
