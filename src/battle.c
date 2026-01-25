@@ -939,7 +939,7 @@ void kill_troop(troop dt)
  */
 void drain_exp(struct unit *u, int n)
 {
-    skill_t sk = (skill_t)(rng_int() % MAXSKILLS);
+    skill_t sk = (skill_t)(rng_uint() % MAXSKILLS);
     skill_t ssk;
 
     /* TODO (enno): we can use u->skill_size to find a random skill */
