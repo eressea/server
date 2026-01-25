@@ -28,6 +28,7 @@
 #include <stb_ds.h>
 
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 
 #ifdef XML_LARGE_SIZE
