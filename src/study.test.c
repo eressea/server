@@ -530,6 +530,21 @@ static void test_demon_skillchange_hungry(CuTest *tc) {
     test_teardown();
 }
 
+static void test_produceexp(CuTest *tc) {
+    unit *u;
+    skill *sv;
+
+    test_setup();
+
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    test_set_skill(u, SK_CROSSBOW, 1, 1);
+    CuAssertPtrNotNull(tc, sv = unit_skill(u, SK_CROSSBOW));
+    produceexp(u, SK_CROSSBOW);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK * 2 / 3, sv->days);
+    test_teardown();
+}
+
 static void test_study_cmd(CuTest *tc) {
     unit *u;
     skill *sv;
@@ -880,6 +895,7 @@ static void test_teach_many_to_many(CuTest *tc) {
 CuSuite *get_study_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_produceexp);
     SUITE_ADD_TEST(suite, test_study_cmd);
     SUITE_ADD_TEST(suite, test_study_cost);
     SUITE_ADD_TEST(suite, test_study_cost_magic);

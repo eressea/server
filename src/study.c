@@ -679,7 +679,7 @@ void produceexp(struct unit *u, enum skill_t sk)
     if (u->number > 0) {
         const struct race *rc = u_race(u);
         if ((rc->flags & RCF_NOLEARN) == 0 && rc_can_learn(rc, sk)) {
-            change_skill_days(u, sk, produceexp_days() * u->number);
+            change_skill_days(u, sk, produceexp_days());
         }
     }
 }

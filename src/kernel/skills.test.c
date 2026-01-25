@@ -90,6 +90,32 @@ static void test_skill_change(CuTest *tc)
     CuAssertIntEquals(tc, 18 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
 }
 
+static void test_reduce_skill(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+    config_set_int("study.random_progress", 0);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    set_number(u, 2); // number should have no effect on skill values
+    change_skill_days(u, SK_CROSSBOW, SKILL_DAYS_PER_WEEK);
+    CuAssertPtrNotNull(tc, unit_skill(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 2 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
+    change_skill_days(u, SK_CROSSBOW, -SKILL_DAYS_PER_WEEK);
+    CuAssertPtrNotNull(tc, unit_skill(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 1, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
+    change_skill_days(u, SK_CROSSBOW, 1 - SKILL_DAYS_PER_WEEK);
+    CuAssertPtrNotNull(tc, unit_skill(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, 0, skill_level(u, SK_CROSSBOW));
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK - 1, skill_days(u, SK_CROSSBOW));
+    change_skill_days(u, SK_CROSSBOW, -1);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
+    change_skill_days(u, SK_CROSSBOW, -1);
+    CuAssertPtrEquals(tc, NULL, unit_skill(u, SK_CROSSBOW));
+}
+
 static void test_set_level(CuTest * tc)
 {
     unit *u;
@@ -220,6 +246,7 @@ static void test_skills_merge(CuTest* tc)
 CuSuite *get_skills_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
+    SUITE_ADD_TEST(suite, test_reduce_skill);
     SUITE_ADD_TEST(suite, test_skill_set);
     SUITE_ADD_TEST(suite, test_skill_change);
     SUITE_ADD_TEST(suite, test_set_level);

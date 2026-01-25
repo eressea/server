@@ -87,7 +87,7 @@ static int progress_weeks(unsigned int level)
     unsigned int coins = MAX_WEEKS_TO_NEXT_LEVEL(level - 1) - 1;
     int heads = 1;
     while (coins--) {
-        heads += rng_int() % 2;
+        heads += rng_uint() % 2;
     }
     return heads;
 }
@@ -99,7 +99,7 @@ static void skill_set(skill *sv, unsigned int level, unsigned int days)
     assert(sv->days == days && sv->level == level);
 }
 
-void sk_set_level(const struct unit *u, skill *sv, int level)
+void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
 {
     int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
     const struct race *rc = u ? u_race(u) : NULL;
@@ -131,10 +131,20 @@ static void reduce_skill_days(unit *u, skill *sv, unsigned int days)
             unsigned int days_lost = max_days - sv->days;
             // subtract those days of un-learning, step down a level:
             days -= days_lost;
-            sk_set_level(u, sv, sv->level - 1);
-            max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
+            if (sv->level > 0) {
+                sk_set_level(u, sv, sv->level - 1);
+                sv->days = 0;
+                max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
+            }
+            else {
+                remove_skill(u, (skill_t)sv->id);
+                sv = NULL;
+                break;
+            }
         }
-        sv->days += days;
+        if (sv) {
+            sv->days += days;
+        }
     }
 }
 

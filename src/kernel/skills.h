@@ -40,7 +40,7 @@ struct attrib *make_skillmod(enum skill_t sk, skillmod_fun special,
 void change_skill_days(struct unit *u, enum skill_t sk, int days);
 void change_skill(struct unit *u, skill *sv, int days);
 int merge_skill(const skill* sv, const skill* sn, skill* result, int n, int add);
-void sk_set_level(const struct unit *u, skill * sv, int level);
+void sk_set_level(const struct unit *u, skill * sv, unsigned int level);
 int skill_compare(const skill* sk, const skill* sc);
 
 int skill_level(struct unit *u, enum skill_t sk);
