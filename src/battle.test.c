@@ -1520,6 +1520,7 @@ static void test_combat_rosthauch(CuTest *tc) {
     const resource_type *rtype;
 
     test_setup();
+    random_source_inject_constants(1.0, 0xdeadbeef);
     init_resources();
     rtype = rt_get_or_create("iron");
     it_rust1 = create_weapon("sword", rtype);
