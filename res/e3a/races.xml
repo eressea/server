@@ -714,7 +714,7 @@
     <skill name="building" modifier="-99"/>
     <skill name="forestry" modifier="-99"/>
     <skill name="catapult" modifier="-99"/>
-     <skill name="magic" modifier="-99"/>
+    <skill name="magic" modifier="-99"/>
     <skill name="training" modifier="-99"/>
     <skill name="riding" modifier="-99"/>
     <skill name="armorer" modifier="-99"/>

@@ -581,13 +581,13 @@ void set_level(struct unit * u, enum skill_t sk, unsigned int value)
     for (len = arrlen(u->skills), s = 0; s != len; ++s) {
         skill* sv = u->skills + s;
         if (sv->id == sk) {
-            sk_set_level(sv, value);
+            sk_set_level(u, sv, value);
             sv->old = sv->level;
             return;
         }
         ++sv;
     }
-    sk_set_level(add_skill(u, sk), value);
+    sk_set_level(u, add_skill(u, sk), value);
 }
 
 static int leftship_age(struct attrib *a, void *owner)
@@ -1231,7 +1231,7 @@ static int newunitid(void)
 {
     int random_unit_no;
     int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    random_unit_no = 1 + (rng_uint() % MAX_UNIT_NR);
     start_random_no = random_unit_no;
 
     while (ufindhash(random_unit_no) || dfindhash(random_unit_no)

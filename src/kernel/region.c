@@ -1097,8 +1097,8 @@ void init_region(region *r)
         t_plain = get_terrain(terrainnames[T_PLAIN]);
     }
     if (terrain->size>0) {
-        horses = rng_int() % (terrain->size / 50);
-        trees = terrain->size * (30 + rng_int() % 40) / 1000;
+        horses = rng_uint() % (terrain->size / 50);
+        trees = terrain->size * (30 + rng_uint() % 40) / 1000;
     }
     if (t_plain && terrain == t_plain) {
         rsethorses(r, horses);
