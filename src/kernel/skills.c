@@ -99,6 +99,12 @@ static void skill_set(skill *sv, unsigned int level, unsigned int days)
     assert(sv->days == days && sv->level == level);
 }
 
+int study_speed(const struct race *rc, enum skill_t sk)
+{
+    int mod = (rc && rc->study_speed) ? rc->study_speed[sk] : 0;
+    return SKILL_DAYS_PER_WEEK - mod;
+}
+
 void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
 {
     int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
@@ -125,25 +131,21 @@ static void increase_skill_days(unit *u, skill *sv, unsigned int days) {
 static void reduce_skill_days(unit *u, skill *sv, unsigned int days)
 {
     if (sv) {
+        // first, strip full levels off the skill:
+        // max_days = maximum days I can have "to do" at current level
         unsigned int max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
-        while (sv->days + days > max_days) {
-            // maximum number of days before we must step down a level:
-            unsigned int days_lost = max_days - sv->days;
-            // subtract those days of un-learning, step down a level:
-            days -= days_lost;
-            if (sv->level > 0) {
-                sk_set_level(u, sv, sv->level - 1);
-                sv->days = 0;
-                max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
-            }
-            else {
-                remove_skill(u, (skill_t)sv->id);
-                sv = NULL;
-                break;
-            }
+        days += sv->days;
+        while (sv->level > 0 && max_days < days) {
+            // level_days = expected time to complete current level.
+            unsigned int level_days = SKILL_DAYS_PER_WEEK * (1 + sv->level);
+            days -= level_days;
+            --sv->level;
+            max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
         }
-        if (sv) {
-            sv->days += days;
+        // store the remaining days
+        sv->days = days;
+        if (sv->level == 0 && sv->days >= SKILL_DAYS_PER_WEEK) {
+            remove_skill(u, (skill_t)sv->id);
         }
     }
 }
@@ -266,8 +268,3 @@ int skill_days(unit *u, enum skill_t sk)
     return sv ? sv->days : 1;
 }
 
-int study_speed(const struct race *rc, skill_t sk)
-{
-    int mod = (rc && rc->study_speed) ? rc->study_speed[sk] : 0;
-    return SKILL_DAYS_PER_WEEK - mod;
-}
