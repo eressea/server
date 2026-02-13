@@ -81,11 +81,11 @@ static bool rule_random_progress(void)
     return rule != 0;
 }
 
-static int progress_weeks(unsigned int level)
+static unsigned int progress_weeks(unsigned int level)
 /* how many weeks must i study to get from level-1 to level */
 {
     unsigned int coins = MAX_WEEKS_TO_NEXT_LEVEL(level - 1) - 1;
-    int heads = 1;
+    unsigned int heads = 1;
     while (coins--) {
         heads += rng_uint() % 2;
     }
@@ -107,10 +107,10 @@ int study_speed(const struct race *rc, enum skill_t sk)
 
 void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
 {
-    int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
+    unsigned int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
     const struct race *rc = u ? u_race(u) : NULL;
     int speed = rc ? study_speed(rc, sv->id) : SKILL_DAYS_PER_WEEK;
-    int days = SKILL_DAYS_PER_WEEK + (weeks - 1) * speed;
+    unsigned int days = SKILL_DAYS_PER_WEEK + (weeks - 1) * speed;
     ASSERT_VALID_SKILL(sv, rc);
     skill_set(sv, level, days);
 }
