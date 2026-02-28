@@ -75,8 +75,6 @@
 #define TDIFF_CHANGE    5       /* 5% hoeher pro Stufe */
 #define DAMAGE_QUOTIENT 2       /* damage += skilldiff/DAMAGE_QUOTIENT */
 
-#define DEBUG_SELECT            /* should be disabled if select_enemy works */
-
 typedef enum combatmagic {
     DO_PRECOMBATSPELL,
     DO_POSTCOMBATSPELL
@@ -1461,9 +1459,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     battle *b = as->battle;
     int selected, enemies;
     size_t si, sl = arrlen(b->sides);
-#ifdef DEBUG_SELECT
-    troop result = no_troop;
-#endif
+
     if (u_race(af->unit)->flags & RCF_FLY) {
         /* flying races ignore min- and maxrow and can attack anyone fighting
          * them */
@@ -1507,17 +1503,26 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
                 if (dr < minrow || dr > maxrow)
                     continue;
                 if (df->alive - df->removed > selected) {
-#ifdef DEBUG_SELECT
-                    if (result.fighter == NULL) {
-                        result.index = selected;
-                        result.fighter = df;
-                    }
-#else
                     troop dt;
                     dt.index = selected;
                     dt.fighter = df;
+                    if (b->turn == 0 && dt.fighter) {
+                        if (rule_tactics_formula == 1) {
+                            int tactics = get_tactics(as, dt.fighter->side);
+
+                            /* percentage chance to get this attack */
+                            if (tactics > 0) {
+                                double tacch = tactics_chance(af->unit, tactics);
+                                if (!chance(tacch)) {
+                                    dt.fighter = NULL;
+                                }
+                            }
+                            else {
+                                dt.fighter = NULL;
+                            }
+                        }
+                    }
                     return dt;
-#endif
                 }
                 selected -= (df->alive - df->removed);
                 enemies -= (df->alive - df->removed);
@@ -1527,12 +1532,9 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
     if (enemies != 0) {
         log_error("select_enemies has a bug.\n");
     }
-#ifdef DEBUG_SELECT
-    return result;
-#else
+
     assert(!selected);
     return no_troop;
-#endif
 }
 
 int get_tactics(const side * as, const side * ds)
@@ -1570,41 +1572,6 @@ double tactics_chance(const unit *u, int skilldiff) {
         }
     }
     return tacch;
-}
-
-static troop select_opponent(battle * b, troop at, int mindist, int maxdist)
-{
-    fighter *af = at.fighter;
-    troop dt;
-
-    if (u_race(af->unit)->flags & RCF_FLY) {
-        /* flying races ignore min- and maxrow and can attack anyone fighting
-         * them */
-        dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-    }
-    else {
-        if (mindist < FIGHT_ROW) mindist = FIGHT_ROW;
-        dt = select_enemy(at.fighter, mindist, maxdist, SELECT_ADVANCE);
-    }
-
-    if (b->turn == 0 && dt.fighter) {
-        if (rule_tactics_formula == 1) {
-            int tactics = get_tactics(at.fighter->side, dt.fighter->side);
-
-            /* percentage chance to get this attack */
-            if (tactics > 0) {
-                double tacch = tactics_chance(af->unit, tactics);
-                if (!chance(tacch)) {
-                    dt.fighter = NULL;
-                }
-            }
-            else {
-                dt.fighter = NULL;
-            }
-        }
-    }
-
-    return dt;
 }
 
 fighter **select_fighters(battle *b, const side *vs, int mask, select_fun cb, void *cbdata)
@@ -2175,10 +2142,10 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                     }
                 }
                 if (missile) {
-                    td = select_opponent(b, ta, missile_range[0], missile_range[1]);
+                    td = select_enemy(ta.fighter, missile_range[0], missile_range[1], SELECT_ADVANCE);
                 }
                 else {
-                    td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+                    td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
                 }
                 if (!td.fighter)
                     return;
@@ -2218,7 +2185,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         do_extra_spell(ta, a);
         break;
     case AT_NATURAL:
-        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+        td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
         if (!td.fighter)
             return;
         if (ta.fighter->person[ta.index].last_action < b->turn) {
@@ -2229,7 +2196,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         }
         break;
     case AT_DRAIN_ST:
-        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+        td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
         if (!td.fighter)
             return;
         if (ta.fighter->person[ta.index].last_action < b->turn) {
@@ -2249,7 +2216,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         }
         break;
     case AT_DRAIN_EXP:
-        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+        td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
         if (!td.fighter)
             return;
         if (ta.fighter->person[ta.index].last_action < b->turn) {
@@ -2260,7 +2227,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         }
         break;
     case AT_DAZZLE:
-        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+        td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
         if (!td.fighter)
             return;
         if (ta.fighter->person[ta.index].last_action < b->turn) {
@@ -2271,7 +2238,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
         }
         break;
     case AT_STRUCTURAL:
-        td = select_opponent(b, ta, melee_range[0], melee_range[1]);
+        td = select_enemy(ta.fighter, melee_range[0], melee_range[1], SELECT_ADVANCE);
         if (!td.fighter)
             return;
         if (ta.fighter->person[ta.index].last_action < b->turn) {

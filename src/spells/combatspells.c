@@ -102,6 +102,18 @@ static double get_force(double power, int formel)
     }
 }
 
+static int spell_terminate(troop at, int force, int enemies, const char *damage)
+{
+    int killed = 0;
+    while (force-- > 0 && killed < enemies) {
+        troop dt = select_enemy(at.fighter, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
+        /* tactics rule can make us find an invalid enemy: */
+        if (dt.fighter) {
+            killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
+        }
+    }
+    return killed;
+}
 /* Generischer Kampfzauber */
 int damage_spell(struct castorder * co, int dmg, int strength)
 {
@@ -110,7 +122,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
     const spell * sp = co->sp;
     double power = co->force;
     battle *b = fi->side->battle;
-    troop at, dt;
+    troop at;
     message *m;
     /* Immer aus der ersten Reihe nehmen */
     int enemies, killed = 0;
@@ -128,12 +140,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
         return 0;
     }
 
-    while (force > 0 && killed < enemies) {
-        dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
-        assert(dt.fighter);
-        --force;
-        killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-    }
+    killed = spell_terminate(at, force, enemies, damage);
 
     m = msg_message("cast_combatspell", "mage spell dead",
         fi->unit, sp, killed);
@@ -529,7 +536,6 @@ int sp_dragonodem(struct castorder * co)
     double power = co->force;
     const spell * sp = co->sp;
     battle *b = fi->side->battle;
-    troop dt;
     troop at;
     int force, enemies;
     const char *damage;
@@ -555,12 +561,7 @@ int sp_dragonodem(struct castorder * co)
         at.fighter = fi;
         at.index = 0;
 
-        while (force && killed < enemies) {
-            dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
-            assert(dt.fighter);
-            --force;
-            killed += terminate(dt, at, AT_COMBATSPELL, damage, false);
-        }
+        killed = spell_terminate(at, force, enemies, damage);
 
         m =
             msg_message("cast_combatspell", "mage spell dead", fi->unit, sp,
