@@ -12,7 +12,6 @@
 
 #include "util/keyword.h"    // for K_RECRUIT
 #include "util/message.h"
-#include "util/variant.h"    // for variant
 
 #include "stb_ds.h"
 
