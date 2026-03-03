@@ -98,7 +98,6 @@ extern "C" {
 
     struct faction *findfaction(int n);
     int max_magicians(const faction * f);
-    void set_show_item(faction * f, const struct item_type *itype);
 
     const char *factionname(const struct faction *f);
     struct unit *addplayer(struct region *r, faction * f);

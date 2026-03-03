@@ -954,9 +954,7 @@ void register_resources(void)
     register_function((pf_generic)res_changeaura, "changeaura");
 }
 
-void show_item(unit * u, const item_type * itype)
-{
-    faction * f = u->faction;
+static void display_potion(faction *f, const item_type *itype) {
     attrib *a;
 
     a = a_find(f->attribs, &at_showitem);
@@ -965,6 +963,33 @@ void show_item(unit * u, const item_type * itype)
     if (!a) {
         a = a_add(&f->attribs, a_new(&at_showitem));
         a->data.v = (void *)itype;
+    }
+}
+
+static void display_item(faction *f, const item_type *itype)
+{
+    const char *name;
+    const char *key;
+    const char *info;
+
+    name = resourcename(itype->rtype, 0);
+    key = mkname("iteminfo", name);
+    info = locale_getstring(f->locale, key);
+
+    if (info == NULL) {
+        info = LOC(f->locale, mkname("iteminfo", "no_info"));
+    }
+    ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
+        itype->weight, itype->rtype, info));
+}
+
+void show_item(faction *f, const item_type * itype)
+{
+    if (itype->flags & ITF_POTION) {
+        display_potion(f, itype);
+    }
+    else {
+        display_item(f, itype);
     }
 }
 
