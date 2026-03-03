@@ -6,7 +6,6 @@
 
 #include "util/message.h"
 #include "util/keyword.h"  // for K_ENTERTAIN, K_MOVE
-#include "util/variant.h"  // for variant
 
 #include <CuTest.h>
 #include <tests.h>
@@ -88,7 +87,7 @@ void test_add_message(CuTest *tc) {
     CuAssertPtrEquals(tc, msg, mlist->begin->msg);
     CuAssertPtrEquals(tc, NULL, mlist->begin->next);
     CuAssertIntEquals(tc, 2, msg->refcount);
-    msg->is_silent = 1;
+    msg->is_silent = -1;
     add_message(&mlist, msg);
     CuAssertIntEquals(tc, 2, msg->refcount);
     CuAssertPtrEquals(tc, NULL, mlist->begin->next);
