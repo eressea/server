@@ -4,6 +4,7 @@
 #include "skill.h"
 
 struct unit;
+struct faction;
 struct attrib;
 struct attrib_type;
 struct race;
