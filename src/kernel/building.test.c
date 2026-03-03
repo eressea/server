@@ -8,6 +8,8 @@
 #include "region.h"
 #include "unit.h"
 
+#include "util/variant.h"  // for variant
+
 #include <strings.h>
 
 #include <stb_ds.h>

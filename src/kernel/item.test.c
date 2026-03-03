@@ -240,13 +240,15 @@ static void test_show_item(CuTest *tc) {
     test_setup();
     init_resources();
     f = test_create_faction();
-    itype = it_find("catapult");
+    itype = test_create_itemtype("catapult");
     show_item(f, itype);
     CuAssertPtrEquals(tc, NULL, a_find(f->attribs, &at_showitem));
 	CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "displayitem"));
 	test_clear_messages(f);
+    a_removeall(&f->attribs, NULL);
 
 	itype = test_create_potiontype("foolpotion", 1);
+    show_item(f, itype);
 	CuAssertPtrNotNull(tc, a = a_find(f->attribs, &at_showitem));
 	CuAssertPtrEquals(tc, (void *)itype, a->data.v);
 	CuAssertPtrNotNull(tc, test_find_faction_message(f, "displayitem"));
