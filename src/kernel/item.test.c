@@ -251,7 +251,7 @@ static void test_show_item(CuTest *tc) {
     show_item(f, itype);
 	CuAssertPtrNotNull(tc, a = a_find(f->attribs, &at_showitem));
 	CuAssertPtrEquals(tc, (void *)itype, a->data.v);
-	CuAssertPtrNotNull(tc, test_find_faction_message(f, "displayitem"));
+	CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "displayitem"));
 
 	test_teardown();
 }
