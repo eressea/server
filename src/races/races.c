@@ -55,10 +55,10 @@ void equip_newunits(struct unit *u)
         break;
     }
     for (itm = u->items; itm; itm = itm->next) {
-        set_show_item(u->faction, itm->type);
+        show_item(u->faction, itm->type);
     }
     for (itm = u->faction->items; itm; itm = itm->next) {
-        set_show_item(u->faction, itm->type);
+        show_item(u->faction, itm->type);
     }
 }
 
