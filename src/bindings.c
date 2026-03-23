@@ -5,6 +5,7 @@
 #include "bind_tolua.h"
 
 #include "console.h"
+#include "creport.h"
 #include "gamedb.h"
 #include "helpers.h"
 #include "laws.h"
@@ -461,7 +462,7 @@ static int tolua_write_summary(lua_State * L)
     free_summary(sum);
     return 0;
 }
-/*
+
 static int tolua_write_map(lua_State * L)
 {
     const char *filename = tolua_tostring(L, 1, 0);
@@ -470,7 +471,7 @@ static int tolua_write_map(lua_State * L)
     }
     return 0;
 }
-*/
+
 static int tolua_read_turn(lua_State * L)
 {
     int cturn = current_turn();
@@ -1002,6 +1003,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, "turn_process", tolua_turn_process);
         tolua_function(L, "turn_end", tolua_turn_end);
         tolua_function(L, "process_orders", tolua_process_orders);
+        tolua_function(L, "write_map", tolua_write_map);
         tolua_function(L, "init_reports", tolua_init_reports);
         tolua_function(L, "write_reports", tolua_write_reports);
         tolua_function(L, "write_report", tolua_write_report);
