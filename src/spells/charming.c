@@ -267,7 +267,7 @@ int sp_charmingsong(castorder *co)
         variant p_modified = resist_chance(mage, target, TYP_UNIT, resist_bonus);
         variant prob = frac_div(p_regular, p_modified);
         if (prob.sa[0] > 0) {
-            if (rng_int() % prob.sa[1] < prob.sa[0]) {
+            if (prob.sa[0] < rng_int() % prob.sa[1]) {
                 /* target resists after all, because of bonus */
                 ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
                     "unit region command target", mage, mage->region, co->order, target));
