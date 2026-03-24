@@ -267,7 +267,14 @@ int sp_charmingsong(castorder *co)
         variant p_modified = resist_chance(mage, target, TYP_UNIT, resist_bonus);
         variant prob = frac_div(p_regular, p_modified);
         if (prob.sa[0] > 0) {
-            if (prob.sa[0] < rng_int() % prob.sa[1]) {
+            /**
+            * given a failure chance of A/B, we roll a
+            * B-sided die, and if the result is less than B - A,
+            * the spell fails.
+            * This formula is a bit odd, because we want it to fail
+            * on low dice rolls, to simplify testing.
+            */
+            if (rng_int() % prob.sa[1] < prob.sa[1] - prob.sa[0]) {
                 /* target resists after all, because of bonus */
                 ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
                     "unit region command target", mage, mage->region, co->order, target));
