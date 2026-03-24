@@ -155,6 +155,13 @@ static void test_charmingsong(CuTest *tc) {
     scale_number(u2, (int)co.force);
     test_clear_messages(f);
 
+    // very big unit, cannot be charmed:
+    scale_number(u2, 1 + (int)(co.force * co.force));
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "spellunitresists"));
+    scale_number(u2, (int)co.force);
+    test_clear_messages(f);
+
     // success:
     CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
     CuAssertPtrEquals(tc, u->faction, u2->faction);
