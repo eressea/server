@@ -187,7 +187,7 @@ static void test_shipowner_goes_to_other_when_empty(CuTest * tc)
     u_set_ship(u, sh);
     u_set_ship(u2, sh);
     CuAssertPtrEquals(tc, u, ship_owner(sh));
-    leave_ship(u);
+    u->number = 0;
     CuAssertPtrEquals(tc, u2, ship_owner(sh));
     test_teardown();
 }
