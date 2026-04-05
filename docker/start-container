@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;$LUA_PATH"
+exec "$@"

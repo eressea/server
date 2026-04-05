@@ -1,0 +1,4 @@
+services:
+  server:
+    build: .
+    image: eressea/server:v1
