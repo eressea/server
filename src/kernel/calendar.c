@@ -50,10 +50,13 @@ const gamedate *get_gamedate(int turn_now, gamedate * gd)
     int t = turn_now - first_turn();
 
     assert(gd);
-    if (t<0) {
+    if (t < 0) {
+        // FIXME: Why is this happening, especially for turn 0?
         t = 0;
-        log_error("current turn %d is before first %d",
+        if (turn_now > 0) {
+            log_error("current turn %d is before first %d",
                 turn_now, first_turn());
+        }
     }
     assert(t>=0);
 

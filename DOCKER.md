@@ -1,3 +1,13 @@
+# Overview
+
+At this point, the container can mount a game directory from the host, and run the server with a given script like so:
+```bash
+docker run -v $HOME/eressea/game-1:/data eressea/server:v1 myscript.lua
+```
+
+This mounts the host's `game-1` directory as a data volume in the container, and the server operated on the files in there, i.e. game data and reports go here.
+The script can either be on the data volume, or one of the pre-made scripts in the scripts directory, like newgame.lua, reports.lua, or run-turn.lua. These get copied to /usr/local/share/eressea/scripts during the build process.
+
 # Installation (using Docker)
 
 ## Install Docker (with compose plugin)
