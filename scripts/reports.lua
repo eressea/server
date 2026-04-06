@@ -1,4 +1,4 @@
-dofile('config.lua')
+require 'config'
 eressea.read_game(get_turn() .. '.dat')
 -- generate a new password and a message for new factions:
 init_reports()

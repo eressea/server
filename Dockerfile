@@ -1,9 +1,8 @@
 FROM ubuntu:24.04 AS build
 
-RUN apt update
-RUN apt install software-properties-common -y
-
-RUN apt install -y build-essential gcc cmake \
+RUN apt update && \
+    apt install --no-install-recommends -y \
+    software-properties-common build-essential gcc cmake \
     liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
     libcjson-dev libiniparser-dev libexpat1-dev libutf8proc-dev
 
@@ -34,7 +33,8 @@ ARG LOCALE
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install -y locales libcjson1 \
+RUN apt update && apt install --no-install-recommends -y \
+    locales libcjson1 \
     liblua5.2-0 libsqlite3-0 \
     libiniparser1 libexpat1 libutf8proc3
 RUN echo "$LOCALE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
