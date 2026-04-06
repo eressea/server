@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
+if [ ! -z "$WWWUSER" ]; then
+    usermod -u $WWWUSER sail
+fi
+
 export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;$LUA_PATH"
 exec "$@"

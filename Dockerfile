@@ -28,14 +28,23 @@ RUN cd eressea/build && make
 
 FROM ubuntu:24.04
 
+ARG WWWGROUP
+ARG WWWUSER
+
 RUN apt update
 RUN apt install -y libcjson1 \
     liblua5.2-0 libsqlite3-0 \
     libiniparser1 libexpat1 libutf8proc3
 
+RUN userdel -r ubuntu
+RUN groupadd --force -g $WWWGROUP eressea
+RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER eressea
+
 COPY --from=build /workspace/eressea/build/eressea /usr/local/bin/
 COPY scripts/ /usr/local/share/eressea/scripts/
 COPY docker/start-container /usr/local/bin/start-container
 RUN chmod 755 /usr/local/bin/start-container
+
+USER $WWWUSER:$WWWGROUP
 
 ENTRYPOINT ["/usr/local/bin/start-container"]
