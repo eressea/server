@@ -4,6 +4,5 @@ if [ ! -z "$WWWUSER" ]; then
     usermod -u $WWWUSER sail
 fi
 
-export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;$LUA_PATH"
-cd /data
+export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;/usr/local/share/eressea/scripts/?/init.lua;$LUA_PATH"
 exec "$@"

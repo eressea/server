@@ -49,10 +49,16 @@ RUN useradd -ms /bin/bash --no-user-group -g $WWWGROUP -u $WWWUSER eressea
 
 COPY --from=build /workspace/eressea/build/eressea /usr/local/bin/
 COPY scripts/ /usr/local/share/eressea/scripts/
+COPY conf/ /usr/local/share/eressea/conf/
+COPY res/ /usr/local/share/eressea/res/
+RUN chmod -R g+rx,o+rx /usr/local/share/eressea
+
 COPY docker/start-container /usr/local/bin/start-container
 RUN chmod 755 /usr/local/bin/start-container
 
 USER $WWWUSER:$WWWGROUP
+
+WORKDIR /data
 
 VOLUME ["/data"]
 
