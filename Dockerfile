@@ -30,11 +30,18 @@ FROM ubuntu:24.04
 
 ARG WWWGROUP
 ARG WWWUSER
+ARG LOCALE
 
-RUN apt update
-RUN apt install -y libcjson1 \
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt update && apt install -y locales libcjson1 \
     liblua5.2-0 libsqlite3-0 \
     libiniparser1 libexpat1 libutf8proc3
+RUN echo "$LOCALE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
+
+ENV LC_ALL=$LOCALE.UTF-8
+ENV LANG=$LOCALE.UTF-8
+ENV LANGUAGE=$LOCALE:en
 
 RUN userdel -r ubuntu
 RUN groupadd --force -g $WWWGROUP eressea
@@ -46,5 +53,7 @@ COPY docker/start-container /usr/local/bin/start-container
 RUN chmod 755 /usr/local/bin/start-container
 
 USER $WWWUSER:$WWWGROUP
+
+VOLUME ["/data"]
 
 ENTRYPOINT ["/usr/local/bin/start-container"]

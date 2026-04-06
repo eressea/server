@@ -5,4 +5,5 @@ if [ ! -z "$WWWUSER" ]; then
 fi
 
 export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;$LUA_PATH"
+cd /data
 exec "$@"
