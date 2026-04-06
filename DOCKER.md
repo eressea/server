@@ -46,7 +46,19 @@ the command `docker compose build` to do that. When you're done, `docker image l
 
 ## Create a game directory and a tiny world.
 
+The following commands set up your first game:
+
 ```bash
 $ cd ~/eressea
 $ mkdir game-1
-$ vim game-1/
+$ docker run -v $HOME/eressea/game-1:/data eressea/server:v1 newgame.lua
+```
+
+After this, your ~/eressea/game-1 directory contains some new files:
+
+`eressea.ini` contains a game configuration with sensible defaults for
+a game with the E2 ruleset. Modify this with your own email address and
+a different ruleset, if you want to. Only e2 and e3 currently supported,
+custom rulesets TBD.
+
+`data/0.dat` is a game file that contains a single-hex island with some ocean around it. There are no players in this world (yet).
