@@ -1232,14 +1232,13 @@ typedef struct authority_hash {
 
 static authority_hash *authorities = NULL;
 
-static const char * authority_to_path(const char *authority, char *name, size_t size) {
+static const char * authority_to_path(const char *authority) {
     ptrdiff_t i;
     /* source and destination cannot share the same buffer */
-    assert(authority < name || authority > name + size);
     if (authorities && 0 <= (i = stbds_shgeti(authorities, authority))) {
-        return join_path(authorities[i].value, authority, name, size);
+        return authorities[i].value;
     }
-    return join_path(json_relpath, authority, name, size);
+    return authority;
 }
 
 void add_authority(const char *key, const char *path) {
@@ -1268,7 +1267,7 @@ static const char * uri_to_file(const char * uri, char *name, size_t size) {
                 memcpy(buffer, authority, alen);
                 buffer[alen] = 0;
 
-                path = authority_to_path(buffer, name, size);
+                path = authority_to_path(buffer);
                 path = path_join(path, pos + 1, name, size);
             }
         }

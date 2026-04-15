@@ -67,7 +67,7 @@ int bind_config_read(const char *filename, const char * relpath)
     FILE *F;
 
     json_relpath = relpath;
-    if (relpath) {
+    if (relpath && relpath[0]) {
         char name[PATH_MAX];
         path_join(relpath, filename, name, sizeof(name));
         F = fopen(name, "r");

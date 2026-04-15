@@ -1,7 +1,7 @@
 if config.config then
     -- custom config file
     local conffile = config.config
-    assert(0 == eressea.config.read(conffile), "could not read JSON data from " .. conffile)
+    assert(0 == eressea.config.read(conffile, ''), "could not read JSON data from " .. conffile)
 elseif config.rules then
     -- standard ruleset
     rules = 'conf/' .. config.rules

@@ -1,9 +1,12 @@
-local path = '.'
-if config.install then
-	path = config.install
-else
-    path = os.getenv("ERESSEA_ROOT") or path
-    config.install = path
+root = os.getenv("ERESSEA_ROOT")
+if root then
+    local path = root .. "/scripts"
+    package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path
 end
-path = path .. "/scripts"
-package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path
+
+if config.install then
+	local path = config.install .. "/scripts"
+    package.path = path .. '/?.lua;' .. path .. '/?/init.lua;' .. package.path
+    eressea.config.add_authority("conf", config.install .. '/conf')
+    eressea.config.add_authority("res", config.install .. '/res')
+end
