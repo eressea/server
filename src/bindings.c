@@ -169,6 +169,12 @@ static int tolua_translate(lua_State * L)
     return 0;
 }
 
+static int tolua_rng_seed(lua_State * L) {
+    int seed = (int)tolua_tonumber(L, 1, 0);
+    rng_init(seed);
+    return 0;
+}
+
 static int tolua_random(lua_State * L)
 {
     lua_pushinteger(L, rng_int());
@@ -943,6 +949,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         {
             tolua_function(L, "inject", lua_rng_default);
             tolua_function(L, "random", tolua_random);
+            tolua_function(L, "seed", tolua_rng_seed);
         }
         tolua_endmodule(L);
         tolua_function(L, "rng_int", tolua_random);
