@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ ! -z "$WWWUSER" ]; then
-    usermod -u $WWWUSER sail
+    usermod -u $WWWUSER eressea
 fi
 
 if [ ! -e eressea.ini ]; then

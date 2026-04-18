@@ -1225,12 +1225,24 @@ static void json_races(cJSON *json) {
 
 const char * json_relpath;
 
-/* TODO: much more configurable authority-to-file lookup */
-static const char * authority_to_path(const char *authority, char *name, size_t size) {
-    /* source and destination cannot share the same buffer */
-    assert(authority < name || authority > name + size);
+typedef struct authority_hash {
+    char *key;
+    char *value;
+} authority_hash;
 
-    return join_path(json_relpath, authority, name, size);
+static authority_hash *authorities = NULL;
+
+static const char * authority_to_path(const char *authority) {
+    ptrdiff_t i;
+    /* source and destination cannot share the same buffer */
+    if (authorities && 0 <= (i = stbds_shgeti(authorities, authority))) {
+        return authorities[i].value;
+    }
+    return authority;
+}
+
+void add_authority(const char *key, const char *path) {
+    shput(authorities, str_strdup(key), str_strdup(path));
 }
 
 static const char * uri_to_file(const char * uri, char *name, size_t size) {
@@ -1255,7 +1267,7 @@ static const char * uri_to_file(const char * uri, char *name, size_t size) {
                 memcpy(buffer, authority, alen);
                 buffer[alen] = 0;
 
-                path = authority_to_path(buffer, name, size);
+                path = authority_to_path(buffer);
                 path = path_join(path, pos + 1, name, size);
             }
         }
@@ -1444,3 +1456,12 @@ void json_config(cJSON *json) {
     }
 }
 
+void jsonconf_done(void) {
+    unsigned int i;
+    size_t sz = shlen(authorities);
+    for (i = 0; i != sz; ++i) {
+        free(authorities[i].key);
+        free(authorities[i].value);
+    }
+    stbds_shfree(authorities);
+}
