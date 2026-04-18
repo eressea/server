@@ -69,23 +69,89 @@ You can also change the locale, which will give you system errors in a different
 
 Before we can run a container, we need to first build the image. Use
 the command `docker compose build` to do that. When you're done,
-`docker image ls` should contain the eressea/server:v1 image.
+`docker image ls` should contain the eressea/server:v1 image. 
+
 
 ## Create a game directory and a tiny world.
 
-The following commands set up your first game:
+The following steps assume you're using the official image.
+If you built your oen image, I recommend that you tag it to
+follow along:
 
 ```bash
-$ cd ~/eressea
-$ mkdir game
-$ docker run -v $HOME/eressea/game:/data eressea/server:v1 newgame.lua
+docker image tag eressea/server:v1 eressea/server:latest
+```
+
+Create a directory for your first game:
+
+```bash
+cd ~/eressea
+mkdir game
+# for convenience, alias the "docker run" command
+alias eressea='docker run -ti -e TERM -v $HOME/eressea/game:/data eressea/server:v1'
+eressea newgame.lua
 ```
 
 After this, your ~/eressea/game directory contains some new files:
 
+`data/0.dat` is a game file that contains a single-hex island with some ocean around it. There are no players in this world (yet).
+
 `eressea.ini` contains a game configuration with sensible defaults for
 a game with the E2 ruleset. Modify this with your own email address and
-a different ruleset, if you want to. Only e2 and e3 currently supported,
-custom rulesets TBD.
+a different ruleset, if you want to. The only built-in rulesets you can choose from are e2 and e3. 
 
-`data/0.dat` is a game file that contains a single-hex island with some ocean around it. There are no players in this world (yet).
+## Let's Play
+Now let's add a faction to our world and write initial reports.
+
+in the game directory, add a short Lua program named start.lua:
+```lua
+require 'config'
+eressea.read_game('0.dat')
+r = get_region(0, 0)
+f = faction.create('orc', 'orcs@example.com', 'de')
+u = unit.create(f, r)
+init_reports()
+write_reports()
+eressea.write_game(get_turn() .. '.dat')
+```
+
+Execute this program:
+```
+eressea start.lua
+```
+You should now have reports for your initial faction in the game/reports
+directory!
+
+If you would like to use the GM Mapper, you can start that with the built-in map.lua program, just run `eressea map.lua`.
+
+## Custom Rulesets
+
+You can choose to make your own rules, too! Just make the following modifications to your eressea.ini :
+```ini
+[lua]
+;rules = e2
+config = rules.json
+```
+This will instruct the game to not use the e2 ruleset, but a rules.json 
+file from your game directory. This file could look like this:
+```json
+{
+	"settings": {
+		"game.name": "Discworld",
+		"game.start": 0
+	},
+	"include": [
+		"config://conf/keywords.json",
+		"config://conf/calendar.json",
+		"config://conf/e2/locales.json",
+		"config://conf/e2/terrains.json",
+		"config://conf/e2/items.json",
+		"config://res/eressea/races.xml",
+		"config://custom/terrains.json",
+		"config://custom/strings.de.po"
+	]
+}
+```
+Here, we are instructing the game to borrow some rules from the core game,
+like the names of keywords, the calendar, and the races. We also borrow the translations, terrains and items from E2. In addition, we include our own terrains and translations from the game/custom directoory. For their strucuture, refer to the original files and make your own changes!
+
