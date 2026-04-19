@@ -1420,11 +1420,12 @@ count_allies(const side * as, int minrow, int maxrow, int select, int allytype)
 }
 
 static int
-count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
+count_enemies_i(const fighter * af, int minrow, int maxrow,
     int select)
 {
     side *as = af->side;
     int i = 0;
+    battle *b = as->battle;
     size_t si, sl = arrlen(b->sides);
 
     for (si = 0; si != sl; ++si) {
@@ -1444,11 +1445,10 @@ count_enemies_i(battle * b, const fighter * af, int minrow, int maxrow,
 }
 
 int
-count_enemies(battle *b, const fighter *af, int minrow, int maxrow,
-    int select)
+count_enemies(const fighter *af, int minrow, int maxrow, int select)
 {
     if (maxrow >= FIRST_ROW) {
-        return count_enemies_i(b, af, minrow, maxrow, select);
+        return count_enemies_i(af, minrow, maxrow, select);
     }
     return 0;
 }
@@ -1469,7 +1469,7 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
 
     if (minrow < FIGHT_ROW) minrow = FIGHT_ROW;
 
-    enemies = count_enemies(b, af, minrow, maxrow, select);
+    enemies = count_enemies(af, minrow, maxrow, select);
 
     /* Niemand ist in der angegebenen Entfernung? */
     if (enemies <= 0)
@@ -2115,7 +2115,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             /* wenn der magier in die potenzielle Reichweite von Attacken des
              * Feindes kommt, beginnt er auch bei einem Status von KAEMPFE NICHT,
              * Kampfzauber zu schleudern: */
-            if (count_enemies(b, af, melee_range[0], missile_range[1],
+            if (count_enemies(af, melee_range[0], missile_range[1],
                 SELECT_ADVANCE | SELECT_DISTANCE | SELECT_FIND)) {
                 do_combatspell(ta);
             }
@@ -2130,7 +2130,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
                 const weapon* wp = ta.fighter->person[ta.index].missile;
                 const weapon_type *wtype = NULL;
                 bool missile = false;
-                if (count_enemies(b, af, melee_range[0], melee_range[1],
+                if (count_enemies(af, melee_range[0], melee_range[1],
                     SELECT_ADVANCE | SELECT_DISTANCE | SELECT_FIND) > 0) {
                     wp = preferred_weapon(ta, true);
                 }
@@ -2266,7 +2266,7 @@ static void do_attack(fighter * af)
         /* Wir suchen eine beliebige Feind-Einheit aus. An der koennen
          * wir feststellen, ob noch jemand da ist. */
         int apr, attacks = attacks_per_round(ta);
-        if (!count_enemies(b, af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
+        if (!count_enemies(af, FIGHT_ROW, LAST_ROW, SELECT_FIND))
             break;
 
         for (apr = 0; apr != attacks; ++apr) {

@@ -199,8 +199,7 @@ troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
 int get_tactics(const struct side* as, const struct side* ds);
 
-int count_enemies(struct battle* b, const struct fighter* af,
-    int minrow, int maxrow, int select);
+int count_enemies(const struct fighter* af, int minrow, int maxrow, int select);
 int natural_armor(struct unit* u);
 const struct armor_type* select_armor(struct troop t, bool shield);
 const struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);

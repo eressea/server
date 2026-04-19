@@ -132,7 +132,7 @@ int damage_spell(struct castorder * co, int dmg, int strength)
     at.fighter = fi;
     at.index = 0;
 
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (enemies == 0) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
@@ -166,7 +166,7 @@ int sp_petrify(struct castorder * co)
 
     force = lovar(get_force(power, 0));
 
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
@@ -211,7 +211,7 @@ int sp_stun(struct castorder * co)
 
     force = lovar(get_force(power, 1));
 
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
@@ -270,7 +270,7 @@ int sp_combatrosthauch(struct castorder * co)
     int force = lovar(power * 15);
     int k = 0;
 
-    if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1,
+    if (!count_enemies(fi, FIGHT_ROW, BEHIND_ROW - 1,
         SELECT_ADVANCE | SELECT_FIND)) {
         message *msg = msg_message("rust_effect_0", "mage", fi->unit);
         message_all(b, msg);
@@ -358,7 +358,7 @@ int sp_sleep(struct castorder * co)
     /* Immer aus der ersten Reihe nehmen */
 
     force = lovar(co->force * 25);
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
@@ -480,7 +480,7 @@ int sp_mindblast(struct castorder * co)
     int k = 0, reset = 0, maxloss = (level + 2) / 3;
     message *m;
     int force = lovar(power * 25);
-    int enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+    int enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
 
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
@@ -547,7 +547,7 @@ int sp_dragonodem(struct castorder * co)
     /* Jungdrache 3->54, Drache 6->216, Wyrm 12->864 Treffer */
     force = lovar(get_force(power, 6));
 
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
 
     if (!enemies) {
         struct message *m =
@@ -593,7 +593,7 @@ int sp_immolation(struct castorder * co)
     /* Betrifft alle Gegner */
     force = 99999;
 
-    if (!count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
+    if (!count_enemies(fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
@@ -764,7 +764,7 @@ int sp_chaosrow(struct castorder * co)
     int k = 0;
     bool chaosrow = sp && (strcmp(sp->sname, "chaosrow") == 0);
 
-    if (!count_enemies(b, fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
+    if (!count_enemies(fi, FIGHT_ROW, NUMROWS, SELECT_ADVANCE | SELECT_FIND)) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
         msg_release(m);
@@ -859,7 +859,7 @@ int flee_spell(struct castorder * co, int strength, bool pre_combat)
     int force;
 
     force = (int)get_force(power, strength);
-    if (force<=0 || !count_enemies(b, fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
+    if (force<=0 || !count_enemies(fi, FIGHT_ROW, AVOID_ROW, SELECT_ADVANCE | SELECT_FIND)) {
         msg = msg_message("flee_effect_0", "mage spell", mage, sp);
         message_all(b, msg);
         msg_release(msg);
@@ -1014,7 +1014,7 @@ int sp_frighten(struct castorder * co)
     df_malus = 2;
     force = (int)get_force(power, 2);
 
-    enemies = count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
+    enemies = count_enemies(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
@@ -1063,7 +1063,7 @@ int sp_tiredsoldiers(struct castorder * co)
     int force = (int)(power * power * 4);
     message *m;
 
-    if (!count_enemies(b, fi, FIGHT_ROW, BEHIND_ROW,
+    if (!count_enemies(fi, FIGHT_ROW, BEHIND_ROW,
         SELECT_ADVANCE | SELECT_FIND)) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
@@ -1109,7 +1109,7 @@ int sp_windshield(struct castorder * co)
     force = (int)get_force(power, 4);
     at_malus = level / 4;
 
-    enemies = count_enemies(b, fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
+    enemies = count_enemies(fi, BEHIND_ROW, BEHIND_ROW, SELECT_ADVANCE);
     if (!enemies) {
         m = msg_message("spell_out_of_range", "mage spell", fi->unit, sp);
         message_all(b, m);
