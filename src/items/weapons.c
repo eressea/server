@@ -78,7 +78,6 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
 {
     fighter *af = at->fighter;
     unit *au = af->unit;
-    battle *b = af->side->battle;
     troop dt;
     int shots = INT_MAX, d = 0, enemies;
     const resource_type *rtype;
