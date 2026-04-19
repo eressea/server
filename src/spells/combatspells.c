@@ -223,12 +223,14 @@ int sp_stun(struct castorder * co)
     while (force && stunned < enemies) {
         troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
         fighter *df = dt.fighter;
-        unit *du = df->unit;
+        if (df) {
+            unit *du = df->unit;
 
-        --force;
-        if (!is_magic_resistant(mage, du, 0)) {
-            df->person[dt.index].flags |= FL_STUNNED;
-            ++stunned;
+            --force;
+            if (!is_magic_resistant(mage, du, 0)) {
+                df->person[dt.index].flags |= FL_STUNNED;
+                ++stunned;
+            }
         }
     }
 
