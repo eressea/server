@@ -273,15 +273,17 @@ static int tolua_region_has_border(lua_State *L)
     if (btype) {
         direction_t dir = (direction_t)tolua_tonumber(L, 3, 0);
         region *r2 = rconnect(r, dir);
-        connection *b;
-        for (b = get_borders(r, r2); b; b = b->next) {
-            if (b->type == btype) {
-                lua_pushboolean(L, true);
-                return 1;
+        if (r2) {
+            connection *b;
+            for (b = get_borders(r, r2); b; b = b->next) {
+                if (b->type == btype) {
+                    lua_pushboolean(L, true);
+                    return 1;
+                }
             }
+            lua_pushboolean(L, false);
+            return 1;
         }
-        lua_pushboolean(L, false);
-        return 1;
     }
     return 0;
 }

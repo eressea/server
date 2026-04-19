@@ -28,6 +28,7 @@
 #include <stb_ds.h>
 
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 
 #ifdef XML_LARGE_SIZE
@@ -1070,7 +1071,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
     }
     else if (xml_strequal(el, "skill")) {
         const XML_Char *name = NULL;
-        int i, speed = 0, mod = 0;
+        int i, speed = INT_MAX, mod = 0;
 
         for (i = 0; attr[i]; i += 2) {
             const XML_Char *key = attr[i], *val = attr[i + 1];
@@ -1091,7 +1092,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
             skill_t sk = find_skill(name);
             if (sk != NOSKILL) {
                 rc->bonus[sk] = (char)mod;
-                if (speed != 0) {
+                if (speed != INT_MAX) {
                     set_study_speed(rc, sk, speed);
                 }
             }
