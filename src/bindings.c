@@ -1037,7 +1037,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, "write_scores", tolua_write_scores);
         tolua_function(L, "update_owners", tolua_update_owners);
         tolua_function(L, "create_curse", tolua_create_curse);
-        tolua_function(L, "translate", &tolua_translate);
+        tolua_function(L, "translate", tolua_translate);
         tolua_function(L, "spells", tolua_get_spells);
         tolua_function(L, "equip_newunits", tolua_equip_newunits);
     } tolua_endmodule(L);
