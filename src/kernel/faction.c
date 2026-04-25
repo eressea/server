@@ -207,7 +207,7 @@ faction *addfaction(const char *email, const char *password,
     }
 
     f->alliance_joindate = turn;
-    f->lastorders = 0;
+    f->lastorders = -1;
     f->password_id = 0;
     faction_set_age(f, 0);
     f->race = frace;
