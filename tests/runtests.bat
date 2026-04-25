@@ -3,7 +3,7 @@ IF EXIST ..\build\x64-Debug\eressea.exe SET BUILD=..\build\x64-Debug
 
 SET SERVER=%BUILD%\eressea.exe
 %BUILD%\test_eressea.exe
-SET LUA_PATH=..\scripts\?.lua;%LUA_PATH%
+SET LUA_PATH=..\scripts\?.lua;..\scripts\?\init.lua;%LUA_PATH%
 
 %SERVER% -v1 ..\scripts\run-tests.lua
 if %ERRORLEVEL% NEQ 0 echo Error %ERRORLEVEL%
