@@ -1607,7 +1607,7 @@ int init_reports(void)
     }
     for (f = factions; f; f = f->next) {
         if (f->email && !fval(f, FFL_NPC)) {
-            if (f->lastorders < 0 || faction_age(f) <= 1) {
+            if (f->lastorders < 0) {
                 attrib *a;
                 /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
                  * kriegen ein neues Passwort: */
