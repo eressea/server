@@ -1082,16 +1082,20 @@ static int run_script(lua_State *L, const char *luafile) {
     F = fopen(luafile, "r");
     if (!F) {
         /* try the scripts in the install directory */
-        char scripts[PATH_MAX], filename[PATH_MAX];
         const char *install_dir = config_get("config.install");
-        join_path(install_dir, "scripts", scripts, sizeof(scripts));
-        join_path(scripts, luafile, filename, sizeof(filename));
-        F = fopen(filename, "r");
+        if (install_dir) {
+            char scripts[PATH_MAX], filename[PATH_MAX];
+            join_path(install_dir, "scripts", scripts, sizeof(scripts));
+            join_path(scripts, luafile, filename, sizeof(filename));
+            F = fopen(filename, "r");
+            if (F) {
+                luafile = filename;
+            }
+        }
         if (!F) {
             log_debug("dofile('%s'): %s", luafile, strerror(errno));
             return errno;
         }
-        luafile = filename;
     }
     fclose(F);
 

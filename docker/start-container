@@ -5,15 +5,5 @@ if [ ! -e eressea.ini ]; then
 fi
 
 export LUA_PATH="/usr/local/share/eressea/scripts/?.lua;/usr/local/share/eressea/scripts/?/init.lua;$LUA_PATH"
-SCRIPT="$1"
-if [ -e "$SCRIPT" ]; then
-    shift
-elif [ -e "/usr/local/share/eressea/scripts/$SCRIPT" ]; then
-    SCRIPT="/usr/local/share/eressea/scripts/$SCRIPT"
-    shift
-else
-    # TODO: debug mode, remove this:
-    exec "$@"
-    exit
-fi
-exec eressea "$@" "$SCRIPT"
+export ERESSEA_INSTALL=/usr/local/share/eressea
+exec eressea -i "$ERESSEA_INSTALL" "$@"
