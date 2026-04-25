@@ -254,6 +254,12 @@ add_test(NAME lua-e3
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
 set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
+set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES
+  ENVIRONMENT_MODIFICATION
+  "LUA_PATH=path_list_prepend:${CMAKE_SOURCE_DIR}/scripts/?/init.lua"
+  ENVIRONMENT_MODIFICATION
+  "LUA_PATH=path_list_prepend:${CMAKE_SOURCE_DIR}/scripts/?.lua"
+)
 
 find_program(LUAROCKS_EXECUTABLE luarocks)
 if(LUAROCKS_EXECUTABLE)
