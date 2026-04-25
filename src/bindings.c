@@ -1112,9 +1112,7 @@ int eressea_run(lua_State *L, const char *luafile)
     lua_getfield(L, -1, "traceback");
     lua_remove(L, -2);
 
-    /* try to run configuration scripts: */
-    err = run_script(L, "custom.lua");
-
+    
     /* run the main script */
     if (luafile) {
         err = run_script(L, luafile);
