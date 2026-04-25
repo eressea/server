@@ -47,5 +47,5 @@ tests/config.lua
 *.mo
 /.vs
 /.idea/
-.env
+.env*
 /tests/data/test.dat
