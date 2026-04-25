@@ -8,7 +8,7 @@ services:
         WWWUSER: '${WWWUSER:-1337}'
         CMAKE_BUILD_TYPE: '${CMAKE_BUILD_TYPE:-Release}'
         LOCALE: '${LOCALE:-en_US}'
-    image: eressea/server:v1
+    image: eressea/server
     hostname: eressea
     environment:
         WWWUSER: '${WWWUSER:-1337}'
