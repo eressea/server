@@ -42,6 +42,7 @@ RUN echo "$LOCALE.UTF-8 UTF-8" >> /etc/locale.gen && locale-gen
 ENV LC_ALL=$LOCALE.UTF-8
 ENV LANG=$LOCALE.UTF-8
 ENV LANGUAGE=$LOCALE:en
+ENV ERESSEA_INSTALL=/usr/local/share/eressea
 
 RUN userdel -r ubuntu
 RUN groupadd --force -g $WWWGROUP eressea
