@@ -3,9 +3,6 @@
 [ "$PREVIEW" != "yes" ] && exit
 [ -z "${ERESSEA}" ] && ERESSEA="$HOME/eressea"
 
-eval "$(luarocks path)"
-export LUA_PATH="${ERESSEA}/git/scripts/?.lua;${ERESSEA}/git/scripts/?/init.lua;$LUA_PATH"
-
 branch="develop"
 if [ -e "${ERESSEA}/build/.preview" ]; then
     branch=$(cat "${ERESSEA}/build/.preview")
