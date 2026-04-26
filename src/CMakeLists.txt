@@ -241,6 +241,10 @@ target_link_libraries(eressea
   ${LUA_LIBRARIES}
 )
 
+add_test(NAME lua-debug
+  COMMAND eressea -v1 ../scripts/debug.lua
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+set_property(TEST lua-debug PROPERTY RUN_SERIAL)
 add_test(NAME lua-core
   COMMAND eressea -v1 ../scripts/run-tests.lua
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
@@ -253,21 +257,21 @@ add_test(NAME lua-e3
   COMMAND eressea -v1 ../scripts/run-tests-e3.lua
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
 set_property(TEST lua-e3 PROPERTY RUN_SERIAL)
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES
-  ENVIRONMENT_MODIFICATION
-  "LUA_PATH=path_list_prepend:${CMAKE_SOURCE_DIR}/scripts/?/init.lua"
-  ENVIRONMENT_MODIFICATION
-  "LUA_PATH=path_list_prepend:${CMAKE_SOURCE_DIR}/scripts/?.lua"
-)
+set_tests_properties(lua-debug lua-core lua-e2 lua-e3 PROPERTIES LABELS "lua;ci-only")
 
 find_program(LUAROCKS_EXECUTABLE luarocks)
 if(LUAROCKS_EXECUTABLE)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-path OUTPUT_VARIABLE LR_PATH)
-execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-cpath OUTPUT_VARIABLE LR_CPATH)
-string(REPLACE ";" "\;" LUA_PATH "${CMAKE_SOURCE_DIR}/scripts/?.lua;${LR_PATH}")
-string(REPLACE ";" "\;" LUA_CPATH "${LR_CPATH}")
-set_tests_properties(lua-core lua-e2 lua-e3 PROPERTIES ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}")
+execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-path 
+  OUTPUT_VARIABLE LR_PATH)
+execute_process(COMMAND ${LUAROCKS_EXECUTABLE} path --lr-cpath 
+  OUTPUT_VARIABLE LR_CPATH)
+string(REPLACE ";" "\;" LUA_PATH 
+  "${CMAKE_SOURCE_DIR}/scripts/?.lua;${CMAKE_SOURCE_DIR}/scripts/?/init.lua;${LR_PATH}")
+string(REPLACE ";" "\;" LUA_CPATH 
+  "${LR_CPATH}")
+set_tests_properties(lua-debug lua-core lua-e2 lua-e3 PROPERTIES
+  ENVIRONMENT "LUA_PATH=${LUA_PATH};LUA_CPATH=${LUA_CPATH}"
+)
 endif(LUAROCKS_EXECUTABLE)
 
 endif (LUA_FOUND)

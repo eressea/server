@@ -1,13 +1,13 @@
-require 'eressea.path'
-require 'eressea'
-require 'eressea.xmlconf'
+print("LUA_PATH is " .. os.getenv('LUA_PATH'))
+print("LUA_CPATH is " .. os.getenv('LUA_CPATH'))
+print("PACKAGE.PATH is " .. package.path)
+lunit = require('lunit')
 
-function gmtool_on_keypressed(keycode)
-    local warp = require('eressea.warpgate')
-    if keycode == gmtool.KEY_F1 then
-        warp.gm_edit()
-    end
+module('tests.example', lunit.testcase, package.seeall)
+function test_example()
+    assert_true(true)
 end
 
-eressea.read_game(get_turn() .. ".dat")
-dump_unit("jiha")
+result = lunit.main()
+return result.errors + result.failed
+

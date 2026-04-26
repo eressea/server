@@ -30,6 +30,7 @@ jobs:
         run: |
           sudo apt install libutf8proc-dev libexpat1-dev liblua5.2-dev lua5.2 luarocks libtolua-dev libncurses5-dev libsqlite3-dev libiniparser-dev libcjson-dev libbsd-dev cppcheck shellcheck clang-tools iwyu
           luarocks install lunitx --local
+          luarocks path
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v4
