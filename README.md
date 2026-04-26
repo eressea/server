@@ -78,7 +78,7 @@ in "args". On my own computer, the configuration looks like this:
       "currentDir": "${env.ERESSEA_ROOT}",
       "env": {
         "ERESSEA_ROOT": "${workspaceRoot}",
-        "LUA_PATH": "${workspaceRoot}\\scripts\\?.lua;${env.LUA_PATH}"
+        "LUA_PATH": "${workspaceRoot}\\scripts\\?.lua;${workspaceRoot}\\scripts\\?\\init.lua;${env.LUA_PATH}"
       },
       "name": "eressea.exe"
     },
@@ -95,6 +95,6 @@ in "args". On my own computer, the configuration looks like this:
 Note that I have an environment variable for my game directory called ERESSEA_ROOT. My LUA_PATH also contains the luarocks installation.
 
 ```
-LUA_PATH=C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?.lua
+LUA_PATH=C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?.lua;C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?\init.lua
 ERESSEA_ROOT C:\Users\Enno\Documents\Eressea\test
 ```
