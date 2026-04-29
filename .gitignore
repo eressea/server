@@ -49,3 +49,4 @@ tests/config.lua
 /.idea/
 .env*
 /tests/data/test.dat
+.cache/clangd
