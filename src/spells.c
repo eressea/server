@@ -5757,7 +5757,6 @@ int sp_break_curse(castorder * co)
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
-    double force = co->force;
     spellparameter *params = co->a_params;
     void *curse_target = NULL;
 
@@ -5779,6 +5778,7 @@ int sp_break_curse(castorder * co)
             "unit region command", mage, mage->region, co->order));
     }
     else {
+        double force = co->force;
         const char *ts = NULL;
         attrib **ap;
         switch (obj) {
@@ -5828,7 +5828,7 @@ int sp_break_curse(castorder * co)
         }
 
         /* curse aufloesen, wenn zauber staerker (force > vigour) */
-        force = reduce_curse(c, cast_level, -force, curse_target);
+        reduce_curse(c, cast_level, force, curse_target);
 
         if (c->vigour <= 0.0) {
             remove_curse(ap, c);

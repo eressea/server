@@ -24,6 +24,7 @@
 #include "kernel/types.h"
 #include <kernel/unit.h>
 
+#include "util/base36.h"
 #include "util/keyword.h"
 #include "util/language.h"
 #include "util/message.h"
@@ -174,28 +175,117 @@ static void test_change_race(CuTest* tc) {
 static void test_break_curse(CuTest *tc) {
     struct region *r;
     struct faction *f;
-    unit *u1, *u2;
+    unit *u;
+    curse *c;
     castorder co;
     spellparameter param, *args = NULL;
 
     test_setup();
     r = test_create_plain(0, 0);
     f = test_create_faction();
-    u1 = test_create_unit(f, r);
-    u2 = test_create_unit(f, r);
-    scale_number(u2, 30);
+    u = test_create_unit(f, r);
+    c = create_curse(u, &r->attribs, &ct_astralblock, 5.0, 1, 0.0, 0);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup(itoa36(c->no));
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 5, 5., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
+    CuAssertPtrEquals(tc, NULL, r->attribs);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "destroy_curse_effect"));
+    test_teardown();
+}
+
+static void test_break_curse_low_level(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    curse *c;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    c = create_curse(u, &r->attribs, &ct_astralblock, 5.0, 1, 0.0, 0);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup(itoa36(c->no));
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 4, 5., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
+    CuAssertPtrNotNull(tc, r->attribs);
+    CuAssertDblEquals(tc, 2.5, c->vigour, 0.01);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "destroy_curse_noeffect"));
+    test_teardown();
+}
+
+static void test_break_curse_too_weak(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    curse *c;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
+    c = create_curse(u, &r->attribs, &ct_astralblock, 5.0, 1, 0.0, 0);
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_REGION;
+    param.data.r = r;
+    arrput(args, param);
+
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup(itoa36(c->no));
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 5, 4., 0, args);
+    CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
+    CuAssertPtrNotNull(tc, r->attribs);
+    CuAssertDblEquals(tc, 5.0, c->vigour, 0.01);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "destroy_curse_noeffect"));
+    test_teardown();
+}
+
+static void test_break_curse_resists(CuTest *tc) {
+    struct region *r;
+    struct faction *f;
+    unit *u;
+    castorder co;
+    spellparameter param, *args = NULL;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    u = test_create_unit(f, r);
 
     param.flag = TARGET_RESISTS;
     param.typ = SPP_BUILDING;
     param.data.b = NULL;
     arrput(args, param);
 
-    param.flag = TARGET_OK;
     param.typ = SPP_STRING;
     param.data.xs = NULL;
     arrput(args, param);
 
-    test_create_castorder(&co, u1, 3, 4., 0, args);
+    test_create_castorder(&co, u, 3, 4., 0, args);
     CuAssertIntEquals(tc, co.level, sp_break_curse(&co));
     CuAssertIntEquals(tc, 0, test_count_messagetype(f->msgs, NULL));
     test_teardown();
@@ -2482,6 +2572,9 @@ CuSuite *get_spells_suite(void)
     SUITE_ADD_TEST(suite, test_create_firewall);
     SUITE_ADD_TEST(suite, test_destroy_firewall);
     SUITE_ADD_TEST(suite, test_break_curse);
+    SUITE_ADD_TEST(suite, test_break_curse_low_level);
+    SUITE_ADD_TEST(suite, test_break_curse_too_weak);
+    SUITE_ADD_TEST(suite, test_break_curse_resists);
     SUITE_ADD_TEST(suite, test_magicrunes);
 
     return suite;
