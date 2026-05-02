@@ -23,15 +23,15 @@ typedef struct attrib {
 
 typedef struct attrib_type {
     const char *name;
-    void(*initialize) (union variant *);
-    void(*finalize) (union variant *);
-    int(*age) (struct attrib *, void *owner);
+    void (*initialize) (union variant *);
+    void (*finalize) (union variant *);
+    int (*age) (struct attrib *, void *owner);
     /* age returns 0 if the attribute needs to be removed, !=0 otherwise */
-    void(*write) (const union variant *, const void *owner, struct storage *);
-    int(*read) (union variant *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
-    void(*upgrade) (struct attrib **alist, struct attrib *a);
+    void (*write) (const union variant *, const void *owner, struct storage *);
+    int (*read) (union variant *, void *owner, struct gamedata *);       /* return AT_READ_OK on success, AT_READ_FAIL if attrib needs removal */
+    void (*upgrade) (struct attrib **alist, struct attrib *a);
     unsigned int flags;
-    void(*dump) (const struct attrib *a);
+    void (*dump) (const struct attrib *a);
 } attrib_type;
 
 void at_register(attrib_type * at);

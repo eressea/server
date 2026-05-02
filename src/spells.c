@@ -354,7 +354,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
 
 }
 
-static int break_curse(attrib ** alist, int cast_level, double force, curse * c, void *curse_target)
+static int break_curses(attrib ** alist, int cast_level, double force, curse * c, void *curse_target)
 {
     int succ = 0;
     /*  attrib **a = a_find(*ap, &at_curse); */
@@ -736,7 +736,7 @@ int sp_destroy_magic(castorder * co)
         return 0;
     }
 
-    succ = break_curse(ap, co->level, force, c, curse_target);
+    succ = break_curses(ap, co->level, force, c, curse_target);
 
     if (succ > 0) {
         ADDMSG(&caster->faction->msgs, msg_message("destroy_magic_effect",

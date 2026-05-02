@@ -108,6 +108,12 @@ static int slave_age(struct curse *c, void *owner)
     return 0;
 }
 
+static void slave_remove(const struct curse *c)
+{
+    slave_data *sd = (slave_data *)c->data.v;
+    sd->self->faction = sd->faction;
+}
+
 const struct curse_type ct_slavery = { 
     .cname = "slavery",
     .typ = CURSETYP_NORM,
@@ -117,6 +123,7 @@ const struct curse_type ct_slavery = {
     .read = slave_read,
     .write = slave_write,
     .age = slave_age,
+    .remove = slave_remove,
     .construct = slave_init,
     .destroy = slave_done,
 };
