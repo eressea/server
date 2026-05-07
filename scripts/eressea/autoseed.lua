@@ -2,10 +2,10 @@ if not config.autoseed or config.autoseed==0 then return nil end
 local autoseed = {}
 
 -- minimum required resources in the 7-hex neighborhood:
-local peasants = 10000
-local trees = 800
+local peasants = 1000
+local trees = 400
 -- minimum resources in the region itself:
-local min_peasants = 2000
+local min_peasants = 1000
 -- number of starters per region:
 local per_region = 2
     
@@ -48,7 +48,7 @@ local function read_players()
         local str = input:read("*line")
         while str do
             if str==nil then break end
-            local email, race, lang = str:match("([^ ]*) ([^ ]*) ([^ ]*)")
+            local email, race, lang = str:match("([^%s]*)%s+([^%s]*)%s+([^%s]*)")
             if email and string.char(string.byte(email, 1))~='#' then
                 table.insert(players, { race = race, lang = lang, email = email })
             end
