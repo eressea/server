@@ -1,0 +1,17 @@
+{
+	"settings": {
+		"game.name": "Earthsea",
+		"game.start": 0,
+		"modules.astralspace": 0,
+		"autoseed.peasants": 1000,
+		"autoseed.trees": 400,
+		"autoseed.min_peasants": 1000,
+		"autoseed.per_region": 2
+	},
+	"include": [
+		"config://conf/e2/config.json",
+		"config://custom/terrains.json",
+		"config://custom/strings.de.po",
+		"config://custom/strings.en.po"
+	]
+}
