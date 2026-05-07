@@ -1,11 +1,15 @@
 if not config.autoseed or config.autoseed==0 then return nil end
 local autoseed = {}
 
+local function config_num(str, def)
+    return tonumber(eressea.config.get(str)) or def
+end
+
 -- minimum required resources in the 7-hex neighborhood:
-local peasants = 1000
-local trees = 400
+local peasants = config_num("autoseed.peasants", 10000)
+local trees = config_num("autoseed.trees", 800)
 -- minimum resources in the region itself:
-local min_peasants = 1000
+local min_peasants = config_num("autoseed.min_peasants", 1000)
 -- number of starters per region:
 local per_region = 2
     
