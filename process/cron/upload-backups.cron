@@ -1,0 +1,25 @@
+#!/bin/sh
+
+GAME=$1
+
+[ "$ENABLED" = "no" ] && exit
+[ -z "$ERESSEA" ] && ERESSEA="$HOME/eressea"
+
+upload()
+{
+    FILEPATH=$(realpath "$1")
+    echo "Upload $FILEPATH..."
+    if [ -e "$FILEPATH" ] ; then
+        scp "$FILEPATH" "synology:Backup/Eressea/game-$GAME/"
+    else
+        echo "Could not backup $FILEPATH: File not found." 
+    fi
+}
+
+TURN=$(cat "$ERESSEA/game-$GAME/turn")
+cd "$ERESSEA/game-$GAME" || exit
+upload "backup/$TURN.tar.bz2"
+upload "backup/$TURN-reports.tar.bz2"
+TURN=$((TURN - 1))
+upload "backup/$TURN.tar.bz2"
+
