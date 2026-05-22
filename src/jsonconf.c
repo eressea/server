@@ -1285,7 +1285,9 @@ static int include_json(const char *uri) {
     int result = -1;
 
     F = fopen(filename, "r");
-    if (F) {
+    if (!F) {
+        log_error("file not found: %s", filename);
+    } else {
         long pos;
         fseek(F, 0, SEEK_END);
         pos = ftell(F);
