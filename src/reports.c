@@ -201,7 +201,7 @@ const char *hp_status(const unit * u)
     return NULL;
 }
 
-bool see_schemes(const region *r, seen_mode mode) {
+bool see_schemes(const region *r, enum seen_mode mode) {
     return mode >= seen_unit && is_astral(r) && !is_cursed(r->attribs, &ct_astralblock);
 }
 
@@ -1164,13 +1164,20 @@ void get_addresses(report_context * ctx)
                 const unit *u = r->units;
                 while (u != NULL) {
                     if (u->faction != ctx->f) {
-                        faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
-                        if (sf) {
-                            bool ballied = sf != ctx->f && sf != lastf
-                                && !fval(u, UFL_ANON_FACTION) && cansee(ctx->f, r, u, stealthmod);
-                            if (ballied || is_allied(ctx->f, sf)) {
-                                add_seen_faction_i(&flist, sf);
-                                lastf = sf;
+                        if (cansee(ctx->f, r, u, stealthmod)) {
+                            faction *sf = get_otherfaction(u);
+                            // faction *sf = visible_faction(ctx->f, u, get_otherfaction(u));
+                            if (sf) {
+                                bool ballied = sf != ctx->f && sf != lastf
+                                    && !fval(u, UFL_ANON_FACTION);
+                                if (ballied || is_allied(ctx->f, sf)) {
+                                    add_seen_faction_i(&flist, sf);
+                                    lastf = sf;
+                                }
+                            }
+                            else if (lastf != u->faction) {
+                                add_seen_faction_i(&flist, u->faction);
+                                lastf = u->faction;
                             }
                         }
                     }
