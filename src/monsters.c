@@ -220,23 +220,42 @@ void monsters_desert(struct faction *monsters)
 
 int monster_attacks(unit * monster, bool rich_only)
 {
-    const race *rc_serpent = get_race(RC_SEASERPENT);
     int result = -1;
 
     if (monster_can_attack(monster)) {
+        const race *rc_serpent = get_race(RC_SEASERPENT);
         region *r = monster->region;
         unit *u2;
         int money = 0;
+        building *b;
+        int protect = 0;
+        for (b = r->buildings; b; b = b->next) {
+            if (b->type->flags & BTF_FORTIFICATION) {
+                protect += b->size;
+            }
+        }
 
         for (u2 = r->units; u2; u2 = u2->next) {
-            if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0) && !in_safe_building(u2, monster)) {
-                int m = get_money(u2);
+            if (u2->faction != monster->faction && cansee(monster->faction, r, u2, 0)) {
+                int m;
+                b = inside_building(u2);
+                
+                if (b && b != inside_building(monster)) {
+                    if (b->type->flags & BTF_FORTIFICATION) {
+                        continue;
+                    }
+                    else if (protect >= u2->number) {
+                        protect -= u2->number;
+                        continue;
+                    }
+                }
                 if (u_race(monster) == rc_serpent) {
                     /* attack bigger ships only */
                     if (!u2->ship || u2->ship->type->cargo <= 50000) {
                         continue;
                     }
                 }
+                m = get_money(u2);
                 if (!rich_only || m > 0) {
                     order *ord = monster_attack(monster, u2);
                     if (ord) {

@@ -4,6 +4,7 @@
 
 #include "kernel/attrib.h"
 #include "kernel/config.h"
+#include "kernel/building.h"
 #include "kernel/faction.h"
 #include "kernel/group.h"
 #include "kernel/item.h"
@@ -123,6 +124,62 @@ static void test_monsters_attack_ocean(CuTest * tc)
     test_teardown();
 }
 
+static void test_monsters_dont_attack_buildings(CuTest *tc)
+{
+    region *r;
+    unit *u, *m;
+    building_type *btype;
+    building *b;
+
+    test_setup();
+    btype = test_create_buildingtype("castle");
+    btype->flags |= BTF_FORTIFICATION;
+    config_set("rules.monsters.attack_chance", "1");
+    create_monsters(&u, &m);
+    r = findregion(0, 0);
+    move_unit(m, r, NULL);
+    m->flags = UFL_GUARD;
+    unit_setid(u, 2);
+
+    b = test_create_building(r, btype);
+    b->size = u->number = 5;
+    u_set_building(u, b);
+
+    plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+
+    /** second unit, does not fit into the building, can be attacked */
+    u = test_create_unit(u->faction, r);
+    unit_setid(u, 3);
+    u_set_building(u, b);
+    plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+    CuAssertPtrNotNull(tc, find_order("attack 3", m));
+
+    /** second unit is fully inside a non-fortified building that gets protected */
+    u->number = b->size;
+    u_set_building(u, NULL);
+    b = test_create_building(r, NULL);
+    b->size = u->number;
+    u_set_building(u, b);
+    plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+    CuAssertPtrEquals(tc, NULL, find_order("attack 3", m));
+
+    /** second unit does not fit into the protected building */
+    ++u->number;
+    plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+    CuAssertPtrNotNull(tc, find_order("attack 3", m));
+
+    /** second unit is fully inside protected building that is too big */
+    b->size = u->number;
+    plan_monsters(m->faction);
+    CuAssertPtrEquals(tc, NULL, find_order("attack 2", m));
+    CuAssertPtrNotNull(tc, find_order("attack 3", m));
+
+    test_teardown();
+}
 static void test_monsters_waiting(CuTest * tc)
 {
     unit *u, *m;
@@ -336,6 +393,7 @@ CuSuite *get_monsters_suite(void)
     SUITE_ADD_TEST(suite, test_monsters_hate);
     SUITE_ADD_TEST(suite, test_spawn_seaserpent);
     SUITE_ADD_TEST(suite, test_monsters_attack_ocean);
+    SUITE_ADD_TEST(suite, test_monsters_dont_attack_buildings);
     SUITE_ADD_TEST(suite, test_seaserpent_piracy);
     SUITE_ADD_TEST(suite, test_monsters_waiting);
     SUITE_ADD_TEST(suite, test_monsters_attack_not);
