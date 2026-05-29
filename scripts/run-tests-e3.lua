@@ -21,6 +21,7 @@ eressea.settings.set("rules.ship.drifting", "0")
 eressea.settings.set("rules.ship.storms", "0")
 eressea.settings.set("skillchange.demon.up", "0")
 eressea.settings.set("NewbieImmunity", "0")
-rules = require('eressea.' .. config.rules)
+require('eressea.' .. config.rules .. '.config')
+require('eressea.' .. config.rules .. '.modules')
 result = lunit.main()
 return result.errors + result.failed

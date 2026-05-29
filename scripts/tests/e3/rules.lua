@@ -957,6 +957,7 @@ function test_bug2083()
 
     -- this is a bit weird, but the bug was caused by market code
     -- being called in two places. We want to make sure this doesn't happen
+    local rules = require('eressea.e3.modules')
     for k, v in pairs(rules) do
         if 'table' == type(v) then
            cb = v['update']
