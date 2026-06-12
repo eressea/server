@@ -29,10 +29,10 @@ function give_item(email, id, uname, iname)
 end
 
 function give_items()
-  give_item("hongeldongel@web.de", "boss", "Drollitz", "rpg_item_1")
-  give_item("zangerl.helmut@chello.at", "holb", "Holbard", "rpg_item_2")
-  give_item("r.lang@chello.at", "brtL", "Bertl", "rpg_item_2")
-  give_item("schlaustauch@gmx.de", "bert", "Bertram", "rpg_item_3")
+  give_item("hodor@example.com", "boss", "Drollitz", "rpg_item_1")
+  give_item("foo@example.com", "holb", "Holbard", "rpg_item_2")
+  give_item("bar@example.com", "brtL", "Bertl", "rpg_item_2")
+  give_item("baz@example.com", "bert", "Bertram", "rpg_item_3")
 end
 
 function island(pl, x, y, r)

@@ -354,7 +354,7 @@ static void magicanalyse_ship(ship * sh, unit * mage, double force)
 
 }
 
-static int break_curse(attrib ** alist, int cast_level, double force, curse * c, void *curse_target)
+static int break_curses(attrib ** alist, int cast_level, double force, curse * c, void *curse_target)
 {
     int succ = 0;
     /*  attrib **a = a_find(*ap, &at_curse); */
@@ -736,7 +736,7 @@ int sp_destroy_magic(castorder * co)
         return 0;
     }
 
-    succ = break_curse(ap, co->level, force, c, curse_target);
+    succ = break_curses(ap, co->level, force, c, curse_target);
 
     if (succ > 0) {
         ADDMSG(&caster->faction->msgs, msg_message("destroy_magic_effect",
@@ -5757,7 +5757,6 @@ int sp_break_curse(castorder * co)
     region *r = co_get_region(co);
     unit *mage = co_get_caster(co);
     int cast_level = co->level;
-    double force = co->force;
     spellparameter *params = co->a_params;
     void *curse_target = NULL;
 
@@ -5779,6 +5778,7 @@ int sp_break_curse(castorder * co)
             "unit region command", mage, mage->region, co->order));
     }
     else {
+        double force = co->force;
         const char *ts = NULL;
         attrib **ap;
         switch (obj) {
@@ -5828,7 +5828,7 @@ int sp_break_curse(castorder * co)
         }
 
         /* curse aufloesen, wenn zauber staerker (force > vigour) */
-        force = reduce_curse(c, cast_level, -force, curse_target);
+        reduce_curse(c, cast_level, force, curse_target);
 
         if (c->vigour <= 0.0) {
             remove_curse(ap, c);

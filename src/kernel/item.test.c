@@ -1,4 +1,7 @@
 #include <kernel/item.h>
+
+#include <kernel/attrib.h>
+#include <kernel/faction.h>
 #include <kernel/pool.h>
 #include <kernel/region.h>
 #include <kernel/terrain.h>
@@ -6,6 +9,7 @@
 #include <util/language.h>
 #include <util/lists.h>
 #include <util/log.h>
+#include <util/variant.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -228,6 +232,30 @@ static void test_get_resource(CuTest *tc) {
     test_teardown();
 }
 
+static void test_show_item(CuTest *tc) {
+    faction *f;
+	attrib *a;
+    const struct item_type *itype;
+
+    test_setup();
+    init_resources();
+    f = test_create_faction();
+    itype = test_create_itemtype("catapult");
+    show_item(f, itype);
+    CuAssertPtrEquals(tc, NULL, a_find(f->attribs, &at_showitem));
+	CuAssertIntEquals(tc, 1, test_count_messagetype(f->msgs, "displayitem"));
+	test_clear_messages(f);
+    a_removeall(&f->attribs, NULL);
+
+	itype = test_create_potiontype("foolpotion", 1);
+    show_item(f, itype);
+	CuAssertPtrNotNull(tc, a = a_find(f->attribs, &at_showitem));
+	CuAssertPtrEquals(tc, (void *)itype, a->data.v);
+	CuAssertPtrEquals(tc, NULL, test_find_faction_message(f, "displayitem"));
+
+	test_teardown();
+}
+
 CuSuite *get_item_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -241,5 +269,6 @@ CuSuite *get_item_suite(void)
     SUITE_ADD_TEST(suite, test_findresourcetype);
     SUITE_ADD_TEST(suite, test_fix_demand);
     SUITE_ADD_TEST(suite, test_core_resources);
+    SUITE_ADD_TEST(suite, test_show_item);
     return suite;
 }

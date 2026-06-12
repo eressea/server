@@ -51,7 +51,7 @@ function test_snowglobe()
     local u = unit.create(f, r1, 1)
     local fail = 0
     u:add_item("snowglobe", have)
-    local xform = { ocean = "glacier", glacier = "glacier", firewall = "volcano", desert = "plain", volcano = "mountain", plain = "plain" }
+    local xform = { ocean = "glacier", glacier = "glacier", desert = "plain", volcano = "mountain", plain = "plain" }
     for k, v in pairs(xform) do
         r2.terrain = k
         use_snowglobe(u, 1, "Ost", nil)

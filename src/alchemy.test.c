@@ -35,7 +35,7 @@ static void test_herbsearch(CuTest * tc)
     race *rc;
     unit *u, *u2;
     region *r;
-    const item_type *itype;
+    item_type *itype;
 
     test_setup();
     r = test_create_plain(0, 0);
@@ -47,6 +47,7 @@ static void test_herbsearch(CuTest * tc)
     f = test_create_faction();
     u = test_create_unit(f, r);
     itype = test_create_itemtype("rosemary");
+    itype->flags |= ITF_HERB;
 
     herbsearch(u, INT_MAX);
     CuAssertPtrNotNull(tc, test_find_messagetype(f->msgs, "error59"));
@@ -98,8 +99,8 @@ static void test_foolpotion_effect(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
-	itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
-	u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+	itype = oldpotiontype[P_FOOL] = test_create_potiontype("balm", 1);
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 	test_set_skill(u, SK_MAGIC, 3, 1);
 	test_set_skill(u, SK_CROSSBOW, 2, 1);
     change_effect(u, itype, 2);
@@ -116,7 +117,7 @@ static void test_use_foolpotion(CuTest *tc) {
     const struct item_type *itype;
 
     test_setup();
-    itype = oldpotiontype[P_FOOL] = it_get_or_create(rt_get_or_create("hodor"));
+    itype = oldpotiontype[P_FOOL] = test_create_potiontype("balm", 1);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     u2 = test_create_unit(test_create_faction(), u->region);
     u->thisorder = create_order(K_USE, u->faction->locale, itoa36(u2->no), NULL);
@@ -164,7 +165,7 @@ static void test_scale_effects(CuTest *tc)
     const struct item_type* ptype;
 
     test_setup();
-    ptype = it_get_or_create(rt_get_or_create("hodor"));
+    ptype = test_create_potiontype("balm", 1);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
 
     set_number(u, 4);
@@ -202,7 +203,7 @@ static void test_scale_bloodpotion(CuTest* tc)
 
     test_setup();
     test_create_race("demon");
-    it_blood = test_create_itemtype("peasantblood");
+    it_blood = test_create_potiontype("peasantblood", 1);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_number(u, 0);
     change_effect(u, it_blood, 10);
@@ -217,7 +218,7 @@ static void test_bloodpotion(CuTest* tc) {
     struct race* rc_demon, * rc_toad;
 
     test_setup();
-    itype = test_create_itemtype("bloodpotion");
+    itype = test_create_potiontype("bloodpotion", 1);
     rc_demon = test_create_race("demon");
     rc_toad = test_create_race("toad");
     CuAssertPtrEquals(tc, rc_demon, (race*)get_race(RC_DAEMON));
@@ -241,7 +242,7 @@ static void test_bloodpotion_fail(CuTest* tc) {
     changerace_data* crd;
 
     test_setup();
-    itype = test_create_itemtype("bloodpotion");
+    itype = test_create_potiontype("bloodpotion", 1);
     rc_demon = test_create_race("demon");
     rc_smurf = test_create_race("smurf");
     CuAssertPtrEquals(tc, rc_demon, (race*)get_race(RC_DAEMON));

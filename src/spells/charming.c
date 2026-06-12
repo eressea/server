@@ -108,6 +108,12 @@ static int slave_age(struct curse *c, void *owner)
     return 0;
 }
 
+static void slave_remove(const struct curse *c)
+{
+    slave_data *sd = (slave_data *)c->data.v;
+    sd->self->faction = sd->faction;
+}
+
 const struct curse_type ct_slavery = { 
     .cname = "slavery",
     .typ = CURSETYP_NORM,
@@ -117,6 +123,7 @@ const struct curse_type ct_slavery = {
     .read = slave_read,
     .write = slave_write,
     .age = slave_age,
+    .remove = slave_remove,
     .construct = slave_init,
     .destroy = slave_done,
 };
@@ -220,6 +227,7 @@ int sp_charmingsong(castorder *co)
     spellparameter *param = co->a_params;
     int duration, resist_bonus = 0;
     int tb = 0;
+    bool resists = false;
 
     /* wenn Ziel gefunden, dieses aber Magieresistent war, Zauber
      * abbrechen aber kosten lassen */
@@ -249,31 +257,46 @@ int sp_charmingsong(castorder *co)
     if (target->number > force) {
         resist_bonus += (int)((target->number - force) * 10);
     }
-    /* Magieresistensbonus fuer hoehere Talentwerte */
-    for (i = 0; i < MAXSKILLS; i++) {
-        int sk = effskill(target, i, NULL);
-        if (tb < sk)
-            tb = sk;
+    if (target->number > force * force) {
+        resists = true;
     }
-    if (tb > 0) {
-        tb -= effskill(mage, SK_MAGIC, NULL);
-        if (tb > 0) {
-            resist_bonus += tb * 15;
+    else {
+        /* Magieresistensbonus fuer hoehere Talentwerte */
+        for (i = 0; i < MAXSKILLS; i++) {
+            int sk = effskill(target, i, NULL);
+            if (tb < sk)
+                tb = sk;
         }
-    }
-    /* Increased chance for magical resistence */
-    if (resist_bonus > 0) {
-        variant p_regular = resist_chance(mage, target, TYP_UNIT, 0);
-        variant p_modified = resist_chance(mage, target, TYP_UNIT, resist_bonus);
-        variant prob = frac_div(p_regular, p_modified);
-        if (prob.sa[0] > 0) {
-            if (rng_int() % prob.sa[1] < prob.sa[0]) {
-                /* target resists after all, because of bonus */
-                ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
-                    "unit region command target", mage, mage->region, co->order, target));
-                return cast_level;
+        if (tb > 0) {
+            tb -= effskill(mage, SK_MAGIC, NULL);
+            if (tb > 0) {
+                resist_bonus += tb * 15;
             }
         }
+        /* Increased chance for magical resistence */
+        if (resist_bonus > 0) {
+            variant p_regular = resist_chance(mage, target, TYP_UNIT, 0);
+            variant p_modified = resist_chance(mage, target, TYP_UNIT, resist_bonus);
+            variant prob = frac_div(p_regular, p_modified);
+            if (prob.sa[0] > 0) {
+                /**
+                * given a failure chance of A/B, we roll a
+                * B-sided die, and if the result is less than B - A,
+                * the spell fails.
+                * This formula is a bit odd, because we want it to fail
+                * on low dice rolls, to simplify testing.
+                */
+                if (rng_int() % prob.sa[1] < prob.sa[1] - prob.sa[0]) {
+                    resists = true;
+                }
+            }
+        }
+    }
+    if (resists) {
+        /* target resists after all, because of bonus */
+        ADDMSG(&mage->faction->msgs, msg_message("spellunitresists",
+            "unit region command target", mage, mage->region, co->order, target));
+        return cast_level;
     }
 
     duration = 3 + rng_int() % (int)force;

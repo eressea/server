@@ -2310,28 +2310,6 @@ int send_cmd(unit * u, struct order *ord)
     return 0;
 }
 
-static void display_potion(unit * u, const item_type * itype) {
-    show_item(u, itype);
-}
-
-static void display_item(unit * u, const item_type * itype)
-{
-    faction * f = u->faction;
-    const char *name;
-    const char *key;
-    const char *info;
-
-    name = resourcename(itype->rtype, 0);
-    key = mkname("iteminfo", name);
-    info = locale_getstring(f->locale, key);
-
-    if (info == NULL) {
-        info = LOC(f->locale, mkname("iteminfo", "no_info"));
-    }
-    ADDMSG(&f->msgs, msg_message("displayitem", "weight item description",
-        itype->weight, itype->rtype, info));
-}
-
 static void display_race(faction * f, const race * rc)
 {
     char buf[2048];
@@ -2362,7 +2340,6 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
                 /* we don't have the item, but it is a potion. do we know it? */
                 int level = potion_level(itype);
                 if (level > 0 && 2 * level <= effskill(u, SK_ALCHEMY, NULL)) {
-                    display_potion(u, itype);
                     found = true;
                 }
             }
@@ -2370,8 +2347,10 @@ static void reshow_other(unit * u, struct order *ord, const char *s) {
                 int i = i_get(u->items, itype);
                 if (i > 0) {
                     found = true;
-                    display_item(u, itype);
                 }
+            }
+            if (found) {
+                show_item(u->faction, itype);
             }
         }
 

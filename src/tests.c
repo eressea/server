@@ -3,6 +3,7 @@
 #endif
 #include "tests.h"
 
+#include "alchemy.h"
 #include "creport.h"
 #include "eressea.h"
 #include "magic.h"             // for spell_component, create_castorder, ...
@@ -486,6 +487,17 @@ building_type *test_create_castle(void) {
     return btype;
 }
 
+
+item_type *test_create_potiontype(const char *name, int level) {
+    resource_type *rtype;
+    item_type *itype;
+
+    rtype = rt_get_or_create(name);
+    rtype->flags = RTF_POOLED | RTF_ITEM;
+    itype = it_get_or_create(rtype);
+    new_potiontype(itype, level);
+    return itype;
+}
 
 item_type * test_create_itemtype(const char * name) {
     resource_type * rtype;

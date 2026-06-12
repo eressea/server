@@ -364,7 +364,13 @@ curse *findcurse(int i)
 bool remove_curse(attrib ** ap, const curse * c)
 {
     attrib *a = a_select(*ap, c, cmp_curse);
-    return a && a_remove(ap, a) == 1;
+    if (a) {
+        if (c->type->remove) {
+            c->type->remove(c);
+        }
+        return a_remove(ap, a) == 1;
+    }
+    return false;
 }
 
 /* gibt die allgemeine Staerke der Verzauberung zurueck. id2 wird wie

@@ -46,6 +46,7 @@ struct item_type * test_create_cart(void);
 struct item_type * test_create_silver(void);
 struct building * test_create_building(struct region * r, const struct building_type * btype);
 struct ship * test_create_ship(struct region * r, const struct ship_type * stype);
+struct item_type *test_create_potiontype(const char *name, int level);
 struct item_type * test_create_itemtype(const char * name);
 struct ship_type *test_create_shiptype(const char * name);
 struct building_type *test_create_buildingtype(const char *name);

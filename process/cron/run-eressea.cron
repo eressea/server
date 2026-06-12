@@ -5,12 +5,6 @@ GAME=$1
 [ "$ENABLED" == "no" ] && exit
 [ -z "$ERESSEA" ] && ERESSEA="$HOME/eressea"
 
-upload()
-{
-    FILEPATH=$(realpath "$1")
-    scp "$FILEPATH" "synology:Backup/Eressea/game-$GAME/"
-}
-
 backup_reports()
 {
     GAME="$1"
@@ -21,7 +15,6 @@ backup_reports()
     fi
     echo "backup turn $TURN, game $GAME, files: ${files[*]}"
     tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-    upload "backup/$TURN.tar.bz2"
     echo "backup reports $TURN, game $GAME"
     tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
     echo "backup/$TURN-reports.tar.bz2"
@@ -29,9 +22,8 @@ backup_reports()
 
 backup()
 {
-    local -n RESULT=$1
-    GAME="$2"
-    TURN="$3"
+    GAME="$1"
+    TURN="$2"
     cd "$ERESSEA/game-$GAME" || exit
     if [ ! -e "data/$TURN.dat" ]; then
       exit 2
@@ -46,12 +38,11 @@ backup()
       files+=("orders.$TURN")
     fi
     tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-    RESULT="backup/$TURN.tar.bz2"
 }
 
 export ERESSEA
 eval "$(luarocks path)"
-export LUA_PATH="${ERESSEA}/server/scripts/?.lua;$LUA_PATH"
+export LUA_PATH="${ERESSEA}/server/scripts/?.lua;${ERESSEA}/git/scripts/?/init.lua;$LUA_PATH"
 BIN="$ERESSEA/server/bin"
 TURN=$(cat "$ERESSEA/game-$GAME/turn")
 if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
@@ -82,8 +73,7 @@ if [ ! -s "orders.$TURN" ]; then
 fi
 
 ## pre-game backup, data and orders only:
-backup BACKUP "$GAME" "$TURN"
-upload "$BACKUP"
+backup "$GAME" "$TURN"
 rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
 "$BIN/updatelist.sh" "$TURN"
@@ -107,8 +97,7 @@ echo "sending reports for game $GAME, turn $TURN"
 "$BIN/compress.sh" "$GAME" "$TURN"
 "$BIN/sendreports.sh" "$GAME"
 ## post-game backup of new data:
-backup NEWFILE "$GAME" "$TURN"
-upload "$NEWFILE"
+backup "$GAME" "$TURN"
 ## post-game backup of reports:
 backup_reports "$GAME" "$TURN"
 if [ ! -f "express-$TURN.txt" ]; then
