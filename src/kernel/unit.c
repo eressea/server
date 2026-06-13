@@ -1231,7 +1231,7 @@ static int newunitid(void)
 {
     int random_unit_no;
     int start_random_no;
-    random_unit_no = 1 + (rng_int() % MAX_UNIT_NR);
+    random_unit_no = 1 + (rng_uint() % MAX_UNIT_NR);
     start_random_no = random_unit_no;
 
     while (ufindhash(random_unit_no) || dfindhash(random_unit_no)

@@ -13,7 +13,7 @@ int lovar(double xpct_x2)
     int n = (int)(xpct_x2 * 500) + 1;
     if (n == 0)
         return 0;
-    return (rng_int() % n + rng_int() % n) / 1000;
+    return (rng_uint() % n + rng_uint() % n) / 1000;
 }
 
 /* gaussian distribution

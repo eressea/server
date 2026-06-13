@@ -307,6 +307,7 @@ static void test_build_with_potion_and_ring(CuTest *tc)
     set_level(u, bf.cons.skill, bf.cons.minskill);
     CuAssertIntEquals(tc, 1, build(u, 1, &bf.cons, 0, 200, 0));
 
+    set_level(u, bf.cons.skill, bf.cons.minskill);
     i_change(&u->items, ring, 1);
     change_effect(u, ptype, 4);
     CuAssertIntEquals(tc, 11, build(u, 1, &bf.cons, 0, 200, 0));
