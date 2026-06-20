@@ -86,7 +86,7 @@ int update_nmrs(int since)
         if (faction_age(f)<=1) {
             ++newplayers;
         }
-        else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED)) {
+        else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED | FFL_PAUSED)) {
             int nmr = since - f->lastorders;
             if (timeout>0) {
                 if (nmr < 0 || nmr > timeout) {
