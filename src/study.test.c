@@ -193,6 +193,40 @@ static void test_study_speed(CuTest *tc) {
     test_teardown();
 }
 
+static void test_study_cmd_with_speed(CuTest *tc) {
+    unit *u;
+    race *rc;
+    skill *sv;
+
+    setup_study();
+    rc = test_create_race("orc");
+    set_study_speed(rc, SK_BUILDING, -SKILL_DAYS_PER_WEEK / 2);
+    CuAssertIntEquals(tc, -15, rc->study_speed[SK_BUILDING]);
+    u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
+
+    // learning at 30 days/week, no study_cost effect here:
+    u->thisorder = create_order(K_STUDY, u->faction->locale, skillnames[SK_BUILDING]);
+    study_cmd(u, u->thisorder);
+    CuAssertPtrNotNull(tc, sv = u->skills);
+    CuAssertIntEquals(tc, SK_BUILDING, sv->id);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 5 * SKILL_DAYS_PER_WEEK / 2, sv->days);
+
+    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, 3 * SKILL_DAYS_PER_WEEK / 2, sv->days);
+
+    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 1, sv->level);
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK / 2, sv->days);
+
+    study_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, 2, sv->level);
+    CuAssertIntEquals(tc, 7 * SKILL_DAYS_PER_WEEK / 2, sv->days);
+
+    test_teardown();
+}
+
 static void test_check_student(CuTest *tc) {
     unit *u;
     race *rc;
@@ -916,6 +950,7 @@ CuSuite *get_study_suite(void)
     SUITE_ADD_TEST(suite, test_study_with_bad_teacher);
     SUITE_ADD_TEST(suite, test_study_race_noteach);
     SUITE_ADD_TEST(suite, test_study_speed);
+    SUITE_ADD_TEST(suite, test_study_cmd_with_speed);
     SUITE_ADD_TEST(suite, test_academy_building);
     SUITE_ADD_TEST(suite, test_academy_bonus);
     SUITE_ADD_TEST(suite, test_demon_skillchange);
