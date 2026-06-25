@@ -8,7 +8,6 @@
 
 #include <attributes/raceprefix.h>
 #include <util/language.h>
-#include <util/variant.h>
 
 #include <tests.h>
 #include <CuTest.h>

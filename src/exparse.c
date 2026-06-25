@@ -1091,7 +1091,7 @@ static void start_races(parseinfo *pi, const XML_Char *el, const XML_Char **attr
         if (name) {
             skill_t sk = find_skill(name);
             if (sk != NOSKILL) {
-                rc->bonus[sk] = (char)mod;
+                rc->bonus[sk] = (signed char)mod;
                 if (speed != INT_MAX) {
                     set_study_speed(rc, sk, speed);
                 }

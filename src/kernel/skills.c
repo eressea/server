@@ -5,6 +5,7 @@
 #include "unit.h"
 
 #include <kernel/attrib.h>
+#include <kernel/race.h>
 #include <kernel/skills.h>
 
 #include <util/goodies.h>
@@ -80,62 +81,96 @@ static bool rule_random_progress(void)
     return rule != 0;
 }
 
-static int progress_weeks(unsigned int level)
+static unsigned int progress_weeks(unsigned int level)
 /* how many weeks must i study to get from level-1 to level */
 {
     unsigned int coins = MAX_WEEKS_TO_NEXT_LEVEL(level - 1) - 1;
-    int heads = 1;
+    unsigned int heads = 1;
     while (coins--) {
-        heads += rng_int() % 2;
+        heads += rng_uint() % 2;
     }
     return heads;
 }
 
 static void skill_set(skill *sv, unsigned int level, unsigned int days)
 {
-    assert(days <= MAX_DAYS_TO_NEXT_LEVEL(level));
     sv->level = level;
     sv->days = days;
     assert(sv->days == days && sv->level == level);
 }
 
-void sk_set_level(skill *sv, int level)
+int study_speed(const struct race *rc, enum skill_t sk)
 {
-    int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
-    skill_set(sv, level, weeks * SKILL_DAYS_PER_WEEK);
+    int mod = (rc && rc->study_speed) ? rc->study_speed[sk] : 0;
+    return SKILL_DAYS_PER_WEEK - mod;
 }
 
-void increase_skill_weeks(unit * u, enum skill_t sk, const unsigned int weeks)
+void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
 {
-    skill *sv = unit_skill(u, sk);
-    unsigned int days = weeks * SKILL_DAYS_PER_WEEK;
-    if (!sv) {
-        sv = add_skill(u, sk);
-    }
-    while (sv->days <= days) {
-        days -= sv->days;
-        sk_set_level(sv, sv->level + 1);
-    }
-    sv->days -= days;
-    assert(sv->days <= MAX_DAYS_TO_NEXT_LEVEL(sv->level));
+    unsigned int weeks = rule_random_progress() ? progress_weeks(level + 1) : (level + 1);
+    const struct race *rc = u ? u_race(u) : NULL;
+    int speed = rc ? study_speed(rc, sv->id) : SKILL_DAYS_PER_WEEK;
+    unsigned int days = SKILL_DAYS_PER_WEEK + (weeks - 1) * speed;
+    ASSERT_VALID_SKILL(sv, rc);
+    skill_set(sv, level, days);
 }
 
-void reduce_skill_weeks(unit * u, skill * sv, const unsigned int weeks)
-{
-    unsigned int days = weeks * SKILL_DAYS_PER_WEEK;
-    unsigned int max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
+static void increase_skill_days(unit *u, skill *sv, unsigned int days) {
+    if (days > 0) {
+        unsigned int leveldays = sv->days;
+        while (leveldays <= days) {
+            sk_set_level(u, sv, sv->level + 1);
+            days -= leveldays;
+            leveldays = sv->days;
+        }
+        sv->days = leveldays - days;
+        ASSERT_VALID_SKILL(sv, u_race(u));
+    }
+}
 
-    sv->days += days;
-    while (sv->level > 0 && sv->days > max_days) {
-        sv->days -= sv->level * SKILL_DAYS_PER_WEEK;
-        --sv->level;
-        max_days -= 2 * SKILL_DAYS_PER_WEEK;
+static void reduce_skill_days(unit *u, skill *sv, unsigned int days)
+{
+    if (sv) {
+        // first, strip full levels off the skill:
+        // max_days = maximum days I can have "to do" at current level
+        unsigned int max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
+        days += sv->days;
+        while (sv->level > 0 && max_days < days) {
+            // level_days = expected time to complete current level.
+            unsigned int level_days = SKILL_DAYS_PER_WEEK * (1 + sv->level);
+            days -= level_days;
+            --sv->level;
+            max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
+        }
+        // store the remaining days
+        sv->days = days;
+        if (sv->level == 0 && sv->days >= SKILL_DAYS_PER_WEEK) {
+            remove_skill(u, (skill_t)sv->id);
+        }
     }
-    if (sv->level == 0) {
-        /* reroll */
-        sk_set_level(sv, sv->level + 1);
+}
+
+void change_skill(unit *u, skill *sv, int days)
+{
+    assert(sv);
+    if (days < 0) {
+        reduce_skill_days(u, sv, -days);
     }
-    assert(sv->days <= MAX_DAYS_TO_NEXT_LEVEL(sv->level));
+    else {
+        increase_skill_days(u, sv, days);
+    }
+}
+
+void change_skill_days(struct unit *u, enum skill_t sk, int days)
+{
+    assert(sk >= 0 && sk < MAXSKILLS);
+    if (days != 0) {
+        skill *sv = unit_skill(u, sk);
+        if (!sv && days > 0) {
+            sv = add_skill(u, sk);
+        }
+        change_skill(u, sv, days);
+    }
 }
 
 int skill_compare(const skill * sk, const skill * sc)
@@ -232,3 +267,4 @@ int skill_days(unit *u, enum skill_t sk)
     const skill *sv = unit_skill(u, sk);
     return sv ? sv->days : 1;
 }
+

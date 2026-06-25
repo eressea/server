@@ -455,7 +455,7 @@ void set_study_speed(race *rc, skill_t sk, int modifier) {
         rc->study_speed = calloc(1, MAXSKILLS);
         if (!rc->study_speed) abort();
     }
-    rc->study_speed[sk] = (char)modifier;
+    rc->study_speed[sk] = (signed char)modifier;
 }
 
 const race *rc_otherrace(const race *rc)
