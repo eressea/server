@@ -6,7 +6,6 @@
 
 #include "util/message.h"
 #include "util/keyword.h"  // for K_ENTERTAIN, K_MOVE
-#include "util/variant.h"
 
 #include <CuTest.h>
 #include <tests.h>
