@@ -898,7 +898,7 @@ static enum CR_Error handle_skill(context *ctx, const char *value, const char *n
         int level = atoi(val + 1) - rc_skillmod(rc, sk) - terrain_mod(rc, sk, u->region);
         if (level > 0) {
             struct skill *sv = add_skill(u, sk);
-            sk_set_level(sv, level);
+            sk_set_level(u, sv, level);
             sv->old = sv->level;
         }
         if (sk == SK_STAMINA) {

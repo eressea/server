@@ -581,13 +581,13 @@ void set_level(struct unit * u, enum skill_t sk, unsigned int value)
     for (len = arrlen(u->skills), s = 0; s != len; ++s) {
         skill* sv = u->skills + s;
         if (sv->id == sk) {
-            sk_set_level(sv, value);
+            sk_set_level(u, sv, value);
             sv->old = sv->level;
             return;
         }
         ++sv;
     }
-    sk_set_level(add_skill(u, sk), value);
+    sk_set_level(u, add_skill(u, sk), value);
 }
 
 static int leftship_age(struct attrib *a, void *owner)

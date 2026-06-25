@@ -6,6 +6,7 @@
 #include "kernel/race.h"
 #include "kernel/region.h"
 #include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
 #include "util/keyword.h"
@@ -479,6 +480,33 @@ static void test_autostudy_batches(CuTest *tc) {
     test_teardown();
 }
 
+static void test_do_autostudy_speed(CuTest *tc) {
+    region *r;
+    unit *u1, *u2;
+    race *rc;
+    faction *f;
+
+    test_setup();
+    config_set("study.random_progress", "0");
+
+    r = test_create_plain(0, 0);
+    rc = test_create_race("orc");
+    set_study_speed(rc, SK_CATAPULT, -5);
+    f = test_create_faction_ex(rc, NULL);
+    u1 = test_create_unit(f, r);
+    set_number(u1, 1);
+    set_level(u1, SK_CATAPULT, 2);
+    u2 = test_create_unit(f, r);
+    set_number(u2, 10);
+    u1->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_CATAPULT]);
+    u2->thisorder = create_order(K_AUTOSTUDY, f->locale, skillnames[SK_CATAPULT]);
+    do_autostudy(r);
+    CuAssertIntEquals(tc, 2, get_level(u1, SK_CATAPULT));
+    CuAssertIntEquals(tc, 1, get_level(u2, SK_CATAPULT));
+    CuAssertIntEquals(tc, SKILL_DAYS_PER_WEEK + 5, u2->skills->days);
+    test_teardown();
+}
+
 static void test_do_autostudy(CuTest *tc) {
     unit *u1, *u2, *u3, *u4;
     faction *f;
@@ -517,6 +545,7 @@ CuSuite *get_automate_suite(void)
     SUITE_ADD_TEST(suite, test_autostudy_init_fallback);
     SUITE_ADD_TEST(suite, test_autostudy_run);
     SUITE_ADD_TEST(suite, test_do_autostudy);
+    SUITE_ADD_TEST(suite, test_do_autostudy_speed);
     SUITE_ADD_TEST(suite, test_autostudy_batches);
     SUITE_ADD_TEST(suite, test_autostudy_run_noteachers);
     SUITE_ADD_TEST(suite, test_autostudy_run_can_teach);

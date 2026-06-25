@@ -189,7 +189,7 @@ static void potion_effects(unit *u) {
         }
         /* bestes Talent raussuchen */
         if (sb != NULL) {
-            reduce_skill_weeks(u, sb, weeks);
+            change_skill(u, sb, -SKILL_DAYS_PER_WEEK * weeks);
             ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
                 "unit weeks skill", u, weeks, (skill_t)sb->id));
         }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
