@@ -29,7 +29,6 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/variant.h"  // for variant
 
 #include <spells/borders.h>
 #include <spells/regioncurse.h>
