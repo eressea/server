@@ -1454,6 +1454,27 @@ count_enemies(const fighter *af, int minrow, int maxrow, int select)
     return 0;
 }
 
+bool escapes_tactics(const fighter *af, const troop dt)
+{
+    side *as = af->side;
+    battle *b = as->battle;
+    if (b->turn == 0 && dt.fighter) {
+        if (rule_tactics_formula == 1) {
+            int tactics = get_tactics(as, dt.fighter->side);
+
+            /* percentage chance to get this attack */
+            if (tactics > 0) {
+                double tacch = tactics_chance(af->unit, tactics);
+                return !chance(tacch);
+            }
+            else {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 troop select_enemy(fighter * af, int minrow, int maxrow, int select)
 {
     side *as = af->side;
@@ -1507,20 +1528,9 @@ troop select_enemy(fighter * af, int minrow, int maxrow, int select)
                     troop dt;
                     dt.index = selected;
                     dt.fighter = df;
-                    if (b->turn == 0 && dt.fighter) {
-                        if (rule_tactics_formula == 1) {
-                            int tactics = get_tactics(as, dt.fighter->side);
-
-                            /* percentage chance to get this attack */
-                            if (tactics > 0) {
-                                double tacch = tactics_chance(af->unit, tactics);
-                                if (!chance(tacch)) {
-                                    dt.fighter = NULL;
-                                }
-                            }
-                            else {
-                                dt.fighter = NULL;
-                            }
+                    if (0 == (select & SELECT_IGNORE_TACTICS)) {
+                        if (escapes_tactics(af, dt)) {
+                            dt.fighter = NULL;
                         }
                     }
                     return dt;
