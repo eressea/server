@@ -2555,7 +2555,7 @@ void loot_items(fighter * corpse)
                     if (maxrow > 0) {
                         if (looting == 1) {
                             /* enemies get dibs */
-                            fig = select_enemy(corpse, FIGHT_ROW, maxrow, 0).fighter;
+                            fig = select_enemy(corpse, FIGHT_ROW, maxrow, SELECT_IGNORE_TACTICS).fighter;
                         }
                         if (!fig) {
                             /* self and allies get second pick */
