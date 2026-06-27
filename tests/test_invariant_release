@@ -1,0 +1,87 @@
+#include <check.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+START_TEST(test_version_shell_injection)
+{
+    // Invariant: Version parameter must not execute arbitrary shell commands
+    const char *payloads[] = {
+        "1.0.0",                    // Valid input
+        "1.0.0; id",                // Basic command injection
+        "1.0.0$(id)",               // Subshell injection
+        "1.0.0`id`",                // Backtick injection
+        "1.0.0\" || id #"           // Quote breaking injection
+    };
+    int num_payloads = sizeof(payloads) / sizeof(payloads[0]);
+
+    for (int i = 0; i < num_payloads; i++) {
+        // Create pipe to capture output
+        int pipefd[2];
+        pipe(pipefd);
+        
+        pid_t pid = fork();
+        if (pid == 0) {
+            // Child process: redirect stdout to pipe
+            close(pipefd[0]);
+            dup2(pipefd[1], STDOUT_FILENO);
+            dup2(pipefd[1], STDERR_FILENO);
+            close(pipefd[1]);
+            
+            // Execute the actual s/release script with payload
+            char cmd[256];
+            snprintf(cmd, sizeof(cmd), "./s/release %s", payloads[i]);
+            execl("/bin/sh", "sh", "-c", cmd, NULL);
+            exit(1);
+        } else {
+            // Parent process: read output
+            close(pipefd[1]);
+            char buffer[1024] = {0};
+            read(pipefd[0], buffer, sizeof(buffer) - 1);
+            close(pipefd[0]);
+            
+            // Wait for child
+            int status;
+            waitpid(pid, &status, 0);
+            
+            // Security check: output must not contain shell command results
+            ck_assert_msg(strstr(buffer, "uid=") == NULL, 
+                         "Shell injection detected for payload: %s", payloads[i]);
+            ck_assert_msg(strstr(buffer, "gid=") == NULL,
+                         "Shell injection detected for payload: %s", payloads[i]);
+        }
+    }
+}
+END_TEST
+
+Suite *security_suite(void)
+{
+    Suite *s;
+    TCase *tc_core;
+
+    s = suite_create("Security");
+    tc_core = tcase_create("Core");
+
+    tcase_add_test(tc_core, test_version_shell_injection);
+    suite_add_tcase(s, tc_core);
+
+    return s;
+}
+
+int main(void)
+{
+    int number_failed;
+    Suite *s;
+    SRunner *sr;
+
+    s = security_suite();
+    sr = srunner_create(s);
+
+    srunner_run_all(sr, CK_NORMAL);
+    number_failed = srunner_ntests_failed(sr);
+    srunner_free(sr);
+
+    return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
