@@ -34,7 +34,7 @@ jobs:
       - name: print version numbers
         run: |
           iwyu --version
-          tolua --version
+          tolua -v
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v6
