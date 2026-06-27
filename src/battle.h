@@ -188,18 +188,19 @@ side* get_side(battle* b, const struct unit* u);
 void do_battles(void);
 
 /* for combat spells and special attacks */
-enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
+enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4, SELECT_IGNORE_TACTICS = 0x8 };
 enum { ALLY_SELF, ALLY_ANY };
 
 int get_unitrow(const fighter* af, const side* vs);
 
+int count_enemies(const struct fighter *af, int minrow, int maxrow, int select);
+bool escapes_tactics(const fighter *af, const troop dt);
 troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
 troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
 int get_tactics(const struct side* as, const struct side* ds);
 
-int count_enemies(const struct fighter* af, int minrow, int maxrow, int select);
 int natural_armor(struct unit* u);
 const struct armor_type* select_armor(struct troop t, bool shield);
 const struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);
