@@ -2490,6 +2490,7 @@ int status_cmd(unit * u, struct order *ord)
         break;
     case P_FLEE:
         unit_setstatus(u, ST_FLEE);
+        setguard(u, false);
         break;
     case P_CHICKEN:
         unit_setstatus(u, ST_CHICKEN);
