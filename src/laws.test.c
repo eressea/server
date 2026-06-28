@@ -1577,7 +1577,23 @@ static void test_status_cmd(CuTest* tc) {
     test_teardown();
 }
 
-static void test_ally_cmd(CuTest* tc) {
+static void test_status_flee_stops_guard(CuTest *tc) {
+    unit *u;
+    faction *f;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    fset(u, UFL_GUARD);
+    u->status = ST_FIGHT;
+    u->thisorder = create_order(K_STATUS, f->locale, param_name(P_FLEE, f->locale));
+    status_cmd(u, u->thisorder);
+    CuAssertIntEquals(tc, ST_FLEE, u->status);
+    CuAssertTrue(tc, !is_guard(u));
+
+    test_teardown();
+}
+
+static void test_ally_cmd(CuTest *tc) {
     unit *u;
     faction * f;
     order *ord;
@@ -3027,6 +3043,7 @@ CuSuite *get_laws_suite(void)
     SUITE_ADD_TEST(suite, test_findparam_ex);
     SUITE_ADD_TEST(suite, test_nmr_warnings);
     SUITE_ADD_TEST(suite, test_status_cmd);
+    SUITE_ADD_TEST(suite, test_status_flee_stops_guard);
     SUITE_ADD_TEST(suite, test_ally_cmd);
     SUITE_ADD_TEST(suite, test_name_cmd);
     SUITE_ADD_TEST(suite, test_name_foreign_cmd);
