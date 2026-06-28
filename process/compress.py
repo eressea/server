@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
+
 from sys import argv, exit
-import os
+import os, subprocess, shlex
 import io
 import os.path
 
@@ -63,7 +64,8 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            os.system("zip %s -q -m -j %s" % (output, ' '.join(parameters)))
+            subprocess.run(["zip", shlex.quote(output), "-q", "-m", "-j",
+                ' '.join(shlex.quote(p) for p in parameters)], check=True)
     else:
         files = []
         for extension in reports:
@@ -74,7 +76,7 @@ for line in infile.readlines():
                 if os.path.isfile(filename):
                     if os.path.isfile(output):
                         continue
-                    os.system("bzip2 %s" % filename)
+                    subprocess.run(["bzip2", shlex.quote(filename)], check=True)
     for extra in extras:
         if os.path.isfile(extra):
             files = files + [extra]
