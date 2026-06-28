@@ -1581,10 +1581,11 @@ static void test_status_flee_stops_guard(CuTest *tc) {
     unit *u;
     faction *f;
 
-    test_setup();
-    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
-    fset(u, UFL_GUARD);
-    u->status = ST_FIGHT;
+    guard_fixture fix;
+
+    setup_guard(&fix, true);
+    u = fix.u;
+    f = fix.u->faction;
     u->thisorder = create_order(K_STATUS, f->locale, param_name(P_FLEE, f->locale));
     status_cmd(u, u->thisorder);
     CuAssertIntEquals(tc, ST_FLEE, u->status);
