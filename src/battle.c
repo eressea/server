@@ -1458,7 +1458,8 @@ bool escapes_tactics(const fighter *af, const troop dt)
 {
     side *as = af->side;
     battle *b = as->battle;
-    if (b->turn == 0 && dt.fighter) {
+    if (b->turn != 0) return false;
+    if (dt.fighter) {
         if (rule_tactics_formula == 1) {
             int tactics = get_tactics(as, dt.fighter->side);
 
