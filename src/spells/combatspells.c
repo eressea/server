@@ -174,15 +174,16 @@ int sp_petrify(struct castorder * co)
         return 0;
     }
 
-    while (force && stoned < enemies) {
+    while (force-- && stoned < enemies) {
         troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-        unit *du = dt.fighter->unit;
-        if (!is_magic_resistant(mage, du, 0)) {
-            /* person ans ende hinter die lebenden schieben */
-            remove_troop(dt);
-            ++stoned;
+        if (dt.fighter) {
+            unit *du = dt.fighter->unit;
+            if (!is_magic_resistant(mage, du, 0)) {
+                /* person ans ende hinter die lebenden schieben */
+                remove_troop(dt);
+                ++stoned;
+            }
         }
-        --force;
     }
 
     m = msg_message("cast_petrify_effect", "mage spell amount", fi->unit, sp,
@@ -220,15 +221,14 @@ int sp_stun(struct castorder * co)
     }
 
     stunned = 0;
-    while (force && stunned < enemies) {
+    while (force-- && stunned < enemies) {
         troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-        fighter *df = dt.fighter;
-        unit *du = df->unit;
-
-        --force;
-        if (!is_magic_resistant(mage, du, 0)) {
-            df->person[dt.index].flags |= FL_STUNNED;
-            ++stunned;
+        if (dt.fighter) {
+            unit *du = dt.fighter->unit;
+            if (!is_magic_resistant(mage, du, 0)) {
+                dt.fighter->person[dt.index].flags |= FL_STUNNED;
+                ++stunned;
+            }
         }
     }
 
@@ -364,17 +364,16 @@ int sp_sleep(struct castorder * co)
         msg_release(m);
         return 0;
     }
-    while (force && enemies) {
-        unit *du;
+    while (force-- && enemies) {
         troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
-        assert(dt.fighter);
-        du = dt.fighter->unit;
-        if (!is_magic_resistant(mage, du, 0)) {
-            dt.fighter->person[dt.index].flags |= FL_SLEEPING;
-            ++k;
-            --enemies;
+        if (dt.fighter) {
+            unit *du = dt.fighter->unit;
+            if (!is_magic_resistant(mage, du, 0)) {
+                dt.fighter->person[dt.index].flags |= FL_SLEEPING;
+                ++k;
+                --enemies;
+            }
         }
-        --force;
     }
 
     m = msg_message("cast_sleep_effect", "mage spell amount", fi->unit, sp, k);
@@ -488,32 +487,32 @@ int sp_mindblast(struct castorder * co)
     }
 
     while (force > 0 && enemies > 0) {
-        unit *du;
-        troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
+        troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE|SELECT_IGNORE_TACTICS);
 
-        assert(dt.fighter);
-        du = dt.fighter->unit;
-        if (du->flags & UFL_MARK) {
-            /* not this one again */
-            continue;
-        }
-
-        if (humanoidrace(u_race(du)) && force >= du->number) {
-            if (!is_magic_resistant(mage, du, 0)) {
-                skill_t sk = random_skill(du, true);
-                if (sk != NOSKILL) {
-                    int n = 1 + rng_int() % maxloss;
-                    attrib *a = make_skillmod(sk, NULL, 0.0, n);
-                    /* neat: you can add a whole lot of these to a unit, they stack */
-                    a_add(&du->attribs, a);
-                }
-                k += du->number;
+        if (dt.fighter) {
+            unit *du = dt.fighter->unit;
+            if (du->flags & UFL_MARK) {
+                /* not this one again */
+                continue;
             }
-            force -= du->number;
+
+            if (humanoidrace(u_race(du)) && force >= du->number) {
+                if (!(is_magic_resistant(mage, du, 0) || escapes_tactics(fi, dt))) {
+                    skill_t sk = random_skill(du, true);
+                    if (sk != NOSKILL) {
+                        int n = 1 + rng_int() % maxloss;
+                        attrib *a = make_skillmod(sk, NULL, 0.0, n);
+                        /* neat: you can add a whole lot of these to a unit, they stack */
+                        a_add(&du->attribs, a);
+                    }
+                    k += du->number;
+                }
+                force -= du->number;
+            }
+            du->flags |= UFL_MARK;
+            reset = 1;
+            enemies -= du->number;
         }
-        du->flags |= UFL_MARK;
-        reset = 1;
-        enemies -= du->number;
     }
 
     if (reset) {
@@ -1020,7 +1019,7 @@ int sp_frighten(struct castorder * co)
         return 0;
     }
 
-    while (force && enemies) {
+    while (force-- && enemies) {
         troop dt = select_enemy(fi, FIGHT_ROW, BEHIND_ROW - 1, SELECT_ADVANCE);
         fighter *df = dt.fighter;
         --enemies;
@@ -1038,7 +1037,6 @@ int sp_frighten(struct castorder * co)
             df->person[dt.index].defense -= df_malus;
             targets++;
         }
-        --force;
     }
 
     m =
@@ -1069,7 +1067,7 @@ int sp_tiredsoldiers(struct castorder * co)
         return 0;
     }
 
-    while (force) {
+    while (force--) {
         troop t = select_enemy(fi, FIGHT_ROW, BEHIND_ROW, SELECT_ADVANCE);
         fighter *df = t.fighter;
 
@@ -1084,7 +1082,6 @@ int sp_tiredsoldiers(struct castorder * co)
                 ++n;
             }
         }
-        --force;
     }
 
     m = msg_message("cast_tired_effect", "mage spell amount", fi->unit, sp, n);
