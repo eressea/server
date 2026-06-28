@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-import os
+import subprocess
 import sys
 
 def new_version(ver):
-    os.system("git tag -f v%s" % ver)
-    os.system("git push --tags -f")
+    subprocess.run(["git", "tag", "-f", "v" + ver], check=True)
+    subprocess.run(["git", "push", "--tags", "-f"], check=True)
 
 new_version(sys.argv[1])
