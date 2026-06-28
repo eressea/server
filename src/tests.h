@@ -3,8 +3,8 @@
 
 #define ASSERT_DBL_DELTA 0.001
 
-enum param_t;
-enum skill_t;
+#include "kernel/skill.h"  // for skill_t
+#include "util/param.h"    // for param_t
 
 struct region;
 struct unit;

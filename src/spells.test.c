@@ -29,7 +29,6 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
-#include "util/variant.h"  // for variant
 
 #include <spells/borders.h>
 #include <spells/regioncurse.h>
@@ -925,7 +924,7 @@ static void test_summonent(CuTest *tc) {
     u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
     test_create_castorder(&co, u, 3, 4.0, 0, NULL);
 
-    /* keine Bäume, keine Kosten */
+    /* keine Bï¿½ume, keine Kosten */
     rsettrees(r, 2, 0);
     CuAssertIntEquals(tc, 0, sp_summonent(&co));
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "error204"));
