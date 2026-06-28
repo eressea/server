@@ -12,7 +12,6 @@
 #include <util/base36.h>
 #include <util/keyword.h>
 #include <util/message.h>
-#include <util/variant.h>
 
 #include <stb_ds.h>
 
