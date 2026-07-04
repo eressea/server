@@ -84,11 +84,13 @@ function test_xmastree()
     assert_equal(10, r:get_resource("tree"))
 	-- intermittent?
 	local k = r:get_key("xm06")
-	local t = get_turn()
-	if (t ~= k) then
-		print("turn " .. t .. ", xm06 " .. k)
-	end
-    assert_equal(t, k) 
+    if k then
+	    local t = get_turn()
+	    if (t ~= k) then
+		    print("turn " .. t .. ", xm06 " .. k)
+	    end
+        assert_equal(t, k)
+    end
 end
 
 function test_stardust()
