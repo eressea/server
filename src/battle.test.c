@@ -247,7 +247,7 @@ static void test_select_enemy(CuTest * tc)
     CuAssertIntEquals(tc, E_ENEMY|E_ATTACKING, get_relation(as, ds));
     CuAssertIntEquals(tc, E_ENEMY, get_relation(ds, as));
 
-    at = select_enemy(df, FIRST_ROW, LAST_ROW, SELECT_ADVANCE);
+    at = select_enemy(df, FIRST_ROW, LAST_ROW, SELECT_ADVANCE|SELECT_IGNORE_TACTICS);
     CuAssertPtrEquals(tc, af, at.fighter);
 
     free_battle(b);

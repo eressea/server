@@ -81,7 +81,6 @@ function test_guards_block_buy()
     local loc = "Juwel"
     r.luxury = lux
     u:add_item("money", 100000)
-    u.name = "Xolgrim"
     u:set_orders("KAUFE 1 " .. loc)
     process_orders()
     assert_equal(1, u:get_item(lux))
