@@ -13,7 +13,7 @@ done
 if [ "$FORCE" != "yes" ] ; then
   DESCRIBE=$(git describe --tags)
   VERSION=$(build/eressea/eressea --version | sed -e 's/Eressea version \([^,]*\),.*/\1/')
-  if [ "$VERSION" != "$DESCRIBE" ] ; then
+  if [ "v$VERSION" != "$DESCRIBE" ] ; then
       echo "You must buld the server before installing it"
       echo "Current build is $VERSION, source is $DESCRIBE"
       exit
