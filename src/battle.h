@@ -193,7 +193,8 @@ enum { ALLY_SELF, ALLY_ANY };
 
 int get_unitrow(const fighter* af, const side* vs);
 
-int count_enemies(const struct fighter *af, int minrow, int maxrow, int select);
+int count_enemies(struct battle *b, const struct fighter *af,
+    int minrow, int maxrow, int select);
 bool escapes_tactics(const fighter *af, const troop dt);
 troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
