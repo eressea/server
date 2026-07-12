@@ -886,6 +886,7 @@ void u_setfaction(unit * u, faction * f)
             u->faction->num_people -= u->number;
         }
         set_group(u, NULL);
+        usetprivate(u, NULL);
         if (u->nextF) {
             u->nextF->prevF = u->prevF;
         }

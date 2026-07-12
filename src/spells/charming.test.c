@@ -32,9 +32,11 @@ static void test_charm_unit(CuTest * tc)
     u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
     mage = test_create_unit(test_create_faction(), u->region);
     u->thisorder = create_order(K_WORK, u->faction->locale, NULL);
-    unit_addorder(u,copy_order(u->thisorder));
+    unit_addorder(u, copy_order(u->thisorder));
+    usetprivate(u, "Sikrit");
     CuAssertTrue(tc, !unit_is_slaved(u));
     charm_unit(u, mage, 3.0, 2);
+    CuAssertStrEquals(tc, NULL, uprivate(u));
     CuAssertPtrEquals(tc, NULL, u->orders);
     CuAssertPtrEquals(tc, NULL, u->thisorder);
     CuAssertPtrNotNull(tc, u->attribs);
