@@ -104,12 +104,15 @@ static void test_give_unit(CuTest * tc) {
     join_group(env.src, "group");
 
     config_set("rules.give.max_men", "0");
+    usetprivate(env.src, "Hodor");
     give_unit(env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, "Hodor", uprivate(env.src));
     CuAssertPtrEquals(tc, env.f1, env.src->faction);
     CuAssertIntEquals(tc, 0, env.f2->newbies);
 
     config_set("rules.give.max_men", "-1");
     give_unit(env.src, env.dst, NULL);
+    CuAssertStrEquals(tc, NULL, uprivate(env.src));
     CuAssertPtrEquals(tc, env.f2, env.src->faction);
     CuAssertPtrEquals(tc, NULL, get_group(env.src));
     CuAssertIntEquals(tc, 1, env.f2->newbies);
