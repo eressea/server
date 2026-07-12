@@ -638,13 +638,12 @@ static void test_unlimited_units(CuTest *tc) {
 static void test_change_faction_clears_private(CuTest *tc) {
     unit *u;
     faction *f;
-    group *g;
 
     test_setup();
     f = test_create_faction();
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     usetprivate(u, "Hodor");
-    g = join_group(u, "Groupies");
+    join_group(u, "Groupies");
     u_setfaction(u, f);
     CuAssertPtrEquals(tc, NULL, get_group(u));
     CuAssertStrEquals(tc, NULL, uprivate(u));
