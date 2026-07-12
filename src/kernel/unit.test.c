@@ -9,6 +9,7 @@
 #include "building.h"
 #include "config.h"
 #include "faction.h"
+#include "group.h"
 #include "item.h"
 #include "magic.h"
 #include "order.h"
@@ -76,7 +77,7 @@ static void test_remove_units_without_faction(CuTest *tc) {
 
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     uid = u->no;
-    u_setfaction(u, 0);
+    u_setfaction(u, NULL);
     remove_empty_units_in_region(u->region);
     CuAssertPtrEquals(tc, NULL, findunit(uid));
     CuAssertIntEquals(tc, 0, u->number);
@@ -634,6 +635,22 @@ static void test_unlimited_units(CuTest *tc) {
     test_teardown();
 }
 
+static void test_change_faction_clears_private(CuTest *tc) {
+    unit *u;
+    faction *f;
+    group *g;
+
+    test_setup();
+    f = test_create_faction();
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    usetprivate(u, "Hodor");
+    g = join_group(u, "Groupies");
+    u_setfaction(u, f);
+    CuAssertPtrEquals(tc, NULL, get_group(u));
+    CuAssertStrEquals(tc, NULL, uprivate(u));
+    test_teardown();
+}
+
 static void test_transfermen_bug_2386(CuTest *tc) {
     unit *u1, *u2;
     region *r;
@@ -1102,6 +1119,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_transfer_hitpoints);
     SUITE_ADD_TEST(suite, test_transfer_skills);
     SUITE_ADD_TEST(suite, test_transfer_skills_merge);
+    SUITE_ADD_TEST(suite, test_change_faction_clears_private);
     SUITE_ADD_TEST(suite, test_transfermen_bug_2386);
     SUITE_ADD_TEST(suite, test_transfermen_bug_2886);
     SUITE_ADD_TEST(suite, test_remove_unit);
