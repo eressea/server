@@ -170,9 +170,12 @@ use_antimagiccrystal(
                 continue;
             }
 
-            force = reduce_curse(c, effect, force, r);
-            if (c->vigour <= 0) {
-                a_remove(&r->attribs, a);
+            /* keine eigene Antimagie auflösen! */
+            if (c->type != &ct_antimagiczone || c->magician->faction != u->faction) {
+                force = reduce_curse(c, effect, force, r);
+                if (c->vigour <= 0) {
+                    a_remove(&r->attribs, a);
+                }
             }
             if (*ap)
                 ap = &(*ap)->next;
