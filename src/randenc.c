@@ -52,6 +52,51 @@
 #include <attributes/iceberg.h>
 extern struct attrib_type at_unitdissolve;
 
+void dissolve_unit(unit *u, int n, const attrib *a)
+{
+    message *msg;
+    region *r = u->region;
+    scale_number(u, u->number - n);
+
+    switch (a->data.ca[0]) {
+    case 1:
+        rsetpeasants(r, rpeasants(r) + n);
+        msg =
+            msg_message("dissolve_units_1", "unit region number race", u, r,
+                n, u_race(u));
+        break;
+    case 2:
+        if (r->land && !fval(r, RF_MALLORN)) {
+            rsettrees(r, 2, rtrees(r, 2) + n);
+            msg =
+                msg_message("dissolve_units_2", "unit region number race", u, r,
+                    n, u_race(u));
+        }
+        else {
+            msg =
+                msg_message("dissolve_units_3", "unit region number race", u, r,
+                    n, u_race(u));
+        }
+        break;
+    default:
+        if (u_race(u) == get_race(RC_STONEGOLEM)
+            || u_race(u) == get_race(RC_IRONGOLEM)) {
+            msg =
+                msg_message("dissolve_units_4", "unit region number race", u, r,
+                    n, u_race(u));
+        }
+        else {
+            msg =
+                msg_message("dissolve_units_5", "unit region number race", u, r,
+                    n, u_race(u));
+        }
+        break;
+    }
+
+    add_message(&u->faction->msgs, msg);
+    msg_release(msg);
+
+}
 /* In a->data.ca[1] steht der Prozentsatz mit dem sich die Einheit
  * aufloest, in a->data.ca[0] kann angegeben werden, wohin die Personen
  * verschwinden. Passiert bereits in der ersten Runde! */
@@ -66,8 +111,6 @@ static void dissolve_units(void)
         for (u = r->units; u; u = u->next) {
             attrib *a = a_find(u->attribs, &at_unitdissolve);
             if (a) {
-                message *msg;
-
                 if (u->age == 0 && a->data.ca[1] < 100)
                     continue;
 
@@ -88,45 +131,7 @@ static void dissolve_units(void)
                     continue;
                 }
 
-                scale_number(u, u->number - n);
-
-                switch (a->data.ca[0]) {
-                case 1:
-                    rsetpeasants(r, rpeasants(r) + n);
-                    msg =
-                        msg_message("dissolve_units_1", "unit region number race", u, r,
-                        n, u_race(u));
-                    break;
-                case 2:
-                    if (r->land && !fval(r, RF_MALLORN)) {
-                        rsettrees(r, 2, rtrees(r, 2) + n);
-                        msg =
-                            msg_message("dissolve_units_2", "unit region number race", u, r,
-                            n, u_race(u));
-                    }
-                    else {
-                        msg =
-                            msg_message("dissolve_units_3", "unit region number race", u, r,
-                            n, u_race(u));
-                    }
-                    break;
-                default:
-                    if (u_race(u) == get_race(RC_STONEGOLEM)
-                        || u_race(u) == get_race(RC_IRONGOLEM)) {
-                        msg =
-                            msg_message("dissolve_units_4", "unit region number race", u, r,
-                            n, u_race(u));
-                    }
-                    else {
-                        msg =
-                            msg_message("dissolve_units_5", "unit region number race", u, r,
-                            n, u_race(u));
-                    }
-                    break;
-                }
-
-                add_message(&u->faction->msgs, msg);
-                msg_release(msg);
+                dissolve_unit(u, n, a);
             }
         }
     }

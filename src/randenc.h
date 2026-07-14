@@ -13,7 +13,7 @@ extern "C" {
 #define PLAGUE_HEALCOST    30   /* Heilkosten */
     void plagues(struct region *r);
     void randomevents(void);
-
+    void dissolve_unit(struct unit *u, int n, const struct attrib *a);
 #ifdef __cplusplus
 }
 #endif

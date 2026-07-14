@@ -8,6 +8,7 @@
 #include "laws.h"
 #include "monsters.h"
 #include "move.h"
+#include "randenc.h"
 #include "study.h"
 #include "spy.h"
 
@@ -2637,6 +2638,24 @@ static void reorder_fleeing(region * r)
     *udst = NULL;
 }
 
+static void free_side(side *si)
+{
+    arrfree(si->leader.fighters);
+}
+
+static void free_fighter(fighter *fig)
+{
+    armor **ap = &fig->armors;
+    while (*ap) {
+        armor *a = *ap;
+        *ap = a->next;
+        free(a);
+    }
+    i_freeall(&fig->loot);
+    free(fig->person);
+    arrfree(fig->weapons);
+}
+
 static void aftermath(battle * b)
 {
     region *r = b->region;
@@ -2646,26 +2665,37 @@ static void aftermath(battle * b)
 
     for (si = 0; si != sl; ++si) {
         side* s = b->sides[si];
-        fighter *df;
+        fighter **fig = &s->fighters;
         s->dead = 0;
 
-        for (df = s->fighters; df; df = df->next) {
+        while (*fig) {
+            fighter *df = *fig;
             unit *du = df->unit;
-            int dead = dead_fighters(df);
-            const race *rc = u_race(du);
-
-            /* tote insgesamt: */
-            s->dead += dead;
-            /* Tote, die wiederbelebt werde koennen: */
-            if (!undeadrace(rc)) {
-                s->casualties += dead;
+            attrib *a = a = a_find(du->attribs, &at_unitdissolve);
+            if (a && a->data.ca[1] == 100) {
+                *fig = df->next;
+                s->alive -= df->alive;
+                free_fighter(df);
+                dissolve_unit(du, du->number, a);
             }
-            if (df->hits + df->kills) {
-                struct message *m =
-                    msg_message("killsandhits", "unit hits kills", du, df->hits,
-                        df->kills);
-                battle_message_faction(b, du->faction, m);
-                msg_release(m);
+            else {
+                int dead = dead_fighters(df);
+                const race *rc = u_race(du);
+
+                /* tote insgesamt: */
+                s->dead += dead;
+                /* Tote, die wiederbelebt werde koennen: */
+                if (!undeadrace(rc)) {
+                    s->casualties += dead;
+                }
+                if (df->hits + df->kills) {
+                    struct message *m =
+                        msg_message("killsandhits", "unit hits kills", du, df->hits,
+                            df->kills);
+                    battle_message_faction(b, du->faction, m);
+                    msg_release(m);
+                }
+                fig = &df->next;
             }
         }
     }
@@ -3514,25 +3544,6 @@ bool join_battle(battle * b, unit * u, bool attack, fighter ** cp)
     }
     *cp = fc;
     return fc != NULL;
-}
-
-static void free_side(side * si)
-{
-    arrfree(si->leader.fighters);
-}
-
-static void free_fighter(fighter * fig)
-{
-    armor **ap = &fig->armors;
-    while (*ap) {
-        armor *a = *ap;
-        *ap = a->next;
-        free(a);
-    }
-    i_freeall(&fig->loot);
-    free(fig->person);
-    arrfree(fig->weapons);
-
 }
 
 static void battle_free(battle * b) {
