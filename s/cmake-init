@@ -1,14 +1,21 @@
-#!/bin/bash
+#!/bin/sh
 
 WITHOUT_LUA=OFF
 ERESSEA_DB=memory
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
 
+# Instruct CMake to generate a compile_commands.json into the build/ directory.
+# This is important for certain LSPs (foremost clangd), to understand 
+# the project and provide intelli-sense and source jumping.
+# If generated, this file is automatically discovered by clangd and used.
+# OFF by default, enable with s/cmake-init --lsp
+LSP_SUPPORT=OFF
+
 usage()
 {
-    echo "usage: $0 --help --db=DB"
+    echo "usage: $0 --help --db=DB --lsp"
 }
-options=$(getopt -a 'hd:' "$@")
+options=$(getopt -a -l lsp 'hd:' "$@")
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 eval set -- "$options"
 
@@ -16,6 +23,8 @@ while true; do
     case "$1" in
         --no-lua)
             WITHOUT_LUA=ON ;;
+        --lsp | -l)
+            LSP_SUPPORT=ON ;;
         --help | -h)
             usage
             ;;
@@ -57,12 +66,19 @@ fi
 
 DEST=$(dirname $ROOT)/server
 
+echo "Without Lua: $WITHOUT_LUA"
+echo "Database driver: $ERESSEA_DB"
+echo "LSP support (compile_commands.json): $LSP_SUPPORT"
+echo "Build Type: $BUILD"
+echo
+
 cat >| build/config.cmake <<HEREDOC
 SET (ERESSEA_DB "$ERESSEA_DB" CACHE STRING "Database driver")
 SET (CMAKE_BUILD_TYPE "$BUILD" CACHE STRING "")
 SET (CMAKE_LIBRARY_PATH "$LIBRARY_PATH" CACHE PATH "")
 SET (CMAKE_PREFIX_PATH "$PREFIX_PATH" CACHE PATH "")
 SET (WITHOUT_LUA $WITHOUT_LUA CACHE BOOL "")
+SET (CMAKE_EXPORT_COMPILE_COMMANDS $LSP_SUPPORT CACHE BOOL "Generate compile_commands.json for LSPs like clangd")
 HEREDOC
 
 set -e
