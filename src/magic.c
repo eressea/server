@@ -2447,6 +2447,9 @@ static bool is_moving_ship(ship * sh)
     const unit *u = ship_owner(sh);
 
     if (u) {
+        if (u->flags & UFL_FOLLOWING) {
+            return true;
+        }
         switch (getkeyword(u->thisorder)) {
         case K_ROUTE:
         case K_MOVE:
