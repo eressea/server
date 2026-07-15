@@ -139,3 +139,25 @@ function test_move_to_same_region_stops_guarding()
     assert_equal(r1, u.region)
     assert_false(u.guard)
 end
+
+function test_flee_guard()
+    local r1 = region.create(0, 0, "plain")
+
+    local f1 = faction.create("human", "guardflee@eressea.de", "de")
+
+    local u11 = unit.create(f1, r1, 1)
+
+    u11:add_item("sword", 1)
+    u11:set_skill("melee", 1)
+    u11.guard = true
+    u11:add_order("BEWACHE")
+    process_orders()
+    assert_equal(true, u11.guard)
+
+    u11:clear_orders()
+    u11:add_order("KÄMPFE FLIEHE")
+
+    process_orders()
+    -- write_reports()
+    assert_equal(false, u11.guard)
+end
