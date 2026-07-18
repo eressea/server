@@ -13,14 +13,13 @@ done
 if [ "$FORCE" != "yes" ] ; then
   DESCRIBE=$(git describe --tags)
   VERSION=$(build/eressea/eressea --version | sed -e 's/Eressea version \([^,]*\),.*/\1/')
-  if [ "v$VERSION" != "$DESCRIBE" ] ; then
-      echo "You must buld the server before installing it"
-      echo "Current build is $VERSION, source is $DESCRIBE"
-      exit
-  fi
   BRANCH=$(git status -s -b | head -1 | cut -d\  -f 2 | sed 's/\..*//')
   if [ "$BRANCH" != "master" ] ; then
     echo "You should only install stable versions from the master branch. Use -f to override."
+    exit
+  elseif [ "v$VERSION" != "$DESCRIBE" ] 
+    echo "You must build the server before installing it"
+    echo "Current build is $VERSION, source is $DESCRIBE"
     exit
   fi
 fi
@@ -31,7 +30,9 @@ fi
 BIN_DIR="build"
 
 ROOT=$(git rev-parse --show-toplevel)
+if [ -z "$PREFIX" ]; then
 PREFIX=$(dirname "$ROOT")/server
+fi
 cd "$ROOT" || exit
 cmake --install "$BIN_DIR" --prefix "$PREFIX"
 if [ ! -e "$PREFIX/bin/backup-eressea" ] ; then

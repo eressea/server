@@ -854,8 +854,9 @@ static void parse_inifile(lua_State * L, const dictionary * d, const char *secti
     size_t len = strlen(section);
 
     /* defaults */
-    arg = config_get("config.install");
+    arg = (const char *) getenv("ERESSEA_INSTALL");
     if (arg) {
+        config_set("config.install", arg);
         lua_pushstring(L, "install");
         lua_pushstring(L, arg);
         lua_rawset(L, -3);
