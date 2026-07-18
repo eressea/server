@@ -88,8 +88,6 @@ static const char * valid_keys[] = {
     "game.dbswap",
     "game.dbbatch",
     "editor.color",
-    "editor.codepage",
-    "editor.population.",
     "lua.",
     NULL
 };
