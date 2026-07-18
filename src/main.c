@@ -88,8 +88,6 @@ static const char * valid_keys[] = {
     "game.dbswap",
     "game.dbbatch",
     "editor.color",
-    "editor.codepage",
-    "editor.population.",
     "lua.",
     NULL
 };
@@ -208,14 +206,6 @@ static int parse_args(int argc, char **argv)
             switch (argi[1]) {
             case 'D':
                 config_set("config.debug", "1");
-                break;
-            case 'i':
-                i = get_arg(argc, argv, 2, i, &arg, NULL);
-                if (arg) {
-                    config_set("config.install", arg);
-                } else {
-                    return usage(argv[0], NULL);
-                }
                 break;
             case 'c':
                 i = get_arg(argc, argv, 2, i, &arg, NULL);
