@@ -27,13 +27,6 @@ function use_ring_of_levitation(u, amount, token, ord)
     return 0
 end
 
--- Muschelplateau
-
-if not config.embassy or config.embassy==0 then return nil end
-
-local embassy = {}
-local home = nil
-
 -- global exports (use item)
 function use_seashell(u, amount)
 -- Muschelplateau...
@@ -49,6 +42,12 @@ function use_seashell(u, amount)
     end
     return -4
 end
+
+-- Muschelplateau
+if not config.embassy or config.embassy==0 then return nil end
+
+local embassy = {}
+local home = nil
 
 function embassy.init()
     home = get_region(165,30)
