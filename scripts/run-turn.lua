@@ -210,4 +210,5 @@ if config.rules then
 elseif not config.config then
   eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end
+assert(use_seashell)
 run_turn(rules)
