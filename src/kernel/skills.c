@@ -111,11 +111,11 @@ void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
     const struct race *rc = u ? u_race(u) : NULL;
     int speed = rc ? study_speed(rc, sv->id) : SKILL_DAYS_PER_WEEK;
     unsigned int days = SKILL_DAYS_PER_WEEK + (weeks - 1) * speed;
-    ASSERT_VALID_SKILL(sv, rc);
     skill_set(sv, level, days);
+    ASSERT_VALID_SKILL(sv, rc);
 }
 
-static void increase_skill_days(unit *u, skill *sv, unsigned int days) {
+static void increase_skill(unit *u, skill *sv, unsigned int days) {
     if (days > 0) {
         unsigned int leveldays = sv->days;
         while (leveldays <= days) {
@@ -128,7 +128,7 @@ static void increase_skill_days(unit *u, skill *sv, unsigned int days) {
     }
 }
 
-static void reduce_skill_days(unit *u, skill *sv, unsigned int days)
+void reduce_skill(unit *u, skill *sv, unsigned int days)
 {
     if (sv) {
         // first, strip full levels off the skill:
@@ -144,9 +144,6 @@ static void reduce_skill_days(unit *u, skill *sv, unsigned int days)
         }
         // store the remaining days
         sv->days = days;
-        if (sv->level == 0 && sv->days >= SKILL_DAYS_PER_WEEK) {
-            remove_skill(u, (skill_t)sv->id);
-        }
     }
 }
 
@@ -154,10 +151,13 @@ void change_skill(unit *u, skill *sv, int days)
 {
     assert(sv);
     if (days < 0) {
-        reduce_skill_days(u, sv, -days);
+        reduce_skill(u, sv, -days);
+        if (sv->level == 0 && sv->days >= SKILL_DAYS_PER_WEEK) {
+            remove_skill(u, (skill_t)sv->id);
+        }
     }
     else {
-        increase_skill_days(u, sv, days);
+        increase_skill(u, sv, days);
     }
 }
 

@@ -795,7 +795,7 @@ void demon_skillchange(unit *u)
             }
 
             if (roll < downchance) {
-                change_skill(u, sv, -SKILL_DAYS_PER_WEEK * weeks);
+                reduce_skill(u, sv, SKILL_DAYS_PER_WEEK * weeks);
                 if (sv->level < 1) {
                     /* demons should never forget below 1 */
                     set_level(u, sv->id, 1);
