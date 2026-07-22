@@ -1837,15 +1837,38 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
 {
     if (!fval(from->terrain, SEA_REGION) && sh->coast != NODIRECTION) {
         direction_t coast = sh->coast;
+        const building_type *btype;
         direction_t dir = reldirection(from, to);
         direction_t coastr = (direction_t)((coast + 1) % MAXDIRECTIONS);
         direction_t coastl =
             (direction_t)((coast + MAXDIRECTIONS - 1) % MAXDIRECTIONS);
 
-        if (dir != coast && dir != coastl && dir != coastr
-            && !buildingtype_exists(from, bt_find("harbour"), true)) {
+        if (dir == coast || dir == coastl || dir == coastr) {
+            return true;
+        }
+        if (NULL != (btype = bt_find("harbour"))) {
+            building *b = get_building_of_type(from, btype, true);
+            if (b) {
+                unit *bo = building_owner(b);
+                if (bo) {
+                    unit *so = ship_owner(sh);
+                    if (so) {
+                        if (ucontact(bo, so)) {
+                            return true;
+                        }
+                        if (alliedunit(bo, so->faction, HELP_GUARD)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                return true;
+            }
             return false;
         }
+        else {
+        }
+        return false;
     }
 
     return true;
