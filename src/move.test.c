@@ -44,6 +44,50 @@ static void setup_move(void) {
         "unit:unit", "region:region", MT_NEW_END);
 }
 
+static void test_ship_takeoff_from_harbor(CuTest *tc)
+{
+    region *r1, *r2;
+    ship *sh;
+    unit *u1, *u2;
+    building *b;
+
+    test_setup();
+    r1 = test_create_ocean(0, 0);
+    r2 = test_create_plain(1, 0);
+    u1 = test_create_unit(test_create_faction(), r2);
+    u1->ship = sh = test_create_ship(r2, NULL);
+    sh->coast = NODIRECTION;
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+    sh->coast = D_WEST;
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+    sh->coast = D_EAST;
+    CuAssertTrue(tc, !can_takeoff(sh, r2, r1));
+
+    // harbor is maintained, not owned by anyone:
+    b = test_create_building(r2, test_create_buildingtype("harbour"));
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+    // harbor is unmaintained:
+    b->flags |= BLD_UNMAINTAINED;
+    CuAssertTrue(tc, !can_takeoff(sh, r2, r1));
+
+    // harbor is maintained, owner is allied:
+    b->flags &= ~BLD_UNMAINTAINED;
+    u2 = test_create_unit(u1->faction, r2);
+    u2->building = b;
+    building_set_owner(u2);
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+
+    // harbor owner is not allied:
+    u_setfaction(u2, test_create_faction());
+    CuAssertTrue(tc, !can_takeoff(sh, r2, r1));
+
+    // harbor owner sets HELP GUARD:
+    ally_set(&u2->faction->allies, u1->faction, HELP_GUARD);
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+
+    test_teardown();
+}
+
 static void test_ship_not_allowed_in_coast(CuTest * tc)
 {
     region *r1, *r2;
@@ -121,7 +165,7 @@ static void test_ship_allowed_coast_ignores_harbor(CuTest* tc)
     u->building = mf.b;
     building_set_owner(u);
 
-    /* ship cannot sail in becasue of the harbor: */
+    /* ship cannot sail in because of the harbor: */
     CuAssertIntEquals(tc, SA_HARBOUR_DENIED, check_ship_allowed(mf.sh, mf.r, mf.b));
 
     /* make it so our ship can enter glaciers: */
@@ -1476,6 +1520,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_sailing_sets_coast);
     SUITE_ADD_TEST(suite, test_sail_into_harbour);
     SUITE_ADD_TEST(suite, test_harbour_in_plain);
+    SUITE_ADD_TEST(suite, test_ship_takeoff_from_harbor);
     SUITE_ADD_TEST(suite, test_ship_not_allowed_in_coast);
     SUITE_ADD_TEST(suite, test_ship_leave_trail);
     SUITE_ADD_TEST(suite, test_ship_allowed_coast_ignores_harbor);
