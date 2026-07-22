@@ -1846,13 +1846,23 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
         if (dir == coast || dir == coastl || dir == coastr) {
             return true;
         }
-        if (btype = bt_find("harbour")) {
+        if (NULL != (btype = bt_find("harbour"))) {
             building *b = get_building_of_type(from, btype, true);
             if (b) {
                 unit *bo = building_owner(b);
-                if (!bo || alliedunit(bo, ship_owner(sh)->faction, HELP_GUARD)) {
-                    return true;
+                if (bo) {
+                    unit *so = ship_owner(sh);
+                    if (so) {
+                        if (ucontact(bo, so)) {
+                            return true;
+                        }
+                        if (alliedunit(bo, so->faction, HELP_GUARD)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
+                return true;
             }
             return false;
         }

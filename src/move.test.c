@@ -77,12 +77,15 @@ static void test_ship_takeoff_from_harbor(CuTest *tc)
     building_set_owner(u2);
     CuAssertTrue(tc, can_takeoff(sh, r2, r1));
 
-    // harbor owner is not allied:
+    // harbor owner is an allied faction:
     u_setfaction(u2, test_create_faction());
+    ally_set(&u2->faction->allies, u1->faction, HELP_GUARD);
+    CuAssertTrue(tc, can_takeoff(sh, r2, r1));
+    // harbor owner doesn't set HELP GUARD:
+    u2->faction->allies->status = 0;
     CuAssertTrue(tc, !can_takeoff(sh, r2, r1));
 
-    // harbor owner sets HELP GUARD:
-    ally_set(&u2->faction->allies, u1->faction, HELP_GUARD);
+    contact_unit(u2, u1);
     CuAssertTrue(tc, can_takeoff(sh, r2, r1));
 
     test_teardown();
