@@ -51,3 +51,4 @@ bool display_potions(struct unit* u);
 int effect_value(const struct attrib* a);
 const struct item_type *effect_type(const struct attrib* a);
 
+void potion_effects(struct unit *u);

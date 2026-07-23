@@ -12,6 +12,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
 /* util includes */
@@ -22,6 +23,8 @@
 #include <util/rand.h>
 
 #include <storage.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <limits.h>
@@ -320,3 +323,29 @@ void scale_effects(unit* u, int n)
         }
     }
 }
+
+void potion_effects(unit *u)
+{
+    int effect = get_effect(u, oldpotiontype[P_FOOL]);
+    if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
+        int weeks = u->number;
+        if (weeks > effect) weeks = effect;
+        ptrdiff_t s, n = arrlen(u->skills);
+        skill *sb = NULL;
+        for (s = 0; s != n; ++s) {
+            skill *sv = u->skills + s;
+            if (sb == NULL || skill_compare(sv, sb) > 0) {
+                sb = sv;
+            }
+            ++sv;
+        }
+        /* bestes Talent raussuchen */
+        if (sb != NULL) {
+            change_skill(u, sb, -SKILL_DAYS_PER_WEEK * weeks);
+            ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+                "unit weeks skill", u, weeks, (skill_t)sb->id));
+        }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
+        change_effect(u, oldpotiontype[P_FOOL], -weeks);
+    }
+}
+
