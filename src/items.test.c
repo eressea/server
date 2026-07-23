@@ -25,7 +25,10 @@
 #include <CuTest.h>
 #include "tests.h"
 
-static void test_antimagic_crystal(CuTest *tc) {
+/**
+ * Der Antimagiekristall erschafft eine Schwächezone.
+ */
+static void test_crystal_creates_zone(CuTest *tc) {
     unit *u;
     curse *c;
     struct item_type *itype;
@@ -37,6 +40,26 @@ static void test_antimagic_crystal(CuTest *tc) {
     CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, 5.0, c->effect, 0.01);
     CuAssertDblEquals(tc, 100.0, c->vigour, 0.01);
+    test_teardown();
+}
+
+static void test_crystal_affects_curses(CuTest *tc) {
+    unit *u;
+    curse *c;
+    struct item_type *itype;
+    test_setup();
+    itype = test_create_itemtype("antimagic");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    c = create_curse(u, &u->region->attribs, &ct_blessedharvest, 10.0, 2, 6.0, 0);
+    CuAssertIntEquals(tc, 0, use_antimagiccrystal(u, itype, 1, NULL));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, 6.0, c->effect, 0.01);
+    CuAssertDblEquals(tc, 7.0, c->vigour, 0.01);
+
+    CuAssertPtrNotNull(tc, c = get_curse(u->region->attribs, &ct_antimagiczone));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, 5.0, c->effect, 0.01);
+    CuAssertDblEquals(tc, 90.0, c->vigour, 0.01);
     test_teardown();
 }
 
@@ -159,6 +182,7 @@ CuSuite *get_items_suite(void)
     SUITE_ADD_TEST(suite, test_bloodpotion_fail);
     SUITE_ADD_TEST(suite, test_use_foolpotion);
     SUITE_ADD_TEST(suite, test_foolpotion_effect);
-    SUITE_ADD_TEST(suite, test_antimagic_crystal);
+    SUITE_ADD_TEST(suite, test_crystal_creates_zone);
+    SUITE_ADD_TEST(suite, test_crystal_affects_curses);
     return suite;
 }
