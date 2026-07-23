@@ -121,8 +121,7 @@ struct order *ord)
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
 * Antimagiezone, die zwei Runden bestehen bleibt */
-static int
-use_antimagiccrystal(
+int use_antimagiccrystal(
     unit * u,
     const struct item_type *itype,
     int amount,
