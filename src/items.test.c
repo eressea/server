@@ -4,16 +4,20 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
+#include "spells/regioncurse.h"
+
 #include "util/base36.h"
 #include "util/keyword.h"
 #include "util/language.h"
 
 #include <kernel/attrib.h>
+#include <kernel/curse.h>
 #include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/item.h>
 #include <kernel/order.h>
 #include <kernel/race.h>
+#include <kernel/region.h>
 #include <kernel/skill.h>
 #include <kernel/skills.h>
 #include <kernel/unit.h>
@@ -23,11 +27,16 @@
 
 static void test_antimagic_crystal(CuTest *tc) {
     unit *u;
+    curse *c;
     struct item_type *itype;
     test_setup();
     itype = test_create_itemtype("antimagic");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     CuAssertIntEquals(tc, 0, use_antimagiccrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, c = get_curse(u->region->attribs, &ct_antimagiczone));
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, 5.0, c->effect, 0.01);
+    CuAssertDblEquals(tc, 100.0, c->vigour, 0.01);
     test_teardown();
 }
 
