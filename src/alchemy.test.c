@@ -211,7 +211,7 @@ static void test_scale_bloodpotion(CuTest* tc)
     CuAssertIntEquals(tc, 0, get_effect(u, it_blood));
 }
 
-static void test_bloodpotion(CuTest* tc) {
+static void test_use_bloodpotion(CuTest* tc) {
     unit* u;
     struct item_type* itype;
     struct race* rc_demon, * rc_toad;
@@ -266,7 +266,7 @@ CuSuite *get_alchemy_suite(void)
     SUITE_ADD_TEST(suite, test_scale_bloodpotion);
     SUITE_ADD_TEST(suite, test_foolpotion_effect);
     SUITE_ADD_TEST(suite, test_use_foolpotion);
-    SUITE_ADD_TEST(suite, test_bloodpotion);
+    SUITE_ADD_TEST(suite, test_use_bloodpotion);
     SUITE_ADD_TEST(suite, test_bloodpotion_fail);
     return suite;
 }
