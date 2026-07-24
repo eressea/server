@@ -118,6 +118,8 @@ struct order *ord)
 
 /* END speedsail */
 
+#define CRYSTAL_EFFECT 5
+#define CRYSTAL_FORCE (20.0 * (CRYSTAL_EFFECT))
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
 * Antimagiezone, die zwei Runden bestehen bleibt */
@@ -142,12 +144,12 @@ int use_antimagiccrystal(
         UNUSED_ARG(ord);
 
         /* Reduziert die Staerke jedes Spruchs um effect */
-        effect = 5;
+        effect = CRYSTAL_EFFECT;
 
         /* Haelt Sprueche bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
-        force = effect * 20.0;     /* Stufe 5 =~ 100 */
+        force = CRYSTAL_FORCE;     /* Stufe 5 =~ 100 */
 
         /* Regionszauber aufloesen */
         while (*ap && force > 0) {
