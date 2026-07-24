@@ -64,6 +64,12 @@ msgstr "\"$unit($unit) erhielt $resources($items) von der $ship($ship).\""
 msgid "reduce_spell"
 msgstr "\"$unit($self) schwächt in $region($region) einen Zauber von $unit.dative($mage) durch Antimagie ab.\""
 
+msgid "reduce_curse"
+msgstr "\"$unit($mage) schwächt in $region($region) einen Zauber durch Antimagie ab.\""
+
+msgid "reduce_curse_of_mage"
+msgstr "\"$unit($mage) schwächt in $region($region) einen Zauber von $unit.dative($target) durch Antimagie ab.\""
+
 msgid "raised"
 msgstr "\"$unit($unit) züchtet $int($amount) Pferde.\""
 

@@ -934,6 +934,9 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level)
             curse_changevigour(&r->attribs, c, -cast_level);
             if (mage != NULL && mage->faction != NULL) {
                 if (force > 0) {
+                    ADDMSG(&u->faction->msgs, msg_message("reduce_curse_of_mage",
+                        "mage target region", u, mage, r));
+                    /* tell the original caster */
                     ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
                         "self mage region", mage, u, r));
                 }
@@ -942,8 +945,11 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level)
                         "self mage region", mage, u, r));
                 }
             }
+            else if (force > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("reduce_curse",
+                    "mage region", u, r));
+            }
         }
-
         /* Patzerfluch-Effekt: */
         c = get_curse(r->attribs, &ct_fumble);
         if (curse_active(c)) {

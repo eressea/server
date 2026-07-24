@@ -5879,6 +5879,21 @@
     </type>
   </message>
 
+  <message name="reduce_curse" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
+
+  <message name="reduce_curse_of_mage" section="magic">
+    <type>
+      <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
+      <arg name="region" type="region"/>
+    </type>
+  </message>
+
   <message name="hornofpeace_u_success" section="magic">
     <type>
       <arg name="unit" type="unit"/>
