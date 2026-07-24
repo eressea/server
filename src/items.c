@@ -182,7 +182,7 @@ int use_antimagiccrystal(
 
         if (force > 0) {
             int duration = 2;
-            create_curse(u, &r->attribs, &ct_antimagiczone, force, duration,
+            create_curse(NULL, &r->attribs, &ct_antimagiczone, force, duration,
                 effect, 0);
         }
     }

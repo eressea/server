@@ -40,23 +40,28 @@ static void test_crystal_creates_zone(CuTest *tc) {
     CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, 5.0, c->effect, 0.01);
     CuAssertDblEquals(tc, 100.0, c->vigour, 0.01);
+    CuAssertPtrEquals(tc, NULL, c->magician);
     test_teardown();
 }
 
 static void test_crystal_affects_curses(CuTest *tc) {
-    unit *u;
+    unit *u, *u2;
     curse *c;
     struct item_type *itype;
     test_setup();
     itype = test_create_itemtype("antimagic");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    c = create_curse(u, &u->region->attribs, &ct_blessedharvest, 10.0, 2, 6.0, 0);
+    u2 = test_create_unit(test_create_faction(), u->region);
+    c = create_curse(u2, &u2->region->attribs, &ct_blessedharvest, 10.0, 2, 6.0, 0);
+    CuAssertPtrEquals(tc, u2, c->magician);
     CuAssertIntEquals(tc, 0, use_antimagiccrystal(u, itype, 1, NULL));
     CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, 6.0, c->effect, 0.01);
     CuAssertDblEquals(tc, 7.0, c->vigour, 0.01);
+    //CuAssertPtrNotNull(tc, test_find_messagetype(u2->faction->msgs, "reduce_spell"));
 
     CuAssertPtrNotNull(tc, c = get_curse(u->region->attribs, &ct_antimagiczone));
+    CuAssertPtrEquals(tc, NULL, c->magician);
     CuAssertIntEquals(tc, 2, c->duration);
     CuAssertDblEquals(tc, 5.0, c->effect, 0.01);
     CuAssertDblEquals(tc, 90.0, c->vigour, 0.01);
