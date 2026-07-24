@@ -11,3 +11,8 @@ void register_itemfunctions(void);
 int use_bloodpotion(struct unit* u, const struct item_type* itype,
     int amount, struct order* ord);
 
+int use_foolpotion(struct unit *user, const struct item_type *itype,
+    int amount, struct order *ord);
+
+int use_antimagiccrystal(struct unit *u, const struct item_type *itype,
+    int amount, struct order *ord);

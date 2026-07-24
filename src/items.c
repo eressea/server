@@ -118,11 +118,12 @@ struct order *ord)
 
 /* END speedsail */
 
+#define CRYSTAL_EFFECT 5
+#define CRYSTAL_FORCE (20.0 * (CRYSTAL_EFFECT))
 /* ------------------------------------------------------------- */
 /* Kann auch von Nichtmagiern benutzt werden, erzeugt eine
 * Antimagiezone, die zwei Runden bestehen bleibt */
-static int
-use_antimagiccrystal(
+int use_antimagiccrystal(
     unit * u,
     const struct item_type *itype,
     int amount,
@@ -143,12 +144,12 @@ use_antimagiccrystal(
         UNUSED_ARG(ord);
 
         /* Reduziert die Staerke jedes Spruchs um effect */
-        effect = 5;
+        effect = CRYSTAL_EFFECT;
 
         /* Haelt Sprueche bis zu einem summierten Gesamtlevel von power aus.
          * Jeder Zauber reduziert die 'Lebenskraft' (vigour) der Antimagiezone
          * um seine Stufe */
-        force = effect * 20.0;     /* Stufe 5 =~ 100 */
+        force = CRYSTAL_FORCE;     /* Stufe 5 =~ 100 */
 
         /* Regionszauber aufloesen */
         while (*ap && force > 0) {
@@ -183,7 +184,7 @@ use_antimagiccrystal(
 
         if (force > 0) {
             int duration = 2;
-            create_curse(u, &r->attribs, &ct_antimagiczone, force, duration,
+            create_curse(NULL, &r->attribs, &ct_antimagiczone, force, duration,
                 effect, 0);
         }
     }
@@ -423,6 +424,37 @@ static int use_healing_potion(unit *u, const item_type *itype,
     ADDMSG(&u->faction->msgs, msg_message("use_item",
         "unit amount item", u, amount, itype->rtype));
     return potion_healing(u, amount);
+}
+
+int use_foolpotion(unit *user, const item_type *itype, int amount,
+    struct order *ord)
+{
+    int targetno = read_unitid(user->faction, user->region);
+    unit *u = findunit(targetno);
+    int max_effects;
+    if (u == NULL || user->region != u->region) {
+        ADDMSG(&user->faction->msgs, msg_feedback(user, ord, "feedback_unit_not_found",
+            ""));
+        return ECUSTOM;
+    }
+    if (effskill(user, SK_STEALTH, NULL) <= effskill(u, SK_PERCEPTION, NULL)) {
+        cmistake(user, ord, 64, MSG_EVENT);
+        return ECUSTOM;
+    }
+    max_effects = u->number * 10 - get_effect(u, itype);
+    if (max_effects > 0) {
+        int use = (max_effects + 9) / 10;
+        int effects = max_effects;
+        if (use > amount) {
+            use = amount;
+            effects = use * 10;
+        }
+        change_effect(u, itype, effects);
+        ADDMSG(&user->faction->msgs, msg_message("givedumb",
+            "unit recipient amount", user, u, use));
+        return use;
+    }
+    return 0;
 }
 
 static int potion_ointment(unit * u, int amount) {

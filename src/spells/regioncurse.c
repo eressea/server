@@ -119,7 +119,7 @@ const curse * c, int self)
 
 const struct curse_type ct_antimagiczone = {
     "antimagiczone",
-    CURSETYP_NORM, 0, (M_DURATION | M_VIGOUR),
+    CURSETYP_NORM, CURSE_IMMUNE, (M_DURATION | M_VIGOUR),
     cinfo_antimagiczone, NULL, NULL, NULL, cansee_antimagiczone
 };
 

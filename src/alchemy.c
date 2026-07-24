@@ -12,6 +12,7 @@
 #include <kernel/pool.h>
 #include <kernel/race.h>
 #include "kernel/skill.h"
+#include "kernel/skills.h"
 #include "kernel/unit.h"
 
 /* util includes */
@@ -22,6 +23,8 @@
 #include <util/rand.h>
 
 #include <storage.h>
+
+#include <stb_ds.h>
 
 /* libc includes */
 #include <limits.h>
@@ -321,34 +324,28 @@ void scale_effects(unit* u, int n)
     }
 }
 
-int use_foolpotion(unit *user, const item_type *itype, int amount,
-    struct order *ord)
+void potion_effects(unit *u)
 {
-    int targetno = read_unitid(user->faction, user->region);
-    unit *u = findunit(targetno);
-    int max_effects;
-    if (u == NULL || user->region != u->region) {
-        ADDMSG(&user->faction->msgs, msg_feedback(user, ord, "feedback_unit_not_found",
-            ""));
-        return ECUSTOM;
-    }
-    if (effskill(user, SK_STEALTH, NULL) <= effskill(u, SK_PERCEPTION, NULL)) {
-        cmistake(user, ord, 64, MSG_EVENT);
-        return ECUSTOM;
-    }
-    max_effects = u->number * 10 - get_effect(u, itype);
-    if (max_effects > 0) {
-        int use = (max_effects + 9) / 10;
-        int effects = max_effects;
-        if (use > amount) {
-            use = amount;
-            effects = use * 10;
+    int effect = get_effect(u, oldpotiontype[P_FOOL]);
+    if (effect > 0) {           /* Trank "Dumpfbackenbrot" */
+        int weeks = u->number;
+        if (weeks > effect) weeks = effect;
+        ptrdiff_t s, n = arrlen(u->skills);
+        skill *sb = NULL;
+        for (s = 0; s != n; ++s) {
+            skill *sv = u->skills + s;
+            if (sb == NULL || skill_compare(sv, sb) > 0) {
+                sb = sv;
+            }
+            ++sv;
         }
-        change_effect(u, itype, effects);
-        ADDMSG(&user->faction->msgs, msg_message("givedumb",
-            "unit recipient amount", user, u, use));
-        return use;
+        /* bestes Talent raussuchen */
+        if (sb != NULL) {
+            change_skill(u, sb, -SKILL_DAYS_PER_WEEK * weeks);
+            ADDMSG(&u->faction->msgs, msg_message("dumbeffect",
+                "unit weeks skill", u, weeks, (skill_t)sb->id));
+        }                         /* sonst Glueck gehabt: wer nix weiss, kann nix vergessen... */
+        change_effect(u, oldpotiontype[P_FOOL], -weeks);
     }
-    return 0;
 }
 
