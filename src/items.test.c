@@ -8,7 +8,7 @@
 
 #include "util/base36.h"
 #include "util/keyword.h"
-#include "util/variant.h"         // for variant
+#include "util/variant.h" // IWYU pragma: keep
 
 #include <kernel/attrib.h>
 #include <kernel/curse.h>
@@ -27,7 +27,7 @@
 
 #include <stddef.h>               // for NULL
 /**
- * Der Antimagiekristall erschafft eine Schwächezone.
+ * Der Antimagiekristall erschafft eine Schwï¿½chezone.
  */
 static void test_crystal_creates_zone(CuTest *tc) {
     unit *u;
