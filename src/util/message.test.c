@@ -1,5 +1,5 @@
 #include "message.h"
-
+#include "variant.h" // IWYU pragma: keep
 #include <CuTest.h>
 #include <tests.h>
 

@@ -7,8 +7,9 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
-#include <util/base36.h>
-#include <util/keyword.h>
+#include "util/base36.h"
+#include "util/keyword.h"
+#include "util/variant.h" // IWYU pragma: keep
 
 #include <kernel/attrib.h>
 #include <kernel/event.h>

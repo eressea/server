@@ -8,6 +8,8 @@
 #include "region.h"
 #include "unit.h"
 
+#include <util/variant.h> // IWYU pragma: keep
+
 #include <strings.h>
 
 #include <stb_ds.h>
