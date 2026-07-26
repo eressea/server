@@ -1,14 +1,11 @@
 #include "alchemy.h"
 
 #include "guard.h"
-#include "laws.h"
-#include "items.h"
 
-#include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
-#include <kernel/order.h>
 #include <kernel/race.h>
+#include <kernel/skill.h>
 #include <kernel/item.h>
 #include <kernel/region.h>
 

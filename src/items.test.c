@@ -8,7 +8,7 @@
 
 #include "util/base36.h"
 #include "util/keyword.h"
-#include "util/language.h"
+#include "util/variant.h"         // for variant
 
 #include <kernel/attrib.h>
 #include <kernel/curse.h>
@@ -25,6 +25,7 @@
 #include <CuTest.h>
 #include "tests.h"
 
+#include <stddef.h>               // for NULL
 /**
  * Der Antimagiekristall erschafft eine Schwächezone.
  */
