@@ -2,8 +2,9 @@
 
 WITHOUT_LUA=OFF
 ERESSEA_DB=memory
+if [ -n "$(which pkg-config)" ]; then
 pkg-config --exists sqlite3 && ERESSEA_DB=sqlite
-
+fi
 usage()
 {
     echo "usage: $0 --help --db=DB"
