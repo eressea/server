@@ -32,6 +32,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 #include <util/umlaut.h>
+// #include "util/variant.h" // IWYU pragma: keep
 
 #include <critbit.h>
 #include <storage.h>

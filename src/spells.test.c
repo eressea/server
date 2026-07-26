@@ -29,6 +29,7 @@
 #include "util/language.h"
 #include "util/message.h"
 #include "util/rand.h"
+#include "util/variant.h" // IWYU pragma: keep
 
 #include <spells/borders.h>
 #include <spells/regioncurse.h>
