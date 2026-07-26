@@ -8,6 +8,7 @@
 
 #include <attributes/raceprefix.h>
 #include <util/language.h>
+#include <util/variant.h> // IWYU pragma: keep
 
 #include <tests.h>
 #include <CuTest.h>
