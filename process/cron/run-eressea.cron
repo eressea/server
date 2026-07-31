@@ -20,6 +20,23 @@ backup_reports()
     echo "backup/$TURN-reports.tar.bz2"
 }
 
+express()
+{
+    GAME="$1"
+    TURN="$2"
+    cd "$ERESSEA/game-$GAME" || exit
+    if [ -d express ]; then
+        if ! -e "express-$TURN.txt" ]; then
+            cd express || exit
+            git pull
+            cd -
+            if [ -e "express/express-$TURN.txt" ];then
+                ln "express/express-$TURN.txt"
+            fi
+        fi
+    fi
+}
+
 backup()
 {
     GAME="$1"
@@ -72,6 +89,8 @@ if [ ! -s "orders.$TURN" ]; then
   exit 2
 fi
 
+## fetch the XE:
+express "$GAME" "$TURN"
 ## pre-game backup, data and orders only:
 backup "$GAME" "$TURN"
 rm -f execute.lock
