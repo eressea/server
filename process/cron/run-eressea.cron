@@ -26,12 +26,15 @@ express()
     TURN="$2"
     cd "$ERESSEA/game-$GAME" || exit
     if [ -d express ]; then
-        if ! -e "express-$TURN.txt" ]; then
+        if [ ! -e "express-$TURN.txt" ]; then
             cd express || exit
             git pull
-            cd -
+            cd - || exit
             if [ -e "express/express-$TURN.txt" ];then
-                ln "express/express-$TURN.txt"
+                echo "copy the express from archive"
+                ln "express/express-$TURN.txt" .
+            else
+                echo "no express this week"
             fi
         fi
     fi
@@ -57,9 +60,9 @@ backup()
     tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
 }
 
+export ERESSEA
 eval "$(luarocks path)"
-export LUA_PATH="${ERESSEA}/server/scripts/?.lua;${ERESSEA}/git/scripts/?/init.lua;$LUA_PATH"
-export ERESSEA_INSTALL="${ERESSEA}/server"
+export LUA_PATH="${ERESSEA}/server/scripts/?.lua;$LUA_PATH"
 BIN="$ERESSEA/server/bin"
 TURN=$(cat "$ERESSEA/game-$GAME/turn")
 if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
