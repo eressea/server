@@ -7,57 +7,57 @@ GAME=$1
 
 backup_reports()
 {
-    GAME="$1"
-    TURN="$2"
-    files=("data/$TURN.dat" parteien.full parteien)
-    if [ -e "orders.$TURN" ]; then
-          files+=("orders.$TURN")
-    fi
-    echo "backup turn $TURN, game $GAME, files: ${files[*]}"
-    tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-    echo "backup reports $TURN, game $GAME"
-    tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
-    echo "backup/$TURN-reports.tar.bz2"
+	GAME="$1"
+	TURN="$2"
+	files=("data/$TURN.dat" parteien.full parteien)
+	if [ -e "orders.$TURN" ]; then
+			files+=("orders.$TURN")
+	fi
+	echo "backup turn $TURN, game $GAME, files: ${files[*]}"
+	tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+	echo "backup reports $TURN, game $GAME"
+	tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
+	echo "backup/$TURN-reports.tar.bz2"
 }
 
 express()
 {
-    GAME="$1"
-    TURN="$2"
-    cd "$ERESSEA/game-$GAME" || exit
-    if [ -d express ]; then
-        if [ ! -e "express-$TURN.txt" ]; then
-            cd express || exit
-            git pull
-            cd - || exit
-            if [ -e "express/express-$TURN.txt" ];then
-                echo "copy the express from archive"
-                ln "express/express-$TURN.txt" .
-            else
-                echo "no express this week"
-            fi
-        fi
-    fi
+	GAME="$1"
+	TURN="$2"
+	cd "$ERESSEA/game-$GAME" || exit
+	if [ -d express ]; then
+		if [ ! -e "express-$TURN.txt" ]; then
+			cd express || exit
+			git pull
+			cd - || exit
+			if [ -e "express/express-$TURN.txt" ];then
+				echo "copy the express from archive"
+				ln "express/express-$TURN.txt" .
+			else
+				echo "no express this week"
+			fi
+		fi
+	fi
 }
 
 backup()
 {
-    GAME="$1"
-    TURN="$2"
-    cd "$ERESSEA/game-$GAME" || exit
-    if [ ! -e "data/$TURN.dat" ]; then
-      exit 2
-    fi
-    if [ ! -d backup ] ; then
-      mkdir -p "$HOME/backup/eressea/game-$GAME"
-      ln -sf "$HOME/backup/eressea/game-$GAME" backup
-    fi
+	GAME="$1"
+	TURN="$2"
+	cd "$ERESSEA/game-$GAME" || exit
+	if [ ! -e "data/$TURN.dat" ]; then
+		exit 2
+	fi
+	if [ ! -d backup ] ; then
+		mkdir -p "$HOME/backup/eressea/game-$GAME"
+		ln -sf "$HOME/backup/eressea/game-$GAME" backup
+	fi
 
-    files=("data/$TURN.dat" parteien.full parteien)
-    if [ -e "orders.$TURN" ]; then
-      files+=("orders.$TURN")
-    fi
-    tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+	files=("data/$TURN.dat" parteien.full parteien)
+	if [ -e "orders.$TURN" ]; then
+		files+=("orders.$TURN")
+	fi
+	tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
 }
 
 export ERESSEA
@@ -66,20 +66,20 @@ export LUA_PATH="${ERESSEA}/server/scripts/?.lua;$LUA_PATH"
 BIN="$ERESSEA/server/bin"
 TURN=$(cat "$ERESSEA/game-$GAME/turn")
 if [ ! -e "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
-  echo "data file $TURN is missing, cannot run turn for game $GAME"
-  exit 1
+	echo "data file $TURN is missing, cannot run turn for game $GAME"
+	exit 1
 fi
 REPORTS="$ERESSEA/game-$GAME/reports"
 DATA="$ERESSEA/game-$GAME/data"
 if [ -d "$REPORTS" ]; then
-  rm -rf "$REPORTS"
+	rm -rf "$REPORTS"
 fi
 mkdir "$REPORTS"
 
 cd "$ERESSEA/game-$GAME" || exit
 
 if [ -d test ]; then
-  touch test/execute.lock
+	touch test/execute.lock
 fi
 
 if [ -e "orders.$TURN" ]; then
@@ -88,8 +88,8 @@ else
 	"$BIN/create-orders" "$GAME" "$TURN"
 fi
 if [ ! -s "orders.$TURN" ]; then
-  echo "server did not create orders for turn $TURN in game $GAME"
-  exit 2
+	echo "server did not create orders for turn $TURN in game $GAME"
+	exit 2
 fi
 
 ## fetch the XE:
@@ -103,17 +103,17 @@ touch execute.lock
 
 (( NEXTTURN=TURN+1 )) || true
 if [ ! -e "$DATA/$NEXTTURN.dat" ]; then
-  echo "server did not create data file $NEXTTURN.dat"
-  exit 5
+	echo "server did not create data file $NEXTTURN.dat"
+	exit 5
 fi
 if [ ! -s "$REPORTS/reports.txt" ]; then
-  echo "server did not create reports.txt in game $GAME"
-  exit 4
+	echo "server did not create reports.txt in game $GAME"
+	exit 4
 fi
 TURN=$NEXTTURN
 if [ ! -s "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
-  echo "server did not create data for turn $TURN in game $GAME"
-  exit 3
+	echo "server did not create data for turn $TURN in game $GAME"
+	exit 3
 fi
 echo "sending reports for game $GAME, turn $TURN"
 "$BIN/compress.sh" "$GAME" "$TURN"
@@ -123,9 +123,9 @@ backup "$GAME" "$TURN"
 ## post-game backup of reports:
 backup_reports "$GAME" "$TURN"
 if [ ! -f "express-$TURN.txt" ]; then
-  if [ -f express.txt ]; then
-    mv express.txt "express-$TURN.txt"
-  fi
+	if [ -f express.txt ]; then
+	mv express.txt "express-$TURN.txt"
+	fi
 fi
 rm -f test/execute.lock
 ) | tee -a "$HOME/log/eressea.cron.log"
