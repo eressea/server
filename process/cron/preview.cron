@@ -5,7 +5,7 @@
 
 branch="develop"
 if [ -e "${ERESSEA}/build/.preview" ]; then
-    branch=$(cat "${ERESSEA}/build/.preview")
+	branch=$(cat "${ERESSEA}/build/.preview")
 fi
 SRC="${ERESSEA}/git"
 "${SRC}/s/preview" build "$branch" || exit $?

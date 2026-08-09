@@ -7,13 +7,13 @@ GAME=$1
 
 upload()
 {
-    FILEPATH=$(realpath "$1")
-    echo "Upload $FILEPATH..."
-    if [ -e "$FILEPATH" ] ; then
-        scp "$FILEPATH" "synology:Backup/Eressea/game-$GAME/"
-    else
-        echo "Could not backup $FILEPATH: File not found." 
-    fi
+	FILEPATH=$(realpath "$1")
+	echo "Upload $FILEPATH..."
+	if [ -e "$FILEPATH" ] ; then
+		scp "$FILEPATH" "synology:Backup/Eressea/game-$GAME/"
+	else
+		echo "Could not backup $FILEPATH: File not found." 
+	fi
 }
 
 TURN=$(cat "$ERESSEA/game-$GAME/turn")

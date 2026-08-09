@@ -6,18 +6,18 @@
 # accept the order file.
 
 if [ "no" == "$CONFIRM" ] ; then
-  exit
+	exit
 fi
 
 if [ -z "$ERESSEA" ] ; then
-  ERESSEA="$HOME/eressea"
-  echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
+	ERESSEA="$HOME/eressea"
+	echo "The ERESSEA environment variable is not set. Assuming $ERESSEA."
 fi
 
 cd "$ERESSEA" || exit
 
 for GAME in "$@"
 do
-  orders-php/check-orders.sh "$GAME"
+	orders-php/check-orders.sh "$GAME"
 done
 
