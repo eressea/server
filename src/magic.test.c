@@ -3,6 +3,8 @@
 #include "contact.h"
 #include "teleport.h"
 
+#include <spells/regioncurse.h>
+
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
@@ -11,6 +13,7 @@
 #include <util/language.h>
 
 #include "kernel/config.h"
+#include "kernel/curse.h"
 #include "kernel/skill.h"      // for SK_MAGIC, enable_skill, SK_STAMINA
 #include "kernel/types.h"      // for M_TYBIED, M_GWYRRD, M_CERDDOR, M_GRAY
 #include <kernel/ally.h>
@@ -872,11 +875,13 @@ static void test_fumble_toad(CuTest *tc) {
 }
 
 static void test_spellpower(CuTest *tc) {
-    unit *u;
+    unit *u, *um;
+    region *r;
     race *rc_elf;
     spell *sp;
     item_type *it_ring;
     building_type *bt_magic;
+    curse *c;
 
     test_setup();
     bt_magic = test_create_buildingtype("stonecircle");
@@ -884,28 +889,42 @@ static void test_spellpower(CuTest *tc) {
     it_ring = test_create_itemtype("rop");
     rc_elf = test_create_race("elf");
     sp = create_spell("herpes");
-    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
-    rsettrees(u->region, 2, u->region->terrain->size);
-    CuAssertTrue(tc, r_isforest(u->region));
-    CuAssertDblEquals(tc, 0.0, spellpower(u->region, u, NULL, 10), 0.01);
-    CuAssertDblEquals(tc, 10.0, spellpower(u->region, u, sp, 10), 0.01);
+    u = test_create_unit(test_create_faction(), r = test_create_plain(0, 0));
+    um = test_create_unit(test_create_faction(), r);
+    rsettrees(r, 2, r->terrain->size);
+    CuAssertTrue(tc, r_isforest(r));
+    CuAssertDblEquals(tc, 0.0, spellpower(r, u, NULL, 10), 0.01);
+    CuAssertDblEquals(tc, 10.0, spellpower(r, u, sp, 10), 0.01);
 
     /* elf in forest : +1 power */
     u_setrace(u, rc_elf);
     config_set("rules.magic.elfpower", "0");
-    CuAssertDblEquals(tc, 10.0, spellpower(u->region, u, sp, 10), 0.01);
+    CuAssertDblEquals(tc, 10.0, spellpower(r, u, sp, 10), 0.01);
     config_set("rules.magic.elfpower", "1");
-    CuAssertDblEquals(tc, 11.0, spellpower(u->region, u, sp, 10), 0.01);
+    CuAssertDblEquals(tc, 11.0, spellpower(r, u, sp, 10), 0.01);
 
     /* ring of power : +1 power */
     i_change(&u->items, it_ring, 1);
-    CuAssertDblEquals(tc, 12.0, spellpower(u->region, u, sp, 10), 0.01);
+    CuAssertDblEquals(tc, 12.0, spellpower(r, u, sp, 10), 0.01);
 
     /* magical buildings : +1 power */
-    u_set_building(u, test_create_building(u->region, bt_magic));
-    CuAssertDblEquals(tc, 13.0, spellpower(u->region, u, sp, 10), 0.01);
+    u_set_building(u, test_create_building(r, bt_magic));
+    CuAssertDblEquals(tc, 13.0, spellpower(r, u, sp, 10), 0.01);
 
-    /* TODO: antimagic zone: drains power, sends messages */
+    /* antimagic zone: drains power, sends messages, reduces c->vigour */
+    c = create_curse(um, &r->attribs, &ct_antimagiczone, 100.0, 2, 5, 0);
+    CuAssertDblEquals(tc, 8.0, spellpower(r, u, sp, 10), 0.01);
+    CuAssertPtrNotNull(tc, test_find_faction_message(um->faction, "spell_reduced_by"));
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spell_reduced"));
+    CuAssertDblEquals(tc, 90.0, c->vigour, 0.01);
+    test_clear_messages(um->faction);
+    test_clear_messages(u->faction);
+
+    /* TODO: antimagic without caster sends message */
+    c->magician = NULL;
+    CuAssertDblEquals(tc, 8.0, spellpower(r, u, sp, 10), 0.01);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spell_reduced"));
+    CuAssertDblEquals(tc, 80.0, c->vigour, 0.01);
 
     test_teardown();
 }

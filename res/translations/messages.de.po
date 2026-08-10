@@ -61,14 +61,11 @@ msgstr "\"$unit($unit) hat Schwierigkeiten seine magischen Energien zu sammeln. 
 msgid "harbor_trade"
 msgstr "\"$unit($unit) erhielt $resources($items) von der $ship($ship).\""
 
-msgid "reduce_spell"
-msgstr "\"$unit($self) schwächt in $region($region) einen Zauber von $unit.dative($mage) durch Antimagie ab.\""
-
-msgid "reduce_curse"
-msgstr "\"$unit($mage) schwächt in $region($region) einen Zauber durch Antimagie ab.\""
-
-msgid "reduce_curse_of_mage"
+msgid "spell_reduced_by"
 msgstr "\"$unit($mage) schwächt in $region($region) einen Zauber von $unit.dative($target) durch Antimagie ab.\""
+
+msgid "spell_reduced"
+msgstr "In $region($region) wird ein Zauber von $unit.dative($target) durch Antimagie abgeschwächt.\""
 
 msgid "raised"
 msgstr "\"$unit($unit) züchtet $int($amount) Pferde.\""
@@ -344,8 +341,11 @@ msgstr "\"Moral der Bauern: $int($morale)\""
 msgid "changemail_invalid"
 msgstr "\"Die Reportadresse wurde nicht geändert, '${value}' ist keine gültige email.\""
 
-msgid "block_spell"
-msgstr "\"Antimagie von $unit.dative($self) blockiert in $region($region) einen Zauber von $unit.dative($mage).\""
+msgid "spell_blocked_by"
+msgstr "\"Antimagie von $unit.dative($mage) blockiert in $region($region) einen Zauber von $unit.dative($target).\""
+
+msgid "spell_blocked"
+msgstr "\"In $region($region) wird ein Zauber von $unit.dative($target) durch Antimagie blockiert.\""
 
 msgid "enter_overload"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit darf nicht an Bord kommen, da sie das Schiff überladen würde.\""

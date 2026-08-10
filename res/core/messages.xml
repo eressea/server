@@ -5863,30 +5863,29 @@
     </type>
   </message>
 
-  <message name="block_spell" section="magic">
+  <message name="spell_blocked" section="magic">
     <type>
-      <arg name="self" type="unit"/>
-      <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="reduce_spell" section="magic">
+  <message name="spell_blocked_by" section="magic">
     <type>
-      <arg name="self" type="unit"/>
       <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="reduce_curse" section="magic">
+  <message name="spell_reduced" section="magic">
     <type>
-      <arg name="mage" type="unit"/>
+      <arg name="target" type="unit"/>
       <arg name="region" type="region"/>
     </type>
   </message>
 
-  <message name="reduce_curse_of_mage" section="magic">
+  <message name="spell_reduced_by" section="magic">
     <type>
       <arg name="mage" type="unit"/>
       <arg name="target" type="unit"/>
