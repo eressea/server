@@ -932,18 +932,23 @@ spellpower(region * r, unit * u, const spell * sp, int cast_level)
             unit *mage = c->magician;
             force -= curse_geteffect(c);
             curse_changevigour(&r->attribs, c, -cast_level);
-            if (mage != NULL && mage->faction != NULL) {
-                if (force > 0) {
-                    ADDMSG(&mage->faction->msgs, msg_message("reduce_spell",
-                        "self mage region", mage, u, r));
+            if (force > 0) {
+                ADDMSG(&u->faction->msgs, msg_message("spell_reduced",
+                    "target region", u, r));
+                if (mage != NULL && mage->faction != NULL) {
+                    ADDMSG(&mage->faction->msgs, msg_message("spell_reduced_by",
+                        "mage target region", mage, u, r));
                 }
-                else {
-                    ADDMSG(&mage->faction->msgs, msg_message("block_spell",
-                        "self mage region", mage, u, r));
+            }
+            else {
+                ADDMSG(&u->faction->msgs, msg_message("spell_blocked",
+                    "target region", u, r));
+                if (mage != NULL && mage->faction != NULL) {
+                    ADDMSG(&mage->faction->msgs, msg_message("spell_blocked_by",
+                        "mage target region", mage, u, r));
                 }
             }
         }
-
         /* Patzerfluch-Effekt: */
         c = get_curse(r->attribs, &ct_fumble);
         if (curse_active(c)) {

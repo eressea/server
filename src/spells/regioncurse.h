@@ -18,6 +18,7 @@ extern const struct curse_type ct_maelstrom;
 extern const struct curse_type ct_riotzone;
 extern const struct curse_type ct_generous;
 extern const struct curse_type ct_badlearn;
+extern const struct curse_type ct_antimagiczone;
 #ifdef ENABLE_FOGTRAP_CURSE
 extern const struct curse_type ct_fogtrap;
 #endif
