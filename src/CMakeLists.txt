@@ -287,6 +287,7 @@ set(TESTS_SRC
   economy.test.c
   give.test.c
   guard.test.c
+  items.test.c
   json.test.c
   jsonconf.test.c
   laws.test.c

@@ -61,8 +61,11 @@ msgstr "\"$unit($unit) finds it difficult to gather its magical energies. ($int3
 msgid "harbor_trade"
 msgstr "\"$unit($unit) received $resources($items) from the $ship($ship).\""
 
-msgid "reduce_spell"
-msgstr "\"In $region($region), anti-magic from $unit($self) reduces the effect of $unit($mage)'s spell.\""
+msgid "spell_reduced_by"
+msgstr "\"In $region($region), anti-magic from $unit($mage) reduces the effect of $unit($target)'s spell.\""
+
+msgid "spell_reduced"
+msgstr "\"In $region($region), anti-magic reduces the effect of $unit($target)'s spell.\""
 
 msgid "raised"
 msgstr "\"$unit($unit) breeds $int($amount) horses.\""
@@ -338,8 +341,11 @@ msgstr "\"peasant morale: $int($morale)\""
 msgid "changemail_invalid"
 msgstr "\"Address not changed, '$value' is an invalid email.\""
 
-msgid "block_spell"
-msgstr "\"In $region($region), anti-magic from $unit($self) blocks the spell of $unit($mage).\""
+msgid "spell_blocked"
+msgstr "\"In $region($region), anti-magic blocks a spell by $unit($target).\""
+
+msgid "spell_blocked_by"
+msgstr "\"In $region($region), anti-magic from $unit($mage) blocks a spell by $unit($target).\""
 
 msgid "enter_overload"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot go aboard, the ship would be overloaded.\""
