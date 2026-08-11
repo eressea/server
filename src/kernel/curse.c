@@ -428,17 +428,6 @@ int curse_geteffect_int(const curse * c)
 }
 
 /* ------------------------------------------------------------- */
-static void
-set_curseingmagician(struct unit *magician, struct attrib *ap_target,
-    const curse_type * ct)
-{
-    curse *c = get_curse(ap_target, ct);
-    if (c) {
-        c->magician = magician;
-    }
-}
-
-/* ------------------------------------------------------------- */
 /* gibt bei Personenbeschraenkten Verzauberungen die Anzahl der
  * betroffenen Personen zurueck. Ansonsten wird 0 zurueckgegeben. */
 int get_cursedmen(const unit * u, const curse * c)
@@ -562,7 +551,7 @@ curse *create_curse(unit * magician, attrib ** ap, const curse_type * ct,
         if (ct->mergeflags & M_MEN && ct->typ == CURSETYP_UNIT) {
             c->data.i += men;
         }
-        set_curseingmagician(magician, *ap, ct);
+        c->magician = magician;
     }
     else if (ap) {
         c = make_curse(magician, ap, ct, vigour, duration, effect, men);
@@ -639,7 +628,7 @@ void transfer_curse(const unit * u, unit * u2, int n)
 /* ------------------------------------------------------------- */
 
 int curse_cansee(const curse *c, const faction *viewer, objtype_t typ, const void *obj, int self) {
-    if (self < 3 && c->magician && c->magician->faction == viewer) {
+    if (self < 3 && (!c->magician || c->magician->faction == viewer)) {
         /* magicians can see their own curses better than anybody, no exceptions */
         self = 3;
     }
