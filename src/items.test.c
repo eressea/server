@@ -45,6 +45,53 @@ static void test_crystal_creates_zone(CuTest *tc) {
     test_teardown();
 }
 
+/**
+ * TODO
+ * 
+ * The antimagic zone xurse is immune to dissolution by
+ * antimagic crystals. The curse is updated, and not 
+ * reduced in strength (full 100 vigour).
+ */
+static void test_crystal_immunity(CuTest *tc) {
+    unit *u;
+    region *r;
+    curse *c;
+    struct item_type *itype;
+    test_setup();
+    itype = test_create_itemtype("antimagic");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    r = u->region;
+    c = create_curse(u, &r->attribs, &ct_antimagiczone, 50.0, 1, 1.0, 0);
+    CuAssertIntEquals(tc, 0, use_antimagiccrystal(u, itype, 1, NULL));
+    CuAssertPtrEquals(tc, c, get_curse(r->attribs, &ct_antimagiczone));
+    CuAssertPtrEquals(tc, NULL, c->magician);
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, 100.0, c->vigour, 0.01);
+    test_teardown();
+}
+
+/**
+ * using a second AMK does not reduce the zone created by the first
+ */
+static void test_crystal_updates_zone(CuTest *tc) {
+    unit *u;
+    region *r;
+    curse *c;
+    struct item_type *itype;
+    test_setup();
+    itype = test_create_itemtype("antimagic");
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    r = u->region;
+    create_curse(u, &r->attribs, &ct_antimagiczone, 50.0, 1, 1.0, 0);
+
+    CuAssertIntEquals(tc, 0, use_antimagiccrystal(u, itype, 1, NULL));
+    CuAssertPtrNotNull(tc, c = get_curse(r->attribs, &ct_antimagiczone));
+    CuAssertPtrEquals(tc, NULL, c->magician);
+    CuAssertIntEquals(tc, 2, c->duration);
+    CuAssertDblEquals(tc, 100.0, c->vigour, 0.01);
+    test_teardown();
+}
+
 static void test_crystal_affects_curses(CuTest *tc) {
     unit *u, *u2;
     curse *c;
@@ -190,5 +237,7 @@ CuSuite *get_items_suite(void)
     SUITE_ADD_TEST(suite, test_foolpotion_effect);
     SUITE_ADD_TEST(suite, test_crystal_creates_zone);
     SUITE_ADD_TEST(suite, test_crystal_affects_curses);
+    SUITE_ADD_TEST(suite, test_crystal_immunity);
+    SUITE_ADD_TEST(suite, test_crystal_updates_zone);
     return suite;
 }
