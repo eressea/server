@@ -336,7 +336,6 @@ target_link_libraries(test_eressea
   game
   cutest
   ${LUA_LIBRARIES}
-  ${CLIBS_LIBRARIES}
   ${STORAGE_LIBRARIES}
   ${CJSON_LIBRARY}
   ${INIPARSER_LIBRARY}
