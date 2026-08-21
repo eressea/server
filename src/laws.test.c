@@ -1644,13 +1644,24 @@ static void test_nmr_warnings(CuTest *tc) {
     faction_set_age(f2, 2);
     CuAssertIntEquals(tc, 2, faction_age(f2));
     f2->lastorders = 1;
+    ally_set(&f1->allies, f2, HELP_GUARD);
+    ally_set(&f2->allies, f1, HELP_GUARD);
     nmr_warnings();
     CuAssertPtrNotNull(tc, f1->msgs);
     CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "nmr_warning"));
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "warn_dropout"));
     CuAssertPtrNotNull(tc, f2->msgs);
     CuAssertPtrNotNull(tc, f2->msgs->begin);
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning"));
     CuAssertPtrNotNull(tc, test_find_messagetype(f2->msgs, "nmr_warning_final"));
+    test_clear_messages(f1);
+    test_clear_messages(f2);
+    f2->lastorders = 0;
+    nmr_warnings();
+    CuAssertPtrNotNull(tc, f1->msgs);
+    CuAssertPtrNotNull(tc, test_find_messagetype(f1->msgs, "nmr_warning"));
+    CuAssertPtrEquals(tc, NULL, test_find_messagetype(f1->msgs, "warn_dropout"));
+
     test_teardown();
 }
 

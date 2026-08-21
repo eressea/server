@@ -770,14 +770,16 @@ void immigration(void)
     }
 }
 
+#define HELP_NMR (HELP_GUARD|HELP_MONEY)
+
 void nmr_warnings(void)
 {
     faction *f, *fa;
-#define HELP_NMR (HELP_GUARD|HELP_MONEY)
+    int timeout = NMRTimeout();
     for (f = factions; f; f = f->next) {
         if (!fval(f, FFL_NOIDLEOUT|FFL_PAUSED) && turn > f->lastorders) {
             ADDMSG(&f->msgs, msg_message("nmr_warning", ""));
-            if (turn - f->lastorders == NMRTimeout() - 1) {
+            if (turn - f->lastorders == timeout - 1) {
                 ADDMSG(&f->msgs, msg_message("nmr_warning_final", ""));
             }
             if ((turn - f->lastorders) >= 2) {
@@ -792,7 +794,7 @@ void nmr_warnings(void)
                     else if (alliedfaction(f, fa, HELP_NMR) && alliedfaction(fa, f, HELP_NMR)) {
                         warn = 1;
                     }
-                    if (warn) {
+                    if (warn && turn - f->lastorders < timeout) {
                         if (msg == NULL) {
                             msg = msg_message("warn_dropout", "faction turns", f,
                                     turn - f->lastorders);
