@@ -36,4 +36,6 @@ const char* calendar_era(void);
 int first_turn(void);
 int storm_factor(int month);
 
+extern int *storms;
+
 #endif

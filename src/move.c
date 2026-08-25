@@ -74,8 +74,6 @@
 #include <limits.h>
 #include <float.h>
 
-int *storms;
-
 typedef struct traveldir {
     int no;
     direction_t dir;

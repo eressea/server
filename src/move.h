@@ -14,7 +14,6 @@ struct unit;
 struct item;
 
 extern struct attrib_type at_shiptrail;
-extern int *storms;
 
 /* Bewegungsweiten: */
 #define BP_WALKING 4
