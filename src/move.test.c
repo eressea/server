@@ -22,6 +22,7 @@
 
 #include "util/keyword.h"
 #include "util/language.h"
+#include "util/macros.h"
 #include "util/message.h"
 #include "util/base36.h"
 #include "util/param.h"
@@ -882,19 +883,70 @@ static void test_follow_ship_msg(CuTest * tc) {
 
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
-    region *r;
-    terrain_type *t_ocean, *t_plain;
-    ship_type *st_boat;
+    ship_type * stype;
+    region * r, *r2;
+    unit * u;
+    faction *f;
 
     test_setup();
-    t_ocean = test_create_terrain("ocean", SEA_REGION);
-    t_plain = test_create_terrain("plain", LAND_REGION);
-    r = test_create_region(0, 0, t_ocean);
-    test_create_region(1, 0, t_ocean);
-    st_boat = test_create_shiptype("boat");
-    sh = test_create_ship(r, st_boat);
+    config_set("rules.ship.drifting", "1");
+    r = test_create_ocean(0, 0);
+    r2 = test_create_ocean(0, 1);
+    stype = test_create_shiptype("fisher");
+    stype->fishing = 1;
+    u = test_create_unit(f = test_create_faction(), r);
+    sh = u->ship = test_create_ship(r, stype);
+    CuAssertIntEquals(tc, 0, sh->flags);
+    drifting_ships(r);
+    CuAssertPtrEquals(tc, r2, sh->region);
+    CuAssertIntEquals(tc, SF_DRIFTED|SF_FISHING, sh->flags);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "ship_drift_nocrew"));
+    test_teardown();
+}
+
+static void test_drift_reason(CuTest *tc) {
+    ship *sh;
+    region *r;
+    unit *u;
+    item_type * itype;
+    ship_type *stype;
+
+    test_setup();
+    itype = test_create_silver();
+    stype = test_create_shiptype("clipper");
+    stype->cabins = 0;
+    stype->cargo = 10000;
+    r = test_create_ocean(0, 0);
+    sh = test_create_ship(r, stype);
+    CuAssertStrEquals(tc, "ship_drift_nocrew", drift_reason(r, sh));
+    u = test_create_unit(test_create_faction(), r);
+    u_set_ship(u, sh);
+    CuAssertStrEquals(tc, "ship_drift_nocrew", drift_reason(r, sh));
+    test_set_skill(u, SK_SAILING, sh->type->sumskill, 0);
+    CuAssertStrEquals(tc, NULL, drift_reason(r, sh));
+
+    scale_number(u, 4);
+    test_set_skill(u, SK_SAILING, MAX(sh->type->cptskill, sh->type->sumskill/3), 0);
+    CuAssertStrEquals(tc, NULL, drift_reason(r, sh));
+
+    stype->cabins = 3;
+    CuAssertStrEquals(tc, "ship_drift_overload", drift_reason(r, sh));
+    stype->cabins = 0;
+
+    i_change(&u->items, itype, sh->type->cargo);
+    CuAssertStrEquals(tc, "ship_drift_overload", drift_reason(r, sh));
+}
+
+static void test_drift_target(CuTest *tc) {
+    ship *sh;
+    region *r;
+
+    test_setup();
+    r = test_create_ocean(0, 0);
+    test_create_ocean(1, 0);
+    sh = test_create_ship(r, NULL);
     CuAssertIntEquals(tc, D_EAST, drift_target(sh));
-    test_create_region(-1, 0, t_plain);
+    test_create_plain(-1, 0);
     CuAssertIntEquals(tc, D_WEST, drift_target(sh));
     test_teardown();
 }
@@ -1552,6 +1604,8 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
+    SUITE_ADD_TEST(suite, test_drift_target);
+    SUITE_ADD_TEST(suite, test_drift_reason);
     SUITE_ADD_TEST(suite, test_route_cycle);
     SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);
