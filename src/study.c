@@ -39,7 +39,7 @@
 #include <util/rng.h>
 #include <util/umlaut.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

@@ -7,7 +7,7 @@
 #include <util/log.h>
 #include <util/macros.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <stdio.h>
 #include <stdlib.h>

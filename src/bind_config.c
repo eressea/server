@@ -14,7 +14,7 @@
 #include <util/log.h>
 #include <util/path.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <cJSON.h>
 

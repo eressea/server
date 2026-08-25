@@ -2,21 +2,22 @@
 #include "key.h"
 
 /* kernel includes */
+#include <kernel/attrib.h>
 #include <kernel/building.h>
 #include <kernel/faction.h>
+#include <kernel/gamedata.h>
 #include <kernel/region.h>
 #include <kernel/ship.h>
 #include <kernel/unit.h>
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/log.h>
-#include <kernel/gamedata.h>
 #include <util/resolve.h>
 
-#include <strings.h>
-#include <storage.h>
+#include <storage/storage.h>
+
+#include <clibs/strings.h>
 
 /* stdc includes */
 #include <string.h>

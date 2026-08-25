@@ -14,7 +14,6 @@ struct unit;
 struct item;
 
 extern struct attrib_type at_shiptrail;
-extern int *storms;
 
 /* Bewegungsweiten: */
 #define BP_WALKING 4
@@ -57,9 +56,11 @@ struct unit *owner_buildingtyp(const struct region *r,
 bool move_blocked(const struct unit *u, const struct region *src,
     const struct region *dest);
 bool can_takeoff(const struct ship * sh, const struct region * from, const struct region * to);
+void sail(struct unit * u, struct order * ord, bool drifting);
 void move_cmd(struct unit * u, struct order * ord);
 void move_cmd_ex(struct unit * u, struct order * ord, const char *directions);
 int follow_ship(struct unit * u, struct order * ord);
+struct region * storm_redirect(const struct region *src, const struct region *dst);
 
 #define SA_HARBOUR_ALLOWED 1
 #define SA_ALLOWED 0

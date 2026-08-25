@@ -19,7 +19,7 @@
 #include <util/base36.h>
 #include <util/functions.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <string.h>

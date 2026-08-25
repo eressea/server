@@ -881,6 +881,86 @@ static void test_follow_ship_msg(CuTest * tc) {
     test_teardown();
 }
 
+static void test_storms(CuTest *tc) {
+    ship *sh;
+    unit *u;
+    faction *f;
+    region *r, *r2;
+    const char *dir;
+    ship_type * stype;
+
+    test_setup();
+    stype = test_create_shiptype("bucket");
+    stype->storm = 100;
+    stype->cargo = 100000;
+    u = test_create_unit(f = test_create_faction(), r = test_create_ocean(0,0));
+    test_set_skill(u, SK_SAILING, stype->sumskill, 0);
+    test_create_ocean(1,0);
+    r2 = test_create_ocean(2,0);
+    u_set_ship(u, sh = test_create_ship(r, stype));
+    dir = LOC(f->locale, directions[D_EAST]);
+    u->thisorder = create_order(K_MOVE, f->locale, "%s %s", dir, dir);
+
+    config_set_int("rules.ship.storms", 0);
+    init_order(u->thisorder, f->locale);
+    sail(u, u->thisorder, true);
+    CuAssertPtrEquals(tc, r2, sh->region);
+    CuAssertPtrEquals(tc, r2, u->region);
+
+    move_ship(sh, r2, r, NULL);
+    config_set_int("rules.ship.storms", 1);
+    config_set_int("rules.calendar.stormchance", 100);
+    init_order(u->thisorder, f->locale);
+    sail(u, u->thisorder, true);
+    CuAssertPtrEquals(tc, sh->region, u->region);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "storm"));
+    CuAssertTrue(tc, sh->damage != 0);
+
+    test_teardown();
+}
+
+static void test_storm_redirect(CuTest *tc) {
+    region *r, *r1, *r2;
+    terrain_type *t_fire;
+
+    /* drift into an adjacent ocean, but not the original destination */
+    test_setup();
+    r = test_create_ocean(0, 0);
+    r1 = test_create_ocean(0, 1);
+    r2 = test_create_ocean(1, 0);
+
+    CuAssertPtrEquals(tc, r2, storm_redirect(r, r1));
+
+    /* do not drift if there is an adjacent non-ocean */
+    r = test_create_ocean(10, 0);
+    r1 = test_create_ocean(10, 1);
+    r2 = test_create_ocean(11, 0);
+    test_create_plain(10, -1); // protects from storm
+
+    CuAssertPtrEquals(tc, NULL, storm_redirect(r, r1));
+
+    /* bug 3119: do not drift if there is an adjacent firewall */
+    t_fire = test_create_terrain("firewall", FORBIDDEN_REGION);
+    r = test_create_ocean(20, 0);
+    r1 = test_create_ocean(20, 1);
+    r2 = test_create_ocean(21, 0);
+    test_create_region(20, -1, t_fire);
+
+    CuAssertPtrEquals(tc, NULL, storm_redirect(r, r1));
+
+    // we do not ave forbidden oceans, do we? but if we did,
+    // they would surely not count as coasts.
+    t_fire = test_create_terrain("deepsea", FORBIDDEN_REGION|SEA_REGION);
+    r = test_create_ocean(20, 0);
+    r1 = test_create_ocean(20, 1);
+    r2 = test_create_ocean(21, 0);
+    test_create_region(20, -1, t_fire);
+
+    CuAssertPtrEquals(tc, r2, storm_redirect(r, r1));
+
+    test_teardown();
+}
+
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
     ship_type * stype;
@@ -1603,6 +1683,9 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_bad_target);
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
+
+    SUITE_ADD_TEST(suite, test_storms);
+    SUITE_ADD_TEST(suite, test_storm_redirect);
     SUITE_ADD_TEST(suite, test_drifting_ships);
     SUITE_ADD_TEST(suite, test_drift_target);
     SUITE_ADD_TEST(suite, test_drift_reason);

@@ -17,8 +17,8 @@
 #include <util/rng.h>
 
 #include <stb_ds.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

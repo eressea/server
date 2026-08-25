@@ -60,8 +60,9 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
+
 #include <stb_ds.h>
 
 /* libc includes */
@@ -72,8 +73,6 @@
 #include <string.h>
 #include <limits.h>
 #include <float.h>
-
-int *storms;
 
 typedef struct traveldir {
     int no;
@@ -1880,7 +1879,7 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
+static void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
 {
     item *itm;
     item *trans = NULL;
@@ -1919,7 +1918,33 @@ void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
     }
 }
 
-static void sail(unit * u, order * ord, bool drifting)
+region * storm_redirect(const region *current_point, const region *next_point)
+{
+    int d_offset = rng_int() % MAXDIRECTIONS;
+    region *rnext = NULL;
+    /* Sturm nur, wenn naechste Region Hochsee ist. */
+    for (direction_t d = 0; d != MAXDIRECTIONS; ++d) {
+        direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+        region *rn = rconnect(current_point, dnext);
+
+        if (rn != NULL) {
+            if (!fval(rn->terrain, SEA_REGION)) {
+                rnext = NULL;
+                break;
+            }
+            if (fval(rn->terrain, FORBIDDEN_REGION)) {
+                // do we even *have* forbidden sea regions?
+                continue;
+            }
+            if (rn != next_point) {
+                rnext = rn;
+            }
+        }
+    }
+    return rnext;
+}
+
+void sail(unit * u, order * ord, bool drifting)
 {
     region_list *route = NULL;
     region *starting_point = u->region;
@@ -1984,7 +2009,7 @@ static void sail(unit * u, order * ord, bool drifting)
                 int stormyness;
                 gamedate date;
                 get_gamedate(turn, &date);
-                stormyness = storms ? storms[date.month] * 5 : 0;
+                stormyness = storm_factor(date.month) * 5;
 
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);
@@ -1999,27 +2024,8 @@ static void sail(unit * u, order * ord, bool drifting)
                 if (stormchance && rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
                     if (!is_cursed(sh->attribs, &ct_nodrift)) {
-                        region *rnext = NULL;
-                        bool storm = true;
-                        int d_offset = rng_int() % MAXDIRECTIONS;
-                        direction_t d;
-                        /* Sturm nur, wenn naechste Region Hochsee ist. */
-                        for (d = 0; d != MAXDIRECTIONS; ++d) {
-                            direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-                            region *rn = rconnect(current_point, dnext);
-
-                            if (rn != NULL) {
-                                if (fval(rn->terrain, FORBIDDEN_REGION))
-                                    continue;
-                                if (!fval(rn->terrain, SEA_REGION)) {
-                                    storm = false;
-                                    break;
-                                }
-                                if (rn != next_point)
-                                    rnext = rn;
-                            }
-                        }
-                        if (storm && rnext != NULL) {
+                        region *rnext = storm_redirect(current_point, next_point);
+                        if (rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
                                 sh, next_point, ship_damage_percent(sh) >= 100));
 

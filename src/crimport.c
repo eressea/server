@@ -36,9 +36,9 @@
 #include <util/lists.h>
 #include <util/log.h>
 
-#include <crpat.h>
-#include <critbit.h>
-#include <strings.h>
+#include <crpat/crpat.h>
+#include <clibs/critbit.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

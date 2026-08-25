@@ -2,7 +2,7 @@
 
 #include <kernel/attrib.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <assert.h>
 #include <limits.h>

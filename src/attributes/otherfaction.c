@@ -6,9 +6,10 @@
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
 
+#include <storage/storage.h>
+
 #include <assert.h>
 #include <stdbool.h>         // for true, false
-#include <storage.h>
 
 /*
  * simple attributes that do not yet have their own file

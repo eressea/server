@@ -21,7 +21,7 @@
 #include <util/rng.h>
 #include <util/unicode.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

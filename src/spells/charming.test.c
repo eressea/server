@@ -14,7 +14,7 @@
 #include <util/keyword.h>
 #include <util/rand.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 #include <tests.h>
 
 #include <stb_ds.h>

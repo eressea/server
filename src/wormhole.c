@@ -19,8 +19,9 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 
-#include <selist.h>
-#include <storage.h>
+#include <storage/storage.h>
+
+#include <clibs/selist.h>
 
 /* libc includes */
 #include <assert.h>

@@ -42,8 +42,7 @@ struct ship *read_ship(struct gamedata *data);
 int write_game(struct gamedata *data);
 int read_game(struct gamedata *data);
 
-/* test-only functions that give access to internal implementation details (BAD) */
-void _test_write_password(struct gamedata *data, const struct faction *f);
-void _test_read_password(struct gamedata *data, struct faction *f);
+void write_password(struct gamedata *data, const struct faction *f);
+void read_password(struct gamedata *data, struct faction *f);
 
 void fix_shadows(void);

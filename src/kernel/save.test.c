@@ -29,9 +29,9 @@
 #include <util/path.h>
 
 #include <memstream.h>
-#include <storage.h>
+#include <storage/storage.h>
 #include <stream.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>
@@ -383,9 +383,9 @@ static void test_read_password(CuTest *tc) {
     faction_setpassword(f, password_hash("secret", PASSWORD_DEFAULT));
     mstream_init(&data.strm);
     gamedata_init(&data, &store, RELEASE_VERSION);
-    _test_write_password(&data, f);
+    write_password(&data, f);
     data.strm.api->rewind(data.strm.handle);
-    _test_read_password(&data, f);
+    read_password(&data, f);
     mstream_done(&data.strm);
     gamedata_done(&data);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
@@ -413,10 +413,10 @@ static void test_read_password_external(CuTest *tc) {
     WRITE_TOK(data.store, "$brokenhash");
     data.strm.api->rewind(data.strm.handle);
     data.version = NOCRYPT_VERSION;
-    _test_read_password(&data, f);
+    read_password(&data, f);
     CuAssertTrue(tc, checkpasswd(f, "newpassword"));
     data.version = BADCRYPT_VERSION;
-    _test_read_password(&data, f);
+    read_password(&data, f);
     CuAssertTrue(tc, checkpasswd(f, "secret"));
     F = fopen(pwfile, "wt");
     if (F) {
@@ -424,7 +424,7 @@ static void test_read_password_external(CuTest *tc) {
         fclose(F);
     }
     CuAssertTrue(tc, checkpasswd(f, "secret"));
-    _test_read_password(&data, f);
+    read_password(&data, f);
     CuAssertTrue(tc, checkpasswd(f, "pwfile"));
     mstream_done(&data.strm);
     gamedata_done(&data);

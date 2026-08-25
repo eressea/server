@@ -7,7 +7,7 @@
 #include <util/umlaut.h>
 
 #include <selist.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

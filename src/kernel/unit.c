@@ -46,8 +46,8 @@
 #include <util/rng.h>
 #include <util/variant.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

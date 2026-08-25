@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+int *storms;
 int turn = 0;
 int first_month = 0;
 int weeks_per_month = 3;
@@ -42,6 +43,20 @@ const char *calendar_era(void)
 int first_turn(void)
 {
     return config_get_int("game.start", 0);
+}
+
+int storm_factor(int month)
+{
+    static int config;
+    static int fixed;
+
+    if (config_changed(&config)) {
+        fixed = config_get_int("rules.calendar.stormchance", 0);
+    }
+    if (fixed > 0) {
+        return fixed;
+    }
+    return storms ? storms[month] : 0;
 }
 
 const gamedate *get_gamedate(int turn_now, gamedate * gd)

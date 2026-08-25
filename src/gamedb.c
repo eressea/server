@@ -5,7 +5,7 @@
 #include "kernel/faction.h"
 #include "kernel/db/driver.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 static int generate_factions(void *data, db_faction *results, int nresults)
 {

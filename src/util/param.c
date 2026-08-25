@@ -8,7 +8,7 @@
 #include "umlaut.h"
 
 #include <critbit.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <assert.h>
 #include <stdlib.h>

@@ -15,7 +15,7 @@
 #include <util/macros.h>
 #include <util/message.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <string.h>

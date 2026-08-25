@@ -15,7 +15,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

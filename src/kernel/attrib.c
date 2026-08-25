@@ -4,9 +4,10 @@
 #include <util/variant.h>
 #include <kernel/gamedata.h>
 
-#include <critbit.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+
+#include <clibs/critbit.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

@@ -33,7 +33,7 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

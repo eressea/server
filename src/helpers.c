@@ -20,7 +20,7 @@
 #include <kernel/spell.h>
 #include <kernel/unit.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <stb_ds.h>
 #include <tolua.h>

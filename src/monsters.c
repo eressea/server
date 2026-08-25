@@ -50,7 +50,7 @@
 
 #include "spells/regioncurse.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

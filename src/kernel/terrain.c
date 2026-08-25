@@ -14,7 +14,7 @@
 #include <util/log.h>
 
 #include <stb_ds.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

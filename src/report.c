@@ -70,11 +70,12 @@
 #include "util/param.h"
 #include <util/rng.h>
 
-#include <format.h>
-#include <selist.h>
-#include <filestream.h>
-#include <stream.h>
-#include <strings.h>
+#include <storage/filestream.h>
+#include <storage/stream.h>
+
+#include <clibs/format.h>
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
 #include <gb_string.h>
 

@@ -44,7 +44,8 @@
 #include <triggers/changerace.h>
 #include <triggers/timeout.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
+
 #include <tests.h>
 
 #include <CuTest.h>

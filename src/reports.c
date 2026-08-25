@@ -61,9 +61,10 @@
 #include "util/password.h"
 #include "util/translation.h"
 
-#include <selist.h>
-#include <stream.h>
-#include <strings.h>
+#include <storage/stream.h>
+
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
 #include <gb_string.h>
 #include <stb_ds.h>

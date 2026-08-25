@@ -34,6 +34,7 @@
 #include "util/rand.h"
 #include "util/variant.h"
 
+#include <clibs/strings.h>
 #include <CuTest.h>
 
 #include <stb_ds.h>
@@ -41,7 +42,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>                // for abort, calloc
-#include <strings.h>
 
 #include "tests.h"
 

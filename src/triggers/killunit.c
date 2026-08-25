@@ -12,7 +12,7 @@
 #include <util/macros.h>
 #include <util/resolve.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <stdio.h>
 #include <stdlib.h>
