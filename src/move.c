@@ -892,7 +892,7 @@ direction_t drift_target(ship *sh) {
     return result;
 }
 
-static void drifting_ships(region * r)
+void drifting_ships(region * r)
 {
     static int config;
     static bool drift;

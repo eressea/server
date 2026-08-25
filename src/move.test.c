@@ -882,19 +882,26 @@ static void test_follow_ship_msg(CuTest * tc) {
 
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
+    region * r;
+    test_setup();
+    config_set("rules.ship.drifting", "1");
+    r = test_create_ocean(0, 0);
+    sh = test_create_ship(r, NULL);
+    drifting_ships(r);
+    CuAssertPtrEquals(tc, r, sh->region);
+    test_teardown();
+}
+
+static void test_drifting_ship_targets(CuTest *tc) {
+    ship *sh;
     region *r;
-    terrain_type *t_ocean, *t_plain;
-    ship_type *st_boat;
 
     test_setup();
-    t_ocean = test_create_terrain("ocean", SEA_REGION);
-    t_plain = test_create_terrain("plain", LAND_REGION);
-    r = test_create_region(0, 0, t_ocean);
-    test_create_region(1, 0, t_ocean);
-    st_boat = test_create_shiptype("boat");
-    sh = test_create_ship(r, st_boat);
+    r = test_create_ocean(0, 0);
+    test_create_ocean(1, 0);
+    sh = test_create_ship(r, NULL);
     CuAssertIntEquals(tc, D_EAST, drift_target(sh));
-    test_create_region(-1, 0, t_plain);
+    test_create_plain(-1, 0);
     CuAssertIntEquals(tc, D_WEST, drift_target(sh));
     test_teardown();
 }
@@ -1552,6 +1559,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_unit_self);
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
     SUITE_ADD_TEST(suite, test_drifting_ships);
+    SUITE_ADD_TEST(suite, test_drifting_ship_targets);
     SUITE_ADD_TEST(suite, test_route_cycle);
     SUITE_ADD_TEST(suite, test_cycle_route);
     SUITE_ADD_TEST(suite, test_route_pause);

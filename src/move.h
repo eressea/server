@@ -70,6 +70,7 @@ int follow_ship(struct unit * u, struct order * ord);
 
 int check_ship_allowed(struct ship *sh, const struct region * r, const struct building *harbour);
 direction_t drift_target(struct ship *sh);
+void drifting_ships(struct region * r);
 struct order * cycle_route(struct order * ord, const struct locale *lang, int gereist);
 struct order * make_movement_order(const struct locale *lang, direction_t steps[], int length);
 
