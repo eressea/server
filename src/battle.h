@@ -188,11 +188,12 @@ side* get_side(battle* b, const struct unit* u);
 void do_battles(void);
 
 /* for combat spells and special attacks */
-enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4 };
+enum { SELECT_ADVANCE = 0x1, SELECT_DISTANCE = 0x2, SELECT_FIND = 0x4, SELECT_IGNORE_TACTICS = 0x8 };
 enum { ALLY_SELF, ALLY_ANY };
 
 int get_unitrow(const fighter* af, const side* vs);
 
+bool escapes_tactics(const fighter *af, const troop dt);
 troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
 troop select_ally(struct fighter* af, int minrow, int maxrow,
