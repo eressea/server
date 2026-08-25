@@ -884,17 +884,22 @@ static void test_drifting_ships(CuTest *tc) {
     ship *sh;
     ship_type * stype;
     region * r, *r2;
+    unit * u;
+    faction *f;
+
     test_setup();
     config_set("rules.ship.drifting", "1");
     r = test_create_ocean(0, 0);
     r2 = test_create_ocean(0, 1);
     stype = test_create_shiptype("fisher");
     stype->fishing = 1;
-    sh = test_create_ship(r, stype);
+    u = test_create_unit(f = test_create_faction(), r);
+    sh = u->ship = test_create_ship(r, stype);
     CuAssertIntEquals(tc, 0, sh->flags);
     drifting_ships(r);
     CuAssertPtrEquals(tc, r2, sh->region);
     CuAssertIntEquals(tc, SF_DRIFTED|SF_FISHING, sh->flags);
+    CuAssertPtrNotNull(tc, test_find_faction_message(f, "ship_drift_nocrew"));
     test_teardown();
 }
 
