@@ -516,7 +516,7 @@ static int walk_speed(const unit * u, const capacities *cap)
     return BP_WALKING;
 }
 
-static bool cansail(const region * r, ship * sh)
+static bool cansail(const region * r, const ship * sh)
 {
     UNUSED_ARG(r);
 
@@ -755,7 +755,7 @@ static building *get_harbour(const region *r) {
     return NULL;
 }
 
-int check_ship_allowed(struct ship *sh, const region * r, const building *harbour)
+int check_ship_allowed(const struct ship *sh, const region * r, const building *harbour)
 {
     if (fval(r->terrain, SEA_REGION)) {
         return SA_ALLOWED;
@@ -874,7 +874,7 @@ static void msg_to_passengers(ship *sh, unit **firstu, unit **lastu, message *ms
     msg_release(msg);
 }
 
-direction_t drift_target(ship *sh) {
+direction_t drift_target(const ship *sh) {
     direction_t d, dir = rng_int() % MAXDIRECTIONS;
     direction_t result = NODIRECTION;
     for (d = 0; d != MAXDIRECTIONS; ++d) {
@@ -890,6 +890,17 @@ direction_t drift_target(ship *sh) {
         }
     }
     return result;
+}
+
+const char *drift_reason(const struct region *r, const struct ship *sh)
+{
+    if (!ship_crewed(sh, ship_owner(sh))) {
+        return "ship_drift_nocrew";
+    }
+    else if (!cansail(r, sh)) {
+        return "ship_drift_overload";
+    }
+    return NULL;
 }
 
 void drifting_ships(region * r)
@@ -928,13 +939,8 @@ void drifting_ships(region * r)
              * Genuegend leicht? Dann ist alles OK. */
 
             if (ship_finished(sh)) {
-                if (!ship_crewed(sh, ship_owner(sh))) {
-                    reason = "ship_drift_nocrew";
-                }
-                else if (!cansail(r, sh)) {
-                    reason = "ship_drift_overload";
-                }
-                else {
+                reason = drift_reason(r, sh);
+                if (!reason) {
                     /* no problems, don't drift */
                     shp = &sh->next;
                     continue;
