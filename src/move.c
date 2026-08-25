@@ -1879,7 +1879,7 @@ bool can_takeoff(const ship * sh, const region * from, const region * to)
     return true;
 }
 
-void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
+static void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
 {
     item *itm;
     item *trans = NULL;
@@ -1918,7 +1918,7 @@ void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
     }
 }
 
-static void sail(unit * u, order * ord, bool drifting)
+void sail(unit * u, order * ord, bool drifting)
 {
     region_list *route = NULL;
     region *starting_point = u->region;
