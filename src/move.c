@@ -1918,7 +1918,7 @@ static void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
     }
 }
 
-static region * storm_redirect(const region *current_point, const region *next_point)
+region * storm_redirect(const region *current_point, const region *next_point)
 {
     int d_offset = rng_int() % MAXDIRECTIONS;
     direction_t d;
@@ -2816,9 +2816,4 @@ void follow_cmds(unit * u)
             }
         }
     }
-}
-
-region * test_storm_redirect(const region *current_point, const region *next_point)
-{
-    return storm_redirect(current_point, next_point);
 }

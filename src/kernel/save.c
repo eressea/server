@@ -1045,7 +1045,7 @@ static char * getpasswd(int fno) {
     return NULL;
 }
 
-static void read_password(gamedata *data, faction *f) {
+void read_password(gamedata *data, faction *f) {
     char name[128];
     READ_STR(data->store, name, sizeof(name));
     if (name[0] == '$' && data->version == BADCRYPT_VERSION) {
@@ -1063,16 +1063,8 @@ static void read_password(gamedata *data, faction *f) {
     }
 }
 
-void _test_read_password(gamedata *data, faction *f) {
-    read_password(data, f);
-}
-
-static void write_password(gamedata *data, const faction *f) {
+void write_password(gamedata *data, const faction *f) {
     WRITE_TOK(data->store, faction_getpassword(f));
-}
-
-void _test_write_password(gamedata *data, const faction *f) {
-    write_password(data, f);
 }
 
 faction *read_faction(gamedata * data)
