@@ -60,6 +60,7 @@ void sail(struct unit * u, struct order * ord, bool drifting);
 void move_cmd(struct unit * u, struct order * ord);
 void move_cmd_ex(struct unit * u, struct order * ord, const char *directions);
 int follow_ship(struct unit * u, struct order * ord);
+struct region * test_storm_redirect(const struct region *src, const struct region *dst);
 
 #define SA_HARBOUR_ALLOWED 1
 #define SA_ALLOWED 0

@@ -1918,6 +1918,29 @@ static void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
     }
 }
 
+static region * storm_redirect(const region *current_point, const region *next_point)
+{
+    int d_offset = rng_int() % MAXDIRECTIONS;
+    direction_t d;
+    /* Sturm nur, wenn naechste Region Hochsee ist. */
+    for (d = 0; d != MAXDIRECTIONS; ++d) {
+        direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
+        region *rn = rconnect(current_point, dnext);
+
+        if (rn != NULL) {
+            if (fval(rn->terrain, FORBIDDEN_REGION))
+                continue;
+            if (!fval(rn->terrain, SEA_REGION)) {
+                break;
+            }
+            if (rn != next_point) {
+                return rn;
+            }
+        }
+    }
+    return NULL;
+}
+
 void sail(unit * u, order * ord, bool drifting)
 {
     region_list *route = NULL;
@@ -1998,27 +2021,8 @@ void sail(unit * u, order * ord, bool drifting)
                 if (stormchance && rng_int() % 10000 < stormchance * sh->type->storm
                     && fval(current_point->terrain, SEA_REGION)) {
                     if (!is_cursed(sh->attribs, &ct_nodrift)) {
-                        region *rnext = NULL;
-                        bool storm = true;
-                        int d_offset = rng_int() % MAXDIRECTIONS;
-                        direction_t d;
-                        /* Sturm nur, wenn naechste Region Hochsee ist. */
-                        for (d = 0; d != MAXDIRECTIONS; ++d) {
-                            direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
-                            region *rn = rconnect(current_point, dnext);
-
-                            if (rn != NULL) {
-                                if (fval(rn->terrain, FORBIDDEN_REGION))
-                                    continue;
-                                if (!fval(rn->terrain, SEA_REGION)) {
-                                    storm = false;
-                                    break;
-                                }
-                                if (rn != next_point)
-                                    rnext = rn;
-                            }
-                        }
-                        if (storm && rnext != NULL) {
+                        region *rnext = storm_redirect(current_point, next_point);
+                        if (rnext != NULL) {
                             ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
                                 sh, next_point, ship_damage_percent(sh) >= 100));
 
@@ -2812,4 +2816,9 @@ void follow_cmds(unit * u)
             }
         }
     }
+}
+
+region * test_storm_redirect(const region *current_point, const region *next_point)
+{
+    return storm_redirect(current_point, next_point);
 }
