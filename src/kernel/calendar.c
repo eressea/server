@@ -44,6 +44,11 @@ int first_turn(void)
     return config_get_int("game.start", 0);
 }
 
+int storm_factor(int month)
+{
+    return storms ? storms[month] : 0;
+}
+
 const gamedate *get_gamedate(int turn_now, gamedate * gd)
 {
     int weeks_per_year = months_per_year * weeks_per_month;

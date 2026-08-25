@@ -1984,7 +1984,7 @@ static void sail(unit * u, order * ord, bool drifting)
                 int stormyness;
                 gamedate date;
                 get_gamedate(turn, &date);
-                stormyness = storms ? storms[date.month] * 5 : 0;
+                stormyness = storm_factor(date.month) * 5;
 
                 /* storms should be the first thing we do. */
                 stormchance = stormyness / shipspeed(sh, u);

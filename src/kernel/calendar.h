@@ -34,5 +34,6 @@ void calendar_cleanup(void);
 const char* calendar_month(int index);
 const char* calendar_era(void);
 int first_turn(void);
+int storm_factor(int month);
 
 #endif
