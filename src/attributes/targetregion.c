@@ -1,12 +1,13 @@
 #include "targetregion.h"
 
-#include <kernel/region.h>
 
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
+#include <kernel/region.h>
+
 #include <util/resolve.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 static void
 write_targetregion(const variant *var, const void *owner, struct storage *store)

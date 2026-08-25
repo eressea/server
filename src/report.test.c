@@ -18,9 +18,10 @@
 #include "util/param.h"
 #include <util/language.h>
 
-#include <memstream.h>
-#include <stream.h>
-#include <strings.h>
+#include <storage/memstream.h>
+#include <storage/stream.h>
+
+#include <clibs/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

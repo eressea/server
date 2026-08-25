@@ -24,10 +24,10 @@
 #include <util/log.h>
 #include <util/message.h>
 
-#include <strings.h>
-
 #include <attributes/key.h>
 #include <attributes/racename.h>
+
+#include <clibs/strings.h>
 
 #include <lua.h>
 #include <lauxlib.h>

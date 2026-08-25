@@ -35,8 +35,9 @@
 #include <kernel/objtypes.h>
 #include <kernel/pool.h>
 
-#include <strings.h>
-#include <selist.h>
+#include <clibs/strings.h>
+#include <clibs/selist.h>
+
 #include <stb_ds.h>
 
 #include <tests.h>

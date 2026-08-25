@@ -59,7 +59,7 @@
 #include "util/rand.h"
 #include "util/rng.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <gb_string.h>
 #include <stb_ds.h>

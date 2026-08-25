@@ -4,7 +4,7 @@
 #include "util/stats.h"
 #include "util/password.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <CuTest.h>
 

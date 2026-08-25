@@ -21,7 +21,7 @@
 #include <util/resolve.h>
 #include <util/rng.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 #include <stb_ds.h>
 
 /* libc includes */

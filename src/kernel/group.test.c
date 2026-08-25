@@ -11,7 +11,7 @@
 #include <attributes/key.h>
 
 #include <stream.h>
-#include <storage.h>
+#include <storage/storage.h>
 #include <memstream.h>
 
 #include <CuTest.h>

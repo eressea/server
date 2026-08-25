@@ -14,7 +14,7 @@
 #include <kernel/region.h>
 #include <kernel/unit.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <assert.h>

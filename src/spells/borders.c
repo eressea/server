@@ -20,7 +20,7 @@
 #include "util/rng.h"
 #include "util/resolve.h"
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <assert.h>
 #include <stdlib.h>

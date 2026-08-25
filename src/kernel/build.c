@@ -40,7 +40,7 @@
 #include <util/parser.h>
 #include <util/resolve.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* from libc */
 #include <assert.h>

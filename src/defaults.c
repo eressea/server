@@ -63,10 +63,10 @@
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
 
-#include <iniparser.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
+#include <iniparser.h>
 
 /* libc includes */
 #include <assert.h>
@@ -79,7 +79,7 @@
 #include <limits.h>
 
 /**
-	- Die alten Befehle nicht beim Befehle laden löschen, sondern in u->defaults befördern
+	- Die alten Befehle nicht beim Befehle laden lï¿½schen, sondern in u->defaults befï¿½rdern
 	- Dann (hier) beim setzen des langen Befehls wegschmeissen, es sei denn es ist ein K_MOVE,
 	- im Falle von K_MOVE eine Variante von update_defaults machen, nur lange Befehle behalten.
 */

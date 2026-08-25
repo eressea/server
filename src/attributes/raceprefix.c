@@ -2,7 +2,7 @@
 
 #include <kernel/attrib.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <assert.h>
 #include <string.h>

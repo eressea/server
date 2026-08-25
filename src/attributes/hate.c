@@ -1,13 +1,13 @@
 #include "hate.h"
 
-#include <kernel/unit.h>
-
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
+#include <kernel/unit.h>
+
 #include <util/macros.h>
 #include <util/resolve.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 static int verify_hate(attrib * a, void *owner)
 {

@@ -22,7 +22,7 @@
 #include "util/crmessage.h"
 #include "util/nrmessage.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <expat.h>
 #include <stb_ds.h>

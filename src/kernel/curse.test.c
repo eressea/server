@@ -15,7 +15,7 @@
 
 #include <binarystore.h>
 #include <memstream.h>
-#include <storage.h>
+#include <storage/storage.h>
 #include <stream.h>
 #include <tests.h>
 

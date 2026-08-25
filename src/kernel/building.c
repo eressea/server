@@ -1,27 +1,27 @@
-#include <kernel/config.h>
 #include "building.h"
 
 #include <attributes/reduceproduction.h>
 #include <spells/regioncurse.h>
 
 /* kernel includes */
+#include "attrib.h"
+#include "config.h"
 #include "curse.h"
-#include "item.h"
-#include "unit.h"
+#include "event.h"
 #include "faction.h"
+#include "gamedata.h"
+#include "item.h"
+#include "lighthouse.h"
+#include "messages.h"
+#include "order.h"
 #include "race.h"
 #include "region.h"
 #include "skill.h"
 #include "study.h"
 #include "terrain.h"
-#include "lighthouse.h"
+#include "unit.h"
 
 /* util includes */
-#include <kernel/attrib.h>
-#include <kernel/event.h>
-#include <kernel/gamedata.h>
-#include <kernel/messages.h>
-#include <kernel/order.h>
 
 #include <util/base36.h>
 #include <util/functions.h>
@@ -34,9 +34,10 @@
 #include <util/umlaut.h>
 // #include "util/variant.h" // IWYU pragma: keep
 
-#include <critbit.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+
+#include <clibs/critbit.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 
@@ -1026,7 +1027,7 @@ default_wage(const region * r, const race * rc)
     else {
         wage = wagetable[esize][2];
         if (rule_blessed_harvest() & HARVEST_WORK) {
-            /* Geändert in E3 */
+            /* Geï¿½ndert in E3 */
             wage += harvest_effect(r);
         }
     }

@@ -8,7 +8,7 @@
 #include <kernel/gamedata.h>
 #include <util/log.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 #include <math.h>
 #include <stdio.h>

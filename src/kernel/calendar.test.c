@@ -65,6 +65,18 @@ static void test_calendar(CuTest * tc)
     test_teardown();
 }
 
+static void test_storm_chance(CuTest * tc)
+{
+    test_setup();
+    CuAssertIntEquals(tc, 0, storm_factor(0));
+    storms = malloc(12 * sizeof(int));
+    storms[0] = 40;
+    CuAssertIntEquals(tc, 40, storm_factor(0));
+    config_set_int("rules.calendar.stormchance", 100);
+    CuAssertIntEquals(tc, 100, storm_factor(0));
+    test_teardown();
+}
+
 static void test_calendar_season(CuTest * tc)
 {
     test_setup();
@@ -118,6 +130,7 @@ CuSuite *get_calendar_suite(void)
     CuSuite *suite = CuSuiteNew();
     SUITE_ADD_TEST(suite, test_calendar_config);
     SUITE_ADD_TEST(suite, test_calendar);
+    SUITE_ADD_TEST(suite, test_storm_chance);
     SUITE_ADD_TEST(suite, test_calendar_season);
     SUITE_ADD_TEST(suite, test_gamedate);
     return suite;
