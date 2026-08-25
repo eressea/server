@@ -177,7 +177,9 @@ function run_turn(rules)
   end
   orderfile = eressea.config.get("config.orderfile") or config.basepath .. '/orders.' .. turn
   print("reading orders from " .. orderfile)
-  eressea.log.debug("executing turn " .. get_turn() .. " with " .. orderfile .. " with rules=" .. config.rules)
+  local str = config.rules or 'unknown'
+  str = string.format("executing turn %d with %s and %s ruleset", get_turn(), orderfile, str)
+  eressea.log.debug(str)
   local result = process(rules, orderfile)
   return result
 end
@@ -205,7 +207,7 @@ local rules = {}
 if config.rules then
   rules = require('eressea.' .. config.rules)
   eressea.log.info('loaded ' .. #rules .. ' modules for ' .. config.rules)
-else
+elseif not config.config then
   eressea.log.warning('no rule modules loaded, specify a game in eressea.ini or with -r')
 end
 run_turn(rules)

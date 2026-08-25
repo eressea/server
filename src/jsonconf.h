@@ -1,16 +1,10 @@
-#ifndef H_JSONCONF_H
-#define H_JSONCONF_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
-    struct cJSON;
+struct cJSON;
 
-    extern const char * json_relpath;
+extern const char * json_relpath;
 
-    void json_config(struct cJSON *str);
+void add_authority(const char *key, const char *path);
 
-#ifdef __cplusplus
-}
-#endif
-#endif
+void json_config(struct cJSON *str);
+void jsonconf_done(void);

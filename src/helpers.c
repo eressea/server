@@ -106,7 +106,7 @@ static void push_param(lua_State * L, char c, spellparameter* param)
     }
 }
 
-/** callback to use lua functions isntead of equipment */
+/** callback to use lua functions instead of equipment */
 static bool lua_equipunit(unit *u, const char *eqname, int mask) {
     lua_State *L = (lua_State *)global.vm_state;
     bool result = false;

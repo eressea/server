@@ -1,0 +1,11 @@
+{
+	"terrains": {
+		"grassland": {
+		  "size": 5000,
+		  "herbs": [ "h0", "h1", "h2", "h3", "h4", "h5" ],
+		  "seed": 3,
+		  "road": 50,
+		  "flags": [ "forest", "cavalry", "land", "walk", "sail", "fly" ]
+		}
+	}
+}

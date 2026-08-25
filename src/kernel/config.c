@@ -12,6 +12,7 @@
 #include "faction.h"
 #include "group.h"
 #include "item.h"
+#include "jsonconf.h"
 #include "messages.h"
 #include "move.h"
 #include "objtypes.h"
@@ -207,6 +208,7 @@ void kernel_done(void)
     reports_done();
     crmessage_done();
     translation_done();
+    jsonconf_done();
     mt_clear();
 }
 

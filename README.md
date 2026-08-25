@@ -9,7 +9,7 @@ Eressea depends on a number of external libraries. On a recent
 Debian-based Linux system, this is the apt-get command to
 install all of them:
 
-    sudo apt-get install git cmake gcc make luarocks \
+    sudo apt-get install git cmake gcc make \
         liblua5.2-dev libtolua-dev libncurses5-dev libsqlite3-dev \
         libcjson-dev libiniparser-dev libexpat1-dev libutf8proc-dev
 
@@ -33,6 +33,21 @@ Here's how you clone and build the source on Linux or macOS:
 
 If you got this far and all went well, you have built the server, and
 it will have passed some basic functionality tests.
+
+### Testing
+
+If you plan to do any development, there is also a whole suite of Lua tests
+that require the [lunit](https://github.com/dcurrie/lunit) unit testing framework. 
+This is best installed using the luarocks package manager:
+```
+ sudo apt-get install lua5.2 luarocks
+ luarocks config lua_version 5.2
+ luarocks config variables.LUA_INCDIR /usr/include/lua5.2
+ luarocks install --local lunitx
+```
+
+You should now be able to run the `s/runtests` script, which will execute
+all the tests.
 
 * [![Static Analysis](https://scan.coverity.com/projects/6742/badge.svg?flat=1)](https://scan.coverity.com/projects/6742/)
 * [![Build Status](https://api.travis-ci.org/eressea/server.svg?branch=develop)](https://travis-ci.org/eressea/server)
@@ -78,7 +93,7 @@ in "args". On my own computer, the configuration looks like this:
       "currentDir": "${env.ERESSEA_ROOT}",
       "env": {
         "ERESSEA_ROOT": "${workspaceRoot}",
-        "LUA_PATH": "${workspaceRoot}\\scripts\\?.lua;${env.LUA_PATH}"
+        "LUA_PATH": "${workspaceRoot}\\scripts\\?.lua;${workspaceRoot}\\scripts\\?\\init.lua;${env.LUA_PATH}"
       },
       "name": "eressea.exe"
     },
@@ -95,6 +110,6 @@ in "args". On my own computer, the configuration looks like this:
 Note that I have an environment variable for my game directory called ERESSEA_ROOT. My LUA_PATH also contains the luarocks installation.
 
 ```
-LUA_PATH=C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?.lua
+LUA_PATH=C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?.lua;C:\Users\Enno\AppData\Roaming\Luarocks\share\lua\5.4\?\init.lua
 ERESSEA_ROOT C:\Users\Enno\Documents\Eressea\test
 ```

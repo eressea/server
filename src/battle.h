@@ -193,8 +193,6 @@ enum { ALLY_SELF, ALLY_ANY };
 
 int get_unitrow(const fighter* af, const side* vs);
 
-int count_enemies(struct battle *b, const struct fighter *af,
-    int minrow, int maxrow, int select);
 bool escapes_tactics(const fighter *af, const troop dt);
 troop select_enemy(struct fighter* af, int minrow, int maxrow,
     int select);
@@ -202,6 +200,7 @@ troop select_ally(struct fighter* af, int minrow, int maxrow,
     int allytype);
 int get_tactics(const struct side* as, const struct side* ds);
 
+int count_enemies(const struct fighter* af, int minrow, int maxrow, int select);
 int natural_armor(struct unit* u);
 const struct armor_type* select_armor(struct troop t, bool shield);
 const struct weapon* select_weapon(const struct troop t, bool attacking, bool ismissile);

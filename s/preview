@@ -126,6 +126,8 @@ shift $((OPTIND-1))
 [ -z "$1" ] && usage
 [ -z "$SOURCE" ] && SOURCE="$ERESSEA/git"
 [ -d "$SOURCE" ] || abort "missing source directory: $SOURCE"
+eval $(luarocks path)
+export LUA_PATH="$SOURCE/scripts/?.lua;$SOURCE/scripts/?/init.lua;$LUA_PATH"
 LIVE="$ERESSEA/game-$game"
 TESTROOT="$LIVE/test"
 

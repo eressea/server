@@ -1,15 +1,20 @@
 #include "charming.h"
 
+#include "spells.h"
+#include "laws.h"
+#include "magic.h"
+
+#include <kernel/curse.h>
 #include <kernel/faction.h>
 #include <kernel/order.h>
 #include <kernel/skill.h>
 #include <kernel/unit.h>
 
+#include <util/base36.h>
 #include <util/keyword.h>
 #include <util/rand.h>
 
-#include <laws.h>
-#include <magic.h>
+#include <strings.h>
 #include <tests.h>
 
 #include <stb_ds.h>
@@ -38,6 +43,39 @@ static void test_charm_unit(CuTest * tc)
     age_unit(&u);
     CuAssertTrue(tc, unit_is_slaved(u));
     age_unit(&u);
+    CuAssertTrue(tc, !unit_is_slaved(u));
+    CuAssertPtrEquals(tc, f, u->faction);
+
+    test_teardown();
+}
+
+static void test_charm_unit_dispell(CuTest *tc)
+{
+    unit *u, *mage;
+    faction *f;
+    castorder co;
+    spellparameter param, *args = NULL;
+    curse *c;
+
+    test_setup();
+    u = test_create_unit(f = test_create_faction(), test_create_plain(0, 0));
+    mage = test_create_unit(test_create_faction(), u->region);
+    charm_unit(u, mage, 3.0, 2);
+    CuAssertTrue(tc, unit_is_slaved(u));
+    CuAssertPtrEquals(tc, mage->faction, u->faction);
+    CuAssertPtrNotNull(tc, c = get_curse(u->attribs, &ct_slavery));
+
+    param.flag = TARGET_OK;
+    param.typ = SPP_UNIT;
+    param.data.u = u;
+    arrput(args, param);
+
+    param.typ = SPP_STRING;
+    param.data.xs = str_strdup(itoa36(c->no));
+    arrput(args, param);
+
+    test_create_castorder(&co, u, 5, 5., 0, args);
+    sp_break_curse(&co);
     CuAssertTrue(tc, !unit_is_slaved(u));
     CuAssertPtrEquals(tc, f, u->faction);
 
@@ -177,6 +215,7 @@ CuSuite *get_charming_suite(void)
     CuSuite *suite = CuSuiteNew();
 
     SUITE_ADD_TEST(suite, test_charm_unit);
+    SUITE_ADD_TEST(suite, test_charm_unit_dispell);
     SUITE_ADD_TEST(suite, test_charmingsong);
     SUITE_ADD_TEST(suite, test_charmed_unit_original_faction_dies);
     SUITE_ADD_TEST(suite, test_charmed_unit_new_faction_dies);

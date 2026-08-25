@@ -169,6 +169,12 @@ static int tolua_translate(lua_State * L)
     return 0;
 }
 
+static int tolua_rng_seed(lua_State * L) {
+    int seed = (int)tolua_tonumber(L, 1, 0);
+    rng_init(seed);
+    return 0;
+}
+
 static int tolua_random(lua_State * L)
 {
     lua_pushinteger(L, rng_int());
@@ -943,6 +949,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         {
             tolua_function(L, "inject", lua_rng_default);
             tolua_function(L, "random", tolua_random);
+            tolua_function(L, "seed", tolua_rng_seed);
         }
         tolua_endmodule(L);
         tolua_function(L, "rng_int", tolua_random);
@@ -1030,7 +1037,7 @@ int tolua_bindings_open(lua_State * L, const dictionary *inifile)
         tolua_function(L, "write_scores", tolua_write_scores);
         tolua_function(L, "update_owners", tolua_update_owners);
         tolua_function(L, "create_curse", tolua_create_curse);
-        tolua_function(L, "translate", &tolua_translate);
+        tolua_function(L, "translate", tolua_translate);
         tolua_function(L, "spells", tolua_get_spells);
         tolua_function(L, "equip_newunits", tolua_equip_newunits);
     } tolua_endmodule(L);
@@ -1074,8 +1081,21 @@ static int run_script(lua_State *L, const char *luafile) {
 
     F = fopen(luafile, "r");
     if (!F) {
-        log_debug("dofile('%s'): %s", luafile, strerror(errno));
-        return errno;
+        /* try the scripts in the install directory */
+        const char *install_dir = config_get("config.install");
+        if (install_dir) {
+            char scripts[PATH_MAX], filename[PATH_MAX];
+            join_path(install_dir, "scripts", scripts, sizeof(scripts));
+            join_path(scripts, luafile, filename, sizeof(filename));
+            F = fopen(filename, "r");
+            if (F) {
+                luafile = filename;
+            }
+        }
+        if (!F) {
+            log_debug("dofile('%s'): %s", luafile, strerror(errno));
+            return errno;
+        }
     }
     fclose(F);
 
@@ -1105,9 +1125,7 @@ int eressea_run(lua_State *L, const char *luafile)
     lua_getfield(L, -1, "traceback");
     lua_remove(L, -2);
 
-    /* try to run configuration scripts: */
-    err = run_script(L, "custom.lua");
-
+    
     /* run the main script */
     if (luafile) {
         err = run_script(L, luafile);

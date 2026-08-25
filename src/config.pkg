@@ -5,6 +5,7 @@ $#include "bind_config.h"
 module eressea {
   module config {
     void bind_config_reset @ reset(void);
+    void bind_config_add_authority @ add_authority(const char *key, const char *path);
     int bind_config_read @ read(const char *filename, const char *relpath);
     int bind_config_parse @ parse(const char *json);
     const char * bind_config_get @ get(const char *key);

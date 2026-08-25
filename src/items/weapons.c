@@ -50,7 +50,7 @@ int *casualties)
     const char *damage = "2d8";
     int force = 1 + rng_int() % 10;
     int enemies =
-        count_enemies(fi->side->battle, fi, 0, 1, SELECT_ADVANCE | SELECT_DISTANCE);
+        count_enemies(fi, 0, 1, SELECT_ADVANCE | SELECT_DISTANCE);
 
     if (!enemies) {
         if (casualties)
@@ -78,7 +78,6 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
 {
     fighter *af = at->fighter;
     unit *au = af->unit;
-    battle *b = af->side->battle;
     troop dt;
     int shots = INT_MAX, d = 0, enemies;
     const resource_type *rtype;
@@ -99,7 +98,7 @@ attack_catapult(const troop * at, const struct weapon_type *wtype,
         }
     }
 
-    enemies = count_enemies(b, af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
+    enemies = count_enemies(af, FIGHT_ROW, FIGHT_ROW, SELECT_ADVANCE);
     if (enemies > CATAPULT_ATTACKS) enemies = CATAPULT_ATTACKS;
     if (enemies == 0) {
         return false;

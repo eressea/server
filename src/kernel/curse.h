@@ -146,6 +146,7 @@ extern "C" {
         int(*cansee) (const struct faction *, const void *, objtype_t,
             const struct curse *, int);
         int(*age) (struct curse *, void *);
+        void(*remove) (const struct curse *);
         void(*construct) (struct curse *);
         void(*destroy) (struct curse *);
     } curse_type;

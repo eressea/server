@@ -1174,7 +1174,7 @@ static void test_reports_genpassword(CuTest *tc) {
     test_setup();
     mt_create_va(mt_new("changepasswd", NULL), "value:string", MT_NEW_END);
     f = test_create_faction();
-    CuAssertIntEquals(tc, 0, f->lastorders);
+    CuAssertIntEquals(tc, -1, f->lastorders);
     CuAssertIntEquals(tc, 0, f->password_id);
     f->options = 0;
     /* writing the report does not change the password */

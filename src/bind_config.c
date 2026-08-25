@@ -27,6 +27,11 @@ void bind_config_reset(void) {
     free_configuration();
 }
 
+void bind_config_add_authority(const char *key, const char *path)
+{
+    add_authority(key, path);
+}
+
 int bind_config_parse(const char *json)
 {
     cJSON * conf = cJSON_Parse(json);
@@ -62,7 +67,7 @@ int bind_config_read(const char *filename, const char * relpath)
     FILE *F;
 
     json_relpath = relpath;
-    if (relpath) {
+    if (relpath && relpath[0]) {
         char name[PATH_MAX];
         path_join(relpath, filename, name, sizeof(name));
         F = fopen(name, "r");
@@ -82,6 +87,7 @@ int bind_config_read(const char *filename, const char * relpath)
             size_t sz = (size_t)size;
 
             data = malloc(sz+1);
+            if (!data) abort();
             sz = fread(data, 1, sz, F);
             data[sz] = 0;
             fclose(F);

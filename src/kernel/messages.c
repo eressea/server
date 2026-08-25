@@ -155,7 +155,7 @@ struct message *msg_feedback(const struct unit *u, struct order *ord,
         msg = msg_create(mtype, args);
     }
     if (ord && is_silent(ord)) {
-        msg->is_silent = 1;
+        msg->is_silent = -1;
     }
 
     return msg;

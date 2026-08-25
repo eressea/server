@@ -1,3 +1,16 @@
+# 31.0
+	- Es wurde ein Bug gefixt, der bei Orks das Lernen von 
+	  Kampftalenten verlangsamt hat, nicht nur das von allen
+	  anderen. 
+	- Wenn in einem Kampf zwei Heere gleich gute Taktiker haben, 
+	  dann ist die Chance, von einem Kämpfer aus dem jeweils 
+	  anderen Heer getroffen zu werden nach der neuen Taktikregel
+	  Null. Das hat allerdings nur für Angriffe mit einer Waffe
+	  gegolten, und z.B. nicht für magische Attacken.
+	- Die Schneekugel macht aus Feuerwänden keine Vulkane mehr.
+	- Fehler im Gesang der Versklavung, der bei besonders großen
+	  Ziel-Einheiten deren Magieresistenz ausgeschaltet hat.
+
 # 30.4.1
 	- Verzauberungen, die eigene Daten speichern, müssen Speicher
 	  reservieren, in den sie sie laden (null-pointer crash).
