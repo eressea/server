@@ -882,13 +882,18 @@ static void test_follow_ship_msg(CuTest * tc) {
 
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
+    ship_type * stype;
     region * r;
     test_setup();
     config_set("rules.ship.drifting", "1");
     r = test_create_ocean(0, 0);
-    sh = test_create_ship(r, NULL);
+    stype = test_create_shiptype("fisher");
+    stype->fishing = 1;
+    sh = test_create_ship(r, stype);
+    CuAssertIntEquals(tc, 0, sh->flags);
     drifting_ships(r);
     CuAssertPtrEquals(tc, r, sh->region);
+    CuAssertIntEquals(tc, SF_DRIFTED|SF_FISHING, sh->flags);
     test_teardown();
 }
 
