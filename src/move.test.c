@@ -919,6 +919,38 @@ static void test_storms(CuTest *tc) {
     test_teardown();
 }
 
+static void test_storm_redirect(CuTest *tc) {
+    region *r, *r1, *r2;
+    terrain_type *t_fire;
+
+    /* drift into an adjacent ocean, but not the original destination */
+    test_setup();
+    r = test_create_ocean(0, 0);
+    r1 = test_create_ocean(0, 1);
+    r2 = test_create_ocean(1, 0);
+
+    CuAssertPtrEquals(tc, r2, storm_redirect(r, r1));
+
+    /* do not drift if there is an adjacent non-ocean */
+    r = test_create_ocean(10, 0);
+    r1 = test_create_ocean(10, 1);
+    r2 = test_create_ocean(11, 0);
+    test_create_plain(10, -1); // protects from storm
+
+    CuAssertPtrEquals(tc, NULL, storm_redirect(r, r1));
+
+    /* bug 3119: do not drift if there is an adjacent firewall */
+    t_fire = test_create_terrain("firewall", FORBIDDEN_REGION);
+    r = test_create_ocean(20, 0);
+    r1 = test_create_ocean(20, 1);
+    r2 = test_create_ocean(21, 0);
+    test_create_region(20, -1, t_fire);
+
+    CuAssertPtrEquals(tc, NULL, storm_redirect(r, r1));
+
+    test_teardown();
+}
+
 static void test_drifting_ships(CuTest *tc) {
     ship *sh;
     ship_type * stype;
@@ -1643,6 +1675,7 @@ CuSuite *get_move_suite(void)
     SUITE_ADD_TEST(suite, test_follow_ship_msg);
 
     SUITE_ADD_TEST(suite, test_storms);
+    SUITE_ADD_TEST(suite, test_storm_redirect);
     SUITE_ADD_TEST(suite, test_drifting_ships);
     SUITE_ADD_TEST(suite, test_drift_target);
     SUITE_ADD_TEST(suite, test_drift_reason);
