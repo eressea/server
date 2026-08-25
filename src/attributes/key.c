@@ -5,8 +5,10 @@
 
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
+
 #include <util/log.h>
-#include <storage.h>
+
+#include <storage/storage.h>
 
 #include <errno.h>
 #include <stdlib.h>

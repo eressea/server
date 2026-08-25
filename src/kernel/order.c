@@ -16,7 +16,7 @@
 #include <util/parser.h>
 
 #include <stream.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

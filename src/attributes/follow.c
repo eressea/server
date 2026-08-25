@@ -1,12 +1,12 @@
 #include "follow.h"
 
-#include <kernel/unit.h>
-
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
+#include <kernel/unit.h>
+
 #include <util/variant.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 static int read_follow(variant * var, void *owner, gamedata *data)
 {

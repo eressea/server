@@ -62,10 +62,11 @@
 #include <util/umlaut.h>
 #include <util/variant.h>
 
-#include <critbit.h>
-#include <selist.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+
+#include <clibs/critbit.h>
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

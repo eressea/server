@@ -4,17 +4,18 @@
 #include "config.h"
 #include "ally.h"
 
+#include "attrib.h"
 #include "unit.h"
 #include "region.h"
+#include "gamedata.h"
 #include "group.h"
 #include "faction.h"
 #include "objtypes.h"
 
-#include <kernel/attrib.h>
-#include <kernel/gamedata.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

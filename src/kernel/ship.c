@@ -33,8 +33,8 @@
 
 #include <critbit.h>
 #include <selist.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 
@@ -613,8 +613,8 @@ const char *ship_getname(const ship * sh)
 }
 
 int ship_damage_percent(const ship *sh) {
-    /* Schaden muss granularer sein als Größe, deshalb ist er skaliert
-     * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Größenpunkt.
+    /* Schaden muss granularer sein als Grï¿½ï¿½e, deshalb ist er skaliert
+     * DAMAGE_SCALE ist der Faktor zwischen 1 Schadenspunkt und 1 Grï¿½ï¿½enpunkt.
      */
     if (sh->damage > 0) {
         double d = (sh->damage * 100.) / ((double)DAMAGE_SCALE * sh->size);

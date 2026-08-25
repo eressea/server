@@ -1,6 +1,7 @@
 #include "alliance.h"
 
-/* kernel includes */
+/* other kernel includes */
+#include "attrib.h"
 #include "calendar.h"
 #include "config.h"
 #include "building.h"
@@ -14,7 +15,6 @@
 #include <attributes/key.h>
 
 /* util includes */
-#include <kernel/attrib.h>
 #include <util/base36.h>
 #include <util/language.h>
 #include <util/message.h>
@@ -22,8 +22,8 @@
 #include <util/rng.h>
 #include <util/umlaut.h>
 
-#include <selist.h>
-#include <strings.h>
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

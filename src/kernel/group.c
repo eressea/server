@@ -19,8 +19,8 @@
 #include <kernel/attrib.h>
 #include <kernel/gamedata.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

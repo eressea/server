@@ -16,7 +16,7 @@
 #include <kernel/gamedata.h>
 #include <kernel/event.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <stdio.h>

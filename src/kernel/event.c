@@ -5,8 +5,8 @@
 #include <kernel/gamedata.h>
 #include <util/log.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>

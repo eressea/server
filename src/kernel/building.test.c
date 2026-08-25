@@ -10,7 +10,7 @@
 
 #include <util/variant.h> // IWYU pragma: keep
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

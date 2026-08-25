@@ -19,7 +19,7 @@
 #include <util/goodies.h>
 #include <util/resolve.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <stdlib.h>

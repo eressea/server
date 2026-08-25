@@ -15,9 +15,10 @@
 #include <util/param.h>
 #include <util/password.h>
 
+#include <clibs/strings.h>
+
 #include <CuTest.h>
 #include <tests.h>
-#include <strings.h>
 
 #include <stdbool.h> 
 #include <stdio.h>

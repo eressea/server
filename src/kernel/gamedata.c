@@ -5,7 +5,7 @@
 
 #include <util/log.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 #include <filestream.h>
 #include <memstream.h>
 #include <binarystore.h>

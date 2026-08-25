@@ -3,10 +3,11 @@
 #include <kernel/gamedata.h>
 #include <util/variant.h>     // for variant
 
-#include <memstream.h>
-#include <storage.h>
-#include <stream.h>           // for stream, stream_i
-#include <strings.h>
+#include <storage/memstream.h>
+#include <storage/storage.h>
+#include <storage/stream.h>           // for stream, stream_i
+
+#include <clibs/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

@@ -1,3 +1,5 @@
+#include "seenspell.h"
+
 #include <kernel/faction.h>
 #include <kernel/spell.h>
 #include <kernel/spellbook.h>
@@ -6,10 +8,10 @@
 #include <util/log.h>
 #include <util/macros.h>
 
-#include "seenspell.h"
 
-#include <selist.h>
-#include <storage.h>
+#include <storage/storage.h>
+
+#include <clibs/selist.h>
 
 #include <stdlib.h>
 #include <string.h>

@@ -49,7 +49,7 @@
 /* external libraries */
 #include <critbit.h>
 #include <iniparser.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <stdio.h>

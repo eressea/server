@@ -60,8 +60,9 @@
 #include <util/rand.h>
 #include <util/rng.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
+
 #include <stb_ds.h>
 
 /* libc includes */

@@ -29,9 +29,9 @@
 #include <util/path.h>
 
 #include <memstream.h>
-#include <storage.h>
+#include <storage/storage.h>
 #include <stream.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <CuTest.h>
 #include <tests.h>

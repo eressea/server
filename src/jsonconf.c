@@ -39,7 +39,7 @@
 #include "util/path.h"
 #include "util/pofile.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* external libraries */
 #include <stb_ds.h>

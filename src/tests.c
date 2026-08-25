@@ -42,7 +42,7 @@
 #include "util/stats.h"
 #include "util/variant.h"      // for variant, VAR_VOIDPTR, VAR_INT
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 #include <CuTest.h>

@@ -68,9 +68,9 @@
 #include <binarystore.h>
 #include <filestream.h>
 #include <selist.h>
-#include <storage.h>
+#include <storage/storage.h>
 #include <stream.h>
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

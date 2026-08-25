@@ -10,8 +10,8 @@
 #include <util/variant.h>
 
 #include <stb_ds.h>
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 #include <assert.h>
 #include <stdlib.h>

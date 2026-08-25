@@ -89,10 +89,10 @@
 #include <spells/regioncurse.h>
 #include <spells/unitcurse.h>
 
-#include <iniparser.h>
-#include <selist.h>
-#include <strings.h>
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
+#include <iniparser.h>
 #include <stb_ds.h>
 
 /* libc includes */

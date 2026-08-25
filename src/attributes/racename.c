@@ -2,7 +2,7 @@
 
 #include <kernel/attrib.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <stdlib.h>

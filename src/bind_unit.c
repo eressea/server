@@ -40,7 +40,7 @@
 #include <util/order_parser.h>        // for OP_Parser, OrderParserStruct
 #include <util/variant.h>
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

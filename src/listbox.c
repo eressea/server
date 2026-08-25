@@ -1,6 +1,6 @@
 #include "listbox.h"
 
-#include <strings.h>
+#include <clibs/strings.h>
 
 #include <curses.h>
 

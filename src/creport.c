@@ -69,10 +69,10 @@ static char g_bigbuf[BUFFERSIZE];
 #include <util/message.h>
 #include <util/nrmessage.h>
 
-#include <filestream.h>
-#include <selist.h>
-#include <stream.h>
-#include <strings.h>
+#include <storage/filestream.h>
+#include <storage/stream.h>
+#include <clibs/selist.h>
+#include <clibs/strings.h>
 
 #include <stb_ds.h>
 

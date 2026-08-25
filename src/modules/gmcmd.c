@@ -23,7 +23,7 @@
 #include <kernel/gamedata.h>
 #include <util/macros.h>
 
-#include <storage.h>
+#include <storage/storage.h>
 
 /* libc includes */
 #include <stdlib.h>

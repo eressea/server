@@ -10,8 +10,8 @@
 #include <util/resolve.h>
 #include <util/lists.h>
 
-#include <storage.h>
-#include <strings.h>
+#include <storage/storage.h>
+#include <clibs/strings.h>
 
 /* libc includes */
 #include <assert.h>
