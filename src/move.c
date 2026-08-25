@@ -1921,24 +1921,27 @@ static void harbour_taxes(region *r, unit *captain, unit *harbourmaster)
 region * storm_redirect(const region *current_point, const region *next_point)
 {
     int d_offset = rng_int() % MAXDIRECTIONS;
-    direction_t d;
+    region *rnext = NULL;
     /* Sturm nur, wenn naechste Region Hochsee ist. */
-    for (d = 0; d != MAXDIRECTIONS; ++d) {
+    for (direction_t d = 0; d != MAXDIRECTIONS; ++d) {
         direction_t dnext = (direction_t)((d + d_offset) % MAXDIRECTIONS);
         region *rn = rconnect(current_point, dnext);
 
         if (rn != NULL) {
-            if (fval(rn->terrain, FORBIDDEN_REGION))
-                continue;
             if (!fval(rn->terrain, SEA_REGION)) {
+                rnext = NULL;
                 break;
             }
+            if (fval(rn->terrain, FORBIDDEN_REGION)) {
+                // do we even *have* forbidden sea regions?
+                continue;
+            }
             if (rn != next_point) {
-                return rn;
+                rnext = rn;
             }
         }
     }
-    return NULL;
+    return rnext;
 }
 
 void sail(unit * u, order * ord, bool drifting)

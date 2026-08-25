@@ -948,6 +948,16 @@ static void test_storm_redirect(CuTest *tc) {
 
     CuAssertPtrEquals(tc, NULL, storm_redirect(r, r1));
 
+    // we do not ave forbidden oceans, do we? but if we did,
+    // they would surely not count as coasts.
+    t_fire = test_create_terrain("deepsea", FORBIDDEN_REGION|SEA_REGION);
+    r = test_create_ocean(20, 0);
+    r1 = test_create_ocean(20, 1);
+    r2 = test_create_ocean(21, 0);
+    test_create_region(20, -1, t_fire);
+
+    CuAssertPtrEquals(tc, r2, storm_redirect(r, r1));
+
     test_teardown();
 }
 
