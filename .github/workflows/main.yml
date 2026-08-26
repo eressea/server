@@ -45,3 +45,8 @@ jobs:
         with:
           args: "-DCMAKE_BUILD_TYPE=Debug"
           run-test: true
+      - name: Integration Test
+        run: |
+          cd tests
+          ./run-turn.sh
+  
