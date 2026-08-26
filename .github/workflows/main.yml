@@ -6,7 +6,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master, develop ]
+    branches: [ master, develop, gh ]
   pull_request:
     branches: [ master, develop ]
 
@@ -45,3 +45,8 @@ jobs:
         with:
           args: "-DCMAKE_BUILD_TYPE=Debug"
           run-test: true
+      - name: Integration Test
+        run: |
+          cd tests
+          ./run-turn.sh
+  
