@@ -285,7 +285,7 @@
       "flags": [ "land", "walk", "sail" ]
     },
     "wall1": {
-      "flags": [ "forbidden", "land" ]
+      "flags": [ "forbidden" ]
     }
   }
 }

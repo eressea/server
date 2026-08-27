@@ -594,7 +594,15 @@ static void test_terrains(CuTest * tc)
         "\"size\": 4000, "
         "\"road\": 50, "
         "\"seed\": 3, "
-        "\"flags\" : [ \"forbidden\", \"arctic\", \"cavalry\", \"sea\", \"forest\", \"land\", \"fly\", \"swim\", \"walk\" ] } }}";
+        "\"flags\" : [ \"arctic\", \"cavalry\", \"forest\", \"land\", \"fly\", \"swim\", \"walk\" ] "
+        "},"
+        "\"ocean\" : {"
+        "\"flags\" : [ \"sea\" ] "
+        "}, "
+        "\"fog\" : { "
+        "\"flags\" : [ \"forbidden\" ] "
+        "}"
+        "}}";
     const terrain_type *ter;
 
     cJSON *json = cJSON_Parse(data);
@@ -603,10 +611,13 @@ static void test_terrains(CuTest * tc)
     CuAssertPtrNotNull(tc, json);
     CuAssertPtrEquals(tc, NULL, (void *)get_terrain("plain"));
 
-    json_config(json);
-    ter = get_terrain("plain");
-    CuAssertPtrNotNull(tc, ter);
-    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | SEA_REGION | FOREST_REGION | CAVALRY_REGION | FORBIDDEN_REGION | FLY_INTO | WALK_INTO | SWIM_INTO , ter->flags);
+    CuAssertTrue(tc, json_config(json));
+    CuAssertPtrNotNull(tc, ter = get_terrain("fog"));
+    CuAssertIntEquals(tc, FORBIDDEN_REGION, ter->flags);
+    CuAssertPtrNotNull(tc, ter = get_terrain("ocean"));
+    CuAssertIntEquals(tc, SEA_REGION, ter->flags);
+    CuAssertPtrNotNull(tc, ter = get_terrain("plain"));
+    CuAssertIntEquals(tc, ARCTIC_REGION | LAND_REGION | FOREST_REGION | CAVALRY_REGION | FLY_INTO | WALK_INTO | SWIM_INTO , ter->flags);
     CuAssertIntEquals(tc, 4000, ter->size);
     CuAssertIntEquals(tc, 50, ter->max_road);
     CuAssertIntEquals(tc, 3, ter->distribution);
