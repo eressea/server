@@ -259,11 +259,18 @@ static void json_terrain_production(cJSON *json, terrain_production *prod) {
     }
 }
 
-static void json_terrain(cJSON *json, terrain_type *ter) {
+static int popcnt8(unsigned char x) {
+    x = (x & 0x55) + (x >> 1 & 0x55);
+    x = (x & 0x33) + (x >> 2 & 0x33);
+    x = (x & 0x0f) + (x >> 4 & 0x0f);
+    return x;
+}
+
+static bool json_terrain(cJSON *json, terrain_type *ter) {
     cJSON *child;
     if (json->type != cJSON_Object) {
         log_error("terrain %s is not a json object: %d", json->string, json->type);
-        return;
+        return false;
     }
     for (child = json->child; child; child = child->next) {
         switch (child->type) {
@@ -285,6 +292,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                         tp->chance = 1.0f;
                         if (entry->type != cJSON_Object) {
                             log_error("terrain %s contains invalid production %s", json->string, entry->string);
+                            return false;
                         }
                         else {
                             json_terrain_production(entry, ter->production + n);
@@ -294,6 +302,7 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             }
             else {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+                return false;
             }
             break;
         case cJSON_String:
@@ -303,14 +312,21 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             }
             else {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+                return false;
             }
             break;
         case cJSON_Array:
             if (strcmp(child->string, "flags") == 0) {
+                unsigned char type;
                 const char * flags[] = {
                     "land", "sea", "forest", "arctic", "cavalry", "forbidden", "sail", "fly", "swim", "walk", 0
                 };
                 ter->flags |= json_flags(child, flags);
+                type = ter->flags & (SEA_REGION|LAND_REGION|FORBIDDEN_REGION);
+                if (popcnt8(type) > 1) {
+                    log_error("terrain %s contains more than one of sea, land, forbidden (%u)", json->string, type);
+                    return false;
+                }
             }
             else if (strcmp(child->string, "herbs") == 0) {
                 cJSON *entry;
@@ -327,7 +343,8 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
                 }
             }
             else {
-                log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+                log_error("terrain %s contains unknown attribute[] %s", json->string, child->string);
+                return false;
             }
             break;
         case cJSON_Number:
@@ -342,12 +359,15 @@ static void json_terrain(cJSON *json, terrain_type *ter) {
             }
             else {
                 log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+                return false;
             }
             break;
         default:
             log_error("terrain %s contains unknown attribute %s", json->string, child->string);
+                return false;
         }
     }
+    return true;
 }
 
 static void json_stage(cJSON *json, building_stage *stage) {
@@ -807,15 +827,18 @@ static void json_disable_features(cJSON *json) {
     }
 }
 
-static void json_terrains(cJSON *json) {
+static bool json_terrains(cJSON *json) {
     cJSON *child;
     if (json->type != cJSON_Object) {
         log_error("terrains is not a json object: %d", json->type);
-        return;
+        return false;
     }
     for (child = json->child; child; child = child->next) {
-        json_terrain(child, get_or_create_terrain(child->string));
+        if (!json_terrain(child, get_or_create_terrain(child->string))) {
+            return false;
+        }
     }
+    return true;
 }
 
 static void json_buildings(cJSON *json) {
@@ -1392,12 +1415,12 @@ static void json_include(cJSON *json) {
     }
 }
 
-void json_config(cJSON *json) {
+bool json_config(cJSON *json) {
     cJSON *child;
     assert(json);
     if (json->type != cJSON_Object) {
         log_error("config is not a json object: %d", json->type);
-        return;
+        return false;
     }
     for (child = json->child; child; child = child->next) {
         if (strcmp(child->string, "races") == 0) {
@@ -1449,13 +1472,17 @@ void json_config(cJSON *json) {
             json_disable_features(child);
         }
         else if (strcmp(child->string, "terrains") == 0) {
-            json_terrains(child);
+            if (!json_terrains(child)) {
+                return false;
+            }
             init_terrains();
         }
         else {
             log_error("config contains unknown attribute %s", child->string);
+            return false;
         }
     }
+    return true;
 }
 
 void jsonconf_done(void) {

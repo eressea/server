@@ -1,6 +1,6 @@
 dofile('../scripts/run-turn.lua')
 turn = get_turn()
 eressea.free_game()
-print("trying to read data from " .. turn)
+print("trying to re-read data from " .. turn)
 eressea.read_game(turn .. ".dat")
 eressea.free_game()
