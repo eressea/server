@@ -39,7 +39,9 @@ int bind_config_parse(const char *json)
     /* create default resources: */
     init_resources();
     if (conf) {
-        json_config(conf);
+        if (!json_config(conf)) {
+            return 1;
+        }
         cJSON_Delete(conf);
         /* alte typen registrieren: */
         init_oldpotions();
