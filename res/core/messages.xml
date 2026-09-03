@@ -2639,7 +2639,7 @@
       <arg name="ship" type="ship"/>
     </type>
   </message>
-  <message name="shipnoshore" section="movement">
+  <message name="shipnoshore" section="errors">
     <type>
       <arg name="ship" type="ship"/>
       <arg name="region" type="region"/>
