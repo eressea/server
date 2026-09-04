@@ -10,7 +10,7 @@
 #include "kernel/config.h"
 #include "kernel/curse.h"
 #include "kernel/faction.h"
-#include "kernel/direction.h"          // for D_WEST, shortdirections, D_EAST, dire...
+#include "kernel/direction.h" 
 #include "kernel/region.h"
 #include "kernel/ship.h"
 #include "kernel/skill.h"       // for SK_SAILING, SK_RIDING
@@ -34,6 +34,7 @@
 #include <CuTest.h>
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 static void setup_move(void) {
