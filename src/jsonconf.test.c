@@ -5,7 +5,6 @@
 #include "jsonconf.h"
 
 #include "eressea.h"
-#include "move.h"
 #include "prefix.h"
 
 #include "kernel/build.h"     // for construction, requirement
