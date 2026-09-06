@@ -34,7 +34,7 @@ express()
 				echo "copy the express from archive"
 				ln "express/express-$TURN.txt" .
 			else
-				echo "no express this week"
+				echo "no express for turn $TURN"
 			fi
 		fi
 	fi
@@ -93,7 +93,7 @@ if [ ! -s "orders.$TURN" ]; then
 fi
 
 ## fetch the XE:
-express "$GAME" "$TURN"
+express "$GAME" $((TURN+1))
 ## pre-game backup, data and orders only:
 backup "$GAME" "$TURN"
 rm -f execute.lock
