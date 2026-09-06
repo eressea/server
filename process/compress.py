@@ -27,6 +27,9 @@ except:
     exit(0)
 
 extras = []
+if os.path.isfile("../attachments.txt"):
+    with open("../attachments.txt", 'r') as file:
+        extras = ['../' + line.strip() for line in file]
 stats = '../parteien'
 if os.path.isfile(stats):
     extra = 'wochenbericht-%s.txt' % turn
