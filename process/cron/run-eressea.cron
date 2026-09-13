@@ -96,7 +96,7 @@ fi
 
 (( NEXTTURN=TURN+1 )) || true
 ## fetch the future XE:
-express "$GAME" $NEXTTURN
+express "$GAME" "$NEXTTURN"
 ## pre-game backup, data and orders only:
 backup "$GAME" "$TURN"
 rm -f execute.lock
