@@ -7,34 +7,34 @@ GAME=$1
 
 backup_reports()
 {
-	GAME="$1"
-	TURN="$2"
-	files=("data/$TURN.dat" parteien.full parteien)
-	if [ -e "orders.$TURN" ]; then
-			files+=("orders.$TURN")
+	local game="$1"
+	local turn="$2"
+	local files=("data/$turn.dat" parteien.full parteien)
+	if [ -e "orders.$turn" ]; then
+			files+=("orders.$turn")
 	fi
-	echo "backup turn $TURN, game $GAME, files: ${files[*]}"
-	tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
-	echo "backup reports $TURN, game $GAME"
-	tar cjf "backup/$TURN-reports.tar.bz2" reports eressea.db
-	echo "backup/$TURN-reports.tar.bz2"
+	echo "backup turn $turn, game $game, files: ${files[*]}"
+	tar cjf "backup/$turn.tar.bz2" "${files[@]}"
+	echo "backup reports $turn, game $game"
+	tar cjf "backup/$turn-reports.tar.bz2" reports eressea.db
+	echo "backup/$turn-reports.tar.bz2"
 }
 
 express()
 {
-	GAME="$1"
-	TURN="$2"
-	cd "$ERESSEA/game-$GAME" || exit
+	local game="$1"
+	local turn="$2"
+	cd "$ERESSEA/game-$game" || exit
 	if [ -d express ]; then
-		if [ ! -e "express-$TURN.txt" ]; then
+		if [ ! -e "express-$turn.txt" ]; then
 			cd express || exit
 			git pull
 			cd - || exit
-			if [ -e "express/express-$TURN.txt" ];then
+			if [ -e "express/express-$turn.txt" ]; then
 				echo "copy the express from archive"
-				ln "express/express-$TURN.txt" .
+				ln "express/express-$turn.txt" .
 			else
-				echo "no express for turn $TURN"
+				echo "no express for turn $turn"
 			fi
 		fi
 	fi
@@ -42,22 +42,24 @@ express()
 
 backup()
 {
-	GAME="$1"
-	TURN="$2"
-	cd "$ERESSEA/game-$GAME" || exit
-	if [ ! -e "data/$TURN.dat" ]; then
-		exit 2
+	local game="$1"
+	local turn="$2"
+	echo "backup game $game, turn $turn"
+	cd "$ERESSEA/game-$game" || exit
+	if [ ! -e "data/$turn.dat" ]; then
+		echo "no such file $turn.dat"
+		return
 	fi
 	if [ ! -d backup ] ; then
-		mkdir -p "$HOME/backup/eressea/game-$GAME"
-		ln -sf "$HOME/backup/eressea/game-$GAME" backup
+		mkdir -p "$HOME/backup/eressea/game-$game"
+		ln -sf "$HOME/backup/eressea/game-$game" backup
 	fi
 
-	files=("data/$TURN.dat" parteien.full parteien)
-	if [ -e "orders.$TURN" ]; then
-		files+=("orders.$TURN")
+	local files=("data/$turn.dat" parteien.full parteien)
+	if [ -e "orders.$turn" ]; then
+		files+=("orders.$turn")
 	fi
-	tar cjf "backup/$TURN.tar.bz2" "${files[@]}"
+	tar cjf "backup/$turn.tar.bz2" "${files[@]}"
 }
 
 export ERESSEA
@@ -92,16 +94,16 @@ if [ ! -s "orders.$TURN" ]; then
 	exit 2
 fi
 
-## fetch the XE:
-express "$GAME" $((TURN+1))
+(( NEXTTURN=TURN+1 )) || true
+## fetch the future XE:
+express "$GAME" $NEXTTURN
 ## pre-game backup, data and orders only:
 backup "$GAME" "$TURN"
 rm -f execute.lock
 "$BIN/run-turn" "$GAME" "$TURN"
-"$BIN/updatelist.sh" "$TURN"
+echo "finished with code $?"
 touch execute.lock
 
-(( NEXTTURN=TURN+1 )) || true
 if [ ! -e "$DATA/$NEXTTURN.dat" ]; then
 	echo "server did not create data file $NEXTTURN.dat"
 	exit 5
@@ -110,21 +112,23 @@ if [ ! -s "$REPORTS/reports.txt" ]; then
 	echo "server did not create reports.txt in game $GAME"
 	exit 4
 fi
-TURN=$NEXTTURN
-if [ ! -s "$ERESSEA/game-$GAME/data/$TURN.dat" ]; then
-	echo "server did not create data for turn $TURN in game $GAME"
+if [ ! -s "$ERESSEA/game-$GAME/data/$NEXTTURN.dat" ]; then
+	echo "server did not create data for turn $NEXTTURN in game $GAME"
 	exit 3
 fi
-echo "sending reports for game $GAME, turn $TURN"
-"$BIN/compress.sh" "$GAME" "$TURN"
+echo "sending reports for game $GAME, turn $NEXTTURN"
+"$BIN/compress.sh" "$GAME" "$NEXTTURN"
 "$BIN/sendreports.sh" "$GAME"
+
+echo "update mailing list"
+"$BIN/updatelist.sh" "$TURN"
 ## post-game backup of new data:
-backup "$GAME" "$TURN"
+backup "$GAME" "$NEXTTURN"
 ## post-game backup of reports:
-backup_reports "$GAME" "$TURN"
-if [ ! -f "express-$TURN.txt" ]; then
+backup_reports "$GAME" "$NEXTTURN"
+if [ ! -f "express-$NEXTTURN.txt" ]; then
 	if [ -f express.txt ]; then
-	mv express.txt "express-$TURN.txt"
+	mv express.txt "express-$NEXTTURN.txt"
 	fi
 fi
 rm -f test/execute.lock
