@@ -16,7 +16,7 @@ template=u"""#!/bin/bash
 
 addr=%(email)s
 [ $# -ge 1 ] && addr=$1
-[ -z $addr ] || $ERESSEA/server/bin/send-%(compression)s-report $addr '%(gamename)s Report #%(turn)s' %(files)s
+  -z $addr ] || $ERESSEA/server/bin/send-%(compression)s-report $addr '%(gamename)s Report #%(turn)s' %(files)s
 """
 
 turn = argv[1]
@@ -67,8 +67,9 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            subprocess.run(["zip", shlex.quote(output), "-q", "-m", "-j",
-                ' '.join(shlex.quote(p) for p in parameters)], check=True)
+            files = [shlex.quote(p) for p in parameters]
+            subprocess.run(["zip", shlex.quote(output), "-q", "-m", "-j"]
+                + files, check=True)
     else:
         files = []
         for extension in reports:
