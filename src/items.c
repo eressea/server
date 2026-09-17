@@ -433,8 +433,8 @@ int use_foolpotion(unit *user, const item_type *itype, int amount,
     unit *u = findunit(targetno);
     int max_effects;
     if (u == NULL || user->region != u->region) {
-        ADDMSG(&user->faction->msgs, msg_feedback(user, ord, "feedback_unit_not_found",
-            ""));
+        ADDMSG(&user->faction->msgs, 
+            msg_feedback(user, ord, "feedback_unit_not_found", NULL));
         return ECUSTOM;
     }
     if (effskill(user, SK_STEALTH, NULL) <= effskill(u, SK_PERCEPTION, NULL)) {
