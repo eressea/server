@@ -487,6 +487,7 @@ static void test_demon_skillchange(CuTest *tc) {
     CuAssertPtrEquals(tc, (void *)rc, (void *)get_race(RC_DAEMON));
     u = test_create_unit(test_create_faction_ex(rc, NULL), test_create_plain(0, 0));
     CuAssertPtrNotNull(tc, u);
+    scale_number(u, 2);
     test_set_skill(u, SK_CROSSBOW, 2, 1);
     test_set_skill(u, SK_MELEE, 2, 1);
     CuAssertIntEquals(tc, 1 * SKILL_DAYS_PER_WEEK, skill_days(u, SK_CROSSBOW));
