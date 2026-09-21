@@ -2474,7 +2474,7 @@
   </message>
   <message name="unit_not_found" section="events">
     <type>
-      <arg name="unit" type="int"/>
+      <arg name="unit" type="string"/>
     </type>
   </message>
   <message name="changepasswd" section="events">

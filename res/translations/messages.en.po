@@ -802,7 +802,7 @@ msgid "wrongpasswd"
 msgstr "\"Your orders had the wrong password (${password}).\""
 
 msgid "unit_not_found"
-msgstr "\"UNIT $int36($unit): This is not our unit.\""
+msgstr "\"UNIT ${unit}: This is not our unit.\""
 
 msgctxt "curseinfo"
 msgid "sparkle_9"
