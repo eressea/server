@@ -116,6 +116,7 @@ void sk_set_level(const struct unit *u, skill *sv, unsigned int level)
 }
 
 static void increase_skill(unit *u, skill *sv, unsigned int days) {
+    days /= u->number;
     if (days > 0) {
         unsigned int leveldays = sv->days;
         while (leveldays <= days) {
@@ -130,7 +131,8 @@ static void increase_skill(unit *u, skill *sv, unsigned int days) {
 
 void reduce_skill(unit *u, skill *sv, unsigned int days)
 {
-    if (sv) {
+    days /= u->number;
+    if (sv && days > 0) {
         // first, strip full levels off the skill:
         // max_days = maximum days I can have "to do" at current level
         unsigned int max_days = MAX_DAYS_TO_NEXT_LEVEL(sv->level);
