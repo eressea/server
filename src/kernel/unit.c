@@ -813,6 +813,16 @@ void transfermen(unit* u, unit* dst, int n)
         dst->flags |=
             u->flags & (UFL_LONGACTION | UFL_NOTMOVING | UFL_HUNGER | UFL_MOVED |
                 UFL_ENTER);
+        if (u->flags & UFL_FLEEING) {
+            if (dst->number == 0) {
+                /* after transfer, dst consists entirely of men fleeing from a fight (cannot guard) */
+                dst->flags |= UFL_FLEEING;
+            }
+        }
+        else {
+            /* after transfer, dst contains men not fleeing from a fight (can guard) */
+            dst->flags &= ~UFL_FLEEING;
+        }
         if (u->attribs) {
             transfer_curse(u, dst, n);
             transfer_effects(u, dst, n);

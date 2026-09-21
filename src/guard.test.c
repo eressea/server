@@ -277,6 +277,30 @@ static void test_guard_checks_allowed_weapon(CuTest *tc)
     test_teardown();
 }
 
+static void test_fleeing_temp_cant_guard(CuTest *tc)
+{
+    unit *ug, *u;
+    region *r;
+    item_type *itype;
+
+    test_setup();
+    itype = it_get_or_create(rt_get_or_create("sword"));
+    new_weapontype(itype, 0, frac_zero, NULL, 0, 0, 0, SK_MELEE);
+    r = test_create_plain(0, 0);
+    u = test_create_unit(test_create_faction(), r);
+    fset(u, UFL_FLEEING);
+    ug = test_create_unit(u->faction, r);
+    set_number(ug, 0);
+    i_change(&ug->items, itype, 1);
+    set_level(u, SK_MELEE, 1);
+    transfermen(u, ug, 1);
+    CuAssertIntEquals(tc, UFL_FLEEING, ug->flags & UFL_FLEEING);
+    CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(ug));
+    CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(u));
+
+    test_teardown();
+}
+
 CuSuite *get_guard_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
@@ -289,5 +313,6 @@ CuSuite *get_guard_suite(void)
     SUITE_ADD_TEST(suite, test_guard_unarmed);
     SUITE_ADD_TEST(suite, test_guard_monsters);
     SUITE_ADD_TEST(suite, test_update_guard);
+    SUITE_ADD_TEST(suite, test_fleeing_temp_cant_guard);
     return suite;
 }

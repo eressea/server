@@ -670,7 +670,8 @@ static void test_transfermen_bug_2386(CuTest *tc) {
     test_teardown();
 }
 
-static void test_transfermen_bug_2886(CuTest *tc) {
+static void test_transfermen_bug_2886(CuTest *tc)
+{
     unit *u1, *u2;
     region *r;
     faction *f;
@@ -686,6 +687,40 @@ static void test_transfermen_bug_2886(CuTest *tc) {
     CuAssertIntEquals(tc, 1, u1->number);
     CuAssertIntEquals(tc, 2, u2->number);
     CuAssertPtrEquals(tc, NULL, unit_skill(u2, SK_ALCHEMY));
+    test_teardown();
+}
+
+static void test_transfermen_bug_3120(CuTest *tc)
+{
+    unit *u1, *u2, *u3;
+    region *r;
+    faction *f;
+
+    test_setup();
+    r = test_create_plain(0, 0);
+    f = test_create_faction();
+    /* u1 is a unit that survived combat, but can't guard */
+    u1 = test_create_unit(f, r);
+    set_number(u1, 2);
+    fset(u1, UFL_FLEEING);
+
+    /* u2 is an empty unit that receives men from u1, so it can't guard either */
+    u2 = test_create_unit(f, r);
+    set_number(u2, 0);
+    transfermen(u1, u2, 1);
+    CuAssertIntEquals(tc, UFL_FLEEING, u2->flags & UFL_FLEEING);
+
+    /* u2 is a non-empty unit that receives men from u1, but it can still guard */
+    u3 = test_create_unit(f, r);
+    transfermen(u1, u3, 1);
+    CuAssertIntEquals(tc, 0, u3->flags & UFL_FLEEING);
+
+    /* u2 is a tainted unit that receives men from a non-tainted one, so it can guard */
+    CuAssertIntEquals(tc, UFL_FLEEING, u2->flags & UFL_FLEEING);
+    CuAssertIntEquals(tc, 0, u3->flags & UFL_FLEEING);
+    transfermen(u3, u2, 1);
+    CuAssertIntEquals(tc, 0, u2->flags & UFL_FLEEING);
+
     test_teardown();
 }
 
@@ -1121,6 +1156,7 @@ CuSuite *get_unit_suite(void)
     SUITE_ADD_TEST(suite, test_change_faction_clears_private);
     SUITE_ADD_TEST(suite, test_transfermen_bug_2386);
     SUITE_ADD_TEST(suite, test_transfermen_bug_2886);
+    SUITE_ADD_TEST(suite, test_transfermen_bug_3120);
     SUITE_ADD_TEST(suite, test_remove_unit);
     SUITE_ADD_TEST(suite, test_remove_empty_units);
     SUITE_ADD_TEST(suite, test_remove_units_without_faction);
