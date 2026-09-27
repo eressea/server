@@ -295,8 +295,8 @@ static void test_fleeing_temp_cant_guard(CuTest *tc)
     set_level(u, SK_MELEE, 1);
     transfermen(u, ug, 1);
     CuAssertIntEquals(tc, UFL_FLEEING, ug->flags & UFL_FLEEING);
-    CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(ug));
-    CuAssertIntEquals(tc, E_GUARD_FLEEING, can_start_guarding(u));
+    CuAssertIntEquals(tc, E_GUARD_FLEE_COMBAT, can_start_guarding(ug));
+    CuAssertIntEquals(tc, E_GUARD_FLEE_COMBAT, can_start_guarding(u));
 
     test_teardown();
 }
