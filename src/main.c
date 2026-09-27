@@ -124,7 +124,7 @@ static dictionary *parse_config(const char *filename)
 static int usage(const char *prog, const char *arg)
 {
     if (arg) {
-        fprintf(stderr, "unknown argument: %s\n\n", arg);
+        fprintf(stderr, "invalid argument: %s\n\n", arg);
     }
     fprintf(stderr, "Usage: %s [options]\n"
         "-t <turn>        : read this datafile, not the most current one\n"
@@ -222,6 +222,11 @@ static int parse_args(int argc, char **argv)
                 } else {
                     return usage(argv[0], NULL);
                 }
+                break;
+            case 'i':
+                usage(argv[0], argi);
+                // used to set config.install
+                i = get_arg(argc, argv, 2, i, &arg, NULL);
                 break;
             case 'f':
                 i = get_arg(argc, argv, 2, i, &luafile, NULL);
