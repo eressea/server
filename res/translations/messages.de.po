@@ -2851,6 +2851,9 @@ msgstr "\"$unit($unit) verspeiste $int($amount) Bauern.\""
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie versucht zu fliehen.\""
 
+msgid "error333"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - Die Einheit kann nicht bewachen, da sie aus einem Kampf geflohen ist.\""
+
 msgid "error325"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Der Zauber kann nur auf ein einzelnes Schiff gewirkt werden.\""
 

@@ -2592,6 +2592,9 @@ int guard_on_cmd(unit * u, struct order *ord)
         else if (err == E_GUARD_FLEEING) {
             cmistake(u, ord, 320, MSG_EVENT);
         }
+        else if (err == E_GUARD_FLEE_COMBAT) {
+            cmistake(u, ord, 333, MSG_EVENT);
+        }
         else if (err == E_GUARD_NEWBIE) {
             cmistake(u, ord, 304, MSG_EVENT);
         }
