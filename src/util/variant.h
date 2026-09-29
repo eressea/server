@@ -34,6 +34,7 @@ extern "C" {
   variant frac_div(variant a, variant b);
   int frac_sign(variant a);
   bool frac_equal(variant a, variant b);
+  int gcd(int a, int b);
 
 #ifdef __cplusplus
 }
