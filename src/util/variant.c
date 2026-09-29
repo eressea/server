@@ -6,7 +6,7 @@
 const variant frac_zero = { .sa = { 0, 1 } };
 const variant frac_one = { .sa = { 1, 1 } };
 
-static int gcd(int a, int b) {
+int gcd(int a, int b) {
     const int primes[] = { 3, 5, 7, 11, 13, 17, 19, 23, 0 };
     int i = 0, g = 1, p = 2;
     while (p && p <= a && p <= b) {

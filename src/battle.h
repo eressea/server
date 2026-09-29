@@ -135,6 +135,7 @@ typedef struct fighter {
     int magic;                  /* Magietalent der Einheit  */
     int horses;                 /* Anzahl brauchbarer Pferde der Einheit */
     int elvenhorses;            /* Anzahl brauchbarer Elfenpferde der Einheit */
+    double xp_drain;
     struct item* loot;
     struct {
         int attacks;
@@ -226,7 +227,8 @@ bool helping(const struct side* as, const struct side* ds);
 void reduce_fighter(fighter* df, int i);
 struct fighter* select_corpse(struct battle* b, struct fighter* af);
 int statusrow(int status);
-void drain_exp(struct unit* u, int d);
+void drain_exp(struct fighter* fig, int d);
+void apply_drain(struct fighter *fig);
 void kill_troop(troop dt);
 void remove_troop(troop dt);   /* not the same as the badly named rmtroop */
 
