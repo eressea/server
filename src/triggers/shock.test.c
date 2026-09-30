@@ -5,10 +5,12 @@
 #include <kernel/event.h>
 #include <kernel/faction.h>
 #include <kernel/unit.h>
-#include "kernel/skill.h"    // for SK_MAGIC
-#include "kernel/types.h"    // for M_GWYRRD
+#include "kernel/skill.h"
+#include "kernel/skills.h"
+#include "kernel/types.h"
 
-#include <util/message.h>
+#include "util/message.h"
+#include "util/rand.h"
 
 #include <tests.h>
 #include <CuTest.h>
@@ -23,12 +25,17 @@ static void shock_setup(void) {
 static void test_shock(CuTest *tc) {
     unit *u;
     trigger *tt;
+    skill *sv;
 
     test_setup();
     shock_setup();
+    random_source_inject_constants(0.f, 0);
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     create_mage(u, M_GWYRRD);
-    set_level(u, SK_MAGIC, 5);
+    test_set_skill(u, SK_CROSSBOW, 1, MAX_WEEKS_TO_NEXT_LEVEL(1));
+    sv = test_set_skill(u, SK_MAGIC, 5, MAX_WEEKS_TO_NEXT_LEVEL(5));
+    CuAssertIntEquals(tc, 5, sv->level);
+    CuAssertIntEquals(tc, 330, sv->days);
     set_spellpoints(u, 10);
     u->hp = 10;
     tt = trigger_shock(u);
@@ -36,6 +43,9 @@ static void test_shock(CuTest *tc) {
     CuAssertIntEquals(tc, 2, u->hp);
     CuAssertIntEquals(tc, 2, get_spellpoints(u));
     CuAssertPtrNotNull(tc, test_find_messagetype(u->faction->msgs, "shock"));
+    // TODO: Talenttageverlust testen
+    CuAssertIntEquals(tc, 4, sv->level);
+    CuAssertIntEquals(tc, 180, sv->days);
     t_free(tt);
     free(tt);
     test_teardown();

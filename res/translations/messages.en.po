@@ -2851,6 +2851,9 @@ msgstr "\"$unit($unit) ate $int($amount) peasants.\""
 msgid "error320"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it is trying to flee.\""
 
+msgid "error333"
+msgstr "\"$unit($unit) in $region($region): '$order($command)' - The unit cannot guard the region because it has flown from a battle.\""
+
 msgid "error325"
 msgstr "\"$unit($unit) in $region($region): '$order($command)' - Spells can only be cast on a single ship.\""
 

@@ -21,13 +21,17 @@ guard_t can_start_guarding(const unit * u)
     if (u->region->terrain->flags & SEA_REGION) {
         return E_GUARD_TERRAIN;
     }
+    if (fval(u, UFL_FLEEING)) {
+        return E_GUARD_FLEE_COMBAT;
+    }
     if (u->status >= ST_FLEE || fval(u, UFL_FLEEING))
         return E_GUARD_FLEEING;
     /* Monster der Monsterpartei duerfen immer bewachen */
     if (IS_MONSTERS(u->faction) || fval(u_race(u), RCF_UNARMEDGUARD))
         return E_GUARD_OK;
-    if (!armedmen(u, true))
+    if (!armedmen(u, true)) {
         return E_GUARD_UNARMED;
+    }
     if (IsImmune(u->faction, faction_age(u->faction) + 1)) {
         /* can be attacked next week, may guard now */
         return E_GUARD_NEWBIE;

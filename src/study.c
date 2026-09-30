@@ -414,8 +414,8 @@ int teach_cmd(unit * teacher, struct order *ord)
         free_order(new_order);      /* parse_order & set_order have each increased the refcount */
     }
     if (academy_students > 0 && sk_academy != NOSKILL) {
-        // TODO: rounding errors here.
-        change_skill_days(teacher, sk_academy, academy_students / teacher->number);
+        // TODO: rounding errors, because increase_skill int-divides by teacher->number again.
+        change_skill_days(teacher, sk_academy, SKILL_DAYS_PER_WEEK / 3 * academy_students / 10);
     }
     reset_order();
     return 0;
@@ -679,7 +679,7 @@ void produceexp(struct unit *u, enum skill_t sk)
     if (u->number > 0) {
         const struct race *rc = u_race(u);
         if ((rc->flags & RCF_NOLEARN) == 0 && rc_can_learn(rc, sk)) {
-            change_skill_days(u, sk, produceexp_days());
+            change_skill_days(u, sk, u->number * produceexp_days());
         }
     }
 }
@@ -749,7 +749,7 @@ int learn_skill(unit *u, enum skill_t sk, int days, int studycost) {
     if (fval(u, UFL_HUNGER)) {
         days /= 2;
     }
-    change_skill_days(u, sk, days / u->number);
+    change_skill_days(u, sk, days);
     return cost;
 }
 
@@ -789,7 +789,7 @@ void demon_skillchange(unit *u)
         skill* sv = u->skills + s;
         int roll = rng_int() % 100;
         if (sv->level > 0 && roll < upchance + downchance) {
-            int weeks = 1;
+            int weeks = u->number;
             if (max_change > 1) {
                 weeks += rng_int() % max_change;
             }

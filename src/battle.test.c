@@ -1107,11 +1107,17 @@ static void test_drain_exp(CuTest *tc)
     const char *msg;
     int i;
     double rand;
+    battle *b;
+    side *as;
+    fighter *af;
 
     test_setup();
     config_set("study.random_progress", "0");
     u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
     set_level(u, SK_STAMINA, 3);
+    b = make_battle(u->region);
+    as = make_side(b, u->faction, 0, 0, 0);
+    af = make_fighter(b, u, as, false);
 
     CuAssertIntEquals(tc, 3, unit_skill(u, SK_STAMINA)->level);
     CuAssertIntEquals(tc, 4 * SKILL_DAYS_PER_WEEK, unit_skill(u, SK_STAMINA)->days);
@@ -1122,7 +1128,7 @@ static void test_drain_exp(CuTest *tc)
 
     for (i = 0; i < 10; ++i) {
         set_level(u, SK_STAMINA, 3);
-        drain_exp(u, 0);
+        drain_exp(af, 0);
         assert_skill(tc, msg = "0 change", u, SK_STAMINA, 3, 4, 4);
         assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
@@ -1130,32 +1136,32 @@ static void test_drain_exp(CuTest *tc)
             random_source_inject_constant(rand);
 
             set_level(u, SK_STAMINA, 3);
-            drain_exp(u, 29);
+            drain_exp(af, 29);
 
             assert_skill(tc, msg = "no change yet", u, SK_STAMINA, 3, 4, rand == 0.0 ? 4 : 5);
             assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
             set_level(u, SK_STAMINA, 3);
-            drain_exp(u, 1);
+            drain_exp(af, 1);
 
             assert_skill(tc, msg = "random change", u, SK_STAMINA, 3, 4, rand == 0.0 ? 4 : 5);
             assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
             set_level(u, SK_STAMINA, 3);
-            drain_exp(u, 30);
+            drain_exp(af, 30);
 
             assert_skill(tc, msg = "plus one", u, SK_STAMINA, 3, 5, 5);
             assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
         }
 
         set_level(u, SK_STAMINA, 3);
-        drain_exp(u, 90);
+        drain_exp(af, 90);
 
         assert_skill(tc, msg = "plus three", u, SK_STAMINA, 3, 7, 7);
         assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);
 
         set_level(u, SK_STAMINA, 3);
-        drain_exp(u, 120);
+        drain_exp(af, 120);
 
         assert_skill(tc, msg = "plus four", u, SK_STAMINA, 2, 5, 5);
         assert_skill(tc, msg, u, SK_MINING, 0, 0, 0);

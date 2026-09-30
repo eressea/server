@@ -936,25 +936,25 @@ void kill_troop(troop dt)
 /** reduces the target's exp by an equivalent of n points learning
  * 30 points = 1 week
  */
-void drain_exp(struct unit *u, int n)
+void drain_exp(fighter *fig, int n)
 {
-    skill_t sk = (skill_t)(rng_uint() % MAXSKILLS);
-    skill_t ssk;
+	double drain = ((double)n / fig->fighting);
+	fig->xp_drain += drain;
+}
 
-    /* TODO (enno): we can use u->skill_size to find a random skill */
-    ssk = sk;
-    while (get_level(u, sk) == 0) {
-        sk++;
-        if (sk == MAXSKILLS)
-            sk = 0;
-        if (sk == ssk) {
-            sk = NOSKILL;
-            break;
-        }
-    }
-    if (sk != NOSKILL) {
-        change_skill_days(u, sk, -n);
-    }
+void apply_drain(fighter *fig)
+{
+	if (fig->xp_drain) {
+		unit *u = fig->unit;
+		int drain = (int)(fig->xp_drain);
+		if (drain > 0) {
+			size_t len = arrlen(u->skills);
+			if (len > 0) {
+				unsigned i = rng_uint() % len;
+				change_skill(u, u->skills + i, -drain);
+			}
+		}
+	}
 }
 
 static void vampirism(troop at, int damage)
@@ -2236,7 +2236,7 @@ static void attack(battle * b, troop ta, const att * a, int numattack)
             ta.fighter->person[ta.index].last_action = b->turn;
         }
         if (hits(ta, td, NULL)) {
-            drain_exp(td.fighter->unit, dice_rand(a->data.dice));
+            drain_exp(td.fighter, dice_rand(a->data.dice));
         }
         break;
     case AT_DAZZLE:
@@ -2682,6 +2682,7 @@ static void aftermath(battle * b)
                 int dead = dead_fighters(df);
                 const race *rc = u_race(du);
 
+				apply_drain(df);
                 /* tote insgesamt: */
                 s->dead += dead;
                 /* Tote, die wiederbelebt werde koennen: */
@@ -3392,6 +3393,7 @@ fighter *make_fighter(battle * b, unit * u, side * s1, bool attack)
     fig->status = u->status;
     fig->side = s1;
     fig->alive = u->number;
+	fig->xp_drain = .0;
     fig->side->alive += u->number;
     fig->special.kills = 0;
     fig->special.attacks = 0;

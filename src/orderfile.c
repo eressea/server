@@ -85,6 +85,17 @@ static void handle_order(void *userData, const char *str) {
     tok = parse_token(&input, buffer, sizeof(buffer));
     if (tok) {
         param_t p = get_param(tok, lang);
+        if (p == NOPARAM) {
+            const struct locale *loc;
+            /** could be lang=en, tok=PARTEI */
+            for (loc = locales; loc; loc = nextlocale(loc)) {
+                if (isparam(tok, loc, P_FACTION)) {
+                    lang = loc;
+                    p = P_FACTION;
+                    break;
+                }
+            }
+        }
         if (p == P_FACTION || p == P_GAMENAME) {
             tok = parse_token(&input, buffer, sizeof(buffer));
             if (tok && strlen(tok)<5) {
