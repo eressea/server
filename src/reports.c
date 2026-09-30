@@ -1615,13 +1615,14 @@ int init_reports(void)
     }
     for (f = factions; f; f = f->next) {
         if (f->email && !fval(f, FFL_NPC)) {
-            if (f->lastorders < 0) {
+            if (f->lastorders < 0 || fval(f, FFL_PWMSG)) {
                 attrib *a;
                 /* neue Parteien, oder solche die noch NIE einen Zug gemacht haben,
                  * kriegen ein neues Passwort: */
                 char *password = faction_genpassword(f, buffer);
                 a = a_add(&f->attribs, a_new(&at_password));
                 a->data.v = str_strdup(password);
+                freset(f, FFL_PWMSG);
             }
         }
     }
