@@ -61,8 +61,9 @@
 #define SLAVE_DATA_VERSION 383 /* ct_slavery has curse-data */
 #define WALL_DATA_VERSION 384 /* wall_data no longer has mage stored in it */
 #define FIX_ROADS_VERSION 385 /* regions did not write the new roads */
+#define SERVER_RELEASE_VERSION 386 /* include the server version string in data files */
 
-#define RELEASE_VERSION FIX_ROADS_VERSION /* use for new datafiles */
+#define RELEASE_VERSION SERVER_RELEASE_VERSION /* use for new datafiles */
 #define MIN_VERSION UIDHASH_VERSION      /* minimal datafile we support */
 #define MAX_VERSION RELEASE_VERSION /* change this if we can need to read the future datafile, and we can do so */
 
