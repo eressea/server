@@ -72,32 +72,32 @@ int update_nmrs(int since)
     faction *f;
     int timeout = NMRTimeout();
 
-    if (timeout>0) {
+    if (timeout > 0) {
         if (nmrs == NULL) {
             nmrs = calloc((1 + (size_t)timeout), sizeof(int));
             if (!nmrs) abort();
         }
-        else {
-            memset(nmrs, 0, sizeof(int) * timeout);
-        }
-    }
-    
-    for (f = factions; f; f = f->next) {
-        if (faction_age(f)<=1) {
-            ++newplayers;
-        }
-        else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED | FFL_PAUSED)) {
-            int nmr = since - f->lastorders;
-            if (timeout>0) {
-                if (nmr < 0 || nmr > timeout) {
-                    log_error("faction %s has %d NMR", itoa36(f->no), nmr);
-                    if (nmr < 0) nmr = 0;
+        memset(nmrs, 0, sizeof(int) * (1 + (size_t)timeout));
+
+        for (f = factions; f; f = f->next) {
+            if (faction_age(f) <= 1) {
+                ++newplayers;
+            }
+            else if (!fval(f, FFL_NOIDLEOUT | FFL_CURSED | FFL_PAUSED)) {
+                int nmr = since - f->lastorders;
+                if (timeout > 0) {
+                    if (nmr < 0 || nmr > timeout) {
+                        log_error("faction %s has %d NMR", itoa36(f->no), nmr);
+                        if (nmr < 0) nmr = 0;
+                    }
+                    if (nmr > 0) {
+                        log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
+                    }
                     if (nmr > timeout) nmr = timeout;
+                    if (nmr >= 0 && nmr <= timeout) {
+                        ++nmrs[nmr];
+                    }
                 }
-                if (nmr > 0) {
-                    log_debug("faction %s has %d NMR", itoa36(f->no), nmr);
-                }
-                ++nmrs[nmr];
             }
         }
     }
