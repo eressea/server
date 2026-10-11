@@ -27,6 +27,9 @@ except:
     exit(0)
 
 extras = []
+if os.path.isfile("../attachments.txt"):
+    with open("../attachments.txt", 'r') as file:
+        extras = ['../' + line.strip() for line in file]
 stats = '../parteien'
 if os.path.isfile(stats):
     extra = 'wochenbericht-%s.txt' % turn
@@ -64,8 +67,9 @@ for line in infile.readlines():
                 filename = "%s%s" % (prefix, extension)
                 if os.path.isfile(filename):
                     parameters = parameters + [ filename ]
-            subprocess.run(["zip", shlex.quote(output), "-q", "-m", "-j",
-                ' '.join(shlex.quote(p) for p in parameters)], check=True)
+            pfiles = [shlex.quote(p) for p in parameters]
+            subprocess.run(["zip", shlex.quote(output), "-q", "-m", "-j"]
+                + pfiles, check=True)
     else:
         files = []
         for extension in reports:
