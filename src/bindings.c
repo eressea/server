@@ -362,7 +362,9 @@ static int tolua_get_nmrs(lua_State * L)
         if (nmrs == NULL) {
             update_nmrs(turn);
         }
-        result = nmrs[n];
+        if (nmrs) {
+            result = nmrs[n];
+        }
     }
     lua_pushinteger(L, result);
     return 1;
