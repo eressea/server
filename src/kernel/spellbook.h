@@ -33,6 +33,7 @@ extern "C" {
     void spellbook_clear(spellbook *sb);
     spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp);
 
+    void export_echeck_spells(void);
 #ifdef __cplusplus
 }
 #endif
