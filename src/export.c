@@ -8,10 +8,14 @@
 #include "kernel/item.h"
 #include "kernel/spell.h"
 #include "kernel/spellbook.h"
+#include "kernel/types.h"
 
 #include "util/language.h"
 
 #include <clibs/strings.h>
+
+#include <stdbool.h>
+#include <stdio.h>
 
 typedef struct exporter {
     const struct locale *lang;
@@ -52,7 +56,7 @@ void export_echeck_spells(void)
         char filename[256];
         str_slprintf(filename, sizeof(filename), "spells-%s.txt", locale_name(lang));
         exp.lang = lang;
-        if (F = fopen(filename, "wt")) {
+        if ((F = fopen(filename, "wt"))) {
             exp.F = F;
             for (magic_t m = (magic_t)1; m != MAXMAGIETYP; ++m) {
                 spellbook *sb = get_spellbook(magic_school[m]);
@@ -89,7 +93,7 @@ void export_echeck_items(void)
         char filename[256];
         str_slprintf(filename, sizeof(filename), "items-%s.txt", locale_name(lang));
         exp.lang = lang;
-        if (F = fopen(filename, "wt")) {
+        if ((F = fopen(filename, "wt"))) {
             exp.F = F;
             resource_foreach(export_item, &exp);
             fclose(exp.F);
