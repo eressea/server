@@ -1395,8 +1395,6 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
 
     if (xml_strequal(el, "weapon")) {
         pi->type = EXP_RESOURCES;
-    }
-    else if (xml_strequal(el, "modifier")) {
         if (nwmods > 0) {
             weapon_type *wtype = rtype->wtype;
             wtype->modifiers = malloc((1 + (size_t)nwmods) * sizeof(weapon_mod));
