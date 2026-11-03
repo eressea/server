@@ -165,6 +165,7 @@ set(SERVER_SRC
   bindings.c
   crimport.c
   console.c
+  export.c
   helpers.c
 )
 else(LUA_FOUND)
