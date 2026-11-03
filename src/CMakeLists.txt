@@ -282,6 +282,7 @@ set(TESTS_SRC
   defaults.test.c
   donations.test.c
   economy.test.c
+  exparse.test.c
   give.test.c
   guard.test.c
   items.test.c

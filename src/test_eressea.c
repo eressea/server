@@ -125,6 +125,7 @@ int RunAllTests(int argc, char *argv[])
     ADD_SUITE(spells);
     ADD_SUITE(unit);
     /* gamecode */
+    ADD_SUITE(exparse);
     ADD_SUITE(teleport);
     ADD_SUITE(automate);
     ADD_SUITE(battle);
