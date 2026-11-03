@@ -347,7 +347,11 @@ set_property(TARGET eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 set_property(TARGET test_eressea PROPERTY C_INCLUDE_WHAT_YOU_USE ${IWYU_PATH})
 endif (IWYU_PATH)
 
-add_test(NAME unit-tests COMMAND test_eressea)
+add_test(
+  NAME unit-tests
+  COMMAND test_eressea
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
 
 install(TARGETS eressea DESTINATION "bin")
 
