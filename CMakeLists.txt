@@ -98,7 +98,13 @@ add_subdirectory (crpat)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 
-install(DIRECTORY etc DESTINATION "." FILES_MATCHING PATTERN "*.txt")
+install(
+  DIRECTORY etc
+  DESTINATION "."
+  FILES_MATCHING
+  PATTERN "*.txt"
+  PATTERN "*.sql"
+)
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.po")
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.xml")
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.json")
