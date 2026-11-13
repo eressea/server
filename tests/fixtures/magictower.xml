@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<eressea>
+  <buildings>
+    <building name="magictower" maxcapacity="2" maxsize="50" magic="yes" magres="40" fumblebonus="10" auraregen="1.75">
+      <maintenance type="money" amount="1000"/>
+      <construction skill="building" minskill="5" reqsize="50">
+        <requirement type="log" quantity="150"/>
+        <requirement type="stone" quantity="250"/>
+        <requirement type="mallorn" quantity="100"/>
+        <requirement type="iron" quantity="150"/>
+        <requirement type="laen" quantity="100"/>
+        <requirement type="money" quantity="25000"/>
+      </construction>
+    </building>
+  </buildings>
+</eressea>

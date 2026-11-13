@@ -1251,7 +1251,7 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
                     btype->taxes = xml_int(attr[i + 1]);
                 }
                 else if (xml_strequal(attr[i], "auraregen")) {
-                    btype->auraregen = xml_int(attr[i + 1]);
+                    btype->auraregen = xml_float(attr[i + 1]);
                 }
                 else if (xml_strequal(attr[i], "magres")) {
                     /* magres is specified in percent! */
