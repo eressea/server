@@ -91,10 +91,8 @@ static double xml_float(const XML_Char *val) {
 }
 
 static variant xml_fraction(const XML_Char *val) {
-    int num, den = 100;
     double fval = atof(val);
-    num = (int)(fval * den + 0.5);
-    return frac_make(num, den);
+    return frac_from_float(fval);
 }
 
 const XML_Char *attr_get(const XML_Char **attr, const char *key) {

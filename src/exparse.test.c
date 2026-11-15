@@ -15,6 +15,7 @@ static void test_weapons(CuTest *tc) {
     CuAssertPtrNotNull(tc, rtype = rt_find("greatbow"));
     CuAssertStrEquals(tc, "greatbow", rtype->_name);
     CuAssertPtrNotNull(tc, rtype->wtype);
+    CuAssertTrue(tc, frac_equal(frac_from_float(0.15), rtype->wtype->magres));
     CuAssertPtrNotNull(tc, rtype->wtype->modifiers);
     CuAssertIntEquals(tc, 0, rtype->wtype->modifiers[2].value);
     test_teardown();

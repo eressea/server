@@ -32,6 +32,7 @@ extern "C" {
   variant frac_sub(variant a, variant b);
   variant frac_mul(variant a, variant b);
   variant frac_div(variant a, variant b);
+  variant frac_from_float(double fval);
   int frac_sign(variant a);
   bool frac_equal(variant a, variant b);
   int gcd(int a, int b);
