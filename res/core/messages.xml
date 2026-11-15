@@ -2662,6 +2662,7 @@
   <message name="storm" section="events">
     <type>
       <arg name="ship" type="ship"/>
+      <arg name="origin" type="region"/>
       <arg name="region" type="region"/>
       <arg name="sink" type="int"/>
     </type>
