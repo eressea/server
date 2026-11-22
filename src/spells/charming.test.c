@@ -238,6 +238,7 @@ static void test_charmingsong(CuTest *tc) {
     u2->flags |= UFL_HERO;
     CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
     CuAssertPtrEquals(tc, f2, u2->faction);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail_noexpensives"));
     u2->flags &= ~UFL_HERO;
 
     // success:

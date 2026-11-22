@@ -1665,6 +1665,15 @@ static void test_migrants(CuTest *tc) {
     CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail::contact"));
     test_clear_messages(u->faction);
 
+    // can_charm makes sure no heroes are transfered:
+    u2->flags |= UFL_HERO;
+    CuAssertIntEquals(tc, co.level, sp_migranten(&co));
+    CuAssertPtrEquals(tc, f, u2->faction);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail_noexpensives"));
+    u2->flags &= ~UFL_HERO;
+    test_clear_messages(u->faction);
+
+    // success:
     contact_unit(u2, u);
     CuAssertIntEquals(tc, u2->number, sp_migranten(&co));
     CuAssertPtrEquals(tc, u->faction, u2->faction);
