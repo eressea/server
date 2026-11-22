@@ -238,7 +238,7 @@ target_compile_definitions(eressea PRIVATE HAVE_LUA)
 target_include_directories (game PUBLIC ${TOLUA_INCLUDE_DIR})
 target_include_directories (game PUBLIC ${LUA_INCLUDE_DIR})
 target_link_libraries(eressea
-  ${TOLUA_LIBRARY}
+  ${TOLUA_LIBRARIES}
   ${LUA_LIBRARIES}
 )
 

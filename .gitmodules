@@ -8,3 +8,6 @@
 [submodule "crpat"]
 	path = crpat
 	url = https://github.com/ennorehling/crpat.git
+[submodule "tolua"]
+	path = tolua
+	url = https://github.com/ennorehling/tolua
