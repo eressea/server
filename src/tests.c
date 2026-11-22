@@ -55,6 +55,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *fixture_path = NULL;
+
 struct skill *test_set_skill(unit *u, enum skill_t sk, int level, int weeks)
 {
     skill *sv;
