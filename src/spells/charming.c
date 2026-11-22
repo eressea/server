@@ -128,7 +128,7 @@ const struct curse_type ct_slavery = {
     .destroy = slave_done,
 };
 
-static bool can_charm(const unit *u, int maxlevel)
+bool can_charm(const unit *u, int maxlevel)
 {
     const skill_t expskills[] =
     { SK_ALCHEMY, SK_HERBALISM, SK_MAGIC, SK_SPY, SK_TACTICS, NOSKILL };
@@ -246,7 +246,7 @@ int sp_charmingsong(castorder *co)
         cmistake(mage, co->order, 45, MSG_MAGIC);
         return 0;
     }
-    /* niemand mit teurem Talent */
+    /* limitierte oder teure Talente. Keine Helden */
     if (!can_charm(target, (int)(force / 2))) {
         ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
             "spellfail_noexpensives", "target", target));
