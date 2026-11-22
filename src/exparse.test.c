@@ -5,13 +5,19 @@
 #include "kernel/item.h"
 #include "kernel/resources.h"
 
+#include "util/path.h"
+#include "util/variant.h"
+
 #include "tests.h"
 #include <CuTest.h>
+
+static char fixture[PATH_MAX];
 
 static void test_weapons(CuTest *tc) {
     const resource_type *rtype;
     test_setup();
-    CuAssertIntEquals(tc, 0, exparse_readfile("tests/fixtures/greatbow.xml"));
+    CuAssertIntEquals(tc, 0, exparse_readfile(
+		path_join(fixture_path, "greatbow.xml", fixture, sizeof(fixture))));
     CuAssertPtrNotNull(tc, rtype = rt_find("greatbow"));
     CuAssertStrEquals(tc, "greatbow", rtype->_name);
     CuAssertPtrNotNull(tc, rtype->wtype);
@@ -24,7 +30,8 @@ static void test_weapons(CuTest *tc) {
 static void test_buildings(CuTest *tc) {
     const building_type *btype;
     test_setup();
-    CuAssertIntEquals(tc, 0, exparse_readfile("tests/fixtures/magictower.xml"));
+    CuAssertIntEquals(tc, 0, exparse_readfile(
+		path_join(fixture_path, "magictower.xml", fixture, sizeof(fixture))));
     CuAssertPtrNotNull(tc, btype = bt_find("magictower"));
     CuAssertDblEquals(tc, 1.75, btype->auraregen, 0.1);
     test_teardown();
@@ -33,7 +40,8 @@ static void test_buildings(CuTest *tc) {
 static void test_resources(CuTest *tc) {
     const resource_type *rtype;
     test_setup();
-    CuAssertIntEquals(tc, 0, exparse_readfile("tests/fixtures/adamantium.xml"));
+    CuAssertIntEquals(tc, 0, exparse_readfile(
+		path_join(fixture_path, "adamantium.xml", fixture, sizeof(fixture))));
     CuAssertPtrNotNull(tc, rtype = rt_find("adamantium"));
     CuAssertStrEquals(tc, "adamantium", rtype->_name);
     CuAssertPtrNotNull(tc, rtype->itype);

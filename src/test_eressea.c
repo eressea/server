@@ -4,6 +4,7 @@
 #include "util/stats.h"
 #include "util/password.h"
 
+#include "tests.h"
 #include <clibs/strings.h>
 
 #include <CuTest.h>
@@ -193,13 +194,25 @@ int RunAllTests(int argc, char *argv[])
     return 0;
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char ** argv)
+{
     ++argv;
     --argc;
-    if (argc > 0 && strcmp("--list", argv[0]) == 0) {
-        list = true;
-        ++argv;
-        --argc;
+    if (argc > 0) {
+        if (strcmp("--list", *argv) == 0) {
+            list = true;
+            ++argv;
+            --argc;
+        }
+        else if (strcmp("--fixtures", *argv) == 0) {
+            ++argv;
+            fixture_path = str_strdup(*argv);
+            ++argv;
+            argc -= 2;
+        }
+    }
+    if (!fixture_path) {
+        fixture_path = str_strdup("tests/fixtures");
     }
     return RunAllTests(argc, argv);
 }
