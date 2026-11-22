@@ -6,6 +6,7 @@
 #include "kernel/resources.h"
 
 #include "util/path.h"
+#include "util/variant.h"
 
 #include "tests.h"
 #include <CuTest.h>
