@@ -49,9 +49,11 @@ message("Building without Lua")
 endif(USING_LUA)
 
 if (LUA_FOUND)
-find_program(TOLUA_EXECUTABLE tolua REQUIRED)
-find_library(TOLUA_LIBRARY tolua REQUIRED)
-find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
+add_subdirectory(tolua)
+# find_program(TOLUA_EXECUTABLE tolua REQUIRED)
+# find_library(TOLUA_LIBRARY tolua REQUIRED)
+# set(TOLUA_LIBRARIES ${TOLUA_LIBRARY})
+# find_path(TOLUA_INCLUDE_DIR NAMES tolua.h HINTS ${LUA_INCLUDE_DIR} REQUIRED)
 endif (LUA_FOUND)
 
 find_library(SQLITE3_LIBRARY sqlite3 REQUIRED)
@@ -98,7 +100,13 @@ add_subdirectory (crpat)
 add_subdirectory (process)
 add_subdirectory (src eressea)
 
-install(DIRECTORY etc DESTINATION "." FILES_MATCHING PATTERN "*.txt")
+install(
+  DIRECTORY etc
+  DESTINATION "."
+  FILES_MATCHING
+  PATTERN "*.txt"
+  PATTERN "*.sql"
+)
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.po")
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.xml")
 install(DIRECTORY res conf DESTINATION "." FILES_MATCHING PATTERN "*.json")

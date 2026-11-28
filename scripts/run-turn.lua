@@ -149,24 +149,26 @@ function process(rules, orders)
   end
   callbacks(rules, 'init')
   
-  -- run the turn:
-  turn_process()
-  callbacks(rules, 'update')
-  turn_end() -- ageing, etc.
+	-- run the turn:
+	turn_process()
+	callbacks(rules, 'update')
+	turn_end() -- ageing, etc.
 
-  if not config.debug then
-      init_reports()
-      file = '' .. get_turn() .. '.dat'
-      if eressea.write_game(file)~=0 then
-        eressea.log.error("could not write game")
-        return -1
-      end
+	init_reports()
+	if (not eressea.config.get("config.debug")) then
+		print("writing data file")
+		file = '' .. get_turn() .. '.dat'
+		if eressea.write_game(file)~=0 then
+			eressea.log.error("could not write game")
+			return -1
+		end
+	end
 
-      write_files(config.locales)
-      update_scores()
-      write_scores("scores")
-  end
-  return 0
+	print("writing reports")
+	write_files(config.locales)
+	update_scores()
+	write_scores("scores")
+	return 0
 end
 
 function run_turn(rules)

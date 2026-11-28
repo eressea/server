@@ -2,7 +2,7 @@
 IF EXIST ..\build\x64-Debug\eressea.exe SET BUILD=..\build\x64-Debug
 
 SET SERVER=%BUILD%\eressea.exe
-%BUILD%\test_eressea.exe
+%BUILD%\test_eressea.exe --fixtures fixtures
 SET LUA_PATH=..\scripts\?.lua;..\scripts\?\init.lua;%LUA_PATH%
 
 %SERVER% -v1 ..\scripts\run-tests.lua

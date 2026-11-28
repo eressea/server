@@ -187,7 +187,7 @@ msgid "packice"
 msgstr "Packeis"
 
 msgctxt "spellinfo"
-msgid "commonfamiliar"
+msgid "summon_familiar"
 msgstr "Einem erfahrenen Magier wird irgendwann auf seinen Wanderungen ein ungewöhnliches Exemplar einer Gattung begegnen, welches sich dem Magier anschließen wird."
 
 msgid "trireme_a"
@@ -242,8 +242,8 @@ msgid "royalbarge"
 msgstr "Königsbarke"
 
 msgctxt "spell"
-msgid "commonfamiliar"
-msgstr "Vertrauten binden"
+msgid "summon_familiar"
+msgstr "Vertrauten rufen"
 
 msgid "barge"
 msgstr "Barke"

@@ -56,19 +56,10 @@ static void handle_faction(void *userData, int no, const char *password) {
     }
 }
 
-static void handle_unit(void *userData, int no) {
+static void handle_unit(void *userData, unit * u) {
     parser_state *state = (parser_state *)userData;
-    unit * u = findunit(no);
 
-    if (!u || u->faction != state->f) {
-        if (state->f) {
-            ADDMSG(&state->f->msgs, msg_message("unit_not_found", "unit", no));
-        }
-        parser_set_unit(state, NULL);
-    }
-    else {
-        parser_set_unit(state, u);
-    }
+    parser_set_unit(state, u);
 }
 
 static void handle_order(void *userData, const char *str) {
@@ -111,7 +102,16 @@ static void handle_order(void *userData, const char *str) {
             tok = parse_token(&input, buffer, sizeof(buffer));
             if (tok) {
                 int no = atoi36(tok);
-                handle_unit(userData, no);
+                unit *u = findunit(no);
+                if (!u || u->faction != state->f) {
+                    if (state->f) {
+                        ADDMSG(&state->f->msgs, msg_message("unit_not_found", "unit", tok));
+                    }
+                    handle_unit(userData, NULL);
+                }
+                else {
+                    handle_unit(userData, u);
+                }
             }
         }
         else if (p == P_NEXT) {

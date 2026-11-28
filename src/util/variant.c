@@ -82,6 +82,13 @@ variant frac_div(variant a, variant b)
     return frac_make(a.sa[0] * b.sa[1], a.sa[1] * b.sa[0]);
 }
 
+variant frac_from_float(double fval)
+{
+    int num, den = 100;
+    num = (int)(fval * den + 0.5);
+    return frac_make(num, den);
+}
+
 int frac_sign(variant a) {
     if (a.sa[0] == 0) return 0;
     if (a.sa[0] > 0 && a.sa[1] > 0) return 1;

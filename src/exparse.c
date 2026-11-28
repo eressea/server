@@ -91,10 +91,8 @@ static double xml_float(const XML_Char *val) {
 }
 
 static variant xml_fraction(const XML_Char *val) {
-    int num, den = 100;
     double fval = atof(val);
-    num = (int)(fval * den + 0.5);
-    return frac_make(num, den);
+    return frac_from_float(fval);
 }
 
 const XML_Char *attr_get(const XML_Char **attr, const char *key) {
@@ -1251,7 +1249,7 @@ static void start_buildings(parseinfo *pi, const XML_Char *el, const XML_Char **
                     btype->taxes = xml_int(attr[i + 1]);
                 }
                 else if (xml_strequal(attr[i], "auraregen")) {
-                    btype->auraregen = xml_int(attr[i + 1]);
+                    btype->auraregen = xml_float(attr[i + 1]);
                 }
                 else if (xml_strequal(attr[i], "magres")) {
                     /* magres is specified in percent! */
@@ -1395,8 +1393,6 @@ static void end_weapon(parseinfo *pi, const XML_Char *el) {
 
     if (xml_strequal(el, "weapon")) {
         pi->type = EXP_RESOURCES;
-    }
-    else if (xml_strequal(el, "modifier")) {
         if (nwmods > 0) {
             weapon_type *wtype = rtype->wtype;
             wtype->modifiers = malloc((1 + (size_t)nwmods) * sizeof(weapon_mod));

@@ -36,7 +36,7 @@ Druide/Gwyrrd (38 Sprüche):
  9  Sog des Lebens             2*L     Stufe*5 GE aus Astralebene in Wald
  9  Heiliger Boden             80,3P   
 10  Erwecke Ents               6*L     Erschafft Einheit
-10  Vertrauten binden          100,5P  Vertrauter
+10  Vertrauten rufen           100,5P  Vertrauter
 11  Segne Steinkreis           350,5P  Wandelt Steinkreis zum gesegneten St.
 12  Rindenhaut (+K)            4*L     Verbessert Rüstung
 13  B... Hitzeelementar        600     halbiert Fruchtbarkeit der Region

@@ -3525,6 +3525,13 @@ int sp_migranten(castorder * co)
     if (param->flag == TARGET_NOTFOUND)
         return 0;
 
+    /* limitierte oder teure Talente. Keine Helden */
+    if (!can_charm(target, (int)(co->force / 2))) {
+        ADDMSG(&mage->faction->msgs, msg_feedback(mage, co->order,
+            "spellfail_noexpensives", "target", target));
+        return co->level;
+    }
+
     /* Personen unserer Rasse koennen problemlos normal uebergeben werden */
     if (u_race(target) == mage->faction->race) {
         /* u ist von unserer Art, das Ritual waere verschwendete Aura. */

@@ -77,4 +77,6 @@ void disabled_test(void *suite, void (*)(struct CuTest *), const char *name);
 
 #define DISABLE_TEST(SUITE, TEST) disabled_test(SUITE, TEST, #TEST)
 
+extern char *fixture_path;
+
 #endif

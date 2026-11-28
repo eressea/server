@@ -1776,6 +1776,8 @@ static void read_factions(gamedata * data)
 int read_game(gamedata *data)
 {
     storage * store = data->store;
+    const char *v = "unknown";
+    char version[32];
 
     if (data->version >= SAVEGAMEID_VERSION) {
         int gameid;
@@ -1788,6 +1790,12 @@ int read_game(gamedata *data)
     else {
         READ_STR(store, NULL, 0);
     }
+    if (data->version >= SERVER_RELEASE_VERSION) {
+        READ_STR(store, version, sizeof(version));
+        v = version;
+    }
+    log_debug("data was written by version `%s`, current version is `%s`",
+        v, eressea_version());
 
     if (data->version < FIXATKEYS_VERSION) {
         attrib *a = NULL;
@@ -1895,9 +1903,10 @@ int write_game(gamedata *data) {
 
     /* globale Variablen */
     assert(data->version <= MAX_VERSION && data->version >= MIN_VERSION);
-
     WRITE_INT(store, game_id());
     WRITE_SECTION(store);
+
+    WRITE_STR(store, eressea_version());
 
     WRITE_INT(store, turn);
 #if RELEASE_VERSION < BORDER_ID_VERSION

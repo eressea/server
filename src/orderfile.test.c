@@ -57,7 +57,7 @@ static void test_no_foreign_unit_orders(CuTest *tc) {
     OP_Parser parser = parser_create(&state);
 
     test_setup();
-    mt_create_va(mt_new("unit_not_found", "events"), "unit:int", MT_NEW_END);
+    mt_create_va(mt_new("unit_not_found", "events"), "unit:string", MT_NEW_END);
     sbs_init(&sbs, orders, sizeof(orders));
     f2 = test_create_faction();
     f2->locale = test_create_locale();

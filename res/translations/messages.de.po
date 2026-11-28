@@ -802,7 +802,7 @@ msgid "wrongpasswd"
 msgstr "\"Deine Befehle hatten ein falsches Passwort (${password}).\""
 
 msgid "unit_not_found"
-msgstr "\"EINHEIT $int36($unit): Diese Einheit gehört uns nicht.\""
+msgstr "\"EINHEIT ${unit}: Diese Einheit gehört uns nicht.\""
 
 msgctxt "curseinfo"
 msgid "sparkle_9"
@@ -1797,7 +1797,7 @@ msgid "potionsave"
 msgstr "\"Eine Person von $unit($unit) konnte durch einen Heiltrank überleben.\""
 
 msgid "storm"
-msgstr "\"Die $ship($ship) wird in $region($region) von Stürmen abgetrieben$if($sink,\" und sinkt\",\"\").\""
+msgstr "\"Die $ship($ship) wird in $region($origin) von Stürmen nach $region($region) abgetrieben$if($sink,\" und sinkt\",\"\").\""
 
 msgid "nr_insectwinter"
 msgstr "Insekten können wegen des Winterwetters in der kommenden Woche nur in Wüsten oder mit Hilfe des Nestwärme-Tranks Personen rekrutieren."

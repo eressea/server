@@ -916,7 +916,7 @@ void free_rtype(resource_type *rtype) {
 static int free_rtype_cb(void * match, const void * key,
     size_t keylen, void *cbdata)
 {
-    resource_type *rtype = ((rt_entry *)match)->value;;
+    resource_type *rtype = ((rt_entry *)match)->value;
     free_rtype(rtype);
     return 0;
 }
@@ -931,7 +931,7 @@ void free_resources(void)
         free(luxurytypes);
         luxurytypes = next;
     }
-    cb_foreach(&cb_resources, "", 0, free_rtype_cb, 0);
+    cb_foreach(&cb_resources, "", 0, free_rtype_cb, NULL);
     cb_clear(&cb_resources);
     ++num_resources;
 
@@ -939,6 +939,28 @@ void free_resources(void)
         cb_clear(inames + i);
         cb_clear(rnames + i);
     }
+}
+
+struct proxy_data {
+    void *udata;
+    int (*callback)(resource_type *, void *);
+};
+
+static int resource_proxy_cb(void *match, const void *key,
+    size_t keylen, void *cbdata)
+{
+    struct proxy_data * proxy = (struct proxy_data *)cbdata;
+    resource_type *rtype = ((rt_entry *)match)->value;
+    return proxy->callback(rtype, proxy->udata);
+}
+
+int resource_foreach(int(*callback)(resource_type *, void *), void *udata)
+{
+    struct proxy_data proxy;
+    proxy.callback = callback;
+    proxy.udata = udata;
+    cb_foreach(&cb_resources, "", 0, resource_proxy_cb, &proxy);
+    return 0;
 }
 
 void register_resources(void)

@@ -139,4 +139,3 @@ spellbook_entry * spellbook_get(spellbook *sb, const struct spell *sp)
     }
     return 0;
 }
-

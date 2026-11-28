@@ -22,6 +22,39 @@
 
 #include <stddef.h>          // for NULL
 
+static void test_can_charm(CuTest *tc)
+{
+    unit *u;
+
+    test_setup();
+
+    u = test_create_unit(test_create_faction(), test_create_plain(0, 0));
+    CuAssertTrue(tc, can_charm(u, 1));
+
+    // No heroes:
+    u->flags |= UFL_HERO;
+    CuAssertTrue(tc, !can_charm(u, 1));
+    u->flags &= ~UFL_HERO;
+
+    // No expensive skill over maxskill:
+    set_level(u, SK_TACTICS, 2);
+    CuAssertTrue(tc, !can_charm(u, 1));
+    CuAssertTrue(tc, can_charm(u, 2));
+
+    // No limited skills:
+    set_level(u, SK_ALCHEMY, 1);
+    CuAssertTrue(tc, !can_charm(u, 2));
+    remove_skill(u, SK_ALCHEMY);
+    CuAssertTrue(tc, can_charm(u, 2));
+
+    // no slaved units:
+    charm_unit(u, u, 1.0, 1);
+    CuAssertTrue(tc, unit_is_slaved(u));
+    CuAssertTrue(tc, !can_charm(u, 2));
+
+    test_teardown();
+}
+
 static void test_charm_unit(CuTest * tc)
 {
     unit *u, *mage;
@@ -202,6 +235,12 @@ static void test_charmingsong(CuTest *tc) {
     scale_number(u2, (int)co.force);
     test_clear_messages(f);
 
+    u2->flags |= UFL_HERO;
+    CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
+    CuAssertPtrEquals(tc, f2, u2->faction);
+    CuAssertPtrNotNull(tc, test_find_faction_message(u->faction, "spellfail_noexpensives"));
+    u2->flags &= ~UFL_HERO;
+
     // success:
     CuAssertIntEquals(tc, co.level, sp_charmingsong(&co));
     CuAssertPtrEquals(tc, u->faction, u2->faction);
@@ -216,6 +255,7 @@ CuSuite *get_charming_suite(void)
 {
     CuSuite *suite = CuSuiteNew();
 
+    SUITE_ADD_TEST(suite, test_can_charm);
     SUITE_ADD_TEST(suite, test_charm_unit);
     SUITE_ADD_TEST(suite, test_charm_unit_dispell);
     SUITE_ADD_TEST(suite, test_charmingsong);

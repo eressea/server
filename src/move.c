@@ -2026,8 +2026,8 @@ void sail(unit * u, order * ord, bool drifting)
                     if (!is_cursed(sh->attribs, &ct_nodrift)) {
                         region *rnext = storm_redirect(current_point, next_point);
                         if (rnext != NULL) {
-                            ADDMSG(&f->msgs, msg_message("storm", "ship region sink",
-                                sh, next_point, ship_damage_percent(sh) >= 100));
+                            ADDMSG(&f->msgs, msg_message("storm", "ship origin region sink",
+                                sh, current_point, rnext, ship_damage_percent(sh) >= 100));
 
                             damage_ship(sh, damage_storm);
                             if (ship_damage_percent(sh) >= 100) {

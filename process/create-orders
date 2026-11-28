@@ -23,4 +23,6 @@ php ../../orders-php/cli.php -d "orders.db" export | tr -d '\r' > "../orders.$TU
 cd .. || exit
 mv orders.dir "orders.dir.$TURN"
 mkdir -p orders.dir
+cd orders.dir
+sqlite3 orders.db < "$ERESSEA/server/etc/migrations/orders.sql"
 

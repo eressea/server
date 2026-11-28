@@ -279,3 +279,4 @@ void register_item_use(int(*foo) (struct unit *,
     const struct item_type *, int, struct order *), const char *name);
 
 void free_resources(void);
+int resource_foreach(int(*callback)(resource_type *, void *), void *udata);
