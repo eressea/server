@@ -14,8 +14,9 @@ UNIT_TESTS="valgrind --quiet --suppressions=$SUPP --error-exitcode=1 --leak-chec
 RUN_TESTS="valgrind --quiet --suppressions=$SUPP --error-exitcode=1 --leak-check=no $RUN_TESTS"
 fi
 
-cd "$ROOT/tests" || exit
-$UNIT_TESTS
+cd "$ROOT" || exit
+$UNIT_TESTS 
+cd "tests" || exit
 $RUN_TESTS -v1 ../scripts/run-tests.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e2.lua
 $RUN_TESTS -v1 ../scripts/run-tests-e3.lua
